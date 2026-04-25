@@ -65,10 +65,8 @@ struct ContentView: View {
 												) {
 													VStack(alignment: .leading) {
 														Image(systemName: c.symbol)
-														
 														Spacer(minLength: 0)
 														Text(c.id)
-//															.lineLimit(2)
 															.fixedSize(horizontal: false, vertical: true)
 															.font(.footnote.scaled(by: 0.9))
 													}
