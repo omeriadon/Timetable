@@ -8,9 +8,8 @@
 import Defaults
 import SwiftUI
 
-enum EditMode {
+enum EditMode: Equatable {
 	case idle
-	case copying(Class)
 	case placing(Class)
 }
 
@@ -29,7 +28,6 @@ struct ContentView: View {
 	@Default(.timetable) var classes
 
 	@State private var mode: EditMode = .idle
-	@State private var clipboard: Class?
 
 	@State private var pendingSlot: Slot?
 	@State private var showingConflict = false
@@ -64,31 +62,40 @@ struct ContentView: View {
 			.padding(.horizontal, 3)
 			.toolbar {
 				ToolbarItem(placement: .topBarLeading) {
-					if case .placing = mode {
-						Button(role: .destructive) {
-							mode = .idle
-							clipboard = nil
-						} label: {
-							Label("Cancel", systemImage: "xmark")
+					Button {
+						if case .placing = mode {
+							withAnimation {
+								mode = .idle
+							}
 						}
+					} label: {
+						Label("Edit", systemImage: "square.and.pencil")
+							.foregroundStyle(
+								mode == EditMode.idle ? .secondary : .primary
+							)
 					}
 				}
 
 				ToolbarItem(placement: .topBarLeading) {
-					if let clipboard, case .placing = mode {
-						Button {
-							deleteClass(clipboard)
-							mode = .idle
-							self.clipboard = nil
-						} label: {
-							Label("Delete", systemImage: "trash")
+					Button {
+						if case .placing(let c) = mode {
+							deleteClass(c)
+							withAnimation {
+								mode = .idle
+							}
 						}
+					} label: {
+						Label("Delete", systemImage: "trash")
+							.foregroundStyle(mode == .idle ? Color.secondary : Color.red)
 					}
+					.disabled(mode == .idle)
 				}
-				ToolbarItem(placement: .title) {
+
+				ToolbarItem(placement: .principal) {
 					Text("PMS Timetable")
 						.monospaced()
 				}
+
 				ToolbarItem(placement: .topBarTrailing) {
 					Button {} label: {
 						Label("Sync", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
@@ -140,8 +147,9 @@ struct ContentView: View {
 						Alert(
 							title: Text(c.id),
 							primaryButton: .default(Text("Copy")) {
-								clipboard = c
-								mode = .placing(c)
+								withAnimation {
+									mode = .placing(c)
+								}
 							},
 							secondaryButton: .cancel()
 						)
