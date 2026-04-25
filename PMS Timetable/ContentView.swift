@@ -67,6 +67,7 @@ struct ContentView: View {
 														Image(systemName: c.symbol)
 														Spacer(minLength: 0)
 														Text(c.id)
+															.lineLimit(2)
 															.fixedSize(horizontal: false, vertical: true)
 															.font(.footnote.scaled(by: 0.9))
 													}
@@ -101,9 +102,9 @@ struct ContentView: View {
 			.toolbar {
 				ToolbarItem(placement: .topBarLeading) {
 					Button {
-						Defaults.reset(.timetable)
+
 					} label: {
-						Label("Reset", systemImage: "arrow.counterclockwise")
+						Label("Edit Classes", systemImage: "pencil")
 					}
 				}
 				ToolbarItem(placement: .title) {
