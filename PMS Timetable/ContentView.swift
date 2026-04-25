@@ -17,7 +17,7 @@ struct ContentView: View {
 		"4",
 		"L",
 		"5",
-		"6"
+		"6",
 	]
 
 	@Default(.timetable) var classes
@@ -43,21 +43,41 @@ struct ContentView: View {
 					}
 					.frame(width: 25)
 
-					ForEach(1..<6) { day in
+					ForEach(0..<5) { day in
 						VStack(spacing: 4) {
-							Text(["Mon", "Tue", "Wed", "Thu", "Fri"][day - 1])
-							ForEach(1..<9) { session in
-								if session == 3 || session == 6 {
+							Text(["Mon", "Tue", "Wed", "Thu", "Fri"][day])
+							ForEach(0..<8) { session in
+								if session == 2 || session == 5 {
 									rectangle(.gray.opacity(0.25), true)
 										.frame(height: 20)
 								} else {
-									if day == 3 && session == 8 || day == 5 && session == 8 {
+									if day == 2 && session == 7 || day == 4 && session == 7 {
 										rectangle(.clear)
 											.frame(height: 60)
 
 									} else {
-										rectangle(.blue)
-											.frame(height: 60)
+										if let c = classFor(day: day, session: session) {
+											rectangle(c.colour.swiftUIColor)
+												.overlay(
+													Image(systemName: c.symbol)
+												)
+												.frame(height: 60)
+
+										} else {
+											RoundedRectangle(cornerRadius: 0)
+												.fill(
+													LinearGradient(
+														stops: [
+															.init(color: .red, location: 0),
+															.init(color: .blue, location: 0.5),
+															.init(color: .red, location: 1),
+														],
+														startPoint: .leading,
+														endPoint: .trailing
+													)
+												)
+												.frame(height: 60)
+										}
 									}
 								}
 							}
@@ -68,6 +88,14 @@ struct ContentView: View {
 			}
 			.padding(.horizontal, 3)
 			.toolbar {
+
+				ToolbarItem(placement: .topBarLeading) {
+					Button {
+						Defaults.reset(.timetable)
+					} label: {
+						Label("Reset", systemImage: "arrow.counterclockwise")
+					}
+				}
 				ToolbarItem(placement: .title) {
 					Text("PMS Timetable")
 						.monospaced()
