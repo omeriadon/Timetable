@@ -10,7 +10,7 @@ import SwiftUI
 
 enum EditMode: Equatable {
 	case idle
-	case placing(Class)
+	case placing(String)
 }
 
 struct ContentView: View {
@@ -78,8 +78,10 @@ struct ContentView: View {
 
 				ToolbarItem(placement: .topBarLeading) {
 					Button {
-						if case .placing(let c) = mode {
-							deleteClass(c)
+						if case .placing(let c) = mode,
+						   let classToDelete = classById(c)
+						{
+							deleteClass(classToDelete)
 							withAnimation {
 								mode = .idle
 							}
@@ -148,14 +150,16 @@ struct ContentView: View {
 							title: Text(c.id),
 							primaryButton: .default(Text("Copy")) {
 								withAnimation {
-									mode = .placing(c)
+									mode = .placing(c.id)
 								}
 							},
 							secondaryButton: .cancel()
 						)
 					}
 					.onTapGesture {
-						guard case .placing(let c) = mode else {
+						guard case .placing(let id) = mode,
+						      let c = classById(id)
+						else {
 							showEditPopover = c
 							return
 						}
@@ -172,9 +176,10 @@ struct ContentView: View {
 					.alert("Overwrite slot?", isPresented: $showingConflict) {
 						Button("Replace", role: .destructive) {
 							if let slot = pendingSlot,
-							   case .placing(let c) = mode
+							   case .placing(let c) = mode,
+							   let classToOverwrite = classById(c)
 							{
-								place(c, at: slot)
+								place(classToOverwrite, at: slot)
 							}
 
 							pendingSlot = nil
@@ -221,6 +226,10 @@ struct ContentView: View {
 		if let i = classes.firstIndex(where: { $0.id == c.id }) {
 			classes[i].slots.append(slot)
 		}
+	}
+
+	func classById(_ id: String) -> Class? {
+		classes.first { $0.id == id }
 	}
 }
 
