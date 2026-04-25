@@ -20,13 +20,13 @@ struct ContentView: View {
 		"6"
 	]
 
-	@Default(.timetable) var timetable
+	@Default(.timetable) var classes
 
 	var body: some View {
 		NavigationStack {
 			VStack {
-				HStack(spacing: 5) {
-					VStack(spacing: 5) {
+				HStack(spacing: 4) {
+					VStack(spacing: 4) {
 						Text("")
 
 						ForEach(Array(sessions.enumerated()), id: \.offset) { _, session in
@@ -44,11 +44,11 @@ struct ContentView: View {
 					.frame(width: 25)
 
 					ForEach(1..<6) { day in
-						VStack(spacing: 5) {
+						VStack(spacing: 4) {
 							Text(["Mon", "Tue", "Wed", "Thu", "Fri"][day - 1])
 							ForEach(1..<9) { session in
 								if session == 3 || session == 6 {
-									rectangle(.gray.opacity(0.5), true)
+									rectangle(.gray.opacity(0.25), true)
 										.frame(height: 20)
 								} else {
 									if day == 3 && session == 8 || day == 5 && session == 8 {
@@ -66,7 +66,7 @@ struct ContentView: View {
 				}
 				Spacer()
 			}
-			.padding(5)
+			.padding(.horizontal, 3)
 			.toolbar {
 				ToolbarItem(placement: .title) {
 					Text("PMS Timetable")
@@ -83,6 +83,14 @@ struct ContentView: View {
 		}
 		.environment(\.dynamicTypeSize, .xSmall)
 		.monospaced()
+	}
+
+	func classFor(day: Int, session: Int) -> Class? {
+		classes.first { c in
+			c.slots.contains {
+				$0.day == day && $0.session == session
+			}
+		}
 	}
 }
 
