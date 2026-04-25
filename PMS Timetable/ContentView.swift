@@ -20,6 +20,8 @@ struct ContentView: View {
 		"6"
 	]
 
+	@Default(.timetable) var timetable
+
 	var body: some View {
 		NavigationStack {
 			VStack {
