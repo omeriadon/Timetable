@@ -57,10 +57,23 @@ struct ContentView: View {
 
 									} else {
 										if let c = classFor(day: day, session: session) {
-											rectangle(c.colour.swiftUIColor)
+											rectangle(
+												c.colour.swiftUIColor.opacity(0.8)
+											)
 												.overlay(
-													Image(systemName: c.symbol)
-												)
+													alignment: .leading
+												) {
+													VStack(alignment: .leading) {
+														Image(systemName: c.symbol)
+														
+														Spacer(minLength: 0)
+														Text(c.id)
+//															.lineLimit(2)
+															.fixedSize(horizontal: false, vertical: true)
+															.font(.footnote.scaled(by: 0.9))
+													}
+													.padding(5)
+												}
 												.frame(height: 60)
 
 										} else {
@@ -88,7 +101,6 @@ struct ContentView: View {
 			}
 			.padding(.horizontal, 3)
 			.toolbar {
-
 				ToolbarItem(placement: .topBarLeading) {
 					Button {
 						Defaults.reset(.timetable)
@@ -100,7 +112,6 @@ struct ContentView: View {
 					Text("PMS Timetable")
 						.monospaced()
 				}
-
 				ToolbarItem(placement: .topBarTrailing) {
 					Button {} label: {
 						Label("Sync", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
@@ -108,6 +119,7 @@ struct ContentView: View {
 					.buttonStyle(.glassProminent)
 				}
 			}
+			.navigationBarTitleDisplayMode(.inline)
 		}
 		.environment(\.dynamicTypeSize, .xSmall)
 		.monospaced()
