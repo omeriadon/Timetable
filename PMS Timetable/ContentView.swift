@@ -9,6 +9,17 @@ import Defaults
 import SwiftUI
 
 struct ContentView: View {
+	let sessions = [
+		"1",
+		"2",
+		"R",
+		"3",
+		"4",
+		"L",
+		"5",
+		"6"
+	]
+
 	var body: some View {
 		NavigationStack {
 			VStack {
@@ -16,17 +27,17 @@ struct ContentView: View {
 					VStack(spacing: 5) {
 						Text("")
 
-						ForEach(1..<9) { session in
-							if session == 3 {
-								Text("R")
-							} else if session == 6 {
-								Text("L")
-							}
-							else {
-								Text("S\(session)")
+						ForEach(Array(sessions.enumerated()), id: \.offset) { _, session in
+							if session == "R" || session == "L" {
+								Text(session)
+									.frame(height: 20)
+									.foregroundStyle(.secondary)
+							} else {
+								Text(session)
 									.frame(height: 60)
 							}
 						}
+						.frame(width: 25)
 					}
 					.frame(width: 25)
 
@@ -38,8 +49,14 @@ struct ContentView: View {
 									rectangle(.gray.opacity(0.5), true)
 										.frame(height: 20)
 								} else {
-									rectangle(.blue)
-										.frame(height: 60)
+									if day == 3 && session == 8 || day == 5 && session == 8 {
+										rectangle(.clear)
+											.frame(height: 60)
+
+									} else {
+										rectangle(.blue)
+											.frame(height: 60)
+									}
 								}
 							}
 						}
