@@ -30,6 +30,11 @@ struct SlotConflict {
 	let secondClassName: String
 }
 
+enum EditorRequest {
+	case allClasses(focus: String?)
+	case emptySlot(EditableSlot)
+}
+
 struct ContentView: View {
 	let sessions = [
 		"1",
@@ -45,6 +50,8 @@ struct ContentView: View {
 	@Default(.timetable) var classes
 
 	@State private var showingEditor = false
+	@State private var editorRequest: EditorRequest?
+	@State private var editorReady = false
 	@State private var draftClasses: [EditableClass] = []
 	@State private var editorPage = 0
 	@State private var pendingPrefillSlot: EditableSlot?
@@ -82,7 +89,7 @@ struct ContentView: View {
 					Button {
 						openEditor()
 					} label: {
-						Label("Edit", systemImage: "square.and.pencil")
+						Label("Edit", systemImage: "pencil")
 					}
 				}
 
@@ -106,6 +113,9 @@ struct ContentView: View {
 			editorSheet
 				.presentationDetents([.fraction(0.8)])
 				.presentationDragIndicator(.visible)
+				.onAppear {
+					prepareEditor()
+				}
 		}
 		.alert(
 			"Slot Conflict",
@@ -159,16 +169,23 @@ struct ContentView: View {
 
 	var editorSheet: some View {
 		NavigationStack {
-			TabView(selection: $editorPage) {
-				ForEach(draftClasses.indices, id: \.self) { index in
-					classEditorPage(index: index)
-						.tag(index)
+			Group {
+				if editorReady {
+					TabView(selection: $editorPage) {
+						ForEach(draftClasses.indices, id: \.self) { index in
+							classEditorPage(index: index)
+								.tag(index)
+						}
+						addClassPage
+							.tag(draftClasses.count)
+					}
+					.tabViewStyle(.page(indexDisplayMode: .always))
+					.animation(.snappy, value: draftClasses.count)
+				} else {
+					ProgressView()
+						.frame(maxWidth: .infinity, maxHeight: .infinity)
 				}
-				addClassPage
-					.tag(draftClasses.count)
 			}
-			.tabViewStyle(.page(indexDisplayMode: .always))
-			.animation(.snappy, value: draftClasses.count)
 			.navigationTitle("Edit Timetable")
 			.navigationBarTitleDisplayMode(.inline)
 			.toolbar {
@@ -192,27 +209,54 @@ struct ContentView: View {
 	@State private var myColor: AvailableColors = .blue
 
 	func classEditorPage(index: Int) -> some View {
-		VStack(spacing: 12) {
-			TextField("Class Name", text: $draftClasses[index].name)
-				.font(.title)
-				.textFieldStyle(.plain)
-				.padding(10)
-				.padding(.leading, 8)
-				.glassEffect(.clear, in: Capsule())
+		VStack(spacing: 25) {
+			GlassEffectContainer(spacing: 20) {
+				HStack {
+					TextField("Class Name", text: $draftClasses[index].name)
+						.font(.title)
+						.textFieldStyle(.plain)
+						.padding(10)
+						.padding(.leading, 8)
+						.glassEffect(
+							.clear.tint(draftClasses[index].color).interactive(),
+							in: Capsule()
+						)
+					
+					Button(role: .destructive) {
+						withAnimation {
+							deleteClass(at: index)
+						}
+					} label: {
+						Label("Delete Class", systemImage: "trash")
+							.font(.title)
+							.padding(10)
+							.labelStyle(.iconOnly)
+					}
+					.buttonStyle(.plain)
+					.buttonBorderShape(.circle)
+					.glassEffect(.clear.tint(.red).interactive(), in: Circle())
+				}
+			}
+			.padding(.horizontal, 32)
+
 
 			Button {
 				isPresented.toggle()
 			} label: {
 				HStack {
 					Text("Select Symbol")
+						.padding(.leading, 10)
+						.foregroundStyle(.white)
 					Spacer()
 					Image(systemName: icon)
 						.sheet(isPresented: $isPresented, content: {
 							SymbolsPicker(selection: $icon, title: "Select Symbol", autoDismiss: true)
 						}).padding()
 				}
+				.font(.title3)
+				.glassEffect(.clear, in: Capsule())
 			}
-			.buttonStyle(.glass)
+			.padding(.horizontal, 32)
 
 			InlineColorPicker(
 				selectedColor: Binding<AvailableColors>(
@@ -224,25 +268,12 @@ struct ContentView: View {
 					}
 				)
 			)
-
-			HStack {
-				Text("Slots")
-					.font(.headline)
-				Spacer()
-				Button {
-					withAnimation {
-						addSlot(to: index)
-					}
-				} label: {
-					Label("Add Slot", systemImage: "plus")
-				}
-				.disabled(draftClasses[index].slots.count >= 4)
-			}
+			.padding(.horizontal, 32)
 
 			List {
 				ForEach($draftClasses[index].slots) { $slot in
 					HStack {
-						Picker("Day", selection: $slot.day) {
+						Picker("Day:", selection: $slot.day) {
 							ForEach(0..<5, id: \.self) { day in
 								Text(dayLabel(day)).tag(day)
 							}
@@ -254,9 +285,9 @@ struct ContentView: View {
 							}
 						}
 
-						Spacer()
+						Spacer(minLength: 120)
 
-						Picker("Period", selection: $slot.period) {
+						Picker("Period:", selection: $slot.period) {
 							ForEach(allowedPeriods(for: slot.day), id: \.self) { period in
 								Text("\(period)").tag(period)
 							}
@@ -270,19 +301,9 @@ struct ContentView: View {
 					}
 				}
 			}
+			.scrollDisabled(true)
 			.animation(.default, value: draftClasses[index].slots)
-
-			Button(role: .destructive) {
-				withAnimation {
-					deleteClass(at: index)
-				}
-			} label: {
-				Label("Delete Class", systemImage: "trash")
-					.padding(10)
-			}
-			.buttonStyle(.glass)
 		}
-		.padding(.horizontal, 32)
 	}
 
 	var addClassPage: some View {
@@ -372,36 +393,84 @@ struct ContentView: View {
 	}
 
 	func openEditor(focusingClassName className: String? = nil) {
-		draftClasses = classes.map { original in
-			EditableClass(
-				originalName: original.id,
-				name: original.id,
-				symbol: original.symbol,
-				color: original.colour.swiftUIColor,
-				slots: original.slots.compactMap { slot in
-					guard let period = periodForSession(slot.session) else { return nil }
-					return EditableSlot(day: slot.day, period: period)
-				}
-			)
-		}
-		pendingPrefillSlot = nil
-
-		if let className,
-		   let index = draftClasses.firstIndex(where: { $0.name == className || $0.originalName == className })
-		{
-			editorPage = index
-		} else {
-			editorPage = 0
-		}
-
-		showingEditor = true
+		editorRequest = .allClasses(focus: className)
+		presentEditor()
 	}
 
 	func openEditorForEmptySlot(day: Int, session: Int) {
 		guard let prefill = editableSlot(fromDay: day, session: session) else { return }
-		openEditor()
-		pendingPrefillSlot = prefill
-		editorPage = draftClasses.count
+		editorRequest = .emptySlot(prefill)
+		presentEditor()
+	}
+
+	func presentEditor() {
+		if showingEditor { return }
+		DispatchQueue.main.async {
+			showingEditor = true
+		}
+	}
+
+	func prepareEditor() {
+		editorReady = false
+
+		switch editorRequest {
+		case .allClasses(let focus):
+			draftClasses = classes.map { original in
+				EditableClass(
+					originalName: original.id,
+					name: original.id,
+					symbol: original.symbol,
+					color: original.colour.swiftUIColor,
+					slots: original.slots.compactMap { slot in
+						guard let period = periodForSession(slot.session) else { return nil }
+						return EditableSlot(day: slot.day, period: period)
+					}
+				)
+			}
+			pendingPrefillSlot = nil
+
+			if let focus,
+			   let index = draftClasses.firstIndex(where: { $0.name == focus || $0.originalName == focus })
+			{
+				editorPage = index
+			} else {
+				editorPage = 0
+			}
+
+		case .emptySlot(let prefill):
+			draftClasses = classes.map { original in
+				EditableClass(
+					originalName: original.id,
+					name: original.id,
+					symbol: original.symbol,
+					color: original.colour.swiftUIColor,
+					slots: original.slots.compactMap { slot in
+						guard let period = periodForSession(slot.session) else { return nil }
+						return EditableSlot(day: slot.day, period: period)
+					}
+				)
+			}
+			pendingPrefillSlot = prefill
+			editorPage = draftClasses.count
+
+		case nil:
+			draftClasses = classes.map { original in
+				EditableClass(
+					originalName: original.id,
+					name: original.id,
+					symbol: original.symbol,
+					color: original.colour.swiftUIColor,
+					slots: original.slots.compactMap { slot in
+						guard let period = periodForSession(slot.session) else { return nil }
+						return EditableSlot(day: slot.day, period: period)
+					}
+				)
+			}
+			editorPage = 0
+			pendingPrefillSlot = nil
+		}
+
+		editorReady = true
 	}
 
 	func validateAndSave() {
