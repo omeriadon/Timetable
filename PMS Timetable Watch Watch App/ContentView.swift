@@ -21,10 +21,14 @@ struct ContentView: View {
 	var body: some View {
 		NavigationStack {
 			VStack {
-				Text("PMS Timetable")
-					.fontWeight(.black)
-					.fontWidth(.expanded)
-					.font(.footnote)
+				HStack {
+					Text("PMS Timetable")
+						.padding(.leading)
+						.fontWeight(.black)
+						.fontWidth(.expanded)
+						.font(.footnote)
+					Spacer()
+				}
 				HStack(spacing: 2) {
 					VStack(spacing: 2) {
 						Text("")
@@ -70,7 +74,7 @@ struct ContentView: View {
 			VStack(spacing: 2) {
 				Text(["Mon", "Tue", "Wed", "Thu", "Fri"][day])
 					.font(.footnote.scaled(by: 0.8))
-					.frame(height: 25)
+					.frame(height: 20)
 				ForEach(0 ..< 8) { session in
 					sessionCell(day, session)
 				}
@@ -97,11 +101,13 @@ struct ContentView: View {
 						c.colour.swiftUIColor.opacity(0.8)
 					) {
 						Image(systemName: c.symbol)
+							.imageScale(.small)
+							.font(.footnote.scaled(by: 0.7))
 						Spacer(minLength: 0)
 						Text(c.id)
 							.lineLimit(2)
 							.fixedSize(horizontal: false, vertical: true)
-							.font(.footnote.scaled(by: 0.9))
+							.font(.footnote.scaled(by: 0.5))
 					}
 					.frame(height: 25)
 
@@ -192,11 +198,6 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 		handleIncomingPayload(applicationContext, source: "applicationContext")
 	}
 
-	func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
-		print("[Watch] didReceiveMessage")
-		handleIncomingPayload(message, source: "didReceiveMessage")
-	}
-
 	private func handleIncomingPayload(_ payload: [String: Any], source: String) {
 		if let payloadError = payload["error"] as? String {
 			print("[Watch] Payload error from \(source): \(payloadError)")
@@ -280,10 +281,10 @@ struct rectangle<Content: View>: View {
 			content
 				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
 		}
-		.padding(5)
+		.padding(2)
 		.glassEffect(
-			!isBreak ? .clear.tint(fill) : .identity,
-			in: RoundedRectangle(cornerRadius: isBreak ? 1 : 2)
+			!isBreak ? .clear.tint(fill).interactive() : .identity,
+			in: RoundedRectangle(cornerRadius: isBreak ? 1 : 4)
 		)
 	}
 }

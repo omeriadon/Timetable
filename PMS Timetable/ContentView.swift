@@ -771,23 +771,8 @@ final class PhoneWatchSyncBridge: NSObject, ObservableObject, WCSessionDelegate 
 			"updatedAt": Date().timeIntervalSince1970,
 		]
 
-		let session = WCSession.default
-		try session.updateApplicationContext(payload)
+		try WCSession.default.updateApplicationContext(payload)
 		print("[iOS] updateApplicationContext sent")
-
-		if session.isReachable {
-			print("[iOS] Watch reachable, sending immediate message")
-			session.sendMessage(payload, replyHandler: { reply in
-				print("[iOS] Watch reply: \(reply)")
-			}, errorHandler: { [weak self] error in
-				print("[iOS] sendMessage error: \(error.localizedDescription)")
-				DispatchQueue.main.async {
-					self?.lastError = "Live send failed: \(error.localizedDescription)"
-				}
-			})
-		} else {
-			print("[iOS] Watch not reachable. Will deliver via application context.")
-		}
 	}
 
 	func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
@@ -809,26 +794,6 @@ final class PhoneWatchSyncBridge: NSObject, ObservableObject, WCSessionDelegate 
 		session.activate()
 	}
 
-	func session(
-		_ session: WCSession,
-		didReceiveMessage message: [String: Any],
-		replyHandler: @escaping ([String: Any]) -> Void
-	) {
-		guard (message["requestSync"] as? Bool) == true else { return }
-		print("[iOS] Watch requested sync (reply handler)")
-
-		do {
-			let data = try JSONEncoder().encode(latestClasses)
-			replyHandler([
-				"timetableData": data,
-				"updatedAt": Date().timeIntervalSince1970,
-			])
-			print("[iOS] Sent \(latestClasses.count) classes in reply")
-		} catch {
-			replyHandler(["error": error.localizedDescription])
-			print("[iOS] Failed to encode reply payload: \(error.localizedDescription)")
-		}
-	}
 }
 
 struct rectangle<Content: View>: View {
@@ -859,7 +824,7 @@ struct rectangle<Content: View>: View {
 		}
 		.padding(5)
 		.glassEffect(
-			!isBreak ? .clear.tint(fill) : .identity,
+			!isBreak ? .clear.tint(fill).interactive() : .identity,
 			in: RoundedRectangle(cornerRadius: isBreak ? 8 : 10)
 		)
 	}
