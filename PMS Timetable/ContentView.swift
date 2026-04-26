@@ -223,10 +223,6 @@ struct ContentView: View {
 			}
 			.navigationBarTitleDisplayMode(.inline)
 			.toolbar {
-				ToolbarItem(placement: .title) {
-					Text("Edit Timetable")
-						.monospaced()
-				}
 				ToolbarItem(placement: .cancellationAction) {
 					Button("Cancel", systemImage: "xmark") {
 						showingEditor = false
