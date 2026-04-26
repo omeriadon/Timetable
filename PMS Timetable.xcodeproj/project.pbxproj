@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		2A02379B2F9C907000AB1E1F /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2A02379A2F9C907000AB1E1F /* Defaults */; };
 		2A02379D2F9C907000AB1E1F /* DefaultsMacros in Frameworks */ = {isa = PBXBuildFile; productRef = 2A02379C2F9C907000AB1E1F /* DefaultsMacros */; };
+		2A0237AC2F9D9DE800AB1E1F /* SFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 2A0237AB2F9D9DE800AB1E1F /* SFSymbolsPicker */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2A02379B2F9C907000AB1E1F /* Defaults in Frameworks */,
+				2A0237AC2F9D9DE800AB1E1F /* SFSymbolsPicker in Frameworks */,
 				2A02379D2F9C907000AB1E1F /* DefaultsMacros in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -81,6 +83,7 @@
 			packageProductDependencies = (
 				2A02379A2F9C907000AB1E1F /* Defaults */,
 				2A02379C2F9C907000AB1E1F /* DefaultsMacros */,
+				2A0237AB2F9D9DE800AB1E1F /* SFSymbolsPicker */,
 			);
 			productName = "PMS Timetable";
 			productReference = 2A02378B2F9C8EA000AB1E1F /* PMS Timetable.app */;
@@ -112,6 +115,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */,
+				2A0237AA2F9D9DE800AB1E1F /* XCLocalSwiftPackageReference "../../../Downloads/SFSymbolsPickerForSwiftUI-main" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2A02378C2F9C8EA000AB1E1F /* Products */;
@@ -352,6 +356,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		2A0237AA2F9D9DE800AB1E1F /* XCLocalSwiftPackageReference "../../../Downloads/SFSymbolsPickerForSwiftUI-main" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../../Downloads/SFSymbolsPickerForSwiftUI-main";
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -373,6 +384,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = DefaultsMacros;
+		};
+		2A0237AB2F9D9DE800AB1E1F /* SFSymbolsPicker */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SFSymbolsPicker;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
