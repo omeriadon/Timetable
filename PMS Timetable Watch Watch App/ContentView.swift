@@ -60,6 +60,13 @@ struct ContentView: View {
 		.onAppear {
 			print("[Watch] ContentView appeared")
 			syncStore.activateIfNeeded()
+			// Pre-build lookup table in background so first click doesn't hang
+			Task {
+				if !syncStore.classes.isEmpty {
+					syncStore.buildLookupTable(syncStore.classes)
+					print("[Watch] Pre-built lookup table on appear")
+				}
+			}
 		}
 		.onChange(of: syncStore.alertMessage) { _, newValue in
 			guard let newValue else { return }
@@ -161,7 +168,9 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 
 	override init() {
 		super.init()
-		loadFromCache()
+		// Load from cache synchronously for initial state
+		// Dictionary will be built on first appear to avoid blocking UI
+		classes = loadClassesFromCache()
 	}
 
 	func activateIfNeeded() {
@@ -229,6 +238,22 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 		}
 	}
 
+	private func loadClassesFromCache() -> [Class] {
+		guard let data = UserDefaults.standard.data(forKey: cacheKey) else {
+			print("[Watch] No cached timetable found")
+			return []
+		}
+
+		do {
+			let decoded = try JSONDecoder().decode([Class].self, from: data)
+			print("[Watch] Loaded \(decoded.count) classes from local cache")
+			return decoded
+		} catch {
+			print("[Watch] Failed to load cache: \(error.localizedDescription)")
+			return []
+		}
+	}
+
 	private func loadFromCache() {
 		guard let data = UserDefaults.standard.data(forKey: cacheKey) else {
 			print("[Watch] No cached timetable found")
@@ -245,7 +270,7 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 		}
 	}
 	
-	private func buildLookupTable(_ classesArray: [Class]) {
+	func buildLookupTable(_ classesArray: [Class]) {
 		var lookup: [String: Class] = [:]
 		for c in classesArray {
 			for slot in c.slots {

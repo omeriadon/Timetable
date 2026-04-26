@@ -168,6 +168,10 @@ struct ContentView: View {
 				.onAppear {
 					prepareEditor()
 				}
+				.onDisappear {
+					editorRequest = nil
+					editorReady = false
+				}
 		}
 		.alert(
 			"Slot Conflict",
