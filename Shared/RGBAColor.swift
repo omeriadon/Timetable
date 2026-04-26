@@ -18,6 +18,20 @@ struct RGBAColor: Codable, Hashable, Defaults.Serializable {
 		Color(red: r, green: g, blue: b, opacity: a)
 	}
 
+	init(r: Double, g: Double, b: Double, a: Double) {
+		self.r = r
+		self.g = g
+		self.b = b
+		self.a = a
+	}
+
+	init(red: Double, green: Double, blue: Double, alpha: Double) {
+		self.r = red
+		self.g = green
+		self.b = blue
+		self.a = alpha
+	}
+
 	init(color: Color) {
 		let ui = UIColor(color)
 

@@ -8,6 +8,7 @@
 import Combine
 import SwiftUI
 import WatchConnectivity
+import WidgetKit
 
 struct ContentView: View {
 	@StateObject private var syncStore = WatchTimetableSyncStore()
@@ -159,18 +160,26 @@ struct ContentView: View {
 
 final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelegate {
 	@Published var classes: [Class] = []
+	@Published var displayMode: DisplayMode = .symbolsOnly
 	@Published var alertMessage: String?
 	
 	var classLookup: [String: Class] = [:]
 
 	private var isActivated = false
 	private let cacheKey = "watchTimetableCache"
+	private let displayModeKey = "watchDisplayMode"
+	private let appGroupID = "group.com.omeriadon.pms-timetable"
+
+	private var sharedDefaults: UserDefaults {
+		UserDefaults(suiteName: appGroupID) ?? UserDefaults.standard
+	}
 
 	override init() {
 		super.init()
 		// Load from cache synchronously for initial state
 		// Dictionary will be built on first appear to avoid blocking UI
 		classes = loadClassesFromCache()
+		loadDisplayModeFromCache()
 	}
 
 	func activateIfNeeded() {
@@ -224,12 +233,25 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 			let decoded = try JSONDecoder().decode([Class].self, from: data)
 			print("[Watch] Decoded \(decoded.count) classes from \(source)")
 
+			var mode = DisplayMode.symbolsOnly
+			if let modeData = payload["displayMode"] as? Data {
+				do {
+					mode = try JSONDecoder().decode(DisplayMode.self, from: modeData)
+					print("[Watch] Decoded displayMode: \(mode.rawValue)")
+				} catch {
+					print("[Watch] Failed to decode displayMode: \(error)")
+				}
+			}
+
 			DispatchQueue.main.async {
 				self.classes = decoded
+				self.displayMode = mode
 				self.buildLookupTable(decoded)
 				self.saveToCache(decoded)
-				print("[Watch] ✓ UI updated with \(decoded.count) classes")
+				self.saveDisplayModeToCache(mode)
+				print("[Watch] ✓ UI updated with \(decoded.count) classes and displayMode: \(mode.rawValue)")
 			}
+			WidgetCenter.shared.reloadAllTimelines()
 		} catch {
 			print("[Watch] Failed to decode payload from \(source): \(error.localizedDescription)")
 			DispatchQueue.main.async {
@@ -239,14 +261,15 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 	}
 
 	private func loadClassesFromCache() -> [Class] {
-		guard let data = UserDefaults.standard.data(forKey: cacheKey) else {
+		guard let data = sharedDefaults.data(forKey: cacheKey) else {
 			print("[Watch] No cached timetable found")
 			return []
 		}
 
 		do {
 			let decoded = try JSONDecoder().decode([Class].self, from: data)
-			print("[Watch] Loaded \(decoded.count) classes from local cache")
+			print("[Watch] Loaded \(decoded.count) classes from shared cache")
+			WidgetCenter.shared.reloadAllTimelines()
 			return decoded
 		} catch {
 			print("[Watch] Failed to load cache: \(error.localizedDescription)")
@@ -255,7 +278,7 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 	}
 
 	private func loadFromCache() {
-		guard let data = UserDefaults.standard.data(forKey: cacheKey) else {
+		guard let data = sharedDefaults.data(forKey: cacheKey) else {
 			print("[Watch] No cached timetable found")
 			return
 		}
@@ -264,7 +287,8 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 			let decoded = try JSONDecoder().decode([Class].self, from: data)
 			classes = decoded
 			buildLookupTable(decoded)
-			print("[Watch] Loaded \(decoded.count) classes from local cache")
+			print("[Watch] Loaded \(decoded.count) classes from shared cache")
+			WidgetCenter.shared.reloadAllTimelines()
 		} catch {
 			print("[Watch] Failed to load cache: \(error.localizedDescription)")
 		}
@@ -285,10 +309,39 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 	private func saveToCache(_ classes: [Class]) {
 		do {
 			let data = try JSONEncoder().encode(classes)
-			UserDefaults.standard.set(data, forKey: cacheKey)
-			print("[Watch] Cached timetable locally: \(data.count) bytes")
+			sharedDefaults.set(data, forKey: cacheKey)
+			print("[Watch] Cached timetable to shared storage: \(data.count) bytes")
 		} catch {
 			print("[Watch] Failed to cache timetable: \(error.localizedDescription)")
+		}
+	}
+
+	private func loadDisplayModeFromCache() {
+		guard let data = sharedDefaults.data(forKey: displayModeKey) else {
+			print("[Watch] No cached displayMode found, using default")
+			displayMode = .symbolsOnly
+			return
+		}
+
+		do {
+			let decoded = try JSONDecoder().decode(DisplayMode.self, from: data)
+			displayMode = decoded
+			print("[Watch] Loaded displayMode from shared cache: \(decoded.rawValue)")
+			WidgetCenter.shared.reloadAllTimelines()
+		} catch {
+			print("[Watch] Failed to load displayMode cache: \(error.localizedDescription)")
+			displayMode = .symbolsOnly
+		}
+	}
+
+	private func saveDisplayModeToCache(_ mode: DisplayMode) {
+		do {
+			let data = try JSONEncoder().encode(mode)
+			sharedDefaults.set(data, forKey: displayModeKey)
+			print("[Watch] Cached displayMode to shared storage: \(mode.rawValue)")
+			WidgetCenter.shared.reloadAllTimelines()
+		} catch {
+			print("[Watch] Failed to cache displayMode: \(error.localizedDescription)")
 		}
 	}
 }

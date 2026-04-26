@@ -54,6 +54,7 @@ struct ContentView: View {
 	]
 
 	@Default(.timetable) var classes
+	@Default(.displayMode) var displayMode
 
 	@State private var showingEditor = false
 	@State private var editorRequest: EditorRequest?
@@ -90,7 +91,41 @@ struct ContentView: View {
 
 					mainContent
 				}
-				Spacer()
+
+				Spacer(minLength: 1)
+
+				VStack {
+					Spacer()
+					HStack {
+						Spacer()
+
+					Picker("Display", selection: $displayMode) {
+						Text("Symbols").tag(DisplayMode.symbolsOnly)
+						Text("Text").tag(DisplayMode.textOnly)
+					}
+					.pickerStyle(.segmented)
+					.frame(maxWidth: 200)
+					.onChange(of: displayMode) { _, _ in
+						Task {
+							await syncToWatchAsync()
+						}
+					}
+
+						Spacer()
+					}
+					Spacer()
+				}
+				.padding(10)
+				.glassEffect(
+					.regular.tint(.blue).interactive(),
+					in: ConcentricRectangle(
+						corners: .concentric,
+						isUniform: true
+					)
+				)
+				.padding(.top)
+				.padding(13)
+				.ignoresSafeArea()
 			}
 			.padding(.horizontal, 3)
 			.toolbar {
@@ -724,7 +759,7 @@ struct ContentView: View {
 		print("[iOS] Starting WatchConnectivity sync...")
 
 		do {
-			try watchSync.pushTimetable(classes)
+			try watchSync.pushTimetable(classes, displayMode: displayMode)
 			print("[iOS] ✓ Sync request sent to watch")
 
 			let elapsed = Date().timeIntervalSince(startedAt)
@@ -773,7 +808,7 @@ final class PhoneWatchSyncBridge: NSObject, ObservableObject, WCSessionDelegate 
 		print("[iOS] Updated latest classes snapshot: \(classes.count) classes")
 	}
 
-	func pushTimetable(_ classes: [Class]) throws {
+	func pushTimetable(_ classes: [Class], displayMode: DisplayMode) throws {
 		activateIfNeeded()
 		latestClasses = classes
 
@@ -781,13 +816,16 @@ final class PhoneWatchSyncBridge: NSObject, ObservableObject, WCSessionDelegate 
 		let data = try JSONEncoder().encode(classes)
 		print("[iOS] Encoded successfully: \(data.count) bytes")
 
+		let displayModeData = try JSONEncoder().encode(displayMode)
+
 		let payload: [String: Any] = [
 			"timetableData": data,
+			"displayMode": displayModeData,
 			"updatedAt": Date().timeIntervalSince1970,
 		]
 
 		try WCSession.default.updateApplicationContext(payload)
-		print("[iOS] updateApplicationContext sent")
+		print("[iOS] updateApplicationContext sent with displayMode: \(displayMode.rawValue)")
 	}
 
 	func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
@@ -868,6 +906,6 @@ func closestColor(to color: Color) -> AvailableColors {
 	})!
 }
 
-// #Preview {
-//	ContentView()
-// }
+#Preview {
+	ContentView()
+}
