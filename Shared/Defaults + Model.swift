@@ -9,30 +9,25 @@ import SwiftUI
 import Defaults
 
 extension Defaults.Keys {
-static let timetable = Key<[Class]>("timetable", default: defaultTimetable)
-static let watchTimetable = Key<[Class]>("watchTimetable", default: defaultTimetable)
+	static let timetable = Key<[Class]>("timetable", default: defaultTimetable)
 }
 
 // array of class
 // class = name + what slots + colour + symbol
 
 struct Class: Hashable, Codable, Defaults.Serializable, Identifiable {
-
-var id: String
-
-var symbol: String
-
-var colour: RGBAColor
-
-var slots: [Slot]
+	var id: String
+	var symbol: String
+	var colour: RGBAColor
+	var slots: [Slot]
 }
 
 struct Slot: Hashable, Codable, Defaults.Serializable {
-let day: Int
-let session: Int
+	let day: Int
+	let session: Int
 
-init(_ day: Int, _ session: Int) {
-self.day = day
-self.session = session
-}
+	init(_ day: Int, _ session: Int) {
+		self.day = day
+		self.session = session
+	}
 }

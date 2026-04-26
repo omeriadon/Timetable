@@ -5,9 +5,11 @@
 //  Created by Adon Omeri on 25/4/2026.
 //
 
+import Combine
 import Defaults
 import SFSymbolsPicker
 import SwiftUI
+import WatchConnectivity
 
 struct EditableSlot: Identifiable, Hashable {
 	let id = UUID()
@@ -58,9 +60,9 @@ struct ContentView: View {
 	@State private var pendingConflict: SlotConflict?
 	@State private var validationMessage: String?
 	@State private var isPresented = false
-@State private var isSyncing = false
-@State private var syncError: String?
-@State private var showSyncError = false
+	@State private var isSyncing = false
+	@State private var showSyncErrorIcon = false
+	@StateObject private var watchSync = PhoneWatchSyncBridge()
 
 	var body: some View {
 		NavigationStack {
@@ -103,41 +105,45 @@ struct ContentView: View {
 				}
 
 				ToolbarItem(placement: .topBarTrailing) {
-				Button {
-					Task { await syncToWatchAsync() }
-				} label: {
-					if isSyncing {
-						ProgressView()
-							.scaleEffect(0.8)
-							.transition(.opacity.combined(with: .scale))
-					} else {
-						Label("Sync", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
-							.transition(.opacity.combined(with: .scale))
+					Button {
+						Task { await syncToWatchAsync() }
+					} label: {
+						if isSyncing {
+							ProgressView()
+								.scaleEffect(0.8)
+								.transition(.blurReplace)
+						} else if showSyncErrorIcon {
+							Image(systemName: "exclamationmark.triangle.fill")
+								.foregroundStyle(.yellow)
+								.transition(.blurReplace)
+						} else {
+							Label("Sync", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
+								.transition(.blurReplace)
+						}
 					}
-				}
-				.buttonStyle(.glassProminent)
-				.disabled(isSyncing)
-				.animation(.easeInOut(duration: 0.2), value: isSyncing)
+					.buttonStyle(.glassProminent)
+					.disabled(isSyncing)
+					.animation(.snappy, value: isSyncing)
 				}
 			}
 			.navigationBarTitleDisplayMode(.inline)
 		}
 		.environment(\.dynamicTypeSize, .xSmall)
 		.monospaced()
-		.alert(
-"Sync Error",
-isPresented: $showSyncError,
-actions: {
-Button("OK", role: .cancel) {
-syncError = nil
-showSyncError = false
-}
-},
-message: {
-Text(syncError ?? "Unknown error")
-}
-)
-.sheet(isPresented: $showingEditor) {
+		.onAppear {
+			watchSync.activateIfNeeded()
+			watchSync.updateLatestClasses(classes)
+		}
+		.onChange(of: classes) { _, newValue in
+			watchSync.updateLatestClasses(newValue)
+		}
+		.onChange(of: watchSync.lastError) { _, newValue in
+			guard let newValue else { return }
+			print("[iOS] Surface error icon: \(newValue)")
+			flashSyncErrorIcon()
+			watchSync.lastError = nil
+		}
+		.sheet(isPresented: $showingEditor) {
 			editorSheet
 				.presentationDetents([.fraction(0.8)])
 				.presentationDragIndicator(.visible)
@@ -217,7 +223,6 @@ Text(syncError ?? "Unknown error")
 			}
 			.navigationBarTitleDisplayMode(.inline)
 			.toolbar {
-
 				ToolbarItem(placement: .title) {
 					Text("Edit Timetable")
 						.monospaced()
@@ -691,29 +696,147 @@ Text(syncError ?? "Unknown error")
 		return "\(dayLabel(slot.day)) Period \(period)"
 	}
 
-func syncToWatchAsync() async {
-		isSyncing = true
-		print("[iOS] Starting sync to watch...")
-		defer {
-			print("[iOS] Sync completed, isSyncing = false")
-			isSyncing = false
-		}
-		
+	@MainActor
+	func syncToWatchAsync() async {
+		if isSyncing { return }
+		let startedAt = Date()
+		withAnimation(.snappy) { isSyncing = true }
+		print("[iOS] Starting WatchConnectivity sync...")
+
 		do {
-			print("[iOS] Encoding \(classes.count) classes...")
-			let encoded = try JSONEncoder().encode(classes)
-			print("[iOS] Encoded successfully: \(encoded.count) bytes")
-			
-			print("[iOS] Writing to shared container (App Groups)...")
-			let sharedDefaults = UserDefaults(suiteName: "group.com.omeriadon.pms-timetable")
-			print("[iOS] Shared container: \(sharedDefaults != nil ? "✓ found" : "✗ NOT found")")
-			sharedDefaults?.set(encoded, forKey: "watchTimetable")
-			sharedDefaults?.synchronize()
-			print("[iOS] ✓ Sync successful!")
+			try watchSync.pushTimetable(classes)
+			print("[iOS] ✓ Sync request sent to watch")
 		} catch {
 			print("[iOS] ✗ Sync failed: \(error.localizedDescription)")
-			syncError = "Sync failed: \(error.localizedDescription)"
-			showSyncError = true
+			flashSyncErrorIcon()
+		}
+
+		let elapsed = Date().timeIntervalSince(startedAt)
+		if elapsed < 0.35 {
+			let remaining = UInt64((0.35 - elapsed) * 1_000_000_000)
+			try? await Task.sleep(nanoseconds: remaining)
+		}
+
+		withAnimation(.snappy) { isSyncing = false }
+		print("[iOS] Sync completed, isSyncing = false")
+	}
+
+	@MainActor
+	func flashSyncErrorIcon() {
+		withAnimation(.snappy) { showSyncErrorIcon = true }
+		Task {
+			try? await Task.sleep(nanoseconds: 1_000_000_000)
+			await MainActor.run {
+				withAnimation(.snappy) { showSyncErrorIcon = false }
+			}
+		}
+	}
+}
+
+final class PhoneWatchSyncBridge: NSObject, ObservableObject, WCSessionDelegate {
+	@Published var lastError: String?
+
+	private var latestClasses: [Class] = []
+	private var isActivated = false
+
+	func activateIfNeeded() {
+		guard WCSession.isSupported() else {
+			print("[iOS] WCSession not supported on this device")
+			return
+		}
+		guard !isActivated else { return }
+
+		let session = WCSession.default
+		session.delegate = self
+		session.activate()
+		isActivated = true
+		print("[iOS] WCSession activate() called")
+	}
+
+	func updateLatestClasses(_ classes: [Class]) {
+		latestClasses = classes
+		print("[iOS] Updated latest classes snapshot: \(classes.count) classes")
+	}
+
+	func pushTimetable(_ classes: [Class]) throws {
+		activateIfNeeded()
+		latestClasses = classes
+
+		print("[iOS] Encoding \(classes.count) classes for watch...")
+		let data = try JSONEncoder().encode(classes)
+		print("[iOS] Encoded successfully: \(data.count) bytes")
+
+		let payload: [String: Any] = [
+			"timetableData": data,
+			"updatedAt": Date().timeIntervalSince1970,
+		]
+
+		let session = WCSession.default
+		try session.updateApplicationContext(payload)
+		print("[iOS] updateApplicationContext sent")
+
+		if session.isReachable {
+			print("[iOS] Watch reachable, sending immediate message")
+			session.sendMessage(payload, replyHandler: { reply in
+				print("[iOS] Watch reply: \(reply)")
+			}, errorHandler: { [weak self] error in
+				print("[iOS] sendMessage error: \(error.localizedDescription)")
+				DispatchQueue.main.async {
+					self?.lastError = "Live send failed: \(error.localizedDescription)"
+				}
+			})
+		} else {
+			print("[iOS] Watch not reachable. Will deliver via application context.")
+		}
+	}
+
+	func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+		print("[iOS] WC activation completed with state: \(activationState.rawValue)")
+		if let error {
+			print("[iOS] WC activation error: \(error.localizedDescription)")
+			DispatchQueue.main.async {
+				self.lastError = "WatchConnectivity activation failed: \(error.localizedDescription)"
+			}
+		}
+	}
+
+	func sessionDidBecomeInactive(_ session: WCSession) {
+		print("[iOS] WC session became inactive")
+	}
+
+	func sessionDidDeactivate(_ session: WCSession) {
+		print("[iOS] WC session deactivated; reactivating")
+		session.activate()
+	}
+
+	func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
+		guard (message["requestSync"] as? Bool) == true else { return }
+		print("[iOS] Watch requested sync (no reply handler)")
+		do {
+			try pushTimetable(latestClasses)
+		} catch {
+			print("[iOS] Failed to push after watch request: \(error.localizedDescription)")
+		}
+	}
+
+	func session(
+		_ session: WCSession,
+		didReceiveMessage message: [String: Any],
+		replyHandler: @escaping ([String: Any]) -> Void
+	) {
+		guard (message["requestSync"] as? Bool) == true else { return }
+		print("[iOS] Watch requested sync (reply handler)")
+
+		do {
+			let data = try JSONEncoder().encode(latestClasses)
+			replyHandler([
+				"timetableData": data,
+				"updatedAt": Date().timeIntervalSince1970,
+			])
+			print("[iOS] Sent \(latestClasses.count) classes in reply")
+		} catch {
+			replyHandler(["error": error.localizedDescription])
+			print("[iOS] Failed to encode reply payload: \(error.localizedDescription)")
 		}
 	}
 }
