@@ -109,12 +109,15 @@ struct ContentView: View {
 					if isSyncing {
 						ProgressView()
 							.scaleEffect(0.8)
+							.transition(.opacity.combined(with: .scale))
 					} else {
 						Label("Sync", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
+							.transition(.opacity.combined(with: .scale))
 					}
 				}
 				.buttonStyle(.glassProminent)
 				.disabled(isSyncing)
+				.animation(.easeInOut(duration: 0.2), value: isSyncing)
 				}
 			}
 			.navigationBarTitleDisplayMode(.inline)
@@ -701,9 +704,11 @@ func syncToWatchAsync() async {
 			let encoded = try JSONEncoder().encode(classes)
 			print("[iOS] Encoded successfully: \(encoded.count) bytes")
 			
-			print("[iOS] Writing to UserDefaults...")
-			UserDefaults.standard.set(encoded, forKey: "watchTimetable")
-			UserDefaults.standard.synchronize()
+			print("[iOS] Writing to shared container (App Groups)...")
+			let sharedDefaults = UserDefaults(suiteName: "group.com.omeriadon.pms-timetable")
+			print("[iOS] Shared container: \(sharedDefaults != nil ? "✓ found" : "✗ NOT found")")
+			sharedDefaults?.set(encoded, forKey: "watchTimetable")
+			sharedDefaults?.synchronize()
 			print("[iOS] ✓ Sync successful!")
 		} catch {
 			print("[iOS] ✗ Sync failed: \(error.localizedDescription)")

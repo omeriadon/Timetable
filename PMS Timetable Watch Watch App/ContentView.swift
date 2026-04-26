@@ -169,8 +169,10 @@ isLoading = false
 }
 
 do {
-print("[Watch] Reading from UserDefaults...")
-guard let data = UserDefaults.standard.data(forKey: "watchTimetable") else {
+print("[Watch] Reading from shared container (App Groups)...")
+let sharedDefaults = UserDefaults(suiteName: "group.com.omeriadon.pms-timetable")
+		print("[Watch] Shared container: \(sharedDefaults != nil ? "✓ found" : "✗ NOT found")")
+		guard let data = sharedDefaults?.data(forKey: "watchTimetable") else {
 print("[Watch] No data found in UserDefaults")
 syncError = "No timetable synced from iOS yet. Tap sync on iOS app first."
 showSyncError = true
