@@ -23,7 +23,7 @@ struct ContentView: View {
 			VStack {
 				HStack {
 					Text("PMS Timetable")
-						.padding(.leading)
+						.padding(.leading, 30)
 						.fontWeight(.black)
 						.fontWidth(.expanded)
 						.font(.footnote)
@@ -32,7 +32,7 @@ struct ContentView: View {
 				HStack(spacing: 2) {
 					VStack(spacing: 2) {
 						Text("")
-							.frame(height: 25)
+							.frame(height: 15)
 							.font(.footnote)
 
 						ForEach(Array(sessions.enumerated()), id: \.offset) { index, session in
@@ -74,7 +74,7 @@ struct ContentView: View {
 			VStack(spacing: 2) {
 				Text(["Mon", "Tue", "Wed", "Thu", "Fri"][day])
 					.font(.footnote.scaled(by: 0.8))
-					.frame(height: 20)
+					.frame(height: 15)
 				ForEach(0 ..< 8) { session in
 					sessionCell(day, session)
 				}
