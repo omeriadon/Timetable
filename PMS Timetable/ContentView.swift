@@ -57,6 +57,7 @@ struct ContentView: View {
 	@State private var pendingPrefillSlot: EditableSlot?
 	@State private var pendingConflict: SlotConflict?
 	@State private var validationMessage: String?
+	@State private var isPresented = false
 
 	var body: some View {
 		NavigationStack {
@@ -113,6 +114,7 @@ struct ContentView: View {
 			editorSheet
 				.presentationDetents([.fraction(0.8)])
 				.presentationDragIndicator(.visible)
+				.interactiveDismissDisabled()
 				.onAppear {
 					prepareEditor()
 				}
@@ -186,16 +188,20 @@ struct ContentView: View {
 						.frame(maxWidth: .infinity, maxHeight: .infinity)
 				}
 			}
-			.navigationTitle("Edit Timetable")
 			.navigationBarTitleDisplayMode(.inline)
 			.toolbar {
+
+				ToolbarItem(placement: .title) {
+					Text("Edit Timetable")
+						.monospaced()
+				}
 				ToolbarItem(placement: .cancellationAction) {
-					Button("Cancel") {
+					Button("Cancel", systemImage: "xmark") {
 						showingEditor = false
 					}
 				}
 				ToolbarItem(placement: .confirmationAction) {
-					Button("Done") {
+					Button("Done", systemImage: "checkmark") {
 						validateAndSave()
 					}
 				}
@@ -203,14 +209,9 @@ struct ContentView: View {
 		}
 	}
 
-	@State private var icon = "star.fill"
-	@State private var isPresented = false
-
-	@State private var myColor: AvailableColors = .blue
-
 	func classEditorPage(index: Int) -> some View {
 		VStack(spacing: 25) {
-			GlassEffectContainer(spacing: 20) {
+			GlassEffectContainer(spacing: 0) {
 				HStack {
 					TextField("Class Name", text: $draftClasses[index].name)
 						.font(.title)
@@ -221,7 +222,7 @@ struct ContentView: View {
 							.clear.tint(draftClasses[index].color).interactive(),
 							in: Capsule()
 						)
-					
+
 					Button(role: .destructive) {
 						withAnimation {
 							deleteClass(at: index)
@@ -237,8 +238,6 @@ struct ContentView: View {
 					.glassEffect(.clear.tint(.red).interactive(), in: Circle())
 				}
 			}
-			.padding(.horizontal, 32)
-
 
 			Button {
 				isPresented.toggle()
@@ -246,17 +245,23 @@ struct ContentView: View {
 				HStack {
 					Text("Select Symbol")
 						.padding(.leading, 10)
-						.foregroundStyle(.white)
 					Spacer()
-					Image(systemName: icon)
-						.sheet(isPresented: $isPresented, content: {
-							SymbolsPicker(selection: $icon, title: "Select Symbol", autoDismiss: true)
-						}).padding()
+					Image(systemName: draftClasses[index].symbol)
+						.sheet(
+							isPresented: $isPresented,
+							content: {
+								SymbolsPicker(
+									selection: $draftClasses[index].symbol,
+									title: "Select Symbol",
+									autoDismiss: true
+								)
+							}
+						).padding()
 				}
 				.font(.title3)
+				.foregroundStyle(.white)
 				.glassEffect(.clear, in: Capsule())
 			}
-			.padding(.horizontal, 32)
 
 			InlineColorPicker(
 				selectedColor: Binding<AvailableColors>(
@@ -268,16 +273,16 @@ struct ContentView: View {
 					}
 				)
 			)
-			.padding(.horizontal, 32)
 
-			List {
+			VStack(alignment: .leading) {
 				ForEach($draftClasses[index].slots) { $slot in
 					HStack {
 						Picker("Day:", selection: $slot.day) {
 							ForEach(0..<5, id: \.self) { day in
-								Text(dayLabel(day)).tag(day)
+								Text("\(dayLabel(day))").tag(day)
 							}
 						}
+						.frame(width: 140, alignment: .leading)
 						.pickerStyle(.menu)
 						.onChange(of: slot.day) { _, newDay in
 							if !canUse(period: slot.period, on: newDay) {
@@ -285,25 +290,51 @@ struct ContentView: View {
 							}
 						}
 
-						Spacer(minLength: 120)
+						Spacer()
 
 						Picker("Period:", selection: $slot.period) {
 							ForEach(allowedPeriods(for: slot.day), id: \.self) { period in
-								Text("\(period)").tag(period)
+								Text("Period \(period)").tag(period)
 							}
 						}
+						.frame(width: 140)
 						.pickerStyle(.menu)
+
+						Spacer()
+
+						Button(role: .destructive) {
+							// 1. Just mutate the array directly, no withAnimation block
+							draftClasses[index].slots.removeAll { $0.id == slot.id }
+						} label: {
+							Image(systemName: "trash")
+						}
+						.frame(width: 20)
+						.buttonStyle(.glassProminent)
+						.buttonBorderShape(.circle)
 					}
+					// 2. Combine scale with opacity so it doesn't get aggressively clipped by the layout
+					.transition(.scale.combined(with: .opacity))
 				}
-				.onDelete { offsets in
-					withAnimation {
-						draftClasses[index].slots.remove(atOffsets: offsets)
+
+				if $draftClasses[index].slots.count < 5 {
+					Button {
+						// 3. Just mutate the array directly, no withAnimation block
+						draftClasses[index].slots
+							.append(EditableSlot(day: 0, period: allowedPeriods(for: 0).first ?? 1))
+					} label: {
+						Label("Add Slot", systemImage: "plus")
 					}
+					.buttonStyle(.glass)
+					.buttonBorderShape(.capsule)
 				}
 			}
-			.scrollDisabled(true)
-			.animation(.default, value: draftClasses[index].slots)
+			// 4. THE MAGIC BULLET: This forces the VStack to animate ANY structural changes to this specific array.
+			.animation(.spring(response: 0.3, dampingFraction: 0.8), value: draftClasses[index].slots)
+
+			Spacer()
 		}
+		.padding(.horizontal, 32)
+		.monospaced()
 	}
 
 	var addClassPage: some View {
@@ -588,7 +619,7 @@ struct ContentView: View {
 	}
 
 	func dayLabel(_ day: Int) -> String {
-		["Mon", "Tue", "Wed", "Thu", "Fri"][day]
+		["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"][day]
 	}
 
 	func allowedPeriods(for day: Int) -> [Int] {
