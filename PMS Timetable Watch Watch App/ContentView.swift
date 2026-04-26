@@ -10,6 +10,9 @@ import SwiftUI
 struct ContentView: View {
 @State private var classes: [Class] = []
 @State private var selectedDay = 0
+@State private var isLoading = false
+@State private var syncError: String?
+@State private var showSyncError = false
 
 let sessions = ["1", "2", "R", "3", "4", "L", "5", "6"]
 let dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri"]
@@ -42,11 +45,17 @@ Text(dayLabels[day])
 .toolbar {
 ToolbarItem(placement: .topBarLeading) {
 Button {
-loadTimetable()
+Task { await loadTimetableAsync() }
 } label: {
+if isLoading {
+ProgressView()
+.scaleEffect(0.7)
+} else {
 Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
 .font(.system(size: 10, weight: .semibold, design: .monospaced))
 }
+}
+.disabled(isLoading)
 }
 }
 .navigationBarTitleDisplayMode(.inline)
@@ -54,8 +63,22 @@ Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
 .environment(\.dynamicTypeSize, .xSmall)
 .monospaced()
 .onAppear {
-loadTimetable()
+print("[Watch] ContentView appeared, loading timetable...")
+Task { await loadTimetableAsync() }
 }
+.alert(
+"Sync Error",
+isPresented: $showSyncError,
+actions: {
+Button("OK", role: .cancel) {
+syncError = nil
+showSyncError = false
+}
+},
+message: {
+Text(syncError ?? "Unknown error")
+}
+)
 }
 
 @ViewBuilder
@@ -137,10 +160,37 @@ $0.day == day && $0.session == session
 }
 }
 
-func loadTimetable() {
-if let data = UserDefaults.standard.data(forKey: "watchTimetable"),
-   let decoded = try? JSONDecoder().decode([Class].self, from: data) {
-classes = decoded
+func loadTimetableAsync() async {
+isLoading = true
+print("[Watch] Starting sync (isLoading = true)...")
+defer {
+print("[Watch] Sync completed, isLoading = false")
+isLoading = false
+}
+
+do {
+print("[Watch] Reading from UserDefaults...")
+guard let data = UserDefaults.standard.data(forKey: "watchTimetable") else {
+print("[Watch] No data found in UserDefaults")
+syncError = "No timetable synced from iOS yet. Tap sync on iOS app first."
+showSyncError = true
+return
+}
+
+print("[Watch] Data found: \\(data.count) bytes")
+print("[Watch] Decoding JSON...")
+let decoded = try JSONDecoder().decode([Class].self, from: data)
+print("[Watch] Decoded \\(decoded.count) classes")
+
+print("[Watch] Updating UI state...")
+await MainActor.run {
+self.classes = decoded
+print("[Watch] ✓ UI updated with \\(self.classes.count) classes")
+}
+} catch {
+print("[Watch] ✗ Sync failed: \\(error)")
+syncError = "Decode failed: \\(error.localizedDescription)"
+showSyncError = true
 }
 }
 }

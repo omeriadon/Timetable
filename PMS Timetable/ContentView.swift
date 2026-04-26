@@ -58,6 +58,9 @@ struct ContentView: View {
 	@State private var pendingConflict: SlotConflict?
 	@State private var validationMessage: String?
 	@State private var isPresented = false
+@State private var isSyncing = false
+@State private var syncError: String?
+@State private var showSyncError = false
 
 	var body: some View {
 		NavigationStack {
@@ -100,17 +103,38 @@ struct ContentView: View {
 				}
 
 				ToolbarItem(placement: .topBarTrailing) {
-					Button { syncToWatch() } label: {
+				Button {
+					Task { await syncToWatchAsync() }
+				} label: {
+					if isSyncing {
+						ProgressView()
+							.scaleEffect(0.8)
+					} else {
 						Label("Sync", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
 					}
-					.buttonStyle(.glassProminent)
+				}
+				.buttonStyle(.glassProminent)
+				.disabled(isSyncing)
 				}
 			}
 			.navigationBarTitleDisplayMode(.inline)
 		}
 		.environment(\.dynamicTypeSize, .xSmall)
 		.monospaced()
-		.sheet(isPresented: $showingEditor) {
+		.alert(
+"Sync Error",
+isPresented: $showSyncError,
+actions: {
+Button("OK", role: .cancel) {
+syncError = nil
+showSyncError = false
+}
+},
+message: {
+Text(syncError ?? "Unknown error")
+}
+)
+.sheet(isPresented: $showingEditor) {
 			editorSheet
 				.presentationDetents([.fraction(0.8)])
 				.presentationDragIndicator(.visible)
@@ -664,11 +688,29 @@ struct ContentView: View {
 		return "\(dayLabel(slot.day)) Period \(period)"
 	}
 
-func syncToWatch() {
-		if let encoded = try? JSONEncoder().encode(classes) {
-			UserDefaults.standard.set(encoded, forKey: "watchTimetable")
+func syncToWatchAsync() async {
+		isSyncing = true
+		print("[iOS] Starting sync to watch...")
+		defer {
+			print("[iOS] Sync completed, isSyncing = false")
+			isSyncing = false
 		}
-}
+		
+		do {
+			print("[iOS] Encoding \(classes.count) classes...")
+			let encoded = try JSONEncoder().encode(classes)
+			print("[iOS] Encoded successfully: \(encoded.count) bytes")
+			
+			print("[iOS] Writing to UserDefaults...")
+			UserDefaults.standard.set(encoded, forKey: "watchTimetable")
+			UserDefaults.standard.synchronize()
+			print("[iOS] ✓ Sync successful!")
+		} catch {
+			print("[iOS] ✗ Sync failed: \(error.localizedDescription)")
+			syncError = "Sync failed: \(error.localizedDescription)"
+			showSyncError = true
+		}
+	}
 }
 
 struct rectangle<Content: View>: View {
