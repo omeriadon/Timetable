@@ -17,6 +17,10 @@ struct EditableSlot: Identifiable, Hashable {
 	var period: Int
 }
 
+enum SyncMode {
+	case normal, loading, success, error
+}
+
 struct EditableClass: Identifiable {
 	let id = UUID()
 	var originalName: String?
@@ -60,8 +64,7 @@ struct ContentView: View {
 	@State private var pendingConflict: SlotConflict?
 	@State private var validationMessage: String?
 	@State private var isPresented = false
-	@State private var isSyncing = false
-	@State private var showSyncErrorIcon = false
+	@State private var syncStatus = SyncMode.normal
 	@StateObject private var watchSync = PhoneWatchSyncBridge()
 
 	var body: some View {
@@ -108,22 +111,24 @@ struct ContentView: View {
 					Button {
 						Task { await syncToWatchAsync() }
 					} label: {
-						if isSyncing {
-							ProgressView()
-								.scaleEffect(0.8)
-								.transition(.blurReplace)
-						} else if showSyncErrorIcon {
-							Image(systemName: "exclamationmark.triangle.fill")
-								.foregroundStyle(.yellow)
-								.transition(.blurReplace)
-						} else {
-							Label("Sync", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
-								.transition(.blurReplace)
+						switch syncStatus {
+							case .normal:
+								Label("Sync", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
+									.transition(.blurReplace)
+							case .loading:
+								ProgressView()
+									.transition(.blurReplace)
+							case .success:
+								Image(systemName: "checkmark.circle.fill")
+									.transition(.blurReplace)
+							case .error:
+								Image(systemName: "exclamationmark.triangle.fill")
+									.transition(.blurReplace)
 						}
 					}
 					.buttonStyle(.glassProminent)
-					.disabled(isSyncing)
-					.animation(.snappy, value: isSyncing)
+					.disabled(syncStatus != .normal)
+					.animation(.easeInOut, value: syncStatus)
 				}
 			}
 			.navigationBarTitleDisplayMode(.inline)
@@ -140,7 +145,9 @@ struct ContentView: View {
 		.onChange(of: watchSync.lastError) { _, newValue in
 			guard let newValue else { return }
 			print("[iOS] Surface error icon: \(newValue)")
-			flashSyncErrorIcon()
+			syncStatus = .error
+			try? await Task.sleep(nanoseconds: 1_000_000_000)
+			syncStatus = .normal
 			watchSync.lastError = nil
 		}
 		.sheet(isPresented: $showingEditor) {
@@ -465,69 +472,71 @@ struct ContentView: View {
 
 	func presentEditor() {
 		if showingEditor { return }
-		DispatchQueue.main.async {
-			showingEditor = true
-		}
+		showingEditor = true
 	}
 
 	func prepareEditor() {
 		editorReady = false
 
 		switch editorRequest {
-		case .allClasses(let focus):
-			draftClasses = classes.map { original in
-				EditableClass(
-					originalName: original.id,
-					name: original.id,
-					symbol: original.symbol,
-					color: original.colour.swiftUIColor,
-					slots: original.slots.compactMap { slot in
-						guard let period = periodForSession(slot.session) else { return nil }
-						return EditableSlot(day: slot.day, period: period)
-					}
-				)
-			}
-			pendingPrefillSlot = nil
+			case .allClasses(let focus):
+				draftClasses = classes.map { original in
+					EditableClass(
+						originalName: original.id,
+						name: original.id,
+						symbol: original.symbol,
+						color: original.colour.swiftUIColor,
+						slots: original.slots.compactMap { slot in
+							guard let period = periodForSession(slot.session) else { return nil }
+							return EditableSlot(day: slot.day, period: period)
+						}
+					)
+				}
+				pendingPrefillSlot = nil
 
-			if let focus,
-			   let index = draftClasses.firstIndex(where: { $0.name == focus || $0.originalName == focus })
-			{
-				editorPage = index
-			} else {
+				if let focus {
+					if let index = draftClasses.firstIndex(where: { $0.name == focus || $0.originalName == focus }) {
+						print("[iOS] Editor focus: found '\(focus)' at index \(index)")
+						editorPage = index
+					} else {
+						print("[iOS] Editor focus: '\(focus)' NOT FOUND, defaulting to 0. Available: \(draftClasses.map { $0.name }.joined(separator: ", "))")
+						editorPage = 0
+					}
+				} else {
+					editorPage = 0
+				}
+
+			case .emptySlot(let prefill):
+				draftClasses = classes.map { original in
+					EditableClass(
+						originalName: original.id,
+						name: original.id,
+						symbol: original.symbol,
+						color: original.colour.swiftUIColor,
+						slots: original.slots.compactMap { slot in
+							guard let period = periodForSession(slot.session) else { return nil }
+							return EditableSlot(day: slot.day, period: period)
+						}
+					)
+				}
+				pendingPrefillSlot = prefill
+				editorPage = draftClasses.count
+
+			case nil:
+				draftClasses = classes.map { original in
+					EditableClass(
+						originalName: original.id,
+						name: original.id,
+						symbol: original.symbol,
+						color: original.colour.swiftUIColor,
+						slots: original.slots.compactMap { slot in
+							guard let period = periodForSession(slot.session) else { return nil }
+							return EditableSlot(day: slot.day, period: period)
+						}
+					)
+				}
 				editorPage = 0
-			}
-
-		case .emptySlot(let prefill):
-			draftClasses = classes.map { original in
-				EditableClass(
-					originalName: original.id,
-					name: original.id,
-					symbol: original.symbol,
-					color: original.colour.swiftUIColor,
-					slots: original.slots.compactMap { slot in
-						guard let period = periodForSession(slot.session) else { return nil }
-						return EditableSlot(day: slot.day, period: period)
-					}
-				)
-			}
-			pendingPrefillSlot = prefill
-			editorPage = draftClasses.count
-
-		case nil:
-			draftClasses = classes.map { original in
-				EditableClass(
-					originalName: original.id,
-					name: original.id,
-					symbol: original.symbol,
-					color: original.colour.swiftUIColor,
-					slots: original.slots.compactMap { slot in
-						guard let period = periodForSession(slot.session) else { return nil }
-						return EditableSlot(day: slot.day, period: period)
-					}
-				)
-			}
-			editorPage = 0
-			pendingPrefillSlot = nil
+				pendingPrefillSlot = nil
 		}
 
 		editorReady = true
@@ -661,25 +670,25 @@ struct ContentView: View {
 
 	func sessionForPeriod(_ period: Int) -> Int? {
 		switch period {
-		case 1: return 0
-		case 2: return 1
-		case 3: return 3
-		case 4: return 4
-		case 5: return 6
-		case 6: return 7
-		default: return nil
+			case 1: return 0
+			case 2: return 1
+			case 3: return 3
+			case 4: return 4
+			case 5: return 6
+			case 6: return 7
+			default: return nil
 		}
 	}
 
 	func periodForSession(_ session: Int) -> Int? {
 		switch session {
-		case 0: return 1
-		case 1: return 2
-		case 3: return 3
-		case 4: return 4
-		case 6: return 5
-		case 7: return 6
-		default: return nil
+			case 0: return 1
+			case 1: return 2
+			case 3: return 3
+			case 4: return 4
+			case 6: return 5
+			case 7: return 6
+			default: return nil
 		}
 	}
 
@@ -695,37 +704,32 @@ struct ContentView: View {
 
 	@MainActor
 	func syncToWatchAsync() async {
-		if isSyncing { return }
+		if syncStatus == .loading { return }
 		let startedAt = Date()
-		withAnimation(.snappy) { isSyncing = true }
+		syncStatus = .loading
 		print("[iOS] Starting WatchConnectivity sync...")
 
 		do {
 			try watchSync.pushTimetable(classes)
 			print("[iOS] ✓ Sync request sent to watch")
+
+			let elapsed = Date().timeIntervalSince(startedAt)
+			if elapsed < 0.35 {
+				let remaining = UInt64((0.35 - elapsed) * 1_000_000_000)
+				try? await Task.sleep(nanoseconds: remaining)
+			}
+
+			syncStatus = .success
+			print("[iOS] Sync completed, showing checkmark")
+
+			try? await Task.sleep(nanoseconds: 1_000_000_000)
+			syncStatus = .normal
+
 		} catch {
 			print("[iOS] ✗ Sync failed: \(error.localizedDescription)")
-			flashSyncErrorIcon()
-		}
-
-		let elapsed = Date().timeIntervalSince(startedAt)
-		if elapsed < 0.35 {
-			let remaining = UInt64((0.35 - elapsed) * 1_000_000_000)
-			try? await Task.sleep(nanoseconds: remaining)
-		}
-
-		withAnimation(.snappy) { isSyncing = false }
-		print("[iOS] Sync completed, isSyncing = false")
-	}
-
-	@MainActor
-	func flashSyncErrorIcon() {
-		withAnimation(.snappy) { showSyncErrorIcon = true }
-		Task {
+			syncStatus = .error
 			try? await Task.sleep(nanoseconds: 1_000_000_000)
-			await MainActor.run {
-				withAnimation(.snappy) { showSyncErrorIcon = false }
-			}
+			syncStatus = .normal
 		}
 	}
 }
@@ -790,7 +794,6 @@ final class PhoneWatchSyncBridge: NSObject, ObservableObject, WCSessionDelegate 
 		print("[iOS] WC session deactivated; reactivating")
 		session.activate()
 	}
-
 }
 
 struct rectangle<Content: View>: View {
@@ -851,6 +854,6 @@ func closestColor(to color: Color) -> AvailableColors {
 	})!
 }
 
-//#Preview {
+// #Preview {
 //	ContentView()
-//}
+// }
