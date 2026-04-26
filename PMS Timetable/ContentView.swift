@@ -109,26 +109,32 @@ struct ContentView: View {
 
 				ToolbarItem(placement: .topBarTrailing) {
 					Button {
-						Task { await syncToWatchAsync() }
-					} label: {
-						switch syncStatus {
-							case .normal:
-								Label("Sync", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
-									.transition(.blurReplace)
-							case .loading:
-								ProgressView()
-									.transition(.blurReplace)
-							case .success:
-								Image(systemName: "checkmark.circle.fill")
-									.transition(.blurReplace)
-							case .error:
-								Image(systemName: "exclamationmark.triangle.fill")
-									.transition(.blurReplace)
+						if syncStatus == .normal {
+							Task {
+								await syncToWatchAsync()
+							}
 						}
+					} label: {
+						ZStack {
+							switch syncStatus {
+								case .normal:
+									Label("Sync", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
+										.transition(.blurReplace)
+								case .loading:
+									ProgressView()
+										.transition(.blurReplace)
+								case .success:
+									Image(systemName: "checkmark")
+										.transition(.blurReplace)
+								case .error:
+									Image(systemName: "exclamationmark.triangle")
+										.transition(.blurReplace)
+							}
+						}
+						.foregroundStyle(.white)
+						.animation(.easeInOut, value: syncStatus)
 					}
 					.buttonStyle(.glassProminent)
-					.disabled(syncStatus != .normal)
-					.animation(.easeInOut, value: syncStatus)
 				}
 			}
 			.navigationBarTitleDisplayMode(.inline)
@@ -146,8 +152,12 @@ struct ContentView: View {
 			guard let newValue else { return }
 			print("[iOS] Surface error icon: \(newValue)")
 			syncStatus = .error
-			try? await Task.sleep(nanoseconds: 1_000_000_000)
-			syncStatus = .normal
+			Task {
+				try? await Task.sleep(nanoseconds: 1_000_000_000)
+				await MainActor.run {
+					syncStatus = .normal
+				}
+			}
 			watchSync.lastError = nil
 		}
 		.sheet(isPresented: $showingEditor) {

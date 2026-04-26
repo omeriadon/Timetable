@@ -145,17 +145,16 @@ struct ContentView: View {
 	}
 
 	func classFor(day: Int, session: Int) -> Class? {
-		syncStore.classes.first { c in
-			c.slots.contains {
-				$0.day == day && $0.session == session
-			}
-		}
+		let key = "\(day)-\(session)"
+		return syncStore.classes.isEmpty ? nil : syncStore.classLookup[key]
 	}
 }
 
 final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelegate {
 	@Published var classes: [Class] = []
 	@Published var alertMessage: String?
+	
+	var classLookup: [String: Class] = [:]
 
 	private var isActivated = false
 	private let cacheKey = "watchTimetableCache"
@@ -218,6 +217,7 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 
 			DispatchQueue.main.async {
 				self.classes = decoded
+				self.buildLookupTable(decoded)
 				self.saveToCache(decoded)
 				print("[Watch] ✓ UI updated with \(decoded.count) classes")
 			}
@@ -238,10 +238,23 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 		do {
 			let decoded = try JSONDecoder().decode([Class].self, from: data)
 			classes = decoded
+			buildLookupTable(decoded)
 			print("[Watch] Loaded \(decoded.count) classes from local cache")
 		} catch {
 			print("[Watch] Failed to load cache: \(error.localizedDescription)")
 		}
+	}
+	
+	private func buildLookupTable(_ classesArray: [Class]) {
+		var lookup: [String: Class] = [:]
+		for c in classesArray {
+			for slot in c.slots {
+				let key = "\(slot.day)-\(slot.session)"
+				lookup[key] = c
+			}
+		}
+		classLookup = lookup
+		print("[Watch] Built lookup table with \(lookup.count) entries")
 	}
 
 	private func saveToCache(_ classes: [Class]) {
