@@ -275,6 +275,7 @@ struct ContentView: View {
 						.padding(.leading, 10)
 					Spacer()
 					Image(systemName: draftClasses[index].symbol)
+						.imageScale(.large)
 						.sheet(
 							isPresented: $isPresented,
 							content: {
@@ -288,7 +289,7 @@ struct ContentView: View {
 				}
 				.font(.title3)
 				.foregroundStyle(.white)
-				.glassEffect(.clear, in: Capsule())
+				.glassEffect(.clear.interactive(), in: Capsule())
 			}
 
 			InlineColorPicker(
@@ -344,7 +345,7 @@ struct ContentView: View {
 					.transition(.scale.combined(with: .opacity))
 				}
 
-				if $draftClasses[index].slots.count < 5 {
+				if $draftClasses[index].slots.count < 4 {
 					Button {
 						// 3. Just mutate the array directly, no withAnimation block
 						draftClasses[index].slots
