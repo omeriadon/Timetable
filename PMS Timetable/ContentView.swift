@@ -100,7 +100,7 @@ struct ContentView: View {
 				}
 
 				ToolbarItem(placement: .topBarTrailing) {
-					Button {} label: {
+					Button { syncToWatch() } label: {
 						Label("Sync", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
 					}
 					.buttonStyle(.glassProminent)
@@ -663,6 +663,12 @@ struct ContentView: View {
 		guard let period = periodForSession(slot.session) else { return "\(dayLabel(slot.day))" }
 		return "\(dayLabel(slot.day)) Period \(period)"
 	}
+
+func syncToWatch() {
+		if let encoded = try? JSONEncoder().encode(classes) {
+			UserDefaults.standard.set(encoded, forKey: "watchTimetable")
+		}
+}
 }
 
 struct rectangle<Content: View>: View {
