@@ -20,51 +20,33 @@ struct ContentView: View {
 
 	var body: some View {
 		NavigationStack {
-			VStack(spacing: 8) {
-				TabView(selection: $selectedDay) {
-					ForEach(0 ..< 5, id: \.self) { day in
-						dayView(day)
-							.tag(day)
-					}
-				}
-				.tabViewStyle(.page(indexDisplayMode: .never))
-				.frame(maxWidth: .infinity, maxHeight: .infinity)
-
+			VStack {
 				HStack(spacing: 4) {
-					ForEach(0 ..< 5, id: \.self) { day in
-						Text(dayLabels[day])
-							.font(.system(size: 9, weight: .semibold, design: .monospaced))
-							.foregroundStyle(day == selectedDay ? .white : .gray)
-							.frame(maxWidth: .infinity)
-					}
-				}
-				.padding(.horizontal, 4)
-				.padding(.bottom, 4)
-			}
-			.toolbar {
-				ToolbarItem(placement: .topBarLeading) {
-					Button {
-						Task { await requestSyncFromPhoneAsync() }
-					} label: {
-						if isLoading {
-							ProgressView()
-								.scaleEffect(0.7)
-								.transition(.blurReplace)
-						} else if showSyncErrorIcon {
-							Image(systemName: "exclamationmark.triangle.fill")
-								.foregroundStyle(.yellow)
-								.transition(.blurReplace)
-						} else {
-							Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
-								.font(.system(size: 10, weight: .semibold, design: .monospaced))
-								.transition(.blurReplace)
+					VStack(spacing: 4) {
+						Text("")
+							.frame(height: 25)
+							.font(.footnote)
+
+						ForEach(Array(sessions.enumerated()), id: \.offset) { index, session in
+							if index == 2 || index == 5 {
+								Text(session)
+									.font(.footnote.scaled(by: 0.7))
+									.foregroundStyle(.secondary)
+									.frame(height: 0)
+							} else {
+								Text(session)
+									.font(.footnote)
+									.frame(height: 25)
+							}
 						}
 					}
-					.disabled(isLoading)
-					.animation(.snappy, value: isLoading)
+					.frame(width: 15)
+
+					mainContent
 				}
+				Spacer()
 			}
-			.navigationBarTitleDisplayMode(.inline)
+			.padding(.bottom, 10)
 		}
 		.environment(\.dynamicTypeSize, .xSmall)
 		.monospaced()
@@ -80,23 +62,54 @@ struct ContentView: View {
 		}
 	}
 
-	@MainActor
-	func requestSyncFromPhoneAsync() async {
-		if isLoading { return }
-		let startedAt = Date()
-		withAnimation(.snappy) { isLoading = true }
-		print("[Watch] Manual sync requested")
-
-		syncStore.requestSyncFromPhone()
-
-		let elapsed = Date().timeIntervalSince(startedAt)
-		if elapsed < 0.35 {
-			let remaining = UInt64((0.35 - elapsed) * 1_000_000_000)
-			try? await Task.sleep(nanoseconds: remaining)
+	var mainContent: some View {
+		ForEach(0 ..< 5) { day in
+			VStack(spacing: 4) {
+				Text(["Mon", "Tue", "Wed", "Thu", "Fri"][day])
+					.font(.footnote.scaled(by: 0.8))
+					.frame(height: 25)
+				ForEach(0 ..< 8) { session in
+					sessionCell(day, session)
+				}
+			}
 		}
+	}
 
-		withAnimation(.snappy) { isLoading = false }
-		print("[Watch] Manual sync finished")
+	@ViewBuilder
+	func sessionCell(_ day: Int, _ session: Int) -> some View {
+		if session == 2 || session == 5 {
+			// recess and lunch
+			rectangle(.gray.opacity(0.25), true)
+				.frame(height: 0)
+		} else {
+			// early finish days
+			if day == 2 && session == 7 || day == 4 && session == 7 {
+				rectangle(.clear, true)
+					.frame(height: 25)
+
+			} else {
+				// actual sessino
+				if let c = classFor(day: day, session: session) {
+					rectangle(
+						c.colour.swiftUIColor.opacity(0.8)
+					) {
+						Image(systemName: c.symbol)
+						Spacer(minLength: 0)
+						Text(c.id)
+							.lineLimit(2)
+							.fixedSize(horizontal: false, vertical: true)
+							.font(.footnote.scaled(by: 0.9))
+					}
+					.frame(height: 25)
+
+				} else {
+					// empty periods
+					RoundedRectangle(cornerRadius: 7)
+						.fill(.white.opacity(0.05))
+						.frame(height: 25)
+				}
+			}
+		}
 	}
 
 	@MainActor
@@ -119,60 +132,6 @@ struct ContentView: View {
 			}
 			.padding(.horizontal, 4)
 			.padding(.vertical, 6)
-		}
-	}
-
-	@ViewBuilder
-	func sessionCell(_ day: Int, _ session: Int) -> some View {
-		if session == 2 || session == 5 {
-			HStack {
-				Text(sessions[session])
-					.font(.system(size: 8, weight: .semibold, design: .monospaced))
-					.foregroundStyle(.secondary)
-					.frame(width: 12)
-				Spacer()
-			}
-			.frame(height: 8)
-		} else if day == 2 && session == 7 || day == 4 && session == 7 {
-			HStack {
-				Text(sessions[session])
-					.font(.system(size: 8, weight: .semibold, design: .monospaced))
-					.foregroundStyle(.tertiary)
-					.frame(width: 12)
-				Spacer()
-			}
-			.frame(height: 12)
-		} else if let c = classFor(day: day, session: session) {
-			HStack(spacing: 3) {
-				Image(systemName: c.symbol)
-					.font(.system(size: 9, weight: .semibold))
-					.foregroundStyle(.white)
-					.frame(width: 14)
-
-				VStack(alignment: .leading, spacing: 1) {
-					Text(c.id)
-						.font(.system(size: 8, weight: .semibold, design: .monospaced))
-						.lineLimit(1)
-					Text(sessions[session])
-						.font(.system(size: 7, weight: .regular, design: .monospaced))
-						.foregroundStyle(.secondary)
-						.lineLimit(1)
-				}
-				.frame(maxWidth: .infinity, alignment: .leading)
-			}
-			.padding(.horizontal, 3)
-			.padding(.vertical, 2)
-			.background(c.colour.swiftUIColor.opacity(0.8), in: RoundedRectangle(cornerRadius: 4))
-			.frame(height: 18)
-		} else {
-			HStack {
-				Text(sessions[session])
-					.font(.system(size: 8, weight: .semibold, design: .monospaced))
-					.foregroundStyle(.tertiary)
-					.frame(width: 12)
-				Spacer()
-			}
-			.frame(height: 12)
 		}
 	}
 
@@ -209,36 +168,6 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 		session.activate()
 		isActivated = true
 		print("[Watch] WCSession activate() called")
-	}
-
-	func requestSyncFromPhone() {
-		activateIfNeeded()
-		let session = WCSession.default
-
-		print("[Watch] requestSyncFromPhone()")
-		print("[Watch] reachable: \(session.isReachable), activationState: \(session.activationState.rawValue)")
-
-		guard session.activationState == .activated else {
-			alertMessage = "WatchConnectivity is not active yet. Try again in a moment."
-			print("[Watch] Cannot request sync: session not activated")
-			return
-		}
-
-		guard session.isReachable else {
-			alertMessage = "iPhone app is not reachable. Open it, then tap Sync again."
-			print("[Watch] Cannot request sync: iPhone not reachable")
-			return
-		}
-
-		session.sendMessage(["requestSync": true], replyHandler: { [weak self] reply in
-			print("[Watch] Got reply from iPhone: keys=\(reply.keys.sorted())")
-			self?.handleIncomingPayload(reply, source: "replyHandler")
-		}, errorHandler: { [weak self] error in
-			print("[Watch] sendMessage failed: \(error.localizedDescription)")
-			DispatchQueue.main.async {
-				self?.alertMessage = "Sync request failed: \(error.localizedDescription)"
-			}
-		})
 	}
 
 	func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
@@ -322,33 +251,37 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 	}
 }
 
-// MARK: - Models
+struct rectangle<Content: View>: View {
+	let fill: Color
+	let isBreak: Bool
+	let content: Content
 
-struct Class: Hashable, Codable, Identifiable {
-	var id: String
-	var symbol: String
-	var colour: RGBAColor
-	var slots: [Slot]
-}
-
-struct Slot: Hashable, Codable {
-	let day: Int
-	let session: Int
-
-	init(_ day: Int, _ session: Int) {
-		self.day = day
-		self.session = session
+	init(
+		_ fill: Color,
+		_ isBreak: Bool = false,
+		@ViewBuilder content: () -> Content
+	) {
+		self.fill = fill
+		self.isBreak = isBreak
+		self.content = content()
 	}
-}
 
-struct RGBAColor: Codable, Hashable {
-	var r: Double
-	var g: Double
-	var b: Double
-	var a: Double
+	init(_ fill: Color, _ isBreak: Bool = false) where Content == EmptyView {
+		self.fill = fill
+		self.isBreak = isBreak
+		self.content = EmptyView()
+	}
 
-	var swiftUIColor: Color {
-		Color(red: r, green: g, blue: b, opacity: a)
+	var body: some View {
+		VStack(alignment: .leading) {
+			content
+				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+		}
+		.padding(5)
+		.glassEffect(
+			!isBreak ? .clear.tint(fill) : .identity,
+			in: RoundedRectangle(cornerRadius: isBreak ? 1 : 2)
+		)
 	}
 }
 

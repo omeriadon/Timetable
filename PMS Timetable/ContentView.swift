@@ -809,16 +809,6 @@ final class PhoneWatchSyncBridge: NSObject, ObservableObject, WCSessionDelegate 
 		session.activate()
 	}
 
-	func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
-		guard (message["requestSync"] as? Bool) == true else { return }
-		print("[iOS] Watch requested sync (no reply handler)")
-		do {
-			try pushTimetable(latestClasses)
-		} catch {
-			print("[iOS] Failed to push after watch request: \(error.localizedDescription)")
-		}
-	}
-
 	func session(
 		_ session: WCSession,
 		didReceiveMessage message: [String: Any],
@@ -899,6 +889,6 @@ func closestColor(to color: Color) -> AvailableColors {
 	})!
 }
 
-#Preview {
-	ContentView()
-}
+//#Preview {
+//	ContentView()
+//}

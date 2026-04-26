@@ -11,6 +11,7 @@
 		2A02379D2F9C907000AB1E1F /* DefaultsMacros in Frameworks */ = {isa = PBXBuildFile; productRef = 2A02379C2F9C907000AB1E1F /* DefaultsMacros */; };
 		2A0237AC2F9D9DE800AB1E1F /* SFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 2A0237AB2F9D9DE800AB1E1F /* SFSymbolsPicker */; };
 		2A098C8D2F9DB844002065BE /* PMS Timetable Watch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 2A098C832F9DB842002065BE /* PMS Timetable Watch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2A1DB40E2F9DE9A300E5AE7C /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2A1DB40D2F9DE9A300E5AE7C /* Defaults */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -75,6 +76,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2A1DB40E2F9DE9A300E5AE7C /* Defaults in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,6 +90,7 @@
 				2A098C842F9DB842002065BE /* PMS Timetable Watch Watch App */,
 				2A02378C2F9C8EA000AB1E1F /* Products */,
 				2A02379F2F9C908300AB1E1F /* Shared */,
+				2A1DB40C2F9DE9A300E5AE7C /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -98,6 +101,13 @@
 				2A098C832F9DB842002065BE /* PMS Timetable Watch Watch App.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		2A1DB40C2F9DE9A300E5AE7C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -144,10 +154,12 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				2A02379F2F9C908300AB1E1F /* Shared */,
 				2A098C842F9DB842002065BE /* PMS Timetable Watch Watch App */,
 			);
 			name = "PMS Timetable Watch Watch App";
 			packageProductDependencies = (
+				2A1DB40D2F9DE9A300E5AE7C /* Defaults */,
 			);
 			productName = "PMS Timetable Watch Watch App";
 			productReference = 2A098C832F9DB842002065BE /* PMS Timetable Watch Watch App.app */;
@@ -565,6 +577,11 @@
 		2A0237AB2F9D9DE800AB1E1F /* SFSymbolsPicker */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SFSymbolsPicker;
+		};
+		2A1DB40D2F9DE9A300E5AE7C /* Defaults */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */;
+			productName = Defaults;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
