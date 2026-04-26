@@ -21,8 +21,12 @@ struct ContentView: View {
 	var body: some View {
 		NavigationStack {
 			VStack {
-				HStack(spacing: 4) {
-					VStack(spacing: 4) {
+				Text("PMS Timetable")
+					.fontWeight(.black)
+					.fontWidth(.expanded)
+					.font(.footnote)
+				HStack(spacing: 2) {
+					VStack(spacing: 2) {
 						Text("")
 							.frame(height: 25)
 							.font(.footnote)
@@ -32,7 +36,7 @@ struct ContentView: View {
 								Text(session)
 									.font(.footnote.scaled(by: 0.7))
 									.foregroundStyle(.secondary)
-									.frame(height: 0)
+									.frame(height: 2)
 							} else {
 								Text(session)
 									.font(.footnote)
@@ -46,7 +50,6 @@ struct ContentView: View {
 				}
 				Spacer()
 			}
-			.padding(.bottom, 10)
 		}
 		.environment(\.dynamicTypeSize, .xSmall)
 		.monospaced()
@@ -64,7 +67,7 @@ struct ContentView: View {
 
 	var mainContent: some View {
 		ForEach(0 ..< 5) { day in
-			VStack(spacing: 4) {
+			VStack(spacing: 2) {
 				Text(["Mon", "Tue", "Wed", "Thu", "Fri"][day])
 					.font(.footnote.scaled(by: 0.8))
 					.frame(height: 25)
@@ -80,7 +83,7 @@ struct ContentView: View {
 		if session == 2 || session == 5 {
 			// recess and lunch
 			rectangle(.gray.opacity(0.25), true)
-				.frame(height: 0)
+				.frame(height: 2)
 		} else {
 			// early finish days
 			if day == 2 && session == 7 || day == 4 && session == 7 {
@@ -104,7 +107,7 @@ struct ContentView: View {
 
 				} else {
 					// empty periods
-					RoundedRectangle(cornerRadius: 7)
+					RoundedRectangle(cornerRadius: 5)
 						.fill(.white.opacity(0.05))
 						.frame(height: 25)
 				}
