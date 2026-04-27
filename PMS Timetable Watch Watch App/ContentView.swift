@@ -227,6 +227,17 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 		handleIncomingPayload(applicationContext, source: "applicationContext")
 	}
 
+	func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
+		print("[Watch] didReceiveMessage")
+		handleIncomingPayload(message, source: "message")
+	}
+
+	func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
+		print("[Watch] didReceiveMessage with replyHandler")
+		handleIncomingPayload(message, source: "message")
+		replyHandler(["status": "ok"])
+	}
+
 	private func handleIncomingPayload(_ payload: [String: Any], source: String) {
 		if let payloadError = payload["error"] as? String {
 			print("[Watch] Payload error from \(source): \(payloadError)")
