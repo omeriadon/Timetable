@@ -18,6 +18,8 @@
 		2A1DB41C2F9ECEC100E5AE7C /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A1DB41B2F9ECEC100E5AE7C /* SwiftUI.framework */; };
 		2A1DB4272F9ECEC300E5AE7C /* PMS Timetable Watch WidgetsExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2A1DB4182F9ECEC100E5AE7C /* PMS Timetable Watch WidgetsExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2A1DB4362F9ED0B500E5AE7C /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2A1DB4352F9ED0B500E5AE7C /* Defaults */; };
+		2A1DB4752F9F822B00E5AE7C /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 2A1DB4742F9F822B00E5AE7C /* Debug.xcconfig */; };
+		2A1DB4772F9F823100E5AE7C /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 2A1DB4762F9F823100E5AE7C /* Release.xcconfig */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,6 +72,8 @@
 		2A1DB4192F9ECEC100E5AE7C /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		2A1DB41B2F9ECEC100E5AE7C /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		2A1DB4382F9ED8E900E5AE7C /* PMS Timetable Watch WidgetsExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "PMS Timetable Watch WidgetsExtension.entitlements"; sourceTree = "<group>"; };
+		2A1DB4742F9F822B00E5AE7C /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		2A1DB4762F9F823100E5AE7C /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -144,6 +148,8 @@
 			isa = PBXGroup;
 			children = (
 				2A1DB4382F9ED8E900E5AE7C /* PMS Timetable Watch WidgetsExtension.entitlements */,
+				2A1DB4742F9F822B00E5AE7C /* Debug.xcconfig */,
+				2A1DB4762F9F823100E5AE7C /* Release.xcconfig */,
 				2A02378D2F9C8EA000AB1E1F /* PMS Timetable */,
 				2A098C842F9DB842002065BE /* PMS Timetable Watch Watch App */,
 				2A1DB41D2F9ECEC100E5AE7C /* PMS Timetable Watch Widgets */,
@@ -305,7 +311,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2A1DB4772F9F823100E5AE7C /* Release.xcconfig in Resources */,
 				2A1DB4102F9E24D800E5AE7C /* PMSTimetable.icon in Resources */,
+				2A1DB4752F9F822B00E5AE7C /* Debug.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -366,6 +374,7 @@
 /* Begin XCBuildConfiguration section */
 		2A0237942F9C8EA100AB1E1F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2A1DB4742F9F822B00E5AE7C /* Debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -430,6 +439,7 @@
 		};
 		2A0237952F9C8EA100AB1E1F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2A1DB4762F9F823100E5AE7C /* Release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -533,7 +543,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = C2HN547N49;
+				DEVELOPMENT_TEAM = P6PV2R9443;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "PMS Timetable";
@@ -549,7 +559,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.omeriadon.PMS-Timetable";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.omeriadon-release.PMS-Timetable";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -609,18 +619,18 @@
 				CODE_SIGN_ENTITLEMENTS = "PMS Timetable Watch Watch App/PMS Timetable Watch Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = C2HN547N49;
+				DEVELOPMENT_TEAM = P6PV2R9443;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "PMS Timetable Watch";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.omeriadon.PMS-Timetable";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.omeriadon-release.PMS-Timetable";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.omeriadon.PMS-Timetable.watchkitapp";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.omeriadon-release.PMS-Timetable.watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -677,7 +687,7 @@
 				CODE_SIGN_ENTITLEMENTS = "PMS Timetable Watch WidgetsExtension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = C2HN547N49;
+				DEVELOPMENT_TEAM = P6PV2R9443;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "PMS Timetable Watch Widgets/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "PMS Timetable Watch Widgets";
@@ -689,7 +699,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.omeriadon.PMS-Timetable.watchkitapp.PMS-Timetable-Watch-Widgets";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.omeriadon-release.PMS-Timetable.watchkitapp.PMS-Timetable-Watch-Widgets";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
