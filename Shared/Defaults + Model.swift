@@ -8,12 +8,13 @@
 import SwiftUI
 import Defaults
 
-let appGroupID = "group.com.omeriadon.pms-timetable"
+let appGroupID = "group.omeriadon.pmstimetable"
+private let sharedDefaults = UserDefaults(suiteName: appGroupID) ?? UserDefaults.standard
 
 extension Defaults.Serializable {
-static var defaults: UserDefaults {
-UserDefaults(suiteName: appGroupID) ?? UserDefaults.standard
-}
+	static var defaults: UserDefaults {
+		sharedDefaults
+	}
 }
 
 enum DisplayMode: String, Codable, Equatable {
@@ -24,12 +25,8 @@ case textOnly = "textOnly"
 extension DisplayMode: Defaults.Serializable {}
 
 extension Defaults.Keys {
-static let timetable = Key<[Class]>("timetable", default: defaultTimetable, suite: UserDefaults(suiteName: appGroupID) ?? UserDefaults.standard)
-	static let displayMode = Key<DisplayMode>(
-		"displayMode",
-		default: .textOnly,
-		suite: UserDefaults(suiteName: appGroupID) ?? UserDefaults.standard
-	)
+	static let timetable = Key<[Class]>("timetable", default: defaultTimetable, suite: sharedDefaults)
+	static let displayMode = Key<DisplayMode>("displayMode", default: .textOnly, suite: sharedDefaults)
 }
 
 struct Class: Hashable, Codable, Defaults.Serializable, Identifiable {

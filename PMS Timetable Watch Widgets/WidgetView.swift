@@ -38,7 +38,6 @@ struct WidgetView: View {
 					}
 				}
 			}
-			.padding(.top, 3)
 			.environment(\.dynamicTypeSize, .xSmall)
 			.monospaced()
 		}
@@ -70,7 +69,7 @@ struct WidgetView: View {
 						case .textOnly:
 							Text(c.id)
 								.lineLimit(1)
-								.font(.footnote.scaled(by: 0.4))
+								.font(.footnote.scaled(by: 0.45))
 						}
 					}
 					.padding(1)

@@ -95,28 +95,36 @@ struct ContentView: View {
 
 				Spacer(minLength: 1)
 
-				VStack {
-					Spacer()
+				List {
 					HStack {
+						Label("watchOS Widget Style", systemImage: "platter.filled.bottom.applewatch.case")
+
 						Spacer()
 
-					Picker("Display", selection: $displayMode) {
-						Text("Symbols").tag(DisplayMode.symbolsOnly)
-						Text("Text").tag(DisplayMode.textOnly)
-					}
-					.pickerStyle(.segmented)
-					.frame(maxWidth: 200)
-					.onChange(of: displayMode) { _, _ in
-						WidgetCenter.shared.reloadAllTimelines()
-						Task {
-							await syncToWatchAsync()
+						Picker("", selection: $displayMode) {
+							Label("Symbols", systemImage: "square.grid.2x2")
+								.labelIconToTitleSpacing(30)
+								.tag(DisplayMode.symbolsOnly)
+							Label("Text", systemImage: "text.alignleft")
+								.labelIconToTitleSpacing(30)
+								.tag(DisplayMode.textOnly)
+						}
+
+						.pickerStyle(.menu)
+						.onChange(of: displayMode) { _, _ in
+							WidgetCenter.shared.reloadAllTimelines()
+							Task {
+								await syncToWatchAsync()
+							}
 						}
 					}
-
-						Spacer()
-					}
-					Spacer()
+					.listRowBackground(
+						Rectangle()
+							.fill(.ultraThinMaterial)
+					)
 				}
+				.scrollContentBackground(.hidden)
+				.scrollDisabled(true)
 				.padding(10)
 				.glassEffect(
 					.regular.tint(.blue).interactive(),
@@ -126,7 +134,7 @@ struct ContentView: View {
 					)
 				)
 				.padding(.top)
-				.padding(13)
+				.padding(10)
 				.ignoresSafeArea()
 			}
 			.padding(.horizontal, 3)
