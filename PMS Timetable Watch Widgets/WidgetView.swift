@@ -34,41 +34,43 @@ struct WidgetView: View {
 							.frame(height: 10)
 						ForEach(0 ..< 8) { session in
 							sessionCell(day, session)
-								.frame(height: 8)
 						}
 					}
 				}
 			}
+			.padding(.top, 3)
 			.environment(\.dynamicTypeSize, .xSmall)
-			.monospaced()	
+			.monospaced()
 		}
 	}
 
 	@ViewBuilder
 	func sessionCell(_ day: Int, _ session: Int) -> some View {
 		if session == 2 || session == 5 {
-			RoundedRectangle(cornerRadius: 0)
-				.fill(.clear)
+			Text("")
+				.font(.footnote.scaled(by: 0.1))
 				.frame(height: 2)
 		} else {
 			if day == 2 && session == 7 || day == 4 && session == 7 {
 				RoundedRectangle(cornerRadius: 0)
 					.fill(.clear)
-					.frame(height: 20)
 			} else {
 				if let c = classLookup["\(day)-\(session)"] {
 					VStack(alignment: .leading) {
 						switch displayMode {
 						case .symbolsOnly:
-							Image(systemName: c.symbol)
+							HStack {
+								Spacer(minLength: 0)
+								Image(systemName: c.symbol)
 									.resizable()
 									.aspectRatio(contentMode: .fit)
-								.imageScale(.small)
-								.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+									.imageScale(.small)
+								Spacer(minLength: 0)
+							}
 						case .textOnly:
 							Text(c.id)
 								.lineLimit(1)
-								.font(.footnote.scaled(by: 0.3))
+								.font(.footnote.scaled(by: 0.4))
 						}
 					}
 					.padding(1)
@@ -81,7 +83,6 @@ struct WidgetView: View {
 				} else {
 					RoundedRectangle(cornerRadius: 0)
 						.fill(.white.opacity(0.05))
-						.frame(height: 20)
 				}
 			}
 		}

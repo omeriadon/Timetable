@@ -43,6 +43,7 @@ struct PMS_Timetable_Watch_WidgetsEntryView: View {
 
 	var body: some View {
 		WidgetView(classes: entry.classes, displayMode: entry.displayMode)
+			.padding(1)
 	}
 }
 
@@ -52,8 +53,9 @@ struct PMS_Timetable_Watch_Widgets: Widget {
 	var body: some WidgetConfiguration {
 		StaticConfiguration(kind: kind, provider: Provider()) { entry in
 			PMS_Timetable_Watch_WidgetsEntryView(entry: entry)
-				.containerBackground(.fill.tertiary, for: .widget)
+				.containerBackground(.black, for: .widget)
 		}
+		.contentMarginsDisabled()
 		.configurationDisplayName("PMS Timetable")
 		.description("Your class schedule for the week.")
 	}
@@ -62,5 +64,9 @@ struct PMS_Timetable_Watch_Widgets: Widget {
 #Preview(as: .accessoryRectangular) {
 	PMS_Timetable_Watch_Widgets()
 } timeline: {
-	TimetableEntry(date: .now, classes: defaultTimetable, displayMode: .symbolsOnly)
+	TimetableEntry(
+		date: .now,
+		classes: defaultTimetable,
+		displayMode: .symbolsOnly
+	)
 }

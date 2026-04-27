@@ -16,6 +16,7 @@ struct ContentView: View {
 	@State private var selectedDay = 0
 	@State private var isLoading = false
 	@State private var showSyncErrorIcon = false
+	@State private var displayModeConfirmation: String?
 
 	private let sessions = ["1", "2", "R", "3", "4", "L", "5", "6"]
 	private let dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri"]
@@ -59,6 +60,21 @@ struct ContentView: View {
 		}
 		.environment(\.dynamicTypeSize, .xSmall)
 		.monospaced()
+		.overlay(alignment: .center) {
+			if let mode = displayModeConfirmation {
+				VStack(spacing: 8) {
+					Label(mode, systemImage: mode == "Symbols" ? "square.grid.2x2" : "text.align.left")
+						.font(.headline)
+				}
+				.padding(.horizontal, 24)
+				.padding(.vertical, 14)
+				.glassEffect(
+					.regular.tint(.blue),
+					in: RoundedRectangle(cornerRadius: 12)
+				)
+				.transition(.opacity.combined(with: .scale(scale: 0.9)))
+			}
+		}
 		.onAppear {
 			print("[Watch] ContentView appeared")
 			syncStore.activateIfNeeded()
@@ -75,6 +91,12 @@ struct ContentView: View {
 			print("[Watch] Surface error icon: \(newValue)")
 			flashSyncErrorIcon()
 			syncStore.alertMessage = nil
+		}
+		.onChange(of: syncStore.displayMode) { _, newMode in
+			displayModeConfirmation = newMode == .symbolsOnly ? "Symbols" : "Text"
+			DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+				displayModeConfirmation = nil
+			}
 		}
 	}
 
@@ -104,7 +126,7 @@ struct ContentView: View {
 					.frame(height: 25)
 
 			} else {
-				// actual sessino
+				// actual session
 				if let c = classFor(day: day, session: session) {
 					rectangle(
 						c.colour.swiftUIColor.opacity(0.8)
@@ -160,8 +182,8 @@ struct ContentView: View {
 }
 
 final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelegate {
-	@Default(.timetable) var classes
-	@Default(.displayMode) var displayMode
+	@Published var classes: [Class] = []
+	@Published var displayMode: DisplayMode = .symbolsOnly
 	@Published var alertMessage: String?
 	
 	var classLookup: [String: Class] = [:]
@@ -170,8 +192,10 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 
 	override init() {
 		super.init()
-		buildLookupTable(Defaults[.timetable])
-		print("[Watch] Init complete, loaded from Defaults: \(Defaults[.timetable].count) classes")
+		classes = Defaults[.timetable]
+		displayMode = Defaults[.displayMode]
+		buildLookupTable(classes)
+		print("[Watch] Init complete, loaded from Defaults: \(classes.count) classes")
 	}
 
 	func activateIfNeeded() {
@@ -239,8 +263,11 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 				self.classes = decoded
 				self.displayMode = mode
 				self.buildLookupTable(decoded)
+				Defaults[.timetable] = decoded
+				Defaults[.displayMode] = mode
+				print("[Watch] Saved to Defaults - displayMode: \(mode.rawValue)")
 				WidgetCenter.shared.reloadAllTimelines()
-				print("[Watch] ✓ UI updated and saved to Defaults via @Default")
+				print("[Watch] ✓ Reloaded widget timelines")
 			}
 		} catch {
 			print("[Watch] Failed to decode payload from \(source): \(error.localizedDescription)")
