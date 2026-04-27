@@ -328,187 +328,222 @@ struct CalendarImportView: View {
 	}
 
 	func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Class] {
-		let timeSlots = [
-			(startHour: 8, startMinute: 50, endHour: 9, endMinute: 48),
-			(startHour: 9, startMinute: 48, endHour: 10, endMinute: 46),
-			(startHour: 11, startMinute: 8, endHour: 12, endMinute: 6),
-			(startHour: 12, startMinute: 6, endHour: 13, endMinute: 4),
-			(startHour: 13, startMinute: 34, endHour: 14, endMinute: 32),
-			(startHour: 14, startMinute: 32, endHour: 15, endMinute: 30),
+		struct SlotWindow {
+			let session: Int
+			let startHour: Int
+			let startMinute: Int
+			let endHour: Int
+			let endMinute: Int
+		}
+
+		let timeSlots: [SlotWindow] = [
+			.init(session: 0, startHour: 8,  startMinute: 50, endHour: 9,  endMinute: 48),
+			.init(session: 1, startHour: 9,  startMinute: 48, endHour: 10, endMinute: 46),
+			.init(session: 3, startHour: 11, startMinute: 8,  endHour: 12, endMinute: 6),
+			.init(session: 4, startHour: 12, startMinute: 6,  endHour: 13, endMinute: 4),
+			.init(session: 6, startHour: 13, startMinute: 34, endHour: 14, endMinute: 32),
+			.init(session: 7, startHour: 14, startMinute: 32, endHour: 15, endMinute: 30),
 		]
 
+		let calendar = Calendar.current
 		var classMap: [String: (color: RGBAColor, symbol: String, slots: [Slot])] = [:]
-		var foundClasses = Set<String>()
 
-		for day in 0..<5 {
-			for (sessionIndex, slot) in timeSlots.enumerated() {
-				let targetDate = Calendar.current.date(byAdding: .day, value: day, to: calculateNextMonday()) ?? Date()
-				guard let slotStart = Calendar.current.date(bySettingHour: slot.startHour, minute: slot.startMinute, second: 0, of: targetDate),
-				      let slotEnd = Calendar.current.date(bySettingHour: slot.endHour, minute: slot.endMinute, second: 0, of: targetDate)
-				else {
-					continue
-				}
+		for event in events {
+			guard
+				let title = event.title?.trimmingCharacters(in: .whitespacesAndNewlines),
+				!title.isEmpty
+			else { continue }
 
-				let overlappingEvents = events.filter { $0.startDate < slotEnd && $0.endDate > slotStart }
-				if let event = overlappingEvents.sorted(by: { $0.startDate < $1.startDate }).first ?? events.first(where: { $0.startDate >= slotStart && $0.startDate < slotEnd }) {
-					guard let className = event.title, !className.isEmpty else { continue }
-					foundClasses.insert(className)
+			let weekday = calendar.component(.weekday, from: event.startDate)
+			guard (2...6).contains(weekday) else { continue } // Mon...Fri
 
-					if classMap[className] == nil {
-						let randomColor = RGBAColor(
-							color: AvailableColors.allCases
-								.randomElement()!.SwiftUIColor
-						)
+			let day = weekday - 2 // Mon = 0, Tue = 1, ..., Fri = 4
+			let dayStart = calendar.startOfDay(for: event.startDate)
 
-						let symbols: [String] = [
-							"pencil.and.scribble",
-							"pencil.tip.crop.circle.badge.arrow.forward",
-							"trash.slash.fill",
-							"folder.badge.plus",
-							"folder.fill.badge.gearshape",
-							"paperplane",
-							"tray.full.fill",
-							"externaldrive.badge.minus",
-							"externaldrive.fill.badge.person.crop",
-							"opticaldiscdrive",
-							"xmark.bin.circle.fill",
-							"document.badge.arrow.up",
-							"arrow.up.document.fill",
-							"arrow.trianglehead.2.clockwise.rotate.90.page.on.clipboard",
-							"heart.text.clipboard.fill",
-							"text.pad.header.badge.clock",
-							"calendar.badge.lock",
-							"11.calendar",
-							"22.calendar",
-							"book",
-							"book.closed.fill",
-							"magazine",
-							"bookmark.square.fill",
-							"backpack",
-							"link",
-							"person.2.badge.key.fill",
-							"oar.2.crossed.circle",
-							"baseball.fill",
-							"american.football.professional",
-							"rugbyball.circle.fill",
-							"cricket.ball.circle.fill",
-							"skis",
-							"trophy.circle",
-							"umbrella.circle.fill",
-							"speaker.plus",
-							"speaker.wave.1",
-							"speaker.trianglebadge.exclamationmark.fill",
-							"arrow.up.left.and.down.right.magnifyingglass",
-							"shield.lefthalf.filled.trianglebadge.exclamationmark",
-							"flag.circle.fill",
-							"flag.pattern.checkered.circle.fill",
-							"bell.circle",
-							"bell.badge.waveform.slash.fill",
-							"tag.circle",
-							"flashlight.on.fill",
-							"camera.shutter.button.fill",
-							"gearshape.fill",
-							"bag.badge.plus",
-							"cart.fill.badge.plus",
-							"creditcard.circle",
-							"wand.and.outline",
-							"dial.medium.fill",
-							"gauge.with.dots.needle.50percent",
-							"die.face.2",
-							"pianokeys.inverse",
-							"hammer.fill",
-							"scroll.fill",
-							"printer.fill",
-							"faxmachine",
-							"case.fill",
-							"suitcase.rolling",
-							"suitcase.rolling.and.film.circle.fill",
-							"puzzlepiece.extension",
-							"lightbulb.min.fill",
-							"fan.oscillation",
-							"fan.badge.arrow.up.and.down.and.arrow.left.and.right.fill",
-							"lamp.table",
-							"light.recessed.3.fill",
-							"chandelier",
-							"light.beacon.min.fill",
-							"door.left.hand.open",
-							"door.garage.closed.trianglebadge.exclamationmark",
-							"air.purifier",
-							"heater.vertical.fill",
-							"drop.keypad.rectangle",
-							"hifireceiver.fill",
-							"laser.burst",
-							"bed.double.circle.fill",
-							"cabinet",
-							"dryer.circle.fill",
-							"microwave",
-							"sink.fill",
-							"tent.2.circle",
-							"signpost.left.fill",
-							"signpost.and.arrowtriangle.up",
-							"lock.fill",
-							"lock.rectangle.stack",
-							"exclamationmark.lock.fill",
-							"lock.rotation",
-							"key.radiowaves.forward.slash.fill",
-							"pin.square.fill",
-							"mappin.and.ellipse",
-							"opticaldisc",
-							"backpack.sensor.tag.radiowaves.left.and.right.fill",
-							"umbrella.sensor.tag.radiowaves.left.and.right",
-							"headset",
-							"earbuds.in.ear.left",
-							"antenna.radiowaves.left.and.right.slash",
-							"helmet",
-							"fuelpump.exclamationmark.fill",
-							"ev.charger.slash.fill",
-							"shoe.arrow.trianglehead.up.and.down",
-							"batteryblock.fill",
-							"batteryblock.stack",
-							"minus.plus.batteryblock.stack.arrowtriangle.left.fill",
-							"horn.fill",
-							"ev.plug.dc.ccs1",
-							"medical.thermometer.fill",
-							"pills",
-							"teddybear",
-							"hat.cap",
-							"shoe.fill",
-							"movieclapper",
-							"sunglasses.fill",
-							"cube.circle.fill",
-							"clock.badge",
-							"clock.badge.airplane.fill",
-							"gauge.with.needle",
-							"gamecontroller.circle.fill",
-							"takeoutbag.and.cup.and.straw",
-							"fork.knife",
-							"scalemass",
-							"hourglass",
-							"australiandollarsign.bank.building.fill",
-							"chineseyuanrenminbisign.bank.building",
-							"dongsign.bank.building.fill",
-							"hryvniasign.bank.building",
-							"malaysianringgitsign.bank.building.fill",
-							"pesetasign.bank.building",
-							"shekelsign.bank.building.fill",
-							"turkishlirasign.bank.building",
-							"binoculars.circle",
-							"exclamationmark.shield.fill",
-						]
+			guard let matchedSlot = timeSlots.first(where: { slot in
+				guard
+					let slotStart = calendar.date(
+						bySettingHour: slot.startHour,
+						minute: slot.startMinute,
+						second: 0,
+						of: dayStart
+					),
+					let slotEnd = calendar.date(
+						bySettingHour: slot.endHour,
+						minute: slot.endMinute,
+						second: 0,
+						of: dayStart
+					)
+				else { return false }
 
-						let randomSymbol = symbols[Int.random(in: 0..<symbols.count - 1)]
-
-						classMap[className] = (color: randomColor, symbol: randomSymbol, slots: [])
-					}
-
-					classMap[className]?.slots.append(Slot(day, sessionIndex + 1))
-				}
+				return event.startDate < slotEnd && event.endDate > slotStart
+			}) else {
+				continue
 			}
+
+			if classMap[title] == nil {
+				let randomColor = RGBAColor(
+					color: AvailableColors.allCases.randomElement()!.SwiftUIColor
+				)
+
+				let symbols: [String] = [
+					"pencil.and.scribble",
+					"pencil.tip.crop.circle.badge.arrow.forward",
+					"trash.slash.fill",
+					"folder.badge.plus",
+					"folder.fill.badge.gearshape",
+					"paperplane",
+					"tray.full.fill",
+					"externaldrive.badge.minus",
+					"externaldrive.fill.badge.person.crop",
+					"opticaldiscdrive",
+					"xmark.bin.circle.fill",
+					"document.badge.arrow.up",
+					"arrow.up.document.fill",
+					"arrow.trianglehead.2.clockwise.rotate.90.page.on.clipboard",
+					"heart.text.clipboard.fill",
+					"text.pad.header.badge.clock",
+					"calendar.badge.lock",
+					"11.calendar",
+					"22.calendar",
+					"book",
+					"book.closed.fill",
+					"magazine",
+					"bookmark.square.fill",
+					"backpack",
+					"link",
+					"person.2.badge.key.fill",
+					"oar.2.crossed.circle",
+					"baseball.fill",
+					"american.football.professional",
+					"rugbyball.circle.fill",
+					"cricket.ball.circle.fill",
+					"skis",
+					"trophy.circle",
+					"umbrella.circle.fill",
+					"speaker.plus",
+					"speaker.wave.1",
+					"speaker.trianglebadge.exclamationmark.fill",
+					"arrow.up.left.and.down.right.magnifyingglass",
+					"shield.lefthalf.filled.trianglebadge.exclamationmark",
+					"flag.circle.fill",
+					"flag.pattern.checkered.circle.fill",
+					"bell.circle",
+					"bell.badge.waveform.slash.fill",
+					"tag.circle",
+					"flashlight.on.fill",
+					"camera.shutter.button.fill",
+					"gearshape.fill",
+					"bag.badge.plus",
+					"cart.fill.badge.plus",
+					"creditcard.circle",
+					"wand.and.outline",
+					"dial.medium.fill",
+					"gauge.with.dots.needle.50percent",
+					"die.face.2",
+					"pianokeys.inverse",
+					"hammer.fill",
+					"scroll.fill",
+					"printer.fill",
+					"faxmachine",
+					"case.fill",
+					"suitcase.rolling",
+					"suitcase.rolling.and.film.circle.fill",
+					"puzzlepiece.extension",
+					"lightbulb.min.fill",
+					"fan.oscillation",
+					"fan.badge.arrow.up.and.down.and.arrow.left.and.right.fill",
+					"lamp.table",
+					"light.recessed.3.fill",
+					"chandelier",
+					"light.beacon.min.fill",
+					"door.left.hand.open",
+					"door.garage.closed.trianglebadge.exclamationmark",
+					"air.purifier",
+					"heater.vertical.fill",
+					"drop.keypad.rectangle",
+					"hifireceiver.fill",
+					"laser.burst",
+					"bed.double.circle.fill",
+					"cabinet",
+					"dryer.circle.fill",
+					"microwave",
+					"sink.fill",
+					"tent.2.circle",
+					"signpost.left.fill",
+					"signpost.and.arrowtriangle.up",
+					"lock.fill",
+					"lock.rectangle.stack",
+					"exclamationmark.lock.fill",
+					"lock.rotation",
+					"key.radiowaves.forward.slash.fill",
+					"pin.square.fill",
+					"mappin.and.ellipse",
+					"opticaldisc",
+					"backpack.sensor.tag.radiowaves.left.and.right.fill",
+					"umbrella.sensor.tag.radiowaves.left.and.right",
+					"headset",
+					"earbuds.in.ear.left",
+					"antenna.radiowaves.left.and.right.slash",
+					"helmet",
+					"fuelpump.exclamationmark.fill",
+					"ev.charger.slash.fill",
+					"shoe.arrow.trianglehead.up.and.down",
+					"batteryblock.fill",
+					"batteryblock.stack",
+					"minus.plus.batteryblock.stack.arrowtriangle.left.fill",
+					"horn.fill",
+					"ev.plug.dc.ccs1",
+					"medical.thermometer.fill",
+					"pills",
+					"teddybear",
+					"hat.cap",
+					"shoe.fill",
+					"movieclapper",
+					"sunglasses.fill",
+					"cube.circle.fill",
+					"clock.badge",
+					"clock.badge.airplane.fill",
+					"gauge.with.needle",
+					"gamecontroller.circle.fill",
+					"takeoutbag.and.cup.and.straw",
+					"fork.knife",
+					"scalemass",
+					"hourglass",
+					"australiandollarsign.bank.building.fill",
+					"chineseyuanrenminbisign.bank.building",
+					"dongsign.bank.building.fill",
+					"hryvniasign.bank.building",
+					"malaysianringgitsign.bank.building.fill",
+					"pesetasign.bank.building",
+					"shekelsign.bank.building.fill",
+					"turkishlirasign.bank.building",
+					"binoculars.circle",
+					"exclamationmark.shield.fill"
+				]
+
+				classMap[title] = (
+					color: randomColor,
+					symbol: symbols.randomElement()!,
+					slots: []
+				)
+			}
+
+			classMap[title]!.slots.append(Slot(day, matchedSlot.session))
 		}
 
-		return classMap.map { name, data in
-			Class(id: name, symbol: data.symbol, colour: data.color, slots: data.slots)
-		}
+		return classMap
+			.map { name, data in
+				Class(
+					id: name,
+					symbol: data.symbol,
+					colour: data.color,
+					slots: data.slots.sorted {
+						$0.day == $1.day ? $0.session < $1.session : $0.day < $1.day
+					}
+				)
+			}
+			.sorted { $0.id < $1.id }
 	}
 }
 
