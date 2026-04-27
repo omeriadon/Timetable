@@ -7,63 +7,28 @@
 
 import SwiftUI
 import WidgetKit
+import Defaults
 
 struct Provider: TimelineProvider {
-	private let appGroupID = "group.com.omeriadon.pms-timetable"
-
-	private var sharedDefaults: UserDefaults {
-		UserDefaults(suiteName: appGroupID) ?? UserDefaults.standard
-	}
-
 	func placeholder(in context: Context) -> TimetableEntry {
 		TimetableEntry(date: Date(), classes: [], displayMode: .symbolsOnly)
 	}
 
 	func getSnapshot(in context: Context, completion: @escaping (TimetableEntry) -> ()) {
-		let classes = loadClassesFromUserDefaults()
-		let displayMode = loadDisplayModeFromUserDefaults()
+		let classes = Defaults[.timetable]
+		let displayMode = Defaults[.displayMode]
+		print("[Widget] getSnapshot: classes=\(classes.count), displayMode=\(displayMode.rawValue)")
 		let entry = TimetableEntry(date: Date(), classes: classes, displayMode: displayMode)
 		completion(entry)
 	}
 
 	func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-		let classes = loadClassesFromUserDefaults()
-		let displayMode = loadDisplayModeFromUserDefaults()
+		let classes = Defaults[.timetable]
+		let displayMode = Defaults[.displayMode]
+		print("[Widget] getTimeline: classes=\(classes.count), displayMode=\(displayMode.rawValue)")
 		let entry = TimetableEntry(date: Date(), classes: classes, displayMode: displayMode)
 		let timeline = Timeline(entries: [entry], policy: .never)
 		completion(timeline)
-	}
-
-	private func loadClassesFromUserDefaults() -> [Class] {
-		guard let data = sharedDefaults.data(forKey: "watchTimetableCache") else {
-			print("[Widget] No cached timetable found in shared storage")
-			return []
-		}
-
-		do {
-			let classes = try JSONDecoder().decode([Class].self, from: data)
-			print("[Widget] Loaded \(classes.count) classes from shared storage")
-			return classes
-		} catch {
-			print("[Widget] Failed to decode classes: \(error)")
-			return []
-		}
-	}
-
-	private func loadDisplayModeFromUserDefaults() -> DisplayMode {
-		guard let data = sharedDefaults.data(forKey: "watchDisplayMode") else {
-			print("[Widget] No cached displayMode found, using default")
-			return .symbolsOnly
-		}
-
-		do {
-			let mode = try JSONDecoder().decode(DisplayMode.self, from: data)
-			print("[Widget] Loaded displayMode from shared storage: \(mode.rawValue)")
-			return mode
-		} catch {
-			print("[Widget] Failed to decode displayMode: \(error)")
-			return .symbolsOnly
-		}
 	}
 }
 

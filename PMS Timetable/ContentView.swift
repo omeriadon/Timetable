@@ -10,6 +10,7 @@ import Defaults
 import SFSymbolsPicker
 import SwiftUI
 import WatchConnectivity
+import WidgetKit
 
 struct EditableSlot: Identifiable, Hashable {
 	let id = UUID()
@@ -106,6 +107,7 @@ struct ContentView: View {
 					.pickerStyle(.segmented)
 					.frame(maxWidth: 200)
 					.onChange(of: displayMode) { _, _ in
+						WidgetCenter.shared.reloadAllTimelines()
 						Task {
 							await syncToWatchAsync()
 						}

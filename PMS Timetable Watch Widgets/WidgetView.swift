@@ -16,21 +16,32 @@ struct WidgetView: View {
 	}
 
 	var body: some View {
-		HStack(spacing: 0) {
-			ForEach(0 ..< 5) { day in
-				VStack(spacing: 0) {
-					Text(["Mon", "Tue", "Wed", "Thu", "Fri"][day])
-						.font(.footnote.scaled(by: 0.5))
-						.frame(height: 10)
-					ForEach(0 ..< 8) { session in
-						sessionCell(day, session)
-							.frame(height: 8)
+		if classes.isEmpty {
+			VStack(spacing: 4) {
+				Text("No timetable")
+					.font(.caption)
+				Text("synced yet")
+					.font(.caption)
+			}
+			.frame(maxWidth: .infinity, maxHeight: .infinity)
+			.background(Color.gray.opacity(0.2))
+		} else {
+			HStack(spacing: 0) {
+				ForEach(0 ..< 5) { day in
+					VStack(spacing: 0) {
+						Text(["Mon", "Tue", "Wed", "Thu", "Fri"][day])
+							.font(.footnote.scaled(by: 0.5))
+							.frame(height: 10)
+						ForEach(0 ..< 8) { session in
+							sessionCell(day, session)
+								.frame(height: 8)
+						}
 					}
 				}
 			}
+			.environment(\.dynamicTypeSize, .xSmall)
+			.monospaced()	
 		}
-		.environment(\.dynamicTypeSize, .xSmall)
-		.monospaced()
 	}
 
 	@ViewBuilder
