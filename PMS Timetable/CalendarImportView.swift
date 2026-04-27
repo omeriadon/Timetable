@@ -9,7 +9,7 @@ import Defaults
 import EventKit
 import SwiftUI
 
-enum CalendarImportStep {
+enum CalendarImportStep: Equatable {
 	case checkingAuthorisation
 	case requestionCalendarAccess
 	case findingCalendar
@@ -121,6 +121,7 @@ struct CalendarImportView: View {
 
 			HStack(alignment: .center) {
 				Text("\(calendarImportStep.progress)")
+					.contentTransition(.numericText())
 
 				Gauge(
 					value: Double(calendarImportStep.progress),
@@ -138,6 +139,7 @@ struct CalendarImportView: View {
 				Text("\(calendarImportStep.total)")
 			}
 		}
+		.animation(.easeInOut, value: calendarImportStep)
 		.task {
 			await performCalendarImport()
 		}
@@ -156,11 +158,9 @@ struct CalendarImportView: View {
 		.presentationDragIndicator(.hidden)
 	}
 
-	func moveForward(to step: CalendarImportStep) {
-		Task {
-			let delay = Double.random(in: 0.5...1.5)
-			try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
-		}
+	func moveForward(to step: CalendarImportStep) async {
+		let delay = Double.random(in: 0.5...1.5)
+		try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
 		calendarImportStep = step
 	}
 
@@ -177,12 +177,12 @@ struct CalendarImportView: View {
 	func performCalendarImport() async {
 		do {
 			print("[iOS] Calendar Import: Starting authorization check...")
-			moveForward(to: .checkingAuthorisation)
+			await moveForward(to: .checkingAuthorisation)
 
 			let eventStore = EKEventStore()
 
 			print("[iOS] Calendar Import: Requesting calendar access...")
-			moveForward(to: .requestionCalendarAccess)
+			await moveForward(to: .requestionCalendarAccess)
 
 			let authorized = try await eventStore.requestFullAccessToEvents()
 
@@ -192,7 +192,7 @@ struct CalendarImportView: View {
 			}
 
 			print("[iOS] Calendar Import: Searching for Compass calendar...")
-			moveForward(to: .findingCalendar)
+			await moveForward(to: .findingCalendar)
 
 			guard let calendar = eventStore.calendars(for: .event).first(where: { $0.title.contains("Compass") }) else {
 				errorAndExit("Compass calendar not found")
@@ -202,26 +202,27 @@ struct CalendarImportView: View {
 			}
 
 			print("[iOS] Calendar Import: Fetching events...")
-			moveForward(to: .fetchingEvents)
+			await moveForward(to: .fetchingEvents)
 
 			let events = try await fetchCompassEvents(from: eventStore, calendar: calendar)
 
 			print("[iOS] Calendar Import: Matching events to time slots...")
-			moveForward(to: .matchingEvents)
+			await moveForward(to: .matchingEvents)
 
 			let importedClasses = try await matchEventsToTimeSlots(events)
 
 			print("[iOS] Calendar Import: Processing titles...")
-			moveForward(to: .translatingTitles)
+			await moveForward(to: .translatingTitles)
 
 			print("[iOS] Calendar Import: Validating...")
-			moveForward(to: .finalising)
+			await moveForward(to: .finalising)
 
 			classes = importedClasses
 
+			await moveForward(to: .done)
 			print("[iOS] Calendar Import: Success!")
 			calendarImportStatus = .success
-			try? await Task.sleep(nanoseconds: 1_200_000_000)
+			try? await Task.sleep(nanoseconds: 2_00_000_000)
 			dismiss()
 			calendarImportStatus = .loading
 
