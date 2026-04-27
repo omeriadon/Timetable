@@ -135,7 +135,14 @@ struct ContentView: View {
 					Button {
 						showCalendarImportSheet = true
 					} label: {
-						Label("Import from Calendar", systemImage: "calendar")
+						Label {
+							Text("Import Calendar")
+							Text("You need to subscribe to Compass Schedule in Calendar to import.")
+								.foregroundStyle(.secondary)
+
+						} icon: {
+							Image(systemName: "calendar")
+						}
 					}
 					.listRowBackground(
 						Rectangle()

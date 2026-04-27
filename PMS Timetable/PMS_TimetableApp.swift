@@ -12,6 +12,7 @@ struct PMS_TimetableApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+				.preferredColorScheme(.dark)
         }
     }
 }

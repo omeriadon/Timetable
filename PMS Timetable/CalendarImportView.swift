@@ -251,7 +251,7 @@ struct CalendarImportView: View {
 	}
 
 	func translateTitle(_ original: String) -> String {
-		let lower = original.lowercased()
+		let lower = original.uppercased()
 
 		switch true {
 			case lower.contains("DS"):
@@ -280,9 +280,6 @@ struct CalendarImportView: View {
 
 			case lower.contains("AEMAS"):
 				return "Specialist"
-
-			case lower.contains("ADV"):
-				return "Advocacy"
 
 			case lower.contains("MUSOS"):
 				return "Music"
