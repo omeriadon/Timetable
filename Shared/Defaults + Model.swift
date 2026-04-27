@@ -6,58 +6,41 @@
 //
 
 import SwiftUI
+import Defaults
 
-enum DisplayMode: String, Codable, Equatable {
-	case symbolsOnly = "symbolsOnly"
-	case textOnly = "textOnly"
+let appGroupID = "group.com.omeriadon.pms-timetable"
+
+extension Defaults.Serializable {
+static var defaults: UserDefaults {
+UserDefaults(suiteName: appGroupID) ?? UserDefaults.standard
+}
 }
 
-#if !os(watchOS)
-import Defaults
+enum DisplayMode: String, Codable, Equatable {
+case symbolsOnly = "symbolsOnly"
+case textOnly = "textOnly"
+}
 
 extension DisplayMode: Defaults.Serializable {}
 
 extension Defaults.Keys {
-	static let timetable = Key<[Class]>("timetable", default: defaultTimetable)
-	static let displayMode = Key<DisplayMode>("displayMode", default: .symbolsOnly)
-}
-#endif
-
-// array of class
-// class = name + what slots + colour + symbol
-
-#if os(watchOS)
-struct Class: Hashable, Codable, Identifiable {
-	var id: String
-	var symbol: String
-	var colour: RGBAColor
-	var slots: [Slot]
+static let timetable = Key<[Class]>("timetable", default: defaultTimetable, suite: UserDefaults(suiteName: appGroupID) ?? UserDefaults.standard)
+static let displayMode = Key<DisplayMode>("displayMode", default: .symbolsOnly, suite: UserDefaults(suiteName: appGroupID) ?? UserDefaults.standard)
 }
 
-struct Slot: Hashable, Codable {
-	let day: Int
-	let session: Int
-
-	init(_ day: Int, _ session: Int) {
-		self.day = day
-		self.session = session
-	}
-}
-#else
 struct Class: Hashable, Codable, Defaults.Serializable, Identifiable {
-	var id: String
-	var symbol: String
-	var colour: RGBAColor
-	var slots: [Slot]
+var id: String
+var symbol: String
+var colour: RGBAColor
+var slots: [Slot]
 }
 
 struct Slot: Hashable, Codable, Defaults.Serializable {
-	let day: Int
-	let session: Int
+let day: Int
+let session: Int
 
-	init(_ day: Int, _ session: Int) {
-		self.day = day
-		self.session = session
-	}
+init(_ day: Int, _ session: Int) {
+self.day = day
+self.session = session
 }
-#endif
+}
