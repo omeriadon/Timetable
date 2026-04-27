@@ -91,7 +91,8 @@ struct CalendarImportView: View {
 							.symbolEffect(.breathe)
 							.transition(.blurReplace)
 					case .success:
-						Image(systemName: "checkmark.circle.fill")
+						Image(systemName: "checkmark.circle")
+							.foregroundStyle(.green)
 							.transition(.blurReplace)
 					case .error:
 						Image(systemName: "exclamationmark.triangle.fill")
