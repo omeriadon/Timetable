@@ -63,7 +63,7 @@ struct ContentView: View {
 		.overlay(alignment: .center) {
 			if let mode = displayModeConfirmation {
 				VStack(spacing: 8) {
-					Label(mode, systemImage: mode == "Symbols" ? "square.grid.2x2" : "text.align.left")
+					Label(mode, systemImage: mode == "Symbols" ? "square.grid.2x2" : "text.alignleft")
 						.font(.headline)
 				}
 				.padding(.horizontal, 24)
@@ -78,13 +78,6 @@ struct ContentView: View {
 		.onAppear {
 			print("[Watch] ContentView appeared")
 			syncStore.activateIfNeeded()
-			// Pre-build lookup table in background so first click doesn't hang
-			Task {
-				if !syncStore.classes.isEmpty {
-					syncStore.buildLookupTable(syncStore.classes)
-					print("[Watch] Pre-built lookup table on appear")
-				}
-			}
 		}
 		.onChange(of: syncStore.alertMessage) { _, newValue in
 			guard let newValue else { return }
@@ -177,7 +170,13 @@ struct ContentView: View {
 
 	func classFor(day: Int, session: Int) -> Class? {
 		let key = "\(day)-\(session)"
-		return syncStore.classes.isEmpty ? nil : syncStore.classLookup[key]
+		var lookup: [String: Class] = [:]
+		for c in syncStore.classes {
+			for slot in c.slots {
+				lookup["\(slot.day)-\(slot.session)"] = c
+			}
+		}
+		return syncStore.classes.isEmpty ? nil : lookup[key]
 	}
 }
 
@@ -185,8 +184,6 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 	@Published var classes: [Class] = []
 	@Published var displayMode: DisplayMode = .symbolsOnly
 	@Published var alertMessage: String?
-	
-	var classLookup: [String: Class] = [:]
 
 	private var isActivated = false
 
@@ -194,7 +191,6 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 		super.init()
 		classes = Defaults[.timetable]
 		displayMode = Defaults[.displayMode]
-		buildLookupTable(classes)
 		print("[Watch] Init complete, loaded from Defaults: \(classes.count) classes")
 	}
 
@@ -262,11 +258,10 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 			DispatchQueue.main.async {
 				self.classes = decoded
 				self.displayMode = mode
-				self.buildLookupTable(decoded)
 				Defaults[.timetable] = decoded
 				Defaults[.displayMode] = mode
 				print("[Watch] Saved to Defaults - displayMode: \(mode.rawValue)")
-				WidgetCenter.shared.reloadAllTimelines()
+				WidgetCenter.shared.reloadTimelines(ofKind: "PMS_Timetable_Watch_Widgets")
 				print("[Watch] ✓ Reloaded widget timelines")
 			}
 		} catch {
@@ -275,18 +270,6 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 				self.alertMessage = "Decode failed: \(error.localizedDescription)"
 			}
 		}
-	}
-	
-	func buildLookupTable(_ classesArray: [Class]) {
-		var lookup: [String: Class] = [:]
-		for c in classesArray {
-			for slot in c.slots {
-				let key = "\(slot.day)-\(slot.session)"
-				lookup[key] = c
-			}
-		}
-		classLookup = lookup
-		print("[Watch] Built lookup table with \(lookup.count) entries")
 	}
 }
 

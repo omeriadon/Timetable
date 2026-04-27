@@ -25,7 +25,11 @@ extension DisplayMode: Defaults.Serializable {}
 
 extension Defaults.Keys {
 static let timetable = Key<[Class]>("timetable", default: defaultTimetable, suite: UserDefaults(suiteName: appGroupID) ?? UserDefaults.standard)
-static let displayMode = Key<DisplayMode>("displayMode", default: .symbolsOnly, suite: UserDefaults(suiteName: appGroupID) ?? UserDefaults.standard)
+	static let displayMode = Key<DisplayMode>(
+		"displayMode",
+		default: .textOnly,
+		suite: UserDefaults(suiteName: appGroupID) ?? UserDefaults.standard
+	)
 }
 
 struct Class: Hashable, Codable, Defaults.Serializable, Identifiable {

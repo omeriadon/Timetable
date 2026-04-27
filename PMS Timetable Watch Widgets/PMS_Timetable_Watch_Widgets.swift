@@ -27,7 +27,7 @@ struct Provider: TimelineProvider {
 		let displayMode = Defaults[.displayMode]
 		print("[Widget] getTimeline: classes=\(classes.count), displayMode=\(displayMode.rawValue)")
 		let entry = TimetableEntry(date: Date(), classes: classes, displayMode: displayMode)
-		let timeline = Timeline(entries: [entry], policy: .never)
+		let timeline = Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(3600)))
 		completion(timeline)
 	}
 }
@@ -43,7 +43,6 @@ struct PMS_Timetable_Watch_WidgetsEntryView: View {
 
 	var body: some View {
 		WidgetView(classes: entry.classes, displayMode: entry.displayMode)
-			.padding(1)
 	}
 }
 
