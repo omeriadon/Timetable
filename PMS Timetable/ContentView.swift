@@ -7,6 +7,7 @@
 
 import Combine
 import Defaults
+@preconcurrency import EventKit
 import SFSymbolsPicker
 import SwiftUI
 import WatchConnectivity
@@ -42,6 +43,13 @@ enum EditorRequest {
 	case emptySlot(EditableSlot)
 }
 
+enum CalendarImportStatus {
+	case idle
+	case loading
+	case success
+	case error
+}
+
 struct ContentView: View {
 	let sessions = [
 		"1",
@@ -68,6 +76,12 @@ struct ContentView: View {
 	@State private var isPresented = false
 	@State private var syncStatus = SyncMode.normal
 	@StateObject private var watchSync = PhoneWatchSyncBridge()
+
+	@State private var showCalendarImportSheet = false
+	@State private var calendarImportStatus = CalendarImportStatus.idle
+	@State private var calendarImportStep = 0
+	@State private var calendarImportMaxSteps = 7
+	@State private var calendarImportMessage = ""
 
 	var body: some View {
 		NavigationStack {
@@ -117,6 +131,16 @@ struct ContentView: View {
 								await syncToWatchAsync()
 							}
 						}
+					}
+					.listRowBackground(
+						Rectangle()
+							.fill(.ultraThinMaterial)
+					)
+					
+					Button {
+						importFromCalendar()
+					} label: {
+						Label("Import from Compass", systemImage: "calendar")
 					}
 					.listRowBackground(
 						Rectangle()
@@ -217,6 +241,11 @@ struct ContentView: View {
 					editorRequest = nil
 					editorReady = false
 				}
+		}
+		.sheet(isPresented: $showCalendarImportSheet) {
+			calendarImportSheetContent
+				.presentationDetents([.medium])
+				.presentationDragIndicator(.visible)
 		}
 		.alert(
 			"Slot Conflict",
@@ -889,6 +918,206 @@ struct rectangle<Content: View>: View {
 			!isBreak ? .clear.tint(fill).interactive() : .identity,
 			in: RoundedRectangle(cornerRadius: isBreak ? 8 : 10)
 		)
+	}
+}
+
+// MARK: - Calendar Import UI & Logic
+
+extension ContentView {
+	var calendarImportSheetContent: some View {
+		ZStack {
+			switch calendarImportStatus {
+			case .idle:
+				VStack(spacing: 16) {
+					ProgressView(value: Double(calendarImportStep), total: Double(calendarImportMaxSteps))
+						.tint(.blue)
+					Text(calendarImportMessage)
+						.font(.caption)
+						.foregroundStyle(.secondary)
+				}
+				.padding()
+
+			case .loading:
+				VStack(spacing: 16) {
+					ProgressView(value: Double(calendarImportStep), total: Double(calendarImportMaxSteps))
+						.tint(.blue)
+					Text(calendarImportMessage)
+						.font(.caption)
+						.foregroundStyle(.secondary)
+				}
+				.padding()
+
+			case .success:
+				ContentUnavailableView(
+					"Import Successful",
+					systemImage: "checkmark.circle.fill",
+					description: Text("Your timetable has been imported from Compass!")
+				)
+
+			case .error:
+				ContentUnavailableView(
+					"Import Failed",
+					systemImage: "exclamationmark.triangle.fill",
+					description: Text(calendarImportMessage)
+				)
+			}
+		}
+	}
+
+	func importFromCalendar() {
+		showCalendarImportSheet = true
+		calendarImportStatus = .idle
+		calendarImportStep = 0
+		calendarImportMessage = "Starting import..."
+		
+		Task {
+			await performCalendarImport()
+		}
+	}
+
+	func performCalendarImport() async {
+		do {
+			print("[iOS] Calendar Import: Starting authorization check...")
+			calendarImportStep = 1
+			calendarImportMessage = "Checking authorization..."
+			try? await Task.sleep(nanoseconds: 500_000_000)
+
+			let eventStore = EKEventStore()
+			
+			print("[iOS] Calendar Import: Requesting calendar access...")
+			calendarImportStep = 2
+			calendarImportMessage = "Requesting calendar access..."
+			try? await Task.sleep(nanoseconds: 500_000_000)
+
+			let authorized = try await eventStore.requestFullAccessToEvents()
+			guard authorized else {
+				calendarImportStatus = .error
+				calendarImportMessage = "Calendar access denied"
+				print("[iOS] Calendar Import: Access denied")
+				try? await Task.sleep(nanoseconds: 2_000_000_000)
+				showCalendarImportSheet = false
+				calendarImportStatus = .idle
+				return
+			}
+
+			print("[iOS] Calendar Import: Searching for Compass calendar...")
+			calendarImportStep = 3
+			calendarImportMessage = "Finding Compass calendar..."
+			try? await Task.sleep(nanoseconds: 500_000_000)
+
+			guard let calendar = eventStore.calendars(for: .event).first(where: { $0.title.contains("Compass") }) else {
+				calendarImportStatus = .error
+				calendarImportMessage = "Compass calendar not found"
+				print("[iOS] Calendar Import: Compass calendar not found")
+				try? await Task.sleep(nanoseconds: 2_000_000_000)
+				showCalendarImportSheet = false
+				calendarImportStatus = .idle
+				return
+			}
+
+			print("[iOS] Calendar Import: Fetching events...")
+			calendarImportStep = 4
+			calendarImportMessage = "Fetching events..."
+			try? await Task.sleep(nanoseconds: 500_000_000)
+
+			let events = try await fetchCompassEvents(from: eventStore, calendar: calendar)
+
+			print("[iOS] Calendar Import: Matching events to time slots...")
+			calendarImportStep = 5
+			calendarImportMessage = "Matching events..."
+			try? await Task.sleep(nanoseconds: 500_000_000)
+
+			let importedClasses = try await matchEventsToTimeSlots(events)
+
+			print("[iOS] Calendar Import: Processing titles...")
+			calendarImportStep = 6
+			calendarImportMessage = "Processing titles..."
+			try? await Task.sleep(nanoseconds: 500_000_000)
+
+			print("[iOS] Calendar Import: Validating...")
+			calendarImportStep = 7
+			calendarImportMessage = "Finalizing..."
+			try? await Task.sleep(nanoseconds: 500_000_000)
+
+			classes = importedClasses
+			try watchSync.pushTimetable(classes, displayMode: displayMode)
+			
+			print("[iOS] Calendar Import: Success!")
+			calendarImportStatus = .success
+			try? await Task.sleep(nanoseconds: 2_000_000_000)
+			showCalendarImportSheet = false
+			calendarImportStatus = .idle
+
+		} catch {
+			print("[iOS] Calendar Import: Error - \(error.localizedDescription)")
+			calendarImportStatus = .error
+			calendarImportMessage = error.localizedDescription
+			try? await Task.sleep(nanoseconds: 2_000_000_000)
+			showCalendarImportSheet = false
+			calendarImportStatus = .idle
+		}
+	}
+
+	func fetchCompassEvents(from store: EKEventStore, calendar: EKCalendar) async throws -> [EKEvent] {
+		let startDate = calculateNextMonday()
+		let endDate = Calendar.current.date(byAdding: .weekOfYear, value: 4, to: startDate) ?? startDate
+		
+		let predicate = store.predicateForEvents(withStart: startDate, end: endDate, calendars: [calendar])
+		let events = store.events(matching: predicate)
+		
+		print("[iOS] Fetched \(events.count) events from Compass calendar")
+		return events
+	}
+
+	func calculateNextMonday() -> Date {
+		let calendar = Calendar.current
+		let now = Date()
+		let components = calendar.dateComponents([.weekday], from: now)
+		
+		let daysUntilMonday = (9 - (components.weekday ?? 0)) % 7
+		let nextMonday = calendar.date(byAdding: .day, value: daysUntilMonday == 0 ? 1 : daysUntilMonday, to: now) ?? now
+		
+		return calendar.startOfDay(for: nextMonday)
+	}
+
+	func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Class] {
+		let timeSlots = [
+			(start: 8.83, end: 9.80),   // 8:50-9:48
+			(start: 9.80, end: 10.77),  // 9:48-10:46
+			(start: 11.13, end: 12.10), // 11:08-12:06
+			(start: 12.10, end: 13.07), // 12:06-1:04
+			(start: 13.57, end: 14.53), // 1:34-2:32
+			(start: 14.53, end: 15.50), // 2:32-3:30
+		]
+		
+		var classMap: [String: (color: RGBAColor, symbol: String, slots: [Slot])] = [:]
+		var foundClasses = Set<String>()
+		
+		for day in 0..<5 {
+			for (sessionIndex, slot) in timeSlots.enumerated() {
+				let targetDate = Calendar.current.date(byAdding: .day, value: day, to: calculateNextMonday()) ?? Date()
+				let slotStart = Calendar.current.date(bySettingHour: Int(slot.start), minute: Int((slot.start.truncatingRemainder(dividingBy: 1)) * 60), second: 0, of: targetDate) ?? targetDate
+				let slotEnd = Calendar.current.date(bySettingHour: Int(slot.end), minute: Int((slot.end.truncatingRemainder(dividingBy: 1)) * 60), second: 0, of: targetDate) ?? targetDate
+				
+				if let event = events.first(where: { $0.startDate >= slotStart && $0.startDate < slotEnd }) {
+					guard let className = event.title, !className.isEmpty else { continue }
+					foundClasses.insert(className)
+					
+					if classMap[className] == nil {
+						let randomColor = RGBAColor(red: Double.random(in: 0...1), green: Double.random(in: 0...1), blue: Double.random(in: 0...1), alpha: 1)
+						let randomSymbol = ["book.fill", "pencil.circle.fill", "person.fill", "chart.bar.fill"][Int.random(in: 0..<4)]
+						classMap[className] = (color: randomColor, symbol: randomSymbol, slots: [])
+					}
+					
+					classMap[className]?.slots.append(Slot(day, sessionIndex + 1))
+					calendarImportMessage = "Found: \(className)"
+				}
+			}
+		}
+		
+		return classMap.map { name, data in
+			Class(id: name, symbol: data.symbol, colour: data.color, slots: data.slots)
+		}
 	}
 }
 
