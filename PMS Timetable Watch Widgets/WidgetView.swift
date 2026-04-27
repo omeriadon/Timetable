@@ -45,45 +45,48 @@ struct WidgetView: View {
 
 	@ViewBuilder
 	func sessionCell(_ day: Int, _ session: Int) -> some View {
-		if session == 2 || session == 5 {
-			Text("")
-				.font(.footnote.scaled(by: 0.1))
-				.frame(height: 2)
-		} else {
-			if day == 2 && session == 7 || day == 4 && session == 7 {
-				RoundedRectangle(cornerRadius: 0)
-					.fill(.clear)
+		Group {
+			if session == 2 || session == 5 {
+				Text("")
+					.font(.footnote.scaled(by: 0.1))
+					.frame(height: 2)
 			} else {
-				if let c = classLookup["\(day)-\(session)"] {
-					VStack(alignment: .leading) {
-						switch displayMode {
-						case .symbolsOnly:
-							HStack {
-								Spacer(minLength: 0)
-								Image(systemName: c.symbol)
-									.resizable()
-									.aspectRatio(contentMode: .fit)
-									.imageScale(.small)
-								Spacer(minLength: 0)
-							}
-						case .textOnly:
-							Text(c.id)
-								.lineLimit(1)
-								.font(.footnote.scaled(by: 0.45))
-						}
-					}
-					.padding(1)
-					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-					.foregroundStyle(.white)
-					.background(
-						RoundedRectangle(cornerRadius: 0)
-							.fill(c.colour.swiftUIColor.opacity(0.8))
-					)
-				} else {
+				if day == 2 && session == 7 || day == 4 && session == 7 {
 					RoundedRectangle(cornerRadius: 0)
-						.fill(.white.opacity(0.05))
+						.fill(.clear)
+				} else {
+					if let c = classLookup["\(day)-\(session)"] {
+						VStack(alignment: .leading) {
+							switch displayMode {
+								case .symbolsOnly:
+									HStack {
+										Spacer(minLength: 0)
+										Image(systemName: c.symbol)
+											.resizable()
+											.aspectRatio(contentMode: .fit)
+											.imageScale(.small)
+										Spacer(minLength: 0)
+									}
+								case .textOnly:
+									Text(c.id)
+										.lineLimit(1)
+										.font(.footnote.scaled(by: 0.45))
+							}
+						}
+						.padding(1)
+						.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+						.foregroundStyle(.white)
+						.background(
+							RoundedRectangle(cornerRadius: 0)
+								.fill(c.colour.swiftUIColor.opacity(0.8))
+						)
+					} else {
+						RoundedRectangle(cornerRadius: 0)
+							.fill(.white.opacity(0.05))
+					}
 				}
 			}
 		}
+		.foregroundStyle(.white)
 	}
 }

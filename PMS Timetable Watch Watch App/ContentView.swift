@@ -108,41 +108,44 @@ struct ContentView: View {
 
 	@ViewBuilder
 	func sessionCell(_ day: Int, _ session: Int) -> some View {
-		if session == 2 || session == 5 {
-			// recess and lunch
-			rectangle(.gray.opacity(0.25), true)
-				.frame(height: 2)
-		} else {
-			// early finish days
-			if day == 2 && session == 7 || day == 4 && session == 7 {
-				rectangle(.clear, true)
-					.frame(height: 25)
-
+		Group {
+			if session == 2 || session == 5 {
+				// recess and lunch
+				rectangle(.gray.opacity(0.25), true)
+					.frame(height: 2)
 			} else {
-				// actual session
-				if let c = classFor(day: day, session: session) {
-					rectangle(
-						c.colour.swiftUIColor.opacity(0.8)
-					) {
-						Image(systemName: c.symbol)
-							.imageScale(.small)
-							.font(.footnote.scaled(by: 0.7))
-						Spacer(minLength: 0)
-						Text(c.id)
-							.lineLimit(2)
-							.fixedSize(horizontal: false, vertical: true)
-							.font(.footnote.scaled(by: 0.5))
-					}
-					.frame(height: 25)
+				// early finish days
+				if day == 2 && session == 7 || day == 4 && session == 7 {
+					rectangle(.clear, true)
+						.frame(height: 25)
 
 				} else {
-					// empty periods
-					RoundedRectangle(cornerRadius: 5)
-						.fill(.white.opacity(0.05))
+					// actual session
+					if let c = classFor(day: day, session: session) {
+						rectangle(
+							c.colour.swiftUIColor.opacity(0.8)
+						) {
+							Image(systemName: c.symbol)
+								.imageScale(.small)
+								.font(.footnote.scaled(by: 0.7))
+							Spacer(minLength: 0)
+							Text(c.id)
+								.lineLimit(2)
+								.fixedSize(horizontal: false, vertical: true)
+								.font(.footnote.scaled(by: 0.5))
+						}
 						.frame(height: 25)
+
+					} else {
+						// empty periods
+						RoundedRectangle(cornerRadius: 5)
+							.fill(.white.opacity(0.05))
+							.frame(height: 25)
+					}
 				}
 			}
 		}
+		.foregroundStyle(.white)
 	}
 
 	@MainActor

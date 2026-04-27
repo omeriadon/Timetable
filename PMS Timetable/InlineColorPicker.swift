@@ -71,7 +71,6 @@ import SwiftUI
 /// ```
 /// Results in:
 /// ![Default InlineColorPicker](InlineColorPickerDescriptionIcon)
-@available(iOS 15.0, macOS 12, tvOS 16.0, watchOS 8.0, visionOS 1.0, *)
 public struct InlineColorPicker<T: ColorOptions>: View {
 	private let selectedColor: Binding<T>
 	private let systemImage: String?
@@ -136,12 +135,12 @@ public struct InlineColorPicker<T: ColorOptions>: View {
 							Circle()
 								.fill(color.SwiftUIColor)
 								.stroke(
-									isSelected ? .white : .clear,
-									lineWidth: 3
+									.white,
+									lineWidth: isSelected ? 3 : 0
 								)
+								.animation(.snappy, value: isSelected)
 								.frame(width: 28, height: 28)
 						}
-
 					}
 					.frame(width: 44, height: 44)
 					.buttonStyle(.plain)
@@ -191,77 +190,98 @@ public struct InlineColorPicker<T: ColorOptions>: View {
 	}
 }
 
-/// A default type, which can be used to bind the selected color for an ``InlineColorPicker``.
-@available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
 public enum AvailableColors: Int, ColorOptions, Codable, Sendable {
-	case blue = 0
-	case cyan = 1
-	case mint = 2
-	case green = 3
-	case yellow = 4
-	case orange = 5
-	case red = 6
-	case purple = 7
-	case indigo = 8
+	case crimsonFlame = 0
+	case tangerinePulse = 1
+	case solarGold = 2
+	case acidLime = 3
+	case emeraldDepth = 4
+	case aquaSurge = 5
+	case electricCyan = 6
+	case sapphireVoid = 7
+	case royalIndigo = 8
+	case neonViolet = 9
+	case magentaShock = 10
+	case hotFuchsia = 11
+	case coralEmber = 12
+	case steelBlueGrey = 13
+	case obsidianBlack = 14
 
 	/// Returns the `Color` for an variable of type ``AvailableColors``.
 	public var SwiftUIColor: Color {
 		switch self {
-		case .blue: return .blue
-		case .cyan: return .cyan
-		case .mint: return .mint
-		case .green: return .green
-		case .yellow: return .yellow
-		case .orange: return .orange
-		case .red: return .red
-		case .purple: return .purple
-		case .indigo: return .indigo
+			case .crimsonFlame:
+				return Color(red: 0.88, green: 0.02, blue: 0.00)
+
+			case .tangerinePulse:
+				return Color(red: 1.00, green: 0.42, blue: 0.00)
+
+			case .solarGold:
+				return Color(red: 1.00, green: 0.76, blue: 0.00)
+
+			case .acidLime:
+				return Color(red: 0.71, green: 1.00, blue: 0.00)
+
+			case .emeraldDepth:
+				return Color(red: 0.00, green: 0.78, blue: 0.32)
+
+			case .aquaSurge:
+				return Color(red: 0.00, green: 0.90, blue: 1.00)
+
+			case .electricCyan:
+				return Color(red: 0.00, green: 0.72, blue: 0.83)
+
+			case .sapphireVoid:
+				return Color(red: 0.16, green: 0.38, blue: 1.00)
+
+			case .royalIndigo:
+				return Color(red: 0.24, green: 0.00, blue: 1.00)
+
+			case .neonViolet:
+				return Color(red: 0.56, green: 0.18, blue: 0.89)
+
+			case .magentaShock:
+				return Color(red: 1.00, green: 0.00, blue: 0.66)
+
+			case .hotFuchsia:
+				return Color(red: 1.00, green: 0.18, blue: 0.58)
+
+			case .coralEmber:
+				return Color(red: 1.00, green: 0.30, blue: 0.30)
+
+			case .steelBlueGrey:
+				return Color(red: 0.38, green: 0.49, blue: 0.53)
+
+			case .obsidianBlack:
+				return Color(red: 0.04, green: 0.06, blue: 0.08)
 		}
 	}
 
 	/// Returns a description of the color used for accessibility.
 	public var accessibilityLabelColorName: String {
-		SwiftUIColor.description
+		switch self {
+			case .crimsonFlame: return "Crimson Flame"
+			case .tangerinePulse: return "Tangerine Pulse"
+			case .solarGold: return "Solar Gold"
+			case .acidLime: return "Acid Lime"
+			case .emeraldDepth: return "Emerald Depth"
+			case .aquaSurge: return "Aqua Surge"
+			case .electricCyan: return "Electric Cyan"
+			case .sapphireVoid: return "Sapphire Void"
+			case .royalIndigo: return "Royal Indigo"
+			case .neonViolet: return "Neon Violet"
+			case .magentaShock: return "Magenta Shock"
+			case .hotFuchsia: return "Hot Fuchsia"
+			case .coralEmber: return "Coral Ember"
+			case .steelBlueGrey: return "Steel Blue Grey"
+			case .obsidianBlack: return "Obsidian Black"
+		}
 	}
 
 	public func hash(into hasher: inout Hasher) {
 		hasher.combine(rawValue)
 	}
 }
-
-// Use this to implement you own collection of colors for the ``InlineColorPicker``.
-//
-// An Enum conforming to this protocol works best:
-//  - Create a new enum and make if conform to ``ColorOptions`` (see an example below).
-//  - Create a `@State` variable of you new type.
-//  - Bind it to the ``InlineColorPicker`` and your picker will display only your selected Colors
-//  - You can also use ``AvailableColors`` which also conforms to this protocol to use the default colors.
-// ```swift
-// public enum WarmColors: Int, ColorOptions {
-//    case yellow = 1
-//    case orange = 2
-//    case red = 3
-//
-//    public var SwiftUIColor: Color {
-//        switch self {
-//        case .yellow:
-//            return .yellow
-//        case .orange:
-//            return .orange
-//        case .red:
-//            return .red
-//        }
-//    }
-//
-//	   public var accessibilityLabelColorName: String {
-//         self.SwiftUIColor.description
-//    }
-//
-//    public func hash(into hasher: inout Hasher) {
-//        hasher.combine(self.rawValue)
-//    }
-// }
-// ```
 
 public protocol ColorOptions: CaseIterable, Hashable {
 	var SwiftUIColor: Color { get }

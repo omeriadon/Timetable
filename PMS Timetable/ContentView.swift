@@ -240,7 +240,7 @@ struct ContentView: View {
 		}
 		.sheet(isPresented: $showCalendarImportSheet) {
 			CalendarImportView()
-				.presentationDetents([.fraction(1/3)])
+				.presentationDetents([.fraction(1 / 3)])
 				.presentationDragIndicator(.hidden)
 		}
 		.alert(
@@ -496,43 +496,45 @@ struct ContentView: View {
 		}
 	}
 
-	@ViewBuilder
 	func sessionCell(_ day: Int, _ session: Int) -> some View {
-		if session == 2 || session == 5 {
-			rectangle(.gray.opacity(0.25), true)
-				.frame(height: 20)
-		} else {
-			if day == 2 && session == 7 || day == 4 && session == 7 {
-				rectangle(.clear, true)
-					.frame(height: 60)
-
+		Group {
+			if session == 2 || session == 5 {
+				rectangle(.gray.opacity(0.25), true)
+					.frame(height: 20)
 			} else {
-				if let c = classFor(day: day, session: session) {
-					rectangle(
-						c.colour.swiftUIColor.opacity(0.8)
-					) {
-						Image(systemName: c.symbol)
-						Spacer(minLength: 0)
-						Text(c.id)
-							.lineLimit(2)
-							.fixedSize(horizontal: false, vertical: true)
-							.font(.footnote.scaled(by: 0.9))
-					}
-					.frame(height: 60)
-					.onTapGesture {
-						openEditor(focusingClassName: c.id)
-					}
+				if day == 2 && session == 7 || day == 4 && session == 7 {
+					rectangle(.clear, true)
+						.frame(height: 60)
 
 				} else {
-					RoundedRectangle(cornerRadius: 10)
-						.fill(.white.opacity(0.05))
+					if let c = classFor(day: day, session: session) {
+						rectangle(
+							c.colour.swiftUIColor.opacity(0.8)
+						) {
+							Image(systemName: c.symbol)
+							Spacer(minLength: 0)
+							Text(c.id)
+								.lineLimit(2)
+								.fixedSize(horizontal: false, vertical: true)
+								.font(.footnote.scaled(by: 0.9))
+						}
 						.frame(height: 60)
 						.onTapGesture {
-							openEditorForEmptySlot(day: day, session: session)
+							openEditor(focusingClassName: c.id)
 						}
+
+					} else {
+						RoundedRectangle(cornerRadius: 10)
+							.fill(.white.opacity(0.05))
+							.frame(height: 60)
+							.onTapGesture {
+								openEditorForEmptySlot(day: day, session: session)
+							}
+					}
 				}
 			}
 		}
+		.foregroundStyle(.white)
 	}
 
 	func classFor(day: Int, session: Int) -> Class? {
