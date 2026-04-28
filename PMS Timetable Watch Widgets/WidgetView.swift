@@ -29,11 +29,47 @@ struct WidgetView: View {
 			HStack(spacing: 0) {
 				ForEach(0 ..< 5) { day in
 					VStack(spacing: 0) {
-						Text(["Mon", "Tue", "Wed", "Thu", "Fri"][day])
-							.font(.footnote.scaled(by: 0.5))
-							.frame(height: 10)
+						HStack {
+							Spacer()
+							Text(["Mon", "Tue", "Wed", "Thu", "Fri"][day])
+								.font(.footnote.scaled(by: 0.5))
+								.frame(height: 10)
+							Spacer()
+						}
+						.background(
+							day == currentWeekdayIndex
+								? Color.white
+								: Color.clear
+						)
+						.foregroundStyle(
+							day == currentWeekdayIndex
+								? Color.black
+								: Color.white
+						)
+
 						ForEach(0 ..< 8) { session in
 							sessionCell(day, session)
+						}
+					}
+					.overlay(alignment: .leading) {
+						if day == currentWeekdayIndex {
+							Rectangle()
+								.fill(Color.white)
+								.frame(width: 1)
+						}
+					}
+					.overlay(alignment: .trailing) {
+						if day == currentWeekdayIndex {
+							Rectangle()
+								.fill(Color.white)
+								.frame(width: 1)
+						}
+					}
+					.overlay(alignment: .bottom) {
+						if day == currentWeekdayIndex {
+							Rectangle()
+								.fill(Color.white)
+								.frame(height: 1)
 						}
 					}
 				}
@@ -43,7 +79,6 @@ struct WidgetView: View {
 		}
 	}
 
-	@ViewBuilder
 	func sessionCell(_ day: Int, _ session: Int) -> some View {
 		Group {
 			if session == 2 || session == 5 {
@@ -64,13 +99,13 @@ struct WidgetView: View {
 										Image(systemName: c.symbol)
 											.resizable()
 											.aspectRatio(contentMode: .fit)
-											.imageScale(.small)
+											.frame(height: 9)
 										Spacer(minLength: 0)
 									}
 								case .textOnly:
 									Text(c.id)
 										.lineLimit(1)
-										.font(.footnote.scaled(by: 0.45))
+										.font(.footnote.scaled(by: 0.5))
 							}
 						}
 						.padding(1)
@@ -78,7 +113,7 @@ struct WidgetView: View {
 						.foregroundStyle(.white)
 						.background(
 							RoundedRectangle(cornerRadius: 0)
-								.fill(c.colour.swiftUIColor.opacity(0.8))
+								.fill(c.colour.swiftUIColor)
 						)
 					} else {
 						RoundedRectangle(cornerRadius: 0)
@@ -88,5 +123,12 @@ struct WidgetView: View {
 			}
 		}
 		.foregroundStyle(.white)
+	}
+
+	private var currentWeekdayIndex: Int {
+		let weekday = Calendar.current.component(.weekday, from: Date())
+		// weekday: 1 = Sunday ... 7 = Saturday
+		// convert to 0 = Monday ... 4 = Friday
+		return (weekday + 5) % 7
 	}
 }
