@@ -91,30 +91,72 @@ struct WidgetView: View {
 						.fill(.clear)
 				} else {
 					if let c = classLookup["\(day)-\(session)"] {
-						VStack(alignment: .leading) {
-							switch displayMode {
-								case .symbolsOnly:
-									HStack {
-										Spacer(minLength: 0)
-										Image(systemName: c.symbol)
-											.resizable()
-											.aspectRatio(contentMode: .fit)
-											.frame(height: 9)
-										Spacer(minLength: 0)
-									}
-								case .textOnly:
-									Text(c.id)
-										.lineLimit(1)
-										.font(.footnote.scaled(by: 0.5))
+						if day == 0 && session == 7 {
+							VStack(alignment: .leading) {
+								switch displayMode {
+									case .symbolsOnly:
+										HStack {
+											Spacer(minLength: 0)
+											Image(systemName: c.symbol)
+												.resizable()
+												.aspectRatio(contentMode: .fit)
+												.frame(height: 9)
+											Spacer(minLength: 0)
+										}
+									case .textOnly:
+										GeometryReader { geo in
+											Text(c.id)
+												.lineLimit(1)
+												.font(.footnote.scaled(by: 0.5))
+												.padding(.leading, 3)
+												.fixedSize(horizontal: true, vertical: false)
+												.padding(.trailing, 1)
+												.frame(width: geo.size.width, alignment: .leading)
+												.clipped()
+												.allowsTightening(true)
+										}
+								}
 							}
+							.padding(1)
+							.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+							.foregroundStyle(.white)
+							.background(
+								RoundedRectangle(cornerRadius: 0)
+									.fill(c.colour.swiftUIColor)
+							)
+						} else {
+							VStack(alignment: .leading) {
+								switch displayMode {
+									case .symbolsOnly:
+										HStack {
+											Spacer(minLength: 0)
+											Image(systemName: c.symbol)
+												.resizable()
+												.aspectRatio(contentMode: .fit)
+												.frame(height: 9)
+											Spacer(minLength: 0)
+										}
+									case .textOnly:
+										GeometryReader { geo in
+											Text(c.id)
+												.lineLimit(1)
+												.font(.footnote.scaled(by: 0.5))
+												.fixedSize(horizontal: true, vertical: false)
+												.padding(.trailing, 1)
+												.frame(width: geo.size.width, alignment: .leading)
+												.clipped()
+												.allowsTightening(true)
+										}
+								}
+							}
+							.padding(1)
+							.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+							.foregroundStyle(.white)
+							.background(
+								RoundedRectangle(cornerRadius: 0)
+									.fill(c.colour.swiftUIColor)
+							)
 						}
-						.padding(1)
-						.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-						.foregroundStyle(.white)
-						.background(
-							RoundedRectangle(cornerRadius: 0)
-								.fill(c.colour.swiftUIColor)
-						)
 					} else {
 						RoundedRectangle(cornerRadius: 0)
 							.fill(.white.opacity(0.05))
