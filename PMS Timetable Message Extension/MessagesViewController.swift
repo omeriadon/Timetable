@@ -20,10 +20,6 @@ class MessagesViewController: MSMessagesAppViewController {
 	override func willBecomeActive(with conversation: MSConversation) {
 		super.willBecomeActive(with: conversation)
 		print("[MessagesViewController] willBecomeActive called")
-
-		if self.presentationStyle == .compact {
-			self.requestPresentationStyle(.compact)
-		}
 	}
 
 	private func setupSwiftUI() {
