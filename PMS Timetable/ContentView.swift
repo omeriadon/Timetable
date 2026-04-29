@@ -77,6 +77,7 @@ struct ContentView: View {
 	@StateObject private var watchSync = PhoneWatchSyncBridge()
 
 	@State private var showCalendarImportSheet = false
+	@State private var importToast: Toast?
 
 	var body: some View {
 		NavigationStack {
@@ -232,6 +233,13 @@ struct ContentView: View {
 			}
 			watchSync.lastError = nil
 		}
+		.onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("TimetableImported"))) { notification in
+			if let message = notification.userInfo?["message"] as? String,
+			   let isSuccess = notification.userInfo?["success"] as? Bool {
+				importToast = Toast(message: message, isSuccess: isSuccess)
+			}
+		}
+		.toast($importToast)
 		.sheet(isPresented: $showingEditor) {
 			editorSheet
 				.presentationDetents([.fraction(0.8)])
