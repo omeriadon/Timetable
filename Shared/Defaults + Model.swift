@@ -8,12 +8,11 @@
 import Defaults
 import SwiftUI
 
-#if os(watchOS)
+
+#if DEBUG
 let appGroupID = "group.omeriadon.pmstimetable"
-#elseif DEBUG
-let appGroupID = "group.omeriadon.debug.pmstimetable"
 #else
-let appGroupID = "group.omeriadon.pmstimetable"
+let appGroupID = "group.omeriadon-release.pmstimetable"
 #endif
 
 private let sharedDefaults = UserDefaults(suiteName: appGroupID) ?? UserDefaults.standard

@@ -19,6 +19,16 @@ struct TimetableView: View {
 		VStack(spacing: 16) {
 			Text("PMS Timetable")
 				.font(.headline)
+			
+			#if DEBUG
+			Text("DEBUG mode - ")
+				.font(.caption2)
+				.foregroundStyle(.secondary)
+			#else
+			Text("RELEASE mode")
+				.font(.caption2)
+				.foregroundStyle(.secondary)
+			#endif
 
 			if classes.isEmpty {
 				Text("No classes scheduled")
