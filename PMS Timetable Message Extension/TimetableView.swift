@@ -12,23 +12,12 @@ import SwiftUI
 struct TimetableView: View {
 	@State private var isSending = false
 	@State private var errorMessage: String?
-	@State private var isLoading = false
 	@Default(.timetable) var classes
 
 	var body: some View {
 		VStack(spacing: 16) {
 			Text("PMS Timetable")
 				.font(.headline)
-			
-			#if DEBUG
-			Text("DEBUG mode - ")
-				.font(.caption2)
-				.foregroundStyle(.secondary)
-			#else
-			Text("RELEASE mode")
-				.font(.caption2)
-				.foregroundStyle(.secondary)
-			#endif
 
 			if classes.isEmpty {
 				Text("No classes scheduled")
@@ -97,34 +86,9 @@ struct TimetableView: View {
 		}
 		.padding()
 		.onAppear {
-			print("[TimetableView] onAppear called")
-			loadTimetable()
+			print("[TimetableView] onAppear called - Defaults currently has \(classes.count) classes")
 		}
 		.monospaced()
-	}
-
-	private func loadTimetable() {
-		DispatchQueue.main.async {
-			print("[TimetableView] Loading timetable from defaults")
-			classes = loadClassesFromDefaults()
-			print("[TimetableView] Loaded \(classes.count) classes")
-			isLoading = false
-		}
-	}
-
-	private func loadClassesFromDefaults() -> [Class] {
-		if let data = UserDefaults(suiteName: "group.omeriadon.pmstimetable")?.data(forKey: "timetable") {
-			let decoder = JSONDecoder()
-			if let decoded = try? decoder.decode([Class].self, from: data) {
-				print("[TimetableView] Successfully decoded \(decoded.count) classes from UserDefaults")
-				return decoded
-			} else {
-				print("[TimetableView] Failed to decode classes from UserDefaults")
-			}
-		} else {
-			print("[TimetableView] No timetable data in UserDefaults")
-		}
-		return []
 	}
 
 	private func sendTimetable() {

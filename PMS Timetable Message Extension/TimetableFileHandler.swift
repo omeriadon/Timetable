@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Defaults
 
 struct TimetableFileHandler {
 	static func handleTimetableFile(at fileURL: URL) -> (success: Bool, message: String) {
@@ -19,11 +20,7 @@ struct TimetableFileHandler {
 				return result
 			}
 
-			if let defaults = UserDefaults(suiteName: "group.omeriadon.pmstimetable") {
-				let encoder = JSONEncoder()
-				let encoded = try encoder.encode(importedClasses)
-				defaults.set(encoded, forKey: "timetable")
-			}
+			Defaults[.timetable] = importedClasses
 
 			let timestamp = DateFormatter.localizedString(
 				from: importedMessage.timestamp,
