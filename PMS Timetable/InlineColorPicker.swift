@@ -121,7 +121,7 @@ public struct InlineColorPicker<T: ColorOptions>: View {
 
 	public var body: some View {
 		let pickerBody = ZStack {
-			LazyVGrid(columns: columns, spacing: 8) {
+			LazyVGrid(columns: columns, spacing: 4) {
 				ForEach(colors.indices, id: \.self) { colorIndex in
 					let color = colors[colorIndex]
 					let isSelected = (color == selectedColor.wrappedValue)

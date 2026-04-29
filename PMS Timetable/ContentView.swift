@@ -306,8 +306,11 @@ struct ContentView: View {
 				if editorReady {
 					TabView(selection: $editorPage) {
 						ForEach(draftClasses.indices, id: \.self) { index in
-							classEditorPage(index: index)
-								.tag(index)
+							ScrollView {
+								classEditorPage(index: index)
+							}
+							.scrollBounceBehavior(.basedOnSize)
+							.tag(index)
 						}
 						addClassPage
 							.tag(draftClasses.count)
@@ -336,7 +339,7 @@ struct ContentView: View {
 	}
 
 	func classEditorPage(index: Int) -> some View {
-		VStack(spacing: 25) {
+		VStack(spacing: 15) {
 			GlassEffectContainer(spacing: 0) {
 				HStack {
 					TextField("Class Name", text: $draftClasses[index].name)
@@ -385,7 +388,6 @@ struct ContentView: View {
 							}
 						).padding()
 				}
-				.font(.title3)
 				.foregroundStyle(.white)
 				.glassEffect(.clear.interactive(), in: Capsule())
 			}

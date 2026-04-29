@@ -538,7 +538,7 @@ struct CalendarImportView: View {
 					id: name,
 					symbol: data.symbol,
 					colour: data.color,
-					slots: data.slots.sorted {
+					slots: Array(Set(data.slots)).sorted {
 						$0.day == $1.day ? $0.session < $1.session : $0.day < $1.day
 					}
 				)
