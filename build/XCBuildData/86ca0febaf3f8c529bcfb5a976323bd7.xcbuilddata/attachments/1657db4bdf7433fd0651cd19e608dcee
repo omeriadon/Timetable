@@ -1,0 +1,89 @@
+{
+  "" : {
+    "diagnostics" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/PMS Timetable Watch WidgetsExtension-primary.dia",
+    "emit-module-dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/PMS Timetable Watch WidgetsExtension-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/PMS Timetable Watch WidgetsExtension-primary-emit-module.dia",
+    "pch" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/PMS Timetable Watch WidgetsExtension-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/PMS Timetable Watch WidgetsExtension-primary.swiftdeps"
+  },
+  "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/PMS Timetable Watch Widgets/PMS_Timetable_Watch_Widgets.swift" : {
+    "const-values" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/PMS_Timetable_Watch_Widgets.swiftconstvalues",
+    "dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/PMS_Timetable_Watch_Widgets.d",
+    "diagnostics" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/PMS_Timetable_Watch_Widgets.dia",
+    "index-unit-output-path" : "/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/PMS_Timetable_Watch_Widgets.o",
+    "llvm-bc" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/PMS_Timetable_Watch_Widgets.bc",
+    "object" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/PMS_Timetable_Watch_Widgets.o",
+    "swift-dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/PMS_Timetable_Watch_Widgets.swiftdeps",
+    "swiftmodule" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/PMS_Timetable_Watch_Widgets~partial.swiftmodule"
+  },
+  "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/PMS Timetable Watch Widgets/PMS_Timetable_Watch_WidgetsBundle.swift" : {
+    "const-values" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/PMS_Timetable_Watch_WidgetsBundle.swiftconstvalues",
+    "dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/PMS_Timetable_Watch_WidgetsBundle.d",
+    "diagnostics" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/PMS_Timetable_Watch_WidgetsBundle.dia",
+    "index-unit-output-path" : "/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/PMS_Timetable_Watch_WidgetsBundle.o",
+    "llvm-bc" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/PMS_Timetable_Watch_WidgetsBundle.bc",
+    "object" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/PMS_Timetable_Watch_WidgetsBundle.o",
+    "swift-dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/PMS_Timetable_Watch_WidgetsBundle.swiftdeps",
+    "swiftmodule" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/PMS_Timetable_Watch_WidgetsBundle~partial.swiftmodule"
+  },
+  "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/PMS Timetable Watch Widgets/WidgetView.swift" : {
+    "const-values" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/WidgetView.swiftconstvalues",
+    "dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/WidgetView.d",
+    "diagnostics" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/WidgetView.dia",
+    "index-unit-output-path" : "/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/WidgetView.o",
+    "llvm-bc" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/WidgetView.bc",
+    "object" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/WidgetView.o",
+    "swift-dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/WidgetView.swiftdeps",
+    "swiftmodule" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/WidgetView~partial.swiftmodule"
+  },
+  "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/Shared/Defaults + Model.swift" : {
+    "const-values" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/Defaults + Model.swiftconstvalues",
+    "dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/Defaults + Model.d",
+    "diagnostics" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/Defaults + Model.dia",
+    "index-unit-output-path" : "/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/Defaults + Model.o",
+    "llvm-bc" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/Defaults + Model.bc",
+    "object" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/Defaults + Model.o",
+    "swift-dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/Defaults + Model.swiftdeps",
+    "swiftmodule" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/Defaults + Model~partial.swiftmodule"
+  },
+  "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/Shared/RGBAColor.swift" : {
+    "const-values" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/RGBAColor.swiftconstvalues",
+    "dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/RGBAColor.d",
+    "diagnostics" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/RGBAColor.dia",
+    "index-unit-output-path" : "/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/RGBAColor.o",
+    "llvm-bc" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/RGBAColor.bc",
+    "object" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/RGBAColor.o",
+    "swift-dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/RGBAColor.swiftdeps",
+    "swiftmodule" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/RGBAColor~partial.swiftmodule"
+  },
+  "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/Shared/TimetableMessage.swift" : {
+    "const-values" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/TimetableMessage.swiftconstvalues",
+    "dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/TimetableMessage.d",
+    "diagnostics" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/TimetableMessage.dia",
+    "index-unit-output-path" : "/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/TimetableMessage.o",
+    "llvm-bc" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/TimetableMessage.bc",
+    "object" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/TimetableMessage.o",
+    "swift-dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/TimetableMessage.swiftdeps",
+    "swiftmodule" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/TimetableMessage~partial.swiftmodule"
+  },
+  "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/Shared/defaultTimetable.swift" : {
+    "const-values" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/defaultTimetable.swiftconstvalues",
+    "dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/defaultTimetable.d",
+    "diagnostics" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/defaultTimetable.dia",
+    "index-unit-output-path" : "/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/defaultTimetable.o",
+    "llvm-bc" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/defaultTimetable.bc",
+    "object" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/defaultTimetable.o",
+    "swift-dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/defaultTimetable.swiftdeps",
+    "swiftmodule" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/defaultTimetable~partial.swiftmodule"
+  },
+  "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "const-values" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/GeneratedAssetSymbols.swiftconstvalues",
+    "dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/GeneratedAssetSymbols.d",
+    "diagnostics" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/GeneratedAssetSymbols.dia",
+    "index-unit-output-path" : "/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/GeneratedAssetSymbols.o",
+    "swift-dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/GeneratedAssetSymbols.swiftdeps",
+    "swiftmodule" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable Watch WidgetsExtension.build/Objects-normal/x86_64/GeneratedAssetSymbols~partial.swiftmodule"
+  }
+}

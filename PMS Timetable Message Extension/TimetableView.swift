@@ -6,13 +6,20 @@
 //
 
 import Defaults
-import Messages
 import SwiftUI
+import UIKit
 
 struct TimetableView: View {
 	@State private var isSending = false
 	@State private var errorMessage: String?
 	@Default(.timetable) var classes
+	let sendAttachment: (URL, @escaping (Result<Void, Error>) -> Void) -> Void
+
+	init(sendAttachment: @escaping (URL, @escaping (Result<Void, Error>) -> Void) -> Void = { _, completion in
+		completion(.failure(TimetableSendError.unavailable))
+	}) {
+		self.sendAttachment = sendAttachment
+	}
 
 	var body: some View {
 		VStack(spacing: 16) {
@@ -107,23 +114,37 @@ struct TimetableView: View {
 
 			try messageData.write(to: timetableFileURL, options: .atomic)
 
-			let message = MSMessage()
-			message.url = timetableFileURL
-			message.accessibilityLabel = "Timetable"
-
 			print("[TimetableView] Timetable file created at \(timetableFileURL)")
-
-			DispatchQueue.main.async {
-				isSending = false
-				errorMessage = "Timetable sent!"
-				DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-					errorMessage = nil
+			sendAttachment(timetableFileURL) { result in
+				DispatchQueue.main.async {
+					isSending = false
+					switch result {
+					case .success:
+						errorMessage = "Timetable attached. Tap send."
+						DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+							errorMessage = nil
+						}
+					case let .failure(error):
+						errorMessage = "Error sending timetable: \(error.localizedDescription)"
+						print("[TimetableView] Error sending: \(error)")
+					}
 				}
 			}
 		} catch {
 			isSending = false
 			errorMessage = "Error encoding timetable: \(error.localizedDescription)"
 			print("[TimetableView] Error sending: \(error)")
+		}
+	}
+}
+
+private enum TimetableSendError: LocalizedError {
+	case unavailable
+
+	var errorDescription: String? {
+		switch self {
+		case .unavailable:
+			return "Messages conversation is unavailable."
 		}
 	}
 }

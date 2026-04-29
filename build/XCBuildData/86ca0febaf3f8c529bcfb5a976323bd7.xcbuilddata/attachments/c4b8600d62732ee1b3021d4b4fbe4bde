@@ -1,0 +1,19 @@
+{
+  "" : {
+    "diagnostics" : "/Users/omeriadon/Library/Developer/Xcode/DerivedData/PMS_Timetable-bnscmpedovlwnshbtwvxpojswrfl/SourcePackages/checkouts/Defaults/build/Defaults.build/Debug-iphonesimulator/DefaultsMacros.build/Objects-normal/x86_64/DefaultsMacros-primary.dia",
+    "emit-module-dependencies" : "/Users/omeriadon/Library/Developer/Xcode/DerivedData/PMS_Timetable-bnscmpedovlwnshbtwvxpojswrfl/SourcePackages/checkouts/Defaults/build/Defaults.build/Debug-iphonesimulator/DefaultsMacros.build/Objects-normal/x86_64/DefaultsMacros-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/omeriadon/Library/Developer/Xcode/DerivedData/PMS_Timetable-bnscmpedovlwnshbtwvxpojswrfl/SourcePackages/checkouts/Defaults/build/Defaults.build/Debug-iphonesimulator/DefaultsMacros.build/Objects-normal/x86_64/DefaultsMacros-primary-emit-module.dia",
+    "pch" : "/Users/omeriadon/Library/Developer/Xcode/DerivedData/PMS_Timetable-bnscmpedovlwnshbtwvxpojswrfl/SourcePackages/checkouts/Defaults/build/Defaults.build/Debug-iphonesimulator/DefaultsMacros.build/Objects-normal/x86_64/DefaultsMacros-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/omeriadon/Library/Developer/Xcode/DerivedData/PMS_Timetable-bnscmpedovlwnshbtwvxpojswrfl/SourcePackages/checkouts/Defaults/build/Defaults.build/Debug-iphonesimulator/DefaultsMacros.build/Objects-normal/x86_64/DefaultsMacros-primary.swiftdeps"
+  },
+  "/Users/omeriadon/Library/Developer/Xcode/DerivedData/PMS_Timetable-bnscmpedovlwnshbtwvxpojswrfl/SourcePackages/checkouts/Defaults/Sources/DefaultsMacros/ObservableDefault.swift" : {
+    "const-values" : "/Users/omeriadon/Library/Developer/Xcode/DerivedData/PMS_Timetable-bnscmpedovlwnshbtwvxpojswrfl/SourcePackages/checkouts/Defaults/build/Defaults.build/Debug-iphonesimulator/DefaultsMacros.build/Objects-normal/x86_64/ObservableDefault.swiftconstvalues",
+    "dependencies" : "/Users/omeriadon/Library/Developer/Xcode/DerivedData/PMS_Timetable-bnscmpedovlwnshbtwvxpojswrfl/SourcePackages/checkouts/Defaults/build/Defaults.build/Debug-iphonesimulator/DefaultsMacros.build/Objects-normal/x86_64/ObservableDefault.d",
+    "diagnostics" : "/Users/omeriadon/Library/Developer/Xcode/DerivedData/PMS_Timetable-bnscmpedovlwnshbtwvxpojswrfl/SourcePackages/checkouts/Defaults/build/Defaults.build/Debug-iphonesimulator/DefaultsMacros.build/Objects-normal/x86_64/ObservableDefault.dia",
+    "index-unit-output-path" : "/Defaults.build/Debug-iphonesimulator/DefaultsMacros.build/Objects-normal/x86_64/ObservableDefault.o",
+    "llvm-bc" : "/Users/omeriadon/Library/Developer/Xcode/DerivedData/PMS_Timetable-bnscmpedovlwnshbtwvxpojswrfl/SourcePackages/checkouts/Defaults/build/Defaults.build/Debug-iphonesimulator/DefaultsMacros.build/Objects-normal/x86_64/ObservableDefault.bc",
+    "object" : "/Users/omeriadon/Library/Developer/Xcode/DerivedData/PMS_Timetable-bnscmpedovlwnshbtwvxpojswrfl/SourcePackages/checkouts/Defaults/build/Defaults.build/Debug-iphonesimulator/DefaultsMacros.build/Objects-normal/x86_64/ObservableDefault.o",
+    "swift-dependencies" : "/Users/omeriadon/Library/Developer/Xcode/DerivedData/PMS_Timetable-bnscmpedovlwnshbtwvxpojswrfl/SourcePackages/checkouts/Defaults/build/Defaults.build/Debug-iphonesimulator/DefaultsMacros.build/Objects-normal/x86_64/ObservableDefault.swiftdeps",
+    "swiftmodule" : "/Users/omeriadon/Library/Developer/Xcode/DerivedData/PMS_Timetable-bnscmpedovlwnshbtwvxpojswrfl/SourcePackages/checkouts/Defaults/build/Defaults.build/Debug-iphonesimulator/DefaultsMacros.build/Objects-normal/x86_64/ObservableDefault~partial.swiftmodule"
+  }
+}
