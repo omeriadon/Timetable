@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Defaults
 import SwiftUI
 
 struct ImportResult: Equatable {
@@ -25,7 +24,7 @@ struct PMS_TimetableApp: App {
 			ContentView()
 				.preferredColorScheme(.dark)
 				.onOpenURL { url in
-					handleDeepLink(url)
+					handleIncomingURL(url)
 				}
 				.environment(\.importedFileURL, $importedFileURL)
 				.environment(\.importStatus, $importStatus)
@@ -33,44 +32,25 @@ struct PMS_TimetableApp: App {
 		}
 	}
 
-	private func handleDeepLink(_ url: URL) {
+	private func handleIncomingURL(_ url: URL) {
+		if url.isFileURL {
+			importedFileURL = url
+			return
+		}
+
 		guard url.scheme == "pmstimetable" else { return }
 		
 		let components = URLComponents(url: url, resolvingAgainstBaseURL: true)
-		guard let queryItems = components?.queryItems,
-			  let dataParam = queryItems.first(where: { $0.name == "data" })?.value else {
+		let dataParam = components?.fragment ?? components?.queryItems?.first(where: { $0.name == "data" })?.value
+		guard let dataParam else {
 			return
 		}
 		
 		do {
-			let timetableData = try ShareableTimetableData.fromBase64URL(dataParam)
-			receivedTimetableData = timetableData
-			saveReceivedTimetable(timetableData)
+			receivedTimetableData = try ShareableTimetableData.fromBase64URL(dataParam)
 		} catch {
 			print("Failed to decode timetable data: \(error)")
 		}
-	}
-
-	private func saveReceivedTimetable(_ data: ShareableTimetableData) {
-		let classes = data.classes.map { shareableClass in
-			Class(
-				id: shareableClass.name,
-				symbol: shareableClass.symbol,
-				colour: RGBAColor(hexString: shareableClass.color),
-				slots: shareableClass.slots.map { Slot($0.day, $0.period) }
-			)
-		}
-
-		let receivedTimetable = ReceivedTimetable(
-			sender: data.sender,
-			classes: classes,
-			receivedAt: Date()
-		)
-
-		var existing = Defaults[.receivedTimetables]
-		existing.removeAll { $0.sender == data.sender }
-		existing.append(receivedTimetable)
-		Defaults[.receivedTimetables] = existing
 	}
 }
 

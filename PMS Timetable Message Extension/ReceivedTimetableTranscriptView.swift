@@ -11,6 +11,7 @@ import Defaults
 
 struct ReceivedTimetableTranscriptView: View {
 	let messageUrl: URL?
+	let fallbackPayload: String?
 	let onAdd: () -> Void
 	
 	@State private var timetableData: ShareableTimetableData?
@@ -117,7 +118,7 @@ struct ReceivedTimetableTranscriptView: View {
 		} label: {
 			HStack {
 				Image(systemName: hasAdded ? "checkmark" : "plus")
-				Text(hasAdded ? "Added to Your Timetables" : "Add to My Timetables")
+				Text(hasAdded ? "Opening PMS Timetable" : "Open in PMS Timetable")
 			}
 			.font(.caption)
 			.frame(maxWidth: .infinity)
@@ -142,21 +143,30 @@ struct ReceivedTimetableTranscriptView: View {
 		timetableData = nil
 
 		guard let url = messageUrl else {
-			debugReason = "No message URL provided by iMessage."
-			isLoading = false
+			loadTimetableData(fromPayload: fallbackPayload, missingPayloadReason: "No message URL or metadata provided by iMessage.")
 			return
 		}
 		
 		let components = URLComponents(url: url, resolvingAgainstBaseURL: true)
-		guard let queryItems = components?.queryItems,
-			  let dataParam = queryItems.first(where: { $0.name == "data" })?.value else {
-			debugReason = "URL missing 'data' query item."
+		let dataParam = components?.fragment ?? components?.queryItems?.first(where: { $0.name == "data" })?.value ?? fallbackPayload
+		guard let dataParam else {
+			debugReason = "URL missing timetable payload."
 			isLoading = false
 			return
 		}
-		
+
+		loadTimetableData(fromPayload: dataParam, missingPayloadReason: "URL missing timetable payload.")
+	}
+
+	private func loadTimetableData(fromPayload payload: String?, missingPayloadReason: String) {
+		guard let payload else {
+			debugReason = missingPayloadReason
+			isLoading = false
+			return
+		}
+
 		do {
-			timetableData = try ShareableTimetableData.fromBase64URL(dataParam)
+			timetableData = try ShareableTimetableData.fromBase64URL(payload)
 			debugReason = ""
 		} catch {
 			debugReason = "Decode failed: \(error.localizedDescription)"
@@ -166,7 +176,7 @@ struct ReceivedTimetableTranscriptView: View {
 }
 
 #Preview {
-	ReceivedTimetableTranscriptView(messageUrl: nil) {
+	ReceivedTimetableTranscriptView(messageUrl: nil, fallbackPayload: nil) {
 		print("Add tapped")
 	}
 }

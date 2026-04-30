@@ -28,7 +28,9 @@ class MessagesViewController: MSMessagesAppViewController {
 	
 	override func willBecomeActive(with conversation: MSConversation) {
 		super.willBecomeActive(with: conversation)
-		selectedMessageURL = conversation.selectedMessage?.url
+		if let url = conversation.selectedMessage?.url {
+			selectedMessageURL = url
+		}
 		setupSwiftUI()
 		startSelectionRefreshLoop()
 	}
@@ -59,7 +61,9 @@ class MessagesViewController: MSMessagesAppViewController {
 
 	override func didReceive(_ message: MSMessage, conversation: MSConversation) {
 		super.didReceive(message, conversation: conversation)
-		selectedMessageURL = message.url
+		if let url = message.url {
+			selectedMessageURL = url
+		}
 	}
 	
 	override func contentSizeThatFits(_ size: CGSize) -> CGSize {
@@ -76,19 +80,25 @@ class MessagesViewController: MSMessagesAppViewController {
 		hostingController?.view.removeFromSuperview()
 		
 		let userDisplayName = Defaults[.userDisplayName]
+		let selectedMessage = activeConversation?.selectedMessage
 		let messageURL = selectedMessageURL
-			?? activeConversation?.selectedMessage?.url
+			?? selectedMessage?.url
 			?? extractURLFromExtensionContext()
 		if selectedMessageURL == nil, let messageURL {
 			selectedMessageURL = messageURL
 		}
+		let fallbackPayload = selectedMessage.flatMap(extractTimetablePayload)
+		let hasSelectedMessage = selectedMessage != nil
 		let view: any View
-		if let messageURL, isTimetableDeepLink(messageURL) {
+		if hasSelectedMessage || messageURL != nil || fallbackPayload != nil {
 			view = AnyView(
-				ReceivedTimetableTranscriptView(messageUrl: messageURL) { [weak self] in
+				ReceivedTimetableTranscriptView(messageUrl: messageURL, fallbackPayload: fallbackPayload) { [weak self] in
 					guard let self else { return }
-					parseAndSaveReceivedTimetable(from: messageURL)
-					openContainingApp(with: messageURL)
+					if let messageURL {
+						openContainingApp(with: messageURL)
+					} else if let fallbackPayload, let url = makeDeepLinkFromEncodedPayload(fallbackPayload) {
+						openContainingApp(with: url)
+					}
 				}
 			)
 		} else if presentationStyle == .transcript {
@@ -209,22 +219,146 @@ class MessagesViewController: MSMessagesAppViewController {
 		let timetableData = ShareableTimetableData(sender: senderName, classes: shareableClasses)
 
 		do {
-			let base64Data = try timetableData.toBase64URL()
-			var components = URLComponents()
-			components.scheme = "pmstimetable"
-			components.host = "open-timetable"
-			components.queryItems = [URLQueryItem(name: "data", value: base64Data)]
-			guard let deepLinkURL = components.url else {
-				completion(.failure(MessageSendError.invalidDeepLink))
-				return
+			let deepLinkURL = try makeDeepLink(for: timetableData)
+			let layout = MSMessageTemplateLayout()
+			layout.image = makeTimetablePreviewImage(classes: classes, senderName: senderName)
+			layout.imageTitle = "\(senderName)'s Timetable"
+			layout.imageSubtitle = "\(classes.count) classes"
+			layout.caption = "PMS Timetable"
+			layout.subcaption = "Tap to preview and import"
+			layout.trailingCaption = "Import"
+			layout.trailingSubcaption = "Shared"
+
+			let message = MSMessage()
+			message.url = deepLinkURL
+			message.layout = layout
+			message.accessibilityLabel = "PMS_TIMETABLE_PAYLOAD:\(try timetableData.toBase64URL())"
+			message.summaryText = "\(senderName)'s PMS Timetable"
+
+			conversation.insert(message) { [weak self] error in
+				if let error {
+					self?.insertFallbackLink(timetableData, senderName: senderName, conversation: conversation, completion: completion) ?? completion(.failure(error))
+				} else {
+					completion(.success(()))
+				}
+			}
+		} catch {
+			insertFallbackLink(timetableData, senderName: senderName, conversation: conversation, completion: completion)
+		}
+	}
+
+	private func makeDeepLink(for timetableData: ShareableTimetableData) throws -> URL {
+		let base64Data = try timetableData.toBase64URL()
+		guard let deepLinkURL = makeDeepLinkFromEncodedPayload(base64Data) else {
+			throw MessageSendError.invalidDeepLink
+		}
+		return deepLinkURL
+	}
+
+	private func makeDeepLinkFromEncodedPayload(_ payload: String) -> URL? {
+		var components = URLComponents()
+		components.scheme = "pmstimetable"
+		components.host = "open-timetable"
+		components.fragment = payload
+		return components.url
+	}
+
+	private func extractTimetablePayload(from message: MSMessage) -> String? {
+		guard let label = message.accessibilityLabel else { return nil }
+		let prefix = "PMS_TIMETABLE_PAYLOAD:"
+		guard label.hasPrefix(prefix) else { return nil }
+		return String(label.dropFirst(prefix.count))
+	}
+
+	private func makeTimetablePreviewImage(classes: [Class], senderName: String) -> UIImage {
+		let size = CGSize(width: 900, height: 520)
+		let renderer = UIGraphicsImageRenderer(size: size)
+		let displayClasses = Array(classes.prefix(6))
+
+		return renderer.image { context in
+			let cgContext = context.cgContext
+			let rect = CGRect(origin: .zero, size: size)
+			UIColor(red: 0.05, green: 0.06, blue: 0.08, alpha: 1).setFill()
+			cgContext.fill(rect)
+
+			let headerAttributes: [NSAttributedString.Key: Any] = [
+				.font: UIFont.monospacedSystemFont(ofSize: 44, weight: .bold),
+				.foregroundColor: UIColor.white
+			]
+			let subheadAttributes: [NSAttributedString.Key: Any] = [
+				.font: UIFont.monospacedSystemFont(ofSize: 24, weight: .medium),
+				.foregroundColor: UIColor.white.withAlphaComponent(0.68)
+			]
+
+			("\(senderName)'s timetable" as NSString).draw(at: CGPoint(x: 44, y: 38), withAttributes: headerAttributes)
+			("\(classes.count) classes ready to import" as NSString).draw(at: CGPoint(x: 46, y: 96), withAttributes: subheadAttributes)
+
+			let columns = 3
+			let cardWidth: CGFloat = 252
+			let cardHeight: CGFloat = 112
+			let gap: CGFloat = 24
+			let startX: CGFloat = 44
+			let startY: CGFloat = 164
+
+			for (index, classItem) in displayClasses.enumerated() {
+				let row = index / columns
+				let column = index % columns
+				let cardRect = CGRect(
+					x: startX + CGFloat(column) * (cardWidth + gap),
+					y: startY + CGFloat(row) * (cardHeight + gap),
+					width: cardWidth,
+					height: cardHeight
+				)
+
+				let path = UIBezierPath(roundedRect: cardRect, cornerRadius: 22)
+				UIColor.white.withAlphaComponent(0.10).setFill()
+				path.fill()
+
+				let stripeRect = CGRect(x: cardRect.minX, y: cardRect.minY, width: 12, height: cardRect.height)
+				let stripePath = UIBezierPath(
+					roundedRect: stripeRect,
+					byRoundingCorners: [.topLeft, .bottomLeft],
+					cornerRadii: CGSize(width: 22, height: 22)
+				)
+				UIColor(classItem.colour.swiftUIColor).setFill()
+				stripePath.fill()
+
+				let titleAttributes: [NSAttributedString.Key: Any] = [
+					.font: UIFont.monospacedSystemFont(ofSize: 25, weight: .semibold),
+					.foregroundColor: UIColor.white
+				]
+				let detailAttributes: [NSAttributedString.Key: Any] = [
+					.font: UIFont.monospacedSystemFont(ofSize: 19, weight: .regular),
+					.foregroundColor: UIColor.white.withAlphaComponent(0.62)
+				]
+
+				(classItem.id as NSString).draw(
+					in: CGRect(x: cardRect.minX + 28, y: cardRect.minY + 22, width: cardRect.width - 44, height: 32),
+					withAttributes: titleAttributes
+				)
+				("\(classItem.slots.count) slot\(classItem.slots.count == 1 ? "" : "s")" as NSString).draw(
+					at: CGPoint(x: cardRect.minX + 28, y: cardRect.minY + 62),
+					withAttributes: detailAttributes
+				)
 			}
 
-			let messageText = """
-			\(senderName)'s PMS Timetable
-			\(deepLinkURL.absoluteString)
-			"""
+			if classes.count > displayClasses.count {
+				let moreAttributes: [NSAttributedString.Key: Any] = [
+					.font: UIFont.monospacedSystemFont(ofSize: 22, weight: .medium),
+					.foregroundColor: UIColor.white.withAlphaComponent(0.72)
+				]
+				("+\(classes.count - displayClasses.count) more classes" as NSString).draw(
+					at: CGPoint(x: 46, y: 456),
+					withAttributes: moreAttributes
+				)
+			}
+		}
+	}
 
-			conversation.insertText(messageText) { error in
+	private func insertFallbackLink(_ timetableData: ShareableTimetableData, senderName: String, conversation: MSConversation, completion: @escaping (Result<Void, Error>) -> Void) {
+		do {
+			let deepLinkURL = try makeDeepLink(for: timetableData)
+			conversation.insertText("\(senderName)'s PMS Timetable\n\(deepLinkURL.absoluteString)") { error in
 				if let error {
 					completion(.failure(error))
 				} else {

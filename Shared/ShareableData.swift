@@ -2,19 +2,19 @@ import Foundation
 import SwiftUI
 import Compression
 
-struct ShareableSlot: Codable {
+struct ShareableSlot: Codable, Equatable {
 	let day: Int
 	let period: Int
 }
 
-struct ShareableClass: Codable {
+struct ShareableClass: Codable, Equatable {
 	let name: String
 	let symbol: String
 	let color: String
 	let slots: [ShareableSlot]
 }
 
-struct ShareableTimetableData: Codable {
+struct ShareableTimetableData: Codable, Equatable {
 	let sender: String
 	let classes: [ShareableClass]
 	

@@ -50,6 +50,8 @@ struct ContentView: View {
 	@Default(.displayMode) var displayMode
 	@Default(.userDisplayName) var userDisplayName
 	@Default(.receivedTimetables) var receivedTimetables
+	@Environment(\.importedFileURL) private var importedFileURL
+	@Environment(\.receivedTimetableData) private var receivedTimetableData
 
 	@State private var showingEditor = false
 	@State private var editorRequest: EditorRequest?
@@ -65,6 +67,8 @@ struct ContentView: View {
 
 	@State private var showCalendarImportSheet = false
 	@State private var selectedTab = 0
+	@State private var pendingSharedTimetable: ReceivedTimetable?
+	@State private var importErrorMessage: String?
 
 	var body: some View { TabView(selection: $selectedTab) {
 		NavigationStack {
@@ -160,12 +164,7 @@ struct ContentView: View {
 			}
 			watchSync.lastError = nil
 		}
-		.onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("TimetableImported"))) { notification in
-			if let message = notification.userInfo?["message"] as? String,
-			   let isSuccess = notification.userInfo?["success"] as? Bool {
 			}
-		}
-		}
 		.tabItem {
 			Label("Timetable", systemImage: "calendar")
 		}
@@ -247,6 +246,49 @@ struct ContentView: View {
 				.presentationDetents([.fraction(1 / 3)])
 				.presentationDragIndicator(.hidden)
 		}
+		.onAppear {
+			processPendingSharedImport()
+		}
+		.sheet(item: $pendingSharedTimetable) { timetable in
+			SharedTimetableImportSheet(
+				timetable: timetable,
+				onCancel: {
+					pendingSharedTimetable = nil
+				},
+				onImport: {
+					importSharedTimetable(timetable)
+				}
+			)
+			.presentationDetents([.medium, .large])
+			.presentationDragIndicator(.visible)
+		}
+		.alert(
+			"Could Not Import Timetable",
+			isPresented: Binding(
+				get: { importErrorMessage != nil },
+				set: { newValue in
+					if !newValue {
+						importErrorMessage = nil
+					}
+				}
+			),
+			actions: {
+				Button("OK", role: .cancel) {
+					importErrorMessage = nil
+				}
+			},
+			message: {
+				Text(importErrorMessage ?? "")
+			}
+		)
+		.onChange(of: importedFileURL.wrappedValue) { _, fileURL in
+			guard fileURL != nil else { return }
+			processPendingSharedImport()
+		}
+		.onChange(of: receivedTimetableData.wrappedValue) { _, timetableData in
+			guard timetableData != nil else { return }
+			processPendingSharedImport()
+		}
 		.alert(
 			"Slot Conflict",
 			isPresented: Binding(
@@ -295,6 +337,71 @@ struct ContentView: View {
 				Text(validationMessage ?? "")
 			}
 		)
+	}
+
+	private func processPendingSharedImport() {
+		if let fileURL = importedFileURL.wrappedValue {
+			prepareImportPreview(from: fileURL)
+			importedFileURL.wrappedValue = nil
+			return
+		}
+
+		if let timetableData = receivedTimetableData.wrappedValue {
+			pendingSharedTimetable = makeReceivedTimetable(from: timetableData)
+			receivedTimetableData.wrappedValue = nil
+		}
+	}
+
+	private func prepareImportPreview(from fileURL: URL) {
+		let didAccess = fileURL.startAccessingSecurityScopedResource()
+		defer {
+			if didAccess {
+				fileURL.stopAccessingSecurityScopedResource()
+			}
+		}
+
+		do {
+			let data = try Data(contentsOf: fileURL)
+			let message = try TimetableMessage.decode(data)
+			guard !message.timetable.isEmpty else {
+				importErrorMessage = "This timetable does not contain any classes."
+				return
+			}
+
+			pendingSharedTimetable = ReceivedTimetable(
+				sender: message.sender,
+				classes: message.timetable,
+				receivedAt: message.timestamp
+			)
+		} catch {
+			importErrorMessage = error.localizedDescription
+		}
+	}
+
+	private func makeReceivedTimetable(from data: ShareableTimetableData) -> ReceivedTimetable {
+		let classes = data.classes.map { shareableClass in
+			Class(
+				id: shareableClass.name,
+				symbol: shareableClass.symbol,
+				colour: RGBAColor(hexString: shareableClass.color),
+				slots: shareableClass.slots.map { Slot($0.day, $0.period) }
+			)
+		}
+
+		return ReceivedTimetable(
+			sender: data.sender,
+			classes: classes,
+			receivedAt: Date()
+		)
+	}
+
+	private func importSharedTimetable(_ timetable: ReceivedTimetable) {
+		var existing = receivedTimetables
+		existing.removeAll { $0.sender == timetable.sender }
+		existing.append(timetable)
+		receivedTimetables = existing
+		selectedTab = 1
+		pendingSharedTimetable = nil
 	}
 
 	
@@ -846,6 +953,65 @@ struct ContentView: View {
 			try? await Task.sleep(nanoseconds: 1_000_000_000)
 			syncStatus = .normal
 		}
+	}
+}
+
+struct SharedTimetableImportSheet: View {
+	let timetable: ReceivedTimetable
+	let onCancel: () -> Void
+	let onImport: () -> Void
+
+	var body: some View {
+		NavigationStack {
+			List {
+				Section {
+					VStack(alignment: .leading, spacing: 8) {
+						Label(timetable.sender, systemImage: "person.crop.circle")
+							.font(.headline)
+						Text("\(timetable.classes.count) classes shared")
+							.font(.subheadline)
+							.foregroundStyle(.secondary)
+					}
+					.padding(.vertical, 4)
+				}
+				.listRowBackground(Rectangle().fill(.ultraThinMaterial))
+
+				Section("Preview") {
+					ForEach(timetable.classes) { classItem in
+						HStack(spacing: 12) {
+							RoundedRectangle(cornerRadius: 4)
+								.fill(classItem.colour.swiftUIColor)
+								.frame(width: 12, height: 28)
+
+							Image(systemName: classItem.symbol)
+								.frame(width: 24)
+
+							VStack(alignment: .leading, spacing: 2) {
+								Text(classItem.id)
+									.font(.subheadline.weight(.semibold))
+								Text("\(classItem.slots.count) slot\(classItem.slots.count == 1 ? "" : "s")")
+									.font(.caption)
+									.foregroundStyle(.secondary)
+							}
+						}
+					}
+					.listRowBackground(Rectangle().fill(.ultraThinMaterial))
+				}
+			}
+			.scrollContentBackground(.hidden)
+			.navigationTitle("Import Timetable")
+			.navigationBarTitleDisplayMode(.inline)
+			.toolbar {
+				ToolbarItem(placement: .cancellationAction) {
+					Button("Cancel", action: onCancel)
+				}
+				ToolbarItem(placement: .confirmationAction) {
+					Button("Import", action: onImport)
+						.buttonStyle(.glassProminent)
+				}
+			}
+		}
+		.monospaced()
 	}
 }
 
