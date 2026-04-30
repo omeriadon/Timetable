@@ -24,81 +24,70 @@ struct TimetableView: View {
 	}
 
 	var body: some View {
-		VStack(spacing: 16) {
-			Text("PMS Timetable")
-				.font(.headline)
-
-			TextField("Your name", text: $senderName)
-				.padding(12)
-				.background(Color.gray.opacity(0.1))
-				.cornerRadius(8)
-
-			if classes.isEmpty {
-				Text("No classes scheduled")
-					.foregroundStyle(.secondary)
-			} else {
-				ScrollView {
-					VStack(alignment: .leading, spacing: 8) {
+		NavigationStack {
+			VStack {
+				if classes.isEmpty {
+					Text("No classes found in your timetable. Import your schedule in the app first to share your timetable.")
+						.foregroundStyle(.secondary)
+				} else {
+					List {
 						ForEach(classes, id: \.id) { classItem in
 							HStack(spacing: 12) {
 								Image(systemName: classItem.symbol)
-									.frame(width: 24)
 
-								VStack(alignment: .leading, spacing: 2) {
-									Text(classItem.id)
-										.font(.subheadline.bold())
-
-									Text("\(classItem.slots.count) slot\(classItem.slots.count == 1 ? "" : "s")")
-										.font(.caption)
-										.foregroundStyle(.secondary)
-								}
+								Text(classItem.id)
 
 								Spacer()
+
+								Text("\(classItem.slots.count) slot\(classItem.slots.count == 1 ? "" : "s")")
 							}
-							.padding(8)
-							.background(Color.gray.opacity(0.1))
-							.cornerRadius(6)
+							.listRowSeparator(.hidden)
+							.listRowBackground(
+								classItem.colour.swiftUIColor.opacity(0.5)
+							)
 						}
 					}
-				}
-				.frame(maxHeight: 250)
-			}
+					.scrollBounceBehavior(.basedOnSize)
+					.scrollContentBackground(.hidden)
 
-			ZStack {
-				if let error = errorMessage {
-					Text(error)
-						.font(.caption)
-						.foregroundStyle(.red)
-						.padding(8)
-						.background(Color.red.opacity(0.1))
-						.cornerRadius(6)
-						.transition(.blurReplace)
-				}
-			}
-			.animation(.easeInOut, value: errorMessage)
+					Button(action: sendTimetable) {
+						HStack(spacing: 8) {
+							if isSending {
+								ProgressView()
+									.transition(.blurReplace)
+							} else {
+								Image(systemName: "paperplane")
+									.transition(.blurReplace)
+							}
 
-			Button(action: sendTimetable) {
-				HStack(spacing: 8) {
-					if isSending {
-						ProgressView()
-							.transition(.blurReplace)
-					} else {
-						Image(systemName: "paperplane")
+							Text("Send Timetable")
+								.contentTransition(.numericText())
+						}
+						.animation(.easeInOut, value: isSending)
+					}
+					.tint(.blue)
+					.buttonStyle(.glassProminent)
+					.buttonBorderShape(.capsule)
+					.buttonSizing(.flexible)
+					.controlSize(.large)
+					.disabled(isSending || classes.isEmpty || senderName.trimmingCharacters(in: .whitespaces).isEmpty)
+				}
+
+				ZStack {
+					if let error = errorMessage {
+						Text(error)
+							.font(.caption)
+							.foregroundStyle(.red)
+							.padding(8)
+							.background(Color.red.opacity(0.1))
+							.cornerRadius(6)
 							.transition(.blurReplace)
 					}
-
-					Text(isSending ? "Sending..." : "Send Timetable")
-						.contentTransition(.numericText())
 				}
-				.animation(.easeInOut, value: isSending)
+				.animation(.easeInOut, value: errorMessage)
 			}
-			.tint(.blue)
-			.buttonStyle(.glassProminent)
-			.buttonBorderShape(.capsule)
-			.buttonSizing(.flexible)
-			.disabled(isSending || classes.isEmpty || senderName.trimmingCharacters(in: .whitespaces).isEmpty)
+			.padding()
 		}
-		.padding()
 		.monospaced()
 	}
 

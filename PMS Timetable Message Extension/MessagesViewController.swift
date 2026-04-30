@@ -222,12 +222,8 @@ class MessagesViewController: MSMessagesAppViewController {
 			let deepLinkURL = try makeDeepLink(for: timetableData)
 			let layout = MSMessageTemplateLayout()
 			layout.image = makeTimetablePreviewImage(classes: classes, senderName: senderName)
-			layout.imageTitle = "\(senderName)'s Timetable"
-			layout.imageSubtitle = "\(classes.count) classes"
-			layout.caption = "PMS Timetable"
+			layout.caption = "\(senderName)'s Timetable"
 			layout.subcaption = "Tap to preview and import"
-			layout.trailingCaption = "Import"
-			layout.trailingSubcaption = "Shared"
 
 			let message = MSMessage()
 			message.url = deepLinkURL
