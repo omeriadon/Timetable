@@ -5,10 +5,10 @@
 //  Created by Adon Omeri on 29/4/2026.
 //
 
-import UIKit
+import Defaults
 import Messages
 import SwiftUI
-import Defaults
+import UIKit
 
 class MessagesViewController: MSMessagesAppViewController {
 	private var hostingController: UIHostingController<AnyView>?
@@ -25,7 +25,7 @@ class MessagesViewController: MSMessagesAppViewController {
 		super.viewDidAppear(animated)
 		startSelectionRefreshLoop()
 	}
-	
+
 	override func willBecomeActive(with conversation: MSConversation) {
 		super.willBecomeActive(with: conversation)
 		if let url = conversation.selectedMessage?.url {
@@ -41,7 +41,7 @@ class MessagesViewController: MSMessagesAppViewController {
 		setupSwiftUI()
 		startSelectionRefreshLoop()
 	}
-	
+
 	override func didTransition(to presentationStyle: MSMessagesAppPresentationStyle) {
 		super.didTransition(to: presentationStyle)
 		setupSwiftUI()
@@ -65,7 +65,7 @@ class MessagesViewController: MSMessagesAppViewController {
 			selectedMessageURL = url
 		}
 	}
-	
+
 	override func contentSizeThatFits(_ size: CGSize) -> CGSize {
 		if presentationStyle == .compact {
 			return CGSize(width: size.width, height: 400)
@@ -78,7 +78,7 @@ class MessagesViewController: MSMessagesAppViewController {
 	private func setupSwiftUI() {
 		hostingController?.removeFromParent()
 		hostingController?.view.removeFromSuperview()
-		
+
 		let userDisplayName = Defaults[.userDisplayName]
 		let selectedMessage = activeConversation?.selectedMessage
 		let messageURL = selectedMessageURL
@@ -114,14 +114,14 @@ class MessagesViewController: MSMessagesAppViewController {
 				}
 			)
 		}
-		
+
 		let newController = UIHostingController(rootView: AnyView(view))
 		newController.view.backgroundColor = .clear
 		self.view.backgroundColor = .clear
-		
+
 		addChild(newController)
 		self.view.addSubview(newController.view)
-		
+
 		newController.view.translatesAutoresizingMaskIntoConstraints = false
 		NSLayoutConstraint.activate([
 			newController.view.topAnchor.constraint(equalTo: self.view.topAnchor),
@@ -129,7 +129,7 @@ class MessagesViewController: MSMessagesAppViewController {
 			newController.view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
 			newController.view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor)
 		])
-		
+
 		newController.didMove(toParent: self)
 		hostingController = newController
 	}
@@ -196,10 +196,8 @@ class MessagesViewController: MSMessagesAppViewController {
 	private func isTimetableDeepLink(_ url: URL) -> Bool {
 		guard url.scheme == "pmstimetable" else { return false }
 		let components = URLComponents(url: url, resolvingAgainstBaseURL: true)
-		let hasData = components?.queryItems?.contains(where: { $0.name == "data" && ($0.value?.isEmpty == false) }) == true
-		return hasData
+		return components?.queryItems?.contains(where: { $0.name == "data" && ($0.value?.isEmpty == false) }) == true
 	}
-
 
 	private func sendTimetableMessage(senderName: String, classes: [Class], completion: @escaping (Result<Void, Error>) -> Void) {
 		guard let conversation = activeConversation else {
@@ -228,7 +226,7 @@ class MessagesViewController: MSMessagesAppViewController {
 			let message = MSMessage()
 			message.url = deepLinkURL
 			message.layout = layout
-			message.accessibilityLabel = "PMS_TIMETABLE_PAYLOAD:\(try timetableData.toBase64URL())"
+			message.accessibilityLabel = try "PMS_TIMETABLE_PAYLOAD:\(timetableData.toBase64URL())"
 			message.summaryText = "\(senderName)'s PMS Timetable"
 
 			conversation.insert(message) { [weak self] error in
@@ -267,34 +265,58 @@ class MessagesViewController: MSMessagesAppViewController {
 	}
 
 	private func makeTimetablePreviewImage(classes: [Class], senderName: String) -> UIImage {
-		let size = CGSize(width: 900, height: 520)
+		let size = CGSize(width: 900, height: 700)
 		let renderer = UIGraphicsImageRenderer(size: size)
-		let displayClasses = Array(classes.prefix(6))
+		let displayClasses = Array(classes.prefix(9))
 
 		return renderer.image { context in
 			let cgContext = context.cgContext
 			let rect = CGRect(origin: .zero, size: size)
-			UIColor(red: 0.05, green: 0.06, blue: 0.08, alpha: 1).setFill()
+			UIColor(red: 0.07, green: 0.09, blue: 0.12, alpha: 1).setFill()
 			cgContext.fill(rect)
+
+			let paragraphStyle = NSMutableParagraphStyle()
+			paragraphStyle.alignment = .right
 
 			let headerAttributes: [NSAttributedString.Key: Any] = [
 				.font: UIFont.monospacedSystemFont(ofSize: 44, weight: .bold),
-				.foregroundColor: UIColor.white
-			]
-			let subheadAttributes: [NSAttributedString.Key: Any] = [
-				.font: UIFont.monospacedSystemFont(ofSize: 24, weight: .medium),
-				.foregroundColor: UIColor.white.withAlphaComponent(0.68)
+				.foregroundColor: UIColor.white,
+				.paragraphStyle: paragraphStyle
 			]
 
-			("\(senderName)'s timetable" as NSString).draw(at: CGPoint(x: 44, y: 38), withAttributes: headerAttributes)
-			("\(classes.count) classes ready to import" as NSString).draw(at: CGPoint(x: 46, y: 96), withAttributes: subheadAttributes)
+			let subParagraphStyle = NSMutableParagraphStyle()
+			subParagraphStyle.alignment = .right
+
+			let subheadAttributes: [NSAttributedString.Key: Any] = [
+				.font: UIFont.monospacedSystemFont(ofSize: 24, weight: .medium),
+				.foregroundColor: UIColor.white.withAlphaComponent(0.68),
+				.paragraphStyle: subParagraphStyle
+			]
+
+			let headerRect = CGRect(
+				x: 44,
+				y: 38,
+				width: size.width - 88,
+				height: 60
+			)
+			("\(senderName)'s timetable" as NSString)
+				.draw(in: headerRect, withAttributes: headerAttributes)
+
+			let subheadRect = CGRect(
+				x: 44,
+				y: 96,
+				width: size.width - 88,
+				height: 40
+			)
+			("\(classes.count) classes" as NSString)
+				.draw(in: subheadRect, withAttributes: subheadAttributes)
 
 			let columns = 3
 			let cardWidth: CGFloat = 252
-			let cardHeight: CGFloat = 112
-			let gap: CGFloat = 24
-			let startX: CGFloat = 44
+			let cardHeight: CGFloat = 120
+			let gap: CGFloat = 20
 			let startY: CGFloat = 164
+			let startX: CGFloat = 44
 
 			for (index, classItem) in displayClasses.enumerated() {
 				let row = index / columns
@@ -306,18 +328,9 @@ class MessagesViewController: MSMessagesAppViewController {
 					height: cardHeight
 				)
 
-				let path = UIBezierPath(roundedRect: cardRect, cornerRadius: 22)
-				UIColor.white.withAlphaComponent(0.10).setFill()
-				path.fill()
-
-				let stripeRect = CGRect(x: cardRect.minX, y: cardRect.minY, width: 12, height: cardRect.height)
-				let stripePath = UIBezierPath(
-					roundedRect: stripeRect,
-					byRoundingCorners: [.topLeft, .bottomLeft],
-					cornerRadii: CGSize(width: 22, height: 22)
-				)
+				let path = UIBezierPath(roundedRect: cardRect, cornerRadius: 20)
 				UIColor(classItem.colour.swiftUIColor).setFill()
-				stripePath.fill()
+				path.fill()
 
 				let titleAttributes: [NSAttributedString.Key: Any] = [
 					.font: UIFont.monospacedSystemFont(ofSize: 25, weight: .semibold),
@@ -335,17 +348,6 @@ class MessagesViewController: MSMessagesAppViewController {
 				("\(classItem.slots.count) slot\(classItem.slots.count == 1 ? "" : "s")" as NSString).draw(
 					at: CGPoint(x: cardRect.minX + 28, y: cardRect.minY + 62),
 					withAttributes: detailAttributes
-				)
-			}
-
-			if classes.count > displayClasses.count {
-				let moreAttributes: [NSAttributedString.Key: Any] = [
-					.font: UIFont.monospacedSystemFont(ofSize: 22, weight: .medium),
-					.foregroundColor: UIColor.white.withAlphaComponent(0.72)
-				]
-				("+\(classes.count - displayClasses.count) more classes" as NSString).draw(
-					at: CGPoint(x: 46, y: 456),
-					withAttributes: moreAttributes
 				)
 			}
 		}
@@ -387,17 +389,18 @@ class MessagesViewController: MSMessagesAppViewController {
 			responder = responder?.next
 		}
 	}
-	
+
 	private func parseAndSaveReceivedTimetable(from url: URL) {
 		guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
-			  let queryItems = components.queryItems,
-			  let dataParam = queryItems.first(where: { $0.name == "data" })?.value else {
+		      let queryItems = components.queryItems,
+		      let dataParam = queryItems.first(where: { $0.name == "data" })?.value
+		else {
 			return
 		}
-		
+
 		do {
 			let data = try ShareableTimetableData.fromBase64URL(dataParam)
-			
+
 			let classes = data.classes.map { shareableClass in
 				Class(
 					id: shareableClass.name,
@@ -406,13 +409,13 @@ class MessagesViewController: MSMessagesAppViewController {
 					slots: shareableClass.slots.map { Slot($0.day, $0.period) }
 				)
 			}
-			
+
 			let receivedTimetable = ReceivedTimetable(
 				sender: data.sender,
 				classes: classes,
 				receivedAt: Date()
 			)
-			
+
 			var existing = Defaults[.receivedTimetables]
 			existing.removeAll { $0.sender == data.sender }
 			existing.append(receivedTimetable)
@@ -444,9 +447,9 @@ extension Color {
 	init(rgba: RGBAColor) {
 		self.init(red: rgba.r, green: rgba.g, blue: rgba.b, opacity: rgba.a)
 	}
-	
+
 	func toHex() -> String {
-		guard let cgColor = self.cgColor else { return "#000000" }
+		guard let cgColor = cgColor else { return "#000000" }
 		guard let components = cgColor.components, components.count >= 3 else { return "#000000" }
 		let r = Int(components[0] * 255)
 		let g = Int(components[1] * 255)
@@ -458,7 +461,7 @@ extension Color {
 extension UIImage {
 	func resized(to size: CGSize) -> UIImage {
 		UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
-		self.draw(in: CGRect(origin: .zero, size: size))
+		draw(in: CGRect(origin: .zero, size: size))
 		let resized = UIGraphicsGetImageFromCurrentImageContext()
 		UIGraphicsEndImageContext()
 		return resized ?? self
