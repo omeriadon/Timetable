@@ -6,4 +6,7 @@
 #define AC_SWIFT_PRIVATE
 #endif
 
+/// The "TimetableDocIcon" asset catalog image resource.
+static NSString * const ACImageNameTimetableDocIcon AC_SWIFT_PRIVATE = @"TimetableDocIcon";
+
 #undef AC_SWIFT_PRIVATE

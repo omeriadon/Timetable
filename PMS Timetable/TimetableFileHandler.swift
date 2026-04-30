@@ -16,9 +16,7 @@ struct TimetableFileHandler {
 
 			let importedClasses = importedMessage.timetable
 			if importedClasses.isEmpty {
-				let result = (false, "No classes in imported timetable")
-				postNotification(result)
-				return result
+				return (false, "No classes in imported timetable")
 			}
 
 			Defaults[.timetable] = importedClasses
@@ -29,25 +27,9 @@ struct TimetableFileHandler {
 				timeStyle: .short
 			)
 			let result = (true, "Timetable from \(importedMessage.sender) imported at \(timestamp)")
-			postNotification(result)
 			return result
 		} catch {
-			let result = (false, "Failed to import timetable: \(error.localizedDescription)")
-			postNotification(result)
-			return result
-		}
-	}
-
-	private static func postNotification(_ result: (success: Bool, message: String)) {
-		DispatchQueue.main.async {
-			NotificationCenter.default.post(
-				name: NSNotification.Name("TimetableImported"),
-				object: nil,
-				userInfo: [
-					"success": result.success,
-					"message": result.message
-				]
-			)
+			return (false, "Failed to import timetable: \(error.localizedDescription)")
 		}
 	}
 }

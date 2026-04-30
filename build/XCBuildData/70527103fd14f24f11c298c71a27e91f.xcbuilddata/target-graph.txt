@@ -1,9 +1,0 @@
-Target dependency graph (4 targets)
-Target 'PMS Timetable Message Extension' in project 'PMS Timetable'
-➜ Explicit dependency on target 'Defaults' in project 'Defaults'
-Target 'Defaults' in project 'Defaults'
-➜ Explicit dependency on target 'Defaults' in project 'Defaults'
-➜ Explicit dependency on target 'Defaults_Defaults' in project 'Defaults'
-Target 'Defaults' in project 'Defaults'
-➜ Explicit dependency on target 'Defaults_Defaults' in project 'Defaults'
-Target 'Defaults_Defaults' in project 'Defaults' (no dependencies)

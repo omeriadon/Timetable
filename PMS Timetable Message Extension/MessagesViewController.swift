@@ -8,76 +8,287 @@
 import UIKit
 import Messages
 import SwiftUI
+import Defaults
 
 class MessagesViewController: MSMessagesAppViewController {
+	private var hostingController: UIHostingController<AnyView>?
+	private var selectedMessageURL: URL?
+	private var selectionRefreshAttempts = 0
+	private let maxSelectionRefreshAttempts = 8
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		print("[MessagesViewController] viewDidLoad called")
 		setupSwiftUI()
 	}
 
+	override func viewDidAppear(_ animated: Bool) {
+		super.viewDidAppear(animated)
+		startSelectionRefreshLoop()
+	}
+	
 	override func willBecomeActive(with conversation: MSConversation) {
 		super.willBecomeActive(with: conversation)
-		print("[MessagesViewController] willBecomeActive called")
+		selectedMessageURL = conversation.selectedMessage?.url
+		setupSwiftUI()
+		startSelectionRefreshLoop()
+	}
+
+	override func didBecomeActive(with conversation: MSConversation) {
+		super.didBecomeActive(with: conversation)
+		selectedMessageURL = selectedMessageURL ?? conversation.selectedMessage?.url ?? extractURLFromExtensionContext()
+		setupSwiftUI()
+		startSelectionRefreshLoop()
+	}
+	
+	override func didTransition(to presentationStyle: MSMessagesAppPresentationStyle) {
+		super.didTransition(to: presentationStyle)
+		setupSwiftUI()
+	}
+
+	override func didSelect(_ message: MSMessage, conversation: MSConversation) {
+		super.didSelect(message, conversation: conversation)
+		selectedMessageURL = message.url
+		print("[MessagesExt] didSelect url: \(message.url?.absoluteString ?? "nil")")
+		setupSwiftUI()
+	}
+
+	override func willSelect(_ message: MSMessage, conversation: MSConversation) {
+		super.willSelect(message, conversation: conversation)
+		print("[MessagesExt] willSelect url: \(message.url?.absoluteString ?? "nil")")
+	}
+
+	override func didReceive(_ message: MSMessage, conversation: MSConversation) {
+		super.didReceive(message, conversation: conversation)
+		selectedMessageURL = message.url
+	}
+	
+	override func contentSizeThatFits(_ size: CGSize) -> CGSize {
+		if presentationStyle == .compact {
+			return CGSize(width: size.width, height: 400)
+		} else if presentationStyle == .expanded {
+			return CGSize(width: size.width, height: 600)
+		}
+		return size
 	}
 
 	private func setupSwiftUI() {
-		print("[MessagesViewController] setupSwiftUI called")
-		let timetableView = TimetableView { [weak self] fileURL, completion in
-			guard let self else {
-				completion(.failure(MessageSendError.controllerDeallocated))
-				return
-			}
-			self.sendAttachment(fileURL, completion: completion)
-		}
-		let hostingController = UIHostingController(rootView: timetableView)
-
-		// Clear backgrounds
-		hostingController.view.backgroundColor = .clear
-		view.backgroundColor = .clear
-
-		// Add as child view controller
-		addChild(hostingController)
-		view.addSubview(hostingController.view)
-
-		// Set up constraints
-		hostingController.view.translatesAutoresizingMaskIntoConstraints = false
-		NSLayoutConstraint.activate([
-			hostingController.view.topAnchor.constraint(equalTo: view.topAnchor),
-			hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-			hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-			hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-		])
-
-		// Complete the transition
-		hostingController.didMove(toParent: self)
+		hostingController?.removeFromParent()
+		hostingController?.view.removeFromSuperview()
 		
-		print("[MessagesViewController] SwiftUI view setup complete")
+		let userDisplayName = Defaults[.userDisplayName]
+		let messageURL = selectedMessageURL
+			?? activeConversation?.selectedMessage?.url
+			?? extractURLFromExtensionContext()
+		if selectedMessageURL == nil, let messageURL {
+			selectedMessageURL = messageURL
+		}
+		let view: any View
+		if let messageURL, isTimetableDeepLink(messageURL) {
+			view = AnyView(
+				ReceivedTimetableTranscriptView(messageUrl: messageURL) { [weak self] in
+					guard let self else { return }
+					parseAndSaveReceivedTimetable(from: messageURL)
+					openContainingApp(with: messageURL)
+				}
+			)
+		} else if presentationStyle == .transcript {
+			view = AnyView(TranscriptPlaceholder())
+		} else {
+			view = AnyView(
+				TimetableView { [weak self] _, classes, completion in
+					guard let self else {
+						completion(.failure(MessageSendError.controllerDeallocated))
+						return
+					}
+					self.sendTimetableMessage(senderName: userDisplayName, classes: classes, completion: completion)
+				}
+			)
+		}
+		
+		let newController = UIHostingController(rootView: AnyView(view))
+		newController.view.backgroundColor = .clear
+		self.view.backgroundColor = .clear
+		
+		addChild(newController)
+		self.view.addSubview(newController.view)
+		
+		newController.view.translatesAutoresizingMaskIntoConstraints = false
+		NSLayoutConstraint.activate([
+			newController.view.topAnchor.constraint(equalTo: self.view.topAnchor),
+			newController.view.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
+			newController.view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+			newController.view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor)
+		])
+		
+		newController.didMove(toParent: self)
+		hostingController = newController
 	}
 
-	private func sendAttachment(_ fileURL: URL, completion: @escaping (Result<Void, Error>) -> Void) {
+	private func startSelectionRefreshLoop() {
+		selectionRefreshAttempts = 0
+		refreshSelectionIfNeeded()
+	}
+
+	private func refreshSelectionIfNeeded() {
+		let currentURL = selectedMessageURL
+			?? activeConversation?.selectedMessage?.url
+			?? extractURLFromExtensionContext()
+
+		if currentURL != nil {
+			if selectedMessageURL == nil {
+				selectedMessageURL = currentURL
+				setupSwiftUI()
+			}
+			return
+		}
+
+		guard selectionRefreshAttempts < maxSelectionRefreshAttempts else { return }
+		selectionRefreshAttempts += 1
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in
+			self?.refreshSelectionIfNeeded()
+		}
+	}
+
+	private func extractURLFromExtensionContext() -> URL? {
+		guard let extensionItems = extensionContext?.inputItems as? [NSExtensionItem] else {
+			return nil
+		}
+
+		for item in extensionItems {
+			if let explicitURL = item.userInfo?["url"] as? URL {
+				return explicitURL
+			}
+			if let urlString = item.userInfo?["url"] as? String, let parsed = URL(string: urlString) {
+				return parsed
+			}
+			for provider in item.attachments ?? [] {
+				if provider.hasItemConformingToTypeIdentifier("public.url") {
+					var extractedURL: URL?
+					let semaphore = DispatchSemaphore(value: 0)
+					provider.loadItem(forTypeIdentifier: "public.url", options: nil) { item, _ in
+						if let url = item as? URL {
+							extractedURL = url
+						} else if let string = item as? String {
+							extractedURL = URL(string: string)
+						}
+						semaphore.signal()
+					}
+					_ = semaphore.wait(timeout: .now() + 0.25)
+					if let extractedURL {
+						return extractedURL
+					}
+				}
+			}
+		}
+		return nil
+	}
+
+	private func isTimetableDeepLink(_ url: URL) -> Bool {
+		guard url.scheme == "pmstimetable" else { return false }
+		let components = URLComponents(url: url, resolvingAgainstBaseURL: true)
+		let hasData = components?.queryItems?.contains(where: { $0.name == "data" && ($0.value?.isEmpty == false) }) == true
+		return hasData
+	}
+
+
+	private func sendTimetableMessage(senderName: String, classes: [Class], completion: @escaping (Result<Void, Error>) -> Void) {
 		guard let conversation = activeConversation else {
 			completion(.failure(MessageSendError.noActiveConversation))
 			return
 		}
 
-		conversation.insertAttachment(fileURL, withAlternateFilename: "Timetable.timetable") { error in
-			if let error {
-				completion(.failure(error))
-			} else {
-				completion(.success(()))
+		let shareableClasses = classes.map { classItem in
+			ShareableClass(
+				name: classItem.id,
+				symbol: classItem.symbol,
+				color: String(format: "#%02X%02X%02X", Int(classItem.colour.r * 255), Int(classItem.colour.g * 255), Int(classItem.colour.b * 255)),
+				slots: classItem.slots.map { ShareableSlot(day: $0.day, period: $0.session) }
+			)
+		}
+
+		let timetableData = ShareableTimetableData(sender: senderName, classes: shareableClasses)
+
+		do {
+			let base64Data = try timetableData.toBase64URL()
+			var components = URLComponents()
+			components.scheme = "pmstimetable"
+			components.host = "open-timetable"
+			components.queryItems = [URLQueryItem(name: "data", value: base64Data)]
+			guard let deepLinkURL = components.url else {
+				completion(.failure(MessageSendError.invalidDeepLink))
+				return
 			}
+
+			let messageText = """
+			\(senderName)'s PMS Timetable
+			\(deepLinkURL.absoluteString)
+			"""
+
+			conversation.insertText(messageText) { error in
+				if let error {
+					completion(.failure(error))
+				} else {
+					completion(.success(()))
+				}
+			}
+		} catch {
+			completion(.failure(error))
 		}
 	}
 
-	override func didReceive(_ message: MSMessage, conversation: MSConversation) {
-		super.didReceive(message, conversation: conversation)
-		print("[MessagesViewController] didReceive called")
+	private func openContainingApp(with url: URL) {
+		extensionContext?.open(url, completionHandler: { [weak self] success in
+			guard let self, !success else { return }
+			self.openViaResponderChain(url)
+		})
+	}
+
+	private func openViaResponderChain(_ url: URL) {
+		var responder: UIResponder? = self
+		while responder != nil {
+			if let application = responder as? UIApplication {
+				if #available(iOS 18.0, *) {
+					application.open(url, options: [:], completionHandler: nil)
+				} else {
+					_ = application.perform(NSSelectorFromString("openURL:"), with: url)
+				}
+				return
+			}
+			responder = responder?.next
+		}
+	}
+	
+	private func parseAndSaveReceivedTimetable(from url: URL) {
+		guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
+			  let queryItems = components.queryItems,
+			  let dataParam = queryItems.first(where: { $0.name == "data" })?.value else {
+			return
+		}
 		
-		if let fileURL = message.url, fileURL.pathExtension == "timetable" {
-			let result = TimetableFileHandler.handleTimetableFile(at: fileURL)
-			print("[Message Extension] Import result: \(result.message)")
+		do {
+			let data = try ShareableTimetableData.fromBase64URL(dataParam)
+			
+			let classes = data.classes.map { shareableClass in
+				Class(
+					id: shareableClass.name,
+					symbol: shareableClass.symbol,
+					colour: RGBAColor(hexString: shareableClass.color),
+					slots: shareableClass.slots.map { Slot($0.day, $0.period) }
+				)
+			}
+			
+			let receivedTimetable = ReceivedTimetable(
+				sender: data.sender,
+				classes: classes,
+				receivedAt: Date()
+			)
+			
+			var existing = Defaults[.receivedTimetables]
+			existing.removeAll { $0.sender == data.sender }
+			existing.append(receivedTimetable)
+			Defaults[.receivedTimetables] = existing
+		} catch {
+			print("Failed to parse received timetable: \(error)")
 		}
 	}
 }
@@ -85,6 +296,7 @@ class MessagesViewController: MSMessagesAppViewController {
 private enum MessageSendError: LocalizedError {
 	case noActiveConversation
 	case controllerDeallocated
+	case invalidDeepLink
 
 	var errorDescription: String? {
 		switch self {
@@ -92,6 +304,33 @@ private enum MessageSendError: LocalizedError {
 			return "No active conversation is available."
 		case .controllerDeallocated:
 			return "Message composer is no longer available."
+		case .invalidDeepLink:
+			return "Could not build timetable link."
 		}
+	}
+}
+
+extension Color {
+	init(rgba: RGBAColor) {
+		self.init(red: rgba.r, green: rgba.g, blue: rgba.b, opacity: rgba.a)
+	}
+	
+	func toHex() -> String {
+		guard let cgColor = self.cgColor else { return "#000000" }
+		guard let components = cgColor.components, components.count >= 3 else { return "#000000" }
+		let r = Int(components[0] * 255)
+		let g = Int(components[1] * 255)
+		let b = Int(components[2] * 255)
+		return String(format: "#%02X%02X%02X", r, g, b)
+	}
+}
+
+extension UIImage {
+	func resized(to size: CGSize) -> UIImage {
+		UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
+		self.draw(in: CGRect(origin: .zero, size: size))
+		let resized = UIGraphicsGetImageFromCurrentImageContext()
+		UIGraphicsEndImageContext()
+		return resized ?? self
 	}
 }

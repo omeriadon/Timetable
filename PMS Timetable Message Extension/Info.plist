@@ -15,7 +15,7 @@
 <key>UTTypeConformsTo</key>
 <array>
 <string>public.data</string>
-<string>public.json</string>
+<string>public.content</string>
 </array>
 <key>UTTypeDescription</key>
 <string>PMS Timetable File</string>
@@ -28,7 +28,7 @@
 <string>timetable</string>
 </array>
 <key>public.mime-type</key>
-<string>application/vnd.omeriadon.pmstimetable+json</string>
+<string>application/x-pms-timetable</string>
 </dict>
 </dict>
 </array>

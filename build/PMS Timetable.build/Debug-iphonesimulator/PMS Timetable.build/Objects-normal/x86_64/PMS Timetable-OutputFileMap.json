@@ -66,16 +66,6 @@
     "swift-dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable.build/Objects-normal/x86_64/TimetableFileHandler.swiftdeps",
     "swiftmodule" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable.build/Objects-normal/x86_64/TimetableFileHandler~partial.swiftmodule"
   },
-  "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/PMS Timetable/ToastModifier.swift" : {
-    "const-values" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable.build/Objects-normal/x86_64/ToastModifier.swiftconstvalues",
-    "dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable.build/Objects-normal/x86_64/ToastModifier.d",
-    "diagnostics" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable.build/Objects-normal/x86_64/ToastModifier.dia",
-    "index-unit-output-path" : "/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable.build/Objects-normal/x86_64/ToastModifier.o",
-    "llvm-bc" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable.build/Objects-normal/x86_64/ToastModifier.bc",
-    "object" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable.build/Objects-normal/x86_64/ToastModifier.o",
-    "swift-dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable.build/Objects-normal/x86_64/ToastModifier.swiftdeps",
-    "swiftmodule" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable.build/Objects-normal/x86_64/ToastModifier~partial.swiftmodule"
-  },
   "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/Shared/Defaults + Model.swift" : {
     "const-values" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable.build/Objects-normal/x86_64/Defaults + Model.swiftconstvalues",
     "dependencies" : "/Users/omeriadon/Documents/Xcode_App_Library/PMS Timetable/build/PMS Timetable.build/Debug-iphonesimulator/PMS Timetable.build/Objects-normal/x86_64/Defaults + Model.d",

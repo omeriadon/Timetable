@@ -30,9 +30,18 @@ enum DisplayMode: String, Codable, Equatable {
 
 extension DisplayMode: Defaults.Serializable {}
 
+struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiable {
+	var id: String { sender }
+	let sender: String
+	let classes: [Class]
+	let receivedAt: Date
+}
+
 extension Defaults.Keys {
 	static let timetable = Key<[Class]>("timetable", default: defaultTimetable, suite: sharedDefaults)
 	static let displayMode = Key<DisplayMode>("displayMode", default: .textOnly, suite: sharedDefaults)
+	static let receivedTimetables = Key<[ReceivedTimetable]>("receivedTimetables", default: [], suite: sharedDefaults)
+	static let userDisplayName = Key<String>("userDisplayName", default: "My Timetable", suite: sharedDefaults)
 }
 
 struct Class: Hashable, Codable, Defaults.Serializable, Identifiable {
@@ -50,4 +59,19 @@ struct Slot: Hashable, Codable, Defaults.Serializable {
 		self.day = day
 		self.session = session
 	}
+}
+
+struct EditableSlot: Identifiable, Hashable {
+	let id = UUID()
+	var day: Int
+	var period: Int
+}
+
+struct EditableClass: Identifiable {
+	let id = UUID()
+	var originalName: String?
+	var name: String
+	var symbol: String
+	var color: Color
+	var slots: [EditableSlot]
 }

@@ -13,23 +13,8 @@ import SwiftUI
 import WatchConnectivity
 import WidgetKit
 
-struct EditableSlot: Identifiable, Hashable {
-	let id = UUID()
-	var day: Int
-	var period: Int
-}
-
 enum SyncMode {
 	case normal, loading, success, error
-}
-
-struct EditableClass: Identifiable {
-	let id = UUID()
-	var originalName: String?
-	var name: String
-	var symbol: String
-	var color: Color
-	var slots: [EditableSlot]
 }
 
 struct SlotConflict {
@@ -63,6 +48,8 @@ struct ContentView: View {
 
 	@Default(.timetable) var classes
 	@Default(.displayMode) var displayMode
+	@Default(.userDisplayName) var userDisplayName
+	@Default(.receivedTimetables) var receivedTimetables
 
 	@State private var showingEditor = false
 	@State private var editorRequest: EditorRequest?
@@ -77,9 +64,9 @@ struct ContentView: View {
 	@StateObject private var watchSync = PhoneWatchSyncBridge()
 
 	@State private var showCalendarImportSheet = false
-	@State private var importToast: Toast?
+	@State private var selectedTab = 0
 
-	var body: some View {
+	var body: some View { TabView(selection: $selectedTab) {
 		NavigationStack {
 			VStack {
 				HStack(spacing: 4) {
@@ -105,66 +92,6 @@ struct ContentView: View {
 
 				Spacer(minLength: 1)
 
-				List {
-					HStack {
-						Label("watchOS Widget Style", systemImage: "platter.filled.bottom.applewatch.case")
-
-						Spacer()
-
-						Picker("", selection: $displayMode) {
-							Label("Symbols", systemImage: "square.grid.2x2")
-								.labelIconToTitleSpacing(30)
-								.tag(DisplayMode.symbolsOnly)
-							Label("Text", systemImage: "text.alignleft")
-								.labelIconToTitleSpacing(30)
-								.tag(DisplayMode.textOnly)
-						}
-
-						.pickerStyle(.menu)
-						.onChange(of: displayMode) { _, _ in
-							WidgetCenter.shared.reloadAllTimelines()
-							Task {
-								await syncToWatchAsync()
-							}
-						}
-					}
-					.listRowBackground(
-						Rectangle()
-							.fill(.ultraThinMaterial)
-					)
-
-					Button {
-						showCalendarImportSheet = true
-					} label: {
-						Label {
-							Text("Import Calendar")
-							Text("You need to subscribe to Compass Schedule in Calendar to import.")
-								.foregroundStyle(.secondary)
-
-						} icon: {
-							Image(systemName: "calendar")
-						}
-					}
-					.listRowBackground(
-						Rectangle()
-							.fill(.ultraThinMaterial)
-					)
-				}
-				.scrollContentBackground(.hidden)
-				.scrollDisabled(true)
-				.padding(10)
-				.tint(.white)
-				.glassEffect(
-					.regular.tint(.gray.opacity(0.5)),
-					in: ConcentricRectangle(
-						corners: .concentric,
-						isUniform: true
-					)
-				)
-				.padding(.top)
-				.padding(10)
-				.ignoresSafeArea()
-			}
 			.padding(.horizontal, 3)
 			.toolbar {
 				ToolbarItem(placement: .topBarLeading) {
@@ -236,10 +163,72 @@ struct ContentView: View {
 		.onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("TimetableImported"))) { notification in
 			if let message = notification.userInfo?["message"] as? String,
 			   let isSuccess = notification.userInfo?["success"] as? Bool {
-				importToast = Toast(message: message, isSuccess: isSuccess)
 			}
 		}
-		.toast($importToast)
+		}
+		.tabItem {
+			Label("Timetable", systemImage: "calendar")
+		}
+		.tag(0)
+		
+		NavigationStack {
+			List {
+				Section("Your Details") {
+					TextField("Your Name", text: $userDisplayName)
+						.listRowBackground(Rectangle().fill(.ultraThinMaterial))
+				}
+				
+				Section("Display") {
+					HStack {
+						Label("watchOS Widget Style", systemImage: "platter.filled.bottom.applewatch.case")
+						Spacer()
+						Picker("", selection: $displayMode) {
+							Label("Symbols", systemImage: "square.grid.2x2")
+								.labelIconToTitleSpacing(30)
+								.tag(DisplayMode.symbolsOnly)
+							Label("Text", systemImage: "text.alignleft")
+								.labelIconToTitleSpacing(30)
+								.tag(DisplayMode.textOnly)
+						}
+						.pickerStyle(.menu)
+						.onChange(of: displayMode) { _, _ in
+							WidgetCenter.shared.reloadAllTimelines()
+							Task {
+								await syncToWatchAsync()
+							}
+						}
+					}
+					.listRowBackground(Rectangle().fill(.ultraThinMaterial))
+				}
+				
+				Section("Calendar") {
+					Button {
+						showCalendarImportSheet = true
+					} label: {
+						Label {
+							Text("Import Calendar")
+							Text("Subscribe to Compass Schedule in Calendar")
+								.foregroundStyle(.secondary)
+						} icon: {
+							Image(systemName: "calendar")
+						}
+					}
+					.listRowBackground(Rectangle().fill(.ultraThinMaterial))
+				}
+				
+				if !receivedTimetables.isEmpty {
+					importedTimetablesSection
+				}
+			}
+			.scrollContentBackground(.hidden)
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationTitle("Settings")
+		}
+		.tabItem {
+			Label("Settings", systemImage: "gear")
+		}
+		.tag(1)
+	}
 		.sheet(isPresented: $showingEditor) {
 			editorSheet
 				.presentationDetents([.fraction(0.8)])
@@ -308,6 +297,29 @@ struct ContentView: View {
 		)
 	}
 
+	
+	private var importedTimetablesSection: some View {
+		Section("Imported Timetables") {
+			ForEach(receivedTimetables) { timetable in
+				importedTimetableRow(timetable)
+			}
+		}
+	}
+	
+	private func importedTimetableRow(_ timetable: ReceivedTimetable) -> some View {
+		VStack(alignment: .leading, spacing: 4) {
+			Text(timetable.sender)
+				.font(.headline)
+			Text("\(timetable.classes.count) classes")
+				.font(.caption)
+				.foregroundStyle(.secondary)
+			Text("Received: \(timetable.receivedAt.formatted(date: .abbreviated, time: .omitted))")
+				.font(.caption2)
+				.foregroundStyle(.secondary)
+		}
+		.listRowBackground(Rectangle().fill(.ultraThinMaterial))
+	}
+	
 	var editorSheet: some View {
 		NavigationStack {
 			Group {

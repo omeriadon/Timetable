@@ -47,6 +47,19 @@ struct RGBAColor: Codable, Hashable, Defaults.Serializable {
 		self.b = Double(b)
 		self.a = Double(a)
 	}
+	
+	init(hexString: String) {
+		let hex = hexString.trimmingCharacters(in: CharacterSet(charactersIn: "#"))
+		let scanner = Scanner(string: hex)
+		var rgb: UInt64 = 0
+		scanner.scanHexInt64(&rgb)
+		
+		let r = Double((rgb >> 16) & 0xFF) / 255.0
+		let g = Double((rgb >> 8) & 0xFF) / 255.0
+		let b = Double(rgb & 0xFF) / 255.0
+		
+		self.init(r: r, g: g, b: b, a: 1.0)
+	}
 }
 
 extension Color {

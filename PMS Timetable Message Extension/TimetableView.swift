@@ -10,21 +10,28 @@ import SwiftUI
 import UIKit
 
 struct TimetableView: View {
+	@State private var senderName: String
 	@State private var isSending = false
 	@State private var errorMessage: String?
 	@Default(.timetable) var classes
-	let sendAttachment: (URL, @escaping (Result<Void, Error>) -> Void) -> Void
+	let sendMessage: (String, [Class], @escaping (Result<Void, Error>) -> Void) -> Void
 
-	init(sendAttachment: @escaping (URL, @escaping (Result<Void, Error>) -> Void) -> Void = { _, completion in
+	init(sendMessage: @escaping (String, [Class], @escaping (Result<Void, Error>) -> Void) -> Void = { _, _, completion in
 		completion(.failure(TimetableSendError.unavailable))
 	}) {
-		self.sendAttachment = sendAttachment
+		self.sendMessage = sendMessage
+		_senderName = State(initialValue: Defaults[.userDisplayName])
 	}
 
 	var body: some View {
 		VStack(spacing: 16) {
 			Text("PMS Timetable")
 				.font(.headline)
+
+			TextField("Your name", text: $senderName)
+				.padding(12)
+				.background(Color.gray.opacity(0.1))
+				.cornerRadius(8)
 
 			if classes.isEmpty {
 				Text("No classes scheduled")
@@ -89,12 +96,9 @@ struct TimetableView: View {
 			.buttonStyle(.glassProminent)
 			.buttonBorderShape(.capsule)
 			.buttonSizing(.flexible)
-			.disabled(isSending || classes.isEmpty)
+			.disabled(isSending || classes.isEmpty || senderName.trimmingCharacters(in: .whitespaces).isEmpty)
 		}
 		.padding()
-		.onAppear {
-			print("[TimetableView] onAppear called - Defaults currently has \(classes.count) classes")
-		}
 		.monospaced()
 	}
 
@@ -102,38 +106,20 @@ struct TimetableView: View {
 		isSending = true
 		errorMessage = nil
 
-		do {
-			let messageData = try TimetableMessage.encode(
-				classes,
-				sender: UIDevice.current.name
-			)
-
-			let timetableFileURL = FileManager.default.temporaryDirectory
-				.appendingPathComponent("Timetable")
-				.appendingPathExtension("timetable")
-
-			try messageData.write(to: timetableFileURL, options: .atomic)
-
-			print("[TimetableView] Timetable file created at \(timetableFileURL)")
-			sendAttachment(timetableFileURL) { result in
-				DispatchQueue.main.async {
-					isSending = false
-					switch result {
-					case .success:
-						errorMessage = "Timetable attached. Tap send."
-						DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-							errorMessage = nil
-						}
-					case let .failure(error):
-						errorMessage = "Error sending timetable: \(error.localizedDescription)"
-						print("[TimetableView] Error sending: \(error)")
+		let name = senderName.trimmingCharacters(in: .whitespaces)
+		sendMessage(name, classes) { result in
+			DispatchQueue.main.async {
+				isSending = false
+				switch result {
+				case .success:
+					errorMessage = "Timetable sent!"
+					DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+						errorMessage = nil
 					}
+				case let .failure(error):
+					errorMessage = "Error sending: \(error.localizedDescription)"
 				}
 			}
-		} catch {
-			isSending = false
-			errorMessage = "Error encoding timetable: \(error.localizedDescription)"
-			print("[TimetableView] Error sending: \(error)")
 		}
 	}
 }
