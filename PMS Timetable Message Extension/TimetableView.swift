@@ -30,25 +30,9 @@ struct TimetableView: View {
 					Text("No classes found in your timetable. Import your schedule in the app first to share your timetable.")
 						.foregroundStyle(.secondary)
 				} else {
-					List {
-						ForEach(classes, id: \.id) { classItem in
-							HStack(spacing: 12) {
-								Image(systemName: classItem.symbol)
-
-								Text(classItem.id)
-
-								Spacer()
-
-								Text("\(classItem.slots.count) slot\(classItem.slots.count == 1 ? "" : "s")")
-							}
-							.listRowSeparator(.hidden)
-							.listRowBackground(
-								classItem.colour.swiftUIColor.opacity(0.5)
-							)
-						}
-					}
-					.scrollBounceBehavior(.basedOnSize)
-					.scrollContentBackground(.hidden)
+					Text("PMS Timetable")
+						.font(.title)
+						.bold()
 
 					Button(action: sendTimetable) {
 						HStack(spacing: 8) {
@@ -73,18 +57,7 @@ struct TimetableView: View {
 					.disabled(isSending || classes.isEmpty || senderName.trimmingCharacters(in: .whitespaces).isEmpty)
 				}
 
-				ZStack {
-					if let error = errorMessage {
-						Text(error)
-							.font(.caption)
-							.foregroundStyle(.red)
-							.padding(8)
-							.background(Color.red.opacity(0.1))
-							.cornerRadius(6)
-							.transition(.blurReplace)
-					}
-				}
-				.animation(.easeInOut, value: errorMessage)
+				Spacer()
 			}
 			.padding()
 		}

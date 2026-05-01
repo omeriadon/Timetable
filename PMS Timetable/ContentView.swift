@@ -963,42 +963,25 @@ struct SharedTimetableImportSheet: View {
 
 	var body: some View {
 		NavigationStack {
-			List {
-				Section {
+			ScrollView {
+				VStack(alignment: .leading, spacing: 16) {
 					VStack(alignment: .leading, spacing: 8) {
-						Label(timetable.sender, systemImage: "person.crop.circle")
+						Text(timetable.sender)
 							.font(.headline)
 						Text("\(timetable.classes.count) classes shared")
 							.font(.subheadline)
 							.foregroundStyle(.secondary)
 					}
-					.padding(.vertical, 4)
+					.frame(maxWidth: .infinity, alignment: .leading)
+
+					TimetableGridPreview(
+						classes: timetable.classes,
+						showsTitle: false
+					)
+					.clipShape(RoundedRectangle(cornerRadius: 16))
 				}
-				.listRowBackground(Rectangle().fill(.ultraThinMaterial))
-
-				Section("Preview") {
-					ForEach(timetable.classes) { classItem in
-						HStack(spacing: 12) {
-							RoundedRectangle(cornerRadius: 4)
-								.fill(classItem.colour.swiftUIColor)
-								.frame(width: 12, height: 28)
-
-							Image(systemName: classItem.symbol)
-								.frame(width: 24)
-
-							VStack(alignment: .leading, spacing: 2) {
-								Text(classItem.id)
-									.font(.subheadline.weight(.semibold))
-								Text("\(classItem.slots.count) slot\(classItem.slots.count == 1 ? "" : "s")")
-									.font(.caption)
-									.foregroundStyle(.secondary)
-							}
-						}
-					}
-					.listRowBackground(Rectangle().fill(.ultraThinMaterial))
-				}
+				.padding()
 			}
-			.scrollContentBackground(.hidden)
 			.navigationTitle("Import Timetable")
 			.navigationBarTitleDisplayMode(.inline)
 			.toolbar {

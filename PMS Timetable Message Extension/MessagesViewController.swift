@@ -219,7 +219,11 @@ class MessagesViewController: MSMessagesAppViewController {
 		do {
 			let deepLinkURL = try makeDeepLink(for: timetableData)
 			let layout = MSMessageTemplateLayout()
-			layout.image = makeTimetablePreviewImage(classes: classes, senderName: senderName)
+			layout.image = TimetablePreviewRenderer.image(
+				classes: classes,
+				title: "\(senderName)'s Timetable",
+				subtitle: "\(classes.count) classes ready to import"
+			)
 			layout.caption = "\(senderName)'s Timetable"
 			layout.subcaption = "Tap to preview and import"
 
@@ -262,95 +266,6 @@ class MessagesViewController: MSMessagesAppViewController {
 		let prefix = "PMS_TIMETABLE_PAYLOAD:"
 		guard label.hasPrefix(prefix) else { return nil }
 		return String(label.dropFirst(prefix.count))
-	}
-
-	private func makeTimetablePreviewImage(classes: [Class], senderName: String) -> UIImage {
-		let size = CGSize(width: 900, height: 700)
-		let renderer = UIGraphicsImageRenderer(size: size)
-		let displayClasses = Array(classes.prefix(9))
-
-		return renderer.image { context in
-			let cgContext = context.cgContext
-			let rect = CGRect(origin: .zero, size: size)
-			UIColor(red: 0.07, green: 0.09, blue: 0.12, alpha: 1).setFill()
-			cgContext.fill(rect)
-
-			let paragraphStyle = NSMutableParagraphStyle()
-			paragraphStyle.alignment = .right
-
-			let headerAttributes: [NSAttributedString.Key: Any] = [
-				.font: UIFont.monospacedSystemFont(ofSize: 44, weight: .bold),
-				.foregroundColor: UIColor.white,
-				.paragraphStyle: paragraphStyle
-			]
-
-			let subParagraphStyle = NSMutableParagraphStyle()
-			subParagraphStyle.alignment = .right
-
-			let subheadAttributes: [NSAttributedString.Key: Any] = [
-				.font: UIFont.monospacedSystemFont(ofSize: 24, weight: .medium),
-				.foregroundColor: UIColor.white.withAlphaComponent(0.68),
-				.paragraphStyle: subParagraphStyle
-			]
-
-			let headerRect = CGRect(
-				x: 44,
-				y: 38,
-				width: size.width - 88,
-				height: 60
-			)
-			("\(senderName)'s timetable" as NSString)
-				.draw(in: headerRect, withAttributes: headerAttributes)
-
-			let subheadRect = CGRect(
-				x: 44,
-				y: 96,
-				width: size.width - 88,
-				height: 40
-			)
-			("\(classes.count) classes" as NSString)
-				.draw(in: subheadRect, withAttributes: subheadAttributes)
-
-			let columns = 3
-			let cardWidth: CGFloat = 252
-			let cardHeight: CGFloat = 120
-			let gap: CGFloat = 20
-			let startY: CGFloat = 164
-			let startX: CGFloat = 44
-
-			for (index, classItem) in displayClasses.enumerated() {
-				let row = index / columns
-				let column = index % columns
-				let cardRect = CGRect(
-					x: startX + CGFloat(column) * (cardWidth + gap),
-					y: startY + CGFloat(row) * (cardHeight + gap),
-					width: cardWidth,
-					height: cardHeight
-				)
-
-				let path = UIBezierPath(roundedRect: cardRect, cornerRadius: 20)
-				UIColor(classItem.colour.swiftUIColor).setFill()
-				path.fill()
-
-				let titleAttributes: [NSAttributedString.Key: Any] = [
-					.font: UIFont.monospacedSystemFont(ofSize: 25, weight: .semibold),
-					.foregroundColor: UIColor.white
-				]
-				let detailAttributes: [NSAttributedString.Key: Any] = [
-					.font: UIFont.monospacedSystemFont(ofSize: 19, weight: .regular),
-					.foregroundColor: UIColor.white.withAlphaComponent(0.62)
-				]
-
-				(classItem.id as NSString).draw(
-					in: CGRect(x: cardRect.minX + 28, y: cardRect.minY + 22, width: cardRect.width - 44, height: 32),
-					withAttributes: titleAttributes
-				)
-				("\(classItem.slots.count) slot\(classItem.slots.count == 1 ? "" : "s")" as NSString).draw(
-					at: CGPoint(x: cardRect.minX + 28, y: cardRect.minY + 62),
-					withAttributes: detailAttributes
-				)
-			}
-		}
 	}
 
 	private func insertFallbackLink(_ timetableData: ShareableTimetableData, senderName: String, conversation: MSConversation, completion: @escaping (Result<Void, Error>) -> Void) {

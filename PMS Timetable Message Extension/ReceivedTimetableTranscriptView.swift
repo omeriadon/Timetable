@@ -20,13 +20,12 @@ struct ReceivedTimetableTranscriptView: View {
 	@State private var debugReason = "Unknown error"
 
 	var body: some View {
-		Group {
+		ZStack {
 			if let data = timetableData {
 				VStack(spacing: 12) {
-					headerSection(for: data)
-						.padding()
-					classesPreview(for: data)
 					addButton
+
+					classesPreview(for: data)
 				}
 			} else if isLoading {
 				ProgressView()
@@ -48,37 +47,13 @@ struct ReceivedTimetableTranscriptView: View {
 		.monospaced()
 	}
 
-	private func headerSection(for data: ShareableTimetableData) -> some View {
-		HStack(spacing: 15) {
-			Text(data.sender)
-				.font(.headline)
-				.lineLimit(1)
-
-			Text("\(data.classes.count) classes")
-				.foregroundStyle(.tertiary)
-
-			Spacer()
-		}
-	}
-
 	private func classesPreview(for data: ShareableTimetableData) -> some View {
-		List {
-			ForEach(data.classes, id: \.name) { cls in
-				HStack(spacing: 12) {
-					Image(systemName: cls.symbol)
-
-					Text(cls.name)
-
-					Spacer()
-
-					Text("\(cls.slots.count) slot\(cls.slots.count == 1 ? "" : "s")")
-				}
-				.listRowSeparator(.hidden)
-				.listRowBackground(parseColor(cls.color).opacity(0.5))
-			}
-		}
-		.scrollBounceBehavior(.basedOnSize)
-		.scrollContentBackground(.hidden)
+		TimetableGridPreview(
+			classes: classes(from: data),
+			showsTitle: true,
+			rowScale: 0.78,
+			showBackground: false
+		)
 	}
 
 	private var addButton: some View {
@@ -98,12 +73,15 @@ struct ReceivedTimetableTranscriptView: View {
 		.controlSize(.large)
 	}
 
-	private func parseColor(_ hexString: String) -> Color {
-		let hex = hexString.dropFirst()
-		let r = Double(UInt8(hex.prefix(2), radix: 16) ?? 0) / 255
-		let g = Double(UInt8(hex.dropFirst(2).prefix(2), radix: 16) ?? 0) / 255
-		let b = Double(UInt8(hex.dropFirst(4).prefix(2), radix: 16) ?? 0) / 255
-		return Color(red: r, green: g, blue: b)
+	private func classes(from data: ShareableTimetableData) -> [Class] {
+		data.classes.map { shareableClass in
+			Class(
+				id: shareableClass.name,
+				symbol: shareableClass.symbol,
+				colour: RGBAColor(hexString: shareableClass.color),
+				slots: shareableClass.slots.map { Slot($0.day, $0.period) }
+			)
+		}
 	}
 
 	private func loadTimetableData() {
