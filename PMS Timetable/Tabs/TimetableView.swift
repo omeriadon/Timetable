@@ -62,7 +62,7 @@ struct TimetableView: View {
 						ToolbarItem(placement: .topBarLeading) {
 							Toggle(isOn: $isEditMode) {
 								Image(systemName: "pencil")
-									.foregroundStyle(.primary)
+									.foregroundStyle(.white)
 							}
 						}
 
@@ -70,6 +70,7 @@ struct TimetableView: View {
 							Text(currentTimetableTitle)
 								.monospaced()
 								.contentTransition(.numericText())
+								.animation(.easeInOut, value: currentTimetableTitle)
 						}
 
 						if !receivedTimetables.isEmpty {
@@ -85,27 +86,27 @@ struct TimetableView: View {
 											Text("Your Timetable")
 										}
 									}
-
-									if !receivedTimetables.isEmpty {
-										Divider()
-
-										ForEach(receivedTimetables.indices, id: \.self) { idx in
-											Button {
-												selectedTimetableIndex = idx
-											} label: {
-												HStack {
-													if selectedTimetableIndex == idx {
-														Image(systemName: "checkmark")
-													}
-													Text(receivedTimetables[idx].sender)
+									Divider()
+									ForEach(receivedTimetables.indices, id: \.self) { idx in
+										Button {
+											selectedTimetableIndex = idx
+										} label: {
+											HStack {
+												if selectedTimetableIndex == idx {
+													Image(systemName: "checkmark")
 												}
+												Text(receivedTimetables[idx].sender)
 											}
 										}
 									}
 								} label: {
 									Image(systemName: "person.2")
+										.padding(10)
+										.glassEffect(.clear.tint(selectedTimetableIndex == nil ? .clear : .blue).interactive(), in: Circle())
 								}
 							}
+							.sharedBackgroundVisibility(.hidden)
+
 						} else if currentTimetable != defaultTimetable {
 							ToolbarItem(placement: .topBarTrailing) {
 								SyncButton(
@@ -180,8 +181,8 @@ struct TimetableView: View {
 							.font(.body)
 					}
 				}
-				.padding(10)
-				.glassEffect(.clear.tint(yourClass.colour.swiftUIColor).interactive(), in: RoundedRectangle(cornerRadius: 12))
+				.padding(15)
+				.glassEffect(.clear.tint(yourClass.colour.swiftUIColor).interactive(), in: RoundedRectangle(cornerRadius: 20))
 
 			} else {
 				HStack {
@@ -189,8 +190,8 @@ struct TimetableView: View {
 					Spacer()
 					Text("Free period")
 				}
-				.padding(10)
-				.glassEffect(.clear.tint(.gray).interactive(), in: RoundedRectangle(cornerRadius: 12))
+				.padding(15)
+				.glassEffect(.clear.tint(.gray).interactive(), in: RoundedRectangle(cornerRadius: 20))
 			}
 
 			Divider()
@@ -214,8 +215,8 @@ struct TimetableView: View {
 								Text(theirClass.id)
 							}
 						}
-						.padding(10)
-						.glassEffect(.clear.tint(theirClass.colour.swiftUIColor).interactive(), in: RoundedRectangle(cornerRadius: 12))
+						.padding(15)
+						.glassEffect(.clear.tint(theirClass.colour.swiftUIColor).interactive(), in: RoundedRectangle(cornerRadius: 20))
 
 					} else {
 						HStack {
@@ -225,8 +226,8 @@ struct TimetableView: View {
 
 							Text("Free period")
 						}
-						.padding(10)
-						.glassEffect(.clear.tint(.gray).interactive(), in: RoundedRectangle(cornerRadius: 12))
+						.padding(15)
+						.glassEffect(.clear.tint(.gray).interactive(), in: RoundedRectangle(cornerRadius: 20))
 					}
 				}
 			}
