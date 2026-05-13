@@ -287,3 +287,27 @@ public protocol ColorOptions: CaseIterable, Hashable {
 	var SwiftUIColor: Color { get }
 	var accessibilityLabelColorName: String { get }
 }
+
+func closestColor(to color: Color) -> AvailableColors {
+	let uiColor = UIColor(color)
+
+	var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+	uiColor.getRed(&r, green: &g, blue: &b, alpha: &a)
+
+	return AvailableColors.allCases.min(by: { lhs, rhs in
+		func components(_ c: Color) -> (CGFloat, CGFloat, CGFloat) {
+			let ui = UIColor(c)
+			var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+			ui.getRed(&r, green: &g, blue: &b, alpha: &a)
+			return (r, g, b)
+		}
+
+		let (lr, lg, lb) = components(lhs.SwiftUIColor)
+		let (rr, rg, rb) = components(rhs.SwiftUIColor)
+
+		let dl = pow(lr - r, 2) + pow(lg - g, 2) + pow(lb - b, 2)
+		let dr = pow(rr - r, 2) + pow(rg - g, 2) + pow(rb - b, 2)
+
+		return dl < dr
+	})!
+}
