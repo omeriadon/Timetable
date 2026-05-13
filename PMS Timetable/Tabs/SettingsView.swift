@@ -62,10 +62,12 @@ struct SettingsView: View {
 					} label: {
 						Label {
 							Text("Import Calendar")
+								.foregroundStyle(.tint)
 							Text("Subscribe to Compass Schedule in Calendar")
 								.foregroundStyle(.secondary)
 						} icon: {
 							Image(systemName: "calendar")
+								.foregroundStyle(.tint)
 						}
 					}
 				}
@@ -74,10 +76,13 @@ struct SettingsView: View {
 					importedTimetablesSection
 				}
 			}
-			.foregroundStyle(.primary)
 			.scrollContentBackground(.hidden)
-			.navigationBarTitleDisplayMode(.inline)
-			.navigationTitle("Settings")
+			.toolbar {
+				ToolbarItem(placement: .title) {
+					Text("Settings")
+						.monospaced()
+				}
+			}
 			.sheet(isPresented: $showCalendarImportSheet) {
 				CalendarImportView()
 					.presentationDetents([.fraction(1 / 3)])

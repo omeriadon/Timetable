@@ -75,12 +75,21 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
+            BlueprintIdentifier = "2A1DB4172F9ECEC100E5AE7C"
+            BuildableName = "PMS Timetable Watch WidgetsExtension.appex"
+            BlueprintName = "PMS Timetable Watch WidgetsExtension"
+            ReferencedContainer = "container:PMS Timetable.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
             BlueprintIdentifier = "2A098C822F9DB842002065BE"
             BuildableName = "PMS Timetable Watch Watch App.app"
             BlueprintName = "PMS Timetable Watch Watch App"
             ReferencedContainer = "container:PMS Timetable.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
       <EnvironmentVariables>
          <EnvironmentVariable
             key = "_XCWidgetKind"
