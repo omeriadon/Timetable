@@ -44,7 +44,7 @@ enum CalendarImportStep: Equatable {
 			case .done:
 				8
 			case .error:
-				9
+				total
 		}
 	}
 
@@ -219,7 +219,7 @@ struct CalendarImportView: View {
 			print("[iOS] Calendar Import: Validating...")
 			await moveForward(to: .finalising)
 
-			classes = translatedClasses
+			classes = translatedClasses.sorted { $0.id.localizedCaseInsensitiveCompare($1.id) == .orderedAscending }
 
 			await moveForward(to: .done)
 			print("[iOS] Calendar Import: Success!")

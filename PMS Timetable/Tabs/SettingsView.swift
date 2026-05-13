@@ -15,7 +15,7 @@ struct SettingsView: View {
 	@Default(.userDisplayName) var userDisplayName
 	@Default(.receivedTimetables) var receivedTimetables
 
-	@State var watchSync: PhoneWatchSyncBridge
+	let watchSync: PhoneWatchSyncBridge
 
 	@Binding var syncStatus: SyncMode
 
@@ -26,7 +26,6 @@ struct SettingsView: View {
 			List {
 				Section("Your Details") {
 					TextField("Your Name", text: $userDisplayName)
-						.listRowBackground(Rectangle().fill(.ultraThinMaterial))
 				}
 
 				Section("Display") {
@@ -55,7 +54,6 @@ struct SettingsView: View {
 							}
 						}
 					}
-					.listRowBackground(Rectangle().fill(.ultraThinMaterial))
 				}
 
 				Section("Calendar") {
@@ -70,13 +68,13 @@ struct SettingsView: View {
 							Image(systemName: "calendar")
 						}
 					}
-					.listRowBackground(Rectangle().fill(.ultraThinMaterial))
 				}
 
 				if !receivedTimetables.isEmpty {
 					importedTimetablesSection
 				}
 			}
+			.foregroundStyle(.primary)
 			.scrollContentBackground(.hidden)
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationTitle("Settings")

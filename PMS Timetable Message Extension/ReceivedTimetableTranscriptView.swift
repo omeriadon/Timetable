@@ -49,7 +49,7 @@ struct ReceivedTimetableTranscriptView: View {
 
 	private func classesPreview(for data: ShareableTimetableData) -> some View {
 		TimetableGridPreview(
-			classes: classes(from: data),
+			classes: data.decodedClasses(),
 			showsTitle: true,
 			rowScale: 0.78,
 			showBackground: false
@@ -71,17 +71,6 @@ struct ReceivedTimetableTranscriptView: View {
 		.buttonBorderShape(.capsule)
 		.buttonSizing(.flexible)
 		.controlSize(.large)
-	}
-
-	private func classes(from data: ShareableTimetableData) -> [Class] {
-		data.classes.map { shareableClass in
-			Class(
-				id: shareableClass.name,
-				symbol: shareableClass.symbol,
-				colour: RGBAColor(hexString: shareableClass.color),
-				slots: shareableClass.slots.map { Slot($0.day, $0.period) }
-			)
-		}
 	}
 
 	private func loadTimetableData() {

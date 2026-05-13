@@ -204,16 +204,7 @@ class MessagesViewController: MSMessagesAppViewController {
 			return
 		}
 
-		let shareableClasses = classes.map { classItem in
-			ShareableClass(
-				name: classItem.id,
-				symbol: classItem.symbol,
-				color: String(format: "#%02X%02X%02X", Int(classItem.colour.r * 255), Int(classItem.colour.g * 255), Int(classItem.colour.b * 255)),
-				slots: classItem.slots.map { ShareableSlot(day: $0.day, period: $0.session) }
-			)
-		}
-
-		let timetableData = ShareableTimetableData(sender: senderName, classes: shareableClasses)
+		let timetableData = ShareableTimetableData(sender: senderName, classes: classes)
 
 		do {
 			let deepLinkURL = try makeDeepLink(for: timetableData)
@@ -315,18 +306,9 @@ class MessagesViewController: MSMessagesAppViewController {
 		do {
 			let data = try ShareableTimetableData.fromBase64URL(dataParam)
 
-			let classes = data.classes.map { shareableClass in
-				Class(
-					id: shareableClass.name,
-					symbol: shareableClass.symbol,
-					colour: RGBAColor(hexString: shareableClass.color),
-					slots: shareableClass.slots.map { Slot($0.day, $0.period) }
-				)
-			}
-
 			let receivedTimetable = ReceivedTimetable(
 				sender: data.sender,
-				classes: classes,
+				classes: data.decodedClasses(),
 				receivedAt: Date()
 			)
 

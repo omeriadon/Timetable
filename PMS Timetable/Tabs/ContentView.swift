@@ -50,11 +50,11 @@ struct ContentView: View {
 
 	var body: some View {
 		TabView(selection: $selectedTab) {
-			Tab("Timetable", systemSymbol: .calendar, value: 0) {
+			Tab("", systemSymbol: .calendar, value: 0) {
 				TimetableView(watchSync: watchSync, syncStatus: $rootSyncStatus)
 			}
 
-			Tab("Settings", systemSymbol: .gear, value: 1) {
+			Tab("", systemSymbol: .gear, value: 1) {
 				SettingsView(watchSync: watchSync, syncStatus: $rootSyncStatus)
 			}
 		}
@@ -114,18 +114,20 @@ struct ContentView: View {
 
 	private func processPendingSharedImport() {
 		if let fileURL = importedFileURL.wrappedValue {
-			prepareImportPreview(from: fileURL)
 			importedFileURL.wrappedValue = nil
+			Task {
+				await prepareImportPreview(from: fileURL)
+			}
 			return
 		}
 
 		if let timetableData = receivedTimetableData.wrappedValue {
-			pendingSharedTimetable = makeReceivedTimetable(from: timetableData)
+			pendingSharedTimetable = timetableData.receivedTimetable()
 			receivedTimetableData.wrappedValue = nil
 		}
 	}
 
-	private func prepareImportPreview(from fileURL: URL) {
+	private func prepareImportPreview(from fileURL: URL) async {
 		let didAccess = fileURL.startAccessingSecurityScopedResource()
 		defer {
 			if didAccess {
@@ -134,7 +136,9 @@ struct ContentView: View {
 		}
 
 		do {
-			let data = try Data(contentsOf: fileURL)
+			let data = try await Task.detached(priority: .userInitiated) {
+				try Data(contentsOf: fileURL)
+			}.value
 			let message = try TimetableMessage.decode(data)
 			guard !message.timetable.isEmpty else {
 				importErrorMessage = "This timetable does not contain any classes."
@@ -149,23 +153,6 @@ struct ContentView: View {
 		} catch {
 			importErrorMessage = error.localizedDescription
 		}
-	}
-
-	private func makeReceivedTimetable(from data: ShareableTimetableData) -> ReceivedTimetable {
-		let classes = data.classes.map { shareableClass in
-			Class(
-				id: shareableClass.name,
-				symbol: shareableClass.symbol,
-				colour: RGBAColor(hexString: shareableClass.color),
-				slots: shareableClass.slots.map { Slot($0.day, $0.period) }
-			)
-		}
-
-		return ReceivedTimetable(
-			sender: data.sender,
-			classes: classes,
-			receivedAt: Date()
-		)
 	}
 }
 

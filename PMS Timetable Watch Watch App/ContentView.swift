@@ -18,10 +18,9 @@ struct ContentView: View {
 	@State private var showSyncErrorIcon = false
 	@State private var displayModeConfirmation: String?
 
-	private let sessions = ["1", "2", "R", "3", "4", "L", "5", "6"]
-	private let dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri"]
-
 	var body: some View {
+		let classLookup = TimetableLayout.classLookup(for: syncStore.classes)
+
 		NavigationStack {
 			VStack {
 				HStack {
@@ -38,8 +37,8 @@ struct ContentView: View {
 							.frame(height: 15)
 							.font(.footnote)
 
-						ForEach(Array(sessions.enumerated()), id: \.offset) { index, session in
-							if index == 2 || index == 5 {
+						ForEach(Array(TimetableLayout.sessions.enumerated()), id: \.offset) { index, session in
+							if TimetableLayout.isBreakSession(index: index) {
 								Text(session)
 									.font(.footnote.scaled(by: 0.7))
 									.foregroundStyle(.secondary)
@@ -53,7 +52,7 @@ struct ContentView: View {
 					}
 					.frame(width: 15)
 
-					mainContent
+					mainContent(classLookup: classLookup)
 				}
 				Spacer()
 			}
@@ -93,34 +92,34 @@ struct ContentView: View {
 		}
 	}
 
-	var mainContent: some View {
+	func mainContent(classLookup: [Slot: Class]) -> some View {
 		ForEach(0 ..< 5) { day in
 			VStack(spacing: 2) {
-				Text(["Mon", "Tue", "Wed", "Thu", "Fri"][day])
+				Text(TimetableLayout.shortDayLabels[day])
 					.font(.footnote.scaled(by: 0.8))
 					.frame(height: 15)
 				ForEach(0 ..< 8) { session in
-					sessionCell(day, session)
+					sessionCell(day, session, classLookup: classLookup)
 				}
 			}
 		}
 	}
 
-	func sessionCell(_ day: Int, _ session: Int) -> some View {
+	func sessionCell(_ day: Int, _ session: Int, classLookup: [Slot: Class]) -> some View {
 		Group {
-			if session == 2 || session == 5 {
+			if TimetableLayout.isBreakSession(index: session) {
 				// recess and lunch
 				rectangle(.gray.opacity(0.25), true)
 					.frame(height: 2)
 			} else {
 				// early finish days
-				if day == 2 && session == 7 || day == 4 && session == 7 {
+				if TimetableLayout.isUnavailable(day: day, session: session) {
 					rectangle(.clear, true)
 						.frame(height: 25)
 
 				} else {
 					// actual session
-					if let c = classFor(day: day, session: session) {
+					if let c = classLookup[Slot(day, session)] {
 						rectangle(
 							c.colour.swiftUIColor.opacity(0.8)
 						) {
@@ -159,26 +158,17 @@ struct ContentView: View {
 	}
 
 	func dayView(_ day: Int) -> some View {
-		ScrollView(.vertical, showsIndicators: false) {
+		let classLookup = TimetableLayout.classLookup(for: syncStore.classes)
+
+		return ScrollView(.vertical, showsIndicators: false) {
 			VStack(spacing: 4) {
 				ForEach(0 ..< 8, id: \.self) { session in
-					sessionCell(day, session)
+					sessionCell(day, session, classLookup: classLookup)
 				}
 			}
 			.padding(.horizontal, 4)
 			.padding(.vertical, 6)
 		}
-	}
-
-	func classFor(day: Int, session: Int) -> Class? {
-		let key = "\(day)-\(session)"
-		var lookup: [String: Class] = [:]
-		for c in syncStore.classes {
-			for slot in c.slots {
-				lookup["\(slot.day)-\(slot.session)"] = c
-			}
-		}
-		return syncStore.classes.isEmpty ? nil : lookup[key]
 	}
 }
 
@@ -269,8 +259,18 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 			}
 
 			DispatchQueue.main.async {
+				let currentClasses = Defaults[.timetable]
+				let currentMode = Defaults[.displayMode]
+				let didChangePayload = currentClasses != decoded || currentMode != mode
+
 				self.classes = decoded
 				self.displayMode = mode
+
+				guard didChangePayload else {
+					print("[Watch] Payload unchanged; skipping Defaults write and widget reload")
+					return
+				}
+
 				Defaults[.timetable] = decoded
 				Defaults[.displayMode] = mode
 				print("[Watch] Saved to Defaults - displayMode: \(mode.rawValue)")

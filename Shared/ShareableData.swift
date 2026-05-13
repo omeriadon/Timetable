@@ -18,6 +18,11 @@ struct ShareableTimetableData: Codable, Equatable {
 	let sender: String
 	let classes: [ShareableClass]
 
+	init(sender: String, classes: [Class]) {
+		self.sender = sender
+		self.classes = classes.map(\.shareableValue)
+	}
+
 	func toJSON() throws -> Data {
 		try JSONEncoder().encode(self)
 	}
@@ -50,6 +55,47 @@ struct ShareableTimetableData: Codable, Equatable {
 		}
 		let jsonData = isV2 ? try data.decompressedLZFSE() : data
 		return try fromJSON(jsonData)
+	}
+}
+
+extension ShareableTimetableData {
+	func decodedClasses() -> [Class] {
+		classes.map(\.classValue)
+	}
+
+	func receivedTimetable(receivedAt: Date = .now) -> ReceivedTimetable {
+		ReceivedTimetable(
+			sender: sender,
+			classes: decodedClasses(),
+			receivedAt: receivedAt
+		)
+	}
+}
+
+extension ShareableClass {
+	var classValue: Class {
+		Class(
+			id: name,
+			symbol: symbol,
+			colour: RGBAColor(hexString: color),
+			slots: slots.map { Slot($0.day, $0.period) }
+		)
+	}
+}
+
+extension Class {
+	var shareableValue: ShareableClass {
+		ShareableClass(
+			name: id,
+			symbol: symbol,
+			color: String(
+				format: "#%02X%02X%02X",
+				Int(colour.r * 255),
+				Int(colour.g * 255),
+				Int(colour.b * 255)
+			),
+			slots: slots.map { ShareableSlot(day: $0.day, period: $0.session) }
+		)
 	}
 }
 

@@ -3,19 +3,10 @@ import SwiftUI
 struct WidgetView: View {
 	let classes: [Class]
 	let displayMode: DisplayMode
-	private let sessions = ["1", "2", "R", "3", "4", "L", "5", "6"]
-	private var classLookup: [String: Class] {
-		var lookup: [String: Class] = [:]
-		for c in classes {
-			for slot in c.slots {
-				let key = "\(slot.day)-\(slot.session)"
-				lookup[key] = c
-			}
-		}
-		return lookup
-	}
 
 	var body: some View {
+		let classLookup = TimetableLayout.classLookup(for: classes)
+
 		if classes.isEmpty {
 			VStack(spacing: 4) {
 				Text("No timetable")
@@ -31,7 +22,7 @@ struct WidgetView: View {
 					VStack(spacing: 0) {
 						HStack {
 							Spacer()
-							Text(["Mon", "Tue", "Wed", "Thu", "Fri"][day])
+							Text(TimetableLayout.shortDayLabels[day])
 								.font(.footnote.scaled(by: 0.5))
 								.frame(height: 10)
 							Spacer()
@@ -48,7 +39,7 @@ struct WidgetView: View {
 						)
 
 						ForEach(0 ..< 8) { session in
-							sessionCell(day, session)
+							sessionCell(day, session, classLookup: classLookup)
 						}
 					}
 					.overlay(alignment: .leading) {
@@ -79,18 +70,18 @@ struct WidgetView: View {
 		}
 	}
 
-	func sessionCell(_ day: Int, _ session: Int) -> some View {
+	func sessionCell(_ day: Int, _ session: Int, classLookup: [Slot: Class]) -> some View {
 		Group {
-			if session == 2 || session == 5 {
+			if TimetableLayout.isBreakSession(index: session) {
 				Text("")
 					.font(.footnote.scaled(by: 0.1))
 					.frame(height: 2)
 			} else {
-				if day == 2 && session == 7 || day == 4 && session == 7 {
+				if TimetableLayout.isUnavailable(day: day, session: session) {
 					RoundedRectangle(cornerRadius: 0)
 						.fill(.clear)
 				} else {
-					if let c = classLookup["\(day)-\(session)"] {
+					if let c = classLookup[Slot(day, session)] {
 						if day == 0, session == 7 {
 							VStack(alignment: .leading) {
 								switch displayMode {

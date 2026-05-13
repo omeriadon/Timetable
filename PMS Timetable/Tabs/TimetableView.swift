@@ -9,7 +9,7 @@ import Defaults
 import SwiftUI
 
 struct TimetableView: View {
-	@State var watchSync: PhoneWatchSyncBridge
+	@ObservedObject var watchSync: PhoneWatchSyncBridge
 
 	@Default(.timetable) var classes
 	@Default(.receivedTimetables) var receivedTimetables
@@ -21,27 +21,22 @@ struct TimetableView: View {
 	@Binding var syncStatus: SyncMode
 
 	var body: some View {
+		let classLookup = TimetableLayout.classLookup(for: classes)
+
 		NavigationStack {
 			VStack {
 				HStack(spacing: 4) {
 					VStack(spacing: 4) {
 						Text("")
 
-						ForEach(Array(sessions.enumerated()), id: \.offset) { _, session in
-							if session == "R" || session == "L" {
-								Text(session)
-									.frame(height: 20)
-									.foregroundStyle(.secondary)
-							} else {
-								Text(session)
-									.frame(height: 60)
-							}
+						ForEach(TimetableLayout.sessions, id: \.self) { session in
+							sessionLabel(for: session)
 						}
 						.frame(width: 25)
 					}
 					.frame(width: 25)
 
-					mainContent
+					mainContent(classLookup: classLookup)
 				}
 
 				Spacer(minLength: 1)
@@ -113,29 +108,29 @@ struct TimetableView: View {
 		}
 	}
 
-	var mainContent: some View {
+	func mainContent(classLookup: [Slot: Class]) -> some View {
 		ForEach(0 ..< 5) { day in
 			VStack(spacing: 4) {
-				Text(["Mon", "Tue", "Wed", "Thu", "Fri"][day])
+				Text(TimetableLayout.shortDayLabels[day])
 				ForEach(0 ..< 8) { session in
-					sessionCell(day, session)
+					sessionCell(day, session, classLookup: classLookup)
 				}
 			}
 		}
 	}
 
-	func sessionCell(_ day: Int, _ session: Int) -> some View {
+	func sessionCell(_ day: Int, _ session: Int, classLookup: [Slot: Class]) -> some View {
 		Group {
-			if session == 2 || session == 5 {
+			if TimetableLayout.isBreakSession(index: session) {
 				rectangle(.gray.opacity(0.25), true)
 					.frame(height: 20)
 			} else {
-				if day == 2 && session == 7 || day == 4 && session == 7 {
+				if TimetableLayout.isUnavailable(day: day, session: session) {
 					rectangle(.clear, true)
 						.frame(height: 60)
 
 				} else {
-					if let c = classFor(day: day, session: session) {
+					if let c = classLookup[Slot(day, session)] {
 						rectangle(
 							c.colour.swiftUIColor.opacity(0.8)
 						) {
@@ -165,12 +160,12 @@ struct TimetableView: View {
 		.foregroundStyle(.white)
 	}
 
-	func classFor(day: Int, session: Int) -> Class? {
-		classes.first { c in
-			c.slots.contains {
-				$0.day == day && $0.session == session
-			}
-		}
+	func sessionLabel(for session: String) -> some View {
+		let isBreakSession = TimetableLayout.isBreakSession(label: session)
+
+		return Text(session)
+			.frame(height: isBreakSession ? 20 : 60)
+			.foregroundStyle(isBreakSession ? Color.secondary : Color.primary)
 	}
 
 	func openEditor(focusingClassName className: String? = nil) {
@@ -185,23 +180,11 @@ struct TimetableView: View {
 	}
 
 	func editableSlot(fromDay day: Int, session: Int) -> EditableSlot? {
-		guard let period = periodForSession(session), canUse(period: period, on: day) else { return nil }
+		guard
+			let period = TimetableLayout.period(forSession: session),
+			TimetableLayout.canUse(period: period, on: day)
+		else { return nil }
+
 		return EditableSlot(day: day, period: period)
-	}
-
-	func canUse(period: Int, on day: Int) -> Bool {
-		!(period == 6 && (day == 2 || day == 4))
-	}
-
-	func periodForSession(_ session: Int) -> Int? {
-		switch session {
-			case 0: 1
-			case 1: 2
-			case 3: 3
-			case 4: 4
-			case 6: 5
-			case 7: 6
-			default: nil
-		}
 	}
 }

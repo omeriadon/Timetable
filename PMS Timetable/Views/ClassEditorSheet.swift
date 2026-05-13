@@ -14,28 +14,27 @@ struct ClassEditorSheet: View {
 	@Binding var classes: [Class]
 
 	@State private var editorPage = 0
-	@State private var isPresented = false
 	@State private var editorReady = false
 
-	let initialRequest: EditorRequest? = nil
+	let initialRequest: EditorRequest?
 
-	@State private var editorRequest: EditorRequest?
 	@State private var draftClasses: [EditableClass] = []
 	@State private var pendingPrefillSlot: EditableSlot?
 	@State private var pendingConflict: SlotConflict?
 	@State private var validationMessage: String?
+	@State private var renameTargetClassID: EditableClass.ID?
+	@State private var proposedClassName = ""
+	@State private var symbolPickerClassID: EditableClass.ID?
 
 	var body: some View {
 		NavigationStack {
-			Group {
+			VStack {
 				if editorReady {
 					TabView(selection: $editorPage) {
 						ForEach(draftClasses.indices, id: \.self) { index in
-							ScrollView {
-								classEditorPage(index: index)
-							}
-							.scrollBounceBehavior(.basedOnSize)
-							.tag(index)
+							classEditorPage(index: index)
+
+								.tag(index)
 						}
 						addClassPage
 							.tag(draftClasses.count)
@@ -61,6 +60,23 @@ struct ClassEditorSheet: View {
 				}
 			}
 		}
+		.alert(
+			"Rename Class",
+			isPresented: renameAlertPresented,
+			actions: {
+				TextField("Class Name", text: $proposedClassName)
+				Button("Cancel", role: .cancel) {
+					renameTargetClassID = nil
+					proposedClassName = ""
+				}
+				Button("Save") {
+					applyClassRename()
+				}
+			},
+			message: {
+				Text("Enter a new class name.")
+			}
+		)
 		.alert(
 			"Slot Conflict",
 			isPresented: Binding(
@@ -113,135 +129,22 @@ struct ClassEditorSheet: View {
 			prepareEditor()
 		}
 		.onDisappear {
-			editorRequest = nil
 			editorReady = false
+		}
+		.sheet(isPresented: symbolPickerPresented) {
+			symbolPickerSheet
 		}
 	}
 
 	func classEditorPage(index: Int) -> some View {
 		VStack(spacing: 15) {
-			GlassEffectContainer(spacing: 0) {
-				HStack {
-					TextField("Class Name", text: $draftClasses[index].name)
-						.font(.title)
-						.textFieldStyle(.plain)
-						.padding(10)
-						.padding(.leading, 8)
-						.glassEffect(
-							.clear.tint(draftClasses[index].color).interactive(),
-							in: Capsule()
-						)
+			classHeaderRow(index: index)
+			symbolSelectionRow(index: index)
 
-					Button(role: .destructive) {
-						withAnimation {
-							deleteClass(at: index)
-						}
-					} label: {
-						Label("Delete Class", systemImage: "trash")
-							.font(.title)
-							.padding(10)
-							.labelStyle(.iconOnly)
-					}
-					.buttonStyle(.plain)
-					.buttonBorderShape(.circle)
-					.glassEffect(.clear.tint(.red).interactive(), in: Circle())
-				}
-			}
+			InlineColorPicker(selectedColor: selectedColorBinding(for: draftClasses[index].id))
 
-			Button {
-				isPresented.toggle()
-			} label: {
-				HStack {
-					Image(systemName: draftClasses[index].symbol)
-						.font(.title)
-						.sheet(
-							isPresented: $isPresented,
-							content: {
-								SymbolsPicker(
-									selection: $draftClasses[index].symbol,
-									title: "",
-									autoDismiss: true
-								)
-							}
-						)
-						.padding()
-
-					Spacer()
-
-					Text("Select Symbol")
-						.padding(.trailing, 24)
-				}
-				.foregroundStyle(.white)
-				.glassEffect(.clear.interactive(), in: Capsule())
-			}
-
-			InlineColorPicker(
-				selectedColor: Binding<AvailableColors>(
-					get: {
-						closestColor(to: draftClasses[index].color)
-					},
-					set: { newEnum in
-						draftClasses[index].color = newEnum.SwiftUIColor
-					}
-				)
-			)
-
-			VStack(alignment: .leading) {
-				ForEach($draftClasses[index].slots) { $slot in
-					HStack {
-						Picker("Day:", selection: $slot.day) {
-							ForEach(0 ..< 5, id: \.self) { day in
-								Text("\(dayLabel(day))").tag(day)
-							}
-						}
-						.frame(width: 140, alignment: .leading)
-						.pickerStyle(.menu)
-						.onChange(of: slot.day) { _, newDay in
-							if !canUse(period: slot.period, on: newDay) {
-								slot.period = 5
-							}
-						}
-
-						Spacer()
-
-						Picker("Period:", selection: $slot.period) {
-							ForEach(allowedPeriods(for: slot.day), id: \.self) { period in
-								Text("Period \(period)").tag(period)
-							}
-						}
-						.frame(width: 140)
-						.pickerStyle(.menu)
-
-						Spacer()
-
-						Button(role: .destructive) {
-							// 1. Just mutate the array directly, no withAnimation block
-							draftClasses[index].slots.removeAll { $0.id == slot.id }
-						} label: {
-							Image(systemName: "trash")
-						}
-						.frame(width: 20)
-						.buttonStyle(.glassProminent)
-						.buttonBorderShape(.circle)
-					}
-					// 2. Combine scale with opacity so it doesn't get aggressively clipped by the layout
-					.transition(.scale.combined(with: .opacity))
-				}
-
-				if $draftClasses[index].slots.count < 4 {
-					Button {
-						// 3. Just mutate the array directly, no withAnimation block
-						draftClasses[index].slots
-							.append(EditableSlot(day: 0, period: allowedPeriods(for: 0).first ?? 1))
-					} label: {
-						Label("Add Slot", systemImage: "plus")
-					}
-					.buttonStyle(.glass)
-					.buttonBorderShape(.capsule)
-				}
-			}
-			// 4. THE MAGIC BULLET: This forces the VStack to animate ANY structural changes to this specific array.
-			.animation(.spring(response: 0.3, dampingFraction: 0.8), value: draftClasses[index].slots)
+			slotEditorSection(index: index)
+				.animation(.spring(response: 0.3, dampingFraction: 0.8), value: draftClasses[index].slots)
 
 			Spacer()
 		}
@@ -278,39 +181,23 @@ struct ClassEditorSheet: View {
 	}
 
 	func dayLabel(_ day: Int) -> String {
-		["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"][day]
+		TimetableLayout.fullDayLabels[day]
 	}
 
 	func allowedPeriods(for day: Int) -> [Int] {
-		(day == 2 || day == 4) ? Array(1 ... 5) : Array(1 ... 6)
+		TimetableLayout.allowedPeriods(for: day)
 	}
 
 	func canUse(period: Int, on day: Int) -> Bool {
-		!(period == 6 && (day == 2 || day == 4))
+		TimetableLayout.canUse(period: period, on: day)
 	}
 
 	func sessionForPeriod(_ period: Int) -> Int? {
-		switch period {
-			case 1: 0
-			case 2: 1
-			case 3: 3
-			case 4: 4
-			case 5: 6
-			case 6: 7
-			default: nil
-		}
+		TimetableLayout.session(forPeriod: period)
 	}
 
 	func periodForSession(_ session: Int) -> Int? {
-		switch session {
-			case 0: 1
-			case 1: 2
-			case 3: 3
-			case 4: 4
-			case 6: 5
-			case 7: 6
-			default: nil
-		}
+		TimetableLayout.period(forSession: session)
 	}
 
 	func slotLabel(_ slot: Slot) -> String {
@@ -325,7 +212,7 @@ struct ClassEditorSheet: View {
 				originalName: nil,
 				name: "New Class",
 				symbol: "book.closed",
-				color: .blue,
+				color: AvailableColors.sapphireVoid.SwiftUIColor,
 				slots: [newSlot, EditableSlot(day: 0, period: 2), EditableSlot(day: 0, period: 3), EditableSlot(day: 0, period: 4)]
 			)
 		)
@@ -435,20 +322,9 @@ struct ClassEditorSheet: View {
 	func prepareEditor() {
 		editorReady = false
 
-		switch editorRequest {
+		switch initialRequest {
 			case let .allClasses(focus):
-				draftClasses = classes.map { original in
-					EditableClass(
-						originalName: original.id,
-						name: original.id,
-						symbol: original.symbol,
-						color: original.colour.swiftUIColor,
-						slots: original.slots.compactMap { slot in
-							guard let period = periodForSession(slot.session) else { return nil }
-							return EditableSlot(day: slot.day, period: period)
-						}
-					)
-				}
+				draftClasses = makeDraftClasses()
 				pendingPrefillSlot = nil
 
 				if let focus {
@@ -464,38 +340,239 @@ struct ClassEditorSheet: View {
 				}
 
 			case let .emptySlot(prefill):
-				draftClasses = classes.map { original in
-					EditableClass(
-						originalName: original.id,
-						name: original.id,
-						symbol: original.symbol,
-						color: original.colour.swiftUIColor,
-						slots: original.slots.compactMap { slot in
-							guard let period = periodForSession(slot.session) else { return nil }
-							return EditableSlot(day: slot.day, period: period)
-						}
-					)
-				}
+				draftClasses = makeDraftClasses()
 				pendingPrefillSlot = prefill
 				editorPage = draftClasses.count
 
 			case nil:
-				draftClasses = classes.map { original in
-					EditableClass(
-						originalName: original.id,
-						name: original.id,
-						symbol: original.symbol,
-						color: original.colour.swiftUIColor,
-						slots: original.slots.compactMap { slot in
-							guard let period = periodForSession(slot.session) else { return nil }
-							return EditableSlot(day: slot.day, period: period)
-						}
-					)
-				}
+				draftClasses = makeDraftClasses()
 				editorPage = 0
 				pendingPrefillSlot = nil
 		}
 
 		editorReady = true
+	}
+
+	func makeDraftClasses() -> [EditableClass] {
+		classes.map { original in
+			EditableClass(
+				originalName: original.id,
+				name: original.id,
+				symbol: original.symbol,
+				color: original.colour.swiftUIColor,
+				slots: original.slots.compactMap { slot in
+					guard let period = periodForSession(slot.session) else { return nil }
+					return EditableSlot(day: slot.day, period: period)
+				}
+			)
+		}
+	}
+
+	var renameAlertPresented: Binding<Bool> {
+		Binding(
+			get: { renameTargetClassID != nil },
+			set: { newValue in
+				if !newValue {
+					renameTargetClassID = nil
+					proposedClassName = ""
+				}
+			}
+		)
+	}
+
+	var symbolPickerPresented: Binding<Bool> {
+		Binding(
+			get: { symbolPickerClassID != nil },
+			set: { newValue in
+				if !newValue {
+					symbolPickerClassID = nil
+				}
+			}
+		)
+	}
+
+	@ViewBuilder
+	var symbolPickerSheet: some View {
+		if let symbolPickerClassID {
+			SymbolsPicker(
+				selection: selectedSymbolBinding(for: symbolPickerClassID),
+				title: "",
+				searchLabel: "Search symbols...",
+				autoDismiss: true
+			)
+		}
+	}
+
+	func classHeaderRow(index: Int) -> some View {
+		GlassEffectContainer(spacing: 0) {
+			HStack(alignment: .center) {
+				Button {
+					beginRenamingClass(at: index)
+				} label: {
+					HStack(spacing: 0) {
+						Text(draftClasses[index].name.isEmpty ? "Class Name" : draftClasses[index].name)
+							.font(.title)
+							.padding(10)
+							.padding(.leading, 8)
+							.contentTransition(.numericText())
+
+						Spacer(minLength: 0)
+					}
+					.frame(maxWidth: .infinity, alignment: .leading)
+					.contentShape(Capsule())
+				}
+				.buttonStyle(.plain)
+				.background {
+					Capsule()
+						.fill(draftClasses[index].color.opacity(0.22))
+						.animation(.snappy(duration: 0.25), value: draftClasses[index].color)
+				}
+				.glassEffect(
+					.clear.tint(draftClasses[index].color).interactive(),
+					in: Capsule()
+				)
+				.animation(.smooth(duration: 0.25), value: closestColor(to: draftClasses[index].color))
+
+				Button(role: .destructive) {
+					withAnimation {
+						deleteClass(at: index)
+					}
+				} label: {
+					Label("Delete Class", systemImage: "trash")
+						.font(.title3)
+						.padding(5)
+						.labelStyle(.iconOnly)
+				}
+				.buttonStyle(.plain)
+				.buttonBorderShape(.circle)
+				.glassEffect(.clear.tint(.red).interactive(), in: Circle())
+			}
+		}
+	}
+
+	func symbolSelectionRow(index: Int) -> some View {
+		Button {
+			symbolPickerClassID = draftClasses[index].id
+		} label: {
+			HStack {
+				Image(systemName: draftClasses[index].symbol)
+					.font(.title)
+					.padding()
+
+				Spacer()
+
+				Text("Select Symbol")
+					.padding(.trailing, 24)
+			}
+			.foregroundStyle(.white)
+			.glassEffect(.clear.interactive(), in: Capsule())
+		}
+	}
+
+	func slotEditorSection(index: Int) -> some View {
+		VStack(alignment: .leading) {
+			ForEach($draftClasses[index].slots) { $slot in
+				slotRow(slot: $slot, classIndex: index)
+					.transition(.scale.combined(with: .opacity))
+			}
+
+			if draftClasses[index].slots.count < 4 {
+				Button {
+					draftClasses[index].slots.append(
+						EditableSlot(day: 0, period: TimetableLayout.allowedPeriods(for: 0).first ?? 1)
+					)
+				} label: {
+					Label("Add Slot", systemImage: "plus")
+				}
+				.buttonStyle(.glass)
+				.buttonBorderShape(.capsule)
+			}
+		}
+	}
+
+	func slotRow(slot: Binding<EditableSlot>, classIndex: Int) -> some View {
+		HStack {
+			Picker("Day:", selection: slot.day) {
+				ForEach(0 ..< 5, id: \.self) { day in
+					Text(dayLabel(day)).tag(day)
+				}
+			}
+			.frame(width: 140, alignment: .leading)
+			.pickerStyle(.menu)
+			.onChange(of: slot.wrappedValue.day) { _, newDay in
+				if !canUse(period: slot.wrappedValue.period, on: newDay) {
+					slot.wrappedValue.period = 5
+				}
+			}
+
+			Spacer()
+
+			Picker("Period:", selection: slot.period) {
+				ForEach(allowedPeriods(for: slot.wrappedValue.day), id: \.self) { period in
+					Text("Period \(period)").tag(period)
+				}
+			}
+			.frame(width: 140)
+			.pickerStyle(.menu)
+
+			Spacer()
+
+			Button(role: .destructive) {
+				draftClasses[classIndex].slots.removeAll { $0.id == slot.wrappedValue.id }
+			} label: {
+				Image(systemName: "trash")
+			}
+			.frame(width: 20)
+			.buttonStyle(.glassProminent)
+			.buttonBorderShape(.circle)
+		}
+	}
+
+	func beginRenamingClass(at index: Int) {
+		guard draftClasses.indices.contains(index) else { return }
+		renameTargetClassID = draftClasses[index].id
+		proposedClassName = draftClasses[index].name
+	}
+
+	func applyClassRename() {
+		guard
+			let renameTargetClassID,
+			let index = draftClasses.firstIndex(where: { $0.id == renameTargetClassID })
+		else {
+			renameTargetClassID = nil
+			proposedClassName = ""
+			return
+		}
+
+		draftClasses[index].name = proposedClassName
+		self.renameTargetClassID = nil
+		proposedClassName = ""
+	}
+
+	func selectedSymbolBinding(for classID: EditableClass.ID) -> Binding<String> {
+		Binding(
+			get: {
+				draftClasses.first(where: { $0.id == classID })?.symbol ?? "questionmark"
+			},
+			set: { newValue in
+				guard let index = draftClasses.firstIndex(where: { $0.id == classID }) else { return }
+				draftClasses[index].symbol = newValue
+			}
+		)
+	}
+
+	func selectedColorBinding(for classID: EditableClass.ID) -> Binding<AvailableColors> {
+		Binding(
+			get: {
+				guard let editableClass = draftClasses.first(where: { $0.id == classID }) else {
+					return .sapphireVoid
+				}
+				return closestColor(to: editableClass.color)
+			},
+			set: { newValue in
+				guard let index = draftClasses.firstIndex(where: { $0.id == classID }) else { return }
+				draftClasses[index].color = newValue.SwiftUIColor
+			}
+		)
 	}
 }

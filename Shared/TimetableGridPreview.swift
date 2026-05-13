@@ -25,10 +25,9 @@ struct TimetableGridPreview: View {
 
 	let userDisplayName = Defaults[.userDisplayName]
 
-	private let sessions = ["1", "2", "R", "3", "4", "L", "5", "6"]
-	private let dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri"]
-
 	var body: some View {
+		let classLookup = TimetableLayout.classLookup(for: classes)
+
 		VStack(alignment: .trailing, spacing: 12) {
 			VStack(alignment: .leading, spacing: 3) {
 				Text(title)
@@ -49,11 +48,11 @@ struct TimetableGridPreview: View {
 					Text("")
 						.frame(height: 18)
 
-					ForEach(Array(sessions.enumerated()), id: \.offset) { _, session in
+					ForEach(TimetableLayout.sessions, id: \.self) { session in
 						Text(session)
 							.font(.caption2)
 							.foregroundStyle(
-								session == "R" || session == "L"
+								TimetableLayout.isBreakSession(label: session)
 									? .white.opacity(0.7)
 									: .white
 							)
@@ -65,14 +64,14 @@ struct TimetableGridPreview: View {
 				HStack(alignment: .top, spacing: 4) {
 					ForEach(0 ..< 5, id: \.self) { day in
 						VStack(spacing: 4) {
-							Text(dayLabels[day])
+							Text(TimetableLayout.shortDayLabels[day])
 								.font(.caption2.weight(.semibold))
 								.foregroundStyle(.white.opacity(0.78))
 								.frame(height: 18)
 
-							ForEach(0 ..< sessions.count, id: \.self) { session in
-								cell(day: day, session: session)
-									.frame(height: rowHeight(for: sessions[session]))
+							ForEach(0 ..< TimetableLayout.sessions.count, id: \.self) { session in
+								cell(day: day, session: session, classLookup: classLookup)
+									.frame(height: rowHeight(for: TimetableLayout.sessions[session]))
 							}
 						}
 					}
@@ -84,15 +83,15 @@ struct TimetableGridPreview: View {
 		.background(showBackground ? backgroundColor : .clear)
 	}
 
-	private func cell(day: Int, session: Int) -> some View {
+	private func cell(day: Int, session: Int, classLookup: [Slot: Class]) -> some View {
 		Group {
-			if sessions[session] == "R" || sessions[session] == "L" {
+			if TimetableLayout.isBreakSession(index: session) {
 				RoundedRectangle(cornerRadius: 5)
 					.fill(.clear)
-			} else if isUnavailable(day: day, session: session) {
+			} else if TimetableLayout.isUnavailable(day: day, session: session) {
 				RoundedRectangle(cornerRadius: 7)
 					.fill(.clear)
-			} else if let classItem = classFor(day: day, session: session) {
+			} else if let classItem = classLookup[Slot(day, session)] {
 				RoundedRectangle(cornerRadius: 7)
 					.fill(classItem.colour.swiftUIColor.opacity(0.82))
 					.overlay(alignment: .topLeading) {
@@ -109,18 +108,8 @@ struct TimetableGridPreview: View {
 		}
 	}
 
-	private func classFor(day: Int, session: Int) -> Class? {
-		classes.first { classItem in
-			classItem.slots.contains { $0.day == day && $0.session == session }
-		}
-	}
-
 	private func rowHeight(for session: String) -> CGFloat {
-		(session == "R" || session == "L" ? 5 : 30) * rowScale
-	}
-
-	private func isUnavailable(day: Int, session: Int) -> Bool {
-		(day == 2 && session == 7) || (day == 4 && session == 7)
+		(TimetableLayout.isBreakSession(label: session) ? 5 : 30) * rowScale
 	}
 }
 
