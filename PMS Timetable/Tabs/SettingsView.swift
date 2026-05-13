@@ -66,7 +66,7 @@ struct SettingsView: View {
 							Text("Import Calendar")
 								.foregroundStyle(.tint)
 							Text("Subscribe to Compass Schedule in Calendar")
-								.foregroundStyle(.secondary)
+								.foregroundStyle(.primary.secondary)
 						} icon: {
 							Image(systemName: "calendar")
 								.foregroundStyle(.tint)

@@ -240,7 +240,7 @@ struct CalendarImportView: View {
 			result.append(
 				Class(
 					id: translateTitle(c.id),
-					symbol: translateSymbol(c.symbol),
+					symbol: c.symbol,
 					colour: c.colour,
 					slots: c.slots
 				)
@@ -283,6 +283,9 @@ struct CalendarImportView: View {
 
 			case lower.contains("MUSOS"):
 				return "Music"
+
+			case lower.contains("AEFSL1"):
+				return "French"
 
 			case lower.contains("AECHE"):
 				return "Chemistry"
@@ -342,6 +345,9 @@ struct CalendarImportView: View {
 				return "testtube.2"
 
 			case lower.contains("AEISL"):
+				return "character.book.closed"
+
+			case lower.contains("AEFSL1"):
 				return "character.book.closed"
 
 			case lower.contains("AELIT"):
@@ -441,7 +447,7 @@ struct CalendarImportView: View {
 
 				classMap[title] = (
 					color: randomColor,
-					symbol: "nothing for now",
+					symbol: translateSymbol(title),
 					slots: []
 				)
 			}

@@ -21,6 +21,7 @@ struct TimetableView: View {
 	@State private var isEditMode = false
 	@State private var selectedTimetableIndex: Int?
 	@State private var showTimetableComparison = false
+	@State private var selectedSlot: (day: Int, session: Int)? = nil
 
 	@Binding var syncStatus: SyncMode
 
@@ -158,75 +159,82 @@ struct TimetableView: View {
 			}
 			.sheet(isPresented: $showTimetableComparison) {
 				timetableComparisonSheet
-					.presentationDetents([.fraction(0.5)])
-					.presentationDragIndicator(.visible)
+					.presentationDetents([.fraction(0.4)])
+					.presentationDragIndicator(.hidden)
 			}
 		}
 	}
 
 	private var timetableComparisonSheet: some View {
-		VStack(spacing: 0) {
-			VStack(spacing: 4) {
-				Text("Your Period")
-					.font(.headline)
-				if let yourClass = findCurrentClass(in: classes) {
+		VStack(spacing: 20) {
+			if let slot = selectedSlot,
+			   let yourClass = getClassAtSlot(day: slot.day, session: slot.session, in: classes)
+			{
+				HStack {
+					Text("You")
+					Spacer()
 					HStack(spacing: 8) {
 						Image(systemName: yourClass.symbol)
 							.font(.title3)
 						Text(yourClass.id)
 							.font(.body)
 					}
-					.foregroundStyle(yourClass.colour.swiftUIColor)
-				} else {
-					Text("Free period")
-						.foregroundStyle(.secondary)
 				}
+				.padding(10)
+				.glassEffect(.clear.tint(yourClass.colour.swiftUIColor).interactive(), in: RoundedRectangle(cornerRadius: 12))
+
+			} else {
+				HStack {
+					Text("You")
+					Spacer()
+					Text("Free period")
+				}
+				.padding(10)
+				.glassEffect(.clear.tint(.gray).interactive(), in: RoundedRectangle(cornerRadius: 12))
 			}
-			.frame(maxWidth: .infinity)
-			.padding()
 
 			Divider()
 
-			VStack(spacing: 8) {
-				Text("Other Timetables")
-					.font(.headline)
-					.padding(.top, 8)
+			Text("Other Timetables")
+				.font(.title2)
+				.padding(.top, 8)
 
+			VStack(spacing: 8) {
 				ForEach(receivedTimetables.indices, id: \.self) { idx in
-					if let theirClass = findCurrentClass(in: receivedTimetables[idx].classes) {
-						VStack(alignment: .leading, spacing: 2) {
+					if let slot = selectedSlot,
+					   let theirClass = getClassAtSlot(day: slot.day, session: slot.session, in: receivedTimetables[idx].classes)
+					{
+						HStack {
 							Text(receivedTimetables[idx].sender)
-								.font(.caption)
-								.foregroundStyle(.secondary)
+
+							Spacer()
+
 							HStack(spacing: 8) {
 								Image(systemName: theirClass.symbol)
-									.font(.caption)
 								Text(theirClass.id)
-									.font(.body)
 							}
-							.foregroundStyle(theirClass.colour.swiftUIColor)
 						}
-						.frame(maxWidth: .infinity, alignment: .leading)
-						.padding(.horizontal)
+						.padding(10)
+						.glassEffect(.clear.tint(theirClass.colour.swiftUIColor).interactive(), in: RoundedRectangle(cornerRadius: 12))
+
 					} else {
-						VStack(alignment: .leading, spacing: 2) {
+						HStack {
 							Text(receivedTimetables[idx].sender)
-								.font(.caption)
-								.foregroundStyle(.secondary)
+
+							Spacer()
+
 							Text("Free period")
-								.font(.body)
-								.foregroundStyle(.secondary)
 						}
-						.frame(maxWidth: .infinity, alignment: .leading)
-						.padding(.horizontal)
+						.padding(10)
+						.glassEffect(.clear.tint(.gray).interactive(), in: RoundedRectangle(cornerRadius: 12))
 					}
 				}
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
-			.padding()
 
 			Spacer()
 		}
+		.padding()
 	}
 
 	private func findCurrentClass(in timetable: [Class]) -> Class? {
@@ -259,6 +267,11 @@ struct TimetableView: View {
 			}
 		}
 		return nil
+	}
+
+	private func getClassAtSlot(day: Int, session: Int, in timetable: [Class]) -> Class? {
+		let classLookup = TimetableLayout.classLookup(for: timetable)
+		return classLookup[Slot(day, session)]
 	}
 
 	func mainContent(classLookup: [Slot: Class]) -> some View {
@@ -299,6 +312,7 @@ struct TimetableView: View {
 							if isEditMode {
 								openEditor(focusingClassName: c.id)
 							} else if !receivedTimetables.isEmpty {
+								selectedSlot = (day, session)
 								showTimetableComparison = true
 							}
 						}
