@@ -8,7 +8,7 @@
 import Defaults
 import SwiftUI
 #if canImport(UIKit)
-import UIKit
+	import UIKit
 #endif
 
 struct TimetableGridPreview: View {
@@ -18,8 +18,8 @@ struct TimetableGridPreview: View {
 		"\(userDisplayName)'s Timetable"
 	}
 
-	var subtitle: String? = nil
-	var backgroundColor = Color(red: 39/255, green: 39/255, blue: 41/255)
+	var subtitle: String?
+	var backgroundColor = Color(red: 39 / 255, green: 39 / 255, blue: 41 / 255)
 	var rowScale: CGFloat = 1
 	var showBackground: Bool = true
 
@@ -63,14 +63,14 @@ struct TimetableGridPreview: View {
 				.frame(width: 28)
 
 				HStack(alignment: .top, spacing: 4) {
-					ForEach(0..<5, id: \.self) { day in
+					ForEach(0 ..< 5, id: \.self) { day in
 						VStack(spacing: 4) {
 							Text(dayLabels[day])
 								.font(.caption2.weight(.semibold))
 								.foregroundStyle(.white.opacity(0.78))
 								.frame(height: 18)
 
-							ForEach(0..<sessions.count, id: \.self) { session in
+							ForEach(0 ..< sessions.count, id: \.self) { session in
 								cell(day: day, session: session)
 									.frame(height: rowHeight(for: sessions[session]))
 							}
@@ -125,24 +125,24 @@ struct TimetableGridPreview: View {
 }
 
 #if canImport(UIKit)
-enum TimetablePreviewRenderer {
-	@MainActor
-	static func image(classes: [Class], title: String, subtitle: String? = nil) -> UIImage {
-		let size = CGSize(width: 630, height: 336)
+	enum TimetablePreviewRenderer {
+		@MainActor
+		static func image(classes: [Class], title _: String, subtitle: String? = nil) -> UIImage {
+			let size = CGSize(width: 630, height: 336)
 
-		let content = TimetableGridPreview(
-			classes: classes,
-			showsTitle: false,
-			subtitle: subtitle
-		)
-		.frame(width: size.width, height: size.height)
-		.background(Color(red: 39/255, green: 39/255, blue: 41/255)) // force fill
-		.clipped()
+			let content = TimetableGridPreview(
+				classes: classes,
+				showsTitle: false,
+				subtitle: subtitle
+			)
+			.frame(width: size.width, height: size.height)
+			.background(Color(red: 39 / 255, green: 39 / 255, blue: 41 / 255)) // force fill
+			.clipped()
 
-		let renderer = ImageRenderer(content: content)
-		renderer.scale = 3
+			let renderer = ImageRenderer(content: content)
+			renderer.scale = 3
 
-		return renderer.uiImage ?? UIImage()
+			return renderer.uiImage ?? UIImage()
+		}
 	}
-}
 #endif // canImport(UIKit)

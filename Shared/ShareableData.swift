@@ -1,6 +1,6 @@
+import Compression
 import Foundation
 import SwiftUI
-import Compression
 
 struct ShareableSlot: Codable, Equatable {
 	let day: Int
@@ -17,15 +17,15 @@ struct ShareableClass: Codable, Equatable {
 struct ShareableTimetableData: Codable, Equatable {
 	let sender: String
 	let classes: [ShareableClass]
-	
+
 	func toJSON() throws -> Data {
-		return try JSONEncoder().encode(self)
+		try JSONEncoder().encode(self)
 	}
-	
+
 	static func fromJSON(_ data: Data) throws -> ShareableTimetableData {
-		return try JSONDecoder().decode(ShareableTimetableData.self, from: data)
+		try JSONDecoder().decode(ShareableTimetableData.self, from: data)
 	}
-	
+
 	func toBase64URL() throws -> String {
 		let jsonData = try toJSON()
 		let payload = try jsonData.compressedLZFSE()
@@ -34,17 +34,17 @@ struct ShareableTimetableData: Codable, Equatable {
 			.replacingOccurrences(of: "/", with: "_")
 			.replacingOccurrences(of: "=", with: "")
 	}
-	
+
 	static func fromBase64URL(_ encoded: String) throws -> ShareableTimetableData {
 		let isV2 = encoded.hasPrefix("v2.")
 		let raw = isV2 ? String(encoded.dropFirst(3)) : encoded
 		var base64 = raw
 			.replacingOccurrences(of: "-", with: "+")
 			.replacingOccurrences(of: "_", with: "/")
-		
+
 		let padCount = (4 - (base64.count % 4)) % 4
 		base64 += String(repeating: "=", count: padCount)
-		
+
 		guard let data = Data(base64Encoded: base64) else {
 			throw NSError(domain: "DecodeError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid base64"])
 		}

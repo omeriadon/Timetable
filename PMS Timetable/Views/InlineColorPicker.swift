@@ -83,9 +83,9 @@ public struct InlineColorPicker<T: ColorOptions>: View {
 	/// - Parameter selectedColor: A binding to a `ColorOptions` value.
 	public init(selectedColor: Binding<T>) {
 		self.selectedColor = selectedColor
-		self.systemImage = nil
-		self.description = nil
-		self.colors = Self.getColors(from: selectedColor.wrappedValue)
+		systemImage = nil
+		description = nil
+		colors = Self.getColors(from: selectedColor.wrappedValue)
 	}
 
 	/// Creates an inline color picker with a leading system image.
@@ -95,8 +95,8 @@ public struct InlineColorPicker<T: ColorOptions>: View {
 	public init(selectedColor: Binding<T>, systemImage: String) {
 		self.selectedColor = selectedColor
 		self.systemImage = systemImage
-		self.description = nil
-		self.colors = Self.getColors(from: selectedColor.wrappedValue)
+		description = nil
+		colors = Self.getColors(from: selectedColor.wrappedValue)
 	}
 
 	/// Creates an expanded inline color picker with a description and icon.
@@ -108,7 +108,7 @@ public struct InlineColorPicker<T: ColorOptions>: View {
 		self.selectedColor = selectedColor
 		self.systemImage = systemImage
 		self.description = description
-		self.colors = Self.getColors(from: selectedColor.wrappedValue)
+		colors = Self.getColors(from: selectedColor.wrappedValue)
 	}
 
 	/// Builds the array of available colors from the type of the wrapped value.
@@ -211,70 +211,70 @@ public enum AvailableColors: Int, ColorOptions, Codable, Sendable {
 	public var SwiftUIColor: Color {
 		switch self {
 			case .crimsonFlame:
-				return Color(red: 0.88, green: 0.02, blue: 0.00)
+				Color(red: 0.88, green: 0.02, blue: 0.00)
 
 			case .tangerinePulse:
-				return Color(red: 1.00, green: 0.42, blue: 0.00)
+				Color(red: 1.00, green: 0.42, blue: 0.00)
 
 			case .solarGold:
-				return Color(red: 1.00, green: 0.76, blue: 0.00)
+				Color(red: 1.00, green: 0.76, blue: 0.00)
 
 			case .acidLime:
-				return Color(red: 0.71, green: 1.00, blue: 0.00)
+				Color(red: 0.71, green: 1.00, blue: 0.00)
 
 			case .emeraldDepth:
-				return Color(red: 0.00, green: 0.78, blue: 0.32)
+				Color(red: 0.00, green: 0.78, blue: 0.32)
 
 			case .aquaSurge:
-				return Color(red: 0.00, green: 0.90, blue: 1.00)
+				Color(red: 0.00, green: 0.90, blue: 1.00)
 
 			case .electricCyan:
-				return Color(red: 0.00, green: 0.72, blue: 0.83)
+				Color(red: 0.00, green: 0.72, blue: 0.83)
 
 			case .sapphireVoid:
-				return Color(red: 0.16, green: 0.38, blue: 1.00)
+				Color(red: 0.16, green: 0.38, blue: 1.00)
 
 			case .royalIndigo:
-				return Color(red: 0.24, green: 0.00, blue: 1.00)
+				Color(red: 0.24, green: 0.00, blue: 1.00)
 
 			case .neonViolet:
-				return Color(red: 0.56, green: 0.18, blue: 0.89)
+				Color(red: 0.56, green: 0.18, blue: 0.89)
 
 			case .magentaShock:
-				return Color(red: 1.00, green: 0.00, blue: 0.66)
+				Color(red: 1.00, green: 0.00, blue: 0.66)
 
 			case .hotFuchsia:
-				return Color(red: 1.00, green: 0.18, blue: 0.58)
+				Color(red: 1.00, green: 0.18, blue: 0.58)
 
 			case .coralEmber:
-				return Color(red: 1.00, green: 0.30, blue: 0.30)
+				Color(red: 1.00, green: 0.30, blue: 0.30)
 
 			case .steelBlueGrey:
-				return Color(red: 0.38, green: 0.49, blue: 0.53)
+				Color(red: 0.38, green: 0.49, blue: 0.53)
 
 			case .obsidianBlack:
-				return Color(red: 0.04, green: 0.06, blue: 0.08)
+				Color(red: 0.04, green: 0.06, blue: 0.08)
 		}
 	}
 
 	/// Returns a description of the color used for accessibility.
 	public var accessibilityLabelColorName: String {
 		switch self {
-			case .crimsonFlame: return "Crimson Flame"
-			case .tangerinePulse: return "Tangerine Pulse"
-			case .solarGold: return "Solar Gold"
-			case .acidLime: return "Acid Lime"
-			case .emeraldDepth: return "Emerald Depth"
-			case .aquaSurge: return "Aqua Surge"
-			case .electricCyan: return "Electric Cyan"
-			case .sapphireVoid: return "Sapphire Void"
-			case .royalIndigo: return "Royal Indigo"
-			case .neonViolet: return "Neon Violet"
-			case .magentaShock: return "Magenta Shock"
-			case .hotFuchsia: return "Hot Fuchsia"
-			case .coralEmber: return "Coral Ember"
-			case .steelBlueGrey: return "Steel Blue Grey"
-			case .obsidianBlack: return "Obsidian Black"
+			case .crimsonFlame: "Crimson Flame"
+			case .tangerinePulse: "Tangerine Pulse"
+			case .solarGold: "Solar Gold"
+			case .acidLime: "Acid Lime"
+			case .emeraldDepth: "Emerald Depth"
+			case .aquaSurge: "Aqua Surge"
+			case .electricCyan: "Electric Cyan"
+			case .sapphireVoid: "Sapphire Void"
+			case .royalIndigo: "Royal Indigo"
+			case .neonViolet: "Neon Violet"
+			case .magentaShock: "Magenta Shock"
+			case .hotFuchsia: "Hot Fuchsia"
+			case .coralEmber: "Coral Ember"
+			case .steelBlueGrey: "Steel Blue Grey"
+			case .obsidianBlack: "Obsidian Black"
 		}
 	}
 

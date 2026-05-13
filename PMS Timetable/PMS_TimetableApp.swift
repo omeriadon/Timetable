@@ -39,13 +39,13 @@ struct PMS_TimetableApp: App {
 		}
 
 		guard url.scheme == "pmstimetable" else { return }
-		
+
 		let components = URLComponents(url: url, resolvingAgainstBaseURL: true)
 		let dataParam = components?.fragment ?? components?.queryItems?.first(where: { $0.name == "data" })?.value
 		guard let dataParam else {
 			return
 		}
-		
+
 		do {
 			receivedTimetableData = try ShareableTimetableData.fromBase64URL(dataParam)
 		} catch {
@@ -76,7 +76,7 @@ extension EnvironmentValues {
 		get { self[ImportStatusKey.self] }
 		set { self[ImportStatusKey.self] = newValue }
 	}
-	
+
 	var receivedTimetableData: Binding<ShareableTimetableData?> {
 		get { self[ReceivedTimetableDataKey.self] }
 		set { self[ReceivedTimetableDataKey.self] = newValue }

@@ -5,16 +5,16 @@
 //  Created by Adon Omeri on 27/4/2026.
 //
 
+import Defaults
 import SwiftUI
 import WidgetKit
-import Defaults
 
 struct Provider: TimelineProvider {
-	func placeholder(in context: Context) -> TimetableEntry {
+	func placeholder(in _: Context) -> TimetableEntry {
 		TimetableEntry(date: Date(), classes: [], displayMode: .symbolsOnly)
 	}
 
-	func getSnapshot(in context: Context, completion: @escaping (TimetableEntry) -> ()) {
+	func getSnapshot(in _: Context, completion: @escaping (TimetableEntry) -> Void) {
 		let classes = Defaults[.timetable]
 		let displayMode = Defaults[.displayMode]
 		print("[Widget] getSnapshot: classes=\(classes.count), displayMode=\(displayMode.rawValue)")
@@ -22,7 +22,7 @@ struct Provider: TimelineProvider {
 		completion(entry)
 	}
 
-	func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
+	func getTimeline(in _: Context, completion: @escaping (Timeline<Entry>) -> Void) {
 		let classes = Defaults[.timetable]
 		let displayMode = Defaults[.displayMode]
 		print("[Widget] getTimeline: classes=\(classes.count), displayMode=\(displayMode.rawValue)")

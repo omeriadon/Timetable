@@ -73,13 +73,13 @@ struct TimetableView: View {
 			DispatchQueue.main.async {
 				isSending = false
 				switch result {
-				case .success:
-					errorMessage = "Timetable sent!"
-					DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-						errorMessage = nil
-					}
-				case let .failure(error):
-					errorMessage = "Error sending: \(error.localizedDescription)"
+					case .success:
+						errorMessage = "Timetable sent!"
+						DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+							errorMessage = nil
+						}
+					case let .failure(error):
+						errorMessage = "Error sending: \(error.localizedDescription)"
 				}
 			}
 		}
@@ -91,8 +91,8 @@ private enum TimetableSendError: LocalizedError {
 
 	var errorDescription: String? {
 		switch self {
-		case .unavailable:
-			return "Messages conversation is unavailable."
+			case .unavailable:
+				"Messages conversation is unavailable."
 		}
 	}
 }

@@ -89,9 +89,8 @@ class MessagesViewController: MSMessagesAppViewController {
 		}
 		let fallbackPayload = selectedMessage.flatMap(extractTimetablePayload)
 		let hasSelectedMessage = selectedMessage != nil
-		let view: any View
-		if hasSelectedMessage || messageURL != nil || fallbackPayload != nil {
-			view = AnyView(
+		let view: any View = if hasSelectedMessage || messageURL != nil || fallbackPayload != nil {
+			AnyView(
 				ReceivedTimetableTranscriptView(messageUrl: messageURL, fallbackPayload: fallbackPayload) { [weak self] in
 					guard let self else { return }
 					if let messageURL {
@@ -102,15 +101,15 @@ class MessagesViewController: MSMessagesAppViewController {
 				}
 			)
 		} else if presentationStyle == .transcript {
-			view = AnyView(TranscriptPlaceholder())
+			AnyView(TranscriptPlaceholder())
 		} else {
-			view = AnyView(
+			AnyView(
 				TimetableView { [weak self] _, classes, completion in
 					guard let self else {
 						completion(.failure(MessageSendError.controllerDeallocated))
 						return
 					}
-					self.sendTimetableMessage(senderName: userDisplayName, classes: classes, completion: completion)
+					sendTimetableMessage(senderName: userDisplayName, classes: classes, completion: completion)
 				}
 			)
 		}
@@ -127,7 +126,7 @@ class MessagesViewController: MSMessagesAppViewController {
 			newController.view.topAnchor.constraint(equalTo: self.view.topAnchor),
 			newController.view.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
 			newController.view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
-			newController.view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor)
+			newController.view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
 		])
 
 		newController.didMove(toParent: self)
@@ -286,7 +285,7 @@ class MessagesViewController: MSMessagesAppViewController {
 	private func openContainingApp(with url: URL) {
 		extensionContext?.open(url, completionHandler: { [weak self] success in
 			guard let self, !success else { return }
-			self.openViaResponderChain(url)
+			openViaResponderChain(url)
 		})
 	}
 
@@ -348,12 +347,12 @@ private enum MessageSendError: LocalizedError {
 
 	var errorDescription: String? {
 		switch self {
-		case .noActiveConversation:
-			return "No active conversation is available."
-		case .controllerDeallocated:
-			return "Message composer is no longer available."
-		case .invalidDeepLink:
-			return "Could not build timetable link."
+			case .noActiveConversation:
+				"No active conversation is available."
+			case .controllerDeallocated:
+				"Message composer is no longer available."
+			case .invalidDeepLink:
+				"Could not build timetable link."
 		}
 	}
 }
@@ -364,7 +363,7 @@ extension Color {
 	}
 
 	func toHex() -> String {
-		guard let cgColor = cgColor else { return "#000000" }
+		guard let cgColor else { return "#000000" }
 		guard let components = cgColor.components, components.count >= 3 else { return "#000000" }
 		let r = Int(components[0] * 255)
 		let g = Int(components[1] * 255)

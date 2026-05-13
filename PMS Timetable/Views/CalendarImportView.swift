@@ -1,5 +1,5 @@
 //
-//  CalendarImportProgressBar.swift
+//  CalendarImportView.swift
 //  PMS Timetable
 //
 //  Created by Adon Omeri on 27/4/2026.
@@ -15,7 +15,7 @@ enum CalendarImportStep: Equatable {
 	case findingCalendar
 	case fetchingEvents
 	case matchingEvents
-	case translatingTitles
+	case processingClasses
 	case finalising
 	case done
 
@@ -37,14 +37,14 @@ enum CalendarImportStep: Equatable {
 				4
 			case .matchingEvents:
 				5
-			case .translatingTitles:
+			case .processingClasses:
 				6
 			case .finalising:
 				7
 			case .done:
 				8
 			case .error:
-				8
+				9
 		}
 	}
 
@@ -60,13 +60,13 @@ enum CalendarImportStep: Equatable {
 				"Fetching events..."
 			case .matchingEvents:
 				"Matching events..."
-			case .translatingTitles:
+			case .processingClasses:
 				"Translating titles..."
 			case .finalising:
 				"Finalising..."
 			case .done:
 				"Calendar Imported"
-			case .error(let t):
+			case let .error(t):
 				"Error: \(t)"
 		}
 	}
@@ -125,7 +125,7 @@ struct CalendarImportView: View {
 
 				Gauge(
 					value: Double(calendarImportStep.progress),
-					in: 0...Double(calendarImportStep.total)
+					in: 0 ... Double(calendarImportStep.total)
 				) {
 					Text("")
 				} currentValueLabel: {
@@ -160,7 +160,7 @@ struct CalendarImportView: View {
 	}
 
 	func moveForward(to step: CalendarImportStep) async {
-		let delay = Double.random(in: 0.5...1.5)
+		let delay = Double.random(in: 0.5 ... 1.5)
 		try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
 		calendarImportStep = step
 	}
@@ -212,8 +212,8 @@ struct CalendarImportView: View {
 
 			let importedClasses = try await matchEventsToTimeSlots(events)
 
-			print("[iOS] Calendar Import: Processing titles...")
-			await moveForward(to: .translatingTitles)
+			print("[iOS] Calendar Import: Processing classes...")
+			await moveForward(to: .processingClasses)
 			let translatedClasses = translateClasses(importedClasses)
 
 			print("[iOS] Calendar Import: Validating...")
@@ -224,7 +224,7 @@ struct CalendarImportView: View {
 			await moveForward(to: .done)
 			print("[iOS] Calendar Import: Success!")
 			calendarImportStatus = .success
-			try? await Task.sleep(nanoseconds: 2_000_000_000)
+			try? await Task.sleep(for: .seconds(2))
 			dismiss()
 			calendarImportStatus = .loading
 
@@ -237,11 +237,10 @@ struct CalendarImportView: View {
 		var result: [Class] = []
 
 		for c in classes {
-			let newName = translateTitle(c.id)
 			result.append(
 				Class(
-					id: newName,
-					symbol: c.symbol,
+					id: translateTitle(c.id),
+					symbol: translateSymbol(c.symbol),
 					colour: c.colour,
 					slots: c.slots
 				)
@@ -305,6 +304,60 @@ struct CalendarImportView: View {
 		}
 	}
 
+	func translateSymbol(_ original: String) -> String {
+		let lower = original.uppercased()
+
+		switch true {
+			case lower.contains("DS"):
+				return "graduationcap"
+
+			case lower.contains("AEMAM"):
+				return "radicand.squareroot"
+
+			case lower.contains("AEPHY"):
+				return "atom"
+
+			case lower.contains("AEEST"):
+				return "building.columns"
+
+			case lower.contains("AECSC"):
+				return "laptopcomputer"
+
+			case lower.contains("ADV"):
+				return "person.3"
+
+			case lower.contains("AEPAE"):
+				return "brain"
+
+			case lower.contains("AEENG"):
+				return "textformat.characters"
+
+			case lower.contains("AEMAS"):
+				return "function"
+
+			case lower.contains("MUSOS"):
+				return "music.note"
+
+			case lower.contains("AECHE"):
+				return "testtube.2"
+
+			case lower.contains("AEISL"):
+				return "character.book.closed"
+
+			case lower.contains("AELIT"):
+				return "books.vertical"
+
+			case lower.contains("AEBLY"):
+				return "leaf"
+
+			case lower.contains("MUP"):
+				return "mouth"
+
+			default:
+				return symbols.randomElement()!
+		}
+	}
+
 	func fetchCompassEvents(from store: EKEventStore, calendar: EKCalendar) async throws -> [EKEvent] {
 		let startDate = calculateNextMonday()
 		let endDate = Calendar.current.date(byAdding: .weekOfYear, value: 4, to: startDate) ?? startDate
@@ -337,10 +390,10 @@ struct CalendarImportView: View {
 		}
 
 		let timeSlots: [SlotWindow] = [
-			.init(session: 0, startHour: 8,  startMinute: 50, endHour: 9,  endMinute: 48),
-			.init(session: 1, startHour: 9,  startMinute: 48, endHour: 10, endMinute: 46),
-			.init(session: 3, startHour: 11, startMinute: 8,  endHour: 12, endMinute: 6),
-			.init(session: 4, startHour: 12, startMinute: 6,  endHour: 13, endMinute: 4),
+			.init(session: 0, startHour: 8, startMinute: 50, endHour: 9, endMinute: 48),
+			.init(session: 1, startHour: 9, startMinute: 48, endHour: 10, endMinute: 46),
+			.init(session: 3, startHour: 11, startMinute: 8, endHour: 12, endMinute: 6),
+			.init(session: 4, startHour: 12, startMinute: 6, endHour: 13, endMinute: 4),
 			.init(session: 6, startHour: 13, startMinute: 34, endHour: 14, endMinute: 32),
 			.init(session: 7, startHour: 14, startMinute: 32, endHour: 15, endMinute: 30),
 		]
@@ -355,7 +408,7 @@ struct CalendarImportView: View {
 			else { continue }
 
 			let weekday = calendar.component(.weekday, from: event.startDate)
-			guard (2...6).contains(weekday) else { continue } // Mon...Fri
+			guard (2 ... 6).contains(weekday) else { continue } // Mon...Fri
 
 			let day = weekday - 2 // Mon = 0, Tue = 1, ..., Fri = 4
 			let dayStart = calendar.startOfDay(for: event.startDate)
@@ -386,145 +439,9 @@ struct CalendarImportView: View {
 					color: AvailableColors.allCases.randomElement()!.SwiftUIColor
 				)
 
-				let symbols: [String] = [
-					"pencil.and.scribble",
-					"pencil.tip.crop.circle.badge.arrow.forward",
-					"trash.slash.fill",
-					"folder.badge.plus",
-					"folder.fill.badge.gearshape",
-					"paperplane",
-					"tray.full.fill",
-					"externaldrive.badge.minus",
-					"externaldrive.fill.badge.person.crop",
-					"opticaldiscdrive",
-					"xmark.bin.circle.fill",
-					"document.badge.arrow.up",
-					"arrow.up.document.fill",
-					"arrow.trianglehead.2.clockwise.rotate.90.page.on.clipboard",
-					"heart.text.clipboard.fill",
-					"text.pad.header.badge.clock",
-					"calendar.badge.lock",
-					"11.calendar",
-					"22.calendar",
-					"book",
-					"book.closed.fill",
-					"magazine",
-					"bookmark.square.fill",
-					"backpack",
-					"link",
-					"person.2.badge.key.fill",
-					"oar.2.crossed.circle",
-					"baseball.fill",
-					"american.football.professional",
-					"rugbyball.circle.fill",
-					"cricket.ball.circle.fill",
-					"skis",
-					"trophy.circle",
-					"umbrella.circle.fill",
-					"speaker.plus",
-					"speaker.wave.1",
-					"speaker.trianglebadge.exclamationmark.fill",
-					"arrow.up.left.and.down.right.magnifyingglass",
-					"shield.lefthalf.filled.trianglebadge.exclamationmark",
-					"flag.circle.fill",
-					"flag.pattern.checkered.circle.fill",
-					"bell.circle",
-					"bell.badge.waveform.slash.fill",
-					"tag.circle",
-					"flashlight.on.fill",
-					"camera.shutter.button.fill",
-					"gearshape.fill",
-					"bag.badge.plus",
-					"cart.fill.badge.plus",
-					"creditcard.circle",
-					"wand.and.outline",
-					"dial.medium.fill",
-					"gauge.with.dots.needle.50percent",
-					"die.face.2",
-					"pianokeys.inverse",
-					"hammer.fill",
-					"scroll.fill",
-					"printer.fill",
-					"faxmachine",
-					"case.fill",
-					"suitcase.rolling",
-					"suitcase.rolling.and.film.circle.fill",
-					"puzzlepiece.extension",
-					"lightbulb.min.fill",
-					"fan.oscillation",
-					"fan.badge.arrow.up.and.down.and.arrow.left.and.right.fill",
-					"lamp.table",
-					"light.recessed.3.fill",
-					"chandelier",
-					"light.beacon.min.fill",
-					"door.left.hand.open",
-					"door.garage.closed.trianglebadge.exclamationmark",
-					"air.purifier",
-					"heater.vertical.fill",
-					"drop.keypad.rectangle",
-					"hifireceiver.fill",
-					"laser.burst",
-					"bed.double.circle.fill",
-					"cabinet",
-					"dryer.circle.fill",
-					"microwave",
-					"sink.fill",
-					"tent.2.circle",
-					"signpost.left.fill",
-					"signpost.and.arrowtriangle.up",
-					"lock.fill",
-					"lock.rectangle.stack",
-					"exclamationmark.lock.fill",
-					"lock.rotation",
-					"key.radiowaves.forward.slash.fill",
-					"pin.square.fill",
-					"mappin.and.ellipse",
-					"opticaldisc",
-					"backpack.sensor.tag.radiowaves.left.and.right.fill",
-					"umbrella.sensor.tag.radiowaves.left.and.right",
-					"headset",
-					"earbuds.in.ear.left",
-					"antenna.radiowaves.left.and.right.slash",
-					"helmet",
-					"fuelpump.exclamationmark.fill",
-					"ev.charger.slash.fill",
-					"shoe.arrow.trianglehead.up.and.down",
-					"batteryblock.fill",
-					"batteryblock.stack",
-					"minus.plus.batteryblock.stack.arrowtriangle.left.fill",
-					"horn.fill",
-					"ev.plug.dc.ccs1",
-					"medical.thermometer.fill",
-					"pills",
-					"teddybear",
-					"hat.cap",
-					"shoe.fill",
-					"movieclapper",
-					"sunglasses.fill",
-					"cube.circle.fill",
-					"clock.badge",
-					"clock.badge.airplane.fill",
-					"gauge.with.needle",
-					"gamecontroller.circle.fill",
-					"takeoutbag.and.cup.and.straw",
-					"fork.knife",
-					"scalemass",
-					"hourglass",
-					"australiandollarsign.bank.building.fill",
-					"chineseyuanrenminbisign.bank.building",
-					"dongsign.bank.building.fill",
-					"hryvniasign.bank.building",
-					"malaysianringgitsign.bank.building.fill",
-					"pesetasign.bank.building",
-					"shekelsign.bank.building.fill",
-					"turkishlirasign.bank.building",
-					"binoculars.circle",
-					"exclamationmark.shield.fill"
-				]
-
 				classMap[title] = (
 					color: randomColor,
-					symbol: symbols.randomElement()!,
+					symbol: "nothing for now",
 					slots: []
 				)
 			}
@@ -554,3 +471,139 @@ struct CalendarImportView: View {
 			CalendarImportView()
 		}
 }
+
+let symbols: [String] = [
+	"pencil.and.scribble",
+	"pencil.tip.crop.circle.badge.arrow.forward",
+	"trash.slash.fill",
+	"folder.badge.plus",
+	"folder.fill.badge.gearshape",
+	"paperplane",
+	"tray.full.fill",
+	"externaldrive.badge.minus",
+	"externaldrive.fill.badge.person.crop",
+	"opticaldiscdrive",
+	"xmark.bin.circle.fill",
+	"document.badge.arrow.up",
+	"arrow.up.document.fill",
+	"arrow.trianglehead.2.clockwise.rotate.90.page.on.clipboard",
+	"heart.text.clipboard.fill",
+	"text.pad.header.badge.clock",
+	"calendar.badge.lock",
+	"11.calendar",
+	"22.calendar",
+	"book",
+	"book.closed.fill",
+	"magazine",
+	"bookmark.square.fill",
+	"backpack",
+	"link",
+	"person.2.badge.key.fill",
+	"oar.2.crossed.circle",
+	"baseball.fill",
+	"american.football.professional",
+	"rugbyball.circle.fill",
+	"cricket.ball.circle.fill",
+	"skis",
+	"trophy.circle",
+	"umbrella.circle.fill",
+	"speaker.plus",
+	"speaker.wave.1",
+	"speaker.trianglebadge.exclamationmark.fill",
+	"arrow.up.left.and.down.right.magnifyingglass",
+	"shield.lefthalf.filled.trianglebadge.exclamationmark",
+	"flag.circle.fill",
+	"flag.pattern.checkered.circle.fill",
+	"bell.circle",
+	"bell.badge.waveform.slash.fill",
+	"tag.circle",
+	"flashlight.on.fill",
+	"camera.shutter.button.fill",
+	"gearshape.fill",
+	"bag.badge.plus",
+	"cart.fill.badge.plus",
+	"creditcard.circle",
+	"wand.and.outline",
+	"dial.medium.fill",
+	"gauge.with.dots.needle.50percent",
+	"die.face.2",
+	"pianokeys.inverse",
+	"hammer.fill",
+	"scroll.fill",
+	"printer.fill",
+	"faxmachine",
+	"case.fill",
+	"suitcase.rolling",
+	"suitcase.rolling.and.film.circle.fill",
+	"puzzlepiece.extension",
+	"lightbulb.min.fill",
+	"fan.oscillation",
+	"fan.badge.arrow.up.and.down.and.arrow.left.and.right.fill",
+	"lamp.table",
+	"light.recessed.3.fill",
+	"chandelier",
+	"light.beacon.min.fill",
+	"door.left.hand.open",
+	"door.garage.closed.trianglebadge.exclamationmark",
+	"air.purifier",
+	"heater.vertical.fill",
+	"drop.keypad.rectangle",
+	"hifireceiver.fill",
+	"laser.burst",
+	"bed.double.circle.fill",
+	"cabinet",
+	"dryer.circle.fill",
+	"microwave",
+	"sink.fill",
+	"tent.2.circle",
+	"signpost.left.fill",
+	"signpost.and.arrowtriangle.up",
+	"lock.fill",
+	"lock.rectangle.stack",
+	"exclamationmark.lock.fill",
+	"lock.rotation",
+	"key.radiowaves.forward.slash.fill",
+	"pin.square.fill",
+	"mappin.and.ellipse",
+	"opticaldisc",
+	"backpack.sensor.tag.radiowaves.left.and.right.fill",
+	"umbrella.sensor.tag.radiowaves.left.and.right",
+	"headset",
+	"earbuds.in.ear.left",
+	"antenna.radiowaves.left.and.right.slash",
+	"helmet",
+	"fuelpump.exclamationmark.fill",
+	"ev.charger.slash.fill",
+	"shoe.arrow.trianglehead.up.and.down",
+	"batteryblock.fill",
+	"batteryblock.stack",
+	"minus.plus.batteryblock.stack.arrowtriangle.left.fill",
+	"horn.fill",
+	"ev.plug.dc.ccs1",
+	"medical.thermometer.fill",
+	"pills",
+	"teddybear",
+	"hat.cap",
+	"shoe.fill",
+	"movieclapper",
+	"sunglasses.fill",
+	"cube.circle.fill",
+	"clock.badge",
+	"clock.badge.airplane.fill",
+	"gauge.with.needle",
+	"gamecontroller.circle.fill",
+	"takeoutbag.and.cup.and.straw",
+	"fork.knife",
+	"scalemass",
+	"hourglass",
+	"australiandollarsign.bank.building.fill",
+	"chineseyuanrenminbisign.bank.building",
+	"dongsign.bank.building.fill",
+	"hryvniasign.bank.building",
+	"malaysianringgitsign.bank.building.fill",
+	"pesetasign.bank.building",
+	"shekelsign.bank.building.fill",
+	"turkishlirasign.bank.building",
+	"binoculars.circle",
+	"exclamationmark.shield.fill",
+]

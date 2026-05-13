@@ -91,7 +91,7 @@ struct WidgetView: View {
 						.fill(.clear)
 				} else {
 					if let c = classLookup["\(day)-\(session)"] {
-						if day == 0 && session == 7 {
+						if day == 0, session == 7 {
 							VStack(alignment: .leading) {
 								switch displayMode {
 									case .symbolsOnly:

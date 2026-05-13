@@ -26,10 +26,10 @@ struct RGBAColor: Codable, Hashable, Defaults.Serializable {
 	}
 
 	init(red: Double, green: Double, blue: Double, alpha: Double) {
-		self.r = red
-		self.g = green
-		self.b = blue
-		self.a = alpha
+		r = red
+		g = green
+		b = blue
+		a = alpha
 	}
 
 	init(color: Color) {
@@ -54,9 +54,9 @@ struct RGBAColor: Codable, Hashable, Defaults.Serializable {
 		var rgb: UInt64 = 0
 		scanner.scanHexInt64(&rgb)
 
-		let r = Double((rgb >> 16) & 0xFF)/255.0
-		let g = Double((rgb >> 8) & 0xFF)/255.0
-		let b = Double(rgb & 0xFF)/255.0
+		let r = Double((rgb >> 16) & 0xFF) / 255.0
+		let g = Double((rgb >> 8) & 0xFF) / 255.0
+		let b = Double(rgb & 0xFF) / 255.0
 
 		self.init(r: r, g: g, b: b, a: 1.0)
 	}

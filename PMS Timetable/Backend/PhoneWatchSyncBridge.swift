@@ -5,10 +5,9 @@
 //  Created by Adon Omeri on 27/4/2026.
 //
 
+import Combine
 import Foundation
 import WatchConnectivity
-import Combine
-
 
 final class PhoneWatchSyncBridge: NSObject, ObservableObject, WCSessionDelegate {
 	@Published var lastError: String?
@@ -63,7 +62,7 @@ final class PhoneWatchSyncBridge: NSObject, ObservableObject, WCSessionDelegate 
 		print("[iOS] updateApplicationContext sent with displayMode: \(displayMode.rawValue)")
 	}
 
-	func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+	func session(_: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
 		print("[iOS] WC activation completed with state: \(activationState.rawValue)")
 		if let error {
 			print("[iOS] WC activation error: \(error.localizedDescription)")
@@ -73,7 +72,7 @@ final class PhoneWatchSyncBridge: NSObject, ObservableObject, WCSessionDelegate 
 		}
 	}
 
-	func sessionDidBecomeInactive(_ session: WCSession) {
+	func sessionDidBecomeInactive(_: WCSession) {
 		print("[iOS] WC session became inactive")
 	}
 

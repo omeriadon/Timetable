@@ -6,10 +6,10 @@
 //
 
 import Combine
+import Defaults
 import SwiftUI
 import WatchConnectivity
 import WidgetKit
-import Defaults
 
 struct ContentView: View {
 	@StateObject private var syncStore = WatchTimetableSyncStore()
@@ -106,7 +106,6 @@ struct ContentView: View {
 		}
 	}
 
-	@ViewBuilder
 	func sessionCell(_ day: Int, _ session: Int) -> some View {
 		Group {
 			if session == 2 || session == 5 {
@@ -211,7 +210,7 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 		print("[Watch] WCSession activate() called")
 	}
 
-	func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+	func session(_: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
 		print("[Watch] WC activation completed with state: \(activationState.rawValue)")
 		if let error {
 			print("[Watch] WC activation error: \(error.localizedDescription)")
@@ -225,17 +224,17 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 		print("[Watch] Reachability changed: \(session.isReachable)")
 	}
 
-	func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
+	func session(_: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
 		print("[Watch] didReceiveApplicationContext")
 		handleIncomingPayload(applicationContext, source: "applicationContext")
 	}
 
-	func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
+	func session(_: WCSession, didReceiveMessage message: [String: Any]) {
 		print("[Watch] didReceiveMessage")
 		handleIncomingPayload(message, source: "message")
 	}
 
-	func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
+	func session(_: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
 		print("[Watch] didReceiveMessage with replyHandler")
 		handleIncomingPayload(message, source: "message")
 		replyHandler(["status": "ok"])
@@ -305,7 +304,7 @@ struct rectangle<Content: View>: View {
 	init(_ fill: Color, _ isBreak: Bool = false) where Content == EmptyView {
 		self.fill = fill
 		self.isBreak = isBreak
-		self.content = EmptyView()
+		content = EmptyView()
 	}
 
 	var body: some View {
