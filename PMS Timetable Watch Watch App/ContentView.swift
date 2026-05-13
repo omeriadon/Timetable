@@ -286,40 +286,6 @@ final class WatchTimetableSyncStore: NSObject, ObservableObject, WCSessionDelega
 	}
 }
 
-struct rectangle<Content: View>: View {
-	let fill: Color
-	let isBreak: Bool
-	let content: Content
-
-	init(
-		_ fill: Color,
-		_ isBreak: Bool = false,
-		@ViewBuilder content: () -> Content
-	) {
-		self.fill = fill
-		self.isBreak = isBreak
-		self.content = content()
-	}
-
-	init(_ fill: Color, _ isBreak: Bool = false) where Content == EmptyView {
-		self.fill = fill
-		self.isBreak = isBreak
-		content = EmptyView()
-	}
-
-	var body: some View {
-		VStack(alignment: .leading) {
-			content
-				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-		}
-		.padding(2)
-		.glassEffect(
-			!isBreak ? .clear.tint(fill).interactive() : .identity,
-			in: RoundedRectangle(cornerRadius: isBreak ? 1 : 4)
-		)
-	}
-}
-
 #Preview {
 	ContentView()
 }
