@@ -440,7 +440,7 @@ struct ClassEditorSheet: View {
 				} label: {
 					Label("Delete Class", systemImage: "trash")
 						.font(.title3)
-						.padding(5)
+						.padding(10)
 						.labelStyle(.iconOnly)
 				}
 				.buttonStyle(.plain)
