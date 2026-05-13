@@ -211,8 +211,6 @@ struct SharedTimetableImportSheet: View {
 	}
 }
 
-
-
 #Preview {
 	ContentView()
 }

@@ -8,72 +8,72 @@
 import SwiftUI
 
 #if os(iOS)
-struct rectangle<Content: View>: View {
-	let fill: Color
-	let isBreak: Bool
-	let content: Content
+	struct rectangle<Content: View>: View {
+		let fill: Color
+		let isBreak: Bool
+		let content: Content
 
-	init(
-		_ fill: Color,
-		_ isBreak: Bool = false,
-		@ViewBuilder content: () -> Content
-	) {
-		self.fill = fill
-		self.isBreak = isBreak
-		self.content = content()
-	}
-
-	init(_ fill: Color, _ isBreak: Bool = false) where Content == EmptyView {
-		self.fill = fill
-		self.isBreak = isBreak
-		content = EmptyView()
-	}
-
-	var body: some View {
-		VStack(alignment: .leading) {
-			content
-				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+		init(
+			_ fill: Color,
+			_ isBreak: Bool = false,
+			@ViewBuilder content: () -> Content
+		) {
+			self.fill = fill
+			self.isBreak = isBreak
+			self.content = content()
 		}
-		.padding(5)
-		.glassEffect(
-			!isBreak ? .clear.tint(fill).interactive() : .identity,
-			in: RoundedRectangle(cornerRadius: isBreak ? 8 : 10)
-		)
+
+		init(_ fill: Color, _ isBreak: Bool = false) where Content == EmptyView {
+			self.fill = fill
+			self.isBreak = isBreak
+			content = EmptyView()
+		}
+
+		var body: some View {
+			VStack(alignment: .leading) {
+				content
+					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+			}
+			.padding(5)
+			.glassEffect(
+				!isBreak ? .clear.tint(fill).interactive() : .identity,
+				in: RoundedRectangle(cornerRadius: isBreak ? 8 : 10)
+			)
+		}
 	}
-}
 
 #elseif os(watchOS)
-struct rectangle<Content: View>: View {
-	let fill: Color
-	let isBreak: Bool
-	let content: Content
+	struct rectangle<Content: View>: View {
+		let fill: Color
+		let isBreak: Bool
+		let content: Content
 
-	init(
-		_ fill: Color,
-		_ isBreak: Bool = false,
-		@ViewBuilder content: () -> Content
-	) {
-		self.fill = fill
-		self.isBreak = isBreak
-		self.content = content()
-	}
-
-	init(_ fill: Color, _ isBreak: Bool = false) where Content == EmptyView {
-		self.fill = fill
-		self.isBreak = isBreak
-		content = EmptyView()
-	}
-
-	var body: some View {
-		VStack(alignment: .leading) {
-			content
-				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+		init(
+			_ fill: Color,
+			_ isBreak: Bool = false,
+			@ViewBuilder content: () -> Content
+		) {
+			self.fill = fill
+			self.isBreak = isBreak
+			self.content = content()
 		}
-		.padding(2)
-		.glassEffect(
-			!isBreak ? .clear.tint(fill).interactive() : .identity,
-			in: RoundedRectangle(cornerRadius: isBreak ? 1 : 4)
-		)
+
+		init(_ fill: Color, _ isBreak: Bool = false) where Content == EmptyView {
+			self.fill = fill
+			self.isBreak = isBreak
+			content = EmptyView()
+		}
+
+		var body: some View {
+			VStack(alignment: .leading) {
+				content
+					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+			}
+			.padding(2)
+			.glassEffect(
+				!isBreak ? .clear.tint(fill).interactive() : .identity,
+				in: RoundedRectangle(cornerRadius: isBreak ? 1 : 4)
+			)
+		}
 	}
-}
 #endif
