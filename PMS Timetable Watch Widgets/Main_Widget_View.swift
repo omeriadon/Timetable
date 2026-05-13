@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct WidgetView: View {
+struct Main_Widget_View: View {
 	let classes: [Class]
 	let displayMode: DisplayMode
 

@@ -105,6 +105,13 @@
 			);
 			target = 2A1DB4172F9ECEC100E5AE7C /* PMS Timetable Watch WidgetsExtension */;
 		};
+		2A6C4D952FB49B9500AF182B /* Exceptions for "PMS Timetable Watch Widgets" folder in "PMS Timetable" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Shared.swift,
+			);
+			target = 2A02378A2F9C8EA000AB1E1F /* PMS Timetable */;
+		};
 		2AAE2F532FA1A00500E050A2 /* Exceptions for "PMS Timetable Message Extension" folder in "PMS Timetable Message Extension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -143,6 +150,7 @@
 		2A1DB41D2F9ECEC100E5AE7C /* PMS Timetable Watch Widgets */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				2A6C4D952FB49B9500AF182B /* Exceptions for "PMS Timetable Watch Widgets" folder in "PMS Timetable" target */,
 				2A1DB4282F9ECEC300E5AE7C /* Exceptions for "PMS Timetable Watch Widgets" folder in "PMS Timetable Watch WidgetsExtension" target */,
 			);
 			path = "PMS Timetable Watch Widgets";

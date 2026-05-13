@@ -12,5 +12,6 @@ import WidgetKit
 struct PMS_Timetable_Watch_WidgetsBundle: WidgetBundle {
 	var body: some Widget {
 		PMS_Timetable_Watch_Widgets()
+		PMS_Timetable_Watch_Widgets_Time_Left()
 	}
 }
