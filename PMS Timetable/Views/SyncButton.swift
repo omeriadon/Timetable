@@ -13,7 +13,6 @@ struct SyncButton: View {
 	let action: () -> Void
 
 	var body: some View {
-		// Only show if the timetable has been modified
 		if !isDefaultTimetable {
 			Button(action: action) {
 				ZStack {
@@ -35,8 +34,8 @@ struct SyncButton: View {
 				.foregroundStyle(.white)
 				.animation(.easeInOut, value: syncStatus)
 			}
+			.buttonBorderShape(.circle)
 			.buttonStyle(.glassProminent)
-			// Disables button interaction while syncing
 			.disabled(syncStatus == .loading)
 		}
 	}
