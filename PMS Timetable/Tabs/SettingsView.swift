@@ -20,6 +20,8 @@ struct SettingsView: View {
 	@Binding var syncStatus: SyncMode
 
 	@State private var showCalendarImportSheet = false
+	@State private var timetableToDelete: ReceivedTimetable?
+	@State private var showDeleteConfirmation = false
 
 	var body: some View {
 		NavigationStack {
@@ -88,6 +90,14 @@ struct SettingsView: View {
 					.presentationDetents([.fraction(1 / 3)])
 					.presentationDragIndicator(.hidden)
 			}
+			.alert("Delete Timetable?", isPresented: $showDeleteConfirmation, presenting: timetableToDelete) { timetable in
+				Button("Cancel", role: .cancel) {}
+				Button("Delete", role: .destructive) {
+					receivedTimetables.removeAll { $0.id == timetable.id }
+				}
+			} message: { timetable in
+				Text("Are you sure you want to delete \(timetable.sender)'s timetable?")
+			}
 		}
 	}
 
@@ -105,6 +115,13 @@ struct SettingsView: View {
 						.foregroundStyle(.secondary)
 				}
 				.listRowBackground(Rectangle().fill(.ultraThinMaterial))
+			}
+			.onDelete { indexSet in
+				for index in indexSet {
+					let timetable = receivedTimetables[index]
+					timetableToDelete = timetable
+					showDeleteConfirmation = true
+				}
 			}
 		}
 	}

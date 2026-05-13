@@ -50,11 +50,11 @@ struct ContentView: View {
 
 	var body: some View {
 		TabView(selection: $selectedTab) {
-			Tab("", systemSymbol: .calendar, value: 0) {
+			Tab("Timetable", systemSymbol: .calendar, value: 0) {
 				TimetableView(watchSync: watchSync, syncStatus: $rootSyncStatus)
 			}
 
-			Tab("", systemSymbol: .gear, value: 1) {
+			Tab("Settings", systemSymbol: .gear, value: 1) {
 				SettingsView(watchSync: watchSync, syncStatus: $rootSyncStatus)
 			}
 		}
@@ -105,7 +105,6 @@ struct ContentView: View {
 
 	private func importSharedTimetable(_ timetable: ReceivedTimetable) {
 		var existing = receivedTimetables
-		existing.removeAll { $0.sender == timetable.sender }
 		existing.append(timetable)
 		receivedTimetables = existing
 		selectedTab = 1

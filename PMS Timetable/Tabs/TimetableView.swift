@@ -13,15 +13,32 @@ struct TimetableView: View {
 
 	@Default(.timetable) var classes
 	@Default(.receivedTimetables) var receivedTimetables
+	@Default(.userDisplayName) var userDisplayName
 	@Default(.displayMode) var displayMode
 
 	@State private var showingEditor = false
 	@State private var editorRequest: EditorRequest?
+	@State private var isEditMode = false
+	@State private var selectedTimetableIndex: Int?
+	@State private var showTimetableComparison = false
 
 	@Binding var syncStatus: SyncMode
 
+	var currentTimetable: [Class] {
+		selectedTimetableIndex.flatMap { idx in
+			receivedTimetables.indices.contains(idx) ? receivedTimetables[idx].classes : nil
+		} ?? classes
+	}
+
+	var currentTimetableTitle: String {
+		if let idx = selectedTimetableIndex {
+			return "\(receivedTimetables[idx].sender)'s Timetable"
+		}
+		return "PMS Timetable"
+	}
+
 	var body: some View {
-		let classLookup = TimetableLayout.classLookup(for: classes)
+		let classLookup = TimetableLayout.classLookup(for: currentTimetable)
 
 		NavigationStack {
 			VStack {
@@ -42,27 +59,61 @@ struct TimetableView: View {
 				Spacer(minLength: 1)
 					.toolbar {
 						ToolbarItem(placement: .topBarLeading) {
-							Button {
-								openEditor()
-							} label: {
-								Label("Edit", systemImage: "pencil")
+							Toggle(isOn: $isEditMode) {
+								Image(systemName: "pencil")
+									.foregroundStyle(.primary)
 							}
 						}
 
 						ToolbarItem(placement: .principal) {
-							Text("PMS Timetable")
+							Text(currentTimetableTitle)
 								.monospaced()
+								.contentTransition(.numericText())
 						}
 
-						if classes != defaultTimetable {
+						if !receivedTimetables.isEmpty {
+							ToolbarItem(placement: .topBarTrailing) {
+								Menu {
+									Button {
+										selectedTimetableIndex = nil
+									} label: {
+										HStack {
+											if selectedTimetableIndex == nil {
+												Image(systemName: "checkmark")
+											}
+											Text("Your Timetable")
+										}
+									}
+
+									if !receivedTimetables.isEmpty {
+										Divider()
+
+										ForEach(receivedTimetables.indices, id: \.self) { idx in
+											Button {
+												selectedTimetableIndex = idx
+											} label: {
+												HStack {
+													if selectedTimetableIndex == idx {
+														Image(systemName: "checkmark")
+													}
+													Text(receivedTimetables[idx].sender)
+												}
+											}
+										}
+									}
+								} label: {
+									Image(systemName: "person.2")
+								}
+							}
+						} else if currentTimetable != defaultTimetable {
 							ToolbarItem(placement: .topBarTrailing) {
 								SyncButton(
 									syncStatus: syncStatus,
-									isDefaultTimetable: classes == defaultTimetable,
+									isDefaultTimetable: currentTimetable == defaultTimetable,
 									action: {
 										Task {
 											await syncToWatchAsync(
-												classes: classes,
+												classes: currentTimetable,
 												displayMode: displayMode,
 												watchSync: watchSync,
 												statusUpdate: { syncStatus = $0 }
@@ -105,7 +156,109 @@ struct TimetableView: View {
 				.presentationDragIndicator(.visible)
 				.interactiveDismissDisabled()
 			}
+			.sheet(isPresented: $showTimetableComparison) {
+				timetableComparisonSheet
+					.presentationDetents([.fraction(0.5)])
+					.presentationDragIndicator(.visible)
+			}
 		}
+	}
+
+	private var timetableComparisonSheet: some View {
+		VStack(spacing: 0) {
+			VStack(spacing: 4) {
+				Text("Your Period")
+					.font(.headline)
+				if let yourClass = findCurrentClass(in: classes) {
+					HStack(spacing: 8) {
+						Image(systemName: yourClass.symbol)
+							.font(.title3)
+						Text(yourClass.id)
+							.font(.body)
+					}
+					.foregroundStyle(yourClass.colour.swiftUIColor)
+				} else {
+					Text("Free period")
+						.foregroundStyle(.secondary)
+				}
+			}
+			.frame(maxWidth: .infinity)
+			.padding()
+
+			Divider()
+
+			VStack(spacing: 8) {
+				Text("Other Timetables")
+					.font(.headline)
+					.padding(.top, 8)
+
+				ForEach(receivedTimetables.indices, id: \.self) { idx in
+					if let theirClass = findCurrentClass(in: receivedTimetables[idx].classes) {
+						VStack(alignment: .leading, spacing: 2) {
+							Text(receivedTimetables[idx].sender)
+								.font(.caption)
+								.foregroundStyle(.secondary)
+							HStack(spacing: 8) {
+								Image(systemName: theirClass.symbol)
+									.font(.caption)
+								Text(theirClass.id)
+									.font(.body)
+							}
+							.foregroundStyle(theirClass.colour.swiftUIColor)
+						}
+						.frame(maxWidth: .infinity, alignment: .leading)
+						.padding(.horizontal)
+					} else {
+						VStack(alignment: .leading, spacing: 2) {
+							Text(receivedTimetables[idx].sender)
+								.font(.caption)
+								.foregroundStyle(.secondary)
+							Text("Free period")
+								.font(.body)
+								.foregroundStyle(.secondary)
+						}
+						.frame(maxWidth: .infinity, alignment: .leading)
+						.padding(.horizontal)
+					}
+				}
+			}
+			.frame(maxWidth: .infinity, alignment: .leading)
+			.padding()
+
+			Spacer()
+		}
+	}
+
+	private func findCurrentClass(in timetable: [Class]) -> Class? {
+		let today = Date()
+		let weekday = Calendar.current.component(.weekday, from: today)
+		let dayIndex = (weekday + 5) % 7
+
+		guard dayIndex < 5 else { return nil }
+
+		let hour = Calendar.current.component(.hour, from: today)
+		let minute = Calendar.current.component(.minute, from: today)
+		let timeInMinutes = hour * 60 + minute
+
+		let periodSchedule = [
+			(8, 50, 9, 48), // Period 1
+			(9, 48, 10, 46), // Period 2
+			(11, 8, 12, 6), // Period 3
+			(12, 6, 13, 4), // Period 4
+			(13, 34, 14, 32), // Period 5
+			(14, 32, 15, 30), // Period 6
+		]
+
+		for (sessionIndex, (startH, startM, endH, endM)) in periodSchedule.enumerated() {
+			let startMinutes = startH * 60 + startM
+			let endMinutes = endH * 60 + endM
+
+			if timeInMinutes >= startMinutes, timeInMinutes < endMinutes {
+				let classLookup = TimetableLayout.classLookup(for: timetable)
+				return classLookup[Slot(dayIndex, sessionIndex)]
+			}
+		}
+		return nil
 	}
 
 	func mainContent(classLookup: [Slot: Class]) -> some View {
@@ -143,7 +296,11 @@ struct TimetableView: View {
 						}
 						.frame(height: 60)
 						.onTapGesture {
-							openEditor(focusingClassName: c.id)
+							if isEditMode {
+								openEditor(focusingClassName: c.id)
+							} else if !receivedTimetables.isEmpty {
+								showTimetableComparison = true
+							}
 						}
 
 					} else {
@@ -151,7 +308,11 @@ struct TimetableView: View {
 							.fill(.white.opacity(0.05))
 							.frame(height: 60)
 							.onTapGesture {
-								openEditorForEmptySlot(day: day, session: session)
+								if isEditMode {
+									openEditorForEmptySlot(day: day, session: session)
+								} else if !receivedTimetables.isEmpty {
+									showTimetableComparison = true
+								}
 							}
 					}
 				}
