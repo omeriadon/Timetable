@@ -35,7 +35,7 @@ struct TimetableView: View {
 		if let idx = selectedTimetableIndex {
 			return "\(receivedTimetables[idx].sender)'s Timetable"
 		}
-		return "PMS Timetable"
+		return "Timetable"
 	}
 
 	var body: some View {
@@ -101,13 +101,12 @@ struct TimetableView: View {
 									}
 								} label: {
 									Image(systemName: "person.2")
-										.padding(10)
-										.glassEffect(.clear.tint(selectedTimetableIndex == nil ? .clear : .blue).interactive(), in: Circle())
+										.tint(selectedTimetableIndex == nil ? nil : .blue)
 								}
 							}
-							.sharedBackgroundVisibility(.hidden)
+						}
 
-						} else if currentTimetable != defaultTimetable {
+						if currentTimetable == defaultTimetable {
 							ToolbarItem(placement: .topBarTrailing) {
 								SyncButton(
 									syncStatus: syncStatus,
@@ -197,8 +196,7 @@ struct TimetableView: View {
 			Divider()
 
 			Text("Other Timetables")
-				.font(.title2)
-				.padding(.top, 8)
+				.font(.title3)
 
 			VStack(spacing: 8) {
 				ForEach(receivedTimetables.indices, id: \.self) { idx in
