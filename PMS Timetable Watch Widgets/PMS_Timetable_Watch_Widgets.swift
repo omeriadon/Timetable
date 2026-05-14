@@ -37,6 +37,10 @@ struct PMS_Timetable_Watch_Widgets: Widget {
 	TimetableEntry(
 		date: .now,
 		classes: defaultTimetable,
-		displayMode: .symbolsOnly
+		displayMode: .symbolsOnly,
+		relevance: TimelineEntryRelevance(
+			score: 1.0,
+			duration: 60 * 60
+		)
 	)
 }

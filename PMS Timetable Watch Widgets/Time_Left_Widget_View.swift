@@ -8,49 +8,55 @@ struct Time_Left_Widget_View: View {
 		let classLookup = TimetableLayout.classLookup(for: entry.classes)
 		let state = getSchoolState(at: entry.date, classLookup: classLookup)
 
-		// Debug: Check if the lookup table even has data
-		let _ = print("DEBUG: classLookup count = \(classLookup.count)")
-
 		Group {
 			switch state {
-				case let .inClass(current, next, info):
-					let _ = print("DEBUG: View State -> In Class: \(current?.id ?? "NIL")")
+				case let .inClass(current, nextText, info):
 					createProgressView(
 						title: current?.id ?? "Free Period",
 						symbol: current?.symbol ?? "studentdesk",
 						color: current?.colour.swiftUIColor ?? .gray,
-						nextText: next != nil ? "Next: \(next!.id)" : "Next: Home",
+						nextText: nextText,
 						start: info.start,
 						end: info.end
 					)
 
-				case let .inBreak(title, next, info):
-					let _ = print("DEBUG: View State -> In Break: \(title)")
+				case let .inBreak(title, nextText, info):
 					createProgressView(
 						title: title,
 						symbol: title == "Lunch" ? "takeoutbag.and.cup.and.straw.fill" : "cup.and.saucer.fill",
 						color: .orange,
-						nextText: next != nil ? "Next: \(next!.id)" : "Last Period",
+						nextText: nextText,
 						start: info.start,
 						end: info.end
 					)
 
 				case .outsideSchool:
-					let _ = print("DEBUG: View State -> Outside School")
 					VStack(alignment: .leading) {
-						Label("School's Out", systemImage: "house.fill").font(.headline).foregroundColor(.indigo)
-						Text("No more classes").font(.system(size: 10)).foregroundColor(.secondary)
+						Label("School's Out", systemImage: "house.fill")
+							.font(.headline)
+							.foregroundColor(.indigo)
+
+						Text("No more classes")
+							.font(.system(size: 10))
+							.foregroundColor(.secondary)
 					}
 			}
 		}
 	}
 
-	private func createProgressView(title: String, symbol: String, color: Color, nextText: String, start: Date, end: Date) -> some View {
+	private func createProgressView(
+		title: String,
+		symbol: String,
+		color: Color,
+		nextText: String,
+		start: Date,
+		end: Date
+	) -> some View {
 		ZStack(alignment: .leading) {
 			GeometryReader { geo in
 				let total = end.timeIntervalSince(start)
 				let elapsed = Date().timeIntervalSince(start)
-				let progress = max(0, min(1, elapsed / total))
+				let progress = total > 0 ? max(0, min(1, elapsed / total)) : 0
 
 				VStack {
 					Rectangle()
@@ -86,8 +92,8 @@ struct Time_Left_Widget_View: View {
 }
 
 enum SchoolState {
-	case inClass(current: Class?, next: Class?, info: (start: Date, end: Date))
-	case inBreak(title: String, next: Class?, info: (start: Date, end: Date))
+	case inClass(current: Class?, nextText: String, info: (start: Date, end: Date))
+	case inBreak(title: String, nextText: String, info: (start: Date, end: Date))
 	case outsideSchool
 }
 
@@ -96,68 +102,99 @@ private func getSchoolState(at date: Date, classLookup: [Slot: Class]) -> School
 	let weekday = calendar.component(.weekday, from: date)
 	let dayIndex = (weekday + 5) % 7
 
-	let hour = calendar.component(.hour, from: date)
-	let minute = calendar.component(.minute, from: date)
-	let nowMins = hour * 60 + minute
-
-	print("--- TIMETABLE DEBUG START ---")
-	print("DEBUG: Current Time: \(hour):\(minute) (\(nowMins) mins)")
-	print("DEBUG: Weekday: \(weekday), Calculated dayIndex: \(dayIndex)")
-
 	guard dayIndex < 5 else {
-		print("DEBUG: Rejected - Weekend")
 		return .outsideSchool
 	}
 
-	// 1. Check Classes
-	for (i, period) in periodTimes.enumerated() {
-		let startMins = period.start.hour * 60 + period.start.min
-		let endMins = period.end.hour * 60 + period.end.min
+	let nowMins = calendar.component(.hour, from: date) * 60 + calendar.component(.minute, from: date)
+
+	for (index, period) in periodTimes.enumerated() {
+		let startMins = minutes(period.start)
+		let endMins = minutes(period.end)
 
 		if nowMins >= startMins, nowMins < endMins {
-			print("DEBUG: Hit Period Index \(i) (\(startMins)-\(endMins) mins)")
-
-			let slot = Slot(dayIndex, i + 1)
-			let current = classLookup[slot]
-
-			if current == nil {
-				print("DEBUG: WARNING - Class is NIL at Slot(\(dayIndex), \(i)). This is why you see 'Free Period'.")
-			} else {
-				print("DEBUG: Found Class: \(current!.id)")
-			}
-
-			let next = (i + 1 < periodTimes.count) ? classLookup[Slot(dayIndex, i + 3)] : nil
+			let current = classForPeriod(index, dayIndex: dayIndex, classLookup: classLookup)
+			let nextText = nextTextAfterClass(periodIndex: index, dayIndex: dayIndex, classLookup: classLookup)
 			let dates = getDates(start: period.start, end: period.end, relativeTo: date)
-			return .inClass(current: current, next: next, info: dates)
+			return .inClass(current: current, nextText: nextText, info: dates)
+		}
+
+		if index < periodTimes.count - 1 {
+			let nextPeriod = periodTimes[index + 1]
+			let breakStart = period.end
+			let breakEnd = nextPeriod.start
+			let breakStartMins = minutes(breakStart)
+			let breakEndMins = minutes(breakEnd)
+
+			if nowMins >= breakStartMins, nowMins < breakEndMins {
+				let title = (breakEndMins - breakStartMins > 20) ? "Lunch" : "Recess"
+				let nextClass = classForPeriod(index + 1, dayIndex: dayIndex, classLookup: classLookup)
+				let nextText = "Next: \(nextClass?.id ?? "Free Period")"
+				let dates = getDates(start: breakStart, end: breakEnd, relativeTo: date)
+				return .inBreak(title: title, nextText: nextText, info: dates)
+			}
 		}
 	}
 
-	// 2. Check Breaks
-	for i in 0 ..< (periodTimes.count - 1) {
-		let currentEnd = periodTimes[i].end
-		let nextStart = periodTimes[i + 1].start
-		let bStart = currentEnd.hour * 60 + currentEnd.min
-		let bEnd = nextStart.hour * 60 + nextStart.min
-
-		if nowMins >= bStart, nowMins < bEnd {
-			print("DEBUG: Hit Break between Period \(i) and \(i + 1)")
-			let next = classLookup[Slot(dayIndex, i + 1)]
-			let title = (bEnd - bStart > 20) ? "Lunch" : "Recess"
-			let dates = getDates(start: currentEnd, end: nextStart, relativeTo: date)
-			return .inBreak(title: title, next: next, info: dates)
-		}
-	}
-
-	print("DEBUG: No period or break matched. Returning OutsideSchool.")
 	return .outsideSchool
 }
 
-private func getDates(start: (hour: Int, min: Int), end: (hour: Int, min: Int), relativeTo: Date) -> (start: Date, end: Date) {
+private func classForPeriod(_ periodIndex: Int, dayIndex: Int, classLookup: [Slot: Class]) -> Class? {
+	let periodNumber = periodIndex + 1
+	guard let session = TimetableLayout.session(forPeriod: periodNumber) else {
+		return nil
+	}
+
+	return classLookup[Slot(dayIndex, session)]
+}
+
+private func nextTextAfterClass(periodIndex: Int, dayIndex: Int, classLookup: [Slot: Class]) -> String {
+	guard periodIndex < periodTimes.count - 1 else {
+		return "Last Period"
+	}
+
+	let currentEnd = minutes(periodTimes[periodIndex].end)
+	let nextStart = minutes(periodTimes[periodIndex + 1].start)
+	let gap = nextStart - currentEnd
+
+	if gap > 0 {
+		return "Next: \(gap > 20 ? "Lunch" : "Recess")"
+	}
+
+	let nextClass = classForPeriod(periodIndex + 1, dayIndex: dayIndex, classLookup: classLookup)
+	return "Next: \(nextClass?.id ?? "Free Period")"
+}
+
+private func minutes(_ time: (hour: Int, min: Int)) -> Int {
+	time.hour * 60 + time.min
+}
+
+private func getDates(
+	start: (hour: Int, min: Int),
+	end: (hour: Int, min: Int),
+	relativeTo: Date
+) -> (start: Date, end: Date) {
 	let calendar = Calendar.current
 	var comps = calendar.dateComponents([.year, .month, .day], from: relativeTo)
-	comps.hour = start.hour; comps.minute = start.min
+
+	comps.hour = start.hour
+	comps.minute = start.min
 	let s = calendar.date(from: comps) ?? relativeTo
-	comps.hour = end.hour; comps.minute = end.min
+
+	comps.hour = end.hour
+	comps.minute = end.min
 	let e = calendar.date(from: comps) ?? relativeTo
+
 	return (s, e)
+}
+
+#Preview {
+	Time_Left_Widget_View(
+		entry: TimetableEntry(
+			date: Date(),
+			classes: defaultTimetable,
+			displayMode: .textOnly,
+			relevance: TimelineEntryRelevance(score: 1, duration: 60 * 60)
+		)
+	)
 }
