@@ -40,10 +40,8 @@ struct Provider: TimelineProvider {
 		let calendar = Calendar.current
 		let todayComponents = calendar.dateComponents([.year, .month, .day], from: now)
 
-		// 1. Initial entry for right now
 		entries.append(TimetableEntry(date: now, classes: classes, displayMode: displayMode))
 
-		// 2. Generate future entries for every period start and end time
 		for period in periodTimes {
 			var startComp = todayComponents
 			startComp.hour = period.start.hour
@@ -62,14 +60,11 @@ struct Provider: TimelineProvider {
 			}
 		}
 
-		// Fix: Correct sorting syntax and variable names
 		let sortedEntries = entries.sorted(by: { $0.date < $1.date })
 
-		// 3. Define the refresh policy (e.g., refresh tomorrow morning)
 		let tomorrow = calendar.date(byAdding: .day, value: 1, to: now)!
 		let nextDayRefresh = calendar.date(bySettingHour: 7, minute: 0, second: 0, of: tomorrow) ?? tomorrow
 
-		// Fix: Explicitly type the Timeline to help the compiler infer EntryType
 		let timeline = Timeline<TimetableEntry>(entries: sortedEntries, policy: .after(nextDayRefresh))
 		completion(timeline)
 	}
