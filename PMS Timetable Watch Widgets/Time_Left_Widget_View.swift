@@ -126,7 +126,7 @@ private func getSchoolState(at date: Date, classLookup: [Slot: Class]) -> School
 				print("DEBUG: Found Class: \(current!.id)")
 			}
 
-			let next = (i + 1 < periodTimes.count) ? classLookup[Slot(dayIndex, i + 1)] : nil
+			let next = (i + 1 < periodTimes.count) ? classLookup[Slot(dayIndex, i + 3)] : nil
 			let dates = getDates(start: period.start, end: period.end, relativeTo: date)
 			return .inClass(current: current, next: next, info: dates)
 		}
