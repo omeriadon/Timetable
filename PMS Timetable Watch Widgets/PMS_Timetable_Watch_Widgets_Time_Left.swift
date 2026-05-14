@@ -13,7 +13,7 @@ struct PMS_Timetable_Watch_WidgetsEntryView_Time_Left: View {
 	var entry: Provider.Entry
 
 	var body: some View {
-		Time_Left_Widget_View(classes: entry.classes)
+		Time_Left_Widget_View(entry: entry)
 	}
 }
 
@@ -23,7 +23,7 @@ struct PMS_Timetable_Watch_Widgets_Time_Left: Widget {
 	var body: some WidgetConfiguration {
 		StaticConfiguration(kind: kind, provider: Provider()) { entry in
 			PMS_Timetable_Watch_WidgetsEntryView_Time_Left(entry: entry)
-				.containerBackground(.clear, for: .widget)
+				.containerBackground(.ultraThinMaterial, for: .widget)
 		}
 		.contentMarginsDisabled()
 		.configurationDisplayName("Time Left in Subject")
@@ -36,7 +36,7 @@ struct PMS_Timetable_Watch_Widgets_Time_Left: Widget {
 	PMS_Timetable_Watch_Widgets_Time_Left()
 } timeline: {
 	TimetableEntry(
-		date: Date(timeIntervalSince1970: 1_778_659_200), // 2:15 PM on a weekday
+		date: Date(),
 		classes: defaultTimetable,
 		displayMode: .symbolsOnly
 	)
