@@ -1,6 +1,6 @@
 //
 //  RGBAColor.swift
-//  PMS Timetable
+//  Timetable
 //
 //  Created by Adon Omeri on 25/4/2026.
 //

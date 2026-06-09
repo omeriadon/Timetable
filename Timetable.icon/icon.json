@@ -1,0 +1,162 @@
+{
+  "features" : [
+    "refractivity"
+  ],
+  "fill" : {
+    "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
+  },
+  "groups" : [
+    {
+      "blur-material" : null,
+      "layers" : [
+        {
+          "fill-specializations" : [
+            {
+              "value" : "none"
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
+              }
+            }
+          ],
+          "image-name" : "Image 7.svg",
+          "name" : "graduationcap",
+          "position" : {
+            "scale" : 2,
+            "translation-in-points" : [
+              167.2795410729367,
+              118.65946470216807
+            ]
+          }
+        }
+      ],
+      "refractivity" : {
+        "depth" : 0.209765625,
+        "enabled" : true,
+        "strength" : 0.266953125
+      },
+      "shadow-specializations" : [
+        {
+          "value" : {
+            "kind" : "neutral",
+            "opacity" : 0
+          }
+        },
+        {
+          "appearance" : "light",
+          "value" : {
+            "kind" : "neutral",
+            "opacity" : 2.48
+          }
+        }
+      ],
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.2
+      }
+    },
+    {
+      "blend-mode-specializations" : [
+        {
+          "appearance" : "dark",
+          "value" : "darken"
+        }
+      ],
+      "blur-material" : 0.05,
+      "layers" : [
+        {
+          "fill-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : "automatic"
+            }
+          ],
+          "image-name" : "Image 5.svg",
+          "name" : "circle.fill",
+          "position" : {
+            "scale" : 4,
+            "translation-in-points" : [
+              167.2795410729367,
+              141.15711470216803
+            ]
+          }
+        }
+      ],
+      "lighting" : "individual",
+      "position" : {
+        "scale" : 1,
+        "translation-in-points" : [
+          0,
+          0
+        ]
+      },
+      "refractivity" : {
+        "depth" : 0.152734375,
+        "enabled" : true,
+        "strength" : 0.2232421875
+      },
+      "shadow-specializations" : [
+        {
+          "value" : {
+            "kind" : "neutral",
+            "opacity" : 0.48
+          }
+        },
+        {
+          "appearance" : "light",
+          "value" : {
+            "kind" : "neutral",
+            "opacity" : 0.6
+          }
+        }
+      ],
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 1
+      }
+    },
+    {
+      "layers" : [
+        {
+          "fill-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : {
+                "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
+              }
+            }
+          ],
+          "glass" : true,
+          "image-name" : "Image 3.svg",
+          "name" : "calendar",
+          "position" : {
+            "scale" : 6,
+            "translation-in-points" : [
+              -31.939258927063293,
+              -42.05626901477126
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.6
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.7
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

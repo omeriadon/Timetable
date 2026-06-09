@@ -1,6 +1,6 @@
 //
 //  TimetableGridPreview.swift
-//  PMS Timetable
+//  Timetable
 //
 //  Created by Adon Omeri on 1/5/2026.
 //

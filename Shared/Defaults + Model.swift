@@ -1,6 +1,6 @@
 //
 //  Defaults + Model.swift
-//  PMS Timetable
+//  Timetable
 //
 //  Created by Adon Omeri on 25/4/2026.
 //
@@ -8,13 +8,7 @@
 import Defaults
 import SwiftUI
 
-#if DEBUG
-	let appGroupID = "group.omeriadon.pmstimetable"
-#else
-	let appGroupID = "group.omeriadon-release.pmstimetable"
-#endif
-
-private let sharedDefaults = UserDefaults(suiteName: appGroupID) ?? UserDefaults.standard
+private let sharedDefaults = UserDefaults(suiteName: "group.omeriadon.timetable") ?? UserDefaults.standard
 
 extension Defaults.Serializable {
 	static var defaults: UserDefaults {

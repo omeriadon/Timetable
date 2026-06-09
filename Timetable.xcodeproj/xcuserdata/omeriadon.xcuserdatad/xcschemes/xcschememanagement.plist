@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>SchemeUserState</key>
+	<dict>
+		<key>Timetable Message Extension.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>2</integer>
+		</dict>
+		<key>Timetable Watch Widgets Extension.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>4</integer>
+		</dict>
+		<key>Timetable Watch.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>3</integer>
+		</dict>
+		<key>Timetable Widget Extension.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
+		<key>Timetable.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>0</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>2A02378A2F9C8EA000AB1E1F</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>2A098C822F9DB842002065BE</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>2A1DB4172F9ECEC100E5AE7C</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>2A25869F2FB5D6490030C8CD</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>2AAE2F402FA1A00300E050A2</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+	</dict>
+</dict>
+</plist>

@@ -1,4 +1,0 @@
-module SwiftSyntax600 {
-header "SwiftSyntax600-Swift.h"
-export *
-}

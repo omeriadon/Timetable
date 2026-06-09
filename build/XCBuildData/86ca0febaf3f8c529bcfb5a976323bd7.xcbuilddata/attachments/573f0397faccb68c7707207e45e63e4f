@@ -1,4 +1,0 @@
-module SwiftIfConfig {
-header "SwiftIfConfig-Swift.h"
-export *
-}
