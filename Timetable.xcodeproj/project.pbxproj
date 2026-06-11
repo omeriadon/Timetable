@@ -104,13 +104,15 @@
 				Timetable/Backend/PhoneWatchSyncBridge.swift,
 				Timetable/Backend/syncToWatchAsync.swift,
 				Timetable/LaunchScreen.storyboard,
-				Timetable/Tabs/ContentView.swift,
+				Timetable/Tabs/ContentView/ContentView.swift,
+				Timetable/Tabs/ContentView/SharedTimetableImportSheet.swift,
 				Timetable/Tabs/SettingsView.swift,
-				Timetable/Tabs/TimetableView.swift,
+				Timetable/Tabs/Timetable/TimetableView.swift,
 				Timetable/TimetableApp.swift,
 				Timetable/Views/CalendarImportView.swift,
 				Timetable/Views/ClassEditorSheet.swift,
 				Timetable/Views/InlineColorPicker.swift,
+				Timetable/Views/NameSheet.swift,
 				Timetable/Views/Other.swift,
 				Timetable/Views/SyncButton.swift,
 			);
@@ -660,7 +662,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -702,7 +704,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

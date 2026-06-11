@@ -432,7 +432,7 @@ struct ClassEditorSheet: View {
 					.clear.tint(draftClasses[index].color).interactive(),
 					in: Capsule()
 				)
-				.animation(.smooth(duration: 0.25), value: closestColor(to: draftClasses[index].color))
+				.animation(.snappy(duration: 0.25), value: closestColor(to: draftClasses[index].color))
 
 				Button(role: .destructive) {
 					withAnimation {
@@ -458,14 +458,14 @@ struct ClassEditorSheet: View {
 		} label: {
 			HStack {
 				Image(systemName: draftClasses[index].symbol)
-					.font(.title)
-					.padding()
+					.font(.title2)
 
 				Spacer()
 
 				Text("Select Symbol")
-					.padding(.trailing, 24)
+					.padding(.trailing, 4)
 			}
+			.padding(10)
 			.foregroundStyle(.white)
 			.glassEffect(.clear.interactive(), in: Capsule())
 		}
@@ -499,6 +499,7 @@ struct ClassEditorSheet: View {
 					Text(dayLabel(day)).tag(day)
 				}
 			}
+			.tint(.white)
 			.frame(width: 140, alignment: .leading)
 			.pickerStyle(.menu)
 			.onChange(of: slot.wrappedValue.day) { _, newDay in

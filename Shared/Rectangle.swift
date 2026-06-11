@@ -39,6 +39,7 @@ import SwiftUI
 				!isBreak ? .regular.tint(fill).interactive() : .identity,
 				in: RoundedRectangle(cornerRadius: isBreak ? 8 : 10)
 			)
+			.contentShape(Rectangle())
 		}
 	}
 

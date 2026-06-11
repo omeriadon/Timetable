@@ -22,12 +22,57 @@ struct SettingsView: View {
 	@State private var showCalendarImportSheet = false
 	@State private var timetableToDelete: ReceivedTimetable?
 	@State private var showDeleteConfirmation = false
+	@State private var showEditTimetableSheet = false
+
+	@Namespace private var ns
 
 	var body: some View {
 		NavigationStack {
 			List {
+
+				Section("Sync to Watch") {
+					SyncButton(
+						syncStatus: syncStatus,
+						action: {
+							Task {
+								await syncToWatchAsync(
+									classes: classes,
+									displayMode: displayMode,
+									watchSync: watchSync,
+									statusUpdate: { syncStatus = $0 }
+								)
+							}
+						}
+					)
+				}
+
 				Section("Your Details") {
 					TextField("Your Name", text: $userDisplayName)
+						.submitLabel(.done)
+				}
+
+				Section("Your Timetable") {
+					Button {
+						showEditTimetableSheet = true
+					} label: {
+						Label {
+							Text("Edit Timetable")
+						} icon: {
+							Image(systemName: "pencil")
+								.foregroundStyle(.tint)
+						}
+					}
+					.matchedTransitionSource(id: "sheetMorph", in: ns)
+					.sheet(isPresented: $showEditTimetableSheet) {
+						ClassEditorSheet(
+							classes: $classes,
+							initialRequest: nil
+						)
+						.presentationDetents([.fraction(0.85)])
+						.presentationDragIndicator(.hidden)
+						.interactiveDismissDisabled()
+						.navigationTransition(.zoom(sourceID: "sheetMorph", in: ns))
+					}
 				}
 
 				Section("Display") {
@@ -65,17 +110,23 @@ struct SettingsView: View {
 							Text("Import Calendar")
 								.foregroundStyle(.tint)
 							Text("Subscribe to Compass Schedule in Calendar")
-								.foregroundStyle(.primary.secondary)
+								.foregroundStyle(.white.secondary)
 						} icon: {
 							Image(systemName: "calendar")
 								.foregroundStyle(.tint)
 						}
+					}
+					.sheet(isPresented: $showCalendarImportSheet) {
+						CalendarImportView()
+							.presentationDetents([.fraction(1 / 3)])
+							.presentationDragIndicator(.hidden)
 					}
 				}
 
 				if !receivedTimetables.isEmpty {
 					importedTimetablesSection
 				}
+
 			}
 			.scrollEdgeEffectStyle(.soft, for: .top)
 			.scrollContentBackground(.hidden)
@@ -84,11 +135,6 @@ struct SettingsView: View {
 					Text("Settings")
 						.monospaced()
 				}
-			}
-			.sheet(isPresented: $showCalendarImportSheet) {
-				CalendarImportView()
-					.presentationDetents([.fraction(1 / 3)])
-					.presentationDragIndicator(.hidden)
 			}
 			.alert("Delete Timetable?", isPresented: $showDeleteConfirmation, presenting: timetableToDelete) { timetable in
 				Button("Cancel", role: .cancel) {}

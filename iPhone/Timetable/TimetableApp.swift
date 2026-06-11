@@ -54,7 +54,7 @@ struct TimetableApp: App {
 		WindowGroup {
 			ContentView()
 				.sheet(isPresented: .constant(showNameSheet)) {
-					nameSheet
+					NameSheet()
 						.presentationDetents([.medium])
 						.presentationDragIndicator(.hidden)
 						.interactiveDismissDisabled()
@@ -67,10 +67,6 @@ struct TimetableApp: App {
 				.environment(\.importStatus, $importStatus)
 				.environment(\.receivedTimetableData, $receivedTimetableData)
 		}
-	}
-
-	var nameSheet: some View {
-		Text("Name")
 	}
 
 	private func handleIncomingURL(_ url: URL) {

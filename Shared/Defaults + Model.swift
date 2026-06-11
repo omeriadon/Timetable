@@ -40,6 +40,7 @@ extension Defaults.Keys {
 	static let userDisplayName = Key<String>("userDisplayName", default: "My Timetable", suite: sharedDefaults)
 }
 
+typealias Timetable = [Class]
 struct Class: Hashable, Codable, Defaults.Serializable, Identifiable {
 	var id: String
 	var symbol: String

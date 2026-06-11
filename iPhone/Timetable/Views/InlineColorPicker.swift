@@ -146,7 +146,6 @@ public struct InlineColorPicker<T: ColorOptions>: View {
 				}
 			}
 		}
-		.animation(.snappy(duration: 0.25), value: selectedColor.wrappedValue)
 
 		if let description, let systemImage {
 			VStack {
