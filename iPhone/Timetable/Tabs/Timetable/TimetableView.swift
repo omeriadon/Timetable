@@ -45,11 +45,11 @@ struct TimetableView: View {
 		NavigationStack {
 			VStack {
 				ScrollView {
-					if let selectedSlot = selectedSlot {
-						TimetableComparison(selectedSlot: selectedSlot)
-					} else {
-						Spacer()
-					}
+					TimetableComparison(selectedSlot: selectedSlot)
+						.opacity(selectedSlot == nil ? 0 : 1)
+						.blur(radius: selectedSlot == nil ? 20 : 0)
+						.allowsHitTesting(selectedSlot != nil)
+						.animation(.snappy(duration: 0.3), value: selectedSlot)
 				}
 				.scrollBounceBehavior(.basedOnSize)
 				.scrollIndicators(.visible)
@@ -136,7 +136,9 @@ struct TimetableView: View {
 						if selectedSlot == Slot(day, session) {
 							selectedSlot = nil
 						} else if let c = classLookup[Slot(day, session)] {
-							selectedSlot = Slot(day, session)
+							if !receivedTimetables.isEmpty {
+								selectedSlot = Slot(day, session)
+							}
 						}
 					} label: {
 						sessionCell(day, session, classLookup: classLookup)

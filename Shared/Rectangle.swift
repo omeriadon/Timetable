@@ -41,7 +41,7 @@ struct rectangle<Content: View>: View {
 		.padding(5)
 		.overlay(
 			RoundedRectangle(cornerRadius: isBreak ? 8 : 10)
-				.strokeBorder(Color.white, lineWidth: selected ? 3 : 0)
+				.strokeBorder(Color.white, lineWidth: selected ? 4 : 0)
 				.transaction { t in
 					t.animation = nil
 				}

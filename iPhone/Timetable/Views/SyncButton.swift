@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import WatchConnectivity
 
 struct SyncButton: View {
 	let syncStatus: SyncMode
@@ -18,22 +19,35 @@ struct SyncButton: View {
 					case .normal:
 						Label("Sync", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
 							.transition(.blurReplace)
+
 					case .loading:
-						ProgressView()
-							.transition(.blurReplace)
+						Label {
+							Text("Loading...")
+						} icon: {
+							ProgressView()
+						}
+						.transition(.blurReplace)
+
 					case .success:
-						Image(systemName: "checkmark")
+						Label("Done", systemImage: "checkmark")
 							.transition(.blurReplace)
+
 					case .error:
-						Image(systemName: "exclamationmark.triangle")
+						Label(errorText(), systemImage: "exclamationmark.triangle")
 							.transition(.blurReplace)
 				}
 			}
-			.foregroundStyle(.white)
 			.animation(.easeInOut, value: syncStatus)
 		}
-		.buttonBorderShape(.circle)
-		.buttonStyle(.glassProminent)
 		.disabled(syncStatus == .loading)
+	}
+
+	func errorText() -> String {
+		var error = "Error"
+		if !WCSession.default.isWatchAppInstalled {
+			error = "Watch app not installed"
+		}
+
+		return error
 	}
 }
