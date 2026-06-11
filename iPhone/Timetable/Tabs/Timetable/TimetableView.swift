@@ -133,9 +133,14 @@ struct TimetableView: View {
 				Text(TimetableLayout.shortDayLabels[day])
 				ForEach(0 ..< 8) { session in
 					Button {
-						selectedSlot = Slot(day, session)
+						if selectedSlot == Slot(day, session) {
+							selectedSlot = nil
+						} else if let c = classLookup[Slot(day, session)] {
+							selectedSlot = Slot(day, session)
+						}
 					} label: {
 						sessionCell(day, session, classLookup: classLookup)
+							.contentShape(Rectangle())
 					}
 					.buttonStyle(.plain)
 				}
@@ -145,34 +150,36 @@ struct TimetableView: View {
 
 	func sessionCell(_ day: Int, _ session: Int, classLookup: [Slot: Class]) -> some View {
 		Group {
+			// break
 			if TimetableLayout.isBreakSession(index: session) {
 				rectangle(.gray.opacity(0.25), true)
 					.frame(height: 20)
-			} else {
-				if TimetableLayout.isUnavailable(day: day, session: session) {
-					rectangle(.clear, true)
-						.frame(height: 60)
 
-				} else {
-					if let c = classLookup[Slot(day, session)] {
-						rectangle(
-							c.colour.swiftUIColor.opacity(0.8)
-						) {
-							Image(systemName: c.symbol)
-							Spacer(minLength: 0)
-							Text(c.id)
-								.lineLimit(2)
-								.fixedSize(horizontal: false, vertical: true)
-								.font(.footnote.scaled(by: 0.9))
-						}
-						.frame(height: 60)
+				// unavailable
+			} else if TimetableLayout.isUnavailable(day: day, session: session) {
+				rectangle(.clear, true)
+					.frame(height: 60)
 
-					} else {
-						RoundedRectangle(cornerRadius: 10)
-							.fill(.white.opacity(0.05))
-							.frame(height: 60)
-					}
+				// normal
+			} else if let c = classLookup[Slot(day, session)] {
+				rectangle(
+					c.colour.swiftUIColor.opacity(0.8),
+					selected: Slot(day, session) == selectedSlot
+				) {
+					Image(systemName: c.symbol)
+					Spacer(minLength: 0)
+					Text(c.id)
+						.lineLimit(2)
+						.fixedSize(horizontal: false, vertical: true)
+						.font(.footnote.scaled(by: 0.9))
 				}
+				.frame(height: 60)
+
+				// idk
+			} else {
+				RoundedRectangle(cornerRadius: 10)
+					.fill(.white.opacity(0.05))
+					.frame(height: 60)
 			}
 		}
 		.foregroundStyle(.white)
