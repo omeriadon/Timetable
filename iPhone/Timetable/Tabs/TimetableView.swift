@@ -25,6 +25,16 @@ struct TimetableView: View {
 
 	@Binding var syncStatus: SyncMode
 
+	init(
+		watchSync: PhoneWatchSyncBridge,
+		syncStatus: Binding<SyncMode>,
+		startComparisonOpen: Bool = false
+	) {
+		self.watchSync = watchSync
+		self._syncStatus = syncStatus
+		self._showTimetableComparison = State(initialValue: startComparisonOpen)
+	}
+
 	var currentTimetable: [Class] {
 		selectedTimetableIndex.flatMap { idx in
 			receivedTimetables.indices.contains(idx) ? receivedTimetables[idx].classes : nil
@@ -153,8 +163,8 @@ struct TimetableView: View {
 					classes: $classes,
 					initialRequest: editorRequest
 				)
-				.presentationDetents([.fraction(0.8)])
-				.presentationDragIndicator(.visible)
+				.presentationDetents([.fraction(0.85)])
+				.presentationDragIndicator(.hidden)
 				.interactiveDismissDisabled()
 			}
 			.sheet(isPresented: $showTimetableComparison) {
@@ -163,6 +173,7 @@ struct TimetableView: View {
 					.presentationDragIndicator(.hidden)
 			}
 		}
+		.padding(.trailing, 2)
 	}
 
 	private var timetableComparisonSheet: some View {
@@ -229,7 +240,6 @@ struct TimetableView: View {
 					}
 				}
 			}
-			.frame(maxWidth: .infinity, alignment: .leading)
 
 			Spacer()
 		}
@@ -361,4 +371,16 @@ struct TimetableView: View {
 
 		return EditableSlot(day: day, period: period)
 	}
+}
+
+#Preview {
+	@Previewable @State var syncMode: SyncMode = .normal
+
+	@Previewable @State var showTimetableComparison = true
+
+	TimetableView(
+		watchSync: PhoneWatchSyncBridge(),
+		syncStatus: $syncMode,
+		startComparisonOpen: true
+	)
 }

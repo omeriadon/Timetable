@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		2A02379B2F9C907000AB1E1F /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2A02379A2F9C907000AB1E1F /* Defaults */; };
-		2A02379D2F9C907000AB1E1F /* DefaultsMacros in Frameworks */ = {isa = PBXBuildFile; productRef = 2A02379C2F9C907000AB1E1F /* DefaultsMacros */; };
 		2A0237AC2F9D9DE800AB1E1F /* SFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 2A0237AB2F9D9DE800AB1E1F /* SFSymbolsPicker */; };
 		2A098C8D2F9DB844002065BE /* Timetable Watch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 2A098C832F9DB842002065BE /* Timetable Watch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2A1DB40E2F9DE9A300E5AE7C /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2A1DB40D2F9DE9A300E5AE7C /* Defaults */; };
@@ -104,6 +103,7 @@
 				Timetable/Backend/Network/NetworkManager.swift,
 				Timetable/Backend/PhoneWatchSyncBridge.swift,
 				Timetable/Backend/syncToWatchAsync.swift,
+				Timetable/LaunchScreen.storyboard,
 				Timetable/Tabs/ContentView.swift,
 				Timetable/Tabs/SettingsView.swift,
 				Timetable/Tabs/TimetableView.swift,
@@ -174,7 +174,6 @@
 			files = (
 				2A02379B2F9C907000AB1E1F /* Defaults in Frameworks */,
 				2A0237AC2F9D9DE800AB1E1F /* SFSymbolsPicker in Frameworks */,
-				2A02379D2F9C907000AB1E1F /* DefaultsMacros in Frameworks */,
 			);
 		};
 		2A098C802F9DB842002065BE /* Frameworks */ = {
@@ -259,7 +258,6 @@
 			name = Timetable;
 			packageProductDependencies = (
 				2A02379A2F9C907000AB1E1F /* Defaults */,
-				2A02379C2F9C907000AB1E1F /* DefaultsMacros */,
 				2A0237AB2F9D9DE800AB1E1F /* SFSymbolsPicker */,
 			);
 			productName = Timetable;
@@ -640,6 +638,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -681,6 +680,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -1058,11 +1058,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = Defaults;
-		};
-		2A02379C2F9C907000AB1E1F /* DefaultsMacros */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */;
-			productName = DefaultsMacros;
 		};
 		2A0237AB2F9D9DE800AB1E1F /* SFSymbolsPicker */ = {
 			isa = XCSwiftPackageProductDependency;

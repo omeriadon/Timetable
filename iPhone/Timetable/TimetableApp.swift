@@ -8,6 +8,7 @@
 import ActivityKit
 import Foundation
 import SwiftUI
+import Defaults
 
 func startPushToStartListener() {
 	Task {
@@ -36,6 +37,12 @@ struct TimetableApp: App {
 	@State private var importStatus: ImportResult?
 	@State private var receivedTimetableData: ShareableTimetableData?
 
+	@Default(.userDisplayName) var userName
+
+	var showNameSheet: Bool {
+		userName.isEmpty
+	}
+
 	init() {
 		startPushToStartListener()
 		#if DEBUG
@@ -46,7 +53,13 @@ struct TimetableApp: App {
 	var body: some Scene {
 		WindowGroup {
 			ContentView()
-				.preferredColorScheme(.dark)
+				.sheet(isPresented: .constant(showNameSheet)) {
+					nameSheet
+						.presentationDetents([.medium])
+						.presentationDragIndicator(.hidden)
+						.interactiveDismissDisabled()
+						.monospaced()
+				}
 				.onOpenURL { url in
 					handleIncomingURL(url)
 				}
@@ -54,6 +67,10 @@ struct TimetableApp: App {
 				.environment(\.importStatus, $importStatus)
 				.environment(\.receivedTimetableData, $receivedTimetableData)
 		}
+	}
+
+	var nameSheet: some View {
+		Text("Name")
 	}
 
 	private func handleIncomingURL(_ url: URL) {

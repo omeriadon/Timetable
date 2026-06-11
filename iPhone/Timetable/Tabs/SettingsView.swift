@@ -36,12 +36,11 @@ struct SettingsView: View {
 						Spacer()
 						Picker("", selection: $displayMode) {
 							Label("Symbols", systemImage: "square.grid.2x2")
-								.labelIconToTitleSpacing(30)
 								.tag(DisplayMode.symbolsOnly)
 							Label("Text", systemImage: "text.alignleft")
-								.labelIconToTitleSpacing(30)
 								.tag(DisplayMode.textOnly)
 						}
+						.tint(.primary)
 						.pickerStyle(.menu)
 						.onChange(of: displayMode) { _, _ in
 							WidgetCenter.shared.reloadAllTimelines()
@@ -78,6 +77,7 @@ struct SettingsView: View {
 					importedTimetablesSection
 				}
 			}
+			.scrollEdgeEffectStyle(.soft, for: .top)
 			.scrollContentBackground(.hidden)
 			.toolbar {
 				ToolbarItem(placement: .title) {

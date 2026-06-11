@@ -52,6 +52,7 @@ struct ClassEditorSheet: View {
 					Button("Cancel", systemImage: "xmark") {
 						dismiss()
 					}
+					.keyboardShortcut(.cancelAction)
 				}
 				ToolbarItem(placement: .confirmationAction) {
 					Button("Done", systemImage: "checkmark") {
@@ -447,6 +448,7 @@ struct ClassEditorSheet: View {
 				.buttonBorderShape(.circle)
 				.glassEffect(.clear.tint(.red).interactive(), in: Circle())
 			}
+			.padding(.top, 10)
 		}
 	}
 

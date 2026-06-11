@@ -71,6 +71,8 @@ struct ContentView: View {
 			.presentationDetents([.medium, .large])
 			.presentationDragIndicator(.visible)
 		}
+		.monospaced()
+		.preferredColorScheme(.dark)
 		.onAppear {
 			processPendingSharedImport()
 		}

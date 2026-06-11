@@ -36,7 +36,7 @@ import SwiftUI
 			}
 			.padding(5)
 			.glassEffect(
-				!isBreak ? .clear.tint(fill).interactive() : .identity,
+				!isBreak ? .regular.tint(fill).interactive() : .identity,
 				in: RoundedRectangle(cornerRadius: isBreak ? 8 : 10)
 			)
 		}
@@ -71,7 +71,7 @@ import SwiftUI
 			}
 			.padding(2)
 			.glassEffect(
-				!isBreak ? .clear.tint(fill).interactive() : .identity,
+				!isBreak ? .regular.tint(fill).interactive() : .identity,
 				in: RoundedRectangle(cornerRadius: isBreak ? 1 : 4)
 			)
 		}

@@ -1,10 +1,7 @@
 {
-  "colors" : [
+  "images" : [
     {
-      "color" : {
-        "platform" : "universal",
-        "reference" : "systemBlueColor"
-      },
+      "filename" : "Timetable-iOS-Default-1024@1x.png",
       "idiom" : "universal"
     },
     {
@@ -14,10 +11,7 @@
           "value" : "dark"
         }
       ],
-      "color" : {
-        "platform" : "universal",
-        "reference" : "systemBlueColor"
-      },
+      "filename" : "Timetable-iOS-Dark-1024@1x.png",
       "idiom" : "universal"
     }
   ],
