@@ -19,6 +19,10 @@ struct Timetable_Watch_Watch_AppApp: App {
 				Tab("Current Class", systemImage: "timer") {
 					CurrentClassView()
 				}
+
+//				Tab("Friends", systemImage: "person.2") {
+//					FriendsTimetables()
+//				}
 			}
 			.monospaced()
 			.tabViewStyle(.verticalPage)

@@ -45,14 +45,14 @@ struct ContentView: View {
 							}
 						}
 					}
-					.frame(width: 10)
+					.frame(width: 7)
 
 					mainContent(classLookup: classLookup)
 				}
 				Spacer()
 			}
 		}
-		.padding(.trailing, 5)
+		.padding(.trailing, 10)
 		.environment(\.dynamicTypeSize, .xSmall)
 		.monospaced()
 		.overlay(alignment: .center) {
