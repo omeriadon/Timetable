@@ -212,9 +212,9 @@
 				2A2A766F2FD971890030B8DA /* Entitlements */,
 				2AAE61AD2FD82845004B3FF4 /* Timetable Message Extension */,
 				2AAE61BB2FD82845004B3FF4 /* Timetable Watch Widget Extension */,
+				2A60F50B2FD953D1009F4CE8 /* Timetable Watch */,
 				2A02379F2F9C908300AB1E1F /* Shared */,
 				2AAE62702FD839A7004B3FF4 /* iPhone */,
-				2A60F50B2FD953D1009F4CE8 /* Timetable Watch */,
 				2ACEE8BB2FD827B10031316D /* Timetable.icon */,
 				2A02378C2F9C8EA000AB1E1F /* Products */,
 			);

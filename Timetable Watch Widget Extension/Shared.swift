@@ -9,20 +9,6 @@ import Defaults
 import Foundation
 import WidgetKit
 
-let periodTimes: [(start: (hour: Int, min: Int), end: (hour: Int, min: Int))] = [
-	((8, 50), (9, 48)), // Period 1
-	((9, 48), (10, 46)), // Period 2
-	((11, 8), (12, 6)), // Period 3
-	((12, 6), (13, 4)), // Period 4
-	((13, 34), (14, 32)), // Period 5
-	((14, 32), (15, 30)), // Period 6
-]
-
-private let schoolStartHour = 8
-private let schoolStartMinute = 30
-private let schoolEndHour = 15
-private let schoolEndMinute = 30
-private let tickMinutes = 8
 private let daysAhead = 5
 
 struct Provider: TimelineProvider {

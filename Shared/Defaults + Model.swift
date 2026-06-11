@@ -10,20 +10,12 @@ import SwiftUI
 
 private let sharedDefaults = UserDefaults(suiteName: "group.omeriadon.timetable") ?? UserDefaults.standard
 
-extension Defaults.Serializable {
-	static var defaults: UserDefaults {
-		sharedDefaults
-	}
-}
-
-enum DisplayMode: String, Codable, Equatable {
+enum DisplayMode: String, Codable, Equatable, Defaults.Serializable {
 	case symbolsOnly
 	case textOnly
 }
 
-extension DisplayMode: Defaults.Serializable {}
-
-struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiable {
+struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiable, Equatable {
 	var id: String {
 		sender
 	}
@@ -41,7 +33,7 @@ extension Defaults.Keys {
 }
 
 typealias Timetable = [Class]
-struct Class: Hashable, Codable, Defaults.Serializable, Identifiable {
+struct Class: Hashable, Codable, Defaults.Serializable, Identifiable, Equatable {
 	var id: String
 	var symbol: String
 	var colour: RGBAColor

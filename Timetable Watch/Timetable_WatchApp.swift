@@ -11,7 +11,17 @@ import SwiftUI
 struct Timetable_Watch_Watch_AppApp: App {
 	var body: some Scene {
 		WindowGroup {
-			ContentView()
+			TabView {
+				Tab("Timetable", systemImage: "calendar") {
+					ContentView()
+				}
+
+				Tab("Current Class", systemImage: "timer") {
+					CurrentClassView()
+				}
+			}
+			.monospaced()
+			.tabViewStyle(.verticalPage)
 		}
 	}
 }

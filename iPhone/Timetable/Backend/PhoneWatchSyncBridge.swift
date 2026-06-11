@@ -5,14 +5,11 @@
 //  Created by Adon Omeri on 27/4/2026.
 //
 
-import Combine
+import Defaults
 import Foundation
 import WatchConnectivity
 
-final class PhoneWatchSyncBridge: NSObject, ObservableObject, WCSessionDelegate {
-	@Published var lastError: String?
-
-	private var latestClasses: [Class] = []
+final class PhoneWatchSyncBridge: NSObject, WCSessionDelegate {
 	private var isActivated = false
 
 	func activateIfNeeded() {
@@ -29,55 +26,46 @@ final class PhoneWatchSyncBridge: NSObject, ObservableObject, WCSessionDelegate 
 		print("[iOS] WCSession activate() called")
 	}
 
-	func updateLatestClasses(_ classes: [Class]) {
-		latestClasses = classes
-		print("[iOS] Updated latest classes snapshot: \(classes.count) classes")
-	}
-
-	func pushTimetable(_ classes: [Class], displayMode: DisplayMode) throws {
+	func pushTimetable() {
 		activateIfNeeded()
-		latestClasses = classes
 
-		print("[iOS] Encoding \(classes.count) classes for watch...")
-		let data = try JSONEncoder().encode(classes)
-		print("[iOS] Encoded successfully: \(data.count) bytes")
+		let encoder = JSONEncoder()
 
-		let displayModeData = try JSONEncoder().encode(displayMode)
+		do {
+			let timetableData = try encoder.encode(Defaults[.timetable])
+			let displayModeData = try encoder.encode(Defaults[.displayMode])
+			let receivedData = try encoder.encode(Defaults[.receivedTimetables])
 
-		let payload: [String: Any] = [
-			"timetableData": data,
-			"displayMode": displayModeData,
-			"updatedAt": Date().timeIntervalSince1970,
-		]
+			let payload: [String: Any] = [
+				"timetableData": timetableData,
+				"displayMode": displayModeData,
+				"receivedTimetables": receivedData,
+				"updatedAt": Date().timeIntervalSince1970
+			]
 
-		let session = WCSession.default
-		try session.updateApplicationContext(payload)
-		if session.isReachable {
-			session.sendMessage(payload, replyHandler: nil) { error in
-				DispatchQueue.main.async {
-					self.lastError = "Watch live sync failed: \(error.localizedDescription)"
+			let session = WCSession.default
+
+			try session.updateApplicationContext(payload)
+
+			if session.isReachable {
+				session.sendMessage(payload, replyHandler: nil) { error in
+					print("Watch live sync failed: \(error.localizedDescription)")
 				}
 			}
+		} catch {
+			print("Error encoding or updating application context: \(error.localizedDescription)")
 		}
-		print("[iOS] updateApplicationContext sent with displayMode: \(displayMode.rawValue)")
 	}
 
-	func session(_: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-		print("[iOS] WC activation completed with state: \(activationState.rawValue)")
+	func session(_: WCSession, activationDidCompleteWith _: WCSessionActivationState, error: Error?) {
 		if let error {
-			print("[iOS] WC activation error: \(error.localizedDescription)")
-			DispatchQueue.main.async {
-				self.lastError = "WatchConnectivity activation failed: \(error.localizedDescription)"
-			}
+			print("WatchConnectivity activation failed: \(error.localizedDescription)")
 		}
 	}
 
-	func sessionDidBecomeInactive(_: WCSession) {
-		print("[iOS] WC session became inactive")
-	}
+	func sessionDidBecomeInactive(_: WCSession) {}
 
 	func sessionDidDeactivate(_ session: WCSession) {
-		print("[iOS] WC session deactivated; reactivating")
 		session.activate()
 	}
 }

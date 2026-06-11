@@ -9,7 +9,7 @@ import Defaults
 import SwiftUI
 
 struct TimetableView: View {
-	@ObservedObject var watchSync: PhoneWatchSyncBridge
+	@Binding var watchSync: PhoneWatchSyncBridge
 
 	@Default(.timetable) var classes
 	@Default(.receivedTimetables) var receivedTimetables
@@ -23,11 +23,11 @@ struct TimetableView: View {
 	@Binding var syncStatus: SyncMode
 
 	init(
-		watchSync: PhoneWatchSyncBridge,
+		watchSync: Binding<PhoneWatchSyncBridge>,
 		syncStatus: Binding<SyncMode>,
 		startComparisonOpen: Bool = false
 	) {
-		self.watchSync = watchSync
+		self._watchSync = watchSync
 		self._syncStatus = syncStatus
 		self._showTimetableComparison = State(initialValue: startComparisonOpen)
 	}
@@ -74,22 +74,10 @@ struct TimetableView: View {
 			}
 			.onAppear {
 				watchSync.activateIfNeeded()
-				watchSync.updateLatestClasses(classes)
+				watchSync.pushTimetable()
 			}
-			.onChange(of: classes) { _, newValue in
-				watchSync.updateLatestClasses(newValue)
-			}
-			.onChange(of: watchSync.lastError) { _, newValue in
-				guard let newValue else { return }
-				print("[iOS] Surface error icon: \(newValue)")
-				syncStatus = .error
-				Task {
-					try? await Task.sleep(nanoseconds: 1_000_000_000)
-					await MainActor.run {
-						syncStatus = .normal
-					}
-				}
-				watchSync.lastError = nil
+			.onChange(of: classes) {
+				watchSync.pushTimetable()
 			}
 		}
 		.padding(.trailing, 2)
@@ -135,7 +123,7 @@ struct TimetableView: View {
 					Button {
 						if selectedSlot == Slot(day, session) {
 							selectedSlot = nil
-						} else if let c = classLookup[Slot(day, session)] {
+						} else if let _ = classLookup[Slot(day, session)] {
 							if !receivedTimetables.isEmpty {
 								selectedSlot = Slot(day, session)
 							}
@@ -210,8 +198,10 @@ struct TimetableView: View {
 
 	@Previewable @State var showTimetableComparison = true
 
+	@Previewable @State var bridge = PhoneWatchSyncBridge()
+
 	TimetableView(
-		watchSync: PhoneWatchSyncBridge(),
+		watchSync: $bridge,
 		syncStatus: $syncMode,
 		startComparisonOpen: false
 	)

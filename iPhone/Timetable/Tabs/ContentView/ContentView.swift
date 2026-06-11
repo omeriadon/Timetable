@@ -40,7 +40,7 @@ struct ContentView: View {
 	@Environment(\.importedFileURL) private var importedFileURL
 	@Environment(\.receivedTimetableData) private var receivedTimetableData
 
-	@StateObject private var watchSync = PhoneWatchSyncBridge()
+	@State private var watchSync = PhoneWatchSyncBridge()
 
 	@State private var selectedTab = 0
 	@State private var pendingSharedTimetable: ReceivedTimetable?
@@ -51,7 +51,7 @@ struct ContentView: View {
 	var body: some View {
 		TabView(selection: $selectedTab) {
 			Tab("Timetable", systemSymbol: .calendar, value: 0) {
-				TimetableView(watchSync: watchSync, syncStatus: $rootSyncStatus)
+				TimetableView(watchSync: $watchSync, syncStatus: $rootSyncStatus)
 			}
 
 			Tab("Settings", systemSymbol: .gear, value: 1) {

@@ -18,26 +18,18 @@ func syncToWatchAsync(
 	statusUpdate(.loading)
 	print("[iOS] Starting WatchConnectivity sync...")
 
-	do {
-		try watchSync.pushTimetable(classes, displayMode: displayMode)
-		print("[iOS] ✓ Sync request sent to watch")
+	watchSync.pushTimetable()
+	print("[iOS] ✓ Sync request sent to watch")
 
-		let elapsed = Date().timeIntervalSince(startedAt)
-		if elapsed < 0.35 {
-			let remaining = UInt64((0.35 - elapsed) * 1_000_000_000)
-			try? await Task.sleep(nanoseconds: remaining)
-		}
-
-		statusUpdate(.success)
-		print("[iOS] Sync completed, showing checkmark")
-
-		try? await Task.sleep(nanoseconds: 1_000_000_000)
-		statusUpdate(.normal)
-
-	} catch {
-		print("[iOS] ✗ Sync failed: \(error.localizedDescription)")
-		statusUpdate(.error)
-		try? await Task.sleep(nanoseconds: 1_000_000_000)
-		statusUpdate(.normal)
+	let elapsed = Date().timeIntervalSince(startedAt)
+	if elapsed < 0.35 {
+		let remaining = UInt64((0.35 - elapsed) * 1_000_000_000)
+		try? await Task.sleep(nanoseconds: remaining)
 	}
+
+	statusUpdate(.success)
+	print("[iOS] Sync completed, showing checkmark")
+
+	try? await Task.sleep(nanoseconds: 1_000_000_000)
+	statusUpdate(.normal)
 }
