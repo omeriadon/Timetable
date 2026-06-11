@@ -83,10 +83,8 @@ struct rectangle<Content: View>: View {
 				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
 		}
 		.padding(2)
-		.glassEffect(
-			!isBreak ? .regular.tint(fill).interactive() : .identity,
-			in: RoundedRectangle(cornerRadius: isBreak ? 1 : 4)
-		)
+		.background(fill)
+		.clipShape(RoundedRectangle(cornerRadius: isBreak ? 1 : 4))
 	}
 }
 #endif

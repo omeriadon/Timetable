@@ -15,11 +15,11 @@ struct FriendsTimetables: View {
 	@State private var now = Date()
 	private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-	#if DEBUG
-		private let debugOffset: TimeInterval = -42647
-	#else
+//	#if DEBUG
+//		private let debugOffset: TimeInterval = -45647
+//	#else
 		private let debugOffset: TimeInterval = 0
-	#endif
+//	#endif
 
 	private var adjustedNow: Date {
 		now.addingTimeInterval(debugOffset)
@@ -77,27 +77,30 @@ struct FriendsTimetables: View {
 				}
 				.ignoresSafeArea()
 
-				VStack(alignment: .leading) {
+				VStack(alignment: .center) {
 					Text(receivedTimetable.sender)
-						.font(.title3)
+						.font(.title2)
 						.bold()
-						.lineLimit(1)
+						.lineLimit(2)
 						.minimumScaleFactor(0.8)
 
 					Spacer()
 
-					Label(title, systemImage: symbol)
-						.font(.body)
-						.bold()
+					HStack {
+						Image(systemName: symbol)
+						Text(title)
+					}
+					.font(.body.scaled(by: 1.2))
+					.bold()
 
 					Spacer()
 						.frame(height: geo.size.height * 0.1)
 
 					Text(!nextText.isEmpty ? nextText : "Done for the day")
-						.font(.caption2)
+						.font(.caption)
 						.foregroundStyle(.secondary)
 				}
-				.frame(width: geo.size.width)
+				.padding(.leading)
 			}
 		}
 		.tint(color)

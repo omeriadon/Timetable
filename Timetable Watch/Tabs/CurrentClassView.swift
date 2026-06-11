@@ -17,11 +17,11 @@ struct CurrentClassView: View {
 
 	private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-	#if DEBUG
-		private let debugOffset: TimeInterval = -45847
-	#else
+//	#if DEBUG
+//		private let debugOffset: TimeInterval = -45847
+//	#else
 		private let debugOffset: TimeInterval = 0
-	#endif
+//	#endif
 
 	private var adjustedNow: Date {
 		now.addingTimeInterval(debugOffset)
@@ -109,21 +109,34 @@ struct CurrentClassView: View {
 				}
 
 				VStack(alignment: .center) {
-					Label(title, systemImage: symbol)
+					Spacer()
+					Spacer()
+
+					Image(systemName: symbol)
+						.font(.title)
+						.bold()
+
+					Text(title)
+						.font(.title2.scaled(by: 0.9))
+						.lineLimit(2)
+						.multilineTextAlignment(.center)
+						.frame(maxWidth: geo.size.width * 0.9)
+						.bold()
 
 					Spacer()
-						.frame(height: geo.size.height * 0.15)
+
 
 					Text(timeString)
 						.contentTransition(.numericText(countsDown: true))
 						.font(.title2)
+						.lineLimit(2)
 						.bold()
 						.padding(.horizontal, 15)
 						.padding(.vertical, 10)
 						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
 
 					Spacer()
-						.frame(height: geo.size.height * 0.15)
+
 
 					Text(nextText)
 						.frame(maxWidth: geo.size.width * 0.8)
@@ -131,11 +144,13 @@ struct CurrentClassView: View {
 						.foregroundStyle(.secondary)
 						.lineLimit(4)
 						.layoutPriority(1)
+
+					Spacer()
+						.frame(height: geo.size.height * 0.1)
 				}
-				.padding(.top, geo.size.height * 0.2)
 			}
-			.ignoresSafeArea()
 		}
+		.ignoresSafeArea()
 		.tint(color)
 	}
 }

@@ -105,7 +105,7 @@ struct ContentView: View {
 		Group {
 			if TimetableLayout.isBreakSession(index: session) {
 				// recess and lunch
-				rectangle(.gray.opacity(0.25), true)
+				rectangle(.clear, true)
 					.frame(height: 2)
 			} else {
 				// early finish days
