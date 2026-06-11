@@ -12,12 +12,22 @@ import SwiftUI
 struct FriendsTimetables: View {
 	let receivedTimetable: ReceivedTimetable
 
-	@State private var now = Date().addingTimeInterval(-45847)
+	@State private var now = Date()
 	private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
+	#if DEBUG
+		private let debugOffset: TimeInterval = -42647
+	#else
+		private let debugOffset: TimeInterval = 0
+	#endif
+
+	private var adjustedNow: Date {
+		now.addingTimeInterval(debugOffset)
+	}
 
 	var body: some View {
 		let classLookup = TimetableLayout.classLookup(for: receivedTimetable.classes)
-		let state = getSchoolState(at: now, classLookup: classLookup)
+		let state = getSchoolState(at: adjustedNow, classLookup: classLookup)
 
 		let title: String
 		let symbol: String
@@ -53,7 +63,7 @@ struct FriendsTimetables: View {
 			let progress: CGFloat = {
 				guard let info = progressInfo else { return 0 }
 				let total = info.end.timeIntervalSince(info.start)
-				let elapsed = now.timeIntervalSince(info.start)
+				let elapsed = adjustedNow.timeIntervalSince(info.start) // Respects the offset
 				return total > 0 ? max(0, min(1, elapsed / total)) : 0
 			}()
 
