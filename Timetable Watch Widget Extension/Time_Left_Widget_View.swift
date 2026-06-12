@@ -52,41 +52,26 @@ struct Time_Left_Widget_View: View {
 		start: Date,
 		end: Date
 	) -> some View {
-		ZStack(alignment: .leading) {
-			GeometryReader { geo in
-				let total = end.timeIntervalSince(start)
-				let elapsed = Date().timeIntervalSince(start)
-				let progress = total > 0 ? max(0, min(1, elapsed / total)) : 0
+		VStack(alignment: .leading) {
+			Label(title, systemImage: symbol)
+				.font(.headline)
+				.lineLimit(1)
 
-				VStack {
-					Rectangle()
-						.fill(color)
-						.frame(width: geo.size.width * progress)
+			Spacer(minLength: 1)
 
-					Spacer(minLength: 0)
-				}
-			}
-			.tint(color)
-			.widgetAccentable()
+			Text(end, style: .timer)
+				.font(.system(.body, design: .monospaced))
 
-			VStack(alignment: .leading) {
-				Label(title, systemImage: symbol)
-					.font(.headline)
-					.lineLimit(1)
+			Spacer(minLength: 1)
 
-				Spacer(minLength: 1)
-
-				Text(end, style: .timer)
-					.font(.system(.body, design: .monospaced))
-
-				Spacer(minLength: 1)
-
-				Text(nextText)
-					.font(.body.scaled(by: 0.9))
-					.foregroundStyle(.secondary)
-					.lineLimit(1)
-			}
-			.padding([.vertical, .leading])
+			Text(nextText)
+				.font(.body.scaled(by: 0.9))
+				.foregroundStyle(.secondary)
+				.lineLimit(1)
+		}
+		.padding([.vertical, .leading])
+		.background {
+			color
 		}
 	}
 }
