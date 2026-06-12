@@ -13,7 +13,7 @@ struct Timetable_Watch_WidgetsEntryView: View {
 	var entry: Provider.Entry
 
 	var body: some View {
-		Main_Widget_View(classes: entry.classes, displayMode: entry.displayMode)
+		Main_Widget_View(classes: entry.classes)
 	}
 }
 
@@ -37,7 +37,6 @@ struct Timetable_Watch_Widgets: Widget {
 	TimetableEntry(
 		date: .now,
 		classes: defaultTimetable,
-		displayMode: .symbolsOnly,
 		relevance: TimelineEntryRelevance(
 			score: 1.0,
 			duration: 60 * 60

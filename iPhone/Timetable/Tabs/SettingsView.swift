@@ -11,7 +11,6 @@ import WidgetKit
 
 struct SettingsView: View {
 	@Default(.timetable) var classes
-	@Default(.displayMode) var displayMode
 	@Default(.userDisplayName) var userDisplayName
 	@Default(.receivedTimetables) var receivedTimetables
 
@@ -29,7 +28,6 @@ struct SettingsView: View {
 	var body: some View {
 		NavigationStack {
 			List {
-
 				Section("Sync to Watch") {
 					SyncButton(
 						syncStatus: syncStatus,
@@ -37,7 +35,6 @@ struct SettingsView: View {
 							Task {
 								await syncToWatchAsync(
 									classes: classes,
-									displayMode: displayMode,
 									watchSync: watchSync,
 									statusUpdate: { syncStatus = $0 }
 								)
@@ -75,33 +72,6 @@ struct SettingsView: View {
 					}
 				}
 
-				Section("Display") {
-					HStack {
-						Label("watchOS Widget Style", systemImage: "platter.filled.bottom.applewatch.case")
-						Spacer()
-						Picker("", selection: $displayMode) {
-							Label("Symbols", systemImage: "square.grid.2x2")
-								.tag(DisplayMode.symbolsOnly)
-							Label("Text", systemImage: "text.alignleft")
-								.tag(DisplayMode.textOnly)
-						}
-						.tint(.primary)
-						.pickerStyle(.menu)
-						.onChange(of: displayMode) { _, _ in
-							WidgetCenter.shared.reloadAllTimelines()
-
-							Task {
-								await syncToWatchAsync(
-									classes: classes,
-									displayMode: displayMode,
-									watchSync: watchSync,
-									statusUpdate: { syncStatus = $0 }
-								)
-							}
-						}
-					}
-				}
-
 				Section("Calendar") {
 					Button {
 						showCalendarImportSheet = true
@@ -126,7 +96,6 @@ struct SettingsView: View {
 				if !receivedTimetables.isEmpty {
 					importedTimetablesSection
 				}
-
 			}
 			.scrollEdgeEffectStyle(.soft, for: .top)
 			.scrollContentBackground(.hidden)

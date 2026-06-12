@@ -5,32 +5,112 @@
 //  Created by Adon Omeri on 26/4/2026.
 //
 
+import Combine
 import Defaults
 import SwiftUI
+
+let debugOffset: TimeInterval = 0
 
 @main
 struct Timetable_Watch_Watch_AppApp: App {
 	@Default(.receivedTimetables) var receivedTimetables
+	@Default(.timetable) var classes
+
+	@State private var currentTab = 0
+	@State private var now = Date()
+
+	private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
+	private var adjustedNow: Date {
+		now.addingTimeInterval(debugOffset)
+	}
+
+	private var currentSchoolState: SchoolState {
+		let classLookup = TimetableLayout.classLookup(for: classes)
+		return getSchoolState(at: adjustedNow, classLookup: classLookup)
+	}
 
 	var body: some Scene {
 		WindowGroup {
-			TabView {
-				Tab("Timetable", systemImage: "calendar") {
+			TabView(selection: $currentTab) {
+				Tab("Timetable", systemImage: "calendar", value: 0) {
 					ContentView()
 				}
 
-				Tab("Current Class", systemImage: "timer") {
-					CurrentClassView()
+				Tab("Current Class", systemImage: "timer", value: 1) {
+					CurrentClassView(now: adjustedNow)
+						.containerBackground(for: .tabView) {
+							switch currentSchoolState {
+								case let .inClass(current, _, info):
+									createProgressBackground(
+										color: current?.colour.swiftUIColor ?? .blue,
+										start: info.start,
+										end: info.end
+									)
+
+								case let .inBreak(_, _, info):
+									createProgressBackground(
+										color: .orange,
+										start: info.start,
+										end: info.end
+									)
+
+								case .outsideSchool:
+									Color.clear
+							}
+						}
 				}
 
-				ForEach(receivedTimetables) { receivedTimetable in
-					Tab(receivedTimetable.sender, systemImage: "person") {
+				ForEach(Array(receivedTimetables.enumerated()), id: \.offset) { index, receivedTimetable in
+					Tab(receivedTimetable.sender, systemImage: "person", value: 2 + index) {
 						FriendsTimetables(receivedTimetable: receivedTimetable)
+							.containerBackground(for: .tabView) {
+								switch currentSchoolState {
+									case let .inClass(current, _, info):
+										createProgressBackground(
+											color: current?.colour.swiftUIColor ?? .blue,
+											start: info.start,
+											end: info.end
+										)
+
+									case let .inBreak(_, _, info):
+										createProgressBackground(
+											color: .orange,
+											start: info.start,
+											end: info.end
+										)
+
+									case .outsideSchool:
+										Color.clear
+								}
+							}
 					}
+				}
+			}
+			.onReceive(timer) { value in
+				withAnimation(.easeInOut(duration: 0.5)) {
+					now = value
 				}
 			}
 			.monospaced()
 			.tabViewStyle(.verticalPage)
+		}
+	}
+
+	private func createProgressBackground(color: Color, start: Date, end: Date) -> some View {
+		GeometryReader { geo in
+			let total = end.timeIntervalSince(start)
+			let elapsed = adjustedNow.timeIntervalSince(start)
+			let progress = total > 0 ? max(0, min(1, elapsed / total)) : 0
+
+			HStack(spacing: 0) {
+				Rectangle()
+					.fill(color)
+					.frame(width: geo.size.width * progress)
+
+				Rectangle()
+					.fill(.black)
+			}
 		}
 	}
 }

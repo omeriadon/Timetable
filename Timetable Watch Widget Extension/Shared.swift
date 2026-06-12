@@ -13,17 +13,15 @@ private let daysAhead = 5
 
 struct Provider: TimelineProvider {
 	func placeholder(in _: Context) -> TimetableEntry {
-		TimetableEntry(date: .now, classes: [], displayMode: .symbolsOnly, relevance: nil)
+		TimetableEntry(date: .now, classes: [], relevance: nil)
 	}
 
 	func getSnapshot(in _: Context, completion: @escaping (TimetableEntry) -> Void) {
 		let classes = Defaults[.timetable]
-		let displayMode = Defaults[.displayMode]
 		completion(
 			TimetableEntry(
 				date: .now,
 				classes: classes,
-				displayMode: displayMode,
 				relevance: nil
 			)
 		)
@@ -31,12 +29,11 @@ struct Provider: TimelineProvider {
 
 	func getTimeline(in _: Context, completion: @escaping (Timeline<TimetableEntry>) -> Void) {
 		let classes = Defaults[.timetable]
-		let displayMode = Defaults[.displayMode]
 		let now = Date()
 		let calendar = Calendar.current
 
 		var entries: [TimetableEntry] = [
-			makeEntry(date: now, classes: classes, displayMode: displayMode, calendar: calendar),
+			makeEntry(date: now, classes: classes, calendar: calendar),
 		]
 
 		for day in nextFiveWeekdays(from: now, calendar: calendar) {
@@ -53,7 +50,7 @@ struct Provider: TimelineProvider {
 			while tick <= schoolEnd {
 				if tick > now {
 					entries.append(
-						makeEntry(date: tick, classes: classes, displayMode: displayMode, calendar: calendar)
+						makeEntry(date: tick, classes: classes, calendar: calendar)
 					)
 				}
 
@@ -69,20 +66,17 @@ struct Provider: TimelineProvider {
 struct TimetableEntry: TimelineEntry {
 	let date: Date
 	let classes: [Class]
-	let displayMode: DisplayMode
 	let relevance: TimelineEntryRelevance?
 }
 
 private func makeEntry(
 	date: Date,
 	classes: [Class],
-	displayMode: DisplayMode,
 	calendar: Calendar
 ) -> TimetableEntry {
 	TimetableEntry(
 		date: date,
 		classes: classes,
-		displayMode: displayMode,
 		relevance: relevance(for: date, calendar: calendar)
 	)
 }

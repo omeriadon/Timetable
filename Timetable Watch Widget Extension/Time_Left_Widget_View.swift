@@ -96,7 +96,6 @@ struct Time_Left_Widget_View: View {
 		entry: TimetableEntry(
 			date: Date(),
 			classes: defaultTimetable,
-			displayMode: .textOnly,
 			relevance: TimelineEntryRelevance(score: 1, duration: 60 * 60)
 		)
 	)

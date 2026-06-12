@@ -33,12 +33,10 @@ final class PhoneWatchSyncBridge: NSObject, WCSessionDelegate {
 
 		do {
 			let timetableData = try encoder.encode(Defaults[.timetable])
-			let displayModeData = try encoder.encode(Defaults[.displayMode])
 			let receivedData = try encoder.encode(Defaults[.receivedTimetables])
 
 			let payload: [String: Any] = [
 				"timetableData": timetableData,
-				"displayMode": displayModeData,
 				"receivedTimetables": receivedData,
 				"updatedAt": Date().timeIntervalSince1970
 			]

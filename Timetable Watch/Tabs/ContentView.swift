@@ -16,10 +16,8 @@ struct ContentView: View {
 	@State private var selectedDay = 0
 	@State private var isLoading = false
 	@State private var showSyncErrorIcon = false
-	@State private var displayModeConfirmation: String?
 
 	@Default(.timetable) var classes
-	@Default(.displayMode) var displayMode
 
 	var body: some View {
 		let classLookup = TimetableLayout.classLookup(for: classes)
@@ -55,21 +53,6 @@ struct ContentView: View {
 		.padding(.trailing, 10)
 		.environment(\.dynamicTypeSize, .xSmall)
 		.monospaced()
-		.overlay(alignment: .center) {
-			if let mode = displayModeConfirmation {
-				VStack(spacing: 8) {
-					Label(mode, systemImage: mode == "Symbols" ? "square.grid.2x2" : "text.alignleft")
-						.font(.headline)
-				}
-				.padding(.horizontal, 24)
-				.padding(.vertical, 14)
-				.glassEffect(
-					.regular.tint(.blue),
-					in: RoundedRectangle(cornerRadius: 12)
-				)
-				.transition(.opacity.combined(with: .scale(scale: 0.9)))
-			}
-		}
 		.onAppear {
 			print("[Watch] ContentView appeared")
 			syncStore.activateIfNeeded()
@@ -79,12 +62,6 @@ struct ContentView: View {
 			print("[Watch] Surface error icon: \(newValue)")
 			flashSyncErrorIcon()
 			syncStore.alertMessage = nil
-		}
-		.onChange(of: displayMode) { _, newMode in
-			displayModeConfirmation = newMode == .symbolsOnly ? "Symbols" : "Text"
-			DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-				displayModeConfirmation = nil
-			}
 		}
 	}
 

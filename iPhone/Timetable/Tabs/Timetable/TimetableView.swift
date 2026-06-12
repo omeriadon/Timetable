@@ -14,7 +14,6 @@ struct TimetableView: View {
 	@Default(.timetable) var classes
 	@Default(.receivedTimetables) var receivedTimetables
 	@Default(.userDisplayName) var userDisplayName
-	@Default(.displayMode) var displayMode
 
 	@State private var selectedTimetable: ReceivedTimetable?
 	@State private var showTimetableComparison = false
@@ -51,7 +50,6 @@ struct TimetableView: View {
 						.allowsHitTesting(selectedSlot != nil)
 						.animation(.snappy(duration: 0.3), value: selectedSlot)
 				}
-				.scrollBounceBehavior(.basedOnSize)
 				.scrollIndicators(.visible)
 				.scrollIndicatorsFlash(onAppear: true)
 				.safeAreaBar(edge: .top, alignment: .center, spacing: 10) {

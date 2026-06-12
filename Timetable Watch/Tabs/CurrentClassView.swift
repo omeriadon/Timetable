@@ -11,25 +11,16 @@ import SwiftUI
 
 struct CurrentClassView: View {
 	@Default(.timetable) private var classes
-	@Default(.displayMode) private var displayMode
 
-	@State private var now = Date()
+	let now: Date
 
 	private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-//	#if DEBUG
-//		private let debugOffset: TimeInterval = -45847
-//	#else
-		private let debugOffset: TimeInterval = 0
-//	#endif
 
-	private var adjustedNow: Date {
-		now.addingTimeInterval(debugOffset)
-	}
 
 	var body: some View {
 		let classLookup = TimetableLayout.classLookup(for: classes)
-		let state = getSchoolState(at: adjustedNow, classLookup: classLookup)
+		let state = getSchoolState(at: now, classLookup: classLookup)
 
 		Group {
 			switch state {
@@ -66,11 +57,6 @@ struct CurrentClassView: View {
 					}
 			}
 		}
-		.onReceive(timer) { value in
-			withAnimation(.easeInOut(duration: 0.5)) {
-				now = value
-			}
-		}
 	}
 
 	private func createProgressView(
@@ -82,73 +68,56 @@ struct CurrentClassView: View {
 		end: Date
 	) -> some View {
 		GeometryReader { geo in
-			let total = end.timeIntervalSince(start)
-			let elapsed = adjustedNow.timeIntervalSince(start)
-			let progress = total > 0 ? max(0, min(1, elapsed / total)) : 0
-
-			let realStart = start.addingTimeInterval(-debugOffset)
-			let realEnd = end.addingTimeInterval(-debugOffset)
-			let safeRealEnd = max(realEnd, realStart.addingTimeInterval(1))
-
-			let remaining = max(0, safeRealEnd.timeIntervalSince(now))
+			// 2. Calculate remaining time using the synchronized parent 'now'
+			let remaining = max(0, end.timeIntervalSince(now))
 			let hours = Int(remaining) / 3600
 			let minutes = (Int(remaining) % 3600) / 60
 			let seconds = Int(remaining) % 60
 
 			let timeString = hours > 0
-				? String(format: "%d:%02d:%02d", hours, minutes, seconds)
-				: String(format: "%02d:%02d", minutes, seconds)
+			? String(format: "%d:%02d:%02d", hours, minutes, seconds)
+			: String(format: "%02d:%02d", minutes, seconds)
 
-			ZStack {
-				HStack(spacing: 0) {
-					Rectangle()
-						.fill(color)
-						.frame(width: geo.size.width * progress)
+			VStack(alignment: .center) {
+				Spacer()
+				Spacer()
 
-					Spacer(minLength: 0)
-				}
+				Image(systemName: symbol)
+					.font(.title)
+					.bold()
 
-				VStack(alignment: .center) {
-					Spacer()
-					Spacer()
+				Text(title)
+					.font(.title2.scaled(by: 0.9))
+					.lineLimit(2)
+					.multilineTextAlignment(.center)
+					.frame(maxWidth: geo.size.width * 0.9)
+					.bold()
 
-					Image(systemName: symbol)
-						.font(.title)
-						.bold()
+				Spacer()
 
-					Text(title)
-						.font(.title2.scaled(by: 0.9))
-						.lineLimit(2)
-						.multilineTextAlignment(.center)
-						.frame(maxWidth: geo.size.width * 0.9)
-						.bold()
+				Text(timeString)
+					.contentTransition(.numericText(countsDown: true))
+					.animation(.easeInOut(duration: 0.5), value: timeString)
+					.font(.title2)
+					.lineLimit(1)
+					.bold()
+					.padding(.horizontal, 15)
+					.padding(.vertical, 10)
+					.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
 
-					Spacer()
+				Spacer()
 
+				Text(nextText)
+					.frame(maxWidth: geo.size.width * 0.8)
+					.font(.caption)
+					.foregroundStyle(.secondary)
+					.lineLimit(4)
+					.layoutPriority(1)
 
-					Text(timeString)
-						.contentTransition(.numericText(countsDown: true))
-						.font(.title2)
-						.lineLimit(2)
-						.bold()
-						.padding(.horizontal, 15)
-						.padding(.vertical, 10)
-						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
-
-					Spacer()
-
-
-					Text(nextText)
-						.frame(maxWidth: geo.size.width * 0.8)
-						.font(.caption)
-						.foregroundStyle(.secondary)
-						.lineLimit(4)
-						.layoutPriority(1)
-
-					Spacer()
-						.frame(height: geo.size.height * 0.1)
-				}
+				Spacer()
+					.frame(height: geo.size.height * 0.1)
 			}
+			.frame(width: geo.size.width)
 		}
 		.ignoresSafeArea()
 		.tint(color)
@@ -156,6 +125,6 @@ struct CurrentClassView: View {
 }
 
 #Preview {
-	CurrentClassView()
+	CurrentClassView(now: Date().addingTimeInterval(debugOffset))
 		.monospaced()
 }

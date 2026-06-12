@@ -64,7 +64,6 @@ final class WatchTimetableSyncStore: NSObject, WCSessionDelegate {
 		}
 
 		let previousTimetable = Defaults[.timetable]
-		let previousMode = Defaults[.displayMode]
 		let previousReceived = Defaults[.receivedTimetables]
 
 		// CLASSES
@@ -73,15 +72,6 @@ final class WatchTimetableSyncStore: NSObject, WCSessionDelegate {
 				Defaults[.timetable] = try JSONDecoder().decode([Class].self, from: timetableData)
 			} catch {
 				print("[Watch] timetable decode failed: \(error)")
-			}
-		}
-
-		// MODE
-		if let modeData = payload["displayMode"] as? Data {
-			do {
-				Defaults[.displayMode] = try JSONDecoder().decode(DisplayMode.self, from: modeData)
-			} catch {
-				print("[Watch] displayMode decode failed: \(error)")
 			}
 		}
 
@@ -96,7 +86,6 @@ final class WatchTimetableSyncStore: NSObject, WCSessionDelegate {
 
 		let changed =
 			previousTimetable != Defaults[.timetable] ||
-			previousMode != Defaults[.displayMode] ||
 			previousReceived != Defaults[.receivedTimetables]
 
 		if changed {

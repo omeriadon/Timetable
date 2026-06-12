@@ -2,7 +2,6 @@ import SwiftUI
 
 struct Main_Widget_View: View {
 	let classes: [Class]
-	let displayMode: DisplayMode
 
 	var body: some View {
 		let classLookup = TimetableLayout.classLookup(for: classes)
@@ -84,28 +83,16 @@ struct Main_Widget_View: View {
 					if let c = classLookup[Slot(day, session)] {
 						if day == 0, session == 7 {
 							VStack(alignment: .leading) {
-								switch displayMode {
-									case .symbolsOnly:
-										HStack {
-											Spacer(minLength: 0)
-											Image(systemName: c.symbol)
-												.resizable()
-												.aspectRatio(contentMode: .fit)
-												.frame(height: 9)
-											Spacer(minLength: 0)
-										}
-									case .textOnly:
-										GeometryReader { geo in
-											Text(c.id)
-												.lineLimit(1)
-												.font(.footnote.scaled(by: 0.5))
-												.padding(.leading, day == currentWeekdayIndex ? 4 : 3)
-												.fixedSize(horizontal: true, vertical: false)
-												.padding(.trailing, 1)
-												.frame(width: geo.size.width, alignment: .leading)
-												.clipped()
-												.allowsTightening(true)
-										}
+								GeometryReader { geo in
+									Text(c.id)
+										.lineLimit(1)
+										.font(.footnote.scaled(by: 0.5))
+										.padding(.leading, day == currentWeekdayIndex ? 4 : 3)
+										.fixedSize(horizontal: true, vertical: false)
+										.padding(.trailing, 1)
+										.frame(width: geo.size.width, alignment: .leading)
+										.clipped()
+										.allowsTightening(true)
 								}
 							}
 							.padding(1)
@@ -117,28 +104,16 @@ struct Main_Widget_View: View {
 							)
 						} else {
 							VStack(alignment: .leading) {
-								switch displayMode {
-									case .symbolsOnly:
-										HStack {
-											Spacer(minLength: 0)
-											Image(systemName: c.symbol)
-												.resizable()
-												.aspectRatio(contentMode: .fit)
-												.frame(height: 9)
-											Spacer(minLength: 0)
-										}
-									case .textOnly:
-										GeometryReader { geo in
-											Text(c.id)
-												.lineLimit(1)
-												.font(.footnote.scaled(by: 0.5))
-												.padding(.leading, day == currentWeekdayIndex ? 1 : 0)
-												.fixedSize(horizontal: true, vertical: false)
-												.padding(.trailing, 1)
-												.frame(width: geo.size.width, alignment: .leading)
-												.clipped()
-												.allowsTightening(true)
-										}
+								GeometryReader { geo in
+									Text(c.id)
+										.lineLimit(1)
+										.font(.footnote.scaled(by: 0.5))
+										.padding(.leading, day == currentWeekdayIndex ? 1 : 0)
+										.fixedSize(horizontal: true, vertical: false)
+										.padding(.trailing, 1)
+										.frame(width: geo.size.width, alignment: .leading)
+										.clipped()
+										.allowsTightening(true)
 								}
 							}
 							.padding(1)

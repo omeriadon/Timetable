@@ -27,7 +27,6 @@ struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiable, Equatabl
 
 extension Defaults.Keys {
 	static let timetable = Key<[Class]>("timetable", default: defaultTimetable, suite: sharedDefaults)
-	static let displayMode = Key<DisplayMode>("displayMode", default: .textOnly, suite: sharedDefaults)
 	static let receivedTimetables = Key<[ReceivedTimetable]>("receivedTimetables", default: [], suite: sharedDefaults)
 	static let userDisplayName = Key<String>("userDisplayName", default: "My Timetable", suite: sharedDefaults)
 }

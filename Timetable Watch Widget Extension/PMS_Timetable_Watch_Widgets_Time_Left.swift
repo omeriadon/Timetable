@@ -38,7 +38,6 @@ struct Timetable_Watch_Widgets_Time_Left: Widget {
 	TimetableEntry(
 		date: Date(),
 		classes: defaultTimetable,
-		displayMode: .symbolsOnly,
 		relevance: TimelineEntryRelevance(
 			score: 1.0,
 			duration: 60 * 60

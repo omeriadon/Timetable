@@ -10,7 +10,6 @@ import SwiftUI
 @MainActor
 func syncToWatchAsync(
 	classes: [Class],
-	displayMode: DisplayMode,
 	watchSync: PhoneWatchSyncBridge,
 	statusUpdate: @escaping (SyncMode) -> Void
 ) async {
