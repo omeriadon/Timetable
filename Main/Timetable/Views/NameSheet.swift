@@ -33,7 +33,7 @@ struct NameSheet: View {
 			}
 			.scrollDismissesKeyboard(.immediately)
 			.toolbar {
-				ToolbarItem(placement: .topBarTrailing) {
+				ToolbarItem(placement: .confirmationAction) {
 					Button(role: .confirm) {
 						userName = name
 					}

@@ -9,7 +9,10 @@ import Defaults
 import SwiftUI
 
 struct TimetableView: View {
+#if os(iOS)
 	@Binding var watchSync: PhoneWatchSyncBridge
+	@Binding var syncStatus: SyncMode
+#endif
 
 	@Default(.timetable) var classes
 	@Default(.receivedTimetables) var receivedTimetables
@@ -19,8 +22,7 @@ struct TimetableView: View {
 	@State private var showTimetableComparison = false
 	@State private var selectedSlot: Slot? = nil
 
-	@Binding var syncStatus: SyncMode
-
+#if os(iOS)
 	init(
 		watchSync: Binding<PhoneWatchSyncBridge>,
 		syncStatus: Binding<SyncMode>,
@@ -30,6 +32,12 @@ struct TimetableView: View {
 		self._syncStatus = syncStatus
 		self._showTimetableComparison = State(initialValue: startComparisonOpen)
 	}
+#else
+	init(
+		startComparisonOpen: Bool = false
+	) {
+		self._showTimetableComparison = State(initialValue: startComparisonOpen)
+	}
 
 	var currentTimetableTitle: String {
 		if let timetable = selectedTimetable {
@@ -37,6 +45,7 @@ struct TimetableView: View {
 		}
 		return "Timetable"
 	}
+#endif
 
 	var body: some View {
 		let classLookup = TimetableLayout.classLookup(for: selectedTimetable?.classes ?? classes)
@@ -70,6 +79,7 @@ struct TimetableView: View {
 				.scrollEdgeEffectStyle(.soft, for: .bottom)
 				.scrollEdgeEffectStyle(.hard, for: .top)
 			}
+#if os(iOS)
 			.onAppear {
 				watchSync.activateIfNeeded()
 				watchSync.pushTimetable()
@@ -77,6 +87,7 @@ struct TimetableView: View {
 			.onChange(of: classes) {
 				watchSync.pushTimetable()
 			}
+#endif
 		}
 		.padding(.trailing, 2)
 	}
@@ -191,11 +202,11 @@ struct TimetableView: View {
 	}
 }
 
+#if os(iOS)
 #Preview {
-	@Previewable @State var syncMode: SyncMode = .normal
-
 	@Previewable @State var showTimetableComparison = true
 
+	@Previewable @State var syncMode: SyncMode = .normal
 	@Previewable @State var bridge = PhoneWatchSyncBridge()
 
 	TimetableView(
@@ -203,4 +214,13 @@ struct TimetableView: View {
 		syncStatus: $syncMode,
 		startComparisonOpen: false
 	)
+
+	TimetableView(startComparisonOpen: false)
 }
+#else
+#Preview {
+	@Previewable @State var showTimetableComparison = true
+
+	TimetableView(startComparisonOpen: false)
+}
+#endif

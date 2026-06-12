@@ -5,11 +5,14 @@
 //  Created by Adon Omeri on 25/4/2026.
 //
 
+#if os(iOS)
 import ActivityKit
+#endif
+import Defaults
 import Foundation
 import SwiftUI
-import Defaults
 
+#if os(iOS)
 func startPushToStartListener() {
 	Task {
 		for await token in Activity<iPhone_Widget_ExtensionAttributes>.pushToStartTokenUpdates {
@@ -25,6 +28,7 @@ func startPushToStartListener() {
 		}
 	}
 }
+#endif
 
 struct ImportResult: Equatable {
 	let success: Bool
@@ -39,16 +43,18 @@ struct TimetableApp: App {
 
 	@Default(.userDisplayName) var userName
 
+	private let cloudSync = CloudStore.shared
+
 	var showNameSheet: Bool {
 		userName.isEmpty
 	}
 
-	init() {
-		startPushToStartListener()
-		#if DEBUG
-		let _ = try? LiveActivityManager.shared.startTestActivity()
-		#endif
-	}
+//	init() {
+//		startPushToStartListener()
+//		#if DEBUG
+//		let _ = try? LiveActivityManager.shared.startTestActivity()
+//		#endif
+//	}
 
 	var body: some Scene {
 		WindowGroup {

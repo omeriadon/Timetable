@@ -5,16 +5,15 @@
 //  Created by Adon Omeri on 25/4/2026.
 //
 
-import Defaults
 import SwiftUI
-
-private let sharedDefaults = UserDefaults(suiteName: "group.omeriadon.timetable") ?? UserDefaults.standard
+import Defaults
 
 enum DisplayMode: String, Codable, Equatable, Defaults.Serializable {
 	case symbolsOnly
 	case textOnly
 }
 
+typealias ReceivedTimetables = [ReceivedTimetable]
 struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiable, Equatable {
 	var id: String {
 		sender
@@ -23,12 +22,6 @@ struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiable, Equatabl
 	let sender: String
 	let classes: [Class]
 	let receivedAt: Date
-}
-
-extension Defaults.Keys {
-	static let timetable = Key<[Class]>("timetable", default: defaultTimetable, suite: sharedDefaults)
-	static let receivedTimetables = Key<[ReceivedTimetable]>("receivedTimetables", default: [], suite: sharedDefaults)
-	static let userDisplayName = Key<String>("userDisplayName", default: "My Timetable", suite: sharedDefaults)
 }
 
 typealias Timetable = [Class]

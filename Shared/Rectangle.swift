@@ -7,7 +7,42 @@
 
 import SwiftUI
 
-#if os(iOS)
+#if os(watchOS)
+
+struct rectangle<Content: View>: View {
+	let fill: Color
+	let isBreak: Bool
+	let content: Content
+
+	init(
+		_ fill: Color,
+		_ isBreak: Bool = false,
+		@ViewBuilder content: () -> Content
+	) {
+		self.fill = fill
+		self.isBreak = isBreak
+		self.content = content()
+	}
+
+	init(_ fill: Color, _ isBreak: Bool = false) where Content == EmptyView {
+		self.fill = fill
+		self.isBreak = isBreak
+		content = EmptyView()
+	}
+
+	var body: some View {
+		VStack(alignment: .leading) {
+			content
+				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+		}
+		.padding(2)
+		.background(fill)
+		.clipShape(RoundedRectangle(cornerRadius: isBreak ? 1 : 4))
+	}
+}
+
+#else
+
 struct rectangle<Content: View>: View {
 	let fill: Color
 	let isBreak: Bool
@@ -55,36 +90,4 @@ struct rectangle<Content: View>: View {
 	}
 }
 
-#elseif os(watchOS)
-struct rectangle<Content: View>: View {
-	let fill: Color
-	let isBreak: Bool
-	let content: Content
-
-	init(
-		_ fill: Color,
-		_ isBreak: Bool = false,
-		@ViewBuilder content: () -> Content
-	) {
-		self.fill = fill
-		self.isBreak = isBreak
-		self.content = content()
-	}
-
-	init(_ fill: Color, _ isBreak: Bool = false) where Content == EmptyView {
-		self.fill = fill
-		self.isBreak = isBreak
-		content = EmptyView()
-	}
-
-	var body: some View {
-		VStack(alignment: .leading) {
-			content
-				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-		}
-		.padding(2)
-		.background(fill)
-		.clipShape(RoundedRectangle(cornerRadius: isBreak ? 1 : 4))
-	}
-}
 #endif

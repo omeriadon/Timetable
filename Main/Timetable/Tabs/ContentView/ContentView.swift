@@ -10,12 +10,14 @@ import Defaults
 @preconcurrency import EventKit
 import SFSafeSymbols
 import SwiftUI
+#if os(iOS)
 import WatchConnectivity
 import WidgetKit
 
 enum SyncMode {
 	case normal, loading, success, error
 }
+#endif // os(iOS)
 
 struct SlotConflict {
 	let slot: Slot
@@ -40,24 +42,34 @@ struct ContentView: View {
 	@Environment(\.importedFileURL) private var importedFileURL
 	@Environment(\.receivedTimetableData) private var receivedTimetableData
 
+#if os(iOS)
 	@State private var watchSync = PhoneWatchSyncBridge()
-
-	@State private var selectedTab = 0
+	@State private var rootSyncStatus = SyncMode.normal
 	@State private var pendingSharedTimetable: ReceivedTimetable?
 	@State private var importErrorMessage: String?
+#endif // os(iOS)
 
-	@State private var rootSyncStatus = SyncMode.normal
+	@State private var selectedTab = 0
 
 	var body: some View {
 		TabView(selection: $selectedTab) {
 			Tab("Timetable", systemSymbol: .calendar, value: 0) {
+#if os(iOS)
 				TimetableView(watchSync: $watchSync, syncStatus: $rootSyncStatus)
+#else
+				TimetableView()
+#endif
 			}
 
 			Tab("Settings", systemSymbol: .gear, value: 1) {
+#if os(iOS)
 				SettingsView(watchSync: watchSync, syncStatus: $rootSyncStatus)
+#else
+				SettingsView()
+#endif
 			}
 		}
+#if os(iOS)
 		.sheet(item: $pendingSharedTimetable) { timetable in
 			SharedTimetableImportSheet(
 				timetable: timetable,
@@ -71,8 +83,6 @@ struct ContentView: View {
 			.presentationDetents([.medium, .large])
 			.presentationDragIndicator(.visible)
 		}
-		.monospaced()
-		.preferredColorScheme(.dark)
 		.onAppear {
 			processPendingSharedImport()
 		}
@@ -103,8 +113,12 @@ struct ContentView: View {
 			guard timetableData != nil else { return }
 			processPendingSharedImport()
 		}
+#endif // os(iOS)
+		.monospaced()
+		.preferredColorScheme(.dark)
 	}
 
+#if os(iOS)
 	private func importSharedTimetable(_ timetable: ReceivedTimetable) {
 		var existing = receivedTimetables
 		existing.append(timetable)
@@ -155,6 +169,7 @@ struct ContentView: View {
 			importErrorMessage = error.localizedDescription
 		}
 	}
+#endif // os(iOS)
 }
 
 #Preview {

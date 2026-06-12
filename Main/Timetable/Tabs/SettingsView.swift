@@ -7,16 +7,22 @@
 
 import Defaults
 import SwiftUI
+#if os(iOS)
 import WidgetKit
+#endif
 
 struct SettingsView: View {
 	@Default(.timetable) var classes
-	@Default(.userDisplayName) var userDisplayName
 	@Default(.receivedTimetables) var receivedTimetables
 
+	@Default(.userDisplayName) var userDisplayName
+	@State private var username: String
+
+#if os(iOS)
 	let watchSync: PhoneWatchSyncBridge
 
 	@Binding var syncStatus: SyncMode
+#endif
 
 	@State private var showCalendarImportSheet = false
 	@State private var timetableToDelete: ReceivedTimetable?
@@ -25,9 +31,23 @@ struct SettingsView: View {
 
 	@Namespace private var ns
 
+#if os(iOS)
+	init(watchSync: PhoneWatchSyncBridge, syncStatus: Binding<SyncMode>) {
+		_username = State(initialValue: Defaults[.userDisplayName])
+
+		self.watchSync = watchSync
+		self._syncStatus = syncStatus
+	}
+#else
+	init() {
+		_username = State(initialValue: Defaults[.userDisplayName])
+	}
+#endif
+
 	var body: some View {
 		NavigationStack {
 			List {
+#if os(iOS)
 				Section("Sync to Watch") {
 					SyncButton(
 						syncStatus: syncStatus,
@@ -42,10 +62,14 @@ struct SettingsView: View {
 						}
 					)
 				}
+#endif // os(iOS)
 
 				Section("Your Details") {
-					TextField("Your Name", text: $userDisplayName)
+					TextField("Your Name", text: $username)
 						.submitLabel(.done)
+				}
+				.onChange(of: username) {
+					Defaults[.userDisplayName] = username
 				}
 
 				Section("Your Timetable") {
@@ -68,7 +92,9 @@ struct SettingsView: View {
 						.presentationDetents([.fraction(0.85)])
 						.presentationDragIndicator(.hidden)
 						.interactiveDismissDisabled()
-						.navigationTransition(.zoom(sourceID: "sheetMorph", in: ns))
+#if os(iOS)
+							.navigationTransition(.zoom(sourceID: "sheetMorph", in: ns))
+#endif
 					}
 				}
 
@@ -100,10 +126,17 @@ struct SettingsView: View {
 			.scrollEdgeEffectStyle(.soft, for: .top)
 			.scrollContentBackground(.hidden)
 			.toolbar {
+#if os(iOS)
 				ToolbarItem(placement: .title) {
 					Text("Settings")
 						.monospaced()
 				}
+#else
+				ToolbarItem(placement: .navigation) {
+					Text("Settings")
+						.monospaced()
+				}
+#endif
 			}
 			.alert("Delete Timetable?", isPresented: $showDeleteConfirmation, presenting: timetableToDelete) { timetable in
 				Button("Cancel", role: .cancel) {}

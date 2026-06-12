@@ -39,14 +39,20 @@ struct ClassEditorSheet: View {
 						addClassPage
 							.tag(draftClasses.count)
 					}
+#if os(iOS)
 					.tabViewStyle(.page(indexDisplayMode: .always))
+#else
+					.tabViewStyle(.sidebarAdaptable)
+#endif
 					.animation(.snappy, value: draftClasses.count)
 				} else {
 					ProgressView()
 						.frame(maxWidth: .infinity, maxHeight: .infinity)
 				}
 			}
+#if os(iOS)
 			.navigationBarTitleDisplayMode(.inline)
+#endif
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button("Cancel", systemImage: "xmark") {
