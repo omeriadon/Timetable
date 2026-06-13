@@ -65,7 +65,7 @@ struct ReceivedTimetableTranscriptView: View {
 		} label: {
 			Label(hasAdded ? "Opening Timetable" : "Open in Timetable", systemImage: hasAdded ? "checkmark" : "plus")
 		}
-		.tint(.blue)
+		.tint(.accentColor)
 		.buttonStyle(.glassProminent)
 		.disabled(hasAdded)
 		.buttonBorderShape(.capsule)

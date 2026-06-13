@@ -49,7 +49,7 @@ struct TimetableView: View {
 						}
 						.animation(.easeInOut, value: isSending)
 					}
-					.tint(.blue)
+					.tint(.accentColor)
 					.buttonStyle(.glassProminent)
 					.buttonBorderShape(.capsule)
 					.buttonSizing(.flexible)

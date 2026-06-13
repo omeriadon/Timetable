@@ -1,5 +1,5 @@
 //
-//  Timetable_Watch_Widgets_Time_Left.swift
+//  TimeLeft.swift
 //  Timetable Watch Widgets
 //
 //  Created by Adon Omeri on 27/4/2026.
@@ -9,16 +9,16 @@ import Defaults
 import SwiftUI
 import WidgetKit
 
-struct Timetable_Watch_WidgetsEntryView_Time_Left: View {
+struct TimeLeftWidgetEntryView: View {
 	var entry: Provider.Entry
 
 	var body: some View {
-		Time_Left_Widget_View(entry: entry)
+		TimeLeftView(entry: entry)
 	}
 }
 
-struct Timetable_Watch_Widgets_Time_Left: Widget {
-	let kind: String = "Timetable_Watch_Widgets_Time_Left"
+struct TimeLeft: Widget {
+	let kind: String = "TimeLeft"
 
 	var body: some WidgetConfiguration {
 		StaticConfiguration(kind: kind, provider: Provider()) { entry in
@@ -28,10 +28,15 @@ struct Timetable_Watch_Widgets_Time_Left: Widget {
 		.contentMarginsDisabled()
 		.configurationDisplayName("Time Left in Subject")
 		.description("Check how much time left until the end of this period.")
+		#if os(watchOS)
 		.supportedFamilies([.accessoryRectangular])
+		#else
+		.supportedFamilies([.systemMedium])
+		#endif
 	}
 }
 
+#if os(watchOS)
 #Preview(as: .accessoryRectangular) {
 	Timetable_Watch_Widgets_Time_Left()
 } timeline: {
@@ -44,3 +49,17 @@ struct Timetable_Watch_Widgets_Time_Left: Widget {
 		)
 	)
 }
+#else
+#Preview(as: .systemMedium) {
+	Timetable_Watch_Widgets_Time_Left()
+} timeline: {
+	TimetableEntry(
+		date: Date(),
+		classes: defaultTimetable,
+		relevance: TimelineEntryRelevance(
+			score: 1.0,
+			duration: 60 * 60
+		)
+	)
+}
+#endif

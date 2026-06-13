@@ -31,13 +31,15 @@ struct ClassEditorSheet: View {
 			VStack {
 				if editorReady {
 					TabView(selection: $editorPage) {
-						ForEach(draftClasses.indices, id: \.self) { index in
-							classEditorPage(index: index)
-
-								.tag(index)
+						ForEach(Array(draftClasses.enumerated()), id: \.element.id) { index, draftClass in
+							Tab(draftClass.name, systemImage: draftClass.symbol, value: index) {
+								classEditorPage(index: index)
+							}
 						}
-						addClassPage
-							.tag(draftClasses.count)
+
+						Tab("Add Class", systemImage: "plus", value: draftClasses.count) {
+							addClassPage
+						}
 					}
 #if os(iOS)
 					.tabViewStyle(.page(indexDisplayMode: .always))
@@ -139,7 +141,9 @@ struct ClassEditorSheet: View {
 			editorReady = false
 		}
 		.sheet(isPresented: symbolPickerPresented) {
-			symbolPickerSheet
+			if let id = symbolPickerClassID {
+				symbolPickerSheet(for: id)
+			}
 		}
 	}
 
@@ -155,8 +159,11 @@ struct ClassEditorSheet: View {
 
 			Spacer()
 		}
+#if os(iOS)
 		.padding(.horizontal, 32)
-		.monospaced()
+#else
+		.padding(.horizontal, 10)
+#endif
 	}
 
 	var addClassPage: some View {
@@ -398,16 +405,13 @@ struct ClassEditorSheet: View {
 		)
 	}
 
-	@ViewBuilder
-	var symbolPickerSheet: some View {
-		if let symbolPickerClassID {
-			SymbolsPicker(
-				selection: selectedSymbolBinding(for: symbolPickerClassID),
-				title: "",
-				searchLabel: "Search symbols...",
-				autoDismiss: true
-			)
-		}
+	func symbolPickerSheet(for id: EditableClass.ID) -> some View {
+		SymbolsPicker(
+			selection: selectedSymbolBinding(for: id),
+			title: "",
+			searchLabel: "Search symbols...",
+			autoDismiss: true
+		)
 	}
 
 	func classHeaderRow(index: Int) -> some View {
@@ -475,6 +479,7 @@ struct ClassEditorSheet: View {
 			.foregroundStyle(.white)
 			.glassEffect(.clear.interactive(), in: Capsule())
 		}
+		.buttonStyle(.plain)
 	}
 
 	func slotEditorSection(index: Int) -> some View {
@@ -518,7 +523,7 @@ struct ClassEditorSheet: View {
 
 			Picker("Period:", selection: slot.period) {
 				ForEach(allowedPeriods(for: slot.wrappedValue.day), id: \.self) { period in
-					Text("Period \(period)").tag(period)
+					Text("\(period)").tag(period)
 				}
 			}
 			.frame(width: 140)

@@ -27,30 +27,26 @@ struct FriendsTimetables: View {
 		let symbol: String
 		let color: Color
 		var nextText = ""
-		let progressInfo: (start: Date, end: Date)?
 
 		switch state {
-			case let .inClass(current, next, info):
+			case let .inClass(current, next, _):
 				title = current?.id ?? "Free Period"
 				symbol = current?.symbol ?? "studentdesk"
 				color = current?.colour.swiftUIColor ?? .blue
 				nextText = next
-				progressInfo = info
 
-			case let .inBreak(breakTitle, next, info):
+			case let .inBreak(breakTitle, next, _):
 				title = breakTitle
 				symbol = breakTitle == "Lunch"
 					? "takeoutbag.and.cup.and.straw.fill"
 					: "cup.and.saucer.fill"
 				color = .orange
 				nextText = next
-				progressInfo = info
 
 			case .outsideSchool:
 				title = "School's Out"
 				symbol = "house.fill"
 				color = .secondary
-				progressInfo = nil
 		}
 
 		return GeometryReader { geo in

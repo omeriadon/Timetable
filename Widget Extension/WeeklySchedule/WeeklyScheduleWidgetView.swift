@@ -1,6 +1,15 @@
+//
+//  WeeklyScheduleWidgetView.swift
+//  Widget Extension
+//
+//  Created by Adon Omeri on 13/5/2026.
+//
+
+import Defaults
+
 import SwiftUI
 
-struct Main_Widget_View: View {
+struct WeeklyScheduleWidgetView: View {
 	let classes: [Class]
 
 	var body: some View {

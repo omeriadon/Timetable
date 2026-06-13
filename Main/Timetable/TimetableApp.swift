@@ -72,7 +72,9 @@ struct TimetableApp: App {
 				.environment(\.importedFileURL, $importedFileURL)
 				.environment(\.importStatus, $importStatus)
 				.environment(\.receivedTimetableData, $receivedTimetableData)
+				.frame(minWidth: 630, minHeight: 530)
 		}
+		.windowResizability(.contentMinSize)
 	}
 
 	private func handleIncomingURL(_ url: URL) {

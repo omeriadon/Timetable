@@ -33,7 +33,7 @@ struct RGBAColor: Codable, Hashable, Defaults.Serializable {
 	}
 
 	init(color: Color) {
-#if os(iOS)
+#if os(iOS) || os(watchOS)
 		let ui = UIColor(color)
 		var r: CGFloat = 0
 		var g: CGFloat = 0

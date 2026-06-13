@@ -61,6 +61,7 @@ struct TimetableView: View {
 				}
 				.scrollIndicators(.visible)
 				.scrollIndicatorsFlash(onAppear: true)
+				.opacity(receivedTimetables.isEmpty ? 0 : 1)
 				.safeAreaBar(edge: .top, alignment: .center, spacing: 10) {
 					HStack(spacing: 4) {
 						VStack(spacing: 4) {
@@ -75,6 +76,9 @@ struct TimetableView: View {
 						mainContent(classLookup: classLookup)
 					}
 					.padding(.bottom, 10)
+					#if os(macOS)
+					.padding([.top, .horizontal], 10)
+					#endif
 				}
 				.scrollEdgeEffectStyle(.soft, for: .bottom)
 				.scrollEdgeEffectStyle(.hard, for: .top)
@@ -215,7 +219,6 @@ struct TimetableView: View {
 		startComparisonOpen: false
 	)
 
-	TimetableView(startComparisonOpen: false)
 }
 #else
 #Preview {

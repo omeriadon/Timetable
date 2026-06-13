@@ -67,6 +67,9 @@ struct SettingsView: View {
 				Section("Your Details") {
 					TextField("Your Name", text: $username)
 						.submitLabel(.done)
+					#if os(macOS)
+						.textFieldStyle(.plain)
+					#endif
 				}
 				.onChange(of: username) {
 					Defaults[.userDisplayName] = username
@@ -94,7 +97,9 @@ struct SettingsView: View {
 						.interactiveDismissDisabled()
 #if os(iOS)
 							.navigationTransition(.zoom(sourceID: "sheetMorph", in: ns))
-#endif
+						#else
+							.frame(width: 600, height: 500)
+						#endif
 					}
 				}
 
@@ -103,10 +108,12 @@ struct SettingsView: View {
 						showCalendarImportSheet = true
 					} label: {
 						Label {
-							Text("Import Calendar")
-								.foregroundStyle(.tint)
-							Text("Subscribe to Compass Schedule in Calendar")
-								.foregroundStyle(.white.secondary)
+							VStack {
+								Text("Import Calendar")
+									.foregroundStyle(.accent)
+								Text("Subscribe to Compass Schedule in Calendar")
+									.foregroundStyle(.white.secondary)
+							}
 						} icon: {
 							Image(systemName: "calendar")
 								.foregroundStyle(.tint)
@@ -123,16 +130,12 @@ struct SettingsView: View {
 					importedTimetablesSection
 				}
 			}
+			.listStyle(.sidebar)
 			.scrollEdgeEffectStyle(.soft, for: .top)
 			.scrollContentBackground(.hidden)
 			.toolbar {
 #if os(iOS)
 				ToolbarItem(placement: .title) {
-					Text("Settings")
-						.monospaced()
-				}
-#else
-				ToolbarItem(placement: .navigation) {
 					Text("Settings")
 						.monospaced()
 				}

@@ -1,7 +1,14 @@
+//
+//  TimeLeftView.swift
+//  Widget Extension
+//
+//  Created by Adon Omeri on 13/5/2026.
+//
+
 import SwiftUI
 import WidgetKit
 
-struct Time_Left_Widget_View: View {
+struct TimeLeftView: View {
 	let entry: TimetableEntry
 
 	var body: some View {

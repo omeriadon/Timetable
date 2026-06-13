@@ -1,6 +1,6 @@
 //
 //  Shared.swift
-//  Timetable
+//  Widget Extension
 //
 //  Created by Adon Omeri on 13/5/2026.
 //
@@ -63,11 +63,15 @@ struct Provider: TimelineProvider {
 	}
 }
 
+// MARK: - TimetableEntry
+
 struct TimetableEntry: TimelineEntry {
 	let date: Date
 	let classes: [Class]
 	let relevance: TimelineEntryRelevance?
 }
+
+// MARK: - makeEntry
 
 private func makeEntry(
 	date: Date,
@@ -80,6 +84,8 @@ private func makeEntry(
 		relevance: relevance(for: date, calendar: calendar)
 	)
 }
+
+// MARK: - nextFiveWeekdays
 
 private func nextFiveWeekdays(from date: Date, calendar: Calendar) -> [Date] {
 	var days: [Date] = []
@@ -98,6 +104,8 @@ private func nextFiveWeekdays(from date: Date, calendar: Calendar) -> [Date] {
 	return days
 }
 
+// MARK: - nextTick
+
 private func nextTick(
 	after now: Date,
 	schoolStart: Date,
@@ -111,6 +119,8 @@ private func nextTick(
 
 	return calendar.date(byAdding: .minute, value: offset, to: schoolStart) ?? now
 }
+
+// MARK: - Relevance
 
 private func relevance(for date: Date, calendar: Calendar) -> TimelineEntryRelevance? {
 	let weekday = calendar.component(.weekday, from: date)
