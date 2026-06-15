@@ -9,21 +9,27 @@ import Defaults
 import SwiftUI
 import WidgetKit
 
-struct TimeLeftWidgetEntryView: View {
-	var entry: Provider.Entry
-
-	var body: some View {
-		TimeLeftView(entry: entry)
-	}
-}
-
 struct TimeLeftWidget: Widget {
 	let kind: String = "TimeLeft"
 
 	var body: some WidgetConfiguration {
 		StaticConfiguration(kind: kind, provider: Provider()) { entry in
-			TimeLeftView(entry: entry)
-				.containerBackground(.ultraThinMaterial, for: .widget)
+			let classLookup = TimetableLayout.classLookup(for: entry.classes)
+			let state = getSchoolState(at: entry.date, classLookup: classLookup)
+
+			let background: Color = {
+				switch state {
+					case let .inClass(current, _, _):
+						return current?.colour.swiftUIColor ?? .gray
+					case .inBreak:
+						return .orange
+					case .outsideSchool:
+						return .black
+				}
+			}()
+
+			TimeLeftView(entry: entry, state: state)
+				.containerBackground(background, for: .widget)
 		}
 		.contentMarginsDisabled()
 		.configurationDisplayName("Time Left in Subject")

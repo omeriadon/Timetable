@@ -7,9 +7,12 @@
 
 import Defaults
 import SwiftUI
+import WidgetKit
 
-struct WeeklyScheduleWidgetView: View {
-	let classes: [Class]
+struct WeeklyScheduleView: View {
+	@Default(.timetable) var classes
+
+	@Environment(\.widgetRenderingMode) var widgetRenderingMode
 
 	// MARK: - body
 
@@ -28,19 +31,36 @@ struct WeeklyScheduleWidgetView: View {
 							Spacer()
 
 							Text(TimetableLayout.shortDayLabels[day])
-								.padding(.vertical, Device.isNotWatchOS ? 5 : 0)
-								.font(Device.isWatchOS ? .footnote.scaled(by: 0.5) : .caption)
-								.frame(height: 10)
+								.font(Device.isWatchOS ? .footnote.scaled(by: 0.5) : .callout)
+								.frame(height: Device.isWatchOS ? 10 : 20)
+								.blendMode(day == currentWeekdayIndex && Device.isNotWatchOS ? .destinationOut : .normal)
 
 							Spacer()
 						}
+						.background {
+							if day == currentWeekdayIndex && Device.isNotWatchOS {
+								Rectangle()
+									.fill(.white)
+									.clipShape(
+										UnevenRoundedRectangle(
+											cornerRadii: .init(
+												topLeading: 0,
+												bottomLeading: 7,
+												bottomTrailing: 7,
+												topTrailing: 0
+											)
+										)
+									)
+									.padding(.bottom, 1)
+							}
+						}
 						.background(
-							day == currentWeekdayIndex
+							day == currentWeekdayIndex && Device.isWatchOS
 								? Color.white
 								: Color.clear
 						)
 						.foregroundStyle(
-							day == currentWeekdayIndex
+							day == currentWeekdayIndex && Device.isWatchOS
 								? Color.black
 								: Color.white
 						)
@@ -52,21 +72,21 @@ struct WeeklyScheduleWidgetView: View {
 						Spacer(minLength: 0)
 					}
 					.overlay(alignment: .leading) {
-						if day == currentWeekdayIndex {
+						if day == currentWeekdayIndex && Device.isWatchOS {
 							Rectangle()
 								.fill(Color.white)
 								.frame(width: 1)
 						}
 					}
 					.overlay(alignment: .trailing) {
-						if day == currentWeekdayIndex {
+						if day == currentWeekdayIndex && Device.isWatchOS {
 							Rectangle()
 								.fill(Color.white)
 								.frame(width: 1)
 						}
 					}
 					.overlay(alignment: .bottom) {
-						if day == currentWeekdayIndex {
+						if day == currentWeekdayIndex && Device.isWatchOS {
 							Rectangle()
 								.fill(Color.white)
 								.frame(height: 1)
@@ -82,19 +102,21 @@ struct WeeklyScheduleWidgetView: View {
 
 	// MARK: - sessionCell
 
+	@ViewBuilder
 	func sessionCell(_ day: Int, _ session: Int, classLookup: [Slot: Class]) -> some View {
-		let leadingPadding: CGFloat = if day == 0, session == 7, Device.isWatchOS {
-			day == currentWeekdayIndex ? 4 : 3
-		} else {
-			day == currentWeekdayIndex ? 1 : 0
-		}
+		let leadingPadding: CGFloat =
+			if day == 0, session == 7, Device.isWatchOS {
+				day == currentWeekdayIndex ? 4 : 3
+			} else {
+				day == currentWeekdayIndex ? 3 : 4
+			}
 
-		return Group {
+		ZStack {
 			// break
 			if TimetableLayout.isBreakSession(index: session) {
 				Text("")
 					.font(.footnote.scaled(by: 0.1))
-					.frame(height: 2)
+					.frame(height: Device.isWatchOS ? 2 : 1)
 			} else {
 				// early finish
 				if TimetableLayout.isUnavailable(day: day, session: session) {
@@ -104,23 +126,36 @@ struct WeeklyScheduleWidgetView: View {
 					if let c = classLookup[Slot(day, session)] {
 						GeometryReader { geo in
 							Text(c.id)
+								.foregroundStyle(.white)
 								.lineLimit(1)
-								.font(Device.isWatchOS ? .footnote.scaled(by: 0.5) : .callout)
+								.font(Device.isWatchOS ? .footnote.scaled(by: 0.5) : .footnote)
 								.padding(.leading, leadingPadding)
-								.padding(.trailing, 1)
+								.allowsTightening(true)
 								.fixedSize(horizontal: true, vertical: false)
 								.frame(width: geo.size.width, height: geo.size.height, alignment: .leading)
+								.blendMode(
+									day == currentWeekdayIndex &&
+										Device.isNotWatchOS &&
+										widgetRenderingMode != .fullColor
+										? .destinationOut : .normal
+								)
 								.clipped()
-								.allowsTightening(true)
+								.padding(.trailing, 1)
 						}
-
 						.padding(1)
 						.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-						.foregroundStyle(.white)
-						.background(
-							RoundedRectangle(cornerRadius: Device.isWatchOS ? 0 : 7)
-								.fill(c.colour.swiftUIColor)
-						)
+						.background {
+							if day == currentWeekdayIndex {
+								RoundedRectangle(cornerRadius: Device.isWatchOS ? 0 : 7)
+									.fill(c.colour.swiftUIColor)
+							} else if widgetRenderingMode != .fullColor {
+								RoundedRectangle(cornerRadius: Device.isWatchOS ? 0 : 7)
+									.stroke(c.colour.swiftUIColor)
+							} else {
+								RoundedRectangle(cornerRadius: Device.isWatchOS ? 0 : 7)
+									.fill(c.colour.swiftUIColor)
+							}
+						}
 
 					} else {
 						// empty period?
@@ -130,6 +165,7 @@ struct WeeklyScheduleWidgetView: View {
 				}
 			}
 		}
+		.compositingGroup()
 		.padding(Device.isNotWatchOS ? 1 : 0)
 		.foregroundStyle(.white)
 	}
@@ -145,5 +181,5 @@ struct WeeklyScheduleWidgetView: View {
 }
 
 #Preview {
-	WeeklyScheduleWidgetView(classes: defaultTimetable)
+	WeeklyScheduleView()
 }

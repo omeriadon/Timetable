@@ -162,7 +162,8 @@ struct ClassEditorSheet: View {
 		#if os(iOS)
 		.padding(.horizontal, 32)
 		#else
-		.padding(.horizontal, 10)
+		.padding(.horizontal, 20)
+		.padding(.top, 10)
 		#endif
 	}
 
@@ -478,6 +479,8 @@ struct ClassEditorSheet: View {
 			.padding(10)
 			.foregroundStyle(.white)
 			.glassEffect(.clear.interactive(), in: Capsule())
+			.frame(height: 25)
+			.contentShape(.capsule)
 		}
 		.buttonStyle(.plain)
 	}

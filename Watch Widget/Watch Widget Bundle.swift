@@ -9,9 +9,8 @@ import SwiftUI
 import WidgetKit
 
 @main
-struct WidgetsBundle: WidgetBundle {
+struct WatchWidgetBundle: WidgetBundle {
 	var body: some Widget {
-		WeeklyScheduleWidget()
-		TimeLeftWidget()
+		SharedWidgetBundle()
 	}
 }

@@ -106,8 +106,8 @@ struct SettingsView: View {
 						showCalendarImportSheet = true
 					} label: {
 						Label {
-							VStack {
-								Text("Import Calendar")
+							VStack(alignment: .leading) {
+								Text("Import from Calendar")
 									.foregroundStyle(.accent)
 								Text("Subscribe to Compass Schedule in Calendar")
 									.foregroundStyle(.white.secondary)

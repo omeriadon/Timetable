@@ -9,20 +9,12 @@ import Defaults
 import SwiftUI
 import WidgetKit
 
-struct WeeklyScheduleWidgetEntryView: View {
-	var entry: Provider.Entry
-
-	var body: some View {
-		WeeklyScheduleWidgetView(classes: entry.classes)
-	}
-}
-
 struct WeeklyScheduleWidget: Widget {
 	let kind: String = "WeeklySchedule"
 
 	var body: some WidgetConfiguration {
-		StaticConfiguration(kind: kind, provider: Provider()) { entry in
-			WeeklyScheduleWidgetEntryView(entry: entry)
+		StaticConfiguration(kind: kind, provider: Provider()) { _ in
+			WeeklyScheduleView()
 				.containerBackground(.black, for: .widget)
 		}
 		#if os(watchOS)
