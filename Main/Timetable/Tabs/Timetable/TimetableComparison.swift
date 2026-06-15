@@ -1,5 +1,5 @@
 //
-//  TimetableComparisonshet.swift
+//  TimetableComparison.swift
 //  Timetable
 //
 //  Created by Adon Omeri on 11/6/2026.
@@ -40,9 +40,9 @@ struct TimetableComparison: View {
 		.padding()
 	}
 
-	func item<Right: View>(
+	func item(
 		left: String,
-		right: Right,
+		right: some View,
 		colour: Color
 	) -> some View {
 		HStack {

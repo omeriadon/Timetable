@@ -17,49 +17,49 @@ struct TimeLeftWidgetEntryView: View {
 	}
 }
 
-struct TimeLeft: Widget {
+struct TimeLeftWidget: Widget {
 	let kind: String = "TimeLeft"
 
 	var body: some WidgetConfiguration {
 		StaticConfiguration(kind: kind, provider: Provider()) { entry in
-			Timetable_Watch_WidgetsEntryView_Time_Left(entry: entry)
+			TimeLeftView(entry: entry)
 				.containerBackground(.ultraThinMaterial, for: .widget)
 		}
 		.contentMarginsDisabled()
 		.configurationDisplayName("Time Left in Subject")
 		.description("Check how much time left until the end of this period.")
 		#if os(watchOS)
-		.supportedFamilies([.accessoryRectangular])
+			.supportedFamilies([.accessoryRectangular])
 		#else
-		.supportedFamilies([.systemMedium])
+			.supportedFamilies([.systemMedium])
 		#endif
 	}
 }
 
 #if os(watchOS)
-#Preview(as: .accessoryRectangular) {
-	Timetable_Watch_Widgets_Time_Left()
-} timeline: {
-	TimetableEntry(
-		date: Date(),
-		classes: defaultTimetable,
-		relevance: TimelineEntryRelevance(
-			score: 1.0,
-			duration: 60 * 60
+	#Preview(as: .accessoryRectangular, widget: {
+		TimeLeftWidget()
+	}, timeline: {
+		TimetableEntry(
+			date: Date(),
+			classes: defaultTimetable,
+			relevance: TimelineEntryRelevance(
+				score: 1.0,
+				duration: 60 * 60
+			)
 		)
-	)
-}
+	})
 #else
-#Preview(as: .systemMedium) {
-	Timetable_Watch_Widgets_Time_Left()
-} timeline: {
-	TimetableEntry(
-		date: Date(),
-		classes: defaultTimetable,
-		relevance: TimelineEntryRelevance(
-			score: 1.0,
-			duration: 60 * 60
+	#Preview(as: .systemMedium, widget: {
+		TimeLeftWidget()
+	}, timeline: {
+		TimetableEntry(
+			date: Date(),
+			classes: defaultTimetable,
+			relevance: TimelineEntryRelevance(
+				score: 1.0,
+				duration: 60 * 60
+			)
 		)
-	)
-}
+	})
 #endif

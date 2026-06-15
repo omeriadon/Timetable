@@ -9,10 +9,10 @@ import Defaults
 import SwiftUI
 
 struct TimetableView: View {
-#if os(iOS)
-	@Binding var watchSync: PhoneWatchSyncBridge
-	@Binding var syncStatus: SyncMode
-#endif
+	#if os(iOS)
+		@Binding var watchSync: PhoneWatchSyncBridge
+		@Binding var syncStatus: SyncMode
+	#endif
 
 	@Default(.timetable) var classes
 	@Default(.receivedTimetables) var receivedTimetables
@@ -22,30 +22,30 @@ struct TimetableView: View {
 	@State private var showTimetableComparison = false
 	@State private var selectedSlot: Slot? = nil
 
-#if os(iOS)
-	init(
-		watchSync: Binding<PhoneWatchSyncBridge>,
-		syncStatus: Binding<SyncMode>,
-		startComparisonOpen: Bool = false
-	) {
-		self._watchSync = watchSync
-		self._syncStatus = syncStatus
-		self._showTimetableComparison = State(initialValue: startComparisonOpen)
-	}
-#else
-	init(
-		startComparisonOpen: Bool = false
-	) {
-		self._showTimetableComparison = State(initialValue: startComparisonOpen)
-	}
-
-	var currentTimetableTitle: String {
-		if let timetable = selectedTimetable {
-			return "\(timetable.sender)'s Timetable"
+	#if os(iOS)
+		init(
+			watchSync: Binding<PhoneWatchSyncBridge>,
+			syncStatus: Binding<SyncMode>,
+			startComparisonOpen: Bool = false
+		) {
+			_watchSync = watchSync
+			_syncStatus = syncStatus
+			_showTimetableComparison = State(initialValue: startComparisonOpen)
 		}
-		return "Timetable"
-	}
-#endif
+	#else
+		init(
+			startComparisonOpen: Bool = false
+		) {
+			_showTimetableComparison = State(initialValue: startComparisonOpen)
+		}
+
+		var currentTimetableTitle: String {
+			if let timetable = selectedTimetable {
+				return "\(timetable.sender)'s Timetable"
+			}
+			return "Timetable"
+		}
+	#endif
 
 	var body: some View {
 		let classLookup = TimetableLayout.classLookup(for: selectedTimetable?.classes ?? classes)
@@ -77,13 +77,13 @@ struct TimetableView: View {
 					}
 					.padding(.bottom, 10)
 					#if os(macOS)
-					.padding([.top, .horizontal], 10)
+						.padding([.top, .horizontal], 10)
 					#endif
 				}
 				.scrollEdgeEffectStyle(.soft, for: .bottom)
 				.scrollEdgeEffectStyle(.hard, for: .top)
 			}
-#if os(iOS)
+			#if os(iOS)
 			.onAppear {
 				watchSync.activateIfNeeded()
 				watchSync.pushTimetable()
@@ -91,7 +91,7 @@ struct TimetableView: View {
 			.onChange(of: classes) {
 				watchSync.pushTimetable()
 			}
-#endif
+			#endif
 		}
 		.padding(.trailing, 2)
 	}
@@ -207,23 +207,22 @@ struct TimetableView: View {
 }
 
 #if os(iOS)
-#Preview {
-	@Previewable @State var showTimetableComparison = true
+	#Preview {
+		@Previewable @State var showTimetableComparison = true
 
-	@Previewable @State var syncMode: SyncMode = .normal
-	@Previewable @State var bridge = PhoneWatchSyncBridge()
+		@Previewable @State var syncMode: SyncMode = .normal
+		@Previewable @State var bridge = PhoneWatchSyncBridge()
 
-	TimetableView(
-		watchSync: $bridge,
-		syncStatus: $syncMode,
-		startComparisonOpen: false
-	)
-
-}
+		TimetableView(
+			watchSync: $bridge,
+			syncStatus: $syncMode,
+			startComparisonOpen: false
+		)
+	}
 #else
-#Preview {
-	@Previewable @State var showTimetableComparison = true
+	#Preview {
+		@Previewable @State var showTimetableComparison = true
 
-	TimetableView(startComparisonOpen: false)
-}
+		TimetableView(startComparisonOpen: false)
+	}
 #endif

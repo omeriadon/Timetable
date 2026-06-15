@@ -1,5 +1,5 @@
 //
-//  SchoolState.swift
+//  For Widgets.swift
 //  Timetable
 //
 //  Created by Adon Omeri on 11/6/2026.

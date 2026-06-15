@@ -6,28 +6,28 @@
 //
 
 #if os(iOS)
-import ActivityKit
+	import ActivityKit
 #endif
 import Defaults
 import Foundation
 import SwiftUI
 
 #if os(iOS)
-func startPushToStartListener() {
-	Task {
-		for await token in Activity<iPhone_Widget_ExtensionAttributes>.pushToStartTokenUpdates {
-			let tokenString = token.map { String(format: "%02x", $0) }.joined()
+	func startPushToStartListener() {
+		Task {
+			for await token in Activity<iPhone_Widget_ExtensionAttributes>.pushToStartTokenUpdates {
+				let tokenString = token.map { String(format: "%02x", $0) }.joined()
 
-			print("PUSH-TO-START TOKEN (hex): \(tokenString)")
-			let base64 = Data(token).base64EncodedString()
-			print("BASE64: \(base64)")
+				print("PUSH-TO-START TOKEN (hex): \(tokenString)")
+				let base64 = Data(token).base64EncodedString()
+				print("BASE64: \(base64)")
 
-			Task {
-				await NetworkManager.shared.registerPushToStartToken(tokenString)
+				Task {
+					await NetworkManager.shared.registerPushToStartToken(tokenString)
+				}
 			}
 		}
 	}
-}
 #endif
 
 struct ImportResult: Equatable {
@@ -72,7 +72,7 @@ struct TimetableApp: App {
 				.environment(\.importedFileURL, $importedFileURL)
 				.environment(\.importStatus, $importStatus)
 				.environment(\.receivedTimetableData, $receivedTimetableData)
-				.frame(minWidth: 630, minHeight: 530)
+				.frame(minWidth: 630, minHeight: 500)
 		}
 		.windowResizability(.contentMinSize)
 	}

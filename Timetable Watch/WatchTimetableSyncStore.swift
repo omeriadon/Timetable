@@ -29,8 +29,8 @@ final class WatchTimetableSyncStore: NSObject, WCSessionDelegate {
 		isActivated = true
 	}
 
-	func session(_ session: WCSession,
-	             activationDidCompleteWith activationState: WCSessionActivationState,
+	func session(_: WCSession,
+	             activationDidCompleteWith _: WCSessionActivationState,
 	             error: Error?)
 	{
 		if let error {
@@ -38,17 +38,17 @@ final class WatchTimetableSyncStore: NSObject, WCSessionDelegate {
 		}
 	}
 
-	func sessionReachabilityDidChange(_ session: WCSession) {}
+	func sessionReachabilityDidChange(_: WCSession) {}
 
-	func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
+	func session(_: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
 		handleIncomingPayload(applicationContext, source: "applicationContext")
 	}
 
-	func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
+	func session(_: WCSession, didReceiveMessage message: [String: Any]) {
 		handleIncomingPayload(message, source: "message")
 	}
 
-	func session(_ session: WCSession,
+	func session(_: WCSession,
 	             didReceiveMessage message: [String: Any],
 	             replyHandler: @escaping ([String: Any]) -> Void)
 	{
@@ -56,7 +56,7 @@ final class WatchTimetableSyncStore: NSObject, WCSessionDelegate {
 		replyHandler(["status": "ok"])
 	}
 
-	private func handleIncomingPayload(_ payload: [String: Any], source: String) {
+	private func handleIncomingPayload(_ payload: [String: Any], source _: String) {
 		// ERROR
 		if let payloadError = payload["error"] as? String {
 			alertMessage = payloadError

@@ -19,7 +19,7 @@ final class NetworkManager {
 		request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
 		request.httpBody = try? JSONSerialization.data(withJSONObject: [
-			"token": token
+			"token": token,
 		])
 
 		_ = try? await URLSession.shared.data(for: request)

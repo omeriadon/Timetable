@@ -38,7 +38,7 @@ final class PhoneWatchSyncBridge: NSObject, WCSessionDelegate {
 			let payload: [String: Any] = [
 				"timetableData": timetableData,
 				"receivedTimetables": receivedData,
-				"updatedAt": Date().timeIntervalSince1970
+				"updatedAt": Date().timeIntervalSince1970,
 			]
 
 			let session = WCSession.default

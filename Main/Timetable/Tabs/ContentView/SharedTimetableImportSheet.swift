@@ -56,11 +56,7 @@ struct SharedTimetableImportSheet: View {
 			classes: defaultTimetable,
 			receivedAt: Date()
 		),
-		onCancel: {
-
-		},
-		onImport: {
-
-		}
+		onCancel: {},
+		onImport: {}
 	)
 }

@@ -6,33 +6,32 @@
 //
 
 import Defaults
-
 import SwiftUI
 
 struct WeeklyScheduleWidgetView: View {
 	let classes: [Class]
 
+	// MARK: - body
+
 	var body: some View {
 		let classLookup = TimetableLayout.classLookup(for: classes)
 
 		if classes.isEmpty {
-			VStack(spacing: 4) {
-				Text("No timetable")
-					.font(.caption)
-				Text("synced yet")
-					.font(.caption)
-			}
-			.frame(maxWidth: .infinity, maxHeight: .infinity)
-			.background(Color.gray.opacity(0.2))
+			Text("No timetable synced yet")
+				.lineLimit(2)
+
 		} else {
 			HStack(spacing: 0) {
 				ForEach(0 ..< 5) { day in
 					VStack(spacing: 0) {
 						HStack {
 							Spacer()
+
 							Text(TimetableLayout.shortDayLabels[day])
-								.font(.footnote.scaled(by: 0.5))
+								.padding(.vertical, Device.isNotWatchOS ? 5 : 0)
+								.font(Device.isWatchOS ? .footnote.scaled(by: 0.5) : .caption)
 								.frame(height: 10)
+
 							Spacer()
 						}
 						.background(
@@ -49,6 +48,8 @@ struct WeeklyScheduleWidgetView: View {
 						ForEach(0 ..< 8) { session in
 							sessionCell(day, session, classLookup: classLookup)
 						}
+
+						Spacer(minLength: 0)
 					}
 					.overlay(alignment: .leading) {
 						if day == currentWeekdayIndex {
@@ -73,75 +74,67 @@ struct WeeklyScheduleWidgetView: View {
 					}
 				}
 			}
+			.padding([.bottom, .horizontal], Device.isNotWatchOS ? 8 : 0)
 			.environment(\.dynamicTypeSize, .xSmall)
 			.monospaced()
 		}
 	}
 
+	// MARK: - sessionCell
+
 	func sessionCell(_ day: Int, _ session: Int, classLookup: [Slot: Class]) -> some View {
-		Group {
+		let leadingPadding: CGFloat = if day == 0, session == 7, Device.isWatchOS {
+			day == currentWeekdayIndex ? 4 : 3
+		} else {
+			day == currentWeekdayIndex ? 1 : 0
+		}
+
+		return Group {
+			// break
 			if TimetableLayout.isBreakSession(index: session) {
 				Text("")
 					.font(.footnote.scaled(by: 0.1))
 					.frame(height: 2)
 			} else {
+				// early finish
 				if TimetableLayout.isUnavailable(day: day, session: session) {
 					RoundedRectangle(cornerRadius: 0)
 						.fill(.clear)
 				} else {
 					if let c = classLookup[Slot(day, session)] {
-						if day == 0, session == 7 {
-							VStack(alignment: .leading) {
-								GeometryReader { geo in
-									Text(c.id)
-										.lineLimit(1)
-										.font(.footnote.scaled(by: 0.5))
-										.padding(.leading, day == currentWeekdayIndex ? 4 : 3)
-										.fixedSize(horizontal: true, vertical: false)
-										.padding(.trailing, 1)
-										.frame(width: geo.size.width, alignment: .leading)
-										.clipped()
-										.allowsTightening(true)
-								}
-							}
-							.padding(1)
-							.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-							.foregroundStyle(.white)
-							.background(
-								RoundedRectangle(cornerRadius: 0)
-									.fill(c.colour.swiftUIColor)
-							)
-						} else {
-							VStack(alignment: .leading) {
-								GeometryReader { geo in
-									Text(c.id)
-										.lineLimit(1)
-										.font(.footnote.scaled(by: 0.5))
-										.padding(.leading, day == currentWeekdayIndex ? 1 : 0)
-										.fixedSize(horizontal: true, vertical: false)
-										.padding(.trailing, 1)
-										.frame(width: geo.size.width, alignment: .leading)
-										.clipped()
-										.allowsTightening(true)
-								}
-							}
-							.padding(1)
-							.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-							.foregroundStyle(.white)
-							.background(
-								RoundedRectangle(cornerRadius: 0)
-									.fill(c.colour.swiftUIColor)
-							)
+						GeometryReader { geo in
+							Text(c.id)
+								.lineLimit(1)
+								.font(Device.isWatchOS ? .footnote.scaled(by: 0.5) : .callout)
+								.padding(.leading, leadingPadding)
+								.padding(.trailing, 1)
+								.fixedSize(horizontal: true, vertical: false)
+								.frame(width: geo.size.width, height: geo.size.height, alignment: .leading)
+								.clipped()
+								.allowsTightening(true)
 						}
+
+						.padding(1)
+						.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+						.foregroundStyle(.white)
+						.background(
+							RoundedRectangle(cornerRadius: Device.isWatchOS ? 0 : 7)
+								.fill(c.colour.swiftUIColor)
+						)
+
 					} else {
+						// empty period?
 						RoundedRectangle(cornerRadius: 0)
-							.fill(.white.opacity(0.05))
+							.fill(.clear)
 					}
 				}
 			}
 		}
+		.padding(Device.isNotWatchOS ? 1 : 0)
 		.foregroundStyle(.white)
 	}
+
+	// MARK: - currentWeekdayIndex
 
 	private var currentWeekdayIndex: Int {
 		let weekday = Calendar.current.component(.weekday, from: Date())
@@ -149,4 +142,8 @@ struct WeeklyScheduleWidgetView: View {
 		// convert to 0 = Monday ... 4 = Friday
 		return (weekday + 5) % 7
 	}
+}
+
+#Preview {
+	WeeklyScheduleWidgetView(classes: defaultTimetable)
 }

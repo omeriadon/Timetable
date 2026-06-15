@@ -41,20 +41,20 @@ struct ClassEditorSheet: View {
 							addClassPage
 						}
 					}
-#if os(iOS)
+					#if os(iOS)
 					.tabViewStyle(.page(indexDisplayMode: .always))
-#else
+					#else
 					.tabViewStyle(.sidebarAdaptable)
-#endif
+					#endif
 					.animation(.snappy, value: draftClasses.count)
 				} else {
 					ProgressView()
 						.frame(maxWidth: .infinity, maxHeight: .infinity)
 				}
 			}
-#if os(iOS)
+			#if os(iOS)
 			.navigationBarTitleDisplayMode(.inline)
-#endif
+			#endif
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button("Cancel", systemImage: "xmark") {
@@ -159,11 +159,11 @@ struct ClassEditorSheet: View {
 
 			Spacer()
 		}
-#if os(iOS)
+		#if os(iOS)
 		.padding(.horizontal, 32)
-#else
+		#else
 		.padding(.horizontal, 10)
-#endif
+		#endif
 	}
 
 	var addClassPage: some View {

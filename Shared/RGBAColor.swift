@@ -33,35 +33,35 @@ struct RGBAColor: Codable, Hashable, Defaults.Serializable {
 	}
 
 	init(color: Color) {
-#if os(iOS) || os(watchOS)
-		let ui = UIColor(color)
-		var r: CGFloat = 0
-		var g: CGFloat = 0
-		var b: CGFloat = 0
-		var a: CGFloat = 0
+		#if os(iOS) || os(watchOS)
+			let ui = UIColor(color)
+			var r: CGFloat = 0
+			var g: CGFloat = 0
+			var b: CGFloat = 0
+			var a: CGFloat = 0
 
-		ui.getRed(&r, green: &g, blue: &b, alpha: &a)
+			ui.getRed(&r, green: &g, blue: &b, alpha: &a)
 
-		self.r = Double(r)
-		self.g = Double(g)
-		self.b = Double(b)
-		self.a = Double(a)
+			self.r = Double(r)
+			self.g = Double(g)
+			self.b = Double(b)
+			self.a = Double(a)
 
-#else
-		let ns = NSColor(color).usingColorSpace(.deviceRGB) ?? NSColor.white
+		#else
+			let ns = NSColor(color).usingColorSpace(.deviceRGB) ?? NSColor.white
 
-		var r: CGFloat = 0
-		var g: CGFloat = 0
-		var b: CGFloat = 0
-		var a: CGFloat = 0
+			var r: CGFloat = 0
+			var g: CGFloat = 0
+			var b: CGFloat = 0
+			var a: CGFloat = 0
 
-		ns.getRed(&r, green: &g, blue: &b, alpha: &a)
+			ns.getRed(&r, green: &g, blue: &b, alpha: &a)
 
-		self.r = Double(r)
-		self.g = Double(g)
-		self.b = Double(b)
-		self.a = Double(a)
-#endif
+			self.r = Double(r)
+			self.g = Double(g)
+			self.b = Double(b)
+			self.a = Double(a)
+		#endif
 	}
 
 	init(hexString: String) {

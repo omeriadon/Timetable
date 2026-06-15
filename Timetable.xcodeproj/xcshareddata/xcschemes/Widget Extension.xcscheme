@@ -16,22 +16,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "2A1DB4172F9ECEC100E5AE7C"
-               BuildableName = "Timetable Watch Widget Extension.appex"
-               ReferencedContainer = "container:Timetable.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "2A098C822F9DB842002065BE"
-               BuildableName = "Watch.app"
-               BlueprintName = "Watch"
+               BlueprintIdentifier = "2A25869F2FB5D6490030C8CD"
+               BuildableName = "Widget Extension.appex"
+               BlueprintName = "Widget Extension"
                ReferencedContainer = "container:Timetable.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -69,20 +56,12 @@
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES"
       queueDebuggingEnabled = "No">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2A02378A2F9C8EA000AB1E1F"
             BuildableName = "Timetable.app"
-            ReferencedContainer = "container:Timetable.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "2A098C822F9DB842002065BE"
-            BuildableName = "Watch.app"
+            BlueprintName = "Timetable"
             ReferencedContainer = "container:Timetable.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -114,16 +93,18 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "2A1DB4172F9ECEC100E5AE7C"
-            BuildableName = "Timetable Watch Widget Extension.appex"
+            BlueprintIdentifier = "2A25869F2FB5D6490030C8CD"
+            BuildableName = "Widget Extension.appex"
+            BlueprintName = "Widget Extension"
             ReferencedContainer = "container:Timetable.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "2A1DB4172F9ECEC100E5AE7C"
-            BuildableName = "Timetable Watch Widget Extension.appex"
+            BlueprintIdentifier = "2A02378A2F9C8EA000AB1E1F"
+            BuildableName = "Timetable.app"
+            BlueprintName = "Timetable"
             ReferencedContainer = "container:Timetable.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

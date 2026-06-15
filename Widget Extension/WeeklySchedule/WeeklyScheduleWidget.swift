@@ -25,11 +25,11 @@ struct WeeklyScheduleWidget: Widget {
 			WeeklyScheduleWidgetEntryView(entry: entry)
 				.containerBackground(.black, for: .widget)
 		}
-#if os(watchOS)
+		#if os(watchOS)
 		.supportedFamilies([.accessoryRectangular])
-#else
+		#else
 		.supportedFamilies([.systemMedium])
-#endif
+		#endif
 		.contentMarginsDisabled()
 		.configurationDisplayName("Timetable")
 		.description("Your class schedule for the week.")
@@ -37,29 +37,29 @@ struct WeeklyScheduleWidget: Widget {
 }
 
 #if os(watchOS)
-#Preview(as: .accessoryRectangular) {
-	WeeklyScheduleWidget()
-} timeline: {
-	TimetableEntry(
-		date: .now,
-		classes: defaultTimetable,
-		relevance: TimelineEntryRelevance(
-			score: 1.0,
-			duration: 60 * 60
+	#Preview(as: .accessoryRectangular) {
+		WeeklyScheduleWidget()
+	} timeline: {
+		TimetableEntry(
+			date: .now,
+			classes: defaultTimetable,
+			relevance: TimelineEntryRelevance(
+				score: 1.0,
+				duration: 60 * 60
+			)
 		)
-	)
-}
+	}
 #else
-#Preview(as: .systemMedium) {
-	WeeklyScheduleWidget()
-} timeline: {
-	TimetableEntry(
-		date: .now,
-		classes: defaultTimetable,
-		relevance: TimelineEntryRelevance(
-			score: 1.0,
-			duration: 60 * 60
+	#Preview(as: .systemMedium) {
+		WeeklyScheduleWidget()
+	} timeline: {
+		TimetableEntry(
+			date: .now,
+			classes: defaultTimetable,
+			relevance: TimelineEntryRelevance(
+				score: 1.0,
+				duration: 60 * 60
+			)
 		)
-	)
-}
+	}
 #endif

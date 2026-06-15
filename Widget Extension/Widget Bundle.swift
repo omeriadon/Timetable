@@ -12,6 +12,6 @@ import WidgetKit
 struct WidgetsBundle: WidgetBundle {
 	var body: some Widget {
 		WeeklyScheduleWidget()
-		Timetable_Watch_Widgets_Time_Left()
+		TimeLeftWidget()
 	}
 }

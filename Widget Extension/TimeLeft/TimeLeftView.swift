@@ -11,6 +11,8 @@ import WidgetKit
 struct TimeLeftView: View {
 	let entry: TimetableEntry
 
+	// MARK: - body
+
 	var body: some View {
 		let classLookup = TimetableLayout.classLookup(for: entry.classes)
 		let state = getSchoolState(at: entry.date, classLookup: classLookup)
@@ -38,25 +40,27 @@ struct TimeLeftView: View {
 					)
 
 				case .outsideSchool:
-					VStack(alignment: .leading) {
+					VStack(alignment: Device.isWatchOS ? .leading : .center) {
 						Label("School's Out", systemImage: "house.fill")
-							.font(.headline)
+							.font(.title3)
 							.foregroundColor(.indigo)
 
 						Text("No more classes")
-							.font(.system(size: 10))
+							.font(.caption)
 							.foregroundColor(.secondary)
 					}
 			}
 		}
 	}
 
+	// MARK: - createProgressView
+
 	private func createProgressView(
 		title: String,
 		symbol: String,
 		color: Color,
 		nextText: String,
-		start: Date,
+		start _: Date,
 		end: Date
 	) -> some View {
 		VStack(alignment: .leading) {
@@ -84,7 +88,7 @@ struct TimeLeftView: View {
 }
 
 #Preview {
-	Time_Left_Widget_View(
+	TimeLeftView(
 		entry: TimetableEntry(
 			date: Date(),
 			classes: defaultTimetable,

@@ -16,8 +16,6 @@ struct CurrentClassView: View {
 
 	private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-
-
 	var body: some View {
 		let classLookup = TimetableLayout.classLookup(for: classes)
 		let state = getSchoolState(at: now, classLookup: classLookup)
@@ -64,7 +62,7 @@ struct CurrentClassView: View {
 		symbol: String,
 		color: Color,
 		nextText: String,
-		start: Date,
+		start _: Date,
 		end: Date
 	) -> some View {
 		GeometryReader { geo in
@@ -75,8 +73,8 @@ struct CurrentClassView: View {
 			let seconds = Int(remaining) % 60
 
 			let timeString = hours > 0
-			? String(format: "%d:%02d:%02d", hours, minutes, seconds)
-			: String(format: "%02d:%02d", minutes, seconds)
+				? String(format: "%d:%02d:%02d", hours, minutes, seconds)
+				: String(format: "%02d:%02d", minutes, seconds)
 
 			VStack(alignment: .center) {
 				Spacer()

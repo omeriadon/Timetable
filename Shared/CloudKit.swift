@@ -37,21 +37,21 @@ final class CloudStore {
 		Defaults.publisher(.timetable)
 			.sink { [weak self] _ in
 				guard let self, !self.isApplyingRemoteChange else { return }
-				self.pushEverything()
+				pushEverything()
 			}
 			.store(in: &cancellables)
 
 		Defaults.publisher(.userDisplayName)
 			.sink { [weak self] _ in
 				guard let self, !self.isApplyingRemoteChange else { return }
-				self.pushEverything()
+				pushEverything()
 			}
 			.store(in: &cancellables)
 
 		Defaults.publisher(.receivedTimetables)
 			.sink { [weak self] _ in
 				guard let self, !self.isApplyingRemoteChange else { return }
-				self.pushEverything()
+				pushEverything()
 			}
 			.store(in: &cancellables)
 	}
