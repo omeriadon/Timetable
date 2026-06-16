@@ -50,7 +50,7 @@ struct ContentView: View {
 				Spacer()
 			}
 		}
-		.padding(.trailing, 10)
+		.padding(.trailing, 8)
 		.environment(\.dynamicTypeSize, .xSmall)
 		.monospaced()
 		.onAppear {
@@ -110,7 +110,6 @@ struct ContentView: View {
 					} else {
 						// empty periods
 						RoundedRectangle(cornerRadius: 5)
-							.fill(.white.opacity(0.05))
 							.frame(height: 25)
 					}
 				}
@@ -127,20 +126,6 @@ struct ContentView: View {
 			await MainActor.run {
 				withAnimation(.snappy) { showSyncErrorIcon = false }
 			}
-		}
-	}
-
-	func dayView(_ day: Int) -> some View {
-		let classLookup = TimetableLayout.classLookup(for: classes)
-
-		return ScrollView(.vertical, showsIndicators: false) {
-			VStack(spacing: 4) {
-				ForEach(0 ..< 8, id: \.self) { session in
-					sessionCell(day, session, classLookup: classLookup)
-				}
-			}
-			.padding(.horizontal, 4)
-			.padding(.vertical, 6)
 		}
 	}
 }

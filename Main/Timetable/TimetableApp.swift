@@ -49,6 +49,10 @@ struct TimetableApp: App {
 		userName.isEmpty
 	}
 
+	#if os(macOS)
+	@NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+	#endif
+
 //	init() {
 //		startPushToStartListener()
 //		#if DEBUG
@@ -72,9 +76,13 @@ struct TimetableApp: App {
 				.environment(\.importedFileURL, $importedFileURL)
 				.environment(\.importStatus, $importStatus)
 				.environment(\.receivedTimetableData, $receivedTimetableData)
-#if os(macOS)
-				.frame(minWidth: 630, minHeight: 500)
-#endif
+			#if os(macOS)
+				.frame(minWidth: 630, minHeight: 580)
+				.background {
+					CustomMaterialView()
+						.ignoresSafeArea()
+				}
+			#endif
 		}
 		.windowResizability(.contentMinSize)
 	}

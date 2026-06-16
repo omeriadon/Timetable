@@ -18,6 +18,24 @@ struct TimeLeftView: View {
 	var body: some View {
 		Group {
 			switch state {
+				case let .beforeSchool(next):
+					VStack(alignment: Device.isWatchOS ? .leading : .center) {
+						Spacer()
+						Spacer()
+
+						Text("Before School")
+							.font(Device.isWatchOS ? .caption : .headline)
+							.foregroundColor(.secondary)
+
+						Spacer()
+
+						Label("First Period: \(next.id)", systemImage: next.symbol)
+							.font(Device.isWatchOS ? .title3 : .title)
+
+						Spacer()
+						Spacer()
+					}
+
 				case let .inClass(current, nextText, info):
 					createProgressView(
 						title: current?.id ?? "Free Period",
@@ -97,6 +115,6 @@ struct TimeLeftView: View {
 			classes: defaultTimetable,
 			relevance: TimelineEntryRelevance(score: 1, duration: 60 * 60)
 		),
-		state: .outsideSchool
+		state: .beforeSchool(next: defaultTimetable[0])
 	)
 }

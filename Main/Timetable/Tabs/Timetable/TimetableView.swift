@@ -63,17 +63,19 @@ struct TimetableView: View {
 				.scrollIndicatorsFlash(onAppear: true)
 				.opacity(receivedTimetables.isEmpty ? 0 : 1)
 				.safeAreaBar(edge: .top, alignment: .center, spacing: 10) {
-					HStack(spacing: 4) {
-						VStack(spacing: 4) {
-							Text("")
+					GlassEffectContainer(spacing: 2) {
+						HStack(spacing: 4) {
+							VStack(spacing: 4) {
+								Text("")
 
-							ForEach(TimetableLayout.sessions, id: \.self) { session in
-								sessionLabel(for: session)
+								ForEach(TimetableLayout.sessions, id: \.self) { session in
+									sessionLabel(for: session)
+								}
 							}
-						}
-						.frame(width: 15)
+							.frame(width: 15)
 
-						mainContent(classLookup: classLookup)
+							mainContent(classLookup: classLookup)
+						}
 					}
 					.padding(.bottom, 10)
 					#if os(macOS)
@@ -91,7 +93,7 @@ struct TimetableView: View {
 			.onChange(of: classes) {
 				watchSync.pushTimetable()
 			}
-			#endif
+#endif // os(iOS)
 		}
 		.padding(.trailing, 2)
 	}
@@ -133,59 +135,20 @@ struct TimetableView: View {
 			VStack(spacing: 4) {
 				Text(TimetableLayout.shortDayLabels[day])
 				ForEach(0 ..< 8) { session in
-					Button {
-						if selectedSlot == Slot(day, session) {
-							selectedSlot = nil
-						} else if let _ = classLookup[Slot(day, session)] {
-							if !receivedTimetables.isEmpty {
-								selectedSlot = Slot(day, session)
+					SessionCellView(day, session, classLookup, selectedSlot)
+						.contentShape(Rectangle())
+						.onTapGesture {
+							if selectedSlot == Slot(day, session) {
+								selectedSlot = nil
+							} else if let _ = classLookup[Slot(day, session)] {
+								if !receivedTimetables.isEmpty {
+									selectedSlot = Slot(day, session)
+								}
 							}
 						}
-					} label: {
-						sessionCell(day, session, classLookup: classLookup)
-							.contentShape(Rectangle())
-					}
-					.buttonStyle(.plain)
 				}
 			}
 		}
-	}
-
-	func sessionCell(_ day: Int, _ session: Int, classLookup: [Slot: Class]) -> some View {
-		Group {
-			// break
-			if TimetableLayout.isBreakSession(index: session) {
-				rectangle(.gray.opacity(0.25), true)
-					.frame(height: 20)
-
-				// unavailable
-			} else if TimetableLayout.isUnavailable(day: day, session: session) {
-				rectangle(.clear, true)
-					.frame(height: 60)
-
-				// normal
-			} else if let c = classLookup[Slot(day, session)] {
-				rectangle(
-					c.colour.swiftUIColor.opacity(0.8),
-					selected: Slot(day, session) == selectedSlot
-				) {
-					Image(systemName: c.symbol)
-					Spacer(minLength: 0)
-					Text(c.id)
-						.lineLimit(2)
-						.fixedSize(horizontal: false, vertical: true)
-						.font(.footnote.scaled(by: 0.9))
-				}
-				.frame(height: 60)
-
-				// idk
-			} else {
-				RoundedRectangle(cornerRadius: 10)
-					.fill(.white.opacity(0.05))
-					.frame(height: 60)
-			}
-		}
-		.foregroundStyle(.white)
 	}
 
 	func sessionLabel(for session: String) -> some View {

@@ -40,7 +40,7 @@ struct WeeklyScheduleView: View {
 						.background {
 							if day == currentWeekdayIndex && Device.isNotWatchOS {
 								Rectangle()
-									.fill(.white)
+									.fill(widgetRenderingMode != .fullColor ? Color.secondary : Color.white)
 									.clipShape(
 										UnevenRoundedRectangle(
 											cornerRadii: .init(
@@ -106,10 +106,16 @@ struct WeeklyScheduleView: View {
 	func sessionCell(_ day: Int, _ session: Int, classLookup: [Slot: Class]) -> some View {
 		let leadingPadding: CGFloat =
 			if day == 0, session == 7, Device.isWatchOS {
-				day == currentWeekdayIndex ? 4 : 3
+				day == currentWeekdayIndex ? 5 : 4
 			} else {
-				day == currentWeekdayIndex ? 3 : 4
+				if Device.isWatchOS {
+					day == currentWeekdayIndex ? 1 : 0
+				} else {
+					day == currentWeekdayIndex ? 3 : 4
+				}
 			}
+
+		let isFullColor = widgetRenderingMode == .fullColor
 
 		ZStack {
 			// break
@@ -146,14 +152,21 @@ struct WeeklyScheduleView: View {
 						.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
 						.background {
 							if day == currentWeekdayIndex {
-								RoundedRectangle(cornerRadius: Device.isWatchOS ? 0 : 7)
-									.fill(c.colour.swiftUIColor)
-							} else if widgetRenderingMode != .fullColor {
-								RoundedRectangle(cornerRadius: Device.isWatchOS ? 0 : 7)
-									.stroke(c.colour.swiftUIColor)
+								if isFullColor {
+									RoundedRectangle(cornerRadius: Device.isWatchOS ? 0 : 7)
+										.fill(c.colour.swiftUIColor)
+								} else {
+									RoundedRectangle(cornerRadius: Device.isWatchOS ? 0 : 7)
+										.fill(c.colour.swiftUIColor.secondary)
+								}
 							} else {
-								RoundedRectangle(cornerRadius: Device.isWatchOS ? 0 : 7)
-									.fill(c.colour.swiftUIColor)
+								if isFullColor {
+									RoundedRectangle(cornerRadius: Device.isWatchOS ? 0 : 7)
+										.fill(c.colour.swiftUIColor)
+								} else {
+									RoundedRectangle(cornerRadius: Device.isWatchOS ? 0 : 7)
+										.stroke(c.colour.swiftUIColor.secondary)
+								}
 							}
 						}
 

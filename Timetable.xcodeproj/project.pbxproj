@@ -23,6 +23,7 @@
 		2ACEE8BD2FD827B10031316D /* Timetable.icon in Resources */ = {isa = PBXBuildFile; fileRef = 2ACEE8BB2FD827B10031316D /* Timetable.icon */; };
 		2ACEE8BE2FD827B10031316D /* Timetable.icon in Resources */ = {isa = PBXBuildFile; fileRef = 2ACEE8BB2FD827B10031316D /* Timetable.icon */; };
 		2ACEE8BF2FD827B10031316D /* Timetable.icon in Resources */ = {isa = PBXBuildFile; fileRef = 2ACEE8BB2FD827B10031316D /* Timetable.icon */; };
+		2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */ = {isa = PBXBuildFile; platformFilters = (macos, ); productRef = 2AE0F13A2FE03989002B5D9D /* MaterialView */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -102,14 +103,18 @@
 		2AAE62BF2FD839B5004B3FF4 /* Exceptions for "Main" folder in "Watch Widget" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Timetable/AppDelegate.swift,
 				Timetable/Assets.xcassets,
 				Timetable/Backend/Network/NetworkManager.swift,
 				Timetable/Backend/PhoneWatchSyncBridge.swift,
 				Timetable/Backend/syncToWatchAsync.swift,
+				Timetable/CustomMaterialView.swift,
 				Timetable/LaunchScreen.storyboard,
 				Timetable/Tabs/ContentView/ContentView.swift,
 				Timetable/Tabs/ContentView/SharedTimetableImportSheet.swift,
 				Timetable/Tabs/SettingsView.swift,
+				Timetable/Tabs/Timetable/SessionCellView.swift,
+				Timetable/Tabs/Timetable/TimetableComparison.swift,
 				Timetable/Tabs/Timetable/TimetableView.swift,
 				Timetable/TimetableApp.swift,
 				Timetable/Views/CalendarImportView.swift,
@@ -130,8 +135,10 @@
 			platformFiltersByRelativePath = {
 				ActivityAttribute.swift = (ios, );
 				LiveActivityManager.swift = (ios, );
+				Timetable/AppDelegate.swift = (macos, );
 				Timetable/Backend/PhoneWatchSyncBridge.swift = (ios, );
 				Timetable/Backend/syncToWatchAsync.swift = (ios, );
+				Timetable/CustomMaterialView.swift = (macos, );
 				Timetable/LaunchScreen.storyboard = (ios, );
 				Timetable/Tabs/ContentView/SharedTimetableImportSheet.swift = (ios, );
 				Timetable/Views/SyncButton.swift = (ios, );
@@ -196,6 +203,7 @@
 		2A0237882F9C8EA000AB1E1F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */,
 				2A02379B2F9C907000AB1E1F /* Defaults in Frameworks */,
 				2A0237AC2F9D9DE800AB1E1F /* SFSymbolsPicker in Frameworks */,
 			);
@@ -297,6 +305,7 @@
 			packageProductDependencies = (
 				2A02379A2F9C907000AB1E1F /* Defaults */,
 				2A0237AB2F9D9DE800AB1E1F /* SFSymbolsPicker */,
+				2AE0F13A2FE03989002B5D9D /* MaterialView */,
 			);
 			productName = Timetable;
 			productReference = 2A02378B2F9C8EA000AB1E1F /* Timetable.app */;
@@ -439,6 +448,7 @@
 			packageReferences = (
 				2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */,
 				2A0237AA2F9D9DE800AB1E1F /* XCLocalSwiftPackageReference "../../../Downloads/SFSymbolsPickerForSwiftUI-main" */,
+				2AE0F1392FE03989002B5D9D /* XCRemoteSwiftPackageReference "MaterialView" */,
 			);
 			preferredProjectObjectVersion = 110;
 			productRefGroup = 2A02378C2F9C8EA000AB1E1F /* Products */;
@@ -1200,6 +1210,14 @@
 				minimumVersion = 9.0.8;
 			};
 		};
+		2AE0F1392FE03989002B5D9D /* XCRemoteSwiftPackageReference "MaterialView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/OskarGroth/MaterialView";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1232,6 +1250,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = Defaults;
+		};
+		2AE0F13A2FE03989002B5D9D /* MaterialView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2AE0F1392FE03989002B5D9D /* XCRemoteSwiftPackageReference "MaterialView" */;
+			productName = MaterialView;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

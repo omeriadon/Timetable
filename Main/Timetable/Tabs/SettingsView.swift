@@ -26,6 +26,7 @@ struct SettingsView: View {
 	@State private var timetableToDelete: ReceivedTimetable?
 	@State private var showDeleteConfirmation = false
 	@State private var showEditTimetableSheet = false
+	@State private var widgetReloadState: Bool = false
 
 	@Namespace private var ns
 
@@ -63,10 +64,16 @@ struct SettingsView: View {
 				#endif // os(iOS)
 
 				Section("Your Details") {
-					TextField("Your Name", text: $username)
-						.submitLabel(.done)
 					#if os(macOS)
+						Button {} label: {
+							TextField("Your Name", text: $username)
+								.submitLabel(.done)
+						}
 						.textFieldStyle(.plain)
+						.frame(width: 200)
+					#else
+						TextField("Your Name", text: $username)
+							.submitLabel(.done)
 					#endif
 				}
 				.onChange(of: username) {
@@ -130,10 +137,32 @@ struct SettingsView: View {
 
 				Section("Developer") {
 					Button {
+						widgetReloadState = true
 						WidgetCenter.shared.reloadAllTimelines()
+
+						Task {
+							try? await Task.sleep(nanoseconds: 5_000_000_000)
+							await MainActor.run {
+								withAnimation(.easeInOut) {
+									widgetReloadState = false
+								}
+							}
+						}
 					} label: {
-						Label("Reload widgets now", systemImage: "widget.extralarge")
+						ZStack {
+							if widgetReloadState {
+								Label("Done", systemImage: "checkmark")
+									.id("done")
+									.transition(.blurReplace)
+							} else {
+								Label("Reload widgets now", systemImage: "widget.extralarge")
+									.id("reload")
+									.transition(.blurReplace)
+							}
+						}
+						.animation(.easeInOut, value: widgetReloadState)
 					}
+					.disabled(widgetReloadState)
 				}
 			}
 			.listStyle(.sidebar)
@@ -161,17 +190,45 @@ struct SettingsView: View {
 	private var importedTimetablesSection: some View {
 		Section("Imported Timetables") {
 			ForEach(receivedTimetables) { timetable in
-				VStack(alignment: .leading, spacing: 4) {
-					Text(timetable.sender)
-						.font(.headline)
-					Text("\(timetable.classes.count) classes")
-						.font(.caption)
-						.foregroundStyle(.secondary)
-					Text("Received: \(timetable.receivedAt.formatted(date: .abbreviated, time: .omitted))")
-						.font(.caption2)
-						.foregroundStyle(.secondary)
+				Group {
+					#if os(macOS)
+						Button {} label: {
+							VStack(alignment: .leading, spacing: 4) {
+								Text(timetable.sender)
+									.font(.headline)
+								Text("\(timetable.classes.count) classes")
+									.font(.caption)
+									.foregroundStyle(.secondary)
+								Text("Received: \(timetable.receivedAt.formatted(date: .abbreviated, time: .omitted))")
+									.font(.caption2)
+									.foregroundStyle(.secondary)
+							}
+						}
+					#else
+						VStack(alignment: .leading, spacing: 4) {
+							Text(timetable.sender)
+								.font(.headline)
+							Text("\(timetable.classes.count) classes")
+								.font(.caption)
+								.foregroundStyle(.secondary)
+							Text("Received: \(timetable.receivedAt.formatted(date: .abbreviated, time: .omitted))")
+								.font(.caption2)
+								.foregroundStyle(.secondary)
+						}
+					#endif
 				}
-				.listRowBackground(Rectangle().fill(.ultraThinMaterial))
+				.contextMenu {
+					Button(role: .destructive) {
+						let timetable = receivedTimetables.first { $0.id == timetable.id }
+						if let timetable {
+							if let index = receivedTimetables.firstIndex(where: { $0.id == timetable.id }) {
+								receivedTimetables.remove(at: index)
+							}
+						}
+					} label: {
+						Label("Delete", systemImage: "trash")
+					}
+				}
 			}
 			.onDelete { indexSet in
 				for index in indexSet {

@@ -12,7 +12,7 @@ import SwiftUI
 let debugOffset: TimeInterval = 0
 
 @main
-struct Timetable_Watch_Watch_AppApp: App {
+struct TimetableWatchApp: App {
 	@Default(.receivedTimetables) var receivedTimetables
 	@Default(.timetable) var classes
 
@@ -41,6 +41,13 @@ struct Timetable_Watch_Watch_AppApp: App {
 					CurrentClassView(now: adjustedNow)
 						.containerBackground(for: .tabView) {
 							switch currentSchoolState {
+								case let .beforeSchool(next):
+									createProgressBackground(
+										color: next.colour.swiftUIColor,
+										start: nil,
+										end: nil
+									)
+
 								case let .inClass(current, _, info):
 									createProgressBackground(
 										color: current?.colour.swiftUIColor ?? .blue,
@@ -63,9 +70,16 @@ struct Timetable_Watch_Watch_AppApp: App {
 
 				ForEach(Array(receivedTimetables.enumerated()), id: \.offset) { index, receivedTimetable in
 					Tab(receivedTimetable.sender, systemImage: "person", value: 2 + index) {
-						FriendsTimetables(receivedTimetable: receivedTimetable)
+						FriendsTimetablesView(receivedTimetable: receivedTimetable)
 							.containerBackground(for: .tabView) {
 								switch currentSchoolState {
+									case let .beforeSchool(next):
+										createProgressBackground(
+											color: next.colour.swiftUIColor,
+											start: nil,
+											end: nil
+										)
+
 									case let .inClass(current, _, info):
 										createProgressBackground(
 											color: current?.colour.swiftUIColor ?? .blue,
@@ -97,19 +111,24 @@ struct Timetable_Watch_Watch_AppApp: App {
 		}
 	}
 
-	private func createProgressBackground(color: Color, start: Date, end: Date) -> some View {
+	private func createProgressBackground(color: Color, start: Date?, end: Date?) -> some View {
 		GeometryReader { geo in
-			let total = end.timeIntervalSince(start)
-			let elapsed = adjustedNow.timeIntervalSince(start)
-			let progress = total > 0 ? max(0, min(1, elapsed / total)) : 0
+			if let start = start, let end = end {
+				let total = end.timeIntervalSince(start)
+				let elapsed = adjustedNow.timeIntervalSince(start)
+				let progress = total > 0 ? max(0, min(1, elapsed / total)) : 0
 
-			HStack(spacing: 0) {
+				HStack(spacing: 0) {
+					Rectangle()
+						.fill(color)
+						.frame(width: geo.size.width * progress)
+
+					Rectangle()
+						.fill(.black)
+				}
+			} else {
 				Rectangle()
 					.fill(color)
-					.frame(width: geo.size.width * progress)
-
-				Rectangle()
-					.fill(.black)
 			}
 		}
 	}

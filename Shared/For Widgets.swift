@@ -23,6 +23,7 @@ let schoolEndMinute = 30
 let tickMinutes = 8
 
 enum SchoolState {
+	case beforeSchool(next: Class)
 	case inClass(current: Class?, nextText: String, info: (start: Date, end: Date))
 	case inBreak(title: String, nextText: String, info: (start: Date, end: Date))
 	case outsideSchool

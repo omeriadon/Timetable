@@ -9,7 +9,7 @@ import Defaults
 import Foundation
 import WidgetKit
 
-private let daysAhead = 5
+//MARK: - Provider
 
 struct Provider: TimelineProvider {
 	func placeholder(in _: Context) -> TimetableEntry {
@@ -29,37 +29,87 @@ struct Provider: TimelineProvider {
 
 	func getTimeline(in _: Context, completion: @escaping (Timeline<TimetableEntry>) -> Void) {
 		let classes = Defaults[.timetable]
-		let now = Date()
 		let calendar = Calendar.current
 
-		var entries: [TimetableEntry] = [
-			makeEntry(date: now, classes: classes, calendar: calendar),
-		]
+		guard let schoolDay = nextSchoolDay(from: .now, calendar: calendar) else {
+			completion(
+				Timeline(
+					entries: [
+						makeEntry(date: .now, classes: classes, calendar: calendar),
+					],
+					policy: .after(Date().addingTimeInterval(60 * 60))
+				)
+			)
+			return
+		}
 
-		for day in nextFiveWeekdays(from: now, calendar: calendar) {
-			guard
-				let schoolStart = calendar.date(bySettingHour: schoolStartHour, minute: schoolStartMinute, second: 0, of: day),
-				let schoolEnd = calendar.date(bySettingHour: schoolEndHour, minute: schoolEndMinute, second: 0, of: day)
-			else { continue }
+		var entries: [TimetableEntry] = []
 
-			let isToday = calendar.isDate(day, inSameDayAs: now)
-			var tick = isToday
-				? nextTick(after: now, schoolStart: schoolStart, stepMinutes: tickMinutes, calendar: calendar)
-				: schoolStart
+		guard
+			let schoolStart = calendar.date(
+				bySettingHour: schoolStartHour,
+				minute: schoolStartMinute,
+				second: 0,
+				of: schoolDay
+			),
+			let schoolEnd = calendar.date(
+				bySettingHour: schoolEndHour,
+				minute: schoolEndMinute,
+				second: 0,
+				of: schoolDay
+			),
+			let preSchool = calendar.date(
+				byAdding: .hour,
+				value: -1,
+				to: schoolStart
+			),
+			let refreshAfterSchool = calendar.date(
+				byAdding: .minute,
+				value: 5,
+				to: schoolEnd
+			)
+		else {
+			return
+		}
 
-			while tick <= schoolEnd {
-				if tick > now {
-					entries.append(
-						makeEntry(date: tick, classes: classes, calendar: calendar)
-					)
-				}
+		entries.append(
+			makeEntry(date: preSchool, classes: classes, calendar: calendar)
+		)
 
-				guard let next = calendar.date(byAdding: .minute, value: tickMinutes, to: tick) else { break }
-				tick = next
+		for period in periodTimes {
+			if let start = calendar.date(
+				bySettingHour: period.start.hour,
+				minute: period.start.min,
+				second: 0,
+				of: schoolDay
+			) {
+				entries.append(
+					makeEntry(date: start, classes: classes, calendar: calendar)
+				)
+			}
+
+			if let end = calendar.date(
+				bySettingHour: period.end.hour,
+				minute: period.end.min,
+				second: 0,
+				of: schoolDay
+			) {
+				entries.append(
+					makeEntry(date: end, classes: classes, calendar: calendar)
+				)
 			}
 		}
 
-		completion(Timeline(entries: entries, policy: .atEnd))
+		entries.append(
+			makeEntry(date: refreshAfterSchool, classes: classes, calendar: calendar)
+		)
+
+		completion(
+			Timeline(
+				entries: entries.sorted { $0.date < $1.date },
+				policy: .after(refreshAfterSchool)
+			)
+		)
 	}
 }
 
@@ -85,83 +135,75 @@ private func makeEntry(
 	)
 }
 
-// MARK: - nextFiveWeekdays
+// MARK: - nextSchoolDay
 
-private func nextFiveWeekdays(from date: Date, calendar: Calendar) -> [Date] {
-	var days: [Date] = []
-	var current = calendar.startOfDay(for: date)
+private func nextSchoolDay(
+	from date: Date,
+	calendar: Calendar
+) -> Date? {
+	var day = calendar.startOfDay(for: date)
 
-	while days.count < daysAhead {
-		let weekday = calendar.component(.weekday, from: current)
+	for _ in 0 ..< 7 {
+		let weekday = calendar.component(.weekday, from: day)
+
 		if (2 ... 6).contains(weekday) {
-			days.append(current)
+			return day
 		}
 
-		guard let next = calendar.date(byAdding: .day, value: 1, to: current) else { break }
-		current = next
+		guard let next = calendar.date(
+			byAdding: .day,
+			value: 1,
+			to: day
+		) else {
+			return nil
+		}
+
+		day = next
 	}
 
-	return days
-}
-
-// MARK: - nextTick
-
-private func nextTick(
-	after now: Date,
-	schoolStart: Date,
-	stepMinutes: Int,
-	calendar: Calendar
-) -> Date {
-	guard now > schoolStart else { return schoolStart }
-
-	let minutesSinceStart = calendar.dateComponents([.minute], from: schoolStart, to: now).minute ?? 0
-	let offset = ((minutesSinceStart / stepMinutes) + 1) * stepMinutes
-
-	return calendar.date(byAdding: .minute, value: offset, to: schoolStart) ?? now
+	return nil
 }
 
 // MARK: - Relevance
 
-private func relevance(for date: Date, calendar: Calendar) -> TimelineEntryRelevance? {
+private func relevance(
+	for date: Date,
+	calendar: Calendar
+) -> TimelineEntryRelevance? {
 	let weekday = calendar.component(.weekday, from: date)
-	guard (2 ... 6).contains(weekday) else { return nil }
 
-	let nowMins = calendar.component(.hour, from: date) * 60 + calendar.component(.minute, from: date)
-
-	for period in periodTimes {
-		let startMins = period.start.hour * 60 + period.start.min
-		let endMins = period.end.hour * 60 + period.end.min
-
-		if nowMins >= startMins, nowMins < endMins,
-		   let endDate = calendar.date(
-		   	bySettingHour: period.end.hour,
-		   	minute: period.end.min,
-		   	second: 0,
-		   	of: date
-		   )
-		{
-			return TimelineEntryRelevance(score: 1.0, duration: endDate.timeIntervalSince(date))
-		}
+	guard (2 ... 6).contains(weekday) else {
+		return TimelineEntryRelevance(score: 0, duration: 0)
 	}
 
-	for i in 0 ..< (periodTimes.count - 1) {
-		let breakStart = periodTimes[i].end
-		let breakEnd = periodTimes[i + 1].start
-
-		let startMins = breakStart.hour * 60 + breakStart.min
-		let endMins = breakEnd.hour * 60 + breakEnd.min
-
-		if nowMins >= startMins, nowMins < endMins,
-		   let endDate = calendar.date(
-		   	bySettingHour: breakEnd.hour,
-		   	minute: breakEnd.min,
-		   	second: 0,
-		   	of: date
-		   )
-		{
-			return TimelineEntryRelevance(score: 0.0, duration: endDate.timeIntervalSince(date))
-		}
+	guard
+		let schoolStart = calendar.date(
+			bySettingHour: schoolStartHour,
+			minute: schoolStartMinute,
+			second: 0,
+			of: date
+		),
+		let schoolEnd = calendar.date(
+			bySettingHour: schoolEndHour,
+			minute: schoolEndMinute,
+			second: 0,
+			of: date
+		),
+		let relevantStart = calendar.date(
+			byAdding: .hour,
+			value: -1,
+			to: schoolStart
+		)
+	else {
+		return nil
 	}
 
-	return nil
+	if date >= relevantStart, date <= schoolEnd {
+		return TimelineEntryRelevance(
+			score: 1.0,
+			duration: schoolEnd.timeIntervalSince(date)
+		)
+	}
+
+	return TimelineEntryRelevance(score: 0, duration: 0)
 }

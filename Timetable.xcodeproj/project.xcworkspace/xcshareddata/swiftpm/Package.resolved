@@ -1,5 +1,5 @@
 {
-  "originHash" : "a475ba387b4d2f1bbf4030c728cfc28a3248e93bedc6a59b1d774f19b7565740",
+  "originHash" : "a17e7d65d501927765ab84ca3a1ec849c77199446840434f88ce61c88dd7a077",
   "pins" : [
     {
       "identity" : "defaults",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "5bfac4928f000fabdbef7e4ed0251399bb0841c9",
         "version" : "9.0.8"
+      }
+    },
+    {
+      "identity" : "materialview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OskarGroth/MaterialView",
+      "state" : {
+        "revision" : "b3a04ce56eca69d388c48e9621ce61778fe976c7",
+        "version" : "1.0.0"
       }
     },
     {

@@ -1,5 +1,5 @@
 //
-//  FriendsTimetables.swift
+//  FriendsTimetablesView.swift
 //  Timetable Watch
 //
 //  Created by Adon Omeri on 11/6/2026.
@@ -9,7 +9,7 @@ import Combine
 import Defaults
 import SwiftUI
 
-struct FriendsTimetables: View {
+struct FriendsTimetablesView: View {
 	let receivedTimetable: ReceivedTimetable
 
 	@State private var now = Date()
@@ -29,6 +29,12 @@ struct FriendsTimetables: View {
 		var nextText = ""
 
 		switch state {
+			case let .beforeSchool(next):
+				title = next.id
+				symbol = next.symbol
+				color = next.colour.swiftUIColor
+				nextText = ""
+
 			case let .inClass(current, next, _):
 				title = current?.id ?? "Free Period"
 				symbol = current?.symbol ?? "studentdesk"
@@ -63,15 +69,25 @@ struct FriendsTimetables: View {
 					Image(systemName: symbol)
 					Text(title)
 				}
-				.font(.body.scaled(by: 1.2))
+				.font(.title2.scaled(by: 0.9))
 				.bold()
 
 				Spacer()
-					.frame(height: geo.size.height * 0.1)
 
-				Text(!nextText.isEmpty ? nextText : "Done for the day")
+				let isAfter850 = Date() >= Calendar.current.date(
+					bySettingHour: 8,
+					minute: 50,
+					second: 0,
+					of: Date()
+				)!
+
+				Text(!nextText.isEmpty ? nextText : isAfter850 ? "Done for the day" : "")
 					.font(.caption)
 					.foregroundStyle(.secondary)
+					.frame(maxWidth: geo.size.width * 0.8)
+					.multilineTextAlignment(.center)
+
+				Spacer()
 			}
 			.frame(width: geo.size.width)
 		}
@@ -86,7 +102,7 @@ struct FriendsTimetables: View {
 }
 
 #Preview {
-	FriendsTimetables(
+	FriendsTimetablesView(
 		receivedTimetable: ReceivedTimetable(
 			sender: "Adon Omeri",
 			classes: defaultTimetable,

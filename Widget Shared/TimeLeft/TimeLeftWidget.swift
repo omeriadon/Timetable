@@ -19,8 +19,10 @@ struct TimeLeftWidget: Widget {
 
 			let background: Color = {
 				switch state {
+					case let .beforeSchool(next):
+						return next.colour.swiftUIColor
 					case let .inClass(current, _, _):
-						return current?.colour.swiftUIColor ?? .gray
+						return current?.colour.swiftUIColor ?? .black
 					case .inBreak:
 						return .orange
 					case .outsideSchool:
