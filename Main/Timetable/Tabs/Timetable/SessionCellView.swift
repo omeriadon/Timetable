@@ -27,7 +27,7 @@ struct SessionCellView: View {
 		Group {
 			// break
 			if TimetableLayout.isBreakSession(index: session) {
-				rectangle(.gray.opacity(0.5)) { EmptyView() }
+				rectangle(.gray.opacity(0.5), isBreak: true) { EmptyView() }
 					.frame(height: 20)
 
 				// unavailable

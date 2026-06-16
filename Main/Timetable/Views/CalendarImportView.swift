@@ -290,6 +290,9 @@ struct CalendarImportView: View {
 			case lower.contains("AECHE"):
 				return "Chemistry"
 
+			case lower.contains("AEHBY"):
+				return "Human Bio"
+
 			case lower.contains("AEISL"):
 				return "Italian"
 
@@ -331,6 +334,9 @@ struct CalendarImportView: View {
 
 			case lower.contains("AEPAE"):
 				return "brain"
+
+			case lower.contains("AEHBY"):
+				return "brain.head.profile"
 
 			case lower.contains("AEENG"):
 				return "textformat.characters"

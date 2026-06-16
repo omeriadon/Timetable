@@ -21,7 +21,7 @@ class TranscriptView: UIView {
 	}
 
 	private func setupUI() {
-		backgroundColor = UIColor.systemBackground
+		backgroundColor = UIColor.clear
 
 		label.text = "Timetable"
 		label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)

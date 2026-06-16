@@ -8,7 +8,7 @@
 import Defaults
 import SwiftUI
 #if canImport(UIKit)
-	import UIKit
+import UIKit
 #endif
 
 struct TimetableGridPreview: View {
@@ -31,7 +31,7 @@ struct TimetableGridPreview: View {
 		VStack(alignment: .trailing, spacing: 12) {
 			VStack(alignment: .leading, spacing: 3) {
 				Text(title)
-					.font(.headline.weight(.semibold))
+					.font(.title3)
 					.lineLimit(1)
 				if let subtitle {
 					Text(subtitle)
@@ -50,7 +50,7 @@ struct TimetableGridPreview: View {
 
 					ForEach(TimetableLayout.sessions, id: \.self) { session in
 						Text(session)
-							.font(.caption2)
+							.font(.caption)
 							.foregroundStyle(
 								TimetableLayout.isBreakSession(label: session)
 									? .white.opacity(0.7)
@@ -65,8 +65,8 @@ struct TimetableGridPreview: View {
 					ForEach(0 ..< 5, id: \.self) { day in
 						VStack(spacing: 4) {
 							Text(TimetableLayout.shortDayLabels[day])
-								.font(.caption2.weight(.semibold))
-								.foregroundStyle(.white.opacity(0.78))
+								.font(.title3)
+								.foregroundStyle(.white.opacity(0.7))
 								.frame(height: 18)
 
 							ForEach(0 ..< TimetableLayout.sessions.count, id: \.self) { session in
@@ -96,7 +96,7 @@ struct TimetableGridPreview: View {
 					.fill(classItem.colour.swiftUIColor.opacity(0.82))
 					.overlay(alignment: .topLeading) {
 						Text(classItem.id)
-							.font(.caption2.weight(.semibold))
+							.font(.headline)
 							.foregroundStyle(.white)
 							.lineLimit(2)
 							.padding(4)
@@ -114,24 +114,25 @@ struct TimetableGridPreview: View {
 }
 
 #if canImport(UIKit)
-	enum TimetablePreviewRenderer {
-		@MainActor
-		static func image(classes: [Class], title _: String, subtitle: String? = nil) -> UIImage {
-			let size = CGSize(width: 630, height: 336)
+enum TimetablePreviewRenderer {
+	@MainActor
+	static func image(classes: [Class], title _: String, subtitle: String? = nil) -> UIImage {
+		let size = CGSize(width: 630, height: 336)
 
-			let content = TimetableGridPreview(
-				classes: classes,
-				showsTitle: false,
-				subtitle: subtitle
-			)
-			.frame(width: size.width, height: size.height)
-			.background(Color(red: 39 / 255, green: 39 / 255, blue: 41 / 255)) // force fill
-			.clipped()
+		let content = TimetableGridPreview(
+			classes: classes,
+			showsTitle: false,
+			subtitle: subtitle,
+			showBackground: false
+		)
+		.frame(width: size.width, height: size.height)
+		.background(.black) // force fill
+		.clipped()
 
-			let renderer = ImageRenderer(content: content)
-			renderer.scale = 3
+		let renderer = ImageRenderer(content: content)
+		renderer.scale = 3
 
-			return renderer.uiImage ?? UIImage()
-		}
+		return renderer.uiImage ?? UIImage()
 	}
+}
 #endif // canImport(UIKit)
