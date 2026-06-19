@@ -1,13 +1,105 @@
 {
   "features" : [
-    "refractivity"
+    "refractivity",
+    "specular-location"
   ],
   "fill" : {
-    "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
+    "linear-gradient" : [
+      "display-p3:0.33129,0.64778,1.00000,1.00000",
+      "display-p3:0.00000,0.32122,0.72634,1.00000"
+    ]
   },
   "groups" : [
     {
       "blur-material" : null,
+      "layers" : [
+        {
+          "blend-mode" : "normal",
+          "fill-specializations" : [
+            {
+              "value" : {
+                "solid" : "extended-gray:1.00000,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "linear-gradient" : [
+                  "display-p3:0.95000,0.95000,0.95000,1.00000",
+                  "extended-gray:1.00000,1.00000"
+                ],
+                "orientation" : {
+                  "start" : {
+                    "x" : 0.22468926458089625,
+                    "y" : 0.7304836958304741
+                  },
+                  "stop" : {
+                    "x" : 1,
+                    "y" : 0.5000000000000006
+                  }
+                }
+              }
+            }
+          ],
+          "image-name" : "Vector (1).svg",
+          "name" : "Cap",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              222.521852668076,
+              249.87471833667882
+            ]
+          }
+        }
+      ],
+      "name" : "Cap",
+      "position-specializations" : [
+        {
+          "value" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              16,
+              -7
+            ]
+          }
+        },
+        {
+          "idiom" : "watchOS",
+          "value" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -16,
+              -39
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.6
+      },
+      "specular" : "outside",
+      "translucency-specializations" : [
+        {
+          "appearance" : "dark",
+          "value" : {
+            "enabled" : true,
+            "value" : 0.46
+          }
+        }
+      ]
+    },
+    {
+      "blend-mode" : "normal",
+      "blur-material-specializations" : [
+        {
+          "value" : 0.04
+        },
+        {
+          "appearance" : "tinted",
+          "value" : 0.07
+        }
+      ],
       "layers" : [
         {
           "fill-specializations" : [
@@ -16,42 +108,63 @@
             },
             {
               "appearance" : "dark",
-              "value" : {
-                "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
-              }
+              "value" : "none"
             }
           ],
-          "image-name" : "Image 7.svg",
-          "name" : "graduationcap",
+          "image-name" : "Ellipse 2.svg",
+          "name" : "Badge",
           "position" : {
-            "scale" : 2,
+            "scale" : 1,
             "translation-in-points" : [
-              167.2795410729367,
-              118.65946470216807
+              225.72231948057595,
+              251.67512931193926
             ]
           }
         }
       ],
-      "refractivity" : {
-        "depth" : 0.209765625,
-        "enabled" : true,
-        "strength" : 0.266953125
-      },
-      "shadow-specializations" : [
+      "name" : "Badge",
+      "position-specializations" : [
         {
           "value" : {
-            "kind" : "neutral",
-            "opacity" : 0
+            "scale" : 1,
+            "translation-in-points" : [
+              16,
+              -7
+            ]
           }
         },
         {
-          "appearance" : "light",
+          "idiom" : "watchOS",
           "value" : {
-            "kind" : "neutral",
-            "opacity" : 2.48
+            "scale" : 1,
+            "translation-in-points" : [
+              -16,
+              -39
+            ]
           }
         }
       ],
+      "refractivity-specializations" : [
+        {
+          "value" : {
+            "depth" : 0.24722656250000014,
+            "enabled" : true,
+            "strength" : 0.4789453125
+          }
+        },
+        {
+          "idiom" : "watchOS",
+          "value" : {
+            "depth" : 0.2420703125,
+            "enabled" : true,
+            "strength" : 0.1181640625
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.6
+      },
       "specular" : true,
       "translucency" : {
         "enabled" : true,
@@ -59,85 +172,367 @@
       }
     },
     {
-      "blend-mode-specializations" : [
-        {
-          "appearance" : "dark",
-          "value" : "darken"
-        }
-      ],
-      "blur-material" : 0.05,
       "layers" : [
         {
           "fill-specializations" : [
             {
+              "value" : {
+                "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
+              }
+            },
+            {
               "appearance" : "dark",
-              "value" : "automatic"
+              "value" : {
+                "automatic-gradient" : "extended-gray:0.75000,1.00000"
+              }
             }
           ],
-          "image-name" : "Image 5.svg",
-          "name" : "circle.fill",
+          "image-name" : "Rectangle 12.svg",
+          "name" : "Rectangle 12",
           "position" : {
-            "scale" : 4,
+            "scale" : 1,
             "translation-in-points" : [
-              167.2795410729367,
-              141.15711470216803
+              129.0223194805759,
+              -305.02912287798347
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "automatic-gradient" : "extended-gray:0.75000,1.00000"
+              }
+            }
+          ],
+          "image-name" : "Rectangle 12.svg",
+          "name" : "Rectangle 12",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -59,
+              -305.02912287798347
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "automatic-gradient" : "extended-gray:0.75000,1.00000"
+              }
+            }
+          ],
+          "image-name" : "Rectangle 12.svg",
+          "name" : "Rectangle 12",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -250.77278442256784,
+              -305.02912287798347
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "automatic-gradient" : "extended-srgb:0.00000,0.75294,0.90980,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "automatic-gradient" : "extended-srgb:0.00000,0.78431,0.70196,1.00000"
+              }
+            }
+          ],
+          "image-name" : "Rectangle 3.svg",
+          "name" : "Date",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              129.0223194805759,
+              23.47512931193927
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "automatic-gradient" : "extended-srgb:0.20392,0.78039,0.34902,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "automatic-gradient" : "extended-srgb:0.38039,0.33333,0.96078,1.00000"
+              }
+            }
+          ],
+          "image-name" : "Rectangle 3.svg",
+          "name" : "Date",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              129.0223194805759,
+              175.45396203367244
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "automatic-gradient" : "srgb:1.00000,0.25882,0.27059,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "automatic-gradient" : "srgb:1.00000,0.25882,0.27059,1.00000"
+              }
+            }
+          ],
+          "image-name" : "Rectangle 3.svg",
+          "name" : "Date",
+          "position-specializations" : [
+            {
+              "value" : {
+                "scale" : 1,
+                "translation-in-points" : [
+                  -59,
+                  23.475129311939327
+                ]
+              }
+            },
+            {
+              "idiom" : "watchOS",
+              "value" : {
+                "scale" : 1,
+                "translation-in-points" : [
+                  -59,
+                  23.475129311939327
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "automatic-gradient" : "extended-srgb:0.79608,0.18824,0.87843,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "automatic-gradient" : "extended-srgb:0.79608,0.18824,0.87843,1.00000"
+              }
+            }
+          ],
+          "image-name" : "Rectangle 3.svg",
+          "name" : "Date",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              129.0223194805759,
+              -125.07682120743988
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "automatic-gradient" : "extended-srgb:0.00000,0.78431,0.70196,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "automatic-gradient" : "extended-srgb:1.00000,0.80000,0.00000,1.00000"
+              }
+            }
+          ],
+          "image-name" : "Rectangle 3.svg",
+          "name" : "Date",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -59,
+              -125.07682120743976
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "automatic-gradient" : "extended-srgb:1.00000,0.55294,0.15686,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "automatic-gradient" : "extended-srgb:0.20392,0.78039,0.34902,1.00000"
+              }
+            }
+          ],
+          "image-name" : "Rectangle 3.svg",
+          "name" : "Date",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -250.77278442256784,
+              -125.07682120743976
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "automatic-gradient" : "extended-srgb:1.00000,0.80000,0.00000,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "automatic-gradient" : "extended-gray:0.50000,1.00000"
+              }
+            }
+          ],
+          "image-name" : "Rectangle 3.svg",
+          "name" : "Date",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -59,
+              175.45396203367255
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "automatic-gradient" : "extended-srgb:0.38039,0.33333,0.96078,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "automatic-gradient" : "extended-srgb:1.00000,0.55294,0.15686,1.00000"
+              }
+            }
+          ],
+          "image-name" : "Rectangle 3.svg",
+          "name" : "Date",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -250.77278442256784,
+              175.45396203367255
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "automatic-gradient" : "extended-gray:0.50000,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "automatic-gradient" : "extended-srgb:0.00000,0.75294,0.90980,1.00000"
+              }
+            }
+          ],
+          "image-name" : "Rectangle 3.svg",
+          "name" : "Date",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -250.77278442256784,
+              23.475129311939384
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "appearance" : "tinted",
+              "value" : {
+                "automatic-gradient" : "srgb:0.00000,0.53333,1.00000,0.69965"
+              }
+            }
+          ],
+          "image-name" : "Inset.svg",
+          "name" : "Inset",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -59,
+              23.475129311939327
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "appearance" : "tinted",
+              "value" : {
+                "automatic-gradient" : "srgb:0.00000,0.53333,1.00000,0.32107"
+              }
+            }
+          ],
+          "image-name" : "Calendar.svg",
+          "name" : "Calendar",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -59,
+              -51
             ]
           }
         }
       ],
       "lighting" : "individual",
-      "position" : {
-        "scale" : 1,
-        "translation-in-points" : [
-          0,
-          0
-        ]
-      },
-      "refractivity" : {
-        "depth" : 0.152734375,
-        "enabled" : true,
-        "strength" : 0.2232421875
-      },
-      "shadow-specializations" : [
+      "name" : "Calendar",
+      "position-specializations" : [
         {
           "value" : {
-            "kind" : "neutral",
-            "opacity" : 0.48
+            "scale" : 1,
+            "translation-in-points" : [
+              8,
+              21
+            ]
           }
         },
         {
-          "appearance" : "light",
+          "idiom" : "watchOS",
           "value" : {
-            "kind" : "neutral",
-            "opacity" : 0.6
-          }
-        }
-      ],
-      "specular" : true,
-      "translucency" : {
-        "enabled" : true,
-        "value" : 1
-      }
-    },
-    {
-      "layers" : [
-        {
-          "fill-specializations" : [
-            {
-              "appearance" : "dark",
-              "value" : {
-                "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
-              }
-            }
-          ],
-          "glass" : true,
-          "image-name" : "Image 3.svg",
-          "name" : "calendar",
-          "position" : {
-            "scale" : 6,
+            "scale" : 1,
             "translation-in-points" : [
-              -31.939258927063293,
-              -42.05626901477126
+              38,
+              36
             ]
           }
         }
@@ -149,7 +544,7 @@
       "specular" : true,
       "translucency" : {
         "enabled" : true,
-        "value" : 0.7
+        "value" : 0.2
       }
     }
   ],

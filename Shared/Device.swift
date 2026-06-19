@@ -61,12 +61,4 @@ enum Device {
 			return false
 		#endif
 	}
-
-	static var isMac: Bool {
-		#if os(macOS)
-			return true
-		#else
-			return false
-		#endif
-	}
 }

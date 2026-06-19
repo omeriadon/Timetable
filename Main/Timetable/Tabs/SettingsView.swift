@@ -45,127 +45,20 @@ struct SettingsView: View {
 
 	var body: some View {
 		NavigationStack {
-			List {
+			Group {
 				#if os(iOS)
-					Section("Sync to Watch") {
-						SyncButton(
-							syncStatus: syncStatus,
-							action: {
-								Task {
-									await syncToWatchAsync(
-										classes: classes,
-										watchSync: watchSync,
-										statusUpdate: { syncStatus = $0 }
-									)
-								}
-							}
-						)
+					List {
+						list
 					}
-				#endif // os(iOS)
+					.listStyle(.sidebar)
 
-				Section("Your Details") {
-					#if os(macOS)
-						Button {} label: {
-							TextField("Your Name", text: $username)
-								.submitLabel(.done)
-						}
-						.textFieldStyle(.plain)
-						.frame(width: 200)
-					#else
-						TextField("Your Name", text: $username)
-							.submitLabel(.done)
-					#endif
-				}
-				.onChange(of: username) {
-					Defaults[.userDisplayName] = username
-				}
-
-				Section("Your Timetable") {
-					Button {
-						showEditTimetableSheet = true
-					} label: {
-						Label {
-							Text("Edit Timetable")
-						} icon: {
-							Image(systemName: "pencil")
-								.foregroundStyle(.tint)
-						}
+				#else
+					Form {
+						list
 					}
-					.matchedTransitionSource(id: "sheetMorph", in: ns)
-					.sheet(isPresented: $showEditTimetableSheet) {
-						ClassEditorSheet(
-							classes: $classes,
-							initialRequest: nil
-						)
-						.presentationDetents([.fraction(0.85)])
-						.presentationDragIndicator(.hidden)
-						.interactiveDismissDisabled()
-						#if os(iOS)
-							.navigationTransition(.zoom(sourceID: "sheetMorph", in: ns))
-						#else
-							.frame(width: 600, height: 500)
-						#endif
-					}
-				}
-
-				Section("Calendar") {
-					Button {
-						showCalendarImportSheet = true
-					} label: {
-						Label {
-							VStack(alignment: .leading) {
-								Text("Import from Calendar")
-									.foregroundStyle(.accent)
-								Text("Subscribe to Compass Schedule in Calendar")
-									.foregroundStyle(.white.secondary)
-							}
-						} icon: {
-							Image(systemName: "calendar")
-								.foregroundStyle(.tint)
-						}
-					}
-					.sheet(isPresented: $showCalendarImportSheet) {
-						CalendarImportView()
-							.presentationDetents([.fraction(1 / 3)])
-							.presentationDragIndicator(.hidden)
-					}
-				}
-
-				if !receivedTimetables.isEmpty {
-					importedTimetablesSection
-				}
-
-				Section("Developer") {
-					Button {
-						widgetReloadState = true
-						WidgetCenter.shared.reloadAllTimelines()
-
-						Task {
-							try? await Task.sleep(nanoseconds: 5_000_000_000)
-							await MainActor.run {
-								withAnimation(.easeInOut) {
-									widgetReloadState = false
-								}
-							}
-						}
-					} label: {
-						ZStack {
-							if widgetReloadState {
-								Label("Done", systemImage: "checkmark")
-									.id("done")
-									.transition(.blurReplace)
-							} else {
-								Label("Reload widgets now", systemImage: "widget.extralarge")
-									.id("reload")
-									.transition(.blurReplace)
-							}
-						}
-						.animation(.easeInOut, value: widgetReloadState)
-					}
-					.disabled(widgetReloadState)
-				}
+					.formStyle(.grouped)
+				#endif
 			}
-			.listStyle(.sidebar)
 			.scrollEdgeEffectStyle(.soft, for: .top)
 			.scrollContentBackground(.hidden)
 			.toolbar {
@@ -187,36 +80,146 @@ struct SettingsView: View {
 		}
 	}
 
+	@ContentBuilder
+	private var list: some View {
+		#if os(iOS)
+			Section("Sync to Watch") {
+				SyncButton(
+					syncStatus: syncStatus,
+					action: {
+						Task {
+							await syncToWatchAsync(
+								classes: classes,
+								watchSync: watchSync,
+								statusUpdate: { syncStatus = $0 }
+							)
+						}
+					}
+				)
+			}
+		#endif // os(iOS)
+
+		Section("Your Details") {
+			TextField("Your Name", text: $username)
+				.submitLabel(.done)
+		}
+		.onChange(of: username) {
+			Defaults[.userDisplayName] = username
+		}
+
+		Section("Your Timetable") {
+			Button {
+				showEditTimetableSheet = true
+			} label: {
+				Label {
+					Text("Edit Timetable")
+				} icon: {
+					Image(systemName: "pencil")
+						.foregroundStyle(.tint)
+				}
+			}
+			.matchedTransitionSource(id: "sheetMorph", in: ns)
+			.sheet(isPresented: $showEditTimetableSheet) {
+				ClassEditorSheet(
+					classes: $classes,
+					initialRequest: nil
+				)
+				.presentationDetents([.fraction(0.85)])
+				.presentationDragIndicator(.hidden)
+				.interactiveDismissDisabled()
+				#if os(iOS)
+					.navigationTransition(.zoom(sourceID: "sheetMorph", in: ns))
+				#else
+					.frame(width: 600, height: 500)
+				#endif
+			}
+		}
+
+		Section("Calendar") {
+			Button {
+				showCalendarImportSheet = true
+			} label: {
+				HStack(alignment: .center) {
+					Image(systemName: "calendar")
+						.foregroundStyle(.tint)
+						.imageScale(.large)
+						.padding(.trailing, 10)
+
+					VStack(alignment: .leading) {
+						Text("Import from Calendar")
+							.foregroundStyle(.accent)
+						Text("Subscribe to Compass Schedule in Calendar")
+							.foregroundStyle(.secondary)
+					}
+				}
+			}
+			.sheet(isPresented: $showCalendarImportSheet) {
+				CalendarImportView()
+					.presentationDetents([.fraction(1 / 3)])
+					.presentationDragIndicator(.hidden)
+			}
+		}
+
+		if !receivedTimetables.isEmpty {
+			importedTimetablesSection
+		}
+
+		Section("Developer") {
+			Button {
+				widgetReloadState = true
+				WidgetCenter.shared.reloadAllTimelines()
+
+				Task {
+					try? await Task.sleep(nanoseconds: 5_000_000_000)
+					await MainActor.run {
+						withAnimation(.easeInOut) {
+							widgetReloadState = false
+						}
+					}
+				}
+			} label: {
+				ZStack {
+					if widgetReloadState {
+						Label("Done", systemImage: "checkmark")
+							.id("done")
+							.transition(.blurReplace)
+					} else {
+						Label("Reload widgets now", systemImage: "widget.extralarge")
+							.id("reload")
+							.transition(.blurReplace)
+					}
+				}
+				.animation(.easeInOut, value: widgetReloadState)
+			}
+			.disabled(widgetReloadState)
+		}
+	}
+
 	private var importedTimetablesSection: some View {
 		Section("Imported Timetables") {
 			ForEach(receivedTimetables) { timetable in
-				Group {
-					#if os(macOS)
-						Button {} label: {
-							VStack(alignment: .leading, spacing: 4) {
-								Text(timetable.sender)
-									.font(.headline)
-								Text("\(timetable.classes.count) classes")
-									.font(.caption)
-									.foregroundStyle(.secondary)
-								Text("Received: \(timetable.receivedAt.formatted(date: .abbreviated, time: .omitted))")
-									.font(.caption2)
-									.foregroundStyle(.secondary)
-							}
-						}
-					#else
-						VStack(alignment: .leading, spacing: 4) {
-							Text(timetable.sender)
-								.font(.headline)
-							Text("\(timetable.classes.count) classes")
-								.font(.caption)
-								.foregroundStyle(.secondary)
-							Text("Received: \(timetable.receivedAt.formatted(date: .abbreviated, time: .omitted))")
-								.font(.caption2)
-								.foregroundStyle(.secondary)
-						}
-					#endif
+				ViewThatFits {
+					HStack {
+						Text(timetable.sender)
+							.font(.title2)
+
+						Spacer()
+
+						Text("Received: \(timetable.receivedAt.formatted(date: .abbreviated, time: .omitted))")
+							.font(.caption2)
+							.foregroundStyle(.secondary)
+					}
+
+					VStack(spacing: 4) {
+						Text(timetable.sender)
+							.font(.title2)
+
+						Text("Received: \(timetable.receivedAt.formatted(date: .abbreviated, time: .omitted))")
+							.font(.caption2)
+							.foregroundStyle(.secondary)
+					}
 				}
+				.contentShape(.rect)
 				.contextMenu {
 					Button(role: .destructive) {
 						let timetable = receivedTimetables.first { $0.id == timetable.id }

@@ -10,38 +10,57 @@ import MaterialView
 import SwiftUI
 
 struct CustomMaterialView: NSViewRepresentable {
-	func makeNSView(context _: Context) -> NSView {
-		let view = NSView()
+	@Environment(\.colorScheme) private var colorScheme
 
-		let effectView = NSMaterialView(frame: view.bounds)
-		effectView.autoresizingMask = [.width, .height]
+	final class Container: NSView {
+		let effectView = NSMaterialView()
 
-		let customEffect = NSMaterialView.Effect(
+		override init(frame frameRect: NSRect) {
+			super.init(frame: frameRect)
+			addSubview(effectView)
+			effectView.autoresizingMask = [.width, .height]
+			effectView.frame = bounds
+		}
+
+		required init?(coder: NSCoder) {
+			super.init(coder: coder)
+		}
+	}
+
+	func makeNSView(context: Context) -> Container {
+		let view = Container()
+
+		view.effectView.effect = makeEffect(for: context.environment.colorScheme)
+
+		return view
+	}
+
+	func updateNSView(_ nsView: Container, context: Context) {
+		nsView.effectView.effect = makeEffect(for: context.environment.colorScheme)
+	}
+
+	private func makeEffect(for scheme: ColorScheme) -> NSMaterialView.Effect {
+		let isDark = scheme == .dark
+
+		return NSMaterialView.Effect(
 			active: NSMaterialView.Effect.MaterialStyle(
-				backgroundColor: NSColor(white: 0.0, alpha: 0.0),
+				backgroundColor: isDark ? NSColor.clear : NSColor.white.withAlphaComponent(0.3),
 				tintColor: NSColor(white: 0.0, alpha: 0.0),
 				tintFilter: kCAFilterLightenBlendMode,
 				saturationFactor: 1.0,
 				brightnessFactor: 0.0,
-				blurRadius: 10
+				blurRadius: 8
 			),
 			inactive: NSMaterialView.Effect.MaterialStyle(
-				backgroundColor: NSColor(white: 0.0, alpha: 0.0),
+				backgroundColor: isDark ? NSColor.black.withAlphaComponent(0.2) : NSColor.white.withAlphaComponent(0.5),
 				tintColor: NSColor(white: 0.0, alpha: 0.0),
-				tintFilter: kCAFilterLightenBlendMode,
+				tintFilter: kCAFilterDarkenBlendMode,
 				saturationFactor: 1.0,
 				brightnessFactor: 0.0,
-				blurRadius: 10
+				blurRadius: 8
 			),
 			rimColor: (inner: .clear, outer: .clear),
 			rimWidth: (inner: 0, outer: 0)
 		)
-
-		effectView.effect = customEffect
-
-		view.addSubview(effectView)
-		return view
 	}
-
-	func updateNSView(_: NSView, context _: Context) {}
 }

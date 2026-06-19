@@ -12,6 +12,8 @@ struct TimetableView: View {
 	#if os(iOS)
 		@Binding var watchSync: PhoneWatchSyncBridge
 		@Binding var syncStatus: SyncMode
+	#else
+		@Binding var expanded: Bool
 	#endif
 
 	@Default(.timetable) var classes
@@ -34,8 +36,10 @@ struct TimetableView: View {
 		}
 	#else
 		init(
+			expanded: Binding<Bool>,
 			startComparisonOpen: Bool = false
 		) {
+			_expanded = expanded
 			_showTimetableComparison = State(initialValue: startComparisonOpen)
 		}
 
@@ -60,8 +64,11 @@ struct TimetableView: View {
 						.animation(.snappy(duration: 0.3), value: selectedSlot)
 				}
 				.scrollIndicators(.visible)
+				.opacity(selectedSlot != nil ? 1 : 0)
 				.scrollIndicatorsFlash(onAppear: true)
+				#if os(macOS)
 				.opacity(receivedTimetables.isEmpty ? 0 : 1)
+				#endif
 				.safeAreaBar(edge: .top, alignment: .center, spacing: 10) {
 					GlassEffectContainer(spacing: 2) {
 						HStack(spacing: 4) {
@@ -77,7 +84,7 @@ struct TimetableView: View {
 							mainContent(classLookup: classLookup)
 						}
 					}
-					.padding(.bottom, 10)
+					.padding(.bottom, Device.isMacOS ? 7 : 10)
 					#if os(macOS)
 						.padding([.top, .horizontal], 10)
 					#endif
@@ -93,7 +100,15 @@ struct TimetableView: View {
 			.onChange(of: classes) {
 				watchSync.pushTimetable()
 			}
-			#endif // os(iOS)
+			#else
+			.onChange(of: selectedSlot) {
+						if selectedSlot == nil {
+							expanded = false
+						} else {
+							expanded = true
+						}
+					}
+			#endif
 		}
 		.padding(.trailing, 2)
 	}
@@ -186,6 +201,6 @@ struct TimetableView: View {
 	#Preview {
 		@Previewable @State var showTimetableComparison = true
 
-		TimetableView(startComparisonOpen: false)
+		TimetableView(expanded: .constant(false), startComparisonOpen: false)
 	}
 #endif

@@ -8,6 +8,23 @@
 import EventKit
 import Foundation
 
+struct SlotConflict {
+	let slot: Slot
+	let firstClassName: String
+	let secondClassName: String
+}
+
+enum EditorRequest {
+	case allClasses(focus: String?)
+	case emptySlot(EditableSlot)
+}
+
+enum CalendarImportStatus {
+	case loading
+	case success
+	case error
+}
+
 // MARK: - fetchCompassEvents
 
 func fetchCompassEvents(from store: EKEventStore, calendar: EKCalendar) async throws -> [EKEvent] {

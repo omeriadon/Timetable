@@ -19,23 +19,6 @@ import SwiftUI
 	}
 #endif // os(iOS)
 
-struct SlotConflict {
-	let slot: Slot
-	let firstClassName: String
-	let secondClassName: String
-}
-
-enum EditorRequest {
-	case allClasses(focus: String?)
-	case emptySlot(EditableSlot)
-}
-
-enum CalendarImportStatus {
-	case loading
-	case success
-	case error
-}
-
 struct ContentView: View {
 	@Default(.timetable) var classes
 	@Default(.receivedTimetables) var receivedTimetables
@@ -51,13 +34,15 @@ struct ContentView: View {
 
 	@State private var selectedTab = 0
 
+	@Binding var expanded: Bool
+
 	var body: some View {
 		TabView(selection: $selectedTab) {
 			Tab("Timetable", systemSymbol: .calendar, value: 0) {
 				#if os(iOS)
 					TimetableView(watchSync: $watchSync, syncStatus: $rootSyncStatus)
 				#else
-					TimetableView()
+					TimetableView(expanded: $expanded)
 				#endif
 			}
 
@@ -69,6 +54,7 @@ struct ContentView: View {
 				#endif
 			}
 		}
+		.scrollEdgeEffectStyle(.soft, for: .top)
 		#if os(iOS)
 		.sheet(item: $pendingSharedTimetable) { timetable in
 			SharedTimetableImportSheet(
@@ -114,8 +100,6 @@ struct ContentView: View {
 			processPendingSharedImport()
 		}
 		#endif // os(iOS)
-		.monospaced()
-		.preferredColorScheme(.dark)
 	}
 
 	#if os(iOS)
@@ -173,5 +157,5 @@ struct ContentView: View {
 }
 
 #Preview {
-	ContentView()
+	ContentView(expanded: .constant(false))
 }

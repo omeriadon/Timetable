@@ -6,29 +6,31 @@
 //
 
 #if os(iOS)
-	import ActivityKit
+import ActivityKit
+#else
+import AppKit
 #endif
 import Defaults
 import Foundation
 import SwiftUI
 
 #if os(iOS)
-	func startPushToStartListener() {
-		Task {
-			for await token in Activity<iPhone_Widget_ExtensionAttributes>.pushToStartTokenUpdates {
-				let tokenString = token.map { String(format: "%02x", $0) }.joined()
+func startPushToStartListener() {
+	Task {
+		for await token in Activity<iPhone_Widget_ExtensionAttributes>.pushToStartTokenUpdates {
+			let tokenString = token.map { String(format: "%02x", $0) }.joined()
 
-				print("PUSH-TO-START TOKEN (hex): \(tokenString)")
-				let base64 = Data(token).base64EncodedString()
-				print("BASE64: \(base64)")
+			print("PUSH-TO-START TOKEN (hex): \(tokenString)")
+			let base64 = Data(token).base64EncodedString()
+			print("BASE64: \(base64)")
 
-				Task {
-					await NetworkManager.shared.registerPushToStartToken(tokenString)
-				}
+			Task {
+				await NetworkManager.shared.registerPushToStartToken(tokenString)
 			}
 		}
 	}
-#endif
+}
+#endif // os(iOS)
 
 struct ImportResult: Equatable {
 	let success: Bool
@@ -41,6 +43,8 @@ struct TimetableApp: App {
 	@State private var importStatus: ImportResult?
 	@State private var receivedTimetableData: ShareableTimetableData?
 
+	@State var expanded: Bool = false
+
 	@Default(.userDisplayName) var userName
 
 	private let cloudSync = CloudStore.shared
@@ -49,9 +53,13 @@ struct TimetableApp: App {
 		userName.isEmpty
 	}
 
-	#if os(macOS)
-		@NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-	#endif
+#if os(macOS)
+	@NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
+	init() {
+		UserDefaults.standard.set(false, forKey: "NSFullScreenMenuItemEverywhere")
+	}
+#endif // os(macOS)
 
 //	init() {
 //		startPushToStartListener()
@@ -62,7 +70,8 @@ struct TimetableApp: App {
 
 	var body: some Scene {
 		WindowGroup {
-			ContentView()
+			ContentView(expanded: $expanded)
+#if os(iOS)
 				.sheet(isPresented: .constant(showNameSheet)) {
 					NameSheet()
 						.presentationDetents([.medium])
@@ -70,22 +79,65 @@ struct TimetableApp: App {
 						.interactiveDismissDisabled()
 						.monospaced()
 				}
+#endif // os(iOS)
 				.onOpenURL { url in
 					handleIncomingURL(url)
 				}
 				.environment(\.importedFileURL, $importedFileURL)
 				.environment(\.importStatus, $importStatus)
 				.environment(\.receivedTimetableData, $receivedTimetableData)
-			#if os(macOS)
-				.frame(minWidth: 630, minHeight: 580)
+				.monospaced()
+#if os(macOS)
+				.onChange(of: expanded) { _, newValue in
+					resizeWindow(expanded: newValue)
+				}
+				.frame(width: 700)
+				.frame(minHeight: 475, idealHeight: 475, maxHeight: 750)
 				.background {
 					CustomMaterialView()
 						.ignoresSafeArea()
 				}
-			#endif
+#else
+				.preferredColorScheme(.dark)
+#endif
 		}
-		.windowResizability(.contentMinSize)
+		.windowResizability(.contentSize)
 	}
+
+#if os(macOS)
+	private func resizeWindow(expanded: Bool) {
+		guard let window = NSApplication.shared.windows.first else { return }
+
+		let newSize = expanded
+			? NSSize(width: 700, height: 727)
+			: NSSize(width: 700, height: 528)
+
+		let currentFrame = window.frame
+
+		let deltaHeight = newSize.height - currentFrame.height
+		let newOrigin = NSPoint(
+			x: currentFrame.origin.x,
+			y: currentFrame.origin.y - deltaHeight
+		)
+
+		let newFrame = NSRect(
+			origin: newOrigin,
+			size: newSize
+		)
+
+		window.styleMask.remove(.resizable)
+		window.styleMask.remove(.fullScreen)
+
+		window.collectionBehavior.remove(.fullScreenPrimary)
+		window.collectionBehavior.remove(.fullScreenAuxiliary)
+		window.collectionBehavior.insert(.fullScreenNone)
+
+		NSAnimationContext.runAnimationGroup { context in
+			context.duration = 0.25
+			window.animator().setFrame(newFrame, display: true)
+		}
+	}
+#endif // os(macOS)
 
 	private func handleIncomingURL(_ url: URL) {
 		if url.isFileURL {
