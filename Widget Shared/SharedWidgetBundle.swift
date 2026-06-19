@@ -1,5 +1,5 @@
 //
-//  WidgetBundle.swift
+//  SharedWidgetBundle.swift
 //  Watch Widget
 //
 //  Created by Adon Omeri on 15/6/2026.

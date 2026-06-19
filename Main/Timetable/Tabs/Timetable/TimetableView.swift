@@ -93,7 +93,7 @@ struct TimetableView: View {
 			.onChange(of: classes) {
 				watchSync.pushTimetable()
 			}
-#endif // os(iOS)
+			#endif // os(iOS)
 		}
 		.padding(.trailing, 2)
 	}

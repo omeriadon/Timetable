@@ -72,11 +72,11 @@ struct CurrentClassView: View {
 		symbol: String,
 		color: Color,
 		nextText: String?,
-		start: Date?,
+		start _: Date?,
 		end: Date?
 	) -> some View {
 		GeometryReader { geo in
-			if let nextText = nextText, let end = end {
+			if let nextText, let end {
 				// 2. Calculate remaining time using the synchronized parent 'now'
 				let remaining = max(0, end.timeIntervalSince(now))
 				let hours = Int(remaining) / 3600

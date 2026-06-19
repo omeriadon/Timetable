@@ -1,12 +1,12 @@
 //
-//  WidgetBundle.swift
+//  Widget Bundle.swift
 //  Widget
 //
 //  Created by Adon Omeri on 15/6/2026.
 //
 
-import WidgetKit
 import SwiftUI
+import WidgetKit
 
 @main
 struct WatchWidgetBundle: WidgetBundle {

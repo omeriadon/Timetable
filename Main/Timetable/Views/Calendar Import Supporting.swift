@@ -5,8 +5,8 @@
 //  Created by Adon Omeri on 19/6/2026.
 //
 
-import Foundation
 import EventKit
+import Foundation
 
 // MARK: - fetchCompassEvents
 

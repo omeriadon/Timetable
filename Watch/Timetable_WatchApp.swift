@@ -113,7 +113,7 @@ struct TimetableWatchApp: App {
 
 	private func createProgressBackground(color: Color, start: Date?, end: Date?) -> some View {
 		GeometryReader { geo in
-			if let start = start, let end = end {
+			if let start, let end {
 				let total = end.timeIntervalSince(start)
 				let elapsed = adjustedNow.timeIntervalSince(start)
 				let progress = total > 0 ? max(0, min(1, elapsed / total)) : 0

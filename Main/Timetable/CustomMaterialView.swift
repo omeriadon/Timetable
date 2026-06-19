@@ -10,7 +10,7 @@ import MaterialView
 import SwiftUI
 
 struct CustomMaterialView: NSViewRepresentable {
-	func makeNSView(context: Context) -> NSView {
+	func makeNSView(context _: Context) -> NSView {
 		let view = NSView()
 
 		let effectView = NSMaterialView(frame: view.bounds)
@@ -43,5 +43,5 @@ struct CustomMaterialView: NSViewRepresentable {
 		return view
 	}
 
-	func updateNSView(_ nsView: NSView, context: Context) {}
+	func updateNSView(_: NSView, context _: Context) {}
 }

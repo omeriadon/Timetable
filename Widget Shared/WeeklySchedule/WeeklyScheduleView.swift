@@ -1,5 +1,5 @@
 //
-//  WeeklyScheduleWidgetView.swift
+//  WeeklyScheduleView.swift
 //  Widget Extension
 //
 //  Created by Adon Omeri on 13/5/2026.
@@ -38,7 +38,7 @@ struct WeeklyScheduleView: View {
 							Spacer()
 						}
 						.background {
-							if day == currentWeekdayIndex && Device.isNotWatchOS {
+							if day == currentWeekdayIndex, Device.isNotWatchOS {
 								Rectangle()
 									.fill(widgetRenderingMode != .fullColor ? Color.secondary : Color.white)
 									.clipShape(
@@ -72,21 +72,21 @@ struct WeeklyScheduleView: View {
 						Spacer(minLength: 0)
 					}
 					.overlay(alignment: .leading) {
-						if day == currentWeekdayIndex && Device.isWatchOS {
+						if day == currentWeekdayIndex, Device.isWatchOS {
 							Rectangle()
 								.fill(Color.white)
 								.frame(width: 1)
 						}
 					}
 					.overlay(alignment: .trailing) {
-						if day == currentWeekdayIndex && Device.isWatchOS {
+						if day == currentWeekdayIndex, Device.isWatchOS {
 							Rectangle()
 								.fill(Color.white)
 								.frame(width: 1)
 						}
 					}
 					.overlay(alignment: .bottom) {
-						if day == currentWeekdayIndex && Device.isWatchOS {
+						if day == currentWeekdayIndex, Device.isWatchOS {
 							Rectangle()
 								.fill(Color.white)
 								.frame(height: 1)

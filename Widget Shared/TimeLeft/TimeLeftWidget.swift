@@ -1,5 +1,5 @@
 //
-//  TimeLeft.swift
+//  TimeLeftWidget.swift
 //  Timetable Watch Widgets
 //
 //  Created by Adon Omeri on 27/4/2026.
@@ -17,18 +17,16 @@ struct TimeLeftWidget: Widget {
 			let classLookup = TimetableLayout.classLookup(for: entry.classes)
 			let state = getSchoolState(at: entry.date, classLookup: classLookup)
 
-			let background: Color = {
-				switch state {
-					case let .beforeSchool(next):
-						return next.colour.swiftUIColor
-					case let .inClass(current, _, _):
-						return current?.colour.swiftUIColor ?? .black
-					case .inBreak:
-						return .orange
-					case .outsideSchool:
-						return .black
-				}
-			}()
+			let background: Color = switch state {
+				case let .beforeSchool(next):
+					next.colour.swiftUIColor
+				case let .inClass(current, _, _):
+					current?.colour.swiftUIColor ?? .black
+				case .inBreak:
+					.orange
+				case .outsideSchool:
+					.black
+			}
 
 			TimeLeftView(entry: entry, state: state)
 				.containerBackground(background, for: .widget)

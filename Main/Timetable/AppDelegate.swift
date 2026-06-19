@@ -8,8 +8,7 @@
 import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-
-	func applicationDidFinishLaunching(_ notification: Notification) {
+	func applicationDidFinishLaunching(_: Notification) {
 		guard let window = NSApplication.shared.windows.first else { return }
 
 		window.isOpaque = false

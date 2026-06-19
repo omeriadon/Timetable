@@ -9,7 +9,7 @@ import Defaults
 import Foundation
 import WidgetKit
 
-//MARK: - Provider
+// MARK: - Provider
 
 struct Provider: TimelineProvider {
 	func placeholder(in _: Context) -> TimetableEntry {
