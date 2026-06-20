@@ -12,6 +12,7 @@
 		2A098C8D2F9DB844002065BE /* Watch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 2A098C832F9DB842002065BE /* Watch.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2A1DB40E2F9DE9A300E5AE7C /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2A1DB40D2F9DE9A300E5AE7C /* Defaults */; };
 		2A1DB42D2F9ECEC300E5AE7C /* Watch Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2A2586A02FB5D6490030C8CD /* Watch Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2A5F91F12FE650FE007302CF /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A5F91F02FE650FE007302CF /* IrregularGradient */; };
 		2AA6DF172FDFAC8F00BBC70E /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AA6DF162FDFAC8F00BBC70E /* WidgetKit.framework */; };
 		2AA6DF192FDFAC8F00BBC70E /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AA6DF182FDFAC8F00BBC70E /* SwiftUI.framework */; };
 		2AA6DF242FDFAC9000BBC70E /* Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2AA6DF142FDFAC8F00BBC70E /* Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -212,6 +213,7 @@
 		2A098C802F9DB842002065BE /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				2A5F91F12FE650FE007302CF /* IrregularGradient in Frameworks */,
 				2A1DB40E2F9DE9A300E5AE7C /* Defaults in Frameworks */,
 			);
 		};
@@ -334,6 +336,7 @@
 			name = Watch;
 			packageProductDependencies = (
 				2A1DB40D2F9DE9A300E5AE7C /* Defaults */,
+				2A5F91F02FE650FE007302CF /* IrregularGradient */,
 			);
 			productName = "Timetable Watch Watch App";
 			productReference = 2A098C832F9DB842002065BE /* Watch.app */;
@@ -450,6 +453,7 @@
 				2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */,
 				2A0237AA2F9D9DE800AB1E1F /* XCLocalSwiftPackageReference "../../../Downloads/SFSymbolsPickerForSwiftUI-main" */,
 				2AE0F1392FE03989002B5D9D /* XCRemoteSwiftPackageReference "MaterialView" */,
+				2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */,
 			);
 			preferredProjectObjectVersion = 110;
 			productRefGroup = 2A02378C2F9C8EA000AB1E1F /* Products */;
@@ -1219,6 +1223,14 @@
 				minimumVersion = 9.0.8;
 			};
 		};
+		2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/joogps/IrregularGradient";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.0;
+			};
+		};
 		2AE0F1392FE03989002B5D9D /* XCRemoteSwiftPackageReference "MaterialView" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/OskarGroth/MaterialView";
@@ -1244,6 +1256,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = Defaults;
+		};
+		2A5F91F02FE650FE007302CF /* IrregularGradient */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */;
+			productName = IrregularGradient;
 		};
 		2AA6DF2B2FDFADAE00BBC70E /* Defaults */ = {
 			isa = XCSwiftPackageProductDependency;

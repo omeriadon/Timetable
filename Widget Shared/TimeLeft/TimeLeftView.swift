@@ -45,10 +45,10 @@ struct TimeLeftView: View {
 						end: info.end
 					)
 
-				case let .inBreak(title, nextText, info):
+				case let .inBreak(breakType, nextText, info):
 					createProgressView(
-						title: title,
-						symbol: title == "Lunch" ? "takeoutbag.and.cup.and.straw.fill" : "cup.and.saucer.fill",
+						title: breakType == .lunch ? "Lunch" : "Recess",
+						symbol: breakType == .lunch ? "takeoutbag.and.cup.and.straw.fill" : "cup.and.saucer.fill",
 						nextText: nextText,
 						start: info.start,
 						end: info.end

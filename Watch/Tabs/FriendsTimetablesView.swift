@@ -41,9 +41,9 @@ struct FriendsTimetablesView: View {
 				color = current?.colour.swiftUIColor ?? .blue
 				nextText = next
 
-			case let .inBreak(breakTitle, next, _):
-				title = breakTitle
-				symbol = breakTitle == "Lunch"
+			case let .inBreak(breakType, next, _):
+				title = breakType == .lunch ? "Lunch" : "Recess"
+				symbol = breakType == .lunch
 					? "takeoutbag.and.cup.and.straw.fill"
 					: "cup.and.saucer.fill"
 				color = .orange

@@ -1,5 +1,5 @@
 {
-  "originHash" : "a17e7d65d501927765ab84ca3a1ec849c77199446840434f88ce61c88dd7a077",
+  "originHash" : "41a4c0df3cca2d46c20500a43e1189798b9035bd6b2c7e96827bbc67a01afde5",
   "pins" : [
     {
       "identity" : "defaults",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "5bfac4928f000fabdbef7e4ed0251399bb0841c9",
         "version" : "9.0.8"
+      }
+    },
+    {
+      "identity" : "irregulargradient",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/joogps/IrregularGradient",
+      "state" : {
+        "revision" : "84cbf2dd9ecf1e98e592e0718310f90fef52d6be",
+        "version" : "2.1.0"
       }
     },
     {

@@ -7,9 +7,14 @@
 
 import Combine
 import Defaults
+import IrregularGradient
 import SwiftUI
 
+#if DEBUG
+let debugOffset: TimeInterval = -96566
+#else
 let debugOffset: TimeInterval = 0
+#endif
 
 @main
 struct TimetableWatchApp: App {
@@ -57,9 +62,10 @@ struct TimetableWatchApp: App {
 
 								case let .inBreak(_, _, info):
 									createProgressBackground(
-										color: .orange,
+										color: .black,
 										start: info.start,
-										end: info.end
+										end: info.end,
+										isBreak: true
 									)
 
 								case .outsideSchool:
@@ -70,9 +76,16 @@ struct TimetableWatchApp: App {
 
 				ForEach(Array(receivedTimetables.enumerated()), id: \.offset) { index, receivedTimetable in
 					Tab(receivedTimetable.sender, systemImage: "person", value: 2 + index) {
+						let friendLookup = TimetableLayout.classLookup(for: receivedTimetable.classes)
+
+						let friendState = getSchoolState(
+							at: adjustedNow,
+							classLookup: friendLookup
+						)
+
 						FriendsTimetablesView(receivedTimetable: receivedTimetable)
 							.containerBackground(for: .tabView) {
-								switch currentSchoolState {
+								switch friendState {
 									case let .beforeSchool(next):
 										createProgressBackground(
 											color: next.colour.swiftUIColor,
@@ -89,9 +102,10 @@ struct TimetableWatchApp: App {
 
 									case let .inBreak(_, _, info):
 										createProgressBackground(
-											color: .orange,
+											color: .black,
 											start: info.start,
-											end: info.end
+											end: info.end,
+											isBreak: true
 										)
 
 									case .outsideSchool:
@@ -111,20 +125,59 @@ struct TimetableWatchApp: App {
 		}
 	}
 
-	private func createProgressBackground(color: Color, start: Date?, end: Date?) -> some View {
+	private func createProgressBackground(color: Color, start: Date?, end: Date?, isBreak: Bool = false) -> some View {
 		GeometryReader { geo in
 			if let start, let end {
 				let total = end.timeIntervalSince(start)
 				let elapsed = adjustedNow.timeIntervalSince(start)
 				let progress = total > 0 ? max(0, min(1, elapsed / total)) : 0
 
-				HStack(spacing: 0) {
-					Rectangle()
-						.fill(color)
+				ZStack {
+					if isBreak {
+						IrregularGradient(
+							colors: [
+								.yellow,
+								.orange,
+								.pink,
+								.red,
+								.purple,
+								.blue,
+								.cyan,
+								.mint,
+								.green,
+								Color(red: 1.0, green: 0.84, blue: 0.0),
+								Color(red: 1.0, green: 0.72, blue: 0.82),
+								Color(red: 0.60, green: 0.90, blue: 1.0),
+								Color(red: 0.70, green: 1.0, blue: 0.70),
+								Color(red: 1.0, green: 0.60, blue: 0.40),
+								Color(red: 0.80, green: 0.60, blue: 1.0)
+							],
+							background: Color.blue,
+							speed: 2,
+							animate: true
+						)
+						.frame(width: geo.size.width, height: geo.size.height)
+					}
+
+					HStack(spacing: 0) {
+						let fill: AnyShapeStyle = isBreak
+							? AnyShapeStyle(.thinMaterial)
+							: AnyShapeStyle(color)
+
+						UnevenRoundedRectangle(
+							cornerRadii: RectangleCornerRadii(
+								topLeading: 0,
+								bottomLeading: 0,
+								bottomTrailing: 30,
+								topTrailing: 30
+							)
+						)
+						.fill(fill)
 						.frame(width: geo.size.width * progress)
 
-					Rectangle()
-						.fill(.black)
+						Rectangle()
+							.fill(.clear)
+					}
 				}
 			} else {
 				Rectangle()

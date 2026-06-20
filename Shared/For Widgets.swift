@@ -25,8 +25,13 @@ let tickMinutes = 8
 enum SchoolState {
 	case beforeSchool(next: Class)
 	case inClass(current: Class?, nextText: String, info: (start: Date, end: Date))
-	case inBreak(title: String, nextText: String, info: (start: Date, end: Date))
+	case inBreak(breakType: BreakType, nextText: String, info: (start: Date, end: Date))
 	case outsideSchool
+}
+
+enum BreakType {
+	case recess
+	case lunch
 }
 
 func getSchoolState(at date: Date, classLookup: [Slot: Class]) -> SchoolState {
@@ -53,17 +58,22 @@ func getSchoolState(at date: Date, classLookup: [Slot: Class]) -> SchoolState {
 
 		if index < periodTimes.count - 1 {
 			let nextPeriod = periodTimes[index + 1]
+
 			let breakStart = period.end
 			let breakEnd = nextPeriod.start
+
 			let breakStartMins = minutes(breakStart)
 			let breakEndMins = minutes(breakEnd)
 
 			if nowMins >= breakStartMins, nowMins < breakEndMins {
-				let title = (breakEndMins - breakStartMins > 20) ? "Lunch" : "Recess"
+				let recess = (breakStart.hour == 10 && breakStart.min == 46)
+				let breakType: BreakType = recess ? .recess : .lunch
+
 				let nextClass = classForPeriod(index + 1, dayIndex: dayIndex, classLookup: classLookup)
 				let nextText = "Next: \(nextClass?.id ?? "Free Period")"
 				let dates = getDates(start: breakStart, end: breakEnd, relativeTo: date)
-				return .inBreak(title: title, nextText: nextText, info: dates)
+
+				return .inBreak(breakType: breakType, nextText: nextText, info: dates)
 			}
 		}
 	}
