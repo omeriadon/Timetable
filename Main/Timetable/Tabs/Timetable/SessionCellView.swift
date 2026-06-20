@@ -12,14 +12,14 @@ struct SessionCellView: View {
 
 	let session: Int
 
-	let classLookup: [Slot: Class]
+	let subjectLookup: [Slot: Subject]
 
 	let selectedSlot: Slot?
 
-	init(_ day: Int, _ session: Int, _ classLookup: [Slot: Class], _ selectedSlot: Slot?) {
+	init(_ day: Int, _ session: Int, _ subjectLookup: [Slot: Subject], _ selectedSlot: Slot?) {
 		self.day = day
 		self.session = session
-		self.classLookup = classLookup
+		self.subjectLookup = subjectLookup
 		self.selectedSlot = selectedSlot
 	}
 
@@ -36,7 +36,7 @@ struct SessionCellView: View {
 					.frame(height: 60)
 
 				// normal
-			} else if let c = classLookup[Slot(day, session)] {
+			} else if let c = subjectLookup[Slot(day, session)] {
 				rectangle(
 					c.colour.swiftUIColor.opacity(0.8),
 					isBreak: false,

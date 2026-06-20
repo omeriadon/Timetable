@@ -17,10 +17,10 @@ struct ContentView: View {
 	@State private var isLoading = false
 	@State private var showSyncErrorIcon = false
 
-	@Default(.timetable) var classes
+	@Default(.timetable) var subjects
 
 	var body: some View {
-		let classLookup = TimetableLayout.classLookup(for: classes)
+		let subjectLookup = TimetableLayout.subjectLookup(for: subjects)
 
 		NavigationStack {
 			VStack {
@@ -45,7 +45,7 @@ struct ContentView: View {
 					}
 					.frame(width: 7)
 
-					mainContent(classLookup: classLookup)
+					mainContent(subjectLookup: subjectLookup)
 				}
 				Spacer()
 			}
@@ -65,20 +65,20 @@ struct ContentView: View {
 		}
 	}
 
-	func mainContent(classLookup: [Slot: Class]) -> some View {
+	func mainContent(subjectLookup: [Slot: Subject]) -> some View {
 		ForEach(0 ..< 5) { day in
 			VStack(spacing: 2) {
 				Text(TimetableLayout.shortDayLabels[day])
 					.font(.footnote.scaled(by: 0.8))
 					.frame(height: 15)
 				ForEach(0 ..< 8) { session in
-					sessionCell(day, session, classLookup: classLookup)
+					sessionCell(day, session, subjectLookup: subjectLookup)
 				}
 			}
 		}
 	}
 
-	func sessionCell(_ day: Int, _ session: Int, classLookup: [Slot: Class]) -> some View {
+	func sessionCell(_ day: Int, _ session: Int, subjectLookup: [Slot: Subject]) -> some View {
 		Group {
 			if TimetableLayout.isBreakSession(index: session) {
 				// recess and lunch
@@ -92,7 +92,7 @@ struct ContentView: View {
 
 				} else {
 					// actual session
-					if let c = classLookup[Slot(day, session)] {
+					if let c = subjectLookup[Slot(day, session)] {
 						rectangle(
 							c.colour.swiftUIColor.opacity(0.8)
 						) {

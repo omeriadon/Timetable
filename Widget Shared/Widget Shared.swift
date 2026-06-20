@@ -1,5 +1,5 @@
 //
-//  Shared.swift
+//  Widget Shared.swift
 //  Widget Extension
 //
 //  Created by Adon Omeri on 13/5/2026.
@@ -13,29 +13,29 @@ import WidgetKit
 
 struct Provider: TimelineProvider {
 	func placeholder(in _: Context) -> TimetableEntry {
-		TimetableEntry(date: .now, classes: [], relevance: nil)
+		TimetableEntry(date: .now, subject: [], relevance: nil)
 	}
 
 	func getSnapshot(in _: Context, completion: @escaping (TimetableEntry) -> Void) {
-		let classes = Defaults[.timetable]
+		let subjects = Defaults[.timetable]
 		completion(
 			TimetableEntry(
 				date: .now,
-				classes: classes,
+				subject: subjects,
 				relevance: nil
 			)
 		)
 	}
 
 	func getTimeline(in _: Context, completion: @escaping (Timeline<TimetableEntry>) -> Void) {
-		let classes = Defaults[.timetable]
+		let subjects = Defaults[.timetable]
 		let calendar = Calendar.current
 
 		guard let schoolDay = nextSchoolDay(from: .now, calendar: calendar) else {
 			completion(
 				Timeline(
 					entries: [
-						makeEntry(date: .now, classes: classes, calendar: calendar),
+						makeEntry(date: .now, subjects: subjects, calendar: calendar),
 					],
 					policy: .after(Date().addingTimeInterval(60 * 60))
 				)
@@ -73,7 +73,7 @@ struct Provider: TimelineProvider {
 		}
 
 		entries.append(
-			makeEntry(date: preSchool, classes: classes, calendar: calendar)
+			makeEntry(date: preSchool, subjects: subjects, calendar: calendar)
 		)
 
 		for period in periodTimes {
@@ -84,7 +84,7 @@ struct Provider: TimelineProvider {
 				of: schoolDay
 			) {
 				entries.append(
-					makeEntry(date: start, classes: classes, calendar: calendar)
+					makeEntry(date: start, subjects: subjects, calendar: calendar)
 				)
 			}
 
@@ -95,13 +95,13 @@ struct Provider: TimelineProvider {
 				of: schoolDay
 			) {
 				entries.append(
-					makeEntry(date: end, classes: classes, calendar: calendar)
+					makeEntry(date: end, subjects: subjects, calendar: calendar)
 				)
 			}
 		}
 
 		entries.append(
-			makeEntry(date: refreshAfterSchool, classes: classes, calendar: calendar)
+			makeEntry(date: refreshAfterSchool, subjects: subjects, calendar: calendar)
 		)
 
 		completion(
@@ -117,7 +117,7 @@ struct Provider: TimelineProvider {
 
 struct TimetableEntry: TimelineEntry {
 	let date: Date
-	let classes: [Class]
+	let subject: [Subject]
 	let relevance: TimelineEntryRelevance?
 }
 
@@ -125,12 +125,12 @@ struct TimetableEntry: TimelineEntry {
 
 private func makeEntry(
 	date: Date,
-	classes: [Class],
+	subjects: [Subject],
 	calendar: Calendar
 ) -> TimetableEntry {
 	TimetableEntry(
 		date: date,
-		classes: classes,
+		subject: subjects,
 		relevance: relevance(for: date, calendar: calendar)
 	)
 }

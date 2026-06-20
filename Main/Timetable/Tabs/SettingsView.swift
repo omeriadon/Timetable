@@ -15,7 +15,7 @@ struct RenameTimetable: Identifiable {
 }
 
 struct SettingsView: View {
-	@Default(.timetable) var classes
+	@Default(.timetable) var subjects
 	@Default(.receivedTimetables) var receivedTimetables
 
 	@Default(.userDisplayName) var userDisplayName
@@ -100,7 +100,7 @@ struct SettingsView: View {
 					action: {
 						Task {
 							await syncToWatchAsync(
-								classes: classes,
+								subjects: subjects,
 								watchSync: watchSync,
 								statusUpdate: { syncStatus = $0 }
 							)
@@ -131,8 +131,8 @@ struct SettingsView: View {
 			}
 			.matchedTransitionSource(id: "sheetMorph", in: ns)
 			.sheet(isPresented: $showEditTimetableSheet) {
-				ClassEditorSheet(
-					classes: $classes,
+				SubjectEditorSheet(
+					subjects: $subjects,
 					initialRequest: nil
 				)
 				.presentationDetents([.fraction(0.85)])

@@ -12,7 +12,7 @@ import SwiftUI
 #endif
 
 struct TimetableGridPreview: View {
-	let classes: [Class]
+	let subjects: [Subject]
 	var showsTitle: Bool = true
 	var title: String {
 		"\(userDisplayName)'s Timetable"
@@ -26,7 +26,7 @@ struct TimetableGridPreview: View {
 	let userDisplayName = Defaults[.userDisplayName]
 
 	var body: some View {
-		let classLookup = TimetableLayout.classLookup(for: classes)
+		let subjectLookup = TimetableLayout.subjectLookup(for: subjects)
 
 		VStack(alignment: .trailing, spacing: 12) {
 			VStack(alignment: .leading, spacing: 3) {
@@ -70,7 +70,7 @@ struct TimetableGridPreview: View {
 								.frame(height: 18)
 
 							ForEach(0 ..< TimetableLayout.sessions.count, id: \.self) { session in
-								cell(day: day, session: session, classLookup: classLookup)
+								cell(day: day, session: session, subjectLookup: subjectLookup)
 									.frame(height: rowHeight(for: TimetableLayout.sessions[session]))
 							}
 						}
@@ -83,7 +83,7 @@ struct TimetableGridPreview: View {
 		.background(showBackground ? backgroundColor : .clear)
 	}
 
-	private func cell(day: Int, session: Int, classLookup: [Slot: Class]) -> some View {
+	private func cell(day: Int, session: Int, subjectLookup: [Slot: Subject]) -> some View {
 		Group {
 			if TimetableLayout.isBreakSession(index: session) {
 				RoundedRectangle(cornerRadius: 5)
@@ -91,11 +91,11 @@ struct TimetableGridPreview: View {
 			} else if TimetableLayout.isUnavailable(day: day, session: session) {
 				RoundedRectangle(cornerRadius: 7)
 					.fill(.clear)
-			} else if let classItem = classLookup[Slot(day, session)] {
+			} else if let subjectItem = subjectLookup[Slot(day, session)] {
 				RoundedRectangle(cornerRadius: 7)
-					.fill(classItem.colour.swiftUIColor.opacity(0.82))
+					.fill(subjectItem.colour.swiftUIColor.opacity(0.82))
 					.overlay(alignment: .topLeading) {
-						Text(classItem.id)
+						Text(subjectItem.id)
 							.font(.headline)
 							.foregroundStyle(.white)
 							.lineLimit(2)
@@ -116,11 +116,11 @@ struct TimetableGridPreview: View {
 #if canImport(UIKit)
 	enum TimetablePreviewRenderer {
 		@MainActor
-		static func image(classes: [Class], title _: String, subtitle: String? = nil) -> UIImage {
+		static func image(subjects: [Subject], title _: String, subtitle: String? = nil) -> UIImage {
 			let size = CGSize(width: 630, height: 336)
 
 			let content = TimetableGridPreview(
-				classes: classes,
+				subjects: subjects,
 				showsTitle: false,
 				subtitle: subtitle,
 				showBackground: false

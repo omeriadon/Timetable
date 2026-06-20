@@ -12,7 +12,7 @@ import SwiftUI
 struct CalendarImportView: View {
 	@Environment(\.dismiss) var dismiss
 
-	@Default(.timetable) var classes
+	@Default(.timetable) var subjects
 
 	@State var sheetHeight = 0.0
 
@@ -147,16 +147,16 @@ struct CalendarImportView: View {
 			print("[iOS] Calendar Import: Matching events to time slots...")
 			await moveForward(to: .matchingEvents)
 
-			let importedClasses = try await matchEventsToTimeSlots(events)
+			let importedSubjects = try await matchEventsToTimeSlots(events)
 
-			print("[iOS] Calendar Import: Processing classes...")
-			await moveForward(to: .processingClasses)
-			let translatedClasses = translateClasses(importedClasses)
+			print("[iOS] Calendar Import: Processing subjects...")
+			await moveForward(to: .processingSubjects)
+			let translatedSubjects = translateSubjects(importedSubjects)
 
 			print("[iOS] Calendar Import: Validating...")
 			await moveForward(to: .finalising)
 
-			classes = translatedClasses.sorted { $0.id.localizedCaseInsensitiveCompare($1.id) == .orderedAscending }
+			subjects = translatedSubjects.sorted { $0.id.localizedCaseInsensitiveCompare($1.id) == .orderedAscending }
 
 			await moveForward(to: .done)
 			print("[iOS] Calendar Import: Success!")

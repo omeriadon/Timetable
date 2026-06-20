@@ -20,8 +20,8 @@ struct FriendsTimetablesView: View {
 	}
 
 	var body: some View {
-		let classLookup = TimetableLayout.classLookup(for: receivedTimetable.classes)
-		let state = getSchoolState(at: adjustedNow, classLookup: classLookup)
+		let subjectLookup = TimetableLayout.subjectLookup(for: receivedTimetable.subjects)
+		let state = getSchoolState(at: adjustedNow, subjectLookup: subjectLookup)
 
 		let title: String
 		let symbol: String
@@ -105,7 +105,7 @@ struct FriendsTimetablesView: View {
 	FriendsTimetablesView(
 		receivedTimetable: ReceivedTimetable(
 			sender: "Adon Omeri",
-			classes: defaultTimetable,
+			subjects: defaultTimetable,
 			receivedAt: Date()
 		)
 	)

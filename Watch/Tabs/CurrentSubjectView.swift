@@ -1,5 +1,5 @@
 //
-//  CurrentClassView.swift
+//  CurrentSubjectView.swift
 //  Timetable Watch
 //
 //  Created by Adon Omeri on 11/6/2026.
@@ -9,16 +9,16 @@ import Combine
 import Defaults
 import SwiftUI
 
-struct CurrentClassView: View {
-	@Default(.timetable) private var classes
+struct CurrentSubjectView: View {
+	@Default(.timetable) private var subjects
 
 	let now: Date
 
 	private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
 	var body: some View {
-		let classLookup = TimetableLayout.classLookup(for: classes)
-		let state = getSchoolState(at: now, classLookup: classLookup)
+		let subjectLookup = TimetableLayout.subjectLookup(for: subjects)
+		let state = getSchoolState(at: now, subjectLookup: subjectLookup)
 
 		Group {
 			switch state {
@@ -60,7 +60,7 @@ struct CurrentClassView: View {
 							.font(.title3)
 							.padding(.bottom)
 
-						Text("No more classes")
+						Text("No more subjects")
 							.foregroundStyle(.secondary)
 					}
 			}
@@ -185,6 +185,6 @@ struct CurrentClassView: View {
 }
 
 #Preview {
-	CurrentClassView(now: Date().addingTimeInterval(debugOffset))
+	CurrentSubjectView(now: Date().addingTimeInterval(debugOffset))
 		.monospaced()
 }

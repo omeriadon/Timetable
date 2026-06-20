@@ -10,16 +10,16 @@ import SwiftUI
 import WidgetKit
 
 struct WeeklyScheduleView: View {
-	@Default(.timetable) var classes
+	@Default(.timetable) var subjects
 
 	@Environment(\.widgetRenderingMode) var widgetRenderingMode
 
 	// MARK: - body
 
 	var body: some View {
-		let classLookup = TimetableLayout.classLookup(for: classes)
+		let subjectLookup = TimetableLayout.subjectLookup(for: subjects)
 
-		if classes.isEmpty {
+		if subjects.isEmpty {
 			Text("No timetable synced yet")
 				.lineLimit(2)
 
@@ -66,7 +66,7 @@ struct WeeklyScheduleView: View {
 						)
 
 						ForEach(0 ..< 8) { session in
-							sessionCell(day, session, classLookup: classLookup)
+							sessionCell(day, session, subjectLookup: subjectLookup)
 						}
 
 						Spacer(minLength: 0)
@@ -103,7 +103,7 @@ struct WeeklyScheduleView: View {
 	// MARK: - sessionCell
 
 	@ViewBuilder
-	func sessionCell(_ day: Int, _ session: Int, classLookup: [Slot: Class]) -> some View {
+	func sessionCell(_ day: Int, _ session: Int, subjectLookup: [Slot: Subject]) -> some View {
 		let leadingPadding: CGFloat =
 			if day == 0, session == 7, Device.isWatchOS {
 				day == currentWeekdayIndex ? 5 : 4
@@ -129,7 +129,7 @@ struct WeeklyScheduleView: View {
 					RoundedRectangle(cornerRadius: 0)
 						.fill(.clear)
 				} else {
-					if let c = classLookup[Slot(day, session)] {
+					if let c = subjectLookup[Slot(day, session)] {
 						GeometryReader { geo in
 							Text(c.id)
 								.foregroundStyle(.white)

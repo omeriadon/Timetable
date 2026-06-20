@@ -13,10 +13,10 @@ struct TimetableView: View {
 	@State private var senderName: String
 	@State private var isSending = false
 	@State private var errorMessage: String?
-	@Default(.timetable) var classes
-	let sendMessage: (String, [Class], @escaping (Result<Void, Error>) -> Void) -> Void
+	@Default(.timetable) var subjects
+	let sendMessage: (String, [Subject], @escaping (Result<Void, Error>) -> Void) -> Void
 
-	init(sendMessage: @escaping (String, [Class], @escaping (Result<Void, Error>) -> Void) -> Void = { _, _, completion in
+	init(sendMessage: @escaping (String, [Subject], @escaping (Result<Void, Error>) -> Void) -> Void = { _, _, completion in
 		completion(.failure(TimetableSendError.unavailable))
 	}) {
 		self.sendMessage = sendMessage
@@ -26,8 +26,8 @@ struct TimetableView: View {
 	var body: some View {
 		NavigationStack {
 			VStack {
-				if classes.isEmpty {
-					Text("No classes found in your timetable. Import your schedule in the app first to share your timetable.")
+				if subjects.isEmpty {
+					Text("No subjects found in your timetable. Import your schedule in the app first to share your timetable.")
 						.foregroundStyle(.secondary)
 				} else {
 					Text("Timetable")
@@ -54,7 +54,7 @@ struct TimetableView: View {
 					.buttonBorderShape(.capsule)
 					.buttonSizing(.flexible)
 					.controlSize(.large)
-					.disabled(isSending || classes.isEmpty || senderName.trimmingCharacters(in: .whitespaces).isEmpty)
+					.disabled(isSending || subjects.isEmpty || senderName.trimmingCharacters(in: .whitespaces).isEmpty)
 				}
 
 				Spacer()
@@ -69,7 +69,7 @@ struct TimetableView: View {
 		errorMessage = nil
 
 		let name = senderName.trimmingCharacters(in: .whitespaces)
-		sendMessage(name, classes) { result in
+		sendMessage(name, subjects) { result in
 			DispatchQueue.main.async {
 				isSending = false
 				switch result {

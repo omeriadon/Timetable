@@ -2,25 +2,13 @@ import Compression
 import Foundation
 import SwiftUI
 
-struct ShareableSlot: Codable, Equatable {
-	let day: Int
-	let period: Int
-}
-
-struct ShareableClass: Codable, Equatable {
-	let name: String
-	let symbol: String
-	let color: String
-	let slots: [ShareableSlot]
-}
-
 struct ShareableTimetableData: Codable, Equatable {
 	let sender: String
-	let classes: [ShareableClass]
+	let subjects: [Subject]
 
-	init(sender: String, classes: [Class]) {
+	init(sender: String, subjects: [Subject]) {
 		self.sender = sender
-		self.classes = classes.map(\.shareableValue)
+		self.subjects = subjects.map(\.shareableValue)
 	}
 
 	func toJSON() throws -> Data {
@@ -56,45 +44,12 @@ struct ShareableTimetableData: Codable, Equatable {
 		let jsonData = isV2 ? try data.decompressedLZFSE() : data
 		return try fromJSON(jsonData)
 	}
-}
-
-extension ShareableTimetableData {
-	func decodedClasses() -> [Class] {
-		classes.map(\.classValue)
-	}
 
 	func receivedTimetable(receivedAt: Date = .now) -> ReceivedTimetable {
 		ReceivedTimetable(
 			sender: sender,
-			classes: decodedClasses(),
+			subjects: subjects,
 			receivedAt: receivedAt
-		)
-	}
-}
-
-extension ShareableClass {
-	var classValue: Class {
-		Class(
-			id: name,
-			symbol: symbol,
-			colour: RGBAColor(hexString: color),
-			slots: slots.map { Slot($0.day, $0.period) }
-		)
-	}
-}
-
-extension Class {
-	var shareableValue: ShareableClass {
-		ShareableClass(
-			name: id,
-			symbol: symbol,
-			color: String(
-				format: "#%02X%02X%02X",
-				Int(colour.r * 255),
-				Int(colour.g * 255),
-				Int(colour.b * 255)
-			),
-			slots: slots.map { ShareableSlot(day: $0.day, period: $0.session) }
 		)
 	}
 }

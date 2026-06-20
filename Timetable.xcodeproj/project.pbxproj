@@ -77,6 +77,22 @@
 			);
 			name = "Embed Foundation Extensions";
 		};
+		2A5F92042FE665C0007302CF /* Embed ExtensionKit Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "$(EXTENSIONS_FOLDER_PATH)";
+			dstSubfolder = Product;
+			files = (
+			);
+			name = "Embed ExtensionKit Extensions";
+		};
+		2A5F92172FE6680B007302CF /* Embed ExtensionKit Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "$(EXTENSIONS_FOLDER_PATH)";
+			dstSubfolder = Product;
+			files = (
+			);
+			name = "Embed ExtensionKit Extensions";
+		};
 		2AAE2F502FA1A00500E050A2 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			dstPath = "";
@@ -101,37 +117,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		2AAE62BF2FD839B5004B3FF4 /* Exceptions for "Main" folder in "Watch Widget" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Timetable/AppDelegate.swift,
-				Timetable/Assets.xcassets,
-				Timetable/Backend/Network/NetworkManager.swift,
-				Timetable/Backend/PhoneWatchSyncBridge.swift,
-				Timetable/Backend/syncToWatchAsync.swift,
-				Timetable/CustomMaterialView.swift,
-				Timetable/LaunchScreen.storyboard,
-				Timetable/Tabs/ContentView/ContentView.swift,
-				Timetable/Tabs/ContentView/SharedTimetableImportSheet.swift,
-				Timetable/Tabs/SettingsView.swift,
-				Timetable/Tabs/Timetable/SessionCellView.swift,
-				Timetable/Tabs/Timetable/TimetableComparison.swift,
-				Timetable/Tabs/Timetable/TimetableView.swift,
-				Timetable/TimetableApp.swift,
-				"Timetable/Views/Calendar Import Supporting.swift",
-				Timetable/Views/CalendarImportView.swift,
-				Timetable/Views/ClassEditorSheet.swift,
-				Timetable/Views/InlineColorPicker.swift,
-				Timetable/Views/NameSheet.swift,
-				Timetable/Views/Other.swift,
-				Timetable/Views/SyncButton.swift,
-			);
-			platformFiltersByRelativePath = {
-				ActivityAttribute.swift = (ios, );
-				LiveActivityManager.swift = (ios, );
-			};
-			target = 2A25869F2FB5D6490030C8CD /* Watch Widget */;
-		};
 		2AC5F7EA2FD842F000B813EA /* Exceptions for "Main" folder in "Timetable" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			platformFiltersByRelativePath = {
@@ -165,6 +150,11 @@
 			path = Info;
 			sourceTree = "<group>";
 		};
+		2A5F92192FE66817007302CF /* App Intents */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "App Intents";
+			sourceTree = "<group>";
+		};
 		2A60F50B2FD953D1009F4CE8 /* Watch */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Watch;
@@ -194,7 +184,6 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				2AC5F7EA2FD842F000B813EA /* Exceptions for "Main" folder in "Timetable" target */,
-				2AAE62BF2FD839B5004B3FF4 /* Exceptions for "Main" folder in "Watch Widget" target */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -253,6 +242,7 @@
 				2AA6DF2A2FDFACFB00BBC70E /* Widget Shared */,
 				2AAE62702FD839A7004B3FF4 /* Main */,
 				2ACEE8BB2FD827B10031316D /* Timetable.icon */,
+				2A5F92192FE66817007302CF /* App Intents */,
 				2AA6DF152FDFAC8F00BBC70E /* Frameworks */,
 				2A02378C2F9C8EA000AB1E1F /* Products */,
 			);
@@ -291,6 +281,7 @@
 				2A0237892F9C8EA000AB1E1F /* Resources */,
 				2A098C8E2F9DB844002065BE /* Embed Watch Content */,
 				2AAE2F502FA1A00500E050A2 /* Embed Foundation Extensions */,
+				2A5F92042FE665C0007302CF /* Embed ExtensionKit Extensions */,
 			);
 			buildRules = (
 			);
@@ -302,6 +293,7 @@
 			fileSystemSynchronizedGroups = (
 				2A02379F2F9C908300AB1E1F /* Shared */,
 				2A2A766F2FD971890030B8DA /* Entitlements */,
+				2A5F92192FE66817007302CF /* App Intents */,
 				2AAE62702FD839A7004B3FF4 /* Main */,
 			);
 			name = Timetable;
@@ -322,6 +314,7 @@
 				2A098C802F9DB842002065BE /* Frameworks */,
 				2A098C812F9DB842002065BE /* Resources */,
 				2A1DB42C2F9ECEC300E5AE7C /* Embed Foundation Extensions */,
+				2A5F92172FE6680B007302CF /* Embed ExtensionKit Extensions */,
 			);
 			buildRules = (
 			);
@@ -331,6 +324,7 @@
 			fileSystemSynchronizedGroups = (
 				2A02379F2F9C908300AB1E1F /* Shared */,
 				2A2A766F2FD971890030B8DA /* Entitlements */,
+				2A5F92192FE66817007302CF /* App Intents */,
 				2A60F50B2FD953D1009F4CE8 /* Watch */,
 			);
 			name = Watch;
@@ -355,9 +349,9 @@
 			fileSystemSynchronizedGroups = (
 				2A02379F2F9C908300AB1E1F /* Shared */,
 				2A2A766F2FD971890030B8DA /* Entitlements */,
+				2A5F92192FE66817007302CF /* App Intents */,
 				2AA6DF2A2FDFACFB00BBC70E /* Widget Shared */,
 				2AAE61BB2FD82845004B3FF4 /* Watch Widget */,
-				2AAE62702FD839A7004B3FF4 /* Main */,
 			);
 			name = "Watch Widget";
 			packageProductDependencies = (
@@ -379,6 +373,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				2A02379F2F9C908300AB1E1F /* Shared */,
+				2A5F92192FE66817007302CF /* App Intents */,
 				2AA6DF1A2FDFAC8F00BBC70E /* Widget */,
 				2AA6DF2A2FDFACFB00BBC70E /* Widget Shared */,
 			);
@@ -403,6 +398,7 @@
 			fileSystemSynchronizedGroups = (
 				2A02379F2F9C908300AB1E1F /* Shared */,
 				2A2A766F2FD971890030B8DA /* Entitlements */,
+				2A5F92192FE66817007302CF /* App Intents */,
 				2AAE61AD2FD82845004B3FF4 /* Message */,
 			);
 			name = Message;

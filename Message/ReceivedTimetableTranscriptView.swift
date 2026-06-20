@@ -25,7 +25,7 @@ struct ReceivedTimetableTranscriptView: View {
 				VStack(spacing: 12) {
 					addButton
 
-					classesPreview(for: data)
+					subjectsPreview(for: data)
 				}
 			} else if isLoading {
 				ProgressView()
@@ -47,9 +47,9 @@ struct ReceivedTimetableTranscriptView: View {
 		.monospaced()
 	}
 
-	private func classesPreview(for data: ShareableTimetableData) -> some View {
+	private func subjectsPreview(for data: ShareableTimetableData) -> some View {
 		TimetableGridPreview(
-			classes: data.decodedClasses(),
+			subjects: data.subjects,
 			showsTitle: true,
 			rowScale: 0.78,
 			showBackground: false

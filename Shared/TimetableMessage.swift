@@ -8,7 +8,7 @@
 import Foundation
 
 struct TimetableMessage: Codable {
-	let timetable: [Class]
+	let timetable: [Subject]
 	let sender: String
 	let timestamp: Date
 
@@ -20,7 +20,7 @@ struct TimetableMessage: Codable {
 }
 
 extension TimetableMessage {
-	static func encode(_ timetable: [Class], sender: String = "Unknown") throws -> Data {
+	static func encode(_ timetable: [Subject], sender: String = "Unknown") throws -> Data {
 		let message = TimetableMessage(
 			timetable: timetable,
 			sender: sender,

@@ -112,7 +112,7 @@ struct TimeLeftView: View {
 	TimeLeftView(
 		entry: TimetableEntry(
 			date: Date(),
-			classes: defaultTimetable,
+			subject: defaultTimetable,
 			relevance: TimelineEntryRelevance(score: 1, duration: 60 * 60)
 		),
 		state: .beforeSchool(next: defaultTimetable[0])

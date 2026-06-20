@@ -10,12 +10,12 @@ import Foundation
 
 struct SlotConflict {
 	let slot: Slot
-	let firstClassName: String
-	let secondClassName: String
+	let firstSubjectName: String
+	let secondSubjectName: String
 }
 
 enum EditorRequest {
-	case allClasses(focus: String?)
+	case allSubjectes(focus: String?)
 	case emptySlot(EditableSlot)
 }
 
@@ -51,14 +51,15 @@ func calculateNextMonday() -> Date {
 	return calendar.startOfDay(for: nextMonday)
 }
 
-// MARK: - translateClasses
+// MARK: - translateSubjectes
 
-func translateClasses(_ classes: [Class]) -> [Class] {
-	var result: [Class] = []
+func
+translateSubjects(_ subjects: [Subject]) -> [Subject] {
+	var result: [Subject] = []
 
-	for c in classes {
+	for c in subjects {
 		result.append(
-			Class(
+			Subject(
 				id: translateTitle(c.id),
 				symbol: c.symbol,
 				colour: c.colour,
@@ -72,7 +73,7 @@ func translateClasses(_ classes: [Class]) -> [Class] {
 
 // MARK: - matchEventsToTimeSlots
 
-func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Class] {
+func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Subject] {
 	struct SlotWindow {
 		let session: Int
 		let startHour: Int
@@ -91,7 +92,7 @@ func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Class] {
 	]
 
 	let calendar = Calendar.current
-	var classMap: [String: (color: RGBAColor, symbol: String, slots: [Slot])] = [:]
+	var subjectMap: [String: (color: RGBAColor, symbol: String, slots: [Slot])] = [:]
 
 	for event in events {
 		guard
@@ -126,24 +127,24 @@ func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Class] {
 			continue
 		}
 
-		if classMap[title] == nil {
+		if subjectMap[title] == nil {
 			let randomColor = RGBAColor(
 				color: AvailableColors.allCases.randomElement()!.SwiftUIColor
 			)
 
-			classMap[title] = (
+			subjectMap[title] = (
 				color: randomColor,
 				symbol: translateSymbol(title),
 				slots: []
 			)
 		}
 
-		classMap[title]!.slots.append(Slot(day, matchedSlot.session))
+		subjectMap[title]!.slots.append(Slot(day, matchedSlot.session))
 	}
 
-	return classMap
+	return subjectMap
 		.map { name, data in
-			Class(
+			Subject(
 				id: name,
 				symbol: data.symbol,
 				colour: data.color,
@@ -163,7 +164,7 @@ enum CalendarImportStep: Equatable {
 	case findingCalendar
 	case fetchingEvents
 	case matchingEvents
-	case processingClasses
+	case processingSubjects
 	case finalising
 	case done
 
@@ -185,7 +186,7 @@ enum CalendarImportStep: Equatable {
 				4
 			case .matchingEvents:
 				5
-			case .processingClasses:
+			case .processingSubjects:
 				6
 			case .finalising:
 				7
@@ -208,7 +209,7 @@ enum CalendarImportStep: Equatable {
 				"Fetching events..."
 			case .matchingEvents:
 				"Matching events..."
-			case .processingClasses:
+			case .processingSubjects:
 				"Translating titles..."
 			case .finalising:
 				"Finalising..."

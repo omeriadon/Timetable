@@ -19,14 +19,14 @@ struct SharedTimetableImportSheet: View {
 					VStack(alignment: .leading, spacing: 8) {
 						Text(timetable.sender)
 							.font(.headline)
-						Text("\(timetable.classes.count) classes shared")
+						Text("\(timetable.subjects.count) subjects shared")
 							.font(.subheadline)
 							.foregroundStyle(.secondary)
 					}
 					.frame(maxWidth: .infinity, alignment: .leading)
 
 					TimetableGridPreview(
-						classes: timetable.classes,
+						subjects: timetable.subjects,
 						showsTitle: false
 					)
 					.clipShape(RoundedRectangle(cornerRadius: 16))
@@ -53,7 +53,7 @@ struct SharedTimetableImportSheet: View {
 	SharedTimetableImportSheet(
 		timetable: ReceivedTimetable(
 			sender: "Monkey",
-			classes: defaultTimetable,
+			subjects: defaultTimetable,
 			receivedAt: Date()
 		),
 		onCancel: {},

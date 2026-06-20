@@ -104,12 +104,12 @@ class MessagesViewController: MSMessagesAppViewController {
 			AnyView(TranscriptPlaceholder())
 		} else {
 			AnyView(
-				TimetableView { [weak self] _, classes, completion in
+				TimetableView { [weak self] _, subjects, completion in
 					guard let self else {
 						completion(.failure(MessageSendError.controllerDeallocated))
 						return
 					}
-					sendTimetableMessage(senderName: userDisplayName, classes: classes, completion: completion)
+					sendTimetableMessage(senderName: userDisplayName, subjects: subjects, completion: completion)
 				}
 			)
 		}
@@ -174,7 +174,7 @@ class MessagesViewController: MSMessagesAppViewController {
 				if provider.hasItemConformingToTypeIdentifier("public.url") {
 					var extractedURL: URL?
 					let semaphore = DispatchSemaphore(value: 0)
-					provider.loadItem(forTypeIdentifier: "public.url", options: nil) { item, _ in
+					provider.loadItem(forTypeIdentifier: "public.url") { item, _ in
 						if let url = item as? URL {
 							extractedURL = url
 						} else if let string = item as? String {
@@ -198,21 +198,21 @@ class MessagesViewController: MSMessagesAppViewController {
 		return components?.queryItems?.contains(where: { $0.name == "data" && ($0.value?.isEmpty == false) }) == true
 	}
 
-	private func sendTimetableMessage(senderName: String, classes: [Class], completion: @escaping (Result<Void, Error>) -> Void) {
+	private func sendTimetableMessage(senderName: String, subjects: [Subject], completion: @escaping (Result<Void, Error>) -> Void) {
 		guard let conversation = activeConversation else {
 			completion(.failure(MessageSendError.noActiveConversation))
 			return
 		}
 
-		let timetableData = ShareableTimetableData(sender: senderName, classes: classes)
+		let timetableData = ShareableTimetableData(sender: senderName, subjects: subjects)
 
 		do {
 			let deepLinkURL = try makeDeepLink(for: timetableData)
 			let layout = MSMessageTemplateLayout()
 			layout.image = TimetablePreviewRenderer.image(
-				classes: classes,
+				subjects: subjects,
 				title: "\(senderName)'s Timetable",
-				subtitle: "\(classes.count) classes ready to import"
+				subtitle: "\(subjects.count) subjects ready to import"
 			)
 			layout.caption = "\(senderName)'s Timetable"
 			layout.subcaption = "Tap to preview and import"
@@ -308,7 +308,7 @@ class MessagesViewController: MSMessagesAppViewController {
 
 			let receivedTimetable = ReceivedTimetable(
 				sender: data.sender,
-				classes: data.decodedClasses(),
+				subjects: data.subjects,
 				receivedAt: Date()
 			)
 

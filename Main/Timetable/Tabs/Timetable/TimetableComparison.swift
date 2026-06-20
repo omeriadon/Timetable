@@ -10,7 +10,7 @@ import SwiftUI
 
 struct TimetableComparison: View {
 	@Default(.receivedTimetables) var receivedTimetables
-	@Default(.timetable) var classes
+	@Default(.timetable) var subjects
 
 	let selectedSlot: Slot?
 
@@ -18,12 +18,12 @@ struct TimetableComparison: View {
 		VStack(spacing: 8) {
 			ForEach(receivedTimetables.indices, id: \.self) { idx in
 				if let slot = selectedSlot,
-				   let theirClass = getClassAtSlot(day: slot.day, session: slot.session, in: receivedTimetables[idx].classes)
+				   let theirSubject = getSubjectAtSlot(day: slot.day, session: slot.session, in: receivedTimetables[idx].subjects)
 				{
 					item(
 						left: receivedTimetables[idx].sender,
-						right: Label(theirClass.id, systemImage: theirClass.symbol),
-						colour: theirClass.colour.swiftUIColor
+						right: Label(theirSubject.id, systemImage: theirSubject.symbol),
+						colour: theirSubject.colour.swiftUIColor
 					)
 
 				} else {
@@ -58,9 +58,9 @@ struct TimetableComparison: View {
 		.glassEffect(.clear.tint(colour).interactive(), in: Capsule())
 	}
 
-	private func getClassAtSlot(day: Int, session: Int, in timetable: [Class]) -> Class? {
-		let classLookup = TimetableLayout.classLookup(for: timetable)
-		return classLookup[Slot(day, session)]
+	private func getSubjectAtSlot(day: Int, session: Int, in timetable: [Subject]) -> Subject? {
+		let subjectLookup = TimetableLayout.subjectLookup(for: timetable)
+		return subjectLookup[Slot(day, session)]
 	}
 }
 

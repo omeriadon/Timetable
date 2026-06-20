@@ -16,7 +16,7 @@ struct TimetableView: View {
 		@Binding var expanded: WindowMode
 	#endif
 
-	@Default(.timetable) var classes
+	@Default(.timetable) var subjects
 	@Default(.receivedTimetables) var receivedTimetables
 	@Default(.userDisplayName) var userDisplayName
 
@@ -52,7 +52,7 @@ struct TimetableView: View {
 	#endif
 
 	var body: some View {
-		let classLookup = TimetableLayout.classLookup(for: selectedTimetable?.classes ?? classes)
+		let subjectLookup = TimetableLayout.subjectLookup(for: selectedTimetable?.subjects ?? subjects)
 
 		NavigationStack {
 			VStack {
@@ -81,7 +81,7 @@ struct TimetableView: View {
 								}
 								.frame(width: 15)
 
-								mainContent(classLookup: classLookup)
+								mainContent(subjectLookup: subjectLookup)
 							}
 						}
 						.padding(.bottom, Device.isMacOS ? 7 : 10)
@@ -97,7 +97,7 @@ struct TimetableView: View {
 				watchSync.activateIfNeeded()
 				watchSync.pushTimetable()
 			}
-			.onChange(of: classes) {
+			.onChange(of: subjects) {
 				watchSync.pushTimetable()
 			}
 			#else
@@ -118,7 +118,7 @@ struct TimetableView: View {
 		.padding(.trailing, 2)
 	}
 
-	private func findCurrentClass(in timetable: [Class]) -> Class? {
+	private func findCurrentSubject(in timetable: [Subject]) -> Subject? {
 		let today = Date()
 		let weekday = Calendar.current.component(.weekday, from: today)
 		let dayIndex = (weekday + 5) % 7
@@ -143,24 +143,24 @@ struct TimetableView: View {
 			let endMinutes = endH * 60 + endM
 
 			if timeInMinutes >= startMinutes, timeInMinutes < endMinutes {
-				let classLookup = TimetableLayout.classLookup(for: timetable)
-				return classLookup[Slot(dayIndex, sessionIndex)]
+				let subjectLookup = TimetableLayout.subjectLookup(for: timetable)
+				return subjectLookup[Slot(dayIndex, sessionIndex)]
 			}
 		}
 		return nil
 	}
 
-	func mainContent(classLookup: [Slot: Class]) -> some View {
+	func mainContent(subjectLookup: [Slot: Subject]) -> some View {
 		ForEach(0 ..< 5) { day in
 			VStack(spacing: 4) {
 				Text(TimetableLayout.shortDayLabels[day])
 				ForEach(0 ..< 8) { session in
-					SessionCellView(day, session, classLookup, selectedSlot)
+					SessionCellView(day, session, subjectLookup, selectedSlot)
 						.contentShape(Rectangle())
 						.onTapGesture {
 							if selectedSlot == Slot(day, session) {
 								selectedSlot = nil
-							} else if let _ = classLookup[Slot(day, session)] {
+							} else if let _ = subjectLookup[Slot(day, session)] {
 								if !receivedTimetables.isEmpty {
 									selectedSlot = Slot(day, session)
 								}

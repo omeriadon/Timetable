@@ -1,5 +1,5 @@
 //
-//  Timetable_WatchApp.swift
+//  WatchApp.swift
 //  Timetable Watch Watch App
 //
 //  Created by Adon Omeri on 26/4/2026.
@@ -19,7 +19,7 @@ let debugOffset: TimeInterval = 0
 @main
 struct TimetableWatchApp: App {
 	@Default(.receivedTimetables) var receivedTimetables
-	@Default(.timetable) var classes
+	@Default(.timetable) var subjects
 
 	@State private var currentTab = 0
 	@State private var now = Date()
@@ -31,8 +31,8 @@ struct TimetableWatchApp: App {
 	}
 
 	private var currentSchoolState: SchoolState {
-		let classLookup = TimetableLayout.classLookup(for: classes)
-		return getSchoolState(at: adjustedNow, classLookup: classLookup)
+		let subjectLookup = TimetableLayout.subjectLookup(for: subjects)
+		return getSchoolState(at: adjustedNow, subjectLookup: subjectLookup)
 	}
 
 	var body: some Scene {
@@ -42,8 +42,8 @@ struct TimetableWatchApp: App {
 					ContentView()
 				}
 
-				Tab("Current Class", systemImage: "timer", value: 1) {
-					CurrentClassView(now: adjustedNow)
+				Tab("Current Subject", systemImage: "timer", value: 1) {
+					CurrentSubjectView(now: adjustedNow)
 						.containerBackground(for: .tabView) {
 							switch currentSchoolState {
 								case let .beforeSchool(next):
@@ -76,11 +76,11 @@ struct TimetableWatchApp: App {
 
 				ForEach(Array(receivedTimetables.enumerated()), id: \.offset) { index, receivedTimetable in
 					Tab(receivedTimetable.sender, systemImage: "person", value: 2 + index) {
-						let friendLookup = TimetableLayout.classLookup(for: receivedTimetable.classes)
+						let friendLookup = TimetableLayout.subjectLookup(for: receivedTimetable.subjects)
 
 						let friendState = getSchoolState(
 							at: adjustedNow,
-							classLookup: friendLookup
+							subjectLookup: friendLookup
 						)
 
 						FriendsTimetablesView(receivedTimetable: receivedTimetable)

@@ -20,7 +20,7 @@ import SwiftUI
 #endif // os(iOS)
 
 struct ContentView: View {
-	@Default(.timetable) var classes
+	@Default(.timetable) var subjects
 	@Default(.receivedTimetables) var receivedTimetables
 	@Environment(\.importedFileURL) private var importedFileURL
 	@Environment(\.receivedTimetableData) private var receivedTimetableData
@@ -140,13 +140,13 @@ struct ContentView: View {
 				}.value
 				let message = try TimetableMessage.decode(data)
 				guard !message.timetable.isEmpty else {
-					importErrorMessage = "This timetable does not contain any classes."
+					importErrorMessage = "This timetable does not contain any subjects."
 					return
 				}
 
 				pendingSharedTimetable = ReceivedTimetable(
 					sender: message.sender,
-					classes: message.timetable,
+					subjects: message.timetable,
 					receivedAt: message.timestamp
 				)
 			} catch {

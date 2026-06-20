@@ -24,7 +24,7 @@ struct WeeklyScheduleWidget: Widget {
 		#endif
 		.contentMarginsDisabled()
 		.configurationDisplayName("Timetable")
-		.description("Your class schedule for the week.")
+		.description("Your subject schedule for the week.")
 	}
 }
 
@@ -34,7 +34,7 @@ struct WeeklyScheduleWidget: Widget {
 	} timeline: {
 		TimetableEntry(
 			date: .now,
-			classes: defaultTimetable,
+			subject: defaultTimetable,
 			relevance: TimelineEntryRelevance(
 				score: 1.0,
 				duration: 60 * 60
@@ -47,7 +47,7 @@ struct WeeklyScheduleWidget: Widget {
 	} timeline: {
 		TimetableEntry(
 			date: .now,
-			classes: defaultTimetable,
+			subject: defaultTimetable,
 			relevance: TimelineEntryRelevance(
 				score: 1.0,
 				duration: 60 * 60

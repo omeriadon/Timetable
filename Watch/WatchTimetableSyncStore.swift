@@ -66,10 +66,10 @@ final class WatchTimetableSyncStore: NSObject, WCSessionDelegate {
 		let previousTimetable = Defaults[.timetable]
 		let previousReceived = Defaults[.receivedTimetables]
 
-		// CLASSES
+		// SUBJECTS
 		if let timetableData = payload["timetableData"] as? Data {
 			do {
-				Defaults[.timetable] = try JSONDecoder().decode([Class].self, from: timetableData)
+				Defaults[.timetable] = try JSONDecoder().decode([Subject].self, from: timetableData)
 			} catch {
 				print("[Watch] timetable decode failed: \(error)")
 			}

@@ -23,8 +23,8 @@ let schoolEndMinute = 30
 let tickMinutes = 8
 
 enum SchoolState {
-	case beforeSchool(next: Class)
-	case inClass(current: Class?, nextText: String, info: (start: Date, end: Date))
+	case beforeSchool(next: Subject)
+	case inClass(current: Subject?, nextText: String, info: (start: Date, end: Date))
 	case inBreak(breakType: BreakType, nextText: String, info: (start: Date, end: Date))
 	case outsideSchool
 }
@@ -34,7 +34,7 @@ enum BreakType {
 	case lunch
 }
 
-func getSchoolState(at date: Date, classLookup: [Slot: Class]) -> SchoolState {
+func getSchoolState(at date: Date, subjectLookup: [Slot: Subject]) -> SchoolState {
 	let calendar = Calendar.current
 	let weekday = calendar.component(.weekday, from: date)
 	let dayIndex = (weekday + 5) % 7
@@ -50,8 +50,8 @@ func getSchoolState(at date: Date, classLookup: [Slot: Class]) -> SchoolState {
 		let endMins = minutes(period.end)
 
 		if nowMins >= startMins, nowMins < endMins {
-			let current = classForPeriod(index, dayIndex: dayIndex, classLookup: classLookup)
-			let nextText = nextTextAfterClass(periodIndex: index, dayIndex: dayIndex, classLookup: classLookup)
+			let current = subjectForPeriod(index, dayIndex: dayIndex, subjectLookup: subjectLookup)
+			let nextText = nextTextAfterSubject(periodIndex: index, dayIndex: dayIndex, subjectLookup: subjectLookup)
 			let dates = getDates(start: period.start, end: period.end, relativeTo: date)
 			return .inClass(current: current, nextText: nextText, info: dates)
 		}
@@ -69,8 +69,8 @@ func getSchoolState(at date: Date, classLookup: [Slot: Class]) -> SchoolState {
 				let recess = (breakStart.hour == 10 && breakStart.min == 46)
 				let breakType: BreakType = recess ? .recess : .lunch
 
-				let nextClass = classForPeriod(index + 1, dayIndex: dayIndex, classLookup: classLookup)
-				let nextText = "Next: \(nextClass?.id ?? "Free Period")"
+				let nextSubject = subjectForPeriod(index + 1, dayIndex: dayIndex, subjectLookup: subjectLookup)
+				let nextText = "Next: \(nextSubject?.id ?? "Free Period")"
 				let dates = getDates(start: breakStart, end: breakEnd, relativeTo: date)
 
 				return .inBreak(breakType: breakType, nextText: nextText, info: dates)
@@ -81,16 +81,16 @@ func getSchoolState(at date: Date, classLookup: [Slot: Class]) -> SchoolState {
 	return .outsideSchool
 }
 
-func classForPeriod(_ periodIndex: Int, dayIndex: Int, classLookup: [Slot: Class]) -> Class? {
+func subjectForPeriod(_ periodIndex: Int, dayIndex: Int, subjectLookup: [Slot: Subject]) -> Subject? {
 	let periodNumber = periodIndex + 1
 	guard let session = TimetableLayout.session(forPeriod: periodNumber) else {
 		return nil
 	}
 
-	return classLookup[Slot(dayIndex, session)]
+	return subjectLookup[Slot(dayIndex, session)]
 }
 
-func nextTextAfterClass(periodIndex: Int, dayIndex: Int, classLookup: [Slot: Class]) -> String {
+func nextTextAfterSubject(periodIndex: Int, dayIndex: Int, subjectLookup: [Slot: Subject]) -> String {
 	guard periodIndex < periodTimes.count - 1 else {
 		return "Last Period"
 	}
@@ -103,8 +103,8 @@ func nextTextAfterClass(periodIndex: Int, dayIndex: Int, classLookup: [Slot: Cla
 		return "Next: \(gap > 20 ? "Lunch" : "Recess")"
 	}
 
-	let nextClass = classForPeriod(periodIndex + 1, dayIndex: dayIndex, classLookup: classLookup)
-	return "Next: \(nextClass?.id ?? "Free Period")"
+	let nextSubject = subjectForPeriod(periodIndex + 1, dayIndex: dayIndex, subjectLookup: subjectLookup)
+	return "Next: \(nextSubject?.id ?? "Free Period")"
 }
 
 func minutes(_ time: (hour: Int, min: Int)) -> Int {

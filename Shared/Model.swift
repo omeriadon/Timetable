@@ -7,6 +7,7 @@
 
 import Defaults
 import SwiftUI
+import AppIntents
 
 enum DisplayMode: String, Codable, Equatable, Defaults.Serializable {
 	case symbolsOnly
@@ -18,23 +19,15 @@ struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiable, Hashable
 	var id: String
 
 	var sender: String
-	var classes: [Class]
+	var subjects: [Subject]
 	let receivedAt: Date
 
-	init(sender: String, classes: [Class], receivedAt: Date) {
+	init(sender: String, subjects: [Subject], receivedAt: Date) {
 		self.id = UUID().uuidString
 		self.sender = sender
-		self.classes = classes
+		self.subjects = subjects
 		self.receivedAt = receivedAt
 	}
-}
-
-typealias Timetable = [Class]
-struct Class: Hashable, Codable, Defaults.Serializable, Identifiable, Equatable {
-	var id: String
-	var symbol: String
-	var colour: RGBAColor
-	var slots: [Slot]
 }
 
 struct Slot: Hashable, Codable, Defaults.Serializable {
@@ -53,7 +46,7 @@ struct EditableSlot: Identifiable, Hashable {
 	var period: Int
 }
 
-struct EditableClass: Identifiable {
+struct EditableSubject: Identifiable {
 	let id = UUID()
 	var originalName: String?
 	var name: String
@@ -112,12 +105,12 @@ enum TimetableLayout {
 		}
 	}
 
-	static func classLookup(for classes: [Class]) -> [Slot: Class] {
-		var lookup: [Slot: Class] = [:]
+	static func subjectLookup(for subjects: [Subject]) -> [Slot: Subject] {
+		var lookup: [Slot: Subject] = [:]
 
-		for classItem in classes {
-			for slot in classItem.slots {
-				lookup[slot] = classItem
+		for subjectItem in subjects {
+			for slot in subjectItem.slots {
+				lookup[slot] = subjectItem
 			}
 		}
 
