@@ -8,7 +8,6 @@
 import AppIntents
 import Defaults
 
-
 struct SubjectEntity: Hashable, Identifiable, Equatable, AppEntity {
 	static var defaultQuery = SubjectQuery()
 
@@ -32,15 +31,6 @@ struct SubjectEntity: Hashable, Identifiable, Equatable, AppEntity {
 
 	var displayRepresentation: DisplayRepresentation {
 		DisplayRepresentation(stringLiteral: id)
-	}
-
-	var shareableValue: Subject {
-		Subject(
-			id: id,
-			symbol: symbol,
-			colour: colour,
-			slots: slots.map { Slot($0.day, $0.session) }
-		)
 	}
 
 	static func == (lhs: SubjectEntity, rhs: SubjectEntity) -> Bool {

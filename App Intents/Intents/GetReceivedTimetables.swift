@@ -9,9 +9,7 @@ import AppIntents
 import Defaults
 
 struct GetReceivedTimetablesIntent: AppIntent {
-
 	static var title: LocalizedStringResource = "Get Received Timetables"
-
 
 	static var description = IntentDescription("Fetches all the timetables you have received from friends.")
 
@@ -19,13 +17,7 @@ struct GetReceivedTimetablesIntent: AppIntent {
 
 	static var supportedModes: IntentModes = .background
 
-//	static var parameterSummary: SummaryContent
-
-
-
-
 	static var isDiscoverable: Bool = true
-
 
 	@MainActor
 	func perform() async throws -> some ReturnsValue<[TimetableEntity]> {
