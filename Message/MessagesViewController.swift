@@ -171,17 +171,16 @@ class MessagesViewController: MSMessagesAppViewController {
 				return parsed
 			}
 			for provider in item.attachments ?? [] {
-				if provider.hasItemConformingToTypeIdentifier("public.url") {
+				if provider.canLoadObject(ofClass: URL.self) {
 					var extractedURL: URL?
 					let semaphore = DispatchSemaphore(value: 0)
-					provider.loadItem(forTypeIdentifier: "public.url") { item, _ in
-						if let url = item as? URL {
-							extractedURL = url
-						} else if let string = item as? String {
-							extractedURL = URL(string: string)
-						}
-						semaphore.signal()
+
+					_ = provider.loadObject(ofClass: URL.self) { urlItem, _ in if let url = urlItem {
+						extractedURL = url
 					}
+					semaphore.signal()
+					}
+
 					_ = semaphore.wait(timeout: .now() + 0.25)
 					if let extractedURL {
 						return extractedURL
