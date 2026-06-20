@@ -6,9 +6,8 @@
 //
 
 import AppIntents
-import Defaults
 
-struct TimetableEntity: AppEntity {
+struct TimetableEntity: Identifiable, AppEntity, SyncableEntity {
 	static var defaultQuery = TimetableQuery()
 	static var typeDisplayRepresentation = TypeDisplayRepresentation(name: "Timetable")
 
@@ -40,6 +39,10 @@ struct TimetableEntity: AppEntity {
 		return DisplayRepresentation(stringLiteral: string)
 	}
 }
+
+#if !os(watchOS)
+extension TimetableEntity: IndexedEntity {}
+#endif
 
 struct SharedInfo: Codable, Identifiable, TransientAppEntity {
 	var id: String {

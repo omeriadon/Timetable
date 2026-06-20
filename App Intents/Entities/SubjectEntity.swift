@@ -6,22 +6,24 @@
 //
 
 import AppIntents
-import Defaults
 
-struct SubjectEntity: Hashable, Identifiable, Equatable, AppEntity {
+struct SubjectEntity: Identifiable, AppEntity, SyncableEntity {
 	static var defaultQuery = SubjectQuery()
 
 	static var typeDisplayRepresentation = TypeDisplayRepresentation(name: "Subject")
 
-	init(id: String, symbol: String, colour: RGBAColor, slots: [Slot]) {
-		self._id = Property(title: LocalizedStringResource(stringLiteral: id))
+	init(name: String, symbol: String, colour: RGBAColor, slots: [Slot]) {
+		self.id = name
 		self.symbol = symbol
 		self.colour = colour
 		self.slots = slots
+		self.name = name
 	}
 
-	@Property(title: "Subject Name")
 	var id: String
+
+	@Property(title: "Subject Name")
+	var name: String
 
 	var symbol: String
 
@@ -32,12 +34,8 @@ struct SubjectEntity: Hashable, Identifiable, Equatable, AppEntity {
 	var displayRepresentation: DisplayRepresentation {
 		DisplayRepresentation(stringLiteral: id)
 	}
-
-	static func == (lhs: SubjectEntity, rhs: SubjectEntity) -> Bool {
-		lhs.id == rhs.id
-	}
-
-	func hash(into hasher: inout Hasher) {
-		hasher.combine(id)
-	}
 }
+
+#if !os(watchOS)
+extension SubjectEntity: IndexedEntity {}
+#endif

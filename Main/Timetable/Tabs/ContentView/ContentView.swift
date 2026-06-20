@@ -56,49 +56,49 @@ struct ContentView: View {
 		}
 		.scrollEdgeEffectStyle(.soft, for: .top)
 		#if os(iOS)
-		.sheet(item: $pendingSharedTimetable) { timetable in
-			SharedTimetableImportSheet(
-				timetable: timetable,
-				onCancel: {
-					pendingSharedTimetable = nil
-				},
-				onImport: {
-					importSharedTimetable(timetable)
-				}
-			)
-			.presentationDetents([.medium, .large])
-			.presentationDragIndicator(.visible)
-		}
-		.onAppear {
-			processPendingSharedImport()
-		}
-		.alert(
-			"Could Not Import Timetable",
-			isPresented: Binding(
-				get: { importErrorMessage != nil },
-				set: { newValue in
-					if !newValue {
+			.sheet(item: $pendingSharedTimetable) { timetable in
+				SharedTimetableImportSheet(
+					timetable: timetable,
+					onCancel: {
+						pendingSharedTimetable = nil
+					},
+					onImport: {
+						importSharedTimetable(timetable)
+					}
+				)
+				.presentationDetents([.medium, .large])
+				.presentationDragIndicator(.visible)
+			}
+			.onAppear {
+				processPendingSharedImport()
+			}
+			.alert(
+				"Could Not Import Timetable",
+				isPresented: Binding(
+					get: { importErrorMessage != nil },
+					set: { newValue in
+						if !newValue {
+							importErrorMessage = nil
+						}
+					}
+				),
+				actions: {
+					Button("OK", role: .cancel) {
 						importErrorMessage = nil
 					}
+				},
+				message: {
+					Text(importErrorMessage ?? "")
 				}
-			),
-			actions: {
-				Button("OK", role: .cancel) {
-					importErrorMessage = nil
-				}
-			},
-			message: {
-				Text(importErrorMessage ?? "")
+			)
+			.onChange(of: importedFileURL.wrappedValue) { _, fileURL in
+				guard fileURL != nil else { return }
+				processPendingSharedImport()
 			}
-		)
-		.onChange(of: importedFileURL.wrappedValue) { _, fileURL in
-			guard fileURL != nil else { return }
-			processPendingSharedImport()
-		}
-		.onChange(of: receivedTimetableData.wrappedValue) { _, timetableData in
-			guard timetableData != nil else { return }
-			processPendingSharedImport()
-		}
+			.onChange(of: receivedTimetableData.wrappedValue) { _, timetableData in
+				guard timetableData != nil else { return }
+				processPendingSharedImport()
+			}
 		#endif // os(iOS)
 	}
 
@@ -109,6 +109,10 @@ struct ContentView: View {
 			receivedTimetables = existing
 			selectedTab = 1
 			pendingSharedTimetable = nil
+
+			Task {
+				await indexEntities()
+			}
 		}
 
 		private func processPendingSharedImport() {

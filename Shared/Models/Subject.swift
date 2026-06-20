@@ -15,12 +15,18 @@ struct Subject: Hashable, Codable, Defaults.Serializable, Identifiable, Equatabl
 	var slots: [Slot]
 
 	func toSubjectEntity() -> SubjectEntity {
-		SubjectEntity(id: id, symbol: symbol, colour: colour, slots: slots)
+		SubjectEntity(name: id, symbol: symbol, colour: colour, slots: slots)
 	}
 }
 
 extension Array where Element == Subject {
 	func toSubjectEntities() -> [SubjectEntity] {
 		map { $0.toSubjectEntity() }
+	}
+
+	func toTimetableEntity() -> TimetableEntity {
+		let id: String = map { $0.id }.joined()
+
+		return TimetableEntity(id: id, subjects: toSubjectEntities())
 	}
 }

@@ -81,6 +81,9 @@ struct TimetableApp: App {
 	var body: some Scene {
 		WindowGroup {
 			ContentView(expanded: $expanded)
+				.task {
+					await indexEntities()
+				}
 #if os(iOS)
 				.sheet(isPresented: .constant(showNameSheet)) {
 					NameSheet()

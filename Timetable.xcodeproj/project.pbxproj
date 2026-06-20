@@ -132,6 +132,34 @@
 			};
 			target = 2A02378A2F9C8EA000AB1E1F /* Timetable */;
 		};
+		2AF9CBFB2FE6D56C00885431 /* Exceptions for "App Intents" folder in "Watch Widget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Entities/Spotlight.swift,
+			);
+			target = 2A25869F2FB5D6490030C8CD /* Watch Widget */;
+		};
+		2AF9CBFC2FE6D56C00885431 /* Exceptions for "App Intents" folder in "Widget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Entities/Spotlight.swift,
+			);
+			target = 2AA6DF132FDFAC8F00BBC70E /* Widget */;
+		};
+		2AF9CBFD2FE6D56C00885431 /* Exceptions for "App Intents" folder in "Message" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Entities/Spotlight.swift,
+			);
+			target = 2AAE2F402FA1A00300E050A2 /* Message */;
+		};
+		2AF9CBFE2FE6D56C00885431 /* Exceptions for "App Intents" folder in "Watch" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Entities/Spotlight.swift,
+			);
+			target = 2A098C822F9DB842002065BE /* Watch */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -152,6 +180,12 @@
 		};
 		2A5F92192FE66817007302CF /* App Intents */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				2AF9CBFB2FE6D56C00885431 /* Exceptions for "App Intents" folder in "Watch Widget" target */,
+				2AF9CBFC2FE6D56C00885431 /* Exceptions for "App Intents" folder in "Widget" target */,
+				2AF9CBFD2FE6D56C00885431 /* Exceptions for "App Intents" folder in "Message" target */,
+				2AF9CBFE2FE6D56C00885431 /* Exceptions for "App Intents" folder in "Watch" target */,
+			);
 			path = "App Intents";
 			sourceTree = "<group>";
 		};

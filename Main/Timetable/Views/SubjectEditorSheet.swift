@@ -290,6 +290,10 @@ struct SubjectEditorSheet: View {
 				slots: Array(uniqueSlots)
 			)
 		}
+
+		Task {
+			await indexEntities()
+		}
 	}
 
 	func validateAndSave() {
