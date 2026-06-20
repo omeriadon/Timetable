@@ -13,7 +13,7 @@ struct TimetableView: View {
 		@Binding var watchSync: PhoneWatchSyncBridge
 		@Binding var syncStatus: SyncMode
 	#else
-		@Binding var expanded: Bool
+		@Binding var expanded: WindowMode
 	#endif
 
 	@Default(.timetable) var classes
@@ -36,7 +36,7 @@ struct TimetableView: View {
 		}
 	#else
 		init(
-			expanded: Binding<Bool>,
+			expanded: Binding<WindowMode>,
 			startComparisonOpen: Bool = false
 		) {
 			_expanded = expanded
@@ -64,33 +64,33 @@ struct TimetableView: View {
 						.animation(.snappy(duration: 0.3), value: selectedSlot)
 				}
 				.scrollIndicators(.visible)
-				.opacity(selectedSlot != nil ? 1 : 0)
-				.scrollIndicatorsFlash(onAppear: true)
 				#if os(macOS)
-				.opacity(receivedTimetables.isEmpty ? 0 : 1)
-				#endif
-				.safeAreaBar(edge: .top, alignment: .center, spacing: 10) {
-					GlassEffectContainer(spacing: 2) {
-						HStack(spacing: 4) {
-							VStack(spacing: 4) {
-								Text("")
+					.opacity(selectedSlot != nil ? 1 : 0)
+					.scrollIndicatorsFlash(onAppear: true)
+				#endif // os(macOS)
+					.opacity(receivedTimetables.isEmpty ? 0 : 1)
+					.safeAreaBar(edge: .top, alignment: .center, spacing: 10) {
+						GlassEffectContainer(spacing: 2) {
+							HStack(spacing: 4) {
+								VStack(spacing: 4) {
+									Text("")
 
-								ForEach(TimetableLayout.sessions, id: \.self) { session in
-									sessionLabel(for: session)
+									ForEach(TimetableLayout.sessions, id: \.self) { session in
+										sessionLabel(for: session)
+									}
 								}
-							}
-							.frame(width: 15)
+								.frame(width: 15)
 
-							mainContent(classLookup: classLookup)
+								mainContent(classLookup: classLookup)
+							}
 						}
+						.padding(.bottom, Device.isMacOS ? 7 : 10)
+						#if os(macOS)
+							.padding([.top, .horizontal], 10)
+						#endif
 					}
-					.padding(.bottom, Device.isMacOS ? 7 : 10)
-					#if os(macOS)
-						.padding([.top, .horizontal], 10)
-					#endif
-				}
-				.scrollEdgeEffectStyle(.soft, for: .bottom)
-				.scrollEdgeEffectStyle(.hard, for: .top)
+					.scrollEdgeEffectStyle(.soft, for: .bottom)
+					.scrollEdgeEffectStyle(.hard, for: .top)
 			}
 			#if os(iOS)
 			.onAppear {
@@ -103,11 +103,16 @@ struct TimetableView: View {
 			#else
 			.onChange(of: selectedSlot) {
 						if selectedSlot == nil {
-							expanded = false
+							expanded = .none
 						} else {
-							expanded = true
+							expanded = .comparison
 						}
 					}
+			.onAppear {
+				if selectedSlot != nil {
+					expanded = .comparison
+				}
+			}
 			#endif
 		}
 		.padding(.trailing, 2)
@@ -201,6 +206,6 @@ struct TimetableView: View {
 	#Preview {
 		@Previewable @State var showTimetableComparison = true
 
-		TimetableView(expanded: .constant(false), startComparisonOpen: false)
+		TimetableView(expanded: .constant(.none), startComparisonOpen: false)
 	}
 #endif

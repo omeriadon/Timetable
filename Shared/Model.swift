@@ -14,14 +14,19 @@ enum DisplayMode: String, Codable, Equatable, Defaults.Serializable {
 }
 
 typealias ReceivedTimetables = [ReceivedTimetable]
-struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiable, Equatable {
-	var id: String {
-		sender
-	}
+struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiable, Hashable, Sendable, Equatable {
+	var id: String
 
-	let sender: String
-	let classes: [Class]
+	var sender: String
+	var classes: [Class]
 	let receivedAt: Date
+
+	init(sender: String, classes: [Class], receivedAt: Date) {
+		self.id = UUID().uuidString
+		self.sender = sender
+		self.classes = classes
+		self.receivedAt = receivedAt
+	}
 }
 
 typealias Timetable = [Class]

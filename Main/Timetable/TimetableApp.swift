@@ -37,13 +37,23 @@ struct ImportResult: Equatable {
 	let message: String
 }
 
+enum WindowMode: Int, Equatable, Identifiable {
+	var id: Int {
+		rawValue
+	}
+
+	case none = 1
+	case comparison = 2
+	case settings = 3
+}
+
 @main
 struct TimetableApp: App {
 	@State private var importedFileURL: URL?
 	@State private var importStatus: ImportResult?
 	@State private var receivedTimetableData: ShareableTimetableData?
 
-	@State var expanded: Bool = false
+	@State var expanded: WindowMode = .none
 
 	@Default(.userDisplayName) var userName
 
@@ -105,12 +115,19 @@ struct TimetableApp: App {
 	}
 
 #if os(macOS)
-	private func resizeWindow(expanded: Bool) {
+	private func resizeWindow(expanded: WindowMode) {
 		guard let window = NSApplication.shared.windows.first else { return }
 
-		let newSize = expanded
-			? NSSize(width: 700, height: 727)
-			: NSSize(width: 700, height: 528)
+		var newSize: NSSize {
+			switch expanded {
+				case .none:
+					NSSize(width: 700, height: 528)
+				case .comparison:
+					NSSize(width: 700, height: 727)
+				case .settings:
+					NSSize(width: 700, height: 750)
+			}
+		}
 
 		let currentFrame = window.frame
 

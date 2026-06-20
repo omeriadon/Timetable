@@ -34,7 +34,7 @@ struct ContentView: View {
 
 	@State private var selectedTab = 0
 
-	@Binding var expanded: Bool
+	@Binding var expanded: WindowMode
 
 	var body: some View {
 		TabView(selection: $selectedTab) {
@@ -50,7 +50,7 @@ struct ContentView: View {
 				#if os(iOS)
 					SettingsView(watchSync: watchSync, syncStatus: $rootSyncStatus)
 				#else
-					SettingsView()
+					SettingsView(expanded: $expanded)
 				#endif
 			}
 		}
@@ -157,5 +157,5 @@ struct ContentView: View {
 }
 
 #Preview {
-	ContentView(expanded: .constant(false))
+	ContentView(expanded: .constant(.none))
 }

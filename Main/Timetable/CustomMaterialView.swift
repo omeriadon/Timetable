@@ -44,7 +44,7 @@ struct CustomMaterialView: NSViewRepresentable {
 
 		return NSMaterialView.Effect(
 			active: NSMaterialView.Effect.MaterialStyle(
-				backgroundColor: isDark ? NSColor.clear : NSColor.white.withAlphaComponent(0.3),
+				backgroundColor: isDark ? NSColor.black.withAlphaComponent(0.2) : NSColor.white.withAlphaComponent(0.3),
 				tintColor: NSColor(white: 0.0, alpha: 0.0),
 				tintFilter: kCAFilterLightenBlendMode,
 				saturationFactor: 1.0,
@@ -52,7 +52,7 @@ struct CustomMaterialView: NSViewRepresentable {
 				blurRadius: 8
 			),
 			inactive: NSMaterialView.Effect.MaterialStyle(
-				backgroundColor: isDark ? NSColor.black.withAlphaComponent(0.2) : NSColor.white.withAlphaComponent(0.5),
+				backgroundColor: isDark ? NSColor.black.withAlphaComponent(0.35) : NSColor.white.withAlphaComponent(0.5),
 				tintColor: NSColor(white: 0.0, alpha: 0.0),
 				tintFilter: kCAFilterDarkenBlendMode,
 				saturationFactor: 1.0,

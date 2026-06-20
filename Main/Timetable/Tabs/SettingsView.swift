@@ -9,6 +9,11 @@ import Defaults
 import SwiftUI
 import WidgetKit
 
+struct RenameTimetable: Identifiable {
+	let id: String
+	let timetable: ReceivedTimetable
+}
+
 struct SettingsView: View {
 	@Default(.timetable) var classes
 	@Default(.receivedTimetables) var receivedTimetables
@@ -20,6 +25,9 @@ struct SettingsView: View {
 		let watchSync: PhoneWatchSyncBridge
 
 		@Binding var syncStatus: SyncMode
+
+	#else
+		@Binding var expanded: WindowMode
 	#endif
 
 	@State private var showCalendarImportSheet = false
@@ -27,6 +35,9 @@ struct SettingsView: View {
 	@State private var showDeleteConfirmation = false
 	@State private var showEditTimetableSheet = false
 	@State private var widgetReloadState: Bool = false
+
+	@State private var renameItem: RenameTimetable?
+	@State private var renameText: String = ""
 
 	@Namespace private var ns
 
@@ -38,7 +49,8 @@ struct SettingsView: View {
 			_syncStatus = syncStatus
 		}
 	#else
-		init() {
+		init(expanded: Binding<WindowMode>) {
+			_expanded = expanded
 			_username = State(initialValue: Defaults[.userDisplayName])
 		}
 	#endif
@@ -56,7 +68,14 @@ struct SettingsView: View {
 					Form {
 						list
 					}
+					.scrollEdgeEffectStyle(.soft, for: .top)
 					.formStyle(.grouped)
+					.onAppear {
+						expanded = .settings
+					}
+					.onDisappear {
+						expanded = .none
+					}
 				#endif
 			}
 			.scrollEdgeEffectStyle(.soft, for: .top)
@@ -68,14 +87,6 @@ struct SettingsView: View {
 							.monospaced()
 					}
 				#endif // os(iOS)
-			}
-			.alert("Delete Timetable?", isPresented: $showDeleteConfirmation, presenting: timetableToDelete) { timetable in
-				Button("Cancel", role: .cancel) {}
-				Button("Delete", role: .destructive) {
-					receivedTimetables.removeAll { $0.id == timetable.id }
-				}
-			} message: { timetable in
-				Text("Are you sure you want to delete \(timetable.sender)'s timetable?")
 			}
 		}
 	}
@@ -150,6 +161,7 @@ struct SettingsView: View {
 							.foregroundStyle(.accent)
 						Text("Subscribe to Compass Schedule in Calendar")
 							.foregroundStyle(.secondary)
+							.font(.callout)
 					}
 				}
 			}
@@ -161,7 +173,21 @@ struct SettingsView: View {
 		}
 
 		if !receivedTimetables.isEmpty {
-			importedTimetablesSection
+			Section("Imported Timetables") {
+				List {
+					importedTimetablesSection
+						.listRowBackground(Color.clear)
+
+				}
+				.reorderContainer(for: ReceivedTimetable.self) { difference in
+					receivedTimetables.apply(difference: difference)
+				}
+				.listStyle(.inset)
+				.scrollContentBackground(.hidden)
+				#if os(iOS)
+					.frame(height: CGFloat(receivedTimetables.count * 60))
+				#endif
+			}
 		}
 
 		Section("Developer") {
@@ -196,50 +222,106 @@ struct SettingsView: View {
 	}
 
 	private var importedTimetablesSection: some View {
-		Section("Imported Timetables") {
-			ForEach(receivedTimetables) { timetable in
-				ViewThatFits {
-					HStack {
-						Text(timetable.sender)
-							.font(.title2)
+		ForEach(Array(receivedTimetables.enumerated()), id: \.element.id) { _, timetable in
+			HStack {
+				Text(timetable.sender)
+					.font(.title2)
 
-						Spacer()
+				Spacer()
 
-						Text("Received: \(timetable.receivedAt.formatted(date: .abbreviated, time: .omitted))")
-							.font(.caption2)
-							.foregroundStyle(.secondary)
-					}
-
-					VStack(spacing: 4) {
-						Text(timetable.sender)
-							.font(.title2)
-
-						Text("Received: \(timetable.receivedAt.formatted(date: .abbreviated, time: .omitted))")
-							.font(.caption2)
-							.foregroundStyle(.secondary)
-					}
-				}
-				.contentShape(.rect)
-				.contextMenu {
-					Button(role: .destructive) {
-						let timetable = receivedTimetables.first { $0.id == timetable.id }
-						if let timetable {
-							if let index = receivedTimetables.firstIndex(where: { $0.id == timetable.id }) {
-								receivedTimetables.remove(at: index)
-							}
-						}
-					} label: {
-						Label("Delete", systemImage: "trash")
-					}
-				}
+				Text("Received: \(timetable.receivedAt.formatted(date: .abbreviated, time: .omitted))")
+					.font(.caption2)
+					.foregroundStyle(.secondary)
 			}
-			.onDelete { indexSet in
-				for index in indexSet {
-					let timetable = receivedTimetables[index]
-					timetableToDelete = timetable
-					showDeleteConfirmation = true
-				}
+			.contentShape(.rect)
+			.swipeActions(edge: .trailing, allowsFullSwipe: false) {
+				contextMenuButtons(for: timetable)
+			}
+			.contextMenu {
+				contextMenuButtons(for: timetable)
+			}
+			.listRowInsets(EdgeInsets())
+		}
+		.reorderable()
+		.onDelete { indexSet in
+			for index in indexSet {
+				let timetable = receivedTimetables[index]
+				timetableToDelete = timetable
+				showDeleteConfirmation = true
 			}
 		}
+		.alert("Rename Timetable", item: $renameItem) { item in
+			TextField("Rename this timetable...", text: $renameText)
+
+			Button("Save", role: .confirm) {
+				if let index = receivedTimetables.firstIndex(where: { $0.id == item.timetable.id }) {
+					receivedTimetables[index].sender = renameText
+				}
+
+				renameItem = nil
+				renameText = ""
+			}
+			.keyboardShortcut(.return)
+
+			Button("Cancel", role: .cancel) {
+				renameItem = nil
+			}
+			.keyboardShortcut(.escape)
+		}
+		.alert("Delete Timetable?", isPresented: $showDeleteConfirmation, presenting: timetableToDelete) { timetable in
+			Button("Cancel", role: .cancel) {}
+			Button("Delete", role: .destructive) {
+				receivedTimetables.removeAll { $0.id == timetable.id }
+			}
+		} message: { timetable in
+			Text("Are you sure you want to delete \(timetable.sender)'s timetable?")
+		}
+	}
+
+	@ContentBuilder
+	func contextMenuButtons(for timetable: ReceivedTimetable) -> some View {
+		Button(role: .destructive) {
+			let timetable = receivedTimetables.first { $0.id == timetable.id }
+			timetableToDelete = timetable
+			showDeleteConfirmation = true
+		} label: {
+			Label("Delete", systemImage: "trash")
+				.tint(.red)
+		}
+
+		Button {
+			renameItem = RenameTimetable(
+				id: timetable.id,
+				timetable: timetable
+			)
+			renameText = timetable.sender
+		} label: {
+			Label("Rename", systemImage: "pencil")
+		}
+	}
+}
+
+extension Array {
+	mutating func apply<CollectionID: Hashable & Sendable>(
+		difference: ReorderDifference<Element.ID, CollectionID>
+	) where Element: Identifiable, Element.ID: Sendable {
+		// Find the source card that moved.
+		guard let sourceIndex = firstIndex(
+			where: { $0.id == difference.sources[0] }
+		)
+		else { return }
+		let movedCard = remove(at: sourceIndex)
+
+		// Find the destination of that card.
+		var destination: Int
+		switch difference.destination.position {
+			case let .before(value):
+				guard let index = firstIndex(where: { $0.id == value })
+				else { return }
+				destination = index
+			case .end:
+				destination = endIndex
+		}
+		insert(movedCard, at: destination)
 	}
 }

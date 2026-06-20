@@ -427,6 +427,7 @@ struct ClassEditorSheet: View {
 							.padding(10)
 							.padding(.leading, 8)
 							.contentTransition(.numericText())
+							.lineLimit(1)
 
 						Spacer(minLength: 0)
 					}
