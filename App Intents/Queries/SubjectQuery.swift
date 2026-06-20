@@ -9,7 +9,7 @@ import AppIntents
 import Defaults
 
 struct SubjectQuery: EntityStringQuery {
-	func entities(for identifiers: [String]) async -> [Subject] {
+	func entities(for identifiers: [String]) async -> [SubjectEntity] {
 		return await MainActor.run {
 			let receivedTimetables = Defaults[.receivedTimetables]
 			let identifierSet = Set(identifiers)
@@ -19,11 +19,13 @@ struct SubjectQuery: EntityStringQuery {
 				return timetable.subjects
 			}
 
-			return allSubjects.filter { identifierSet.contains($0.id) }
+			return allSubjects
+				.filter { identifierSet.contains($0.id) }
+				.toSubjectEntities()
 		}
 	}
 
-	func entities(matching string: String) async -> [Subject] {
+	func entities(matching string: String) async -> [SubjectEntity] {
 		return await MainActor.run {
 			let receivedTimetables = Defaults[.receivedTimetables]
 
@@ -31,17 +33,21 @@ struct SubjectQuery: EntityStringQuery {
 				return timetable.subjects
 			}
 
-			return allSubjects.filter { $0.id.localizedCaseInsensitiveContains(string) }
+			return allSubjects
+				.filter { $0.id.localizedCaseInsensitiveContains(string) }
+				.toSubjectEntities()
 		}
 	}
 
-	func suggestedEntities() async -> [Subject] {
+	func suggestedEntities() async -> [SubjectEntity] {
 		return await MainActor.run {
 			let receivedTimetables = Defaults[.receivedTimetables]
 
-			return receivedTimetables.flatMap { timetable -> [Subject] in
-				return timetable.subjects
-			}
+			return receivedTimetables
+				.flatMap { timetable -> [Subject] in
+					return timetable.subjects
+				}
+				.toSubjectEntities()
 		}
 	}
 }

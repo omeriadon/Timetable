@@ -8,7 +8,7 @@ struct ShareableTimetableData: Codable, Equatable {
 
 	init(sender: String, subjects: [Subject]) {
 		self.sender = sender
-		self.subjects = subjects.map(\.shareableValue)
+		self.subjects = subjects
 	}
 
 	func toJSON() throws -> Data {

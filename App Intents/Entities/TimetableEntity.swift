@@ -8,26 +8,19 @@
 import AppIntents
 import Defaults
 
-struct TimetableEntity: Codable, Defaults.Serializable, AppEntity {
+struct TimetableEntity: AppEntity {
 	static var defaultQuery = TimetableQuery()
 	static var typeDisplayRepresentation = TypeDisplayRepresentation(name: "Timetable")
 
 	var id: String
 
-	@Property(title: "Owner")
-	private(set) var storedOwnerType: OwnerType
-
 	@Property(title: "Subjects")
-	var subjects: Timetable
+	var subjects: [SubjectEntity]
 
 	@Property(title: "Shared Info")
-	var sharedInfo: SharedInfo? {
-		didSet {
-			self.storedOwnerType = self.sharedInfo == nil ? .user : .shared
-		}
-	}
+	var sharedInfo: SharedInfo?
 
-	init(id: String, ownerType: OwnerType, subjects: Timetable, sender: String? = nil, receivedAt: Date? = nil) {
+	init(id: String, subjects: [SubjectEntity], sender: String? = nil, receivedAt: Date? = nil) {
 		self.id = id
 		self.subjects = subjects
 		if let sender, let receivedAt {
@@ -37,14 +30,10 @@ struct TimetableEntity: Codable, Defaults.Serializable, AppEntity {
 
 	var displayRepresentation: DisplayRepresentation {
 		let string = {
-			switch self.storedOwnerType {
-				case .user:
-					return "Your timetable"
-				case .shared:
-					if let sender = sharedInfo?.sender {
-						return "\(sender)'s Timetable"
-					}
-					return "Shared timetable"
+			if let sharedInfo {
+				return "\(sharedInfo.sender)'s Timetable"
+			} else {
+				return "Your timetable"
 			}
 		}()
 
@@ -74,20 +63,4 @@ struct SharedInfo: Codable, Identifiable, TransientAppEntity {
 		self.receivedAt = receivedAt
 		self.sender = sender
 	}
-}
-
-enum OwnerType: String, Codable, AppEnum, CaseIterable, Identifiable {
-	var id: String {
-		self.rawValue
-	}
-
-	static let typeDisplayRepresentation = TypeDisplayRepresentation(stringLiteral: "Owner")
-
-	static let caseDisplayRepresentations: [OwnerType: DisplayRepresentation] = [
-		.user: DisplayRepresentation(stringLiteral: "Your timetable"),
-		.shared: DisplayRepresentation(stringLiteral: "Shared timetable")
-	]
-
-	case user = "Your timetable"
-	case shared = "Shared timetable"
 }

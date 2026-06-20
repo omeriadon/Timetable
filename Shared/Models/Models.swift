@@ -5,29 +5,13 @@
 //  Created by Adon Omeri on 25/4/2026.
 //
 
+import AppIntents
 import Defaults
 import SwiftUI
-import AppIntents
 
 enum DisplayMode: String, Codable, Equatable, Defaults.Serializable {
 	case symbolsOnly
 	case textOnly
-}
-
-typealias ReceivedTimetables = [ReceivedTimetable]
-struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiable, Hashable, Sendable, Equatable {
-	var id: String
-
-	var sender: String
-	var subjects: [Subject]
-	let receivedAt: Date
-
-	init(sender: String, subjects: [Subject], receivedAt: Date) {
-		self.id = UUID().uuidString
-		self.sender = sender
-		self.subjects = subjects
-		self.receivedAt = receivedAt
-	}
 }
 
 struct Slot: Hashable, Codable, Defaults.Serializable {

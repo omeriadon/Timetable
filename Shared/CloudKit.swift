@@ -87,7 +87,7 @@ final class CloudStore {
 
 		if let data = store.data(forKey: "timetable"),
 		   let timetable = try? JSONDecoder().decode(
-		   	Timetable.self,
+		   	[Subject].self,
 		   	from: data
 		   )
 		{

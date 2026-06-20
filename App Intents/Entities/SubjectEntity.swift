@@ -8,9 +8,8 @@
 import AppIntents
 import Defaults
 
-typealias Timetable = [Subject]
-typealias SubjectEntity = Subject
-struct Subject: Hashable, Codable, Defaults.Serializable, Identifiable, Equatable, AppEntity {
+
+struct SubjectEntity: Hashable, Identifiable, Equatable, AppEntity {
 	static var defaultQuery = SubjectQuery()
 
 	static var typeDisplayRepresentation = TypeDisplayRepresentation(name: "Subject")
@@ -44,7 +43,7 @@ struct Subject: Hashable, Codable, Defaults.Serializable, Identifiable, Equatabl
 		)
 	}
 
-	static func == (lhs: Subject, rhs: Subject) -> Bool {
+	static func == (lhs: SubjectEntity, rhs: SubjectEntity) -> Bool {
 		lhs.id == rhs.id
 	}
 

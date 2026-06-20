@@ -18,7 +18,7 @@ struct TimetableQuery: EntityStringQuery {
 					identifiers.contains(t.sender) ||
 					t.subjects.contains { identifiers.contains($0.id) }
 			}
-			.map { TimetableEntity(id: $0.id, ownerType: .shared, subjects: $0.subjects, sender: $0.sender, receivedAt: $0.receivedAt) }
+			.toTimetableEntities()
 		}
 	}
 
@@ -31,14 +31,14 @@ struct TimetableQuery: EntityStringQuery {
 					t.subjects.contains { $0.id.localizedCaseInsensitiveContains(string)
 					}
 			}
-			.map { TimetableEntity(id: $0.id, ownerType: .shared, subjects: $0.subjects, sender: $0.sender, receivedAt: $0.receivedAt) }
+			.toTimetableEntities()
 		}
 	}
 
 	func suggestedEntities() async throws -> [TimetableEntity] {
 		return await MainActor.run {
 			Defaults[.receivedTimetables]
-				.map { TimetableEntity(id: $0.id, ownerType: .shared, subjects: $0.subjects, sender: $0.sender, receivedAt: $0.receivedAt) }
+				.toTimetableEntities()
 		}
 	}
 }
