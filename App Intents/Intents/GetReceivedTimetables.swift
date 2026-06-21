@@ -28,7 +28,8 @@ struct GetReceivedTimetablesIntent: AppIntent {
 
 		if entities.isEmpty {
 			return .result(
-				value: []
+				value: [],
+				view: GetReceivedTimetablesIntentView(entities: entities)
 			)
 		}
 
@@ -43,29 +44,47 @@ struct GetReceivedTimetablesIntentView: View {
 	let entities: [TimetableEntity]
 
 	var body: some View {
-		VStack(spacing: 10) {
-			ForEach(Array(entities).enumerated(), id: \.element.id) { index, entity in
-				VStack {
-					HStack {
-						Text(entity.displayRepresentation.title)
+		VStack(spacing: 0) {
+			if !entities.isEmpty {
+				ForEach(Array(entities).enumerated(), id: \.element.id) { index, entity in
+					VStack(spacing: 0) {
+						HStack {
+							Text(entity.displayRepresentation.title)
 
-						Spacer()
+							Spacer()
 
-						if entity.sharedInfo != nil {
-							Image(systemName: "person.2.fill")
-								.foregroundColor(.accentColor)
-								.imageScale(.large)
+							if entity.sharedInfo != nil {
+								Image(systemName: "person.2.fill")
+									.imageScale(.large)
+							}
+						}
+						.padding(.vertical)
+
+						if index < entities.count - 1 {
+							Divider()
 						}
 					}
-					.padding(.vertical, 12)
-
-					if index < entities.count - 1 {
-						Divider()
-					}
+					.padding(.horizontal, 20)
 				}
-				.padding(.horizontal)
+			} else {
+				VStack {
+					Text("No Received Timetables")
+						.lineLimit(2)
+						.font(.title)
+						.bold()
+
+					Text("Import a timetable from Messages to see your friend's schedules.")
+						.lineLimit(3)
+				}
+				.multilineTextAlignment(.center)
+				.padding()
 			}
 		}
-		.padding([.bottom, .horizontal])
+		.background {
+			ContainerRelativeShape()
+				.fill(Color.blue.gradient)
+		}
+		.padding(.horizontal)
+		.monospaced()
 	}
 }

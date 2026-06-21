@@ -177,7 +177,6 @@ struct SettingsView: View {
 				List {
 					importedTimetablesSection
 						.listRowBackground(Color.clear)
-
 				}
 				.reorderContainer(for: ReceivedTimetable.self) { difference in
 					receivedTimetables.apply(difference: difference)
@@ -187,6 +186,32 @@ struct SettingsView: View {
 				#if os(iOS)
 					.frame(height: CGFloat(receivedTimetables.count * 60))
 				#endif
+			}
+			.alert("Rename Timetable", item: $renameItem) { item in
+				TextField("Rename this timetable...", text: $renameText)
+
+				Button("Save", role: .confirm) {
+					if let index = receivedTimetables.firstIndex(where: { $0.id == item.timetable.id }) {
+						receivedTimetables[index].sender = renameText
+					}
+
+					renameItem = nil
+					renameText = ""
+				}
+				.keyboardShortcut(.return)
+
+				Button("Cancel", role: .cancel) {
+					renameItem = nil
+				}
+				.keyboardShortcut(.escape)
+			}
+			.alert("Delete Timetable?", isPresented: $showDeleteConfirmation, presenting: timetableToDelete) { timetable in
+				Button("Cancel", role: .cancel) {}
+				Button("Delete", role: .destructive) {
+					receivedTimetables.removeAll { $0.id == timetable.id }
+				}
+			} message: { timetable in
+				Text("Are you sure you want to delete \(timetable.sender)'s timetable?")
 			}
 		}
 
@@ -249,32 +274,6 @@ struct SettingsView: View {
 				timetableToDelete = timetable
 				showDeleteConfirmation = true
 			}
-		}
-		.alert("Rename Timetable", item: $renameItem) { item in
-			TextField("Rename this timetable...", text: $renameText)
-
-			Button("Save", role: .confirm) {
-				if let index = receivedTimetables.firstIndex(where: { $0.id == item.timetable.id }) {
-					receivedTimetables[index].sender = renameText
-				}
-
-				renameItem = nil
-				renameText = ""
-			}
-			.keyboardShortcut(.return)
-
-			Button("Cancel", role: .cancel) {
-				renameItem = nil
-			}
-			.keyboardShortcut(.escape)
-		}
-		.alert("Delete Timetable?", isPresented: $showDeleteConfirmation, presenting: timetableToDelete) { timetable in
-			Button("Cancel", role: .cancel) {}
-			Button("Delete", role: .destructive) {
-				receivedTimetables.removeAll { $0.id == timetable.id }
-			}
-		} message: { timetable in
-			Text("Are you sure you want to delete \(timetable.sender)'s timetable?")
 		}
 	}
 

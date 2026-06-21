@@ -45,6 +45,17 @@ func getSchoolState(at date: Date, subjectLookup: [Slot: Subject]) -> SchoolStat
 
 	let nowMins = calendar.component(.hour, from: date) * 60 + calendar.component(.minute, from: date)
 
+	if let firstPeriod = periodTimes.first {
+		let firstPeriodStartMins = minutes(firstPeriod.start)
+		let sevenAMInMinutes = 7 * 60
+
+		if nowMins >= sevenAMInMinutes && nowMins < firstPeriodStartMins {
+			if let firstSubject = subjectForPeriod(0, dayIndex: dayIndex, subjectLookup: subjectLookup) {
+				return .beforeSchool(next: firstSubject)
+			}
+		}
+	}
+
 	for (index, period) in periodTimes.enumerated() {
 		let startMins = minutes(period.start)
 		let endMins = minutes(period.end)

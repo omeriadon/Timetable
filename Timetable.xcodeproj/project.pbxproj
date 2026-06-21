@@ -12,6 +12,10 @@
 		2A098C8D2F9DB844002065BE /* Watch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 2A098C832F9DB842002065BE /* Watch.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2A1DB40E2F9DE9A300E5AE7C /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2A1DB40D2F9DE9A300E5AE7C /* Defaults */; };
 		2A1DB42D2F9ECEC300E5AE7C /* Watch Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2A2586A02FB5D6490030C8CD /* Watch Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2A43AFA12FE7849E00BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFA02FE7849E00BBC8BD /* IrregularGradient */; };
+		2A43AFAF2FE785CF00BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFAE2FE785CF00BBC8BD /* IrregularGradient */; };
+		2A43AFB12FE785E300BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFB02FE785E300BBC8BD /* IrregularGradient */; };
+		2A43AFB32FE785E700BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFB22FE785E700BBC8BD /* IrregularGradient */; };
 		2A5F91F12FE650FE007302CF /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A5F91F02FE650FE007302CF /* IrregularGradient */; };
 		2AA6DF172FDFAC8F00BBC70E /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AA6DF162FDFAC8F00BBC70E /* WidgetKit.framework */; };
 		2AA6DF192FDFAC8F00BBC70E /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AA6DF182FDFAC8F00BBC70E /* SwiftUI.framework */; };
@@ -228,6 +232,7 @@
 		2A0237882F9C8EA000AB1E1F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				2A43AFA12FE7849E00BBC8BD /* IrregularGradient in Frameworks */,
 				2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */,
 				2A02379B2F9C907000AB1E1F /* Defaults in Frameworks */,
 				2A0237AC2F9D9DE800AB1E1F /* SFSymbolsPicker in Frameworks */,
@@ -243,12 +248,14 @@
 		2A25869D2FB5D6490030C8CD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				2A43AFB32FE785E700BBC8BD /* IrregularGradient in Frameworks */,
 				2AC5F7ED2FD8435700B813EA /* Defaults in Frameworks */,
 			);
 		};
 		2AA6DF112FDFAC8F00BBC70E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				2A43AFB12FE785E300BBC8BD /* IrregularGradient in Frameworks */,
 				2AA6DF2C2FDFADAE00BBC70E /* Defaults in Frameworks */,
 				2AA6DF192FDFAC8F00BBC70E /* SwiftUI.framework in Frameworks */,
 				2AA6DF172FDFAC8F00BBC70E /* WidgetKit.framework in Frameworks */,
@@ -257,6 +264,7 @@
 		2AAE2F3E2FA1A00300E050A2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				2A43AFAF2FE785CF00BBC8BD /* IrregularGradient in Frameworks */,
 				2AAE301E2FA1A5F100E050A2 /* Defaults in Frameworks */,
 			);
 		};
@@ -335,6 +343,7 @@
 				2A02379A2F9C907000AB1E1F /* Defaults */,
 				2A0237AB2F9D9DE800AB1E1F /* SFSymbolsPicker */,
 				2AE0F13A2FE03989002B5D9D /* MaterialView */,
+				2A43AFA02FE7849E00BBC8BD /* IrregularGradient */,
 			);
 			productName = Timetable;
 			productReference = 2A02378B2F9C8EA000AB1E1F /* Timetable.app */;
@@ -390,6 +399,7 @@
 			name = "Watch Widget";
 			packageProductDependencies = (
 				2AC5F7EC2FD8435700B813EA /* Defaults */,
+				2A43AFB22FE785E700BBC8BD /* IrregularGradient */,
 			);
 			productName = "iPhone Widget ExtensionExtension";
 			productReference = 2A2586A02FB5D6490030C8CD /* Watch Widget.appex */;
@@ -414,6 +424,7 @@
 			name = Widget;
 			packageProductDependencies = (
 				2AA6DF2B2FDFADAE00BBC70E /* Defaults */,
+				2A43AFB02FE785E300BBC8BD /* IrregularGradient */,
 			);
 			productName = WidgetExtension;
 			productReference = 2AA6DF142FDFAC8F00BBC70E /* Widget.appex */;
@@ -438,6 +449,7 @@
 			name = Message;
 			packageProductDependencies = (
 				2AAE301D2FA1A5F100E050A2 /* Defaults */,
+				2A43AFAE2FE785CF00BBC8BD /* IrregularGradient */,
 			);
 			productName = "Timetable Message Extension";
 			productReference = 2AAE2F412FA1A00300E050A2 /* Message.appex */;
@@ -1286,6 +1298,26 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = Defaults;
+		};
+		2A43AFA02FE7849E00BBC8BD /* IrregularGradient */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */;
+			productName = IrregularGradient;
+		};
+		2A43AFAE2FE785CF00BBC8BD /* IrregularGradient */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */;
+			productName = IrregularGradient;
+		};
+		2A43AFB02FE785E300BBC8BD /* IrregularGradient */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */;
+			productName = IrregularGradient;
+		};
+		2A43AFB22FE785E700BBC8BD /* IrregularGradient */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */;
+			productName = IrregularGradient;
 		};
 		2A5F91F02FE650FE007302CF /* IrregularGradient */ = {
 			isa = XCSwiftPackageProductDependency;

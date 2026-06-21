@@ -10,12 +10,6 @@ import Defaults
 import IrregularGradient
 import SwiftUI
 
-#if DEBUG
-let debugOffset: TimeInterval = -96566
-#else
-let debugOffset: TimeInterval = 0
-#endif
-
 @main
 struct TimetableWatchApp: App {
 	@Default(.receivedTimetables) var receivedTimetables
