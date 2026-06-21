@@ -16,6 +16,8 @@
 		2A43AFAF2FE785CF00BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFAE2FE785CF00BBC8BD /* IrregularGradient */; };
 		2A43AFB12FE785E300BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFB02FE785E300BBC8BD /* IrregularGradient */; };
 		2A43AFB32FE785E700BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFB22FE785E700BBC8BD /* IrregularGradient */; };
+		2A43AFCF2FE80ED900BBC8BD /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFCE2FE80ED900BBC8BD /* ZIPFoundation */; };
+		2A43AFD22FE810C900BBC8BD /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFD12FE810C900BBC8BD /* OpenSSL */; };
 		2A5F91F12FE650FE007302CF /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A5F91F02FE650FE007302CF /* IrregularGradient */; };
 		2AA6DF172FDFAC8F00BBC70E /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AA6DF162FDFAC8F00BBC70E /* WidgetKit.framework */; };
 		2AA6DF192FDFAC8F00BBC70E /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AA6DF182FDFAC8F00BBC70E /* SwiftUI.framework */; };
@@ -129,9 +131,9 @@
 				Timetable/AppDelegate.swift = (macos, );
 				Timetable/Backend/PhoneWatchSyncBridge.swift = (ios, );
 				Timetable/Backend/syncToWatchAsync.swift = (ios, );
+				Timetable/ContentView/SharedTimetableImportSheet.swift = (ios, );
 				Timetable/CustomMaterialView.swift = (macos, );
 				Timetable/LaunchScreen.storyboard = (ios, );
-				Timetable/Tabs/ContentView/SharedTimetableImportSheet.swift = (ios, );
 				Timetable/Views/SyncButton.swift = (ios, );
 			};
 			target = 2A02378A2F9C8EA000AB1E1F /* Timetable */;
@@ -180,6 +182,11 @@
 		2A2A76702FD971C10030B8DA /* Info */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Info;
+			sourceTree = "<group>";
+		};
+		2A43AFB42FE80A4A00BBC8BD /* Wallet */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Wallet;
 			sourceTree = "<group>";
 		};
 		2A5F92192FE66817007302CF /* App Intents */ = {
@@ -235,7 +242,9 @@
 				2A43AFA12FE7849E00BBC8BD /* IrregularGradient in Frameworks */,
 				2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */,
 				2A02379B2F9C907000AB1E1F /* Defaults in Frameworks */,
+				2A43AFD22FE810C900BBC8BD /* OpenSSL in Frameworks */,
 				2A0237AC2F9D9DE800AB1E1F /* SFSymbolsPicker in Frameworks */,
+				2A43AFCF2FE80ED900BBC8BD /* ZIPFoundation in Frameworks */,
 			);
 		};
 		2A098C802F9DB842002065BE /* Frameworks */ = {
@@ -274,6 +283,7 @@
 		2A0237822F9C8EA000AB1E1F = {
 			isa = PBXGroup;
 			children = (
+				2A43AFB42FE80A4A00BBC8BD /* Wallet */,
 				2A2A76702FD971C10030B8DA /* Info */,
 				2A2A766F2FD971890030B8DA /* Entitlements */,
 				2AAE61AD2FD82845004B3FF4 /* Message */,
@@ -335,6 +345,7 @@
 			fileSystemSynchronizedGroups = (
 				2A02379F2F9C908300AB1E1F /* Shared */,
 				2A2A766F2FD971890030B8DA /* Entitlements */,
+				2A43AFB42FE80A4A00BBC8BD /* Wallet */,
 				2A5F92192FE66817007302CF /* App Intents */,
 				2AAE62702FD839A7004B3FF4 /* Main */,
 			);
@@ -344,6 +355,8 @@
 				2A0237AB2F9D9DE800AB1E1F /* SFSymbolsPicker */,
 				2AE0F13A2FE03989002B5D9D /* MaterialView */,
 				2A43AFA02FE7849E00BBC8BD /* IrregularGradient */,
+				2A43AFCE2FE80ED900BBC8BD /* ZIPFoundation */,
+				2A43AFD12FE810C900BBC8BD /* OpenSSL */,
 			);
 			productName = Timetable;
 			productReference = 2A02378B2F9C8EA000AB1E1F /* Timetable.app */;
@@ -496,6 +509,8 @@
 				2A0237AA2F9D9DE800AB1E1F /* XCLocalSwiftPackageReference "../../../Downloads/SFSymbolsPickerForSwiftUI-main" */,
 				2AE0F1392FE03989002B5D9D /* XCRemoteSwiftPackageReference "MaterialView" */,
 				2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */,
+				2A43AFCD2FE80ED900BBC8BD /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+				2A43AFD02FE810C900BBC8BD /* XCRemoteSwiftPackageReference "OpenSSL-Package" */,
 			);
 			preferredProjectObjectVersion = 110;
 			productRefGroup = 2A02378C2F9C8EA000AB1E1F /* Products */;
@@ -1265,6 +1280,22 @@
 				minimumVersion = 9.0.8;
 			};
 		};
+		2A43AFCD2FE80ED900BBC8BD /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.20;
+			};
+		};
+		2A43AFD02FE810C900BBC8BD /* XCRemoteSwiftPackageReference "OpenSSL-Package" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/krzyzanowskim/OpenSSL-Package.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.6.2000;
+			};
+		};
 		2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/joogps/IrregularGradient";
@@ -1318,6 +1349,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */;
 			productName = IrregularGradient;
+		};
+		2A43AFCE2FE80ED900BBC8BD /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A43AFCD2FE80ED900BBC8BD /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+		2A43AFD12FE810C900BBC8BD /* OpenSSL */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A43AFD02FE810C900BBC8BD /* XCRemoteSwiftPackageReference "OpenSSL-Package" */;
+			productName = OpenSSL;
 		};
 		2A5F91F02FE650FE007302CF /* IrregularGradient */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -38,7 +38,7 @@ struct ContentView: View {
 
 	var body: some View {
 		TabView(selection: $selectedTab) {
-			Tab("Timetable", systemSymbol: .calendar, value: 0) {
+			Tab("Timetable", systemImage: "calendar", value: 0) {
 				#if os(iOS)
 					TimetableView(watchSync: $watchSync, syncStatus: $rootSyncStatus)
 				#else
@@ -46,12 +46,16 @@ struct ContentView: View {
 				#endif
 			}
 
-			Tab("Settings", systemSymbol: .gear, value: 1) {
+			Tab("Settings", systemImage: "gear", value: 1) {
 				#if os(iOS)
 					SettingsView(watchSync: watchSync, syncStatus: $rootSyncStatus)
 				#else
 					SettingsView(expanded: $expanded)
 				#endif
+			}
+
+			Tab("Add To Wallet", systemImage: "wallet.pass", value: 2) {
+				AddPassView()
 			}
 		}
 		.scrollEdgeEffectStyle(.soft, for: .top)

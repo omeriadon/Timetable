@@ -1,5 +1,5 @@
 {
-  "originHash" : "41a4c0df3cca2d46c20500a43e1189798b9035bd6b2c7e96827bbc67a01afde5",
+  "originHash" : "a510b439431fe66558d4f10300457195a211c96ecc69c93f0699cceb1746c50a",
   "pins" : [
     {
       "identity" : "defaults",
@@ -29,6 +29,15 @@
       }
     },
     {
+      "identity" : "openssl-package",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/krzyzanowskim/OpenSSL-Package.git",
+      "state" : {
+        "revision" : "2d180b33702e0e67fd58607d1f96d5fad0816d10",
+        "version" : "3.6.2000"
+      }
+    },
+    {
       "identity" : "sfsafesymbols",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SFSafeSymbols/SFSafeSymbols.git",
@@ -44,6 +53,15 @@
       "state" : {
         "revision" : "79e4b74a295b6eb74a8b585e3a39d29e70c1dbd1",
         "version" : "603.0.2"
+      }
+    },
+    {
+      "identity" : "zipfoundation",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/weichsel/ZIPFoundation",
+      "state" : {
+        "revision" : "22787ffb59de99e5dc1fbfe80b19c97a904ad48d",
+        "version" : "0.9.20"
       }
     }
   ],
