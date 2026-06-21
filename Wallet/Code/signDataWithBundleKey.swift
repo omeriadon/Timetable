@@ -38,8 +38,8 @@ func signDataWithBundledKey(_ manifestData: Data) throws -> Data {
 	ERR_load_CRYPTO_strings()
 
 	// 2. Locate the .pem keys copied to your main app bundle
-	guard let passKeyURL = Bundle.main.url(forResource: "pass_best", withExtension: "pem"),
-	      let walletCertURL = Bundle.main.url(forResource: "wallet_pass_best", withExtension: "pem")
+	guard let passKeyURL = Bundle.main.url(forResource: "pass", withExtension: "pem"),
+	      let walletCertURL = Bundle.main.url(forResource: "wallet_pass", withExtension: "pem")
 	else {
 		throw SigningError.resourceNotFound
 	}
