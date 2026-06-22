@@ -35,7 +35,6 @@ func signDataWithBundledKey(_ manifestData: Data) throws -> Data {
 	// 1. Initialize OpenSSL configuration so it recognizes key formats
 	OSSL_PROVIDER_load(nil, "default")
 	OpenSSL_add_all_algorithms()
-	ERR_load_CRYPTO_strings()
 
 	// 2. Locate the .pem keys copied to your main app bundle
 	guard let passKeyURL = Bundle.main.url(forResource: "pass", withExtension: "pem"),

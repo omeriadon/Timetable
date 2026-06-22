@@ -31,13 +31,11 @@ struct SettingsView: View {
 	#endif
 
 	@State private var showCalendarImportSheet = false
-	@State private var timetableToDelete: ReceivedTimetable?
-	@State private var showDeleteConfirmation = false
 	@State private var showEditTimetableSheet = false
 	@State private var widgetReloadState: Bool = false
 
-	@State private var renameItem: RenameTimetable?
-	@State private var renameText: String = ""
+	@State private var showEditReceivedTimetablesSheet = false
+	@Namespace private var namespace
 
 	@Namespace private var ns
 
@@ -62,6 +60,7 @@ struct SettingsView: View {
 					List {
 						list
 					}
+					.environment(\.defaultMinListRowHeight, 0)
 					.listStyle(.sidebar)
 
 				#else
@@ -146,6 +145,12 @@ struct SettingsView: View {
 			}
 		}
 
+		Section("Add Timetable to Wallet") {
+			AddPassView()
+				.listRowInsets(EdgeInsets())
+				.clipShape(.containerRelative)
+		}
+
 		Section("Calendar") {
 			Button {
 				showCalendarImportSheet = true
@@ -174,44 +179,18 @@ struct SettingsView: View {
 
 		if !receivedTimetables.isEmpty {
 			Section("Imported Timetables") {
-				List {
-					importedTimetablesSection
-						.listRowBackground(Color.clear)
+				Button {
+					showEditReceivedTimetablesSheet = true
+				} label: {
+					Label("Edit Received Timetables...", systemImage: "calendar")
 				}
-				.reorderContainer(for: ReceivedTimetable.self) { difference in
-					receivedTimetables.apply(difference: difference)
-				}
-				.listStyle(.inset)
-				.scrollContentBackground(.hidden)
-				#if os(iOS)
-					.frame(height: CGFloat(receivedTimetables.count * 60))
-				#endif
+				.matchedTransitionSource(id: "unique_transition_id", in: namespace)
 			}
-			.alert("Rename Timetable", item: $renameItem) { item in
-				TextField("Rename this timetable...", text: $renameText)
-
-				Button("Save", role: .confirm) {
-					if let index = receivedTimetables.firstIndex(where: { $0.id == item.timetable.id }) {
-						receivedTimetables[index].sender = renameText
-					}
-
-					renameItem = nil
-					renameText = ""
-				}
-				.keyboardShortcut(.return)
-
-				Button("Cancel", role: .cancel) {
-					renameItem = nil
-				}
-				.keyboardShortcut(.escape)
-			}
-			.alert("Delete Timetable?", isPresented: $showDeleteConfirmation, presenting: timetableToDelete) { timetable in
-				Button("Cancel", role: .cancel) {}
-				Button("Delete", role: .destructive) {
-					receivedTimetables.removeAll { $0.id == timetable.id }
-				}
-			} message: { timetable in
-				Text("Are you sure you want to delete \(timetable.sender)'s timetable?")
+			.sheet(isPresented: $showEditTimetableSheet) {
+				ReceivedTimetablesView()
+					.navigationTransition(
+						.zoom(sourceID: "unique_transition_id", in: namespace)
+					)
 			}
 		}
 
@@ -243,59 +222,6 @@ struct SettingsView: View {
 				.animation(.easeInOut, value: widgetReloadState)
 			}
 			.disabled(widgetReloadState)
-		}
-	}
-
-	private var importedTimetablesSection: some View {
-		ForEach(Array(receivedTimetables.enumerated()), id: \.element.id) { _, timetable in
-			HStack {
-				Text(timetable.sender)
-					.font(.title2)
-
-				Spacer()
-
-				Text("Received: \(timetable.receivedAt.formatted(date: .abbreviated, time: .omitted))")
-					.font(.caption2)
-					.foregroundStyle(.secondary)
-			}
-			.contentShape(.rect)
-			.swipeActions(edge: .trailing, allowsFullSwipe: false) {
-				contextMenuButtons(for: timetable)
-			}
-			.contextMenu {
-				contextMenuButtons(for: timetable)
-			}
-			.listRowInsets(EdgeInsets())
-		}
-		.reorderable()
-		.onDelete { indexSet in
-			for index in indexSet {
-				let timetable = receivedTimetables[index]
-				timetableToDelete = timetable
-				showDeleteConfirmation = true
-			}
-		}
-	}
-
-	@ContentBuilder
-	func contextMenuButtons(for timetable: ReceivedTimetable) -> some View {
-		Button(role: .destructive) {
-			let timetable = receivedTimetables.first { $0.id == timetable.id }
-			timetableToDelete = timetable
-			showDeleteConfirmation = true
-		} label: {
-			Label("Delete", systemImage: "trash")
-				.tint(.red)
-		}
-
-		Button {
-			renameItem = RenameTimetable(
-				id: timetable.id,
-				timetable: timetable
-			)
-			renameText = timetable.sender
-		} label: {
-			Label("Rename", systemImage: "pencil")
 		}
 	}
 }

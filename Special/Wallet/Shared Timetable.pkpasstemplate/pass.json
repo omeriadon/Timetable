@@ -37,7 +37,13 @@
 
     ],
     "backFields" : [
-
+      {
+        "_id" : "1641ECA9-BA21-40C7-9B1D-69068FF7D78D",
+        "key" : "back1",
+        "label" : "test",
+        "textAlignment" : "PKTextAlignmentNatural",
+        "value" : "test back field"
+      }
     ],
     "footerFields" : [
 

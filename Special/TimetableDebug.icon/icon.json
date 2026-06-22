@@ -1,0 +1,472 @@
+{
+  "features" : [
+    "refractivity"
+  ],
+  "fill" : {
+    "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "fill-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : {
+                "solid" : "extended-gray:1.00000,1.00000"
+              }
+            }
+          ],
+          "glass" : false,
+          "image-name" : "DEBUG.svg",
+          "name" : "DEBUG",
+          "position-specializations" : [
+            {
+              "idiom" : "watchOS",
+              "value" : {
+                "scale" : 1,
+                "translation-in-points" : [
+                  -58,
+                  0
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "name" : "DEBUG",
+      "position" : {
+        "scale" : 1.2,
+        "translation-in-points" : [
+          102,
+          299
+        ]
+      },
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.6
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.2
+      }
+    },
+    {
+      "layers" : [
+        {
+          "image-name" : "Frame 13 (2).svg",
+          "name" : "BADGE",
+          "position-specializations" : [
+            {
+              "idiom" : "watchOS",
+              "value" : {
+                "scale" : 1,
+                "translation-in-points" : [
+                  -58,
+                  0
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "name" : "Badge",
+      "position" : {
+        "scale" : 1.2,
+        "translation-in-points" : [
+          102,
+          299
+        ]
+      },
+      "refractivity" : {
+        "depth" : 0.1823046875,
+        "enabled" : true,
+        "strength" : 0.2970703125
+      },
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.6
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "layers" : [
+        {
+          "fill-specializations" : [
+            {
+              "value" : "none"
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "automatic-gradient" : "extended-gray:0.75000,1.00000"
+              }
+            }
+          ],
+          "image-name" : "Rectangle 12.svg",
+          "name" : "Rectangle 12",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              129.0223194805759,
+              -305.02912287798347
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : "none"
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "automatic-gradient" : "extended-gray:0.75000,1.00000"
+              }
+            }
+          ],
+          "image-name" : "Rectangle 12.svg",
+          "name" : "Rectangle 12",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -59,
+              -305.02912287798347
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : "none"
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "automatic-gradient" : "extended-gray:0.75000,1.00000"
+              }
+            }
+          ],
+          "image-name" : "Rectangle 12.svg",
+          "name" : "Rectangle 12",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -250.77278442256784,
+              -305.02912287798347
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : "none"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "none"
+            }
+          ],
+          "image-name" : "Rectangle 3.svg",
+          "name" : "Date",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              129.0223194805759,
+              23.47512931193927
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : "none"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "none"
+            }
+          ],
+          "image-name" : "Rectangle 3.svg",
+          "name" : "Date",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              129.0223194805759,
+              175.45396203367244
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : "none"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "none"
+            }
+          ],
+          "image-name" : "Rectangle 3.svg",
+          "name" : "Date",
+          "position-specializations" : [
+            {
+              "value" : {
+                "scale" : 1,
+                "translation-in-points" : [
+                  -59,
+                  23.475129311939327
+                ]
+              }
+            },
+            {
+              "idiom" : "watchOS",
+              "value" : {
+                "scale" : 1,
+                "translation-in-points" : [
+                  -59,
+                  23.475129311939327
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : "none"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "none"
+            }
+          ],
+          "image-name" : "Rectangle 3.svg",
+          "name" : "Date",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              129.0223194805759,
+              -125.07682120743988
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : "none"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "none"
+            }
+          ],
+          "image-name" : "Rectangle 3.svg",
+          "name" : "Date",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -59,
+              -125.07682120743976
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : "none"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "none"
+            }
+          ],
+          "image-name" : "Rectangle 3.svg",
+          "name" : "Date",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -250.77278442256784,
+              -125.07682120743976
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : "none"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "none"
+            }
+          ],
+          "image-name" : "Rectangle 3.svg",
+          "name" : "Date",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -59,
+              175.45396203367255
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : "none"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "none"
+            }
+          ],
+          "image-name" : "Rectangle 3.svg",
+          "name" : "Date",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -250.77278442256784,
+              175.45396203367255
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : "none"
+            },
+            {
+              "appearance" : "dark",
+              "value" : "none"
+            }
+          ],
+          "image-name" : "Rectangle 3.svg",
+          "name" : "Date",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -250.77278442256784,
+              23.475129311939384
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : "none"
+            },
+            {
+              "appearance" : "tinted",
+              "value" : {
+                "automatic-gradient" : "srgb:0.00000,0.53333,1.00000,0.69965"
+              }
+            }
+          ],
+          "image-name" : "Inset.svg",
+          "name" : "Inset",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -59,
+              23.475129311939327
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : "none"
+            },
+            {
+              "appearance" : "tinted",
+              "value" : {
+                "automatic-gradient" : "srgb:0.00000,0.53333,1.00000,0.32107"
+              }
+            }
+          ],
+          "image-name" : "Calendar.svg",
+          "name" : "Calendar",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -59,
+              -51
+            ]
+          }
+        }
+      ],
+      "lighting" : "individual",
+      "name" : "Calendar",
+      "position-specializations" : [
+        {
+          "value" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              8,
+              21
+            ]
+          }
+        },
+        {
+          "idiom" : "watchOS",
+          "value" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              38,
+              36
+            ]
+          }
+        }
+      ],
+      "refractivity" : {
+        "depth" : 0.2109375,
+        "enabled" : true,
+        "strength" : 0.21046875
+      },
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.6
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.72
+      }
+    },
+    {
+      "layers" : [
+        {
+          "fill-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : "none"
+            }
+          ],
+          "glass" : false,
+          "image-name" : "Grid (Do not export) (2).svg",
+          "name" : "Grid"
+        }
+      ],
+      "name" : "Grid",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.6
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.2
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}
