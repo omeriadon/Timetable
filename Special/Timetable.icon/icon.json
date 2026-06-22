@@ -44,7 +44,7 @@
           "image-name" : "Vector (1).svg",
           "name" : "Cap",
           "position" : {
-            "scale" : 1,
+            "scale" : 0.86,
             "translation-in-points" : [
               222.521852668076,
               249.87471833667882
@@ -58,7 +58,7 @@
           "value" : {
             "scale" : 1,
             "translation-in-points" : [
-              16,
+              20,
               -7
             ]
           }
@@ -69,7 +69,7 @@
             "scale" : 1,
             "translation-in-points" : [
               -16,
-              -39
+              -43
             ]
           }
         }
@@ -128,7 +128,7 @@
           "value" : {
             "scale" : 1,
             "translation-in-points" : [
-              16,
+              20,
               -7
             ]
           }
@@ -139,7 +139,7 @@
             "scale" : 1,
             "translation-in-points" : [
               -16,
-              -39
+              -43
             ]
           }
         }
@@ -155,20 +155,20 @@
         {
           "idiom" : "watchOS",
           "value" : {
-            "depth" : 0.2420703125,
+            "depth" : 0.2165625,
             "enabled" : true,
-            "strength" : 0.1181640625
+            "strength" : 0.1314453125
           }
         }
       ],
       "shadow" : {
         "kind" : "neutral",
-        "opacity" : 0.6
+        "opacity" : 4
       },
       "specular" : true,
       "translucency" : {
         "enabled" : true,
-        "value" : 0.2
+        "value" : 0.25
       }
     },
     {
@@ -521,7 +521,7 @@
           "value" : {
             "scale" : 1,
             "translation-in-points" : [
-              8,
+              23,
               21
             ]
           }

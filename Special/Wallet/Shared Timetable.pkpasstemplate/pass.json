@@ -43,6 +43,12 @@
         "label" : "test",
         "textAlignment" : "PKTextAlignmentNatural",
         "value" : "test back field"
+      },
+      {
+        "_id" : "B1B32491-B4C0-4CF1-BE30-B37193073888",
+        "key" : "sender",
+        "label" : "Sender",
+        "value" : "Adon"
       }
     ],
     "footerFields" : [

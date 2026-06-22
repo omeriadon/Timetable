@@ -39,7 +39,7 @@
         "scale" : 1.2,
         "translation-in-points" : [
           102,
-          299
+          261
         ]
       },
       "shadow" : {
@@ -54,6 +54,22 @@
     {
       "layers" : [
         {
+          "fill" : {
+            "linear-gradient" : [
+              "extended-gray:1.00000,1.00000",
+              "extended-gray:1.00000,0.68301"
+            ],
+            "orientation" : {
+              "start" : {
+                "x" : 0.5,
+                "y" : 1
+              },
+              "stop" : {
+                "x" : 0.5,
+                "y" : 0
+              }
+            }
+          },
           "image-name" : "Frame 13 (2).svg",
           "name" : "BADGE",
           "position-specializations" : [
@@ -75,7 +91,7 @@
         "scale" : 1.2,
         "translation-in-points" : [
           102,
-          299
+          261
         ]
       },
       "refractivity" : {
@@ -90,7 +106,7 @@
       "specular" : true,
       "translucency" : {
         "enabled" : true,
-        "value" : 0.5
+        "value" : 0.74
       }
     },
     {
@@ -98,12 +114,14 @@
         {
           "fill-specializations" : [
             {
-              "value" : "none"
+              "value" : {
+                "solid" : "extended-gray:1.00000,0.44000"
+              }
             },
             {
               "appearance" : "dark",
               "value" : {
-                "automatic-gradient" : "extended-gray:0.75000,1.00000"
+                "automatic-gradient" : "extended-gray:0.75000,0.58255"
               }
             }
           ],
@@ -120,12 +138,14 @@
         {
           "fill-specializations" : [
             {
-              "value" : "none"
+              "value" : {
+                "solid" : "extended-gray:1.00000,0.44000"
+              }
             },
             {
               "appearance" : "dark",
               "value" : {
-                "automatic-gradient" : "extended-gray:0.75000,1.00000"
+                "automatic-gradient" : "extended-gray:0.75000,0.58255"
               }
             }
           ],
@@ -142,12 +162,14 @@
         {
           "fill-specializations" : [
             {
-              "value" : "none"
+              "value" : {
+                "solid" : "extended-gray:1.00000,0.44000"
+              }
             },
             {
               "appearance" : "dark",
               "value" : {
-                "automatic-gradient" : "extended-gray:0.75000,1.00000"
+                "automatic-gradient" : "extended-gray:0.75000,0.58255"
               }
             }
           ],
@@ -358,7 +380,9 @@
         {
           "fill-specializations" : [
             {
-              "value" : "none"
+              "value" : {
+                "solid" : "extended-srgb:0.00000,0.53333,1.00000,0.59000"
+              }
             },
             {
               "appearance" : "tinted",
@@ -380,7 +404,9 @@
         {
           "fill-specializations" : [
             {
-              "value" : "none"
+              "value" : {
+                "solid" : "extended-gray:1.00000,0.54000"
+              }
             },
             {
               "appearance" : "tinted",
@@ -407,7 +433,7 @@
           "value" : {
             "scale" : 1,
             "translation-in-points" : [
-              8,
+              24,
               21
             ]
           }
@@ -435,10 +461,20 @@
       "specular" : true,
       "translucency" : {
         "enabled" : true,
-        "value" : 0.72
+        "value" : 1
       }
     },
     {
+      "blend-mode-specializations" : [
+        {
+          "value" : "overlay"
+        },
+        {
+          "appearance" : "dark",
+          "value" : "hard-light"
+        }
+      ],
+      "blur-material" : null,
       "layers" : [
         {
           "fill-specializations" : [
@@ -447,19 +483,26 @@
               "value" : "none"
             }
           ],
-          "glass" : false,
+          "glass" : true,
           "image-name" : "Grid (Do not export) (2).svg",
           "name" : "Grid"
         }
       ],
+      "lighting" : "combined",
       "name" : "Grid",
+      "refractivity" : {
+        "depth" : 0.226015625,
+        "enabled" : false,
+        "strength" : 1
+      },
       "shadow" : {
         "kind" : "neutral",
         "opacity" : 0.6
       },
+      "specular" : false,
       "translucency" : {
         "enabled" : true,
-        "value" : 0.2
+        "value" : 0.7
       }
     }
   ],

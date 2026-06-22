@@ -35,7 +35,6 @@ struct SettingsView: View {
 	@State private var widgetReloadState: Bool = false
 
 	@State private var showEditReceivedTimetablesSheet = false
-	@Namespace private var namespace
 
 	@Namespace private var ns
 
@@ -184,13 +183,22 @@ struct SettingsView: View {
 				} label: {
 					Label("Edit Received Timetables...", systemImage: "calendar")
 				}
-				.matchedTransitionSource(id: "unique_transition_id", in: namespace)
-			}
-			.sheet(isPresented: $showEditTimetableSheet) {
-				ReceivedTimetablesView()
-					.navigationTransition(
-						.zoom(sourceID: "unique_transition_id", in: namespace)
-					)
+				.matchedTransitionSource(id: "unique_transition_id", in: ns)
+				.sheet(isPresented: $showEditReceivedTimetablesSheet) {
+					ReceivedTimetablesView()
+					#if os(iOS)
+						.navigationTransition(
+							.zoom(sourceID: "unique_transition_id", in: ns)
+						)
+					#else
+						.frame(width: 600, height: 500)
+					#endif
+				}
+				.onChange(of: receivedTimetables) { _, newValue in
+					if newValue.isEmpty {
+
+					}
+				}
 			}
 		}
 
