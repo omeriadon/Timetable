@@ -156,7 +156,9 @@ struct CalendarImportView: View {
 			print("[iOS] Calendar Import: Validating...")
 			await moveForward(to: .finalising)
 
-			subjects = translatedSubjects.sorted { $0.id.localizedCaseInsensitiveCompare($1.id) == .orderedAscending }
+			subjects = translatedSubjects
+				.sorted { $0.id.localizedCaseInsensitiveCompare($1.id) == .orderedAscending }
+				.filter { !$0.slots.isEmpty }
 
 			await moveForward(to: .done)
 			print("[iOS] Calendar Import: Success!")

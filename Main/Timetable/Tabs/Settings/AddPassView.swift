@@ -8,36 +8,110 @@
 import PassKit
 import SwiftUI
 
+enum PassState: Equatable {
+	case idle
+	case generating
+	case ready(PKPass)
+	case added
+	case error
+}
+
 struct AddPassView: View {
-	@State private var hasBeenAdded = false
+	@State private var currentState: PassState = .idle
+	@State private var walletButtonID = UUID()
 
 	var body: some View {
 		ZStack {
-			if hasBeenAdded {
-				Text("Pass added to Apple Wallet.")
-					.padding(.leading)
-					.transition(.blurReplace)
-			} else if PKAddPassesViewController.canAddPasses() {
-				if let url = try? generatePass(),
-				   let passData = try? Data(contentsOf: url),
-				   let pass = try? PKPass(data: passData)
-				{
-					AddPassToWalletButton([pass]) { added in
-						hasBeenAdded = added
-					}
-					.addPassToWalletButtonStyle(.black)
-					.transition(.blurReplace)
-				} else {
-					Text("Unable to generat a pass to add to Wallet.")
-						.padding(.leading)
-				}
-
-			} else {
+			if !PKAddPassesViewController.canAddPasses() {
 				Text("Apple Wallet is not available on this device.")
-					.padding(.leading)
+					.foregroundStyle(.secondary)
+					.transition(.blurReplace)
+			} else {
+				switch currentState {
+					case .idle:
+						Button {
+							generatePassAsync()
+						} label: {
+							Label("Generate Apple Wallet Pass", systemImage: "wallet.pass")
+								.foregroundStyle(.accent)
+						}
+						.transition(.blurReplace)
+
+					case .generating:
+						HStack(spacing: 10) {
+							ProgressView()
+							Text("Generating Pass...")
+						}
+						.frame(maxWidth: .infinity, maxHeight: .infinity)
+						.transition(.blurReplace)
+
+					case .ready(let pass):
+						AddPassToWalletButton([pass]) { added in
+							if added {
+								withAnimation(.easeInOut) {
+									currentState = .added
+								}
+								triggerResetTimer()
+							}
+						}
+						.addPassToWalletButtonStyle(.black)
+						.id(walletButtonID)
+						.clipShape(.containerRelative)
+						.transition(.blurReplace)
+
+					case .added:
+						Text("Pass added to Apple Wallet.")
+
+							.transition(.blurReplace)
+
+					case .error:
+						Text("Unable to generate a pass.")
+
+							.foregroundColor(.red)
+							.transition(.blurReplace)
+				}
 			}
 		}
-		.animation(.easeInOut, value: hasBeenAdded)
-		.frame(height: 44)
+		.animation(.easeInOut, value: currentState)
+	}
+
+	private func generatePassAsync() {
+		withAnimation(.easeInOut) {
+			currentState = .generating
+		}
+
+		Task(priority: .userInitiated) {
+			do {
+				let url = try generatePass()
+				let passData = try Data(contentsOf: url)
+				let pass = try PKPass(data: passData)
+
+				await MainActor.run {
+					withAnimation(.easeInOut) {
+						currentState = .ready(pass)
+					}
+				}
+			} catch {
+				print("[Wallet] Error generating pass: \(error)")
+				await MainActor.run {
+					withAnimation(.easeInOut) {
+						currentState = .error
+					}
+				}
+			}
+		}
+	}
+
+	private func triggerResetTimer() {
+		Task {
+			try? await Task.sleep(for: .seconds(5))
+
+			await MainActor.run {
+				withAnimation(.easeInOut) {
+					walletButtonID = UUID()
+					currentState = .idle
+				}
+			}
+		}
 	}
 }

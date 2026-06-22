@@ -29,7 +29,7 @@ enum CalendarImportStatus {
 
 func fetchCompassEvents(from store: EKEventStore, calendar: EKCalendar) async throws -> [EKEvent] {
 	let startDate = calculateNextMonday()
-	let endDate = Calendar.current.date(byAdding: .weekOfYear, value: 4, to: startDate) ?? startDate
+	let endDate = Calendar.current.date(byAdding: .weekOfYear, value: 6, to: startDate) ?? startDate
 
 	let predicate = store.predicateForEvents(withStart: startDate, end: endDate, calendars: [calendar])
 	let events = store.events(matching: predicate)
@@ -53,8 +53,7 @@ func calculateNextMonday() -> Date {
 
 // MARK: - translateSubjectes
 
-func
-translateSubjects(_ subjects: [Subject]) -> [Subject] {
+func translateSubjects(_ subjects: [Subject]) -> [Subject] {
 	var result: [Subject] = []
 
 	for c in subjects {
@@ -92,8 +91,15 @@ func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Subject] {
 	]
 
 	let calendar = Calendar.current
-	var subjectMap: [String: (color: RGBAColor, symbol: String, slots: [Slot])] = [:]
 
+	// Track frequency of title claims on unique slots across the 6-week window
+	// Key: "day,session" -> Value: [SubjectTitle : OccurrencesCount]
+	var slotScoreboard: [String: [String: Int]] = [:]
+
+	// Track overall metadata for subjects we discover
+	var subjectMeta: [String: (color: RGBAColor, symbol: String)] = [:]
+
+	// 1. First Pass: Parse events and score frequencies across the 6 weeks
 	for event in events {
 		guard
 			let title = event.title?.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -108,18 +114,8 @@ func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Subject] {
 
 		guard let matchedSlot = timeSlots.first(where: { slot in
 			guard
-				let slotStart = calendar.date(
-					bySettingHour: slot.startHour,
-					minute: slot.startMinute,
-					second: 0,
-					of: dayStart
-				),
-				let slotEnd = calendar.date(
-					bySettingHour: slot.endHour,
-					minute: slot.endMinute,
-					second: 0,
-					of: dayStart
-				)
+				let slotStart = calendar.date(bySettingHour: slot.startHour, minute: slot.startMinute, second: 0, of: dayStart),
+				let slotEnd = calendar.date(bySettingHour: slot.endHour, minute: slot.endMinute, second: 0, of: dayStart)
 			else { return false }
 
 			return event.startDate < slotEnd && event.endDate > slotStart
@@ -127,30 +123,55 @@ func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Subject] {
 			continue
 		}
 
-		if subjectMap[title] == nil {
-			let randomColor = RGBAColor(
-				color: AvailableColors.allCases.randomElement()!.SwiftUIColor
-			)
-
-			subjectMap[title] = (
-				color: randomColor,
-				symbol: translateSymbol(title),
-				slots: []
+		// Store metadata if it's the first time seeing this item
+		if subjectMeta[title] == nil {
+			subjectMeta[title] = (
+				color: RGBAColor(color: AvailableColors.allCases.randomElement()!.SwiftUIColor),
+				symbol: translateSymbol(title)
 			)
 		}
 
-		subjectMap[title]!.slots.append(Slot(day, matchedSlot.session))
+		// Update the scoreboard for this explicit time slot
+		let slotKey = "\(day),\(matchedSlot.session)"
+		var scores = slotScoreboard[slotKey] ?? [:]
+		scores[title] = (scores[title] ?? 0) + 1
+		slotScoreboard[slotKey] = scores
 	}
 
-	return subjectMap
-		.map { name, data in
-			Subject(
+	// 2. Second Pass: Rebuild cleanly by assigning slots strictly to the highest scoring title
+	var subjectSlotsMap: [String: [Slot]] = [:]
+
+	for (slotKey, scores) in slotScoreboard {
+		// Split our dictionary key back into structural data
+		let components = slotKey.split(separator: ",").compactMap { Int($0) }
+		guard components.count == 2 else { continue }
+		let day = components[0]
+		let session = components[1]
+
+		// Find the absolute highest recurring title for this exact slot
+		if let winningTitle = scores.max(by: { $0.value < $1.value })?.key {
+			if subjectSlotsMap[winningTitle] == nil {
+				subjectSlotsMap[winningTitle] = []
+			}
+			subjectSlotsMap[winningTitle]?.append(Slot(day, session))
+		}
+	}
+
+	// 3. Map directly to clean structural models, strictly dropping items that lost all their slots
+	return subjectSlotsMap
+		.filter { !$0.value.isEmpty } // Drop 0-slot items immediately before mapping
+		.compactMap { name, slots in
+			guard let meta = subjectMeta[name] else { return nil }
+
+			let sortedUniqueSlots = Array(Set(slots)).sorted {
+				$0.day == $1.day ? $0.session < $1.session : $0.day < $1.day
+			}
+
+			return Subject(
 				id: name,
-				symbol: data.symbol,
-				colour: data.color,
-				slots: Array(Set(data.slots)).sorted {
-					$0.day == $1.day ? $0.session < $1.session : $0.day < $1.day
-				}
+				symbol: meta.symbol,
+				colour: meta.color,
+				slots: sortedUniqueSlots
 			)
 		}
 		.sorted { $0.id < $1.id }

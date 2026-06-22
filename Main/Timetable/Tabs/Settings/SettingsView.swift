@@ -59,7 +59,6 @@ struct SettingsView: View {
 					List {
 						list
 					}
-					.environment(\.defaultMinListRowHeight, 0)
 					.listStyle(.sidebar)
 
 				#else
@@ -146,8 +145,6 @@ struct SettingsView: View {
 
 		Section("Add Timetable to Wallet") {
 			AddPassView()
-				.listRowInsets(EdgeInsets())
-				.clipShape(.containerRelative)
 		}
 
 		Section("Calendar") {
@@ -195,9 +192,7 @@ struct SettingsView: View {
 					#endif
 				}
 				.onChange(of: receivedTimetables) { _, newValue in
-					if newValue.isEmpty {
-
-					}
+					if newValue.isEmpty {}
 				}
 			}
 		}
@@ -219,11 +214,11 @@ struct SettingsView: View {
 				ZStack {
 					if widgetReloadState {
 						Label("Done", systemImage: "checkmark")
-							.id("done")
+
 							.transition(.blurReplace)
 					} else {
 						Label("Reload widgets now", systemImage: "widget.extralarge")
-							.id("reload")
+							.foregroundStyle(.accent)
 							.transition(.blurReplace)
 					}
 				}

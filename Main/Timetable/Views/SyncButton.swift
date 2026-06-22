@@ -17,7 +17,8 @@ struct SyncButton: View {
 			ZStack {
 				switch syncStatus {
 					case .normal:
-						Label("Sync", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
+						Label("Sync To Watch", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
+							.foregroundStyle(.accent)
 							.transition(.blurReplace)
 
 					case .loading:
