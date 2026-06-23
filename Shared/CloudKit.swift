@@ -47,24 +47,10 @@ final class CloudStore {
 				pushEverything()
 			}
 			.store(in: &cancellables)
-
-		Defaults.publisher(.receivedTimetables)
-			.sink { [weak self] _ in
-				guard let self, !self.isApplyingRemoteChange else { return }
-				pushEverything()
-			}
-			.store(in: &cancellables)
 	}
 
 	func pushEverything() {
 		guard !isApplyingRemoteChange else { return }
-
-		do {
-			let data = try JSONEncoder().encode(Defaults[.receivedTimetables])
-			store.set(data, forKey: "receivedTimetables")
-		} catch {
-			print(error)
-		}
 
 		do {
 			let data = try JSONEncoder().encode(Defaults[.timetable])
@@ -92,15 +78,6 @@ final class CloudStore {
 		   )
 		{
 			Defaults[.timetable] = timetable
-		}
-
-		if let data = store.data(forKey: "receivedTimetables"),
-		   let receivedTimetables = try? JSONDecoder().decode(
-		   	ReceivedTimetables.self,
-		   	from: data
-		   )
-		{
-			Defaults[.receivedTimetables] = receivedTimetables
 		}
 
 		if let data = store.data(forKey: "userDisplayName"),
