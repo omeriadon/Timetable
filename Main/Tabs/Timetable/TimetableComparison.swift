@@ -5,30 +5,30 @@
 //  Created by Adon Omeri on 11/6/2026.
 //
 
-import Defaults
+
 import SwiftUI
 
 struct TimetableComparison: View {
-	@Default(.receivedTimetables) var receivedTimetables
-	@Default(.timetable) var subjects
+
+	@Environment(\.passManager) private var passManager
 
 	let selectedSlot: Slot?
 
 	var body: some View {
 		VStack(spacing: 8) {
-			ForEach(receivedTimetables.indices, id: \.self) { idx in
+			ForEach(passManager.receivedTimetables.indices, id: \.self) { idx in
 				if let slot = selectedSlot,
-				   let theirSubject = getSubjectAtSlot(day: slot.day, session: slot.session, in: receivedTimetables[idx].subjects)
+				   let theirSubject = getSubjectAtSlot(day: slot.day, session: slot.session, in: passManager.receivedTimetables[idx].subjects)
 				{
 					item(
-						left: receivedTimetables[idx].sender,
+						left: passManager.receivedTimetables[idx].sender,
 						right: Label(theirSubject.id, systemImage: theirSubject.symbol),
 						colour: theirSubject.colour.swiftUIColor
 					)
 
 				} else {
 					item(
-						left: receivedTimetables[idx].sender,
+						left: passManager.receivedTimetables[idx].sender,
 						right: Label("Free period", systemImage: "square.dotted"),
 						colour: .gray
 					)

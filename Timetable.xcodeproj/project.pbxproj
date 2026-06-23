@@ -109,11 +109,12 @@
 		2AC5F7EA2FD842F000B813EA /* Exceptions for "Main" folder in "Timetable" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			platformFiltersByRelativePath = {
-				Timetable/AppDelegate.swift = (macos, );
-				Timetable/Backend/PhoneWatchSyncBridge.swift = (ios, );
-				Timetable/Backend/syncToWatchAsync.swift = (ios, );
-				Timetable/CustomMaterialView.swift = (macos, );
-				Timetable/Views/SyncButton.swift = (ios, );
+				Backend/PhoneWatchSyncBridge.swift = (ios, );
+				Backend/syncToWatchAsync.swift = (ios, );
+				Tabs/Settings/AddPassView.swift = (ios, xros, );
+				Views/SyncButton.swift = (ios, );
+				macOS/AppDelegate.swift = (macos, );
+				macOS/CustomMaterialView.swift = (macos, );
 			};
 			target = 2A02378A2F9C8EA000AB1E1F /* Timetable */;
 		};
@@ -142,6 +143,11 @@
 			);
 			platformFiltersByRelativePath = {
 				LaunchScreen.storyboard = (ios, );
+				"Wallet/Shared Timetable.pkpasstemplate" = (ios, xros, );
+				Wallet/generatePass.swift = (ios, xros, );
+				Wallet/pass.pem = (ios, xros, );
+				Wallet/signDataWithBundleKey.swift = (ios, xros, );
+				Wallet/wallet_pass.pem = (ios, xros, );
 			};
 			target = 2A02378A2F9C8EA000AB1E1F /* Timetable */;
 		};
@@ -191,6 +197,22 @@
 			);
 			target = 2A098C822F9DB842002065BE /* Watch */;
 		};
+		2AD85AAF2FE97B64004EAB2B /* Exceptions for "Shared" folder in "Watch Widget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Wallet/TimetablePassManager.swift,
+				Wallet/toReceivedTimetable.swift,
+			);
+			target = 2A25869F2FB5D6490030C8CD /* Watch Widget */;
+		};
+		2AD85AB02FE97B64004EAB2B /* Exceptions for "Shared" folder in "Widget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Wallet/TimetablePassManager.swift,
+				Wallet/toReceivedTimetable.swift,
+			);
+			target = 2AA6DF132FDFAC8F00BBC70E /* Widget */;
+		};
 		2AF9CBFB2FE6D56C00885431 /* Exceptions for "App Intents" folder in "Watch Widget" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -217,6 +239,10 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		2A02379F2F9C908300AB1E1F /* Shared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				2AD85AAF2FE97B64004EAB2B /* Exceptions for "Shared" folder in "Watch Widget" target */,
+				2AD85AB02FE97B64004EAB2B /* Exceptions for "Shared" folder in "Widget" target */,
+			);
 			path = Shared;
 			sourceTree = "<group>";
 		};
@@ -1166,7 +1192,7 @@
 		};
 		2A43AFCD2FE80ED900BBC8BD /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/weichsel/ZIPFoundation";
+			repositoryURL = "https://github.com/omeriadon/ZIPFoundation";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 0.9.20;

@@ -29,15 +29,13 @@ enum WindowMode: Int, Equatable, Identifiable {
 
 @main
 struct TimetableApp: App {
-	@State private var importedFileURL: URL?
-	@State private var importStatus: ImportResult?
-	@State private var receivedTimetableData: ShareableTimetableData?
-
 	@State var expanded: WindowMode = .none
 
 	@Default(.userDisplayName) var userName
 
 	private let cloudSync = CloudStore.shared
+
+	@State private var passManager = TimetablePassManager()
 
 	var showNameSheet: Bool {
 		userName.isEmpty
@@ -65,6 +63,7 @@ struct TimetableApp: App {
 						.interactiveDismissDisabled()
 						.monospaced()
 				}
+				.environment(\.passManager, passManager)
 #endif // os(iOS)
 				.monospaced()
 #if os(macOS)

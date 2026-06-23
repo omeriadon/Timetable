@@ -16,7 +16,8 @@ struct RenameTimetable: Identifiable {
 
 struct SettingsView: View {
 	@Default(.timetable) var subjects
-	@Default(.receivedTimetables) var receivedTimetables
+
+	@Environment(\.passManager) private var passManager
 
 	@Default(.userDisplayName) var userDisplayName
 	@State private var username: String
@@ -173,7 +174,7 @@ struct SettingsView: View {
 			}
 		}
 
-		if !receivedTimetables.isEmpty {
+		if !passManager.receivedTimetables.isEmpty {
 			Section("Imported Timetables") {
 				Button {
 					showEditReceivedTimetablesSheet = true
@@ -191,7 +192,7 @@ struct SettingsView: View {
 						.frame(width: 600, height: 500)
 					#endif
 				}
-				.onChange(of: receivedTimetables) { _, newValue in
+				.onChange(of: passManager.receivedTimetables) { _, newValue in
 					if newValue.isEmpty {}
 				}
 			}

@@ -5,7 +5,7 @@
 //  Created by Adon Omeri on 25/4/2026.
 //
 
-import Defaults
+
 import SwiftUI
 #if os(iOS)
 	import WatchConnectivity
@@ -16,8 +16,8 @@ import SwiftUI
 #endif // os(iOS)
 
 struct ContentView: View {
-	@Default(.timetable) var subjects
-	@Default(.receivedTimetables) var receivedTimetables
+
+
 
 	#if os(iOS)
 		@State private var watchSync = PhoneWatchSyncBridge()

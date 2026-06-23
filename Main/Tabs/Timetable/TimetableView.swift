@@ -17,8 +17,9 @@ struct TimetableView: View {
 	#endif
 
 	@Default(.timetable) var subjects
-	@Default(.receivedTimetables) var receivedTimetables
-	@Default(.userDisplayName) var userDisplayName
+
+	@Environment(\.passManager) private var passManager
+
 
 	@State private var selectedTimetable: ReceivedTimetable?
 	@State private var showTimetableComparison = false
@@ -68,7 +69,7 @@ struct TimetableView: View {
 					.opacity(selectedSlot != nil ? 1 : 0)
 					.scrollIndicatorsFlash(onAppear: true)
 				#endif // os(macOS)
-					.opacity(receivedTimetables.isEmpty ? 0 : 1)
+					.opacity(passManager.receivedTimetables.isEmpty ? 0 : 1)
 					.safeAreaBar(edge: .top, alignment: .center, spacing: 10) {
 						GlassEffectContainer(spacing: 2) {
 							HStack(spacing: 4) {
@@ -161,7 +162,7 @@ struct TimetableView: View {
 							if selectedSlot == Slot(day, session) {
 								selectedSlot = nil
 							} else if let _ = subjectLookup[Slot(day, session)] {
-								if !receivedTimetables.isEmpty {
+								if !passManager.receivedTimetables.isEmpty {
 									selectedSlot = Slot(day, session)
 								}
 							}
