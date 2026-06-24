@@ -34,7 +34,7 @@ struct WeeklyScheduleWidget: Widget {
 	} timeline: {
 		TimetableEntry(
 			date: .now,
-			subject: defaultTimetable,
+			subject: debugTimetable,
 			relevance: TimelineEntryRelevance(
 				score: 1.0,
 				duration: 60 * 60
@@ -47,7 +47,7 @@ struct WeeklyScheduleWidget: Widget {
 	} timeline: {
 		TimetableEntry(
 			date: .now,
-			subject: defaultTimetable,
+			subject: debugTimetable,
 			relevance: TimelineEntryRelevance(
 				score: 1.0,
 				duration: 60 * 60

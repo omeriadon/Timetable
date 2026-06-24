@@ -105,7 +105,7 @@ struct FriendsTimetablesView: View {
 	FriendsTimetablesView(
 		receivedTimetable: ReceivedTimetable(
 			sender: "Adon Omeri",
-			subjects: defaultTimetable,
+			subjects: debugTimetable,
 			receivedAt: Date()
 		)
 	)

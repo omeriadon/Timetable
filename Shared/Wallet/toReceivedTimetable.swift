@@ -15,37 +15,86 @@ extension PKPass {
 		// Ensure this pass belongs specifically to your Timetable bundle ID identifier
 		guard self.passTypeIdentifier == "pass.com.omeriadon.Timetable" else { return nil }
 
-		// 1. Grab and unpack the root userInfo object
-		guard let userInfo = self.userInfo,
-		      let rawJsonString = userInfo["rawTimetableData"] as? String,
-		      let jsonData = rawJsonString.data(using: .utf8)
-		else {
+		// 1. Grab the raw userInfo object
+		guard let userInfo = self.userInfo else {
+			print("❌ Pass Parsing Error: userInfo dictionary is completely missing.")
 			return nil
 		}
 
-		// 2. Safely decode structural subject data
+		// 2. Extract the timetable array payload
+		guard let rawData = userInfo["rawTimetableData"] else {
+			print("❌ Pass Parsing Error: 'rawTimetableData' key is missing from userInfo.")
+			return nil
+		}
+
+		// 3. Serialize back to raw JSON Data safely
+		let jsonData: Data
+		if let jsonString = rawData as? String {
+			guard let data = jsonString.data(using: .utf8) else { return nil }
+			jsonData = data
+		} else {
+			do {
+				jsonData = try JSONSerialization.data(withJSONObject: rawData, options: [])
+			} catch {
+				print("❌ Pass Parsing Error: JSONSerialization failed: \(error)")
+				return nil
+			}
+		}
+
+		// 4. Decode the subject data layout
 		guard let subjects = try? JSONDecoder().decode([Subject].self, from: jsonData) else {
+			print("❌ Pass Parsing Error: JSON structure layout does not match your [Subject] model.")
 			return nil
 		}
 
-		// 3. Extract sender name strictly from backFields metadata
-		// PKPass localizes and exposes these fields directly via localizedValue(forFieldKey:)
-		guard let senderName = self.localizedValue(forFieldKey: "sender") as? String,
-		      !senderName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-		else {
+		// 5. Extract sender name (Try userInfo first, fallback to back-of-pass fields)
+		let senderName: String
+		if let userInfoSender = userInfo["sender"] as? String {
+			senderName = userInfoSender
+		} else if let passFieldSender = self.localizedValue(forFieldKey: "sender") as? String {
+			senderName = passFieldSender
+		} else {
+			print("❌ Pass Parsing Error: 'sender' identifier not found in userInfo or pass fields.")
 			return nil
 		}
 
-		// 4. Extract the exact historic sharing timestamp from the pass data fields
-		// Since it's stored as an ISO8601 string ("2026-06-22T11:17:52Z") in primaryFields,
-		// we extract and convert it back to a standard Date object.
-		guard let sharedString = self.localizedValue(forFieldKey: "shared") as? String,
-		      let sharedDate = ISO8601DateFormatter().date(from: sharedString)
-		else {
-			return nil
+		guard !senderName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
+
+		// 6. Extract sharing timestamp
+		let sharedDate: Date
+
+		if let userInfoShared = userInfo["shared"] as? String,
+		   let parsedDate = ISO8601DateFormatter().date(from: userInfoShared)
+		{
+			sharedDate = parsedDate
+		} else if let rawShared = self.localizedValue(forFieldKey: "shared") {
+			if let alreadyDate = rawShared as? Date {
+				sharedDate = alreadyDate
+			} else if let dateString = rawShared as? String {
+
+				let fallbackFormatter = DateFormatter()
+				fallbackFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
+				fallbackFormatter.locale = Locale(identifier: "en_US_POSIX")
+				fallbackFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+
+				// If Apple Wallet localized the string, parsing will fail.
+				// Fallback to Date() to prevent the whole pass from failing to load.
+				if let parsed = ISO8601DateFormatter().date(from: dateString) ?? fallbackFormatter.date(from: dateString) {
+					sharedDate = parsed
+				} else {
+					print("⚠️ Pass Parsing Warning: 'shared' text found but formatting failed: \(dateString). Defaulting to current date.")
+					sharedDate = Date()
+				}
+			} else {
+				print("⚠️ Pass Parsing Warning: 'shared' field is an unexpected type. Defaulting to current date.")
+				sharedDate = Date()
+			}
+		} else {
+			print("⚠️ Pass Parsing Warning: 'shared' key not found in userInfo or pass fields. Defaulting to current date.")
+			sharedDate = Date()
 		}
 
-		// All-or-nothing check passed successfully
+		// Success!
 		return ReceivedTimetable(
 			sender: senderName,
 			subjects: subjects,

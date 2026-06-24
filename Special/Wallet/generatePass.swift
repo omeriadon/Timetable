@@ -62,6 +62,7 @@ func generatePass() throws -> URL {
 
 	// Set date
 	let dateFormatter = ISO8601DateFormatter()
+	dateFormatter.formatOptions = [.withInternetDateTime]
 	let sharedDate = dateFormatter.string(from: Date())
 
 	// Loop through pass styles and update fields cleanly
@@ -99,9 +100,17 @@ func generatePass() throws -> URL {
 				"value": subjectsSummaryString
 			]
 
-			// Build the new additions for the BACK fields
+			// Build the new additions for the back fields
 			let contextBackFields: [[String: Any]] = [
-				["key": "sender", "label": "Sender", "value": name]
+				["key": "sender", "label": "Sender", "value": name],
+
+				[
+					"key": "shared",
+					"label": "Shared On",
+					"value": sharedDate,
+					"dateStyle": "PKDateStyleLong",
+					"timeStyle": "PKDateStyleNone"
+				]
 			] + subjectBackFields + [
 				["key": "amountOfSubjects", "label": "Total Subjects", "value": subjects.count],
 				subjectsSummaryItem

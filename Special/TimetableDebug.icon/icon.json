@@ -38,8 +38,8 @@
       "position" : {
         "scale" : 1.2,
         "translation-in-points" : [
-          102,
-          261
+          76,
+          308
         ]
       },
       "shadow" : {
@@ -90,8 +90,8 @@
       "position" : {
         "scale" : 1.2,
         "translation-in-points" : [
-          102,
-          261
+          76,
+          308
         ]
       },
       "refractivity" : {

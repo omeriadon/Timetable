@@ -14,9 +14,9 @@ final class TimetablePassManager {
 	// Cached array to prevent constant re-computation across views
 	private(set) var receivedTimetables: ReceivedTimetables = []
 	private(set) var isLoading = false
-    
+
 	private let passLibrary = PKPassLibrary()
-    
+
 	init() {
 		// Only load if PassKit is actually available on this device platform (e.g., Mac vs iOS)
 		if PKPassLibrary.isPassLibraryAvailable() {
@@ -29,25 +29,34 @@ final class TimetablePassManager {
 			refreshPasses()
 		}
 	}
-    
+
 	@objc private func passLibraryDidChange(_ notification: Notification) {
 		refreshPasses()
 	}
-    
+
 	/// Scans Apple Wallet on a background thread and updates the cached list
 	func refreshPasses() {
 		print("refreshing")
 		guard PKPassLibrary.isPassLibraryAvailable() else { return }
 		isLoading = true
-        
-		Task(priority: .userInitiated) {
-			// Fetch raw passes from Apple Wallet
-			let allPasses = self.passLibrary.passes()
-			print(allPasses)
 
-			// Map and safely extract your Custom models
+		Task(priority: .userInitiated) {
+			let allPasses = self.passLibrary.passes()
+			print("Found \(allPasses.count) raw passes in Wallet.")
+
+			for (index, pass) in allPasses.enumerated() {
+				print("--- Inspecting Pass \(index) ---")
+				print("Title: \(pass.localizedName)")
+				print("Type ID: \(pass.passTypeIdentifier)")
+				print("Serial: \(pass.serialNumber)")
+				print("UserInfo Dictionary: \(String(describing: pass.userInfo))")
+
+				// See if your custom decoder method is throwing an unhandled nil
+				let converted = pass.toReceivedTimetable()
+				print("Conversion result: \(converted == nil ? "❌ FAILED (Returned nil)" : "✅ SUCCESS")")
+			}
+
 			let extractedTimetables = allPasses.compactMap { $0.toReceivedTimetable() }
-			print(extractedTimetables)
 
 			await MainActor.run {
 				withAnimation(.easeInOut) {
@@ -55,14 +64,13 @@ final class TimetablePassManager {
 					self.isLoading = false
 				}
 			}
-			print("done")
 		}
 	}
-    
+
 	/// Completely deletes a pass from the user's Apple Wallet matching a timetable instance
 	func deletePass(for timetable: ReceivedTimetable) {
 		guard PKPassLibrary.isPassLibraryAvailable() else { return }
-        
+
 		// Find the native pass in the system matchable by its identification characteristics
 		let systemPasses = passLibrary.passes()
 		if let matchingPass = systemPasses.first(where: { $0.toReceivedTimetable()?.id == timetable.id }) {
@@ -70,7 +78,7 @@ final class TimetablePassManager {
 			// Note: The PKPassLibraryDidChange notification will automatically trigger refreshPasses()
 		}
 	}
-    
+
 	/// Handles requests to replace old system metadata safely
 	func updatePass(for timetable: ReceivedTimetable, with updatedSubjects: [Subject]) {
 		// To natively update a pass template, you usually deploy an updated cryptographic .pkpass file
@@ -80,8 +88,8 @@ final class TimetablePassManager {
 	}
 }
 
-// MARK: - Environment Value Injection Support
-
 extension EnvironmentValues {
-	@Entry var passManager: TimetablePassManager = .init()
+	private static let defaultPassManager = TimetablePassManager()
+
+	@Entry var passManager: TimetablePassManager = Self.defaultPassManager
 }
