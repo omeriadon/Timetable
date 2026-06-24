@@ -7,6 +7,7 @@
 
 import SwiftUI
 #if os(iOS)
+import VisualEffectBlurView
 import WatchConnectivity
 
 enum SyncMode {
@@ -47,23 +48,33 @@ struct ContentView: View {
 
 func makeCustomShareImage() -> UIImage? {
 	let config = UIImage.SymbolConfiguration(pointSize: 18, weight: .bold, scale: .large)
-	guard let symbolImage = UIImage(systemName: "square.and.arrow.up", withConfiguration: config) else { return nil }
 
-	let canvasSize = CGSize(width: symbolImage.size.width, height: symbolImage.size.height + 6)
+	// 1. Keep it as .alwaysTemplate here so the tint color applies correctly during rendering
+	guard let symbolImage = UIImage(systemName: "paperplane", withConfiguration: config)?
+		.withTintColor(.systemBlue, renderingMode: .alwaysTemplate)
+	else {
+		return nil
+	}
+
+	let canvasSize = CGSize(
+		width: symbolImage.size.width + 2, // Slight adjustment to prevent clipping on the sides
+		height: symbolImage.size.height + 6
+	)
 
 	let renderer = UIGraphicsImageRenderer(size: canvasSize)
-	let staticImage = renderer.image { _ in
+	let renderedImage = renderer.image { _ in
 		let rect = CGRect(
-			x: 0,
-			y: 0,
+			x: 1,
+			y: 4,
 			width: symbolImage.size.width,
 			height: symbolImage.size.height
 		)
+
 		symbolImage.draw(in: rect)
 	}
 
-	// 4. Return as a raw template, stripping all "fill" metadata out permanently
-	return staticImage.withRenderingMode(.alwaysTemplate)
+	// 2. Crucial Step: Tell the UITabBar to use the original colors of the rendered image
+	return renderedImage.withRenderingMode(.alwaysOriginal)
 }
 
 struct ProminentActionTabView: UIViewControllerRepresentable {
@@ -102,11 +113,10 @@ struct ProminentActionTabView: UIViewControllerRepresentable {
 		context.coordinator.prominentTabIdentifier = prominentTabIdentifier
 	}
 
-	final class Coordinator: NSObject, UITabBarControllerDelegate {
+	/// 2. Conformed Coordinator to UIAdaptivePresentationControllerDelegate
+	final class Coordinator: NSObject, UITabBarControllerDelegate, UIAdaptivePresentationControllerDelegate {
 		var prominentTabIdentifier: String
-
-		private var progressTimer: Timer?
-		private var currentAngle: CGFloat = 0
+		private var activeBlurView: VisualEffectBlurView? // Keep track of the blur view instance
 
 		init(prominentTabIdentifier: String) {
 			self.prominentTabIdentifier = prominentTabIdentifier
@@ -122,75 +132,55 @@ struct ProminentActionTabView: UIViewControllerRepresentable {
 		}
 
 		private func presentSharePassWorkflow(from tabBarController: UITabBarController, currentTab: UITab) {
-			// Avoid triggering multiple tasks if tapped repeatedly while loading
-			guard progressTimer == nil else { return }
-
-			// 1. Start spinning the progress symbol on the main thread
-			startProgressAnimation(for: currentTab)
-
-			// 2. Safely kick off generation on a background core
 			Task.detached(priority: .userInitiated) { [self] in
 				do {
 					let url = try await generatePass()
 
 					await MainActor.run {
-						self.stopProgressAnimation(for: currentTab)
 						self.presentShareSheet(with: url, from: tabBarController)
 					}
 				} catch {
-					Print("[Wallet] Background Share Error: \(error)")
+					print("[Wallet] Background Share Error: \(error)")
 					await MainActor.run {
-						self.stopProgressAnimation(for: currentTab)
 						self.presentErrorAlert(from: tabBarController)
 					}
 				}
 			}
 		}
 
-		// MARK: - Tab Bar Icon Spinner Logic
-
-		private func startProgressAnimation(for tab: UITab) {
-			currentAngle = 0
-
-			progressTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { [weak self] _ in
-				guard let self = self else { return }
-				self.currentAngle += 0.08
-
-				let config = UIImage.SymbolConfiguration(pointSize: 18, weight: .bold, scale: .large)
-				guard let progressImage = UIImage(systemName: "paperplane", withConfiguration: config) else { return }
-
-				let canvasSize = CGSize(width: progressImage.size.width, height: progressImage.size.height + 6)
-				let renderer = UIGraphicsImageRenderer(size: canvasSize)
-
-				let rotatedImage = renderer.image { context in
-					context.cgContext.translateBy(x: canvasSize.width / 2, y: canvasSize.height / 2)
-					context.cgContext.rotate(by: self.currentAngle)
-
-					progressImage.draw(in: CGRect(
-						x: -progressImage.size.width / 2,
-						y: -progressImage.size.height / 2,
-						width: progressImage.size.width,
-						height: progressImage.size.height
-					))
-				}
-
-				tab.image = rotatedImage.withRenderingMode(.alwaysTemplate)
-			}
-		}
-
-		private func stopProgressAnimation(for tab: UITab) {
-			progressTimer?.invalidate()
-			progressTimer = nil
-
-			// Revert seamlessly to your original clean share image layout
-			tab.image = makeCustomShareImage()
-		}
-
-		// MARK: - Presentation Destinations
-
 		private func presentShareSheet(with fileURL: URL, from tabBarController: UITabBarController) {
+			// FIX: Added 'try?' to handle the throwing initializer safely
+			guard let blurView = try? VisualEffectBlurView(blurEffectStyle: .regular) else {
+				print("Error: VisualEffectBlurView failed to initialize.")
+				return
+			}
+
+			blurView.blurRadius = 0
+			blurView.frame = tabBarController.view.bounds
+			blurView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+			tabBarController.view.addSubview(blurView)
+			activeBlurView = blurView
+
+			// 1. Animate the blur radius up to 5px over 0.4 seconds
+			UIView.animate(withDuration: 0.4, delay: 0, options: .curveEaseInOut, animations: {
+				blurView.blurRadius = 4
+			}, completion: nil)
+
 			let activityViewController = UIActivityViewController(activityItems: [fileURL], applicationActivities: nil)
 
+			// Assign the presentation delegate to catch interactive swipe-to-dismiss actions
+			activityViewController.presentationController?.delegate = self
+
+			// Fallback handler for button-based dismissals (like tapping an action or "Close")
+			activityViewController.completionWithItemsHandler = { [weak self, weak tabBarController] _, _, _, _ in
+				guard let self = self else { return }
+				// Only run if the swipe gesture delegate didn't already clean it up
+				if self.activeBlurView?.superview != nil {
+					self.animateBlurOut(alongside: tabBarController?.transitionCoordinator)
+				}
+			}
+
+			// Popover presentation configuration for iPad
 			if let popoverController = activityViewController.popoverPresentationController {
 				popoverController.sourceView = tabBarController.tabBar
 				let tabBarWidth = tabBarController.tabBar.frame.width
@@ -203,6 +193,32 @@ struct ProminentActionTabView: UIViewControllerRepresentable {
 			}
 
 			tabBarController.present(activityViewController, animated: true)
+		}
+
+		/// 7. This triggers the split second a user starts interactively swiping down the share sheet
+		func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
+			animateBlurOut(alongside: presentationController.presentedViewController.transitionCoordinator)
+		}
+
+		/// Helper method to handle the matching 0.4s ease-out animation
+		private func animateBlurOut(alongside coordinator: UIViewControllerTransitionCoordinator?) {
+			guard let blurView = activeBlurView else { return }
+
+			if let coordinator = coordinator {
+				coordinator.animate(alongsideTransition: { _ in
+					blurView.blurRadius = 0
+				}, completion: { _ in
+					blurView.removeFromSuperview()
+					self.activeBlurView = nil
+				})
+			} else {
+				UIView.animate(withDuration: 0.4, delay: 0, options: .curveEaseInOut, animations: {
+					blurView.blurRadius = 0
+				}, completion: { _ in
+					blurView.removeFromSuperview()
+					self.activeBlurView = nil
+				})
+			}
 		}
 
 		private func presentErrorAlert(from tabBarController: UITabBarController) {

@@ -1,5 +1,5 @@
 {
-  "originHash" : "d9f41c4ab9f27ecfabac5858694eda283e2136e7fcc6065f14d47ba4d66a014f",
+  "originHash" : "76fa546c4f97a2c851a00c37592b178be6709ac2ed54d19d849c552a52ac872b",
   "pins" : [
     {
       "identity" : "defaults",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "00a7465a0668a87fa159e779b9d80f1f9652357e",
         "version" : "9.0.9"
+      }
+    },
+    {
+      "identity" : "dgswiftutilities",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/dominicstop/DGSwiftUtilities",
+      "state" : {
+        "revision" : "54b490d618a22b21a1b7ed70f5a824eaa65c89e9",
+        "version" : "0.47.0"
       }
     },
     {
@@ -53,6 +62,15 @@
       "state" : {
         "revision" : "79e4b74a295b6eb74a8b585e3a39d29e70c1dbd1",
         "version" : "603.0.2"
+      }
+    },
+    {
+      "identity" : "visualeffectblurview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/dominicstop/VisualEffectBlurView.git",
+      "state" : {
+        "revision" : "ccfe9e564678832db2dff717664d7a9e52255737",
+        "version" : "7.3.1"
       }
     },
     {
