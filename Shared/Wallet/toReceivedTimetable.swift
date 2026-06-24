@@ -71,7 +71,6 @@ extension PKPass {
 			if let alreadyDate = rawShared as? Date {
 				sharedDate = alreadyDate
 			} else if let dateString = rawShared as? String {
-
 				let fallbackFormatter = DateFormatter()
 				fallbackFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
 				fallbackFormatter.locale = Locale(identifier: "en_US_POSIX")
@@ -94,11 +93,13 @@ extension PKPass {
 			sharedDate = Date()
 		}
 
-		// Success!
-		return ReceivedTimetable(
+		var timetable = ReceivedTimetable(
 			sender: senderName,
 			subjects: subjects,
 			receivedAt: sharedDate
 		)
+		timetable.id = self.serialNumber
+
+		return timetable
 	}
 }

@@ -1194,8 +1194,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/omeriadon/ZIPFoundation";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.9.20;
+				branch = development;
+				kind = branch;
 			};
 		};
 		2A43AFD02FE810C900BBC8BD /* XCRemoteSwiftPackageReference "OpenSSL-Package" */ = {

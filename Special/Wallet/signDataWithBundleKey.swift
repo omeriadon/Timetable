@@ -31,7 +31,7 @@ func getOpenSSLError() -> String {
 	return "Unknown OpenSSL Error (Code: \(errorCode))"
 }
 
-func signDataWithBundledKey(_ manifestData: Data) throws -> Data {
+nonisolated func signDataWithBundledKey(_ manifestData: Data) throws -> Data {
 	// 1. Initialize OpenSSL configuration so it recognizes key formats
 	OSSL_PROVIDER_load(nil, "default")
 	OpenSSL_add_all_algorithms()

@@ -5,9 +5,16 @@
 //  Created by Adon Omeri on 22/6/2026.
 //
 
+import Defaults
 import Foundation
 import PassKit
 import SwiftUI
+
+enum TimetableInWalletState {
+	case inWalletUpToDate
+	case inWalletNotUpToDate
+	case notInWallet
+}
 
 @Observable
 final class TimetablePassManager {
@@ -31,6 +38,7 @@ final class TimetablePassManager {
 	}
 
 	@objc private func passLibraryDidChange(_ notification: Notification) {
+		print("passLibraryDidChange")
 		refreshPasses()
 	}
 
@@ -69,15 +77,58 @@ final class TimetablePassManager {
 
 	/// Completely deletes a pass from the user's Apple Wallet matching a timetable instance
 	func deletePass(for timetable: ReceivedTimetable) {
+		print("deletePass")
 		guard PKPassLibrary.isPassLibraryAvailable() else { return }
 
 		// Find the native pass in the system matchable by its identification characteristics
 		let systemPasses = passLibrary.passes()
-		if let matchingPass = systemPasses.first(where: { $0.toReceivedTimetable()?.id == timetable.id }) {
+
+		// ✨ THE FIX: Match based on stable values (sender + timestamp) instead of the volatile random UUID
+		let matchingPass = systemPasses.first { pass in
+			guard let extracted = pass.toReceivedTimetable() else { return false }
+			return extracted.sender == timetable.sender && extracted.receivedAt == timetable.receivedAt
+		}
+
+		if let matchingPass {
 			passLibrary.removePass(matchingPass)
 			// Note: The PKPassLibraryDidChange notification will automatically trigger refreshPasses()
+			print("pass found and removed!")
+		} else {
+			print("pass not found")
 		}
 	}
+
+	#if !os(watchOS)
+	func isSelfTimetableUpToDate() -> TimetableInWalletState {
+		guard PKPassLibrary.isPassLibraryAvailable() else { return .inWalletUpToDate }
+
+		let systemPasses = passLibrary.passes()
+
+		let matchingPass: PKPass? = systemPasses.first { pass in
+			pass.serialNumber == DeviceIDProvider().getDeviceID()
+		}
+
+		if let matchingPass {
+			if let extractedTimetable = matchingPass.toReceivedTimetable() {
+				if extractedTimetable.sender == Defaults[.userDisplayName],
+				   extractedTimetable.subjects == Defaults[.timetable]
+				{
+					print("pass found, up to date")
+					return .inWalletUpToDate
+				} else {
+					print("pass found, not up to date")
+					return .inWalletNotUpToDate
+				}
+			} else {
+				return .notInWallet
+			}
+
+		} else {
+			print("pass not found")
+			return .notInWallet
+		}
+	}
+	#endif // !os(watchOS)
 
 	/// Handles requests to replace old system metadata safely
 	func updatePass(for timetable: ReceivedTimetable, with updatedSubjects: [Subject]) {

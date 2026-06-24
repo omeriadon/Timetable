@@ -58,6 +58,9 @@ struct ReceivedTimetablesView: View {
 					.contextMenu {
 						contextMenuButtons(for: timetable)
 					}
+					.swipeActions(edge: .trailing, allowsFullSwipe: false) {
+						contextMenuButtons(for: timetable)
+					}
 				}
 			}
 			.alert("Rename Timetable", item: $renameItem) { item in

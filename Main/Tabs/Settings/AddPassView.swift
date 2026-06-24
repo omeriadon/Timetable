@@ -20,6 +20,8 @@ struct AddPassView: View {
 	@State private var currentState: PassState = .idle
 	@State private var walletButtonID = UUID()
 
+	@Environment(\.passManager) var passManager
+
 	var body: some View {
 		ZStack {
 			if !PKAddPassesViewController.canAddPasses() {
@@ -29,11 +31,27 @@ struct AddPassView: View {
 			} else {
 				switch currentState {
 					case .idle:
-						Button {
-							generatePassAsync()
-						} label: {
-							Label("Generate Apple Wallet Pass", systemImage: "wallet.pass")
-								.foregroundStyle(.accent)
+						ZStack {
+							switch passManager.isSelfTimetableUpToDate() {
+								case .notInWallet:
+									Button {
+										generatePassAsync()
+									} label: {
+										Label("Generate Apple Wallet Pass", systemImage: "wallet.pass")
+											.foregroundStyle(.accent)
+									}
+								case .inWalletNotUpToDate:
+									Button {
+										generatePassAsync()
+									} label: {
+										Label("Generate Apple Wallet Pass", systemImage: "wallet.pass")
+											.foregroundStyle(.accent)
+										Text("Your pass in Wallet is not up to date")
+											.foregroundStyle(.red)
+									}
+								case .inWalletUpToDate:
+									Label("Your pass in Wallet is up to date", systemImage: "checkmark")
+							}
 						}
 						.transition(.blurReplace)
 

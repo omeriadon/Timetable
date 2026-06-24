@@ -184,6 +184,8 @@ struct SettingsView: View {
 				.matchedTransitionSource(id: "unique_transition_id", in: ns)
 				.sheet(isPresented: $showEditReceivedTimetablesSheet) {
 					ReceivedTimetablesView()
+						.presentationDetents([.fraction(0.8)])
+						.presentationDragIndicator(.hidden)
 					#if os(iOS)
 						.navigationTransition(
 							.zoom(sourceID: "unique_transition_id", in: ns)

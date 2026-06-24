@@ -83,6 +83,7 @@ struct TimetableView: View {
 								.frame(width: 15)
 
 								mainContent(subjectLookup: subjectLookup)
+									.drawingGroup(opaque: false)
 							}
 						}
 						.padding(.bottom, Device.isMacOS ? 7 : 10)

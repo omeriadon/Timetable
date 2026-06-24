@@ -20,7 +20,7 @@ enum PassError: Error {
 
 typealias JSON = [String: Any]
 
-func generatePass() throws -> URL {
+nonisolated func generatePass() throws -> URL {
 	// get data
 	let subjects = Defaults[.timetable]
 	let name = Defaults[.userDisplayName]

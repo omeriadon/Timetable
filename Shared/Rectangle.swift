@@ -69,7 +69,7 @@ import SwiftUI
 			.padding(5)
 			.overlay(
 				RoundedRectangle(cornerRadius: isBreak ? 8 : 10)
-					.strokeBorder(Color.white, lineWidth: selected ? 4 : 0)
+					.strokeBorder(Color.white, lineWidth: selected ? 2 : 0)
 					.transaction { t in
 						t.animation = nil
 					}
