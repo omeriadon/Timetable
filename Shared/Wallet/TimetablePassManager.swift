@@ -38,30 +38,30 @@ final class TimetablePassManager {
 	}
 
 	@objc private func passLibraryDidChange(_ notification: Notification) {
-		print("passLibraryDidChange")
+		Print("passLibraryDidChange")
 		refreshPasses()
 	}
 
 	/// Scans Apple Wallet on a background thread and updates the cached list
 	func refreshPasses() {
-		print("refreshing")
+		Print("refreshing")
 		guard PKPassLibrary.isPassLibraryAvailable() else { return }
 		isLoading = true
 
 		Task(priority: .userInitiated) {
 			let allPasses = self.passLibrary.passes()
-			print("Found \(allPasses.count) raw passes in Wallet.")
+			Print("Found \(allPasses.count) raw passes in Wallet.")
 
 			for (index, pass) in allPasses.enumerated() {
-				print("--- Inspecting Pass \(index) ---")
-				print("Title: \(pass.localizedName)")
-				print("Type ID: \(pass.passTypeIdentifier)")
-				print("Serial: \(pass.serialNumber)")
-				print("UserInfo Dictionary: \(String(describing: pass.userInfo))")
+				Print("--- Inspecting Pass \(index) ---")
+				Print("Title: \(pass.localizedName)")
+				Print("Type ID: \(pass.passTypeIdentifier)")
+				Print("Serial: \(pass.serialNumber)")
+				Print("UserInfo Dictionary: \(String(describing: pass.userInfo))")
 
 				// See if your custom decoder method is throwing an unhandled nil
 				let converted = pass.toReceivedTimetable()
-				print("Conversion result: \(converted == nil ? "❌ FAILED (Returned nil)" : "✅ SUCCESS")")
+				Print("Conversion result: \(converted == nil ? "❌ FAILED (Returned nil)" : "✅ SUCCESS")")
 			}
 
 			let extractedTimetables = allPasses.compactMap { $0.toReceivedTimetable() }
@@ -77,7 +77,7 @@ final class TimetablePassManager {
 
 	/// Completely deletes a pass from the user's Apple Wallet matching a timetable instance
 	func deletePass(for timetable: ReceivedTimetable) {
-		print("deletePass")
+		Print("deletePass")
 		guard PKPassLibrary.isPassLibraryAvailable() else { return }
 
 		// Find the native pass in the system matchable by its identification characteristics
@@ -92,9 +92,9 @@ final class TimetablePassManager {
 		if let matchingPass {
 			passLibrary.removePass(matchingPass)
 			// Note: The PKPassLibraryDidChange notification will automatically trigger refreshPasses()
-			print("pass found and removed!")
+			Print("pass found and removed!")
 		} else {
-			print("pass not found")
+			Print("pass not found")
 		}
 	}
 
@@ -113,10 +113,10 @@ final class TimetablePassManager {
 				if extractedTimetable.sender == Defaults[.userDisplayName],
 				   extractedTimetable.subjects == Defaults[.timetable]
 				{
-					print("pass found, up to date")
+					Print("pass found, up to date")
 					return .inWalletUpToDate
 				} else {
-					print("pass found, not up to date")
+					Print("pass found, not up to date")
 					return .inWalletNotUpToDate
 				}
 			} else {
@@ -124,7 +124,7 @@ final class TimetablePassManager {
 			}
 
 		} else {
-			print("pass not found")
+			Print("pass not found")
 			return .notInWallet
 		}
 	}
@@ -135,7 +135,7 @@ final class TimetablePassManager {
 		// To natively update a pass template, you usually deploy an updated cryptographic .pkpass file
 		// package back into the library, or update via push notifications if connected to a web service.
 		// For localized updates, regenerate your pass with new info and re-add it using `PKPassLibrary.replacePass(with:)`
-		print("Update pass triggered for \(timetable.sender). Regenerate and call replacePass(with:)")
+		Print("Update pass triggered for \(timetable.sender). Regenerate and call replacePass(with:)")
 	}
 }
 

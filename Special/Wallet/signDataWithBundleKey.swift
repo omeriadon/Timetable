@@ -18,7 +18,7 @@ enum SigningError: Error {
 }
 
 /// Helper to extract the concrete OpenSSL error string
-func getOpenSSLError() -> String {
+nonisolated func getOpenSSLError() -> String {
 	let errorCode = ERR_get_error()
 	if errorCode == 0 { return "No OpenSSL error code recorded." }
 
@@ -59,28 +59,29 @@ nonisolated func signDataWithBundledKey(_ manifestData: Data) throws -> Data {
 
 	// 4. Try parsing the private key
 	guard let pkey = PEM_read_bio_PrivateKey(pkeyBio, nil, nil, nil) else {
-		print("❌ OpenSSL Private Key Parsing Failed!")
-		print("Detailed OpenSSL Error: \(getOpenSSLError())")
+		Print("❌ OpenSSL Private Key Parsing Failed!")
+		Print("Detailed OpenSSL Error: \(getOpenSSLError())")
 		throw SigningError.parsePrivateKeyFailed
 	}
-	print("✅ Private key parsed successfully: \(pkey)")
+	Print("✅ Private key parsed successfully: \(pkey)")
 	defer { EVP_PKEY_free(pkey) }
 
 	// 5. Try parsing the certificate
 	guard let cert = PEM_read_bio_X509(certBio, nil, nil, nil) else {
-		print("❌ OpenSSL Certificate Parsing Failed!")
-		print("Detailed OpenSSL Error: \(getOpenSSLError())")
+		Print("❌ OpenSSL Certificate Parsing Failed!")
+		Print("Detailed OpenSSL Error: \(getOpenSSLError())")
 		throw SigningError.parseCertificateFailed
 	}
-	print("✅ Certificate parsed successfully: \(cert)")
+	Print("✅ Certificate parsed successfully: \(cert)")
 	defer { X509_free(cert) }
 
 	// 6. Generate the PKCS7 Signature envelope
 	let signingFlags: Int32 = PKCS7_DETACHED | PKCS7_BINARY
 
 	guard let pkcs7Structure = PKCS7_sign(cert, pkey, nil, manifestBio, signingFlags) else {
-		print("❌ PKCS7 Signing Failed!")
-		print("Detailed OpenSSL Error: \(getOpenSSLError())")
+		Print("❌ PKCS7 Signing Failed!")
+		let error = getOpenSSLError()
+		Print("Detailed OpenSSL Error: \( error)")
 		throw SigningError.signingFailed
 	}
 	defer { PKCS7_free(pkcs7Structure) }

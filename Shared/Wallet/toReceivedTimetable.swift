@@ -17,13 +17,13 @@ extension PKPass {
 
 		// 1. Grab the raw userInfo object
 		guard let userInfo = self.userInfo else {
-			print("❌ Pass Parsing Error: userInfo dictionary is completely missing.")
+			Print("❌ Pass Parsing Error: userInfo dictionary is completely missing.")
 			return nil
 		}
 
 		// 2. Extract the timetable array payload
 		guard let rawData = userInfo["rawTimetableData"] else {
-			print("❌ Pass Parsing Error: 'rawTimetableData' key is missing from userInfo.")
+			Print("❌ Pass Parsing Error: 'rawTimetableData' key is missing from userInfo.")
 			return nil
 		}
 
@@ -36,14 +36,14 @@ extension PKPass {
 			do {
 				jsonData = try JSONSerialization.data(withJSONObject: rawData, options: [])
 			} catch {
-				print("❌ Pass Parsing Error: JSONSerialization failed: \(error)")
+				Print("❌ Pass Parsing Error: JSONSerialization failed: \(error)")
 				return nil
 			}
 		}
 
 		// 4. Decode the subject data layout
 		guard let subjects = try? JSONDecoder().decode([Subject].self, from: jsonData) else {
-			print("❌ Pass Parsing Error: JSON structure layout does not match your [Subject] model.")
+			Print("❌ Pass Parsing Error: JSON structure layout does not match your [Subject] model.")
 			return nil
 		}
 
@@ -54,7 +54,7 @@ extension PKPass {
 		} else if let passFieldSender = self.localizedValue(forFieldKey: "sender") as? String {
 			senderName = passFieldSender
 		} else {
-			print("❌ Pass Parsing Error: 'sender' identifier not found in userInfo or pass fields.")
+			Print("❌ Pass Parsing Error: 'sender' identifier not found in userInfo or pass fields.")
 			return nil
 		}
 
@@ -81,15 +81,15 @@ extension PKPass {
 				if let parsed = ISO8601DateFormatter().date(from: dateString) ?? fallbackFormatter.date(from: dateString) {
 					sharedDate = parsed
 				} else {
-					print("⚠️ Pass Parsing Warning: 'shared' text found but formatting failed: \(dateString). Defaulting to current date.")
+					Print("⚠️ Pass Parsing Warning: 'shared' text found but formatting failed: \(dateString). Defaulting to current date.")
 					sharedDate = Date()
 				}
 			} else {
-				print("⚠️ Pass Parsing Warning: 'shared' field is an unexpected type. Defaulting to current date.")
+				Print("⚠️ Pass Parsing Warning: 'shared' field is an unexpected type. Defaulting to current date.")
 				sharedDate = Date()
 			}
 		} else {
-			print("⚠️ Pass Parsing Warning: 'shared' key not found in userInfo or pass fields. Defaulting to current date.")
+			Print("⚠️ Pass Parsing Warning: 'shared' key not found in userInfo or pass fields. Defaulting to current date.")
 			sharedDate = Date()
 		}
 

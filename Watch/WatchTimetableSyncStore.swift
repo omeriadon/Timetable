@@ -71,7 +71,7 @@ final class WatchTimetableSyncStore: NSObject, WCSessionDelegate {
 			do {
 				Defaults[.timetable] = try JSONDecoder().decode([Subject].self, from: timetableData)
 			} catch {
-				print("[Watch] timetable decode failed: \(error)")
+				Print("[Watch] timetable decode failed: \(error)")
 			}
 		}
 
@@ -80,7 +80,7 @@ final class WatchTimetableSyncStore: NSObject, WCSessionDelegate {
 			do {
 				Defaults[.receivedTimetables] = try JSONDecoder().decode([ReceivedTimetable].self, from: receivedData)
 			} catch {
-				print("[Watch] receivedTimetables decode failed: \(error)")
+				Print("[Watch] receivedTimetables decode failed: \(error)")
 			}
 		}
 

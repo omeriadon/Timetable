@@ -14,7 +14,7 @@ final class PhoneWatchSyncBridge: NSObject, WCSessionDelegate {
 
 	func activateIfNeeded() {
 		guard WCSession.isSupported() else {
-			print("[iOS] WCSession not supported on this device")
+			Print("[iOS] WCSession not supported on this device")
 			return
 		}
 		guard !isActivated else { return }
@@ -23,7 +23,7 @@ final class PhoneWatchSyncBridge: NSObject, WCSessionDelegate {
 		session.delegate = self
 		session.activate()
 		isActivated = true
-		print("[iOS] WCSession activate() called")
+		Print("[iOS] WCSession activate() called")
 	}
 
 	func pushTimetable() {
@@ -47,17 +47,17 @@ final class PhoneWatchSyncBridge: NSObject, WCSessionDelegate {
 
 			if session.isReachable {
 				session.sendMessage(payload, replyHandler: nil) { error in
-					print("Watch live sync failed: \(error.localizedDescription)")
+					Print("Watch live sync failed: \(error.localizedDescription)")
 				}
 			}
 		} catch {
-			print("Error encoding or updating application context: \(error.localizedDescription)")
+			Print("Error encoding or updating application context: \(error.localizedDescription)")
 		}
 	}
 
 	func session(_: WCSession, activationDidCompleteWith _: WCSessionActivationState, error: Error?) {
 		if let error {
-			print("WatchConnectivity activation failed: \(error.localizedDescription)")
+			Print("WatchConnectivity activation failed: \(error.localizedDescription)")
 		}
 	}
 

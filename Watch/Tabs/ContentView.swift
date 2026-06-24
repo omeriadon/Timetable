@@ -54,12 +54,12 @@ struct ContentView: View {
 		.environment(\.dynamicTypeSize, .xSmall)
 		.monospaced()
 		.onAppear {
-			print("[Watch] ContentView appeared")
+			Print("[Watch] ContentView appeared")
 			syncStore.activateIfNeeded()
 		}
 		.onChange(of: syncStore.alertMessage) { _, newValue in
 			guard let newValue else { return }
-			print("[Watch] Surface error icon: \(newValue)")
+			Print("[Watch] Surface error icon: \(newValue)")
 			flashSyncErrorIcon()
 			syncStore.alertMessage = nil
 		}

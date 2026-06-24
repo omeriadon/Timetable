@@ -20,10 +20,14 @@ enum PassError: Error {
 
 typealias JSON = [String: Any]
 
-nonisolated func generatePass() throws -> URL {
+nonisolated func generatePass() async throws -> URL {
+
+	let startTime = ContinuousClock.now
+
+
 	// get data
-	let subjects = Defaults[.timetable]
-	let name = Defaults[.userDisplayName]
+	let subjects = await Defaults[.timetable]
+	let name = await Defaults[.userDisplayName]
 
 	let fileManager = FileManager.default
 
@@ -58,7 +62,7 @@ nonisolated func generatePass() throws -> URL {
 	passDict["userInfo"] = userInfo
 
 	// Set serial number
-	passDict["serialNumber"] = DeviceIDProvider().getDeviceID()
+	passDict["serialNumber"] = await DeviceIDProvider().getDeviceID()
 
 	// Set date
 	let dateFormatter = ISO8601DateFormatter()
@@ -164,7 +168,7 @@ nonisolated func generatePass() throws -> URL {
 	}
 
 	// This print statement will now look like clean Swift dictionaries, no __NSArrayM!
-	print(passDict)
+	Print(passDict)
 
 	// Write the modified JSON back into the working folder
 	let modifiedJSONData = try JSONSerialization.data(withJSONObject: passDict, options: .prettyPrinted)
@@ -203,7 +207,7 @@ nonisolated func generatePass() throws -> URL {
 		let signatureData = try signDataWithBundledKey(manifestData)
 		try signatureData.write(to: signatureURL)
 	} catch {
-		print("Cryptographic signing failed: \(error)")
+		Print("Cryptographic signing failed: \(error)")
 		throw PassError.signingFailed
 	}
 
@@ -212,9 +216,12 @@ nonisolated func generatePass() throws -> URL {
 
 	do {
 		try fileManager.zipItem(at: passWorkingURL, to: finalPkpassURL, shouldKeepParent: false)
+
+		let elapsedTime = ContinuousClock.now - startTime
+		Print("Pass generation took: \(elapsedTime)")
 		return finalPkpassURL
 	} catch {
-		print("Zipping up your .pkpass archive failed: \(error)")
+		Print("Zipping up your .pkpass archive failed: \(error)")
 		throw PassError.zipFailed
 	}
 }

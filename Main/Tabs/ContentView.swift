@@ -105,10 +105,11 @@ struct ProminentActionTabView: UIViewControllerRepresentable {
 	final class Coordinator: NSObject, UITabBarControllerDelegate {
 		var prominentTabIdentifier: String
 
+		private var progressTimer: Timer?
+		private var currentAngle: CGFloat = 0
 
 		init(prominentTabIdentifier: String) {
 			self.prominentTabIdentifier = prominentTabIdentifier
-
 		}
 
 		func tabBarController(_ tabBarController: UITabBarController, shouldSelectTab tab: UITab) -> Bool {
@@ -116,60 +117,80 @@ struct ProminentActionTabView: UIViewControllerRepresentable {
 				return true
 			}
 
-			// Intercept the tab press and kick off the asynchronous workflow
-			presentSharePassWorkflow(from: tabBarController)
+			presentSharePassWorkflow(from: tabBarController, currentTab: tab)
 			return false
 		}
 
-		private func presentSharePassWorkflow(from tabBarController: UITabBarController) {
-			guard tabBarController.presentedViewController == nil else { return }
+		private func presentSharePassWorkflow(from tabBarController: UITabBarController, currentTab: UITab) {
+			// Avoid triggering multiple tasks if tapped repeatedly while loading
+			guard progressTimer == nil else { return }
 
+			// 1. Start spinning the progress symbol on the main thread
+			startProgressAnimation(for: currentTab)
 
-			let loadingVC = UIViewController()
-			loadingVC.modalPresentationStyle = .overFullScreen
-			loadingVC.modalTransitionStyle = .crossDissolve
+			// 2. Safely kick off generation on a background core
+			Task.detached(priority: .userInitiated) { [self] in
+				do {
+					let url = try await generatePass()
 
-			let blurEffect = UIBlurEffect(style: .systemMaterial)
-			let blurView = UIVisualEffectView(effect: blurEffect)
-			blurView.frame = loadingVC.view.bounds
-			blurView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-			loadingVC.view.addSubview(blurView)
-
-			let spinner = UIActivityIndicatorView(style: .large)
-			spinner.center = loadingVC.view.center
-			spinner.startAnimating()
-			loadingVC.view.addSubview(spinner)
-
-			tabBarController.present(loadingVC, animated: true) {
-
-				Task.detached(priority: .userInitiated) { [self] in
-					do {
-
-						let url = try generatePass()
-
-
-						await MainActor.run {
-							loadingVC.dismiss(animated: true) {
-								self.presentShareSheet(with: url, from: tabBarController)
-							}
-						}
-					} catch {
-						print("[Wallet] Background Share Error: \(error)")
-						await MainActor.run {
-							loadingVC.dismiss(animated: true) {
-								self.presentErrorAlert(from: tabBarController)
-							}
-						}
+					await MainActor.run {
+						self.stopProgressAnimation(for: currentTab)
+						self.presentShareSheet(with: url, from: tabBarController)
+					}
+				} catch {
+					Print("[Wallet] Background Share Error: \(error)")
+					await MainActor.run {
+						self.stopProgressAnimation(for: currentTab)
+						self.presentErrorAlert(from: tabBarController)
 					}
 				}
 			}
 		}
 
+		// MARK: - Tab Bar Icon Spinner Logic
+
+		private func startProgressAnimation(for tab: UITab) {
+			currentAngle = 0
+
+			progressTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { [weak self] _ in
+				guard let self = self else { return }
+				self.currentAngle += 0.08
+
+				let config = UIImage.SymbolConfiguration(pointSize: 18, weight: .bold, scale: .large)
+				guard let progressImage = UIImage(systemName: "paperplane", withConfiguration: config) else { return }
+
+				let canvasSize = CGSize(width: progressImage.size.width, height: progressImage.size.height + 6)
+				let renderer = UIGraphicsImageRenderer(size: canvasSize)
+
+				let rotatedImage = renderer.image { context in
+					context.cgContext.translateBy(x: canvasSize.width / 2, y: canvasSize.height / 2)
+					context.cgContext.rotate(by: self.currentAngle)
+
+					progressImage.draw(in: CGRect(
+						x: -progressImage.size.width / 2,
+						y: -progressImage.size.height / 2,
+						width: progressImage.size.width,
+						height: progressImage.size.height
+					))
+				}
+
+				tab.image = rotatedImage.withRenderingMode(.alwaysTemplate)
+			}
+		}
+
+		private func stopProgressAnimation(for tab: UITab) {
+			progressTimer?.invalidate()
+			progressTimer = nil
+
+			// Revert seamlessly to your original clean share image layout
+			tab.image = makeCustomShareImage()
+		}
+
+		// MARK: - Presentation Destinations
+
 		private func presentShareSheet(with fileURL: URL, from tabBarController: UITabBarController) {
-			// Passing a local file URL pointing to a '.pkpass' enables standard file system operations natively
 			let activityViewController = UIActivityViewController(activityItems: [fileURL], applicationActivities: nil)
 
-			// Prevent crashes on iPad layouts by explicitly pinning the anchor popover layout
 			if let popoverController = activityViewController.popoverPresentationController {
 				popoverController.sourceView = tabBarController.tabBar
 				let tabBarWidth = tabBarController.tabBar.frame.width

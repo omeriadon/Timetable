@@ -106,7 +106,7 @@ struct CalendarImportView: View {
 		calendarImportStep = .error(error)
 		calendarImportStatus = .error
 		Task {
-			print("[iOS] error: \(error)")
+			Print("[iOS] error: \(error)")
 			try? await Task.sleep(for: .seconds(2))
 			dismiss()
 		}
@@ -114,12 +114,12 @@ struct CalendarImportView: View {
 
 	func performCalendarImport() async {
 		do {
-			print("[iOS] Calendar Import: Starting authorization check...")
+			Print("[iOS] Calendar Import: Starting authorization check...")
 			await moveForward(to: .checkingAuthorisation)
 
 			let eventStore = EKEventStore()
 
-			print("[iOS] Calendar Import: Requesting calendar access...")
+			Print("[iOS] Calendar Import: Requesting calendar access...")
 			await moveForward(to: .requestionCalendarAccess)
 
 			let authorized = try await eventStore.requestFullAccessToEvents()
@@ -129,7 +129,7 @@ struct CalendarImportView: View {
 				return
 			}
 
-			print("[iOS] Calendar Import: Searching for Compass calendar...")
+			Print("[iOS] Calendar Import: Searching for Compass calendar...")
 			await moveForward(to: .findingCalendar)
 
 			guard let calendar = eventStore.calendars(for: .event).first(where: { $0.title.contains("Compass") }) else {
@@ -139,21 +139,21 @@ struct CalendarImportView: View {
 				return
 			}
 
-			print("[iOS] Calendar Import: Fetching events...")
+			Print("[iOS] Calendar Import: Fetching events...")
 			await moveForward(to: .fetchingEvents)
 
 			let events = try await fetchCompassEvents(from: eventStore, calendar: calendar)
 
-			print("[iOS] Calendar Import: Matching events to time slots...")
+			Print("[iOS] Calendar Import: Matching events to time slots...")
 			await moveForward(to: .matchingEvents)
 
 			let importedSubjects = try await matchEventsToTimeSlots(events)
 
-			print("[iOS] Calendar Import: Processing subjects...")
+			Print("[iOS] Calendar Import: Processing subjects...")
 			await moveForward(to: .processingSubjects)
 			let translatedSubjects = translateSubjects(importedSubjects)
 
-			print("[iOS] Calendar Import: Validating...")
+			Print("[iOS] Calendar Import: Validating...")
 			await moveForward(to: .finalising)
 
 			subjects = translatedSubjects
@@ -161,7 +161,7 @@ struct CalendarImportView: View {
 				.filter { !$0.slots.isEmpty }
 
 			await moveForward(to: .done)
-			print("[iOS] Calendar Import: Success!")
+			Print("[iOS] Calendar Import: Success!")
 			calendarImportStatus = .success
 			try? await Task.sleep(for: .seconds(2))
 			dismiss()

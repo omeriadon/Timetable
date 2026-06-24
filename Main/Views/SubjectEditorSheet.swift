@@ -348,10 +348,10 @@ struct SubjectEditorSheet: View {
 
 				if let focus {
 					if let index = draftSubjects.firstIndex(where: { $0.name == focus || $0.originalName == focus }) {
-						print("[iOS] Editor focus: found '\(focus)' at index \(index)")
+						Print("[iOS] Editor focus: found '\(focus)' at index \(index)")
 						editorPage = index
 					} else {
-						print("[iOS] Editor focus: '\(focus)' NOT FOUND, defaulting to 0. Available: \(draftSubjects.map(\.name).joined(separator: ", "))")
+						Print("[iOS] Editor focus: '\(focus)' NOT FOUND, defaulting to 0. Available: \(draftSubjects.map(\.name).joined(separator: ", "))")
 						editorPage = 0
 					}
 				} else {

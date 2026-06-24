@@ -15,10 +15,10 @@ func syncToWatchAsync(
 ) async {
 	let startedAt = Date()
 	statusUpdate(.loading)
-	print("[iOS] Starting WatchConnectivity sync...")
+	Print("[iOS] Starting WatchConnectivity sync...")
 
 	watchSync.pushTimetable()
-	print("[iOS] ✓ Sync request sent to watch")
+	Print("[iOS] ✓ Sync request sent to watch")
 
 	let elapsed = Date().timeIntervalSince(startedAt)
 	if elapsed < 0.35 {
@@ -27,7 +27,7 @@ func syncToWatchAsync(
 	}
 
 	statusUpdate(.success)
-	print("[iOS] Sync completed, showing checkmark")
+	Print("[iOS] Sync completed, showing checkmark")
 
 	try? await Task.sleep(nanoseconds: 1_000_000_000)
 	statusUpdate(.normal)

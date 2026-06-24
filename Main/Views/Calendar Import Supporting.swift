@@ -34,7 +34,7 @@ func fetchCompassEvents(from store: EKEventStore, calendar: EKCalendar) async th
 	let predicate = store.predicateForEvents(withStart: startDate, end: endDate, calendars: [calendar])
 	let events = store.events(matching: predicate)
 
-	print("[iOS] Fetched \(events.count) events from Compass calendar")
+	Print("[iOS] Fetched \(events.count) events from Compass calendar")
 	return events
 }
 

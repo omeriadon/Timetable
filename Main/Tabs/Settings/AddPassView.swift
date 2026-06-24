@@ -100,7 +100,7 @@ struct AddPassView: View {
 
 		Task(priority: .userInitiated) {
 			do {
-				let url = try generatePass()
+				let url = try await generatePass()
 				let passData = try Data(contentsOf: url)
 				let pass = try PKPass(data: passData)
 
@@ -110,7 +110,7 @@ struct AddPassView: View {
 					}
 				}
 			} catch {
-				print("[Wallet] Error generating pass: \(error)")
+				Print("[Wallet] Error generating pass: \(error)")
 				await MainActor.run {
 					withAnimation(.easeInOut) {
 						currentState = .error
