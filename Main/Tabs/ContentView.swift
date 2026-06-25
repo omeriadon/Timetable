@@ -7,19 +7,18 @@
 
 import SwiftUI
 #if os(iOS)
-import VisualEffectBlurView
 import WatchConnectivity
 
 enum SyncMode {
 	case normal, loading, success, error
 }
-#endif // os(iOS)
+#endif
 
 struct ContentView: View {
 #if os(iOS)
 	@State private var watchSync = PhoneWatchSyncBridge()
 	@State private var rootSyncStatus = SyncMode.normal
-#endif // os(iOS)
+#endif
 
 	@Binding var expanded: WindowMode
 
@@ -46,42 +45,78 @@ struct ContentView: View {
 
 #if os(iOS)
 
-func makeCustomShareImage() -> UIImage? {
-	let config = UIImage.SymbolConfiguration(pointSize: 18, weight: .bold, scale: .large)
+// MARK: - Custom Backdrop Blur
 
-	// 1. Keep it as .alwaysTemplate here so the tint color applies correctly during rendering
-	guard let symbolImage = UIImage(systemName: "paperplane", withConfiguration: config)?
-		.withTintColor(.systemBlue, renderingMode: .alwaysTemplate)
-	else {
-		return nil
+/// A custom visual effect view that extracts its Core Animation backdrop layer
+/// to allow direct manipulation and animation of the blur radius value.
+final class CustomBackdropBlurView: UIVisualEffectView {
+	private var blurFilter: NSObject?
+
+	init() {
+		super.init(effect: UIBlurEffect(style: .regular))
+
+		// Access the private CAFilter class
+		guard let CAFilter = NSClassFromString("CAFilter")! as? NSObject.Type else {
+			print("[CustomBlur] Error: Can't find CAFilter class")
+			return
+		}
+
+		// Create a standard gaussian blur instead of a variable blur
+		guard let filter = CAFilter.perform(NSSelectorFromString("filterWithType:"), with: "gaussianBlur")?.takeUnretainedValue() as? NSObject else {
+			print("[CustomBlur] Error: Can't create gaussianBlur")
+			return
+		}
+
+		self.blurFilter = filter
+
+		// Name the filter so we can target it with CABasicAnimation keypaths
+		filter.setValue("gaussianBlur", forKey: "name")
+		filter.setValue(0.0, forKey: "inputRadius")
+		filter.setValue(true, forKey: "inputNormalizeEdges")
+
+		guard let backdropLayer = subviews.first?.layer else { return }
+		backdropLayer.filters = [filter]
+
+		// Hide the standard dimming/tint views to prevent hard lines or color overlays
+		for subview in subviews.dropFirst() {
+			subview.alpha = 0
+		}
 	}
 
-	let canvasSize = CGSize(
-		width: symbolImage.size.width + 2, // Slight adjustment to prevent clipping on the sides
-		height: symbolImage.size.height + 6
-	)
-
-	let renderer = UIGraphicsImageRenderer(size: canvasSize)
-	let renderedImage = renderer.image { _ in
-		let rect = CGRect(
-			x: 1,
-			y: 4,
-			width: symbolImage.size.width,
-			height: symbolImage.size.height
-		)
-
-		symbolImage.draw(in: rect)
+	@available(*, unavailable)
+	required init?(coder: NSCoder) {
+		fatalError("init(coder:) has not been implemented")
 	}
 
-	// 2. Crucial Step: Tell the UITabBar to use the original colors of the rendered image
-	return renderedImage.withRenderingMode(.alwaysOriginal)
+	/// Animates the blur radius directly on the Core Animation layer
+	func animateRadius(to radius: CGFloat, duration: TimeInterval) {
+		guard let backdropLayer = subviews.first?.layer, let filter = blurFilter else { return }
+
+		let currentRadius = filter.value(forKey: "inputRadius") as? CGFloat ?? 0.0
+
+		let animation = CABasicAnimation(keyPath: "filters.gaussianBlur.inputRadius")
+		animation.fromValue = currentRadius
+		animation.toValue = radius
+		animation.duration = duration
+		animation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+		animation.fillMode = .forwards
+		animation.isRemovedOnCompletion = false
+
+		backdropLayer.add(animation, forKey: "radiusAnimation")
+
+		// Update the underlying model value
+		filter.setValue(radius, forKey: "inputRadius")
+		backdropLayer.filters = [filter]
+	}
 }
+
+// MARK: - Tab View Bridge
 
 struct ProminentActionTabView: UIViewControllerRepresentable {
 	@Binding var watchSync: PhoneWatchSyncBridge
 	@Binding var rootSyncStatus: SyncMode
 
-	let prominentTabIdentifier = "prominent-share-action"
+	private let prominentTabIdentifier = "prominent-share-action"
 
 	func makeCoordinator() -> Coordinator {
 		Coordinator(prominentTabIdentifier: prominentTabIdentifier)
@@ -113,10 +148,27 @@ struct ProminentActionTabView: UIViewControllerRepresentable {
 		context.coordinator.prominentTabIdentifier = prominentTabIdentifier
 	}
 
-	/// 2. Conformed Coordinator to UIAdaptivePresentationControllerDelegate
+	private func makeCustomShareImage() -> UIImage? {
+		let config = UIImage.SymbolConfiguration(pointSize: 18, weight: .bold, scale: .large)
+		guard let symbolImage = UIImage(systemName: "paperplane", withConfiguration: config)?
+			.withTintColor(.systemBlue, renderingMode: .alwaysTemplate)
+		else {
+			return nil
+		}
+
+		let canvasSize = CGSize(width: symbolImage.size.width + 2, height: symbolImage.size.height + 6)
+		let renderer = UIGraphicsImageRenderer(size: canvasSize)
+
+		let renderedImage = renderer.image { _ in
+			symbolImage.draw(in: CGRect(x: 1, y: 4, width: symbolImage.size.width, height: symbolImage.size.height))
+		}
+
+		return renderedImage.withRenderingMode(.alwaysOriginal)
+	}
+
 	final class Coordinator: NSObject, UITabBarControllerDelegate, UIAdaptivePresentationControllerDelegate {
 		var prominentTabIdentifier: String
-		private var activeBlurView: VisualEffectBlurView? // Keep track of the blur view instance
+		private var activeBlurView: CustomBackdropBlurView?
 
 		init(prominentTabIdentifier: String) {
 			self.prominentTabIdentifier = prominentTabIdentifier
@@ -127,63 +179,63 @@ struct ProminentActionTabView: UIViewControllerRepresentable {
 				return true
 			}
 
-			presentSharePassWorkflow(from: tabBarController, currentTab: tab)
+			guard activeBlurView == nil else {
+				return false
+			}
+
+			presentBlur(in: tabBarController)
+			presentSharePassWorkflow(from: tabBarController)
+
 			return false
 		}
 
-		private func presentSharePassWorkflow(from tabBarController: UITabBarController, currentTab: UITab) {
-			Task.detached(priority: .userInitiated) { [self] in
+		private func presentSharePassWorkflow(from tabBarController: UITabBarController) {
+			Task { [weak self, weak tabBarController] in
+				guard let self, let tabBarController else { return }
+
 				do {
 					let url = try await generatePass()
-
 					await MainActor.run {
 						self.presentShareSheet(with: url, from: tabBarController)
 					}
 				} catch {
 					print("[Wallet] Background Share Error: \(error)")
 					await MainActor.run {
-						self.presentErrorAlert(from: tabBarController)
+						self.dismissBlur(animated: true) {
+							self.presentErrorAlert(from: tabBarController)
+						}
 					}
 				}
 			}
 		}
 
-		private func presentShareSheet(with fileURL: URL, from tabBarController: UITabBarController) {
-			// FIX: Added 'try?' to handle the throwing initializer safely
-			guard let blurView = try? VisualEffectBlurView(blurEffectStyle: .regular) else {
-				print("Error: VisualEffectBlurView failed to initialize.")
-				return
-			}
-
-			blurView.blurRadius = 0
+		private func presentBlur(in tabBarController: UITabBarController) {
+			let blurView = CustomBackdropBlurView()
 			blurView.frame = tabBarController.view.bounds
 			blurView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+
 			tabBarController.view.addSubview(blurView)
 			activeBlurView = blurView
 
-			// 1. Animate the blur radius up to 5px over 0.4 seconds
-			UIView.animate(withDuration: 0.4, delay: 0, options: .curveEaseInOut, animations: {
-				blurView.blurRadius = 4
-			}, completion: nil)
+			// Animate purely the radius taking 3.5 seconds
+			blurView.animateRadius(to: 3, duration: 3.5)
+		}
 
-			let activityViewController = UIActivityViewController(activityItems: [fileURL], applicationActivities: nil)
+		private func presentShareSheet(with fileURL: URL, from tabBarController: UITabBarController) {
+			let activityViewController = UIActivityViewController(
+				activityItems: [fileURL],
+				applicationActivities: nil
+			)
 
-			// Assign the presentation delegate to catch interactive swipe-to-dismiss actions
 			activityViewController.presentationController?.delegate = self
-
-			// Fallback handler for button-based dismissals (like tapping an action or "Close")
-			activityViewController.completionWithItemsHandler = { [weak self, weak tabBarController] _, _, _, _ in
-				guard let self = self else { return }
-				// Only run if the swipe gesture delegate didn't already clean it up
-				if self.activeBlurView?.superview != nil {
-					self.animateBlurOut(alongside: tabBarController?.transitionCoordinator)
-				}
+			activityViewController.completionWithItemsHandler = { [weak self] _, _, _, _ in
+				self?.dismissBlur(animated: true)
 			}
 
-			// Popover presentation configuration for iPad
 			if let popoverController = activityViewController.popoverPresentationController {
 				popoverController.sourceView = tabBarController.tabBar
 				let tabBarWidth = tabBarController.tabBar.frame.width
+
 				popoverController.sourceRect = CGRect(
 					x: tabBarWidth / 2 - 25,
 					y: 0,
@@ -195,40 +247,55 @@ struct ProminentActionTabView: UIViewControllerRepresentable {
 			tabBarController.present(activityViewController, animated: true)
 		}
 
-		/// 7. This triggers the split second a user starts interactively swiping down the share sheet
 		func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
-			animateBlurOut(alongside: presentationController.presentedViewController.transitionCoordinator)
+			guard let coordinator = presentationController.presentedViewController.transitionCoordinator else {
+				dismissBlur(animated: true)
+				return
+			}
+
+			// Syncs the exact 2.5s custom animation requirement during swipe dismissal
+			coordinator.animate(alongsideTransition: { [weak self] _ in
+				self?.dismissBlur(animated: true)
+			}, completion: nil)
 		}
 
-		/// Helper method to handle the matching 0.4s ease-out animation
-		private func animateBlurOut(alongside coordinator: UIViewControllerTransitionCoordinator?) {
-			guard let blurView = activeBlurView else { return }
+		private func dismissBlur(animated: Bool, completion: (() -> Void)? = nil) {
+			guard let blurView = activeBlurView else {
+				completion?()
+				return
+			}
 
-			if let coordinator = coordinator {
-				coordinator.animate(alongsideTransition: { _ in
-					blurView.blurRadius = 0
-				}, completion: { _ in
-					blurView.removeFromSuperview()
-					self.activeBlurView = nil
-				})
+			let cleanup = { [weak self] in
+				blurView.removeFromSuperview()
+				self?.activeBlurView = nil
+				completion?()
+			}
+
+			if animated {
+				// Use CATransaction to wrap the 2.5s animation and safely trigger the cleanup callback
+				CATransaction.begin()
+				CATransaction.setCompletionBlock {
+					cleanup()
+				}
+				blurView.animateRadius(to: 0, duration: 2.5)
+				CATransaction.commit()
 			} else {
-				UIView.animate(withDuration: 0.4, delay: 0, options: .curveEaseInOut, animations: {
-					blurView.blurRadius = 0
-				}, completion: { _ in
-					blurView.removeFromSuperview()
-					self.activeBlurView = nil
-				})
+				cleanup()
 			}
 		}
 
 		private func presentErrorAlert(from tabBarController: UITabBarController) {
-			let alert = UIAlertController(title: "Error", message: "Unable to generate your shareable pass.", preferredStyle: .alert)
+			let alert = UIAlertController(
+				title: "Error",
+				message: "Unable to generate your shareable pass.",
+				preferredStyle: .alert
+			)
 			alert.addAction(UIAlertAction(title: "OK", style: .default))
 			tabBarController.present(alert, animated: true)
 		}
 	}
 }
-#endif // os(iOS)
+#endif
 
 #Preview {
 	ContentView(expanded: .constant(.none))

@@ -24,7 +24,6 @@
 		2AA6DF2C2FDFADAE00BBC70E /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AA6DF2B2FDFADAE00BBC70E /* Defaults */; };
 		2AC5F7ED2FD8435700B813EA /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AC5F7EC2FD8435700B813EA /* Defaults */; };
 		2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */ = {isa = PBXBuildFile; platformFilters = (macos, ); productRef = 2AE0F13A2FE03989002B5D9D /* MaterialView */; };
-		2AE1E3922FEC12D700FFCF7E /* VisualEffectBlurView in Frameworks */ = {isa = PBXBuildFile; productRef = 2AE1E3912FEC12D700FFCF7E /* VisualEffectBlurView */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -298,7 +297,6 @@
 			files = (
 				2A43AFA12FE7849E00BBC8BD /* IrregularGradient in Frameworks */,
 				2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */,
-				2AE1E3922FEC12D700FFCF7E /* VisualEffectBlurView in Frameworks */,
 				2A02379B2F9C907000AB1E1F /* Defaults in Frameworks */,
 				2A43AFD22FE810C900BBC8BD /* OpenSSL in Frameworks */,
 				2A0237AC2F9D9DE800AB1E1F /* SFSymbolsPicker in Frameworks */,
@@ -399,7 +397,6 @@
 				2A43AFA02FE7849E00BBC8BD /* IrregularGradient */,
 				2A43AFCE2FE80ED900BBC8BD /* ZIPFoundation */,
 				2A43AFD12FE810C900BBC8BD /* OpenSSL */,
-				2AE1E3912FEC12D700FFCF7E /* VisualEffectBlurView */,
 			);
 			productName = Timetable;
 			productReference = 2A02378B2F9C8EA000AB1E1F /* Timetable.app */;
@@ -525,7 +522,6 @@
 				2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */,
 				2A43AFCD2FE80ED900BBC8BD /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 				2A43AFD02FE810C900BBC8BD /* XCRemoteSwiftPackageReference "OpenSSL-Package" */,
-				2AE1E3902FEC12D700FFCF7E /* XCRemoteSwiftPackageReference "VisualEffectBlurView" */,
 			);
 			preferredProjectObjectVersion = 110;
 			productRefGroup = 2A02378C2F9C8EA000AB1E1F /* Products */;
@@ -739,7 +735,7 @@
 				CODE_SIGN_ENTITLEMENTS = Special/Entitlements/Timetable.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = P6PV2R9443;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -770,7 +766,7 @@
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.omeriadon.Timetable;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -806,7 +802,7 @@
 				CODE_SIGN_ENTITLEMENTS = Special/Entitlements/Timetable.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = P6PV2R9443;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -837,7 +833,7 @@
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.omeriadon.Timetable;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -871,7 +867,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "Special/Entitlements/Timetable Watch.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = P6PV2R9443;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -882,7 +878,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.omeriadon.Timetable.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -907,7 +903,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "Special/Entitlements/Timetable Watch.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = P6PV2R9443;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -918,7 +914,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.omeriadon.Timetable.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -943,7 +939,7 @@
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = "Special/Entitlements/Timetable Widget Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = P6PV2R9443;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -964,7 +960,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.6;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.omeriadon.Timetable.watchkitapp.Widget-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -998,7 +994,7 @@
 				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = "Special/Entitlements/Timetable Widget Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = P6PV2R9443;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -1019,7 +1015,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.6;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.omeriadon.Timetable.watchkitapp.Widget-Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -1053,7 +1049,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = P6PV2R9443;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1073,7 +1069,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.omeriadon.Timetable.Widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -1097,7 +1093,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = P6PV2R9443;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1117,7 +1113,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.omeriadon.Timetable.Widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -1226,14 +1222,6 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		2AE1E3902FEC12D700FFCF7E /* XCRemoteSwiftPackageReference "VisualEffectBlurView" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/dominicstop/VisualEffectBlurView.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 7.3.1;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1296,11 +1284,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2AE0F1392FE03989002B5D9D /* XCRemoteSwiftPackageReference "MaterialView" */;
 			productName = MaterialView;
-		};
-		2AE1E3912FEC12D700FFCF7E /* VisualEffectBlurView */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2AE1E3902FEC12D700FFCF7E /* XCRemoteSwiftPackageReference "VisualEffectBlurView" */;
-			productName = VisualEffectBlurView;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
