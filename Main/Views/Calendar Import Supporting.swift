@@ -423,10 +423,10 @@ func translateSymbol(_ original: String) -> String {
 			return "testtube.2"
 
 		case lower.contains("AEISL"):
-			return "character.book.closed"
+			return "translate"
 
 		case lower.contains("AEFSL1"):
-			return "character.book.closed"
+			return "translate"
 
 		case lower.contains("AELIT"):
 			return "books.vertical"
