@@ -144,9 +144,11 @@ struct SettingsView: View {
 			}
 		}
 
-		Section("Add Timetable to Wallet") {
-			AddPassView()
-		}
+		#if !os(macOS)
+			Section("Add Timetable to Wallet") {
+				AddPassView()
+			}
+		#endif
 
 		Section("Calendar") {
 			Button {

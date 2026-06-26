@@ -1,6 +1,6 @@
 //
 //  WeeklyScheduleWidget.swift
-//  Widget Extension
+//  Shared Widget
 //
 //  Created by Adon Omeri on 27/4/2026.
 //

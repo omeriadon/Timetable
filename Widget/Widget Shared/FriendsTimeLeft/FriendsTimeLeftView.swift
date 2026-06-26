@@ -1,14 +1,23 @@
 //
-//  TimeLeftView.swift
-//  Shared Widget
+//  FriendsTimeLeftView.swift
+//  Widget Shared
 //
 //  Created by Adon Omeri on 13/5/2026.
 //
 
+import Defaults
 import SwiftUI
 import WidgetKit
 
-struct TimeLeftView: View {
+struct FriendScheduleItem {
+	let name: String
+	let isUser: Bool
+
+	let currentSubject: String
+	let nextSubject: String
+}
+
+struct FriendsTimeLeftView: View {
 	let entry: TimetableEntry
 
 	let state: SchoolState

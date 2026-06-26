@@ -1,5 +1,5 @@
 //
-//  TimeLeftWidget.swift
+//  FriendsTimeLeftWidget.swift
 //  Shared Widget
 //
 //  Created by Adon Omeri on 27/4/2026.
@@ -9,8 +9,8 @@ import Defaults
 import SwiftUI
 import WidgetKit
 
-struct TimeLeftWidget: Widget {
-	let kind: String = "TimeLeft"
+struct FriendsTimeLeftWidget: Widget {
+	let kind: String = "FriendsTimeLeft"
 
 	var body: some WidgetConfiguration {
 		StaticConfiguration(kind: kind, provider: Provider()) { entry in
@@ -23,49 +23,49 @@ struct TimeLeftWidget: Widget {
 				case let .inClass(current, _, _):
 					current?.colour.swiftUIColor ?? .black
 				case .inBreak:
-					.orange
+						.orange
 				case .outsideSchool:
-					.black
+						.black
 			}
 
 			TimeLeftView(entry: entry, state: state)
 				.containerBackground(background, for: .widget)
 		}
 		.contentMarginsDisabled()
-		.configurationDisplayName("Time Left in Subject")
-		.description("Check how much time left until the end of this period.")
-		#if os(watchOS)
-			.supportedFamilies([.accessoryRectangular])
-		#else
-			.supportedFamilies([.systemMedium])
-		#endif
+		.configurationDisplayName("Friends Current Subjects")
+		.description("Check what subjects your friends have right now, along with time left.")
+#if os(watchOS)
+		.supportedFamilies([.accessoryRectangular])
+#else
+		.supportedFamilies([.systemMedium])
+#endif
 	}
 }
 
 #if os(watchOS)
-	#Preview(as: .accessoryRectangular, widget: {
-		TimeLeftWidget()
-	}, timeline: {
+	#Preview(as: .accessoryRectangular) {
+		FriendsTimeLeftWidget()
+	} timeline: {
 		TimetableEntry(
-			date: Date(),
+			date: .now,
 			subject: debugTimetable,
 			relevance: TimelineEntryRelevance(
 				score: 1.0,
 				duration: 60 * 60
 			)
 		)
-	})
+	}
 #else
-	#Preview(as: .systemMedium, widget: {
-		TimeLeftWidget()
-	}, timeline: {
+	#Preview(as: .systemMedium) {
+		FriendsTimeLeftWidget()
+	} timeline: {
 		TimetableEntry(
-			date: Date(),
+			date: .now,
 			subject: debugTimetable,
 			relevance: TimelineEntryRelevance(
 				score: 1.0,
 				duration: 60 * 60
 			)
 		)
-	})
+	}
 #endif

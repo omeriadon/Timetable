@@ -1,6 +1,6 @@
 //
 //  WeeklyScheduleView.swift
-//  Widget Extension
+//  Shared Widget
 //
 //  Created by Adon Omeri on 13/5/2026.
 //
@@ -191,8 +191,4 @@ struct WeeklyScheduleView: View {
 		// convert to 0 = Monday ... 4 = Friday
 		return (weekday + 5) % 7
 	}
-}
-
-#Preview {
-	WeeklyScheduleView()
 }
