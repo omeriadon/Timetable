@@ -10,7 +10,7 @@ import Defaults
 
 struct SubjectQuery: EntityStringQuery {
 	func entities(for identifiers: [String]) async -> [SubjectEntity] {
-		return await MainActor.run {
+		await MainActor.run {
 			let receivedTimetables = Defaults[.receivedTimetables]
 			let identifierSet = Set(identifiers)
 
@@ -26,7 +26,7 @@ struct SubjectQuery: EntityStringQuery {
 	}
 
 	func entities(matching string: String) async -> [SubjectEntity] {
-		return await MainActor.run {
+		await MainActor.run {
 			let receivedTimetables = Defaults[.receivedTimetables]
 
 			let allSubjects = receivedTimetables.flatMap { timetable -> [Subject] in
@@ -40,7 +40,7 @@ struct SubjectQuery: EntityStringQuery {
 	}
 
 	func suggestedEntities() async -> [SubjectEntity] {
-		return await MainActor.run {
+		await MainActor.run {
 			let receivedTimetables = Defaults[.receivedTimetables]
 
 			return receivedTimetables

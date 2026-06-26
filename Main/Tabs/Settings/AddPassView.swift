@@ -63,7 +63,7 @@ struct AddPassView: View {
 						.frame(maxWidth: .infinity, maxHeight: .infinity)
 						.transition(.blurReplace)
 
-					case .ready(let pass):
+					case let .ready(pass):
 						AddPassToWalletButton([pass]) { added in
 							if added {
 								withAnimation(.easeInOut) {
@@ -110,7 +110,7 @@ struct AddPassView: View {
 					}
 				}
 			} catch {
-				Print("[Wallet] Error generating pass: \(error)")
+				PrintError("[Wallet] Error generating pass: \(error)")
 				await MainActor.run {
 					withAnimation(.easeInOut) {
 						currentState = .error

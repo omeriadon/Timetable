@@ -235,8 +235,8 @@ struct SettingsView: View {
 }
 
 extension Array {
-	mutating func apply<CollectionID: Hashable & Sendable>(
-		difference: ReorderDifference<Element.ID, CollectionID>
+	mutating func apply(
+		difference: ReorderDifference<Element.ID, some Hashable & Sendable>
 	) where Element: Identifiable, Element.ID: Sendable {
 		// Find the source card that moved.
 		guard let sourceIndex = firstIndex(

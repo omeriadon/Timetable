@@ -59,8 +59,8 @@ nonisolated func signDataWithBundledKey(_ manifestData: Data) throws -> Data {
 
 	// 4. Try parsing the private key
 	guard let pkey = PEM_read_bio_PrivateKey(pkeyBio, nil, nil, nil) else {
-		Print("❌ OpenSSL Private Key Parsing Failed!")
-		Print("Detailed OpenSSL Error: \(getOpenSSLError())")
+		PrintError("❌ OpenSSL Private Key Parsing Failed!")
+		PrintError("Detailed OpenSSL Error: \(getOpenSSLError())")
 		throw SigningError.parsePrivateKeyFailed
 	}
 	Print("✅ Private key parsed successfully: \(pkey)")
@@ -68,8 +68,8 @@ nonisolated func signDataWithBundledKey(_ manifestData: Data) throws -> Data {
 
 	// 5. Try parsing the certificate
 	guard let cert = PEM_read_bio_X509(certBio, nil, nil, nil) else {
-		Print("❌ OpenSSL Certificate Parsing Failed!")
-		Print("Detailed OpenSSL Error: \(getOpenSSLError())")
+		PrintError("❌ OpenSSL Certificate Parsing Failed!")
+		PrintError("Detailed OpenSSL Error: \(getOpenSSLError())")
 		throw SigningError.parseCertificateFailed
 	}
 	Print("✅ Certificate parsed successfully: \(cert)")
@@ -79,9 +79,9 @@ nonisolated func signDataWithBundledKey(_ manifestData: Data) throws -> Data {
 	let signingFlags: Int32 = PKCS7_DETACHED | PKCS7_BINARY
 
 	guard let pkcs7Structure = PKCS7_sign(cert, pkey, nil, manifestBio, signingFlags) else {
-		Print("❌ PKCS7 Signing Failed!")
+		PrintError("❌ PKCS7 Signing Failed!")
 		let error = getOpenSSLError()
-		Print("Detailed OpenSSL Error: \( error)")
+		PrintError("Detailed OpenSSL Error: \(error)")
 		throw SigningError.signingFailed
 	}
 	defer { PKCS7_free(pkcs7Structure) }

@@ -106,6 +106,43 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		2A35BFAB2FEE0F5500EF5563 /* Exceptions for "Main" folder in "Watch Widget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Backend/Keychain.swift,
+			);
+			target = 2A25869F2FB5D6490030C8CD /* Watch Widget */;
+		};
+		2A35BFAC2FEE0F5500EF5563 /* Exceptions for "Main" folder in "Widget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Backend/Keychain.swift,
+			);
+			target = 2AA6DF132FDFAC8F00BBC70E /* Widget */;
+		};
+		2A35BFAD2FEE0F5500EF5563 /* Exceptions for "Main" folder in "Watch" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Backend/Keychain.swift,
+			);
+			target = 2A098C822F9DB842002065BE /* Watch */;
+		};
+		2AA9C7BD2FEE72DC00AD87A8 /* Exceptions for "Widget" folder in "Timetable" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Widget Shared/FriendsTimeLeft/FriendsTimeLeftView.swift",
+				"Widget Shared/FriendsTimeLeft/FriendsTimeLeftWidget.swift",
+				"Widget Shared/Widget Shared.swift",
+			);
+			target = 2A02378A2F9C8EA000AB1E1F /* Timetable */;
+		};
+		2AA9C7C22FEE7C5400AD87A8 /* Exceptions for "Widget" folder in "Watch" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Widget Shared/Widget Shared.swift",
+			);
+			target = 2A098C822F9DB842002065BE /* Watch */;
+		};
 		2AC5F7EA2FD842F000B813EA /* Exceptions for "Main" folder in "Timetable" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			platformFiltersByRelativePath = {
@@ -197,22 +234,6 @@
 			);
 			target = 2A098C822F9DB842002065BE /* Watch */;
 		};
-		2AD85AAF2FE97B64004EAB2B /* Exceptions for "Shared" folder in "Watch Widget" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Wallet/TimetablePassManager.swift,
-				Wallet/toReceivedTimetable.swift,
-			);
-			target = 2A25869F2FB5D6490030C8CD /* Watch Widget */;
-		};
-		2AD85AB02FE97B64004EAB2B /* Exceptions for "Shared" folder in "Widget" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Wallet/TimetablePassManager.swift,
-				Wallet/toReceivedTimetable.swift,
-			);
-			target = 2AA6DF132FDFAC8F00BBC70E /* Widget */;
-		};
 		2AF9CBFB2FE6D56C00885431 /* Exceptions for "App Intents" folder in "Watch Widget" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -239,10 +260,6 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		2A02379F2F9C908300AB1E1F /* Shared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				2AD85AAF2FE97B64004EAB2B /* Exceptions for "Shared" folder in "Watch Widget" target */,
-				2AD85AB02FE97B64004EAB2B /* Exceptions for "Shared" folder in "Widget" target */,
-			);
 			path = Shared;
 			sourceTree = "<group>";
 		};
@@ -265,6 +282,9 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				2AC5F7EA2FD842F000B813EA /* Exceptions for "Main" folder in "Timetable" target */,
+				2A35BFAB2FEE0F5500EF5563 /* Exceptions for "Main" folder in "Watch Widget" target */,
+				2A35BFAC2FEE0F5500EF5563 /* Exceptions for "Main" folder in "Widget" target */,
+				2A35BFAD2FEE0F5500EF5563 /* Exceptions for "Main" folder in "Watch" target */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -272,8 +292,10 @@
 		2AD85A4F2FE8F213004EAB2B /* Widget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				2AA9C7BD2FEE72DC00AD87A8 /* Exceptions for "Widget" folder in "Timetable" target */,
 				2AD85A6F2FE8F219004EAB2B /* Exceptions for "Widget" folder in "Watch Widget" target */,
 				2AD85A702FE8F219004EAB2B /* Exceptions for "Widget" folder in "Widget" target */,
+				2AA9C7C22FEE7C5400AD87A8 /* Exceptions for "Widget" folder in "Watch" target */,
 			);
 			path = Widget;
 			sourceTree = "<group>";
@@ -740,7 +762,7 @@
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = NO;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
-				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = NO;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
 				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
@@ -807,7 +829,7 @@
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = NO;
 				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
-				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = NO;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
 				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
@@ -865,7 +887,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = Timetable;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = "Special/Entitlements/Timetable Watch.entitlements";
+				CODE_SIGN_ENTITLEMENTS = Special/Entitlements/Watch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = P6PV2R9443;
@@ -901,7 +923,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = Timetable;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = "Special/Entitlements/Timetable Watch.entitlements";
+				CODE_SIGN_ENTITLEMENTS = Special/Entitlements/Watch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = P6PV2R9443;
@@ -937,7 +959,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				AUTOMATION_APPLE_EVENTS = NO;
-				CODE_SIGN_ENTITLEMENTS = "Special/Entitlements/Timetable Widget Extension.entitlements";
+				CODE_SIGN_ENTITLEMENTS = Special/Entitlements/Widget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = P6PV2R9443;
@@ -992,7 +1014,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				AUTOMATION_APPLE_EVENTS = NO;
-				CODE_SIGN_ENTITLEMENTS = "Special/Entitlements/Timetable Widget Extension.entitlements";
+				CODE_SIGN_ENTITLEMENTS = Special/Entitlements/Widget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = P6PV2R9443;
@@ -1046,6 +1068,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				AUTOMATION_APPLE_EVENTS = NO;
+				CODE_SIGN_ENTITLEMENTS = Special/Entitlements/Widget.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -1053,6 +1077,12 @@
 				DEVELOPMENT_TEAM = P6PV2R9443;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Special/Info/Widget.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Timetable Widgets";
@@ -1072,6 +1102,12 @@
 				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.omeriadon.Timetable.Widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
+				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
+				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
+				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
+				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
+				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -1090,6 +1126,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				AUTOMATION_APPLE_EVENTS = NO;
+				CODE_SIGN_ENTITLEMENTS = Special/Entitlements/Widget.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -1097,6 +1135,12 @@
 				DEVELOPMENT_TEAM = P6PV2R9443;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Special/Info/Widget.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Timetable Widgets";
@@ -1116,6 +1160,12 @@
 				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.omeriadon.Timetable.Widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
+				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
+				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
+				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
+				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
+				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;

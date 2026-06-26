@@ -23,43 +23,41 @@ struct TimetableEntity: Identifiable, AppEntity, SyncableEntity {
 		self.id = id
 		self.subjects = subjects
 		if let sender, let receivedAt {
-			self.sharedInfo = SharedInfo(receivedAt: receivedAt, sender: sender)
+			sharedInfo = SharedInfo(receivedAt: receivedAt, sender: sender)
 		}
 	}
 
 	var displayRepresentation: DisplayRepresentation {
-		let string = {
-			if let sharedInfo {
-				return "\(sharedInfo.sender)'s Timetable"
-			} else {
-				return "Your timetable"
-			}
-		}()
+		let string = if let sharedInfo {
+			"\(sharedInfo.sender)'s Timetable"
+		} else {
+			"Your timetable"
+		}
 
 		return DisplayRepresentation(stringLiteral: string)
 	}
 }
 
 #if !os(watchOS)
-extension TimetableEntity: IndexedEntity {}
+	extension TimetableEntity: IndexedEntity {}
 #endif
 
 struct SharedInfo: Codable, Identifiable, TransientAppEntity {
 	var id: String {
-		"\(self.sender)\(self.receivedAt.description)"
+		"\(sender)\(receivedAt.description)"
 	}
 
 	static let typeDisplayRepresentation = TypeDisplayRepresentation(stringLiteral: "Owner")
 	var displayRepresentation: DisplayRepresentation {
-		DisplayRepresentation(stringLiteral: "\(self.sender)'s Timetable")
+		DisplayRepresentation(stringLiteral: "\(sender)'s Timetable")
 	}
 
 	var receivedAt: Date
 	var sender: String
 
 	init() {
-		self.receivedAt = Date()
-		self.sender = ""
+		receivedAt = Date()
+		sender = ""
 	}
 
 	init(receivedAt: Date, sender: String) {

@@ -1,5 +1,5 @@
 //
-//  GetCurrentSubjectIntent.swift
+//  GetCurrentSubject.swift
 //  Timetable
 //
 //  Created by Adon Omeri on 20/6/2026.
@@ -30,23 +30,21 @@ struct GetCurrentSubjectIntent: SnippetIntent {
 		let subjectLookup = TimetableLayout.subjectLookup(for: subjects)
 		let state = getSchoolState(at: adjustedNow, subjectLookup: subjectLookup)
 
-		let text: String = {
-			switch state {
-				case .beforeSchool:
-					"Before School"
-				case let .inClass(current, _, _):
-					current?.id ?? "Unknown Subject"
-				case let .inBreak(breakType, _, _):
-					switch breakType {
-						case .recess:
-							"Recess"
-						case .lunch:
-							"Lunch"
-					}
-				case .outsideSchool:
-					"Outside School Time"
-			}
-		}()
+		let text: String = switch state {
+			case .beforeSchool:
+				"Before School"
+			case let .inClass(current, _, _):
+				current?.id ?? "Unknown Subject"
+			case let .inBreak(breakType, _, _):
+				switch breakType {
+					case .recess:
+						"Recess"
+					case .lunch:
+						"Lunch"
+				}
+			case .outsideSchool:
+				"Outside School Time"
+		}
 
 		return .result(dialog: IntentDialog(stringLiteral: text), view: GetCurrentSubjectIntentView(state: state, now: adjustedNow))
 	}
@@ -275,7 +273,7 @@ struct GetCurrentSubjectIntentView: View {
 								Color(red: 0.60, green: 0.90, blue: 1.0),
 								Color(red: 0.70, green: 1.0, blue: 0.70),
 								Color(red: 1.0, green: 0.60, blue: 0.40),
-								Color(red: 0.80, green: 0.60, blue: 1.0)
+								Color(red: 0.80, green: 0.60, blue: 1.0),
 							],
 							background: Color.blue,
 							speed: 2,

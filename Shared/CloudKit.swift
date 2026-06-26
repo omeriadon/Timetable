@@ -56,14 +56,14 @@ final class CloudStore {
 			let data = try JSONEncoder().encode(Defaults[.timetable])
 			store.set(data, forKey: "timetable")
 		} catch {
-			Print(error)
+			PrintError(error)
 		}
 
 		do {
 			let data = try JSONEncoder().encode(Defaults[.userDisplayName])
 			store.set(data, forKey: "userDisplayName")
 		} catch {
-			Print(error)
+			PrintError(error)
 		}
 	}
 
@@ -94,7 +94,7 @@ final class CloudStore {
 		do {
 			accountStatus = try await CKContainer.default().accountStatus()
 		} catch {
-			Print(error.localizedDescription)
+			PrintError(error.localizedDescription)
 		}
 	}
 }

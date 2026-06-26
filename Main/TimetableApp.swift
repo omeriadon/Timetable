@@ -6,7 +6,7 @@
 //
 
 #if os(macOS)
-import AppKit
+	import AppKit
 #endif
 import Defaults
 import Foundation
@@ -41,13 +41,13 @@ struct TimetableApp: App {
 		userName.isEmpty
 	}
 
-#if os(macOS)
-	@NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+	#if os(macOS)
+		@NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
-	init() {
-		UserDefaults.standard.set(false, forKey: "NSFullScreenMenuItemEverywhere")
-	}
-#endif // os(macOS)
+		init() {
+			UserDefaults.standard.set(false, forKey: "NSFullScreenMenuItemEverywhere")
+		}
+	#endif // os(macOS)
 
 	var body: some Scene {
 		WindowGroup {
@@ -55,7 +55,7 @@ struct TimetableApp: App {
 				.task {
 					await indexEntities()
 				}
-#if os(iOS)
+			#if os(iOS)
 				.sheet(isPresented: .constant(showNameSheet)) {
 					NameSheet()
 						.presentationDetents([.medium])
@@ -64,9 +64,9 @@ struct TimetableApp: App {
 						.monospaced()
 				}
 				.environment(\.passManager, passManager)
-#endif // os(iOS)
+			#endif // os(iOS)
 				.monospaced()
-#if os(macOS)
+			#if os(macOS)
 				.onChange(of: expanded) { _, newValue in
 					resizeWindow(expanded: newValue)
 				}
@@ -76,52 +76,52 @@ struct TimetableApp: App {
 					CustomMaterialView()
 						.ignoresSafeArea()
 				}
-#else
+			#else
 				.preferredColorScheme(.dark)
-#endif
+			#endif
 		}
 		.windowResizability(.contentSize)
 	}
 
-#if os(macOS)
-	private func resizeWindow(expanded: WindowMode) {
-		guard let window = NSApplication.shared.windows.first else { return }
+	#if os(macOS)
+		private func resizeWindow(expanded: WindowMode) {
+			guard let window = NSApplication.shared.windows.first else { return }
 
-		var newSize: NSSize {
-			switch expanded {
-				case .none:
-					NSSize(width: 700, height: 528)
-				case .comparison:
-					NSSize(width: 700, height: 727)
-				case .settings:
-					NSSize(width: 700, height: 750)
+			var newSize: NSSize {
+				switch expanded {
+					case .none:
+						NSSize(width: 700, height: 528)
+					case .comparison:
+						NSSize(width: 700, height: 727)
+					case .settings:
+						NSSize(width: 700, height: 750)
+				}
+			}
+
+			let currentFrame = window.frame
+
+			let deltaHeight = newSize.height - currentFrame.height
+			let newOrigin = NSPoint(
+				x: currentFrame.origin.x,
+				y: currentFrame.origin.y - deltaHeight
+			)
+
+			let newFrame = NSRect(
+				origin: newOrigin,
+				size: newSize
+			)
+
+			window.styleMask.remove(.resizable)
+			window.styleMask.remove(.fullScreen)
+
+			window.collectionBehavior.remove(.fullScreenPrimary)
+			window.collectionBehavior.remove(.fullScreenAuxiliary)
+			window.collectionBehavior.insert(.fullScreenNone)
+
+			NSAnimationContext.runAnimationGroup { context in
+				context.duration = 0.25
+				window.animator().setFrame(newFrame, display: true)
 			}
 		}
-
-		let currentFrame = window.frame
-
-		let deltaHeight = newSize.height - currentFrame.height
-		let newOrigin = NSPoint(
-			x: currentFrame.origin.x,
-			y: currentFrame.origin.y - deltaHeight
-		)
-
-		let newFrame = NSRect(
-			origin: newOrigin,
-			size: newSize
-		)
-
-		window.styleMask.remove(.resizable)
-		window.styleMask.remove(.fullScreen)
-
-		window.collectionBehavior.remove(.fullScreenPrimary)
-		window.collectionBehavior.remove(.fullScreenAuxiliary)
-		window.collectionBehavior.insert(.fullScreenNone)
-
-		NSAnimationContext.runAnimationGroup { context in
-			context.duration = 0.25
-			window.animator().setFrame(newFrame, display: true)
-		}
-	}
-#endif // os(macOS)
+	#endif // os(macOS)
 }

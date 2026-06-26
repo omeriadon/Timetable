@@ -5,11 +5,9 @@
 //  Created by Adon Omeri on 11/6/2026.
 //
 
-
 import SwiftUI
 
 struct TimetableComparison: View {
-
 	@Environment(\.passManager) private var passManager
 
 	let selectedSlot: Slot?

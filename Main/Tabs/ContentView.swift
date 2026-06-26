@@ -7,193 +7,188 @@
 
 import SwiftUI
 #if os(iOS)
-import WatchConnectivity
+	import WatchConnectivity
 
-enum SyncMode {
-	case normal, loading, success, error
-}
+	enum SyncMode {
+		case normal, loading, success, error
+	}
 #endif
 
 struct ContentView: View {
-#if os(iOS)
-	@State private var watchSync = PhoneWatchSyncBridge()
-	@State private var rootSyncStatus = SyncMode.normal
-	@State private var isBlurred = false
-#endif
+	#if os(iOS)
+		@State private var watchSync = PhoneWatchSyncBridge()
+		@State private var rootSyncStatus = SyncMode.normal
+		@State private var isBlurred = false
+	#endif
 
 	@Binding var expanded: WindowMode
 
 	var body: some View {
-#if os(iOS)
-		ProminentActionTabView(
-			watchSync: $watchSync,
-			rootSyncStatus: $rootSyncStatus,
-			isBlurred: $isBlurred
-		)
-		.ignoresSafeArea()
+		#if os(iOS)
+			ProminentActionTabView(
+				watchSync: $watchSync,
+				rootSyncStatus: $rootSyncStatus,
+				isBlurred: $isBlurred
+			)
+			.ignoresSafeArea()
+			.blur(radius: isBlurred ? 2 : 0)
+			.opacity(isBlurred ? 0.8 : 1.0)
+			.animation(.easeInOut(duration: 0.35), value: isBlurred)
+		#else
+			TabView {
+				Tab("Timetable", systemImage: "calendar") {
+					TimetableView(expanded: $expanded)
+				}
 
-		.blur(radius: isBlurred ? 2 : 0)
-		.opacity(isBlurred ? 0.8 : 1.0)
-		.animation(.easeInOut(duration: 0.35), value: isBlurred)
-#else
-		TabView {
-			Tab("Timetable", systemImage: "calendar") {
-				TimetableView(expanded: $expanded)
+				Tab("Settings", systemImage: "gear") {
+					SettingsView(expanded: $expanded)
+				}
 			}
-
-			Tab("Settings", systemImage: "gear") {
-				SettingsView(expanded: $expanded)
-			}
-		}
-#endif
+		#endif
 	}
 }
 
 #if os(iOS)
 
-// MARK: - Tab View Bridge
+	// MARK: - Tab View Bridge
 
-struct ProminentActionTabView: UIViewControllerRepresentable {
-	@Binding var watchSync: PhoneWatchSyncBridge
-	@Binding var rootSyncStatus: SyncMode
-	@Binding var isBlurred: Bool // 4. Receive Binding
+	struct ProminentActionTabView: UIViewControllerRepresentable {
+		@Binding var watchSync: PhoneWatchSyncBridge
+		@Binding var rootSyncStatus: SyncMode
+		@Binding var isBlurred: Bool // 4. Receive Binding
 
-	let prominentTabIdentifier = "prominent-share-action"
+		let prominentTabIdentifier = "prominent-share-action"
 
-	func makeCoordinator() -> Coordinator {
-
-		Coordinator(self)
-	}
-
-	func makeUIViewController(context: Context) -> UITabBarController {
-		let tabBarController = UITabBarController()
-		tabBarController.delegate = context.coordinator
-
-		tabBarController.tabs = [
-			UITab(title: "Timetable", image: UIImage(systemName: "calendar"), identifier: "timetable") { _ in
-				UIHostingController(rootView: TimetableView(watchSync: $watchSync, syncStatus: $rootSyncStatus))
-			},
-			UITab(title: "Share", image: makeCustomShareImage(), identifier: prominentTabIdentifier) { _ in
-				UIHostingController(rootView: EmptyView())
-			},
-			UITab(title: "Settings", image: UIImage(systemName: "gear"), identifier: "settings") { _ in
-				UIHostingController(rootView: SettingsView(watchSync: watchSync, syncStatus: $rootSyncStatus))
-			}
-		]
-
-		tabBarController.selectedTab = tabBarController.tabs.first
-		tabBarController.prominentTabIdentifier = prominentTabIdentifier
-
-		return tabBarController
-	}
-
-	func updateUIViewController(_ uiViewController: UITabBarController, context: Context) {
-		// Update coordinator parent if needed
-		context.coordinator.parent = self
-	}
-
-	private func makeCustomShareImage() -> UIImage? {
-		let config = UIImage.SymbolConfiguration(pointSize: 18, weight: .bold, scale: .large)
-		guard let symbolImage = UIImage(systemName: "paperplane", withConfiguration: config)?
-			.withTintColor(.systemBlue, renderingMode: .alwaysTemplate)
-		else {
-			return nil
+		func makeCoordinator() -> Coordinator {
+			Coordinator(self)
 		}
 
-		let canvasSize = CGSize(width: symbolImage.size.width + 2, height: symbolImage.size.height + 6)
-		let renderer = UIGraphicsImageRenderer(size: canvasSize)
+		func makeUIViewController(context: Context) -> UITabBarController {
+			let tabBarController = UITabBarController()
+			tabBarController.delegate = context.coordinator
 
-		let renderedImage = renderer.image { _ in
-			symbolImage.draw(in: CGRect(x: 1, y: 4, width: symbolImage.size.width, height: symbolImage.size.height))
+			tabBarController.tabs = [
+				UITab(title: "Timetable", image: UIImage(systemName: "calendar"), identifier: "timetable") { _ in
+					UIHostingController(rootView: TimetableView(watchSync: $watchSync, syncStatus: $rootSyncStatus))
+				},
+				UITab(title: "Share", image: makeCustomShareImage(), identifier: prominentTabIdentifier) { _ in
+					UIHostingController(rootView: EmptyView())
+				},
+				UITab(title: "Settings", image: UIImage(systemName: "gear"), identifier: "settings") { _ in
+					UIHostingController(rootView: SettingsView(watchSync: watchSync, syncStatus: $rootSyncStatus))
+				},
+			]
+
+			tabBarController.selectedTab = tabBarController.tabs.first
+			tabBarController.prominentTabIdentifier = prominentTabIdentifier
+
+			return tabBarController
 		}
 
-		return renderedImage.withRenderingMode(.alwaysOriginal)
-	}
-
-	final class Coordinator: NSObject, UITabBarControllerDelegate, UIAdaptivePresentationControllerDelegate {
-		var parent: ProminentActionTabView
-
-		init(_ parent: ProminentActionTabView) {
-			self.parent = parent
+		func updateUIViewController(_: UITabBarController, context: Context) {
+			// Update coordinator parent if needed
+			context.coordinator.parent = self
 		}
 
-		func tabBarController(_ tabBarController: UITabBarController, shouldSelectTab tab: UITab) -> Bool {
-			guard tab.identifier == parent.prominentTabIdentifier else {
-				return true
+		private func makeCustomShareImage() -> UIImage? {
+			let config = UIImage.SymbolConfiguration(pointSize: 18, weight: .bold, scale: .large)
+			guard let symbolImage = UIImage(systemName: "paperplane", withConfiguration: config)?
+				.withTintColor(.systemBlue, renderingMode: .alwaysTemplate)
+			else {
+				return nil
 			}
 
+			let canvasSize = CGSize(width: symbolImage.size.width + 2, height: symbolImage.size.height + 6)
+			let renderer = UIGraphicsImageRenderer(size: canvasSize)
 
-			guard !parent.isBlurred else {
+			let renderedImage = renderer.image { _ in
+				symbolImage.draw(in: CGRect(x: 1, y: 4, width: symbolImage.size.width, height: symbolImage.size.height))
+			}
+
+			return renderedImage.withRenderingMode(.alwaysOriginal)
+		}
+
+		final class Coordinator: NSObject, UITabBarControllerDelegate, UIAdaptivePresentationControllerDelegate {
+			var parent: ProminentActionTabView
+
+			init(_ parent: ProminentActionTabView) {
+				self.parent = parent
+			}
+
+			func tabBarController(_ tabBarController: UITabBarController, shouldSelectTab tab: UITab) -> Bool {
+				guard tab.identifier == parent.prominentTabIdentifier else {
+					return true
+				}
+
+				guard !parent.isBlurred else {
+					return false
+				}
+
+				parent.isBlurred = true
+				presentSharePassWorkflow(from: tabBarController)
+
 				return false
 			}
 
+			private func presentSharePassWorkflow(from tabBarController: UITabBarController) {
+				Task { @MainActor [weak self, weak tabBarController] in
+					guard let self, let tabBarController else { return }
 
-			parent.isBlurred = true
-			presentSharePassWorkflow(from: tabBarController)
-
-			return false
-		}
-
-		private func presentSharePassWorkflow(from tabBarController: UITabBarController) {
-			Task { @MainActor [weak self, weak tabBarController] in
-				guard let self, let tabBarController else { return }
-
-				do {
-					// Assuming generatePass() is an async function accessible here
-					let url = try await generatePass()
-					self.presentShareSheet(with: url, from: tabBarController)
-				} catch {
-					print("[Wallet] Background Share Error: \(error)")
-					self.parent.isBlurred = false
-					self.presentErrorAlert(from: tabBarController)
+					do {
+						// Assuming generatePass() is an async function accessible here
+						let url = try await generatePass()
+						presentShareSheet(with: url, from: tabBarController)
+					} catch {
+						PrintError("[Wallet] Background Share Error: \(error)")
+						parent.isBlurred = false
+						presentErrorAlert(from: tabBarController)
+					}
 				}
 			}
-		}
 
-		private func presentShareSheet(with fileURL: URL, from tabBarController: UITabBarController) {
-			let activityViewController = UIActivityViewController(
-				activityItems: [fileURL],
-				applicationActivities: nil
-			)
-
-			activityViewController.presentationController?.delegate = self
-
-			// 6. Un-blur when sheet is dismissed fully
-			activityViewController.completionWithItemsHandler = { [weak self] _, _, _, _ in
-				self?.parent.isBlurred = false
-			}
-
-			if let popoverController = activityViewController.popoverPresentationController {
-				popoverController.sourceView = tabBarController.tabBar
-				let tabBarWidth = tabBarController.tabBar.frame.width
-
-				popoverController.sourceRect = CGRect(
-					x: tabBarWidth / 2 - 25,
-					y: 0,
-					width: 50,
-					height: tabBarController.tabBar.frame.height
+			private func presentShareSheet(with fileURL: URL, from tabBarController: UITabBarController) {
+				let activityViewController = UIActivityViewController(
+					activityItems: [fileURL],
+					applicationActivities: nil
 				)
+
+				activityViewController.presentationController?.delegate = self
+
+				// 6. Un-blur when sheet is dismissed fully
+				activityViewController.completionWithItemsHandler = { [weak self] _, _, _, _ in
+					self?.parent.isBlurred = false
+				}
+
+				if let popoverController = activityViewController.popoverPresentationController {
+					popoverController.sourceView = tabBarController.tabBar
+					let tabBarWidth = tabBarController.tabBar.frame.width
+
+					popoverController.sourceRect = CGRect(
+						x: tabBarWidth / 2 - 25,
+						y: 0,
+						width: 50,
+						height: tabBarController.tabBar.frame.height
+					)
+				}
+
+				tabBarController.present(activityViewController, animated: true)
 			}
 
-			tabBarController.present(activityViewController, animated: true)
-		}
+			func presentationControllerWillDismiss(_: UIPresentationController) {
+				parent.isBlurred = false
+			}
 
-
-		func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
-			parent.isBlurred = false
-		}
-
-		private func presentErrorAlert(from tabBarController: UITabBarController) {
-			let alert = UIAlertController(
-				title: "Error",
-				message: "Unable to generate your shareable pass.",
-				preferredStyle: .alert
-			)
-			alert.addAction(UIAlertAction(title: "OK", style: .default))
-			tabBarController.present(alert, animated: true)
+			private func presentErrorAlert(from tabBarController: UITabBarController) {
+				let alert = UIAlertController(
+					title: "Error",
+					message: "Unable to generate your shareable pass.",
+					preferredStyle: .alert
+				)
+				alert.addAction(UIAlertAction(title: "OK", style: .default))
+				tabBarController.present(alert, animated: true)
+			}
 		}
 	}
-}
 #endif // os(iOS)
 
 #Preview {

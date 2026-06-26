@@ -10,7 +10,7 @@ import Defaults
 
 struct TimetableQuery: EntityStringQuery {
 	func entities(for identifiers: [String]) async throws -> [TimetableEntity] {
-		return await MainActor.run {
+		await MainActor.run {
 			let receivedTimetables = Defaults[.receivedTimetables]
 
 			return receivedTimetables.filter { t in
@@ -23,7 +23,7 @@ struct TimetableQuery: EntityStringQuery {
 	}
 
 	func entities(matching string: String) async throws -> [TimetableEntity] {
-		return await MainActor.run {
+		await MainActor.run {
 			let receivedTimetables = Defaults[.receivedTimetables]
 
 			return receivedTimetables.filter { t in
@@ -36,7 +36,7 @@ struct TimetableQuery: EntityStringQuery {
 	}
 
 	func suggestedEntities() async throws -> [TimetableEntity] {
-		return await MainActor.run {
+		await MainActor.run {
 			Defaults[.receivedTimetables]
 				.toTimetableEntities()
 		}

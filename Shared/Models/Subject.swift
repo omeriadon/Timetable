@@ -19,13 +19,13 @@ struct Subject: Hashable, Codable, Defaults.Serializable, Identifiable, Equatabl
 	}
 }
 
-extension Array where Element == Subject {
+extension [Subject] {
 	func toSubjectEntities() -> [SubjectEntity] {
 		map { $0.toSubjectEntity() }
 	}
 
 	func toTimetableEntity() -> TimetableEntity {
-		let id: String = map { $0.id }.joined()
+		let id: String = map(\.id).joined()
 
 		return TimetableEntity(id: id, subjects: toSubjectEntities())
 	}

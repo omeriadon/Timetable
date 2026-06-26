@@ -29,9 +29,27 @@ enum SchoolState {
 	case outsideSchool
 }
 
-enum BreakType {
+enum BreakType: String {
 	case recess
 	case lunch
+
+	var description: String {
+		switch self {
+			case .recess:
+				"Recess"
+			case .lunch:
+				"Lunch"
+		}
+	}
+
+	var symbol: String {
+		switch self {
+			case .recess:
+				"cup.and.saucer.fill"
+			case .lunch:
+				"takeoutbag.and.cup.and.straw.fill"
+		}
+	}
 }
 
 func getSchoolState(at date: Date, subjectLookup: [Slot: Subject]) -> SchoolState {
@@ -49,7 +67,7 @@ func getSchoolState(at date: Date, subjectLookup: [Slot: Subject]) -> SchoolStat
 		let firstPeriodStartMins = minutes(firstPeriod.start)
 		let sevenAMInMinutes = 7 * 60
 
-		if nowMins >= sevenAMInMinutes && nowMins < firstPeriodStartMins {
+		if nowMins >= sevenAMInMinutes, nowMins < firstPeriodStartMins {
 			if let firstSubject = subjectForPeriod(0, dayIndex: dayIndex, subjectLookup: subjectLookup) {
 				return .beforeSchool(next: firstSubject)
 			}

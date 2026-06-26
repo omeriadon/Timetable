@@ -7,13 +7,16 @@
 
 import Defaults
 import Foundation
+import PassKit
 import WidgetKit
 
 // MARK: - Provider
 
 struct Provider: TimelineProvider {
+	let passManager = TimetablePassManager()
+
 	func placeholder(in _: Context) -> TimetableEntry {
-		TimetableEntry(date: .now, subject: [], relevance: nil)
+		TimetableEntry(date: .now, subjects: [], relevance: nil)
 	}
 
 	func getSnapshot(in _: Context, completion: @escaping (TimetableEntry) -> Void) {
@@ -21,23 +24,31 @@ struct Provider: TimelineProvider {
 		completion(
 			TimetableEntry(
 				date: .now,
-				subject: subjects,
+				subjects: subjects,
 				relevance: nil
 			)
 		)
 	}
 
 	func getTimeline(in _: Context, completion: @escaping (Timeline<TimetableEntry>) -> Void) {
-		let subjects = Defaults[.timetable]
+		let deviceID = DeviceIDProvider().getDeviceID()
+
+		Print("widget deviceID = \(DeviceIDProvider().getDeviceID())")
+
+		let subjects = PKPassLibrary().passes()
+			.compactMap { $0.toReceivedTimetable() }
+			.first(where: { $0.id == deviceID })?
+			.subjects ?? []
+
 		let calendar = Calendar.current
 
-		guard let schoolDay = nextSchoolDay(from: .now, calendar: calendar) else {
+		guard let schoolDay = nextSchoolDay(from: .now.addingTimeInterval(debugOffset), calendar: calendar) else {
 			completion(
 				Timeline(
 					entries: [
 						makeEntry(date: .now, subjects: subjects, calendar: calendar),
 					],
-					policy: .after(Date().addingTimeInterval(60 * 60))
+					policy: .after(Date().addingTimeInterval(debugOffset).addingTimeInterval(60 * 60))
 				)
 			)
 			return
@@ -117,7 +128,7 @@ struct Provider: TimelineProvider {
 
 struct TimetableEntry: TimelineEntry {
 	let date: Date
-	let subject: [Subject]
+	let subjects: [Subject]
 	let relevance: TimelineEntryRelevance?
 }
 
@@ -130,7 +141,7 @@ private func makeEntry(
 ) -> TimetableEntry {
 	TimetableEntry(
 		date: date,
-		subject: subjects,
+		subjects: subjects,
 		relevance: relevance(for: date, calendar: calendar)
 	)
 }

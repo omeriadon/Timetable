@@ -5,7 +5,6 @@
 //  Created by Adon Omeri on 22/6/2026.
 //
 
-
 import SwiftUI
 
 struct ReceivedTimetablesView: View {

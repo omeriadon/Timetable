@@ -8,11 +8,14 @@
 import Foundation
 import os
 
-nonisolated private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.omeriadon.timetable", category: "General")
+private nonisolated let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.omeriadon.timetable", category: "General")
 
-@Sendable nonisolated public func Print(_ message: @autoclosure () -> Any) {
-	#if DEBUG
+@Sendable public nonisolated func Print(_ message: @autoclosure () -> Any) {
 	let evaluatedMessage = message()
-	logger.info("\(String(describing: evaluatedMessage))")
-	#endif
+	logger.debug("\(String(describing: evaluatedMessage))")
+}
+
+@Sendable public nonisolated func PrintError(_ message: @autoclosure () -> Any) {
+	let evaluatedMessage = message()
+	logger.error("\(String(describing: evaluatedMessage))")
 }

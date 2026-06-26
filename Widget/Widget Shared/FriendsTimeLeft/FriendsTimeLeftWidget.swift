@@ -12,33 +12,43 @@ import WidgetKit
 struct FriendsTimeLeftWidget: Widget {
 	let kind: String = "FriendsTimeLeft"
 
+	let passManager = TimetablePassManager()
+
 	var body: some WidgetConfiguration {
 		StaticConfiguration(kind: kind, provider: Provider()) { entry in
-			let subjectLookup = TimetableLayout.subjectLookup(for: entry.subject)
-			let state = getSchoolState(at: entry.date, subjectLookup: subjectLookup)
-
-			let background: Color = switch state {
-				case let .beforeSchool(next):
-					next.colour.swiftUIColor
-				case let .inClass(current, _, _):
-					current?.colour.swiftUIColor ?? .black
-				case .inBreak:
-						.orange
-				case .outsideSchool:
-						.black
+			let friendsSubjects = passManager.receivedTimetables.filter {
+				$0.id != DeviceIDProvider().getDeviceID()
 			}
 
-			TimeLeftView(entry: entry, state: state)
-				.containerBackground(background, for: .widget)
+			let friendScheduleItems: [ScheduleItem] = friendsSubjects.map {
+				let friendSubjectLookup = TimetableLayout.subjectLookup(for: $0.subjects)
+				let friendState = getSchoolState(at: Date().addingTimeInterval(debugOffset), subjectLookup: friendSubjectLookup)
+
+				let friendBackground: Color = switch friendState {
+					case let .beforeSchool(next):
+						next.colour.swiftUIColor
+					case let .inClass(current, _, _):
+						current?.colour.swiftUIColor ?? .black
+					case .inBreak:
+						.orange
+					case .outsideSchool:
+						.black
+				}
+
+				return ScheduleItem(name: $0.sender, currentState: friendState, backgroundColour: friendBackground)
+			}
+
+			FriendsTimeLeftView(entry: entry, schedules: friendScheduleItems)
+				.containerBackground(.black, for: .widget)
 		}
 		.contentMarginsDisabled()
 		.configurationDisplayName("Friends Current Subjects")
 		.description("Check what subjects your friends have right now, along with time left.")
-#if os(watchOS)
-		.supportedFamilies([.accessoryRectangular])
-#else
-		.supportedFamilies([.systemMedium])
-#endif
+		#if os(watchOS)
+			.supportedFamilies([.accessoryRectangular])
+		#else
+			.supportedFamilies([.systemMedium])
+		#endif
 	}
 }
 
@@ -48,7 +58,7 @@ struct FriendsTimeLeftWidget: Widget {
 	} timeline: {
 		TimetableEntry(
 			date: .now,
-			subject: debugTimetable,
+			subjects: debugTimetable,
 			relevance: TimelineEntryRelevance(
 				score: 1.0,
 				duration: 60 * 60
@@ -61,7 +71,7 @@ struct FriendsTimeLeftWidget: Widget {
 	} timeline: {
 		TimetableEntry(
 			date: .now,
-			subject: debugTimetable,
+			subjects: debugTimetable,
 			relevance: TimelineEntryRelevance(
 				score: 1.0,
 				duration: 60 * 60

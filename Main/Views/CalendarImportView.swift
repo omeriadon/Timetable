@@ -106,7 +106,7 @@ struct CalendarImportView: View {
 		calendarImportStep = .error(error)
 		calendarImportStatus = .error
 		Task {
-			Print("[iOS] error: \(error)")
+			PrintError("[iOS] error: \(error)")
 			try? await Task.sleep(for: .seconds(2))
 			dismiss()
 		}

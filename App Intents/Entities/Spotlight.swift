@@ -16,7 +16,7 @@ func indexEntities() async {
 	var timetables = Defaults[.receivedTimetables].toTimetableEntities()
 	timetables.append(Defaults[.timetable].toTimetableEntity())
 
-	let subjects: [SubjectEntity] = timetables.flatMap { $0.subjects }
+	let subjects: [SubjectEntity] = timetables.flatMap(\.subjects)
 
 	try? await timetableIndex.indexAppEntities(timetables)
 	try? await subjectIndex.indexAppEntities(subjects)

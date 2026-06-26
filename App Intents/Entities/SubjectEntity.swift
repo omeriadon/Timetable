@@ -1,5 +1,5 @@
 //
-//  Subject.swift
+//  SubjectEntity.swift
 //  Timetable
 //
 //  Created by Adon Omeri on 20/6/2026.
@@ -13,7 +13,7 @@ struct SubjectEntity: Identifiable, AppEntity, SyncableEntity {
 	static var typeDisplayRepresentation = TypeDisplayRepresentation(name: "Subject")
 
 	init(name: String, symbol: String, colour: RGBAColor, slots: [Slot]) {
-		self.id = name
+		id = name
 		self.symbol = symbol
 		self.colour = colour
 		self.slots = slots
@@ -37,5 +37,5 @@ struct SubjectEntity: Identifiable, AppEntity, SyncableEntity {
 }
 
 #if !os(watchOS)
-extension SubjectEntity: IndexedEntity {}
+	extension SubjectEntity: IndexedEntity {}
 #endif

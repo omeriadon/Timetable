@@ -351,7 +351,7 @@ struct SubjectEditorSheet: View {
 						Print("[iOS] Editor focus: found '\(focus)' at index \(index)")
 						editorPage = index
 					} else {
-						Print("[iOS] Editor focus: '\(focus)' NOT FOUND, defaulting to 0. Available: \(draftSubjects.map(\.name).joined(separator: ", "))")
+						PrintError("[iOS] Editor focus: '\(focus)' NOT FOUND, defaulting to 0. Available: \(draftSubjects.map(\.name).joined(separator: ", "))")
 						editorPage = 0
 					}
 				} else {

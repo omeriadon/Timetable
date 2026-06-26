@@ -9,7 +9,7 @@ import SwiftUI
 import WidgetKit
 
 @main
-struct WatchWidgetBundle: WidgetBundle {
+struct TimetableWidgetBundle: WidgetBundle {
 	var body: some Widget {
 		SharedWidgetBundle()
 	}

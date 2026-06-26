@@ -9,110 +9,241 @@ import Defaults
 import SwiftUI
 import WidgetKit
 
-struct FriendScheduleItem {
-	let name: String
-	let isUser: Bool
+struct ScheduleItem: Identifiable {
+	var id: String {
+		name
+	}
 
-	let currentSubject: String
-	let nextSubject: String
+	let name: String
+
+	let currentState: SchoolState
+	let backgroundColour: Color
 }
+
+let mathematics = Subject(
+	id: "mathematics",
+	symbol: "function",
+	colour: RGBAColor(hexString: "#3B82F6"),
+	slots: [Slot(0, 0), Slot(2, 1), Slot(4, 2)]
+)
+
+let english = Subject(
+	id: "english",
+	symbol: "book",
+	colour: RGBAColor(hexString: "#EF4444"),
+	slots: [Slot(1, 0), Slot(3, 2), Slot(4, 4)]
+)
+
+let science = Subject(
+	id: "science",
+	symbol: "atom",
+	colour: RGBAColor(hexString: "#10B981"),
+	slots: [Slot(0, 2), Slot(2, 3), Slot(3, 0)]
+)
+
+let history = Subject(
+	id: "history",
+	symbol: "building.columns.fill",
+	colour: RGBAColor(hexString: "#F59E0B"),
+	slots: [Slot(1, 1), Slot(3, 3)]
+)
+
+let geography = Subject(
+	id: "geography",
+	symbol: "globe.europe.africa.fill",
+	colour: RGBAColor(hexString: "#06B6D4"),
+	slots: [Slot(0, 4), Slot(2, 0)]
+)
+
+let physics = Subject(
+	id: "physics",
+	symbol: "bolt.fill",
+	colour: RGBAColor(hexString: "#8B5CF6"),
+	slots: [Slot(1, 4), Slot(4, 1)]
+)
+
+let chemistry = Subject(
+	id: "chemistry",
+	symbol: "testtube.2",
+	colour: RGBAColor(hexString: "#EC4899"),
+	slots: [Slot(0, 1), Slot(2, 4)]
+)
+
+let computerScience = Subject(
+	id: "computer-science",
+	symbol: "desktopcomputer",
+	colour: RGBAColor(hexString: "#64748B"),
+	slots: [Slot(1, 3), Slot(3, 1), Slot(4, 0)]
+)
+
+let art = Subject(
+	id: "art",
+	symbol: "paintpalette.fill",
+	colour: RGBAColor(hexString: "#F97316"),
+	slots: [Slot(2, 2), Slot(4, 3)]
+)
+
+let pe = Subject(
+	id: "physical-education",
+	symbol: "figure.run",
+	colour: RGBAColor(hexString: "#22C55E"),
+	slots: [Slot(0, 3), Slot(3, 4)]
+)
 
 struct FriendsTimeLeftView: View {
 	let entry: TimetableEntry
 
-	let state: SchoolState
+	let schedules: [ScheduleItem]
 
-	// MARK: - body
+	init(entry: TimetableEntry, schedules: [ScheduleItem]) {
+		self.entry = entry
 
-	var body: some View {
-		Group {
-			switch state {
-				case let .beforeSchool(next):
-					VStack(alignment: Device.isWatchOS ? .leading : .center) {
-						Spacer()
-						Spacer()
+		if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
+			self.schedules = [
+				ScheduleItem(
+					name: "Alex",
+					currentState: .beforeSchool(next: english),
+					backgroundColour: .red
+				),
 
-						Text("Before School")
-							.font(Device.isWatchOS ? .caption : .headline)
-							.foregroundColor(.secondary)
+				ScheduleItem(
+					name: "Emily",
+					currentState: .inBreak(
+						breakType: .recess,
+						nextText: "Science",
+						info: (start: Date(), end: Date().addingTimeInterval(20 * 60))
+					),
+					backgroundColour: .green
+				),
 
-						Spacer()
+				ScheduleItem(
+					name: "Noah",
+					currentState: .inClass(
+						current: history,
+						nextText: "Geography",
+						info: (start: Date(), end: Date().addingTimeInterval(55 * 60))
+					),
+					backgroundColour: .orange
+				),
 
-						Label("First Period: \(next.id)", systemImage: next.symbol)
-							.font(Device.isWatchOS ? .title3 : .title)
+				ScheduleItem(
+					name: "Sophia",
+					currentState: .outsideSchool,
+					backgroundColour: .purple
+				),
 
-						Spacer()
-						Spacer()
-					}
+				ScheduleItem(
+					name: "Liam",
+					currentState: .inBreak(
+						breakType: .lunch,
+						nextText: "Physics",
+						info: (start: Date(), end: Date().addingTimeInterval(40 * 60))
+					),
+					backgroundColour: .pink
+				),
 
-				case let .inClass(current, nextText, info):
-					createProgressView(
-						title: current?.id ?? "Free Period",
-						symbol: current?.symbol ?? "studentdesk",
-						nextText: nextText,
-						start: info.start,
-						end: info.end
-					)
+				ScheduleItem(
+					name: "Olivia",
+					currentState: .inClass(
+						current: chemistry,
+						nextText: "Computer Science",
+						info: (start: Date(), end: Date().addingTimeInterval(50 * 60))
+					),
+					backgroundColour: .cyan
+				),
 
-				case let .inBreak(breakType, nextText, info):
-					createProgressView(
-						title: breakType == .lunch ? "Lunch" : "Recess",
-						symbol: breakType == .lunch ? "takeoutbag.and.cup.and.straw.fill" : "cup.and.saucer.fill",
-						nextText: nextText,
-						start: info.start,
-						end: info.end
-					)
+				ScheduleItem(
+					name: "Ethan",
+					currentState: .beforeSchool(next: pe),
+					backgroundColour: .mint
+				),
 
-				case .outsideSchool:
-					VStack(alignment: Device.isWatchOS ? .leading : .center) {
-						Spacer()
-						Spacer()
+				ScheduleItem(
+					name: "Mia",
+					currentState: .inClass(
+						current: art,
+						nextText: "Home",
+						info: (start: Date(), end: Date().addingTimeInterval(45 * 60))
+					),
+					backgroundColour: .yellow
+				),
 
-						Label("School's Out", systemImage: "house.fill")
-							.font(Device.isWatchOS ? .title3 : .title)
-							.foregroundColor(.indigo)
-
-						Spacer()
-
-						Text("No more classes")
-							.font(Device.isWatchOS ? .caption : .headline)
-							.foregroundColor(.secondary)
-
-						Spacer()
-						Spacer()
-					}
-			}
+				ScheduleItem(
+					name: "Lucas",
+					currentState: .outsideSchool,
+					backgroundColour: .gray
+				),
+			]
+		} else {
+			self.schedules = schedules
 		}
-		.monospaced()
 	}
 
-	// MARK: - createProgressView
+	var body: some View {
+		VStack(spacing: 0) {
+			HStack {
+				Text("You")
 
-	private func createProgressView(
-		title: String,
-		symbol: String,
-		nextText: String,
-		start _: Date,
-		end: Date
-	) -> some View {
-		VStack(alignment: .leading) {
-			Label(title, systemImage: symbol)
-				.font(Device.isWatchOS ? .headline : .title)
-				.lineLimit(1)
+				Spacer()
 
-			Spacer(minLength: 1)
+				let subjectLookup = TimetableLayout.subjectLookup(for: entry.subjects)
+				let state = getSchoolState(at: Date().addingTimeInterval(debugOffset), subjectLookup: subjectLookup)
 
-			Text(end, style: .timer)
-				.font(Device.isWatchOS ? .body : .largeTitle.scaled(by: 1.3))
-				.contentTransition(.numericText(countsDown: true))
+				switch state {
+					case let .beforeSchool(next):
+						Text("before school")
 
-			Spacer(minLength: 1)
+					case let .inClass(current, nextText, info):
+						Text(timerInterval: Date.now ... info.end, countsDown: true)
+							.contentTransition(.numericText(countsDown: true))
 
-			Text(nextText)
-				.font(Device.isWatchOS ? .body.scaled(by: 0.9) : .title3)
-				.foregroundStyle(.secondary)
-				.lineLimit(1)
+					case let .inBreak(breakType, nextText, info):
+						Text(timerInterval: Date.now ... info.end, countsDown: true)
+							.contentTransition(.numericText(countsDown: true))
+
+					case .outsideSchool:
+						Text("after")
+				}
+			}
+			.frame(height: 40)
+			.padding(.horizontal, 15)
+
+			ForEach(schedules.prefix(4)) { schedule in
+				HStack(spacing: 0) {
+					Text(schedule.name)
+
+					Spacer()
+
+					Group {
+						switch schedule.currentState {
+							case let .beforeSchool(next: next):
+								Text(next.id.capitalized)
+
+							case let .inBreak(breakType: breakType, nextText: nextText, info: info):
+								Label(breakType.description, systemImage: breakType.symbol)
+									.imageScale(.small)
+
+							case let .inClass(current: current, nextText: nextText, info: info):
+								Label(current?.id ?? "unknown", systemImage: current?.symbol ?? "circle")
+
+							case .outsideSchool:
+								Label("Outside School Time", systemImage: "zzz")
+						}
+					}
+					.animation(.easeInOut, value: schedule.id)
+					.font(.callout)
+				}
+				.frame(maxHeight: 37)
+				.padding(.horizontal, 15)
+				.background {
+					schedule.backgroundColour
+				}
+			}
+
+			Spacer(minLength: 0)
 		}
-		.padding([.vertical, .leading])
+		.foregroundStyle(.white)
+		.monospaced()
+		.dynamicTypeSize(.medium)
 	}
 }

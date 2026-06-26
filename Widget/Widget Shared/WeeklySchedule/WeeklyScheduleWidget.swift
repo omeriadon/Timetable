@@ -13,8 +13,8 @@ struct WeeklyScheduleWidget: Widget {
 	let kind: String = "WeeklySchedule"
 
 	var body: some WidgetConfiguration {
-		StaticConfiguration(kind: kind, provider: Provider()) { _ in
-			WeeklyScheduleView()
+		StaticConfiguration(kind: kind, provider: Provider()) { entry in
+			WeeklyScheduleView(entry: entry)
 				.containerBackground(.black, for: .widget)
 		}
 		#if os(watchOS)
@@ -34,7 +34,7 @@ struct WeeklyScheduleWidget: Widget {
 	} timeline: {
 		TimetableEntry(
 			date: .now,
-			subject: debugTimetable,
+			subjects: debugTimetable,
 			relevance: TimelineEntryRelevance(
 				score: 1.0,
 				duration: 60 * 60
@@ -47,7 +47,7 @@ struct WeeklyScheduleWidget: Widget {
 	} timeline: {
 		TimetableEntry(
 			date: .now,
-			subject: debugTimetable,
+			subjects: debugTimetable,
 			relevance: TimelineEntryRelevance(
 				score: 1.0,
 				duration: 60 * 60

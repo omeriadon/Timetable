@@ -17,7 +17,7 @@ struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiable, Hashable
 	let receivedAt: Date
 
 	init(sender: String, subjects: [Subject], receivedAt: Date) {
-		self.id = UUID().uuidString
+		id = UUID().uuidString
 		self.sender = sender
 		self.subjects = subjects
 		self.receivedAt = receivedAt
@@ -25,16 +25,16 @@ struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiable, Hashable
 
 	func toTimetableEntity() -> TimetableEntity {
 		let entity = TimetableEntity(
-			id: self.id,
-			subjects: self.subjects.toSubjectEntities()
+			id: id,
+			subjects: subjects.toSubjectEntities()
 		)
-		entity.sharedInfo = SharedInfo(receivedAt: self.receivedAt, sender: self.sender)
+		entity.sharedInfo = SharedInfo(receivedAt: receivedAt, sender: sender)
 		return entity
 	}
 }
 
-extension Array where Element == ReceivedTimetable {
+extension [ReceivedTimetable] {
 	func toTimetableEntities() -> [TimetableEntity] {
-		self.map { $0.toTimetableEntity() }
+		map { $0.toTimetableEntity() }
 	}
 }

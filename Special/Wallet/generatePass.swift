@@ -21,9 +21,7 @@ enum PassError: Error {
 typealias JSON = [String: Any]
 
 nonisolated func generatePass() async throws -> URL {
-
 	let startTime = ContinuousClock.now
-
 
 	// get data
 	let subjects = await Defaults[.timetable]
@@ -95,13 +93,13 @@ nonisolated func generatePass() async throws -> URL {
 			}
 
 			let subjectsSummaryString: String = subjects
-				.map { $0.id }
+				.map(\.id)
 				.joined(separator: ", ")
 
 			let subjectsSummaryItem: [String: Any] = [
 				"key": "subjectsSummary",
 				"label": "Subjects Summary",
-				"value": subjectsSummaryString
+				"value": subjectsSummaryString,
 			]
 
 			// Build the new additions for the back fields
@@ -113,11 +111,11 @@ nonisolated func generatePass() async throws -> URL {
 					"label": "Shared On",
 					"value": sharedDate,
 					"dateStyle": "PKDateStyleLong",
-					"timeStyle": "PKDateStyleNone"
-				]
+					"timeStyle": "PKDateStyleNone",
+				],
 			] + subjectBackFields + [
 				["key": "amountOfSubjects", "label": "Total Subjects", "value": subjects.count],
-				subjectsSummaryItem
+				subjectsSummaryItem,
 			]
 
 			// To prevent duplicate keys if this runs multiple times, filter out existing matching keys
@@ -148,7 +146,7 @@ nonisolated func generatePass() async throws -> URL {
 						"key": "subjectsSummary",
 						"label": "Subjects Summary",
 						"textAlignment": "PKTextAlignmentNatural",
-						"value": subjectsSummaryString
+						"value": subjectsSummaryString,
 					])
 				}
 				subField["footerFields"] = footerFields
@@ -158,7 +156,7 @@ nonisolated func generatePass() async throws -> URL {
 					"key": "subjectsSummary",
 					"label": "Subjects Summary",
 					"textAlignment": "PKTextAlignmentNatural",
-					"value": subjectsSummaryString
+					"value": subjectsSummaryString,
 				]]
 			}
 
@@ -183,7 +181,7 @@ nonisolated func generatePass() async throws -> URL {
 	let files = try fileManager.contentsOfDirectory(atPath: passWorkingURL.path)
 
 	for file in files {
-		guard file != ".DS_Store" && file != "manifest.json" && file != "signature" else { continue }
+		guard file != ".DS_Store", file != "manifest.json", file != "signature" else { continue }
 		let fileURL = passWorkingURL.appendingPathComponent(file)
 
 		var isDirectory: ObjCBool = false
@@ -207,7 +205,7 @@ nonisolated func generatePass() async throws -> URL {
 		let signatureData = try signDataWithBundledKey(manifestData)
 		try signatureData.write(to: signatureURL)
 	} catch {
-		Print("Cryptographic signing failed: \(error)")
+		PrintError("Cryptographic signing failed: \(error)")
 		throw PassError.signingFailed
 	}
 
@@ -221,7 +219,7 @@ nonisolated func generatePass() async throws -> URL {
 		Print("Pass generation took: \(elapsedTime)")
 		return finalPkpassURL
 	} catch {
-		Print("Zipping up your .pkpass archive failed: \(error)")
+		PrintError("Zipping up your .pkpass archive failed: \(error)")
 		throw PassError.zipFailed
 	}
 }

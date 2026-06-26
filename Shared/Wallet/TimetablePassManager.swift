@@ -37,7 +37,7 @@ final class TimetablePassManager {
 		}
 	}
 
-	@objc private func passLibraryDidChange(_ notification: Notification) {
+	@objc private func passLibraryDidChange(_: Notification) {
 		Print("passLibraryDidChange")
 		refreshPasses()
 	}
@@ -51,18 +51,6 @@ final class TimetablePassManager {
 		Task(priority: .userInitiated) {
 			let allPasses = self.passLibrary.passes()
 			Print("Found \(allPasses.count) raw passes in Wallet.")
-
-			for (index, pass) in allPasses.enumerated() {
-				Print("--- Inspecting Pass \(index) ---")
-				Print("Title: \(pass.localizedName)")
-				Print("Type ID: \(pass.passTypeIdentifier)")
-				Print("Serial: \(pass.serialNumber)")
-				Print("UserInfo Dictionary: \(String(describing: pass.userInfo))")
-
-				// See if your custom decoder method is throwing an unhandled nil
-				let converted = pass.toReceivedTimetable()
-				Print("Conversion result: \(converted == nil ? "❌ FAILED (Returned nil)" : "✅ SUCCESS")")
-			}
 
 			let extractedTimetables = allPasses.compactMap { $0.toReceivedTimetable() }
 
@@ -94,48 +82,50 @@ final class TimetablePassManager {
 			// Note: The PKPassLibraryDidChange notification will automatically trigger refreshPasses()
 			Print("pass found and removed!")
 		} else {
-			Print("pass not found")
+			PrintError("pass not found")
 		}
 	}
 
-	#if !os(watchOS)
-	func isSelfTimetableUpToDate() -> TimetableInWalletState {
-		guard PKPassLibrary.isPassLibraryAvailable() else { return .inWalletUpToDate }
+	#if !os(watchOS) && !os(macOS)
+		func isSelfTimetableUpToDate() -> TimetableInWalletState {
+			guard PKPassLibrary.isPassLibraryAvailable() else { return .inWalletUpToDate }
 
-		let systemPasses = passLibrary.passes()
+			let systemPasses = passLibrary.passes()
 
-		let matchingPass: PKPass? = systemPasses.first { pass in
-			pass.serialNumber == DeviceIDProvider().getDeviceID()
-		}
+			Print("device deviceID = \(DeviceIDProvider().getDeviceID())")
 
-		if let matchingPass {
-			if let extractedTimetable = matchingPass.toReceivedTimetable() {
-				if extractedTimetable.sender == Defaults[.userDisplayName],
-				   extractedTimetable.subjects == Defaults[.timetable]
-				{
-					Print("pass found, up to date")
-					return .inWalletUpToDate
-				} else {
-					Print("pass found, not up to date")
-					return .inWalletNotUpToDate
-				}
-			} else {
-				return .notInWallet
+			let matchingPass: PKPass? = systemPasses.first { pass in
+				pass.serialNumber == DeviceIDProvider().getDeviceID()
 			}
 
-		} else {
-			Print("pass not found")
-			return .notInWallet
+			if let matchingPass {
+				if let extractedTimetable = matchingPass.toReceivedTimetable() {
+					if extractedTimetable.sender == Defaults[.userDisplayName],
+					   extractedTimetable.subjects == Defaults[.timetable]
+					{
+						Print("pass found, up to date")
+						return .inWalletUpToDate
+					} else {
+						Print("pass found, not up to date")
+						return .inWalletNotUpToDate
+					}
+				} else {
+					return .notInWallet
+				}
+
+			} else {
+				PrintError("pass not found")
+				return .notInWallet
+			}
 		}
-	}
-	#endif // !os(watchOS)
+	#endif // !os(watchOS) && !os(macOS)
 
 	/// Handles requests to replace old system metadata safely
-	func updatePass(for timetable: ReceivedTimetable, with updatedSubjects: [Subject]) {
+	func updatePass(for timetable: ReceivedTimetable, with _: [Subject]) {
 		// To natively update a pass template, you usually deploy an updated cryptographic .pkpass file
 		// package back into the library, or update via push notifications if connected to a web service.
 		// For localized updates, regenerate your pass with new info and re-add it using `PKPassLibrary.replacePass(with:)`
-		Print("Update pass triggered for \(timetable.sender). Regenerate and call replacePass(with:)")
+		PrintError("Update pass triggered for \(timetable.sender). Regenerate and call replacePass(with:)")
 	}
 }
 

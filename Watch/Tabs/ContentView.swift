@@ -59,7 +59,7 @@ struct ContentView: View {
 		}
 		.onChange(of: syncStore.alertMessage) { _, newValue in
 			guard let newValue else { return }
-			Print("[Watch] Surface error icon: \(newValue)")
+			PrintError("[Watch] Surface error icon: \(newValue)")
 			flashSyncErrorIcon()
 			syncStore.alertMessage = nil
 		}

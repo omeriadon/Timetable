@@ -15,7 +15,7 @@ enum KeychainManager {
 		let query: [String: Any] = [
 			kSecClass as String: kSecClassGenericPassword,
 			kSecAttrAccount as String: key,
-			kSecValueData as String: data
+			kSecValueData as String: data,
 		]
 
 		// Always delete the old item first to ensure a clean overwrite
@@ -28,7 +28,7 @@ enum KeychainManager {
 			kSecClass as String: kSecClassGenericPassword,
 			kSecAttrAccount as String: key,
 			kSecReturnData as String: kCFBooleanTrue!,
-			kSecMatchLimit as String: kSecMatchLimitOne
+			kSecMatchLimit as String: kSecMatchLimitOne,
 		]
 
 		var dataTypeRef: AnyObject?
@@ -47,6 +47,10 @@ class DeviceIDProvider {
 
 	/// Fetches the persistent device ID from the Keychain, creating it if it doesn't exist.
 	func getDeviceID() -> String {
+		if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
+			return "1"
+		}
+
 		// Look for an existing ID
 		if let existingID = KeychainManager.read(forKey: keychainKey) {
 			return existingID

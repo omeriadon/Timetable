@@ -14,7 +14,7 @@ struct TimeLeftWidget: Widget {
 
 	var body: some WidgetConfiguration {
 		StaticConfiguration(kind: kind, provider: Provider()) { entry in
-			let subjectLookup = TimetableLayout.subjectLookup(for: entry.subject)
+			let subjectLookup = TimetableLayout.subjectLookup(for: entry.subjects)
 			let state = getSchoolState(at: entry.date, subjectLookup: subjectLookup)
 
 			let background: Color = switch state {
@@ -48,7 +48,7 @@ struct TimeLeftWidget: Widget {
 	}, timeline: {
 		TimetableEntry(
 			date: Date(),
-			subject: debugTimetable,
+			subjects: debugTimetable,
 			relevance: TimelineEntryRelevance(
 				score: 1.0,
 				duration: 60 * 60
@@ -61,7 +61,7 @@ struct TimeLeftWidget: Widget {
 	}, timeline: {
 		TimetableEntry(
 			date: Date(),
-			subject: debugTimetable,
+			subjects: debugTimetable,
 			relevance: TimelineEntryRelevance(
 				score: 1.0,
 				duration: 60 * 60

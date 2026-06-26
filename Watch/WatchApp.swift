@@ -168,7 +168,7 @@ struct TimetableWatchApp: App {
 								Color(red: 0.60, green: 0.90, blue: 1.0),
 								Color(red: 0.70, green: 1.0, blue: 0.70),
 								Color(red: 1.0, green: 0.60, blue: 0.40),
-								Color(red: 0.80, green: 0.60, blue: 1.0)
+								Color(red: 0.80, green: 0.60, blue: 1.0),
 							],
 							background: Color.blue,
 							speed: 2,

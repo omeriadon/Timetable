@@ -47,17 +47,17 @@ final class PhoneWatchSyncBridge: NSObject, WCSessionDelegate {
 
 			if session.isReachable {
 				session.sendMessage(payload, replyHandler: nil) { error in
-					Print("Watch live sync failed: \(error.localizedDescription)")
+					PrintError("Watch live sync failed: \(error.localizedDescription)")
 				}
 			}
 		} catch {
-			Print("Error encoding or updating application context: \(error.localizedDescription)")
+			PrintError("Error encoding or updating application context: \(error.localizedDescription)")
 		}
 	}
 
 	func session(_: WCSession, activationDidCompleteWith _: WCSessionActivationState, error: Error?) {
 		if let error {
-			Print("WatchConnectivity activation failed: \(error.localizedDescription)")
+			PrintError("WatchConnectivity activation failed: \(error.localizedDescription)")
 		}
 	}
 

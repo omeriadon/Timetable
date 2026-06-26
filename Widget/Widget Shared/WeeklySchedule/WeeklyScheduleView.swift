@@ -10,16 +10,19 @@ import SwiftUI
 import WidgetKit
 
 struct WeeklyScheduleView: View {
-	@Default(.timetable) var subjects
+	let entry: TimetableEntry
 
 	@Environment(\.widgetRenderingMode) var widgetRenderingMode
 
 	// MARK: - body
 
 	var body: some View {
+		let subjects = entry.subjects
 		let subjectLookup = TimetableLayout.subjectLookup(for: subjects)
 
 		if subjects.isEmpty {
+			let _ = Print("widget deviceID = \(DeviceIDProvider().getDeviceID())")
+
 			Text("No timetable synced yet")
 				.lineLimit(2)
 
@@ -186,7 +189,7 @@ struct WeeklyScheduleView: View {
 	// MARK: - currentWeekdayIndex
 
 	private var currentWeekdayIndex: Int {
-		let weekday = Calendar.current.component(.weekday, from: Date())
+		let weekday = Calendar.current.component(.weekday, from: Date().addingTimeInterval(debugOffset))
 		// weekday: 1 = Sunday ... 7 = Saturday
 		// convert to 0 = Monday ... 4 = Friday
 		return (weekday + 5) % 7

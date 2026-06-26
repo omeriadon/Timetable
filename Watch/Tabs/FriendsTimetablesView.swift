@@ -74,7 +74,7 @@ struct FriendsTimetablesView: View {
 
 				Spacer()
 
-				let isAfter850 = Date() >= Calendar.current.date(
+				let isAfter850 = Date().addingTimeInterval(debugOffset) >= Calendar.current.date(
 					bySettingHour: 8,
 					minute: 50,
 					second: 0,

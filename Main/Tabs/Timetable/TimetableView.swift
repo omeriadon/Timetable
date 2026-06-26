@@ -20,7 +20,6 @@ struct TimetableView: View {
 
 	@Environment(\.passManager) private var passManager
 
-
 	@State private var selectedTimetable: ReceivedTimetable?
 	@State private var showTimetableComparison = false
 	@State private var selectedSlot: Slot? = nil
@@ -110,18 +109,18 @@ struct TimetableView: View {
 							expanded = .comparison
 						}
 					}
-			.onAppear {
-				if selectedSlot != nil {
-					expanded = .comparison
-				}
-			}
+					.onAppear {
+						if selectedSlot != nil {
+							expanded = .comparison
+						}
+					}
 			#endif
 		}
 		.padding(.trailing, 2)
 	}
 
 	private func findCurrentSubject(in timetable: [Subject]) -> Subject? {
-		let today = Date()
+		let today = Date().addingTimeInterval(debugOffset)
 		let weekday = Calendar.current.component(.weekday, from: today)
 		let dayIndex = (weekday + 5) % 7
 
