@@ -31,8 +31,6 @@ struct Provider: TimelineProvider {
 	}
 
 	func getTimeline(in _: Context, completion: @escaping (Timeline<TimetableEntry>) -> Void) {
-		let deviceID = DeviceIDProvider().getDeviceID()
-
 		Print("widget deviceID = \(DeviceIDProvider().getDeviceID())")
 
 		let subjects = PKPassLibrary().passes()
