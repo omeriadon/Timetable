@@ -194,11 +194,11 @@ struct FriendsTimeLeftView: View {
 						Text("before school")
 
 					case let .inClass(current, nextText, info):
-						Text(timerInterval: Date.now ... info.end, countsDown: true)
+						Text(timerInterval: Date.now.addingTimeInterval(debugOffset) ... info.end, countsDown: true)
 							.contentTransition(.numericText(countsDown: true))
 
 					case let .inBreak(breakType, nextText, info):
-						Text(timerInterval: Date.now ... info.end, countsDown: true)
+						Text(timerInterval: Date.now.addingTimeInterval(debugOffset) ... info.end, countsDown: true)
 							.contentTransition(.numericText(countsDown: true))
 
 					case .outsideSchool:

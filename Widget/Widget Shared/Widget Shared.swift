@@ -37,7 +37,8 @@ struct Provider: TimelineProvider {
 
 		let subjects = PKPassLibrary().passes()
 			.compactMap { $0.toReceivedTimetable() }
-			.first(where: { $0.id == deviceID })?
+//			.first(where: { $0.id == deviceID })?
+			.first?
 			.subjects ?? []
 
 		let calendar = Calendar.current
