@@ -76,14 +76,18 @@ struct NetworkAlert: Identifiable {
 }
 
 enum NetworkError: Error, LocalizedError {
+	case cancelled
 	case invalidConfiguration
 	case invalidResponse
 	case offline
 	case server(statusCode: Int, response: ServerErrorResponse)
+	case timedOut
 	case transport(String)
 
 	var errorDescription: String? {
 		switch self {
+			case .cancelled:
+				"The request was cancelled."
 			case .invalidConfiguration:
 				"The timetable server URL is not configured."
 			case .invalidResponse:
@@ -92,6 +96,8 @@ enum NetworkError: Error, LocalizedError {
 				"Connect to the internet and try again."
 			case let .server(_, response):
 				response.message
+			case .timedOut:
+				"The server took too long to respond."
 			case let .transport(message):
 				message
 		}
@@ -241,13 +247,39 @@ final class NetworkManager {
 			return data
 		} catch let error as NetworkError {
 			PrintError("Request failed for \(endpoint.path)", category: .network, error: error)
+			if case .cancelled = error {
+				throw error
+			}
 			present(error)
 			throw error
+		} catch is CancellationError {
+			throw NetworkError.cancelled
+		} catch let error as URLError {
+			let networkError = map(error)
+			if case .cancelled = networkError {
+				throw networkError
+			}
+			PrintError("Transport failed for \(endpoint.path)", category: .network, error: error)
+			present(networkError)
+			throw networkError
 		} catch {
 			let networkError = NetworkError.transport(error.localizedDescription)
 			PrintError("Transport failed for \(endpoint.path)", category: .network, error: error)
 			present(networkError)
 			throw networkError
+		}
+	}
+
+	private func map(_ error: URLError) -> NetworkError {
+		switch error.code {
+			case .cancelled:
+				.cancelled
+			case .networkConnectionLost, .notConnectedToInternet:
+				.offline
+			case .timedOut:
+				.timedOut
+			default:
+				.transport(error.localizedDescription)
 		}
 	}
 
