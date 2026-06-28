@@ -1,8 +1,8 @@
 //
-//  generatePass.swift
-//  Timetable
+//   generatePass.swift
+//   Shared
 //
-//  Created by Adon Omeri on 21/6/2026.
+//   Created by Adon Omeri on 21/6/2026.
 //
 
 import CryptoKit

@@ -1,8 +1,8 @@
 //
-//  CloudKit.swift
-//  Timetable
+//   CloudKit.swift
+//   Shared
 //
-//  Created by Adon Omeri on 12/6/2026.
+//   Created by Adon Omeri on 12/6/2026.
 //
 
 import CloudKit

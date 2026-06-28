@@ -1,8 +1,8 @@
 //
-//  signDataWithBundleKey.swift
-//  Timetable
+//   signDataWithBundleKey.swift
+//   Shared
 //
-//  Created by Adon Omeri on 21/6/2026.
+//   Created by Adon Omeri on 21/6/2026.
 //
 
 import Foundation

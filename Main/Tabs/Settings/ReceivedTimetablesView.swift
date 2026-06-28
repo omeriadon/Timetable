@@ -1,8 +1,8 @@
 //
-//  ReceivedTimetablesView.swift
-//  Timetable
+//   ReceivedTimetablesView.swift
+//   Main
 //
-//  Created by Adon Omeri on 22/6/2026.
+//   Created by Adon Omeri on 22/6/2026.
 //
 
 import SwiftUI

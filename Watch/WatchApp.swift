@@ -1,8 +1,8 @@
 //
-//  WatchApp.swift
-//  Timetable Watch Watch App
+//   WatchApp.swift
+//   Watch
 //
-//  Created by Adon Omeri on 26/4/2026.
+//   Created by Adon Omeri on 26/4/2026.
 //
 
 import Combine

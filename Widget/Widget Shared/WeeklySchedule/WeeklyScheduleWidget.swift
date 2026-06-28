@@ -1,8 +1,8 @@
 //
-//  WeeklyScheduleWidget.swift
-//  Shared Widget
+//   WeeklyScheduleWidget.swift
+//   Watch
 //
-//  Created by Adon Omeri on 27/4/2026.
+//   Created by Adon Omeri on 13/6/2026.
 //
 
 import Defaults

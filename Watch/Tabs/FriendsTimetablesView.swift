@@ -1,8 +1,8 @@
 //
-//  FriendsTimetablesView.swift
-//  Timetable Watch
+//   FriendsTimetablesView.swift
+//   Watch
 //
-//  Created by Adon Omeri on 11/6/2026.
+//   Created by Adon Omeri on 11/6/2026.
 //
 
 import Combine

@@ -1,8 +1,8 @@
 //
-//  DEBUG.swift
-//  Timetable
+//   DEBUG.swift
+//   Shared
 //
-//  Created by Adon Omeri on 20/6/2026.
+//   Created by Adon Omeri on 24/6/2026.
 //
 
 import Foundation

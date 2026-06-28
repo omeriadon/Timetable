@@ -1,8 +1,8 @@
 //
-//  NameSheet.swift
-//  Timetable
+//   NameSheet.swift
+//   Main
 //
-//  Created by Adon Omeri on 11/6/2026.
+//   Created by Adon Omeri on 11/6/2026.
 //
 
 import Defaults

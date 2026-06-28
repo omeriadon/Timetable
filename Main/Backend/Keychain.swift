@@ -1,43 +1,64 @@
 //
-//  Keychain.swift
-//  Timetable
+//   Keychain.swift
+//   Main
 //
-//  Created by Adon Omeri on 22/6/2026.
+//   Created by Adon Omeri on 22/6/2026.
 //
 
 import Foundation
 import Security
 
 enum KeychainManager {
-	static func save(string: String, forKey key: String) {
-		guard let data = string.data(using: .utf8) else { return }
-
+	@discardableResult
+	static func save(data: Data, forKey key: String) -> Bool {
 		let query: [String: Any] = [
 			kSecClass as String: kSecClassGenericPassword,
 			kSecAttrAccount as String: key,
 			kSecValueData as String: data,
 		]
 
-		// Always delete the old item first to ensure a clean overwrite
 		SecItemDelete(query as CFDictionary)
-		SecItemAdd(query as CFDictionary, nil)
+		return SecItemAdd(query as CFDictionary, nil) == errSecSuccess
 	}
 
-	static func read(forKey key: String) -> String? {
+	@discardableResult
+	static func save(string: String, forKey key: String) -> Bool {
+		guard let data = string.data(using: .utf8) else { return false }
+		return save(data: data, forKey: key)
+	}
+
+	static func readData(forKey key: String) -> Data? {
 		let query: [String: Any] = [
 			kSecClass as String: kSecClassGenericPassword,
 			kSecAttrAccount as String: key,
-			kSecReturnData as String: kCFBooleanTrue!,
+			kSecReturnData as String: kCFBooleanTrue as Any,
 			kSecMatchLimit as String: kSecMatchLimitOne,
 		]
 
 		var dataTypeRef: AnyObject?
 		let status = SecItemCopyMatching(query as CFDictionary, &dataTypeRef)
 
-		if status == errSecSuccess, let data = dataTypeRef as? Data, let string = String(data: data, encoding: .utf8) {
-			return string
+		if status == errSecSuccess {
+			return dataTypeRef as? Data
 		}
+
 		return nil
+	}
+
+	static func read(forKey key: String) -> String? {
+		guard let data = readData(forKey: key) else { return nil }
+		return String(data: data, encoding: .utf8)
+	}
+
+	@discardableResult
+	static func delete(forKey key: String) -> Bool {
+		let query: [String: Any] = [
+			kSecClass as String: kSecClassGenericPassword,
+			kSecAttrAccount as String: key,
+		]
+
+		let status = SecItemDelete(query as CFDictionary)
+		return status == errSecSuccess || status == errSecItemNotFound
 	}
 }
 

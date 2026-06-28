@@ -1,8 +1,8 @@
 //
-//  ReceivedTimetable.swift
-//  Timetable
+//   ReceivedTimetable.swift
+//   Shared
 //
-//  Created by Adon Omeri on 20/6/2026.
+//   Created by Adon Omeri on 20/6/2026.
 //
 
 import Defaults

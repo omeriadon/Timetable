@@ -1,8 +1,8 @@
 //
-//  ContentView.swift
-//  Timetable Watch Watch App
+//   ContentView.swift
+//   Watch
 //
-//  Created by Adon Omeri on 26/4/2026.
+//   Created by Adon Omeri on 11/6/2026.
 //
 
 import Defaults

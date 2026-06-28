@@ -1,8 +1,8 @@
 //
-//  SessionCellView.swift
-//  Timetable
+//   SessionCellView.swift
+//   Main
 //
-//  Created by Adon Omeri on 16/6/2026.
+//   Created by Adon Omeri on 16/6/2026.
 //
 
 import SwiftUI

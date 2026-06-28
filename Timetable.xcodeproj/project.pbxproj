@@ -110,6 +110,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Backend/Keychain.swift,
+				Backend/SessionStore.swift,
 			);
 			target = 2A25869F2FB5D6490030C8CD /* Watch Widget */;
 		};
@@ -117,6 +118,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Backend/Keychain.swift,
+				Backend/SessionStore.swift,
 			);
 			target = 2AA6DF132FDFAC8F00BBC70E /* Widget */;
 		};
@@ -124,6 +126,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Backend/Keychain.swift,
+				Backend/SessionStore.swift,
 			);
 			target = 2A098C822F9DB842002065BE /* Watch */;
 		};

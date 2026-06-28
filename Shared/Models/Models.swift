@@ -1,8 +1,8 @@
 //
-//  Defaults + Model.swift
-//  Timetable
+//   Models.swift
+//   Shared
 //
-//  Created by Adon Omeri on 25/4/2026.
+//   Created by Adon Omeri on 25/4/2026.
 //
 
 import AppIntents

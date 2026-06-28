@@ -1,8 +1,8 @@
 //
-//  WatchTimetableSyncStore.swift
-//  Timetable
+//   WatchTimetableSyncStore.swift
+//   Watch
 //
-//  Created by Adon Omeri on 11/6/2026.
+//   Created by Adon Omeri on 11/6/2026.
 //
 
 import Defaults

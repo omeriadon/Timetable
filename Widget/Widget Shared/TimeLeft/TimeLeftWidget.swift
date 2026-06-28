@@ -1,8 +1,8 @@
 //
-//  TimeLeftWidget.swift
-//  Shared Widget
+//   TimeLeftWidget.swift
+//   Watch
 //
-//  Created by Adon Omeri on 27/4/2026.
+//   Created by Adon Omeri on 13/5/2026.
 //
 
 import Defaults

@@ -1,8 +1,8 @@
 //
-//  TimetableApp.swift
-//  Timetable
+//   TimetableApp.swift
+//   Main
 //
-//  Created by Adon Omeri on 25/4/2026.
+//   Created by Adon Omeri on 25/4/2026.
 //
 
 #if os(macOS)
@@ -36,6 +36,7 @@ struct TimetableApp: App {
 	private let cloudSync = CloudStore.shared
 
 	@State private var passManager = TimetablePassManager()
+	@State private var sessionStore = SessionStore.shared
 
 	var showNameSheet: Bool {
 		userName.isEmpty
@@ -53,7 +54,11 @@ struct TimetableApp: App {
 		WindowGroup {
 			ContentView(expanded: $expanded)
 				.task {
+					if Defaults[.installationID].isEmpty {
+						Defaults[.installationID] = DeviceIDProvider.shared.getDeviceID()
+					}
 					await indexEntities()
+					await sessionStore.restore()
 				}
 			#if os(iOS)
 				.sheet(isPresented: .constant(showNameSheet)) {

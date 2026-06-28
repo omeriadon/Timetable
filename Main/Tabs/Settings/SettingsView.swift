@@ -1,8 +1,8 @@
 //
-//  SettingsView.swift
-//  Timetable
+//   SettingsView.swift
+//   Main
 //
-//  Created by Adon Omeri on 13/5/2026.
+//   Created by Adon Omeri on 13/5/2026.
 //
 
 import Defaults

@@ -1,8 +1,8 @@
 //
-//  CalendarImportView.swift
-//  Timetable
+//   CalendarImportView.swift
+//   Main
 //
-//  Created by Adon Omeri on 27/4/2026.
+//   Created by Adon Omeri on 27/4/2026.
 //
 
 import Defaults

@@ -1,8 +1,8 @@
 //
-//  CustomMaterialView.swift
-//  Timetable
+//   CustomMaterialView.swift
+//   Main
 //
-//  Created by Adon Omeri on 15/6/2026.
+//   Created by Adon Omeri on 16/6/2026.
 //
 
 import AppKit

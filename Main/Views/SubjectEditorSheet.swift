@@ -1,8 +1,8 @@
 //
-//  SubjectEditorSheet.swift
-//  Timetable
+//   SubjectEditorSheet.swift
+//   Main
 //
-//  Created by Adon Omeri on 13/5/2026.
+//   Created by Adon Omeri on 25/4/2026.
 //
 
 import SFSymbolsPicker

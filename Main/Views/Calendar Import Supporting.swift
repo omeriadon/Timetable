@@ -1,8 +1,8 @@
 //
-//  Calendar Import Supporting.swift
-//  Timetable
+//   Calendar Import Supporting.swift
+//   Main
 //
-//  Created by Adon Omeri on 19/6/2026.
+//   Created by Adon Omeri on 19/6/2026.
 //
 
 import EventKit

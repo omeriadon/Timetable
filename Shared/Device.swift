@@ -1,8 +1,8 @@
 //
-//  Device.swift
-//  Timetable
+//   Device.swift
+//   Shared
 //
-//  Created by Adon Omeri on 13/6/2026.
+//   Created by Adon Omeri on 15/6/2026.
 //
 
 #if canImport(UIKit)

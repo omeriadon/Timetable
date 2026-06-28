@@ -1,8 +1,8 @@
 //
-//  Rectangle.swift
-//  Timetable
+//   Rectangle.swift
+//   Shared
 //
-//  Created by Adon Omeri on 13/5/2026.
+//   Created by Adon Omeri on 13/5/2026.
 //
 
 import SwiftUI

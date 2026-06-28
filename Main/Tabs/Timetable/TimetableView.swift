@@ -1,8 +1,8 @@
 //
-//  TimetableView.swift
-//  Timetable
+//   TimetableView.swift
+//   Main
 //
-//  Created by Adon Omeri on 13/5/2026.
+//   Created by Adon Omeri on 11/6/2026.
 //
 
 import Defaults

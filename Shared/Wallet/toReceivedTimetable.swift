@@ -1,8 +1,8 @@
 //
-//  toReceivedTimetable.swift
-//  Timetable
+//   toReceivedTimetable.swift
+//   Shared
 //
-//  Created by Adon Omeri on 22/6/2026.
+//   Created by Adon Omeri on 23/6/2026.
 //
 
 import Foundation

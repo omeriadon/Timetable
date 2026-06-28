@@ -1,8 +1,8 @@
 //
-//  SharedWidgetBundle.swift
-//  Watch Widget
+//   SharedWidgetBundle.swift
+//   Watch
 //
-//  Created by Adon Omeri on 15/6/2026.
+//   Created by Adon Omeri on 15/6/2026.
 //
 
 import SwiftUI

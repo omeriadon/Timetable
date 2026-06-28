@@ -1,8 +1,8 @@
 //
-//  TimetableEntity.swift
-//  Timetable
+//   TimetableEntity.swift
+//   App Intents
 //
-//  Created by Adon Omeri on 20/6/2026.
+//   Created by Adon Omeri on 20/6/2026.
 //
 
 import AppIntents

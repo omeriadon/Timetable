@@ -1,8 +1,8 @@
 //
-//  InlineColorPicker.swift
-//  Timetable
+//   InlineColorPicker.swift
+//   Main
 //
-//  Created by Adon Omeri on 26/4/2026.
+//   Created by Adon Omeri on 26/4/2026.
 //
 
 import SwiftUI

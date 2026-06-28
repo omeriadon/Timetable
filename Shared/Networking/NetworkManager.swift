@@ -1,3 +1,10 @@
+//
+//   NetworkManager.swift
+//   Shared
+//
+//   Created by Adon Omeri on 28/6/2026.
+//
+
 import Foundation
 import Network
 import Observation
@@ -221,7 +228,7 @@ final class NetworkManager {
 				throw NetworkError.invalidResponse
 			}
 
-			if response.statusCode == 401, mayRefresh, try await refreshAuthentication() {
+			if response.statusCode == 401, endpoint.requiresAuthentication, mayRefresh, try await refreshAuthentication() {
 				return try await execute(endpoint, body: body, mayRefresh: false)
 			}
 

@@ -1,8 +1,8 @@
 //
-//  AddPassView.swift
-//  Timetable
+//   AddPassView.swift
+//   Main
 //
-//  Created by Adon Omeri on 21/6/2026.
+//   Created by Adon Omeri on 22/6/2026.
 //
 
 import PassKit

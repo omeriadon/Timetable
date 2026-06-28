@@ -1,8 +1,8 @@
 //
-//  Widget Bundle.swift
-//  Widget
+//   Widget Bundle.swift
+//   Watch
 //
-//  Created by Adon Omeri on 15/6/2026.
+//   Created by Adon Omeri on 15/6/2026.
 //
 
 import SwiftUI

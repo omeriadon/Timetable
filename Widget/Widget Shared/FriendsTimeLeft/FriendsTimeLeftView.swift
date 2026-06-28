@@ -1,8 +1,8 @@
 //
-//  FriendsTimeLeftView.swift
-//  Widget Shared
+//   FriendsTimeLeftView.swift
+//   Watch
 //
-//  Created by Adon Omeri on 13/5/2026.
+//   Created by Adon Omeri on 13/5/2026.
 //
 
 import Defaults
@@ -187,23 +187,23 @@ struct FriendsTimeLeftView: View {
 				Spacer()
 
 				let subjectLookup = TimetableLayout.subjectLookup(for: entry.subjects)
-				let state = getSchoolState(at: Date().addingTimeInterval(debugOffset), subjectLookup: subjectLookup)
+//				let state = getSchoolState(at: Date().addingTimeInterval(debugOffset), subjectLookup: subjectLookup)
 
-				switch state {
-					case let .beforeSchool(next):
-						Text("before school")
-
-					case let .inClass(current, nextText, info):
-						Text(timerInterval: Date.now.addingTimeInterval(debugOffset) ... info.end, countsDown: true)
-							.contentTransition(.numericText(countsDown: true))
-
-					case let .inBreak(breakType, nextText, info):
-						Text(timerInterval: Date.now.addingTimeInterval(debugOffset) ... info.end, countsDown: true)
-							.contentTransition(.numericText(countsDown: true))
-
-					case .outsideSchool:
-						Text("after")
-				}
+//				switch state {
+//					case let .beforeSchool(next):
+//						Text("before school")
+//
+//					case let .inClass(current, nextText, info):
+//						Text(timerInterval: Date.now.addingTimeInterval(debugOffset) ... info.end, countsDown: true)
+//							.contentTransition(.numericText(countsDown: true))
+//
+//					case let .inBreak(breakType, nextText, info):
+//						Text(timerInterval: Date.now.addingTimeInterval(debugOffset) ... info.end, countsDown: true)
+//							.contentTransition(.numericText(countsDown: true))
+//
+//					case .outsideSchool:
+//						Text("after")
+//				}
 			}
 			.frame(height: 40)
 			.padding(.horizontal, 15)
@@ -215,20 +215,20 @@ struct FriendsTimeLeftView: View {
 					Spacer()
 
 					Group {
-						switch schedule.currentState {
-							case let .beforeSchool(next: next):
-								Text(next.id.capitalized)
-
-							case let .inBreak(breakType: breakType, nextText: nextText, info: info):
-								Label(breakType.description, systemImage: breakType.symbol)
-									.imageScale(.small)
-
-							case let .inClass(current: current, nextText: nextText, info: info):
-								Label(current?.id ?? "unknown", systemImage: current?.symbol ?? "circle")
-
-							case .outsideSchool:
-								Label("Outside School Time", systemImage: "zzz")
-						}
+//						switch schedule.currentState {
+//							case let .beforeSchool(next: next):
+//								Text(next.id.capitalized)
+//
+//							case let .inBreak(breakType: breakType, nextText: nextText, info: info):
+//								Label(breakType.description, systemImage: breakType.symbol)
+//									.imageScale(.small)
+//
+//							case let .inClass(current: current, nextText: nextText, info: info):
+//								Label(current?.id ?? "unknown", systemImage: current?.symbol ?? "circle")
+//
+//							case .outsideSchool:
+//								Label("Outside School Time", systemImage: "zzz")
+//						}
 					}
 					.animation(.easeInOut, value: schedule.id)
 					.font(.callout)

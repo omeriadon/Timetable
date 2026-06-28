@@ -1,8 +1,8 @@
 //
-//  RGBAColor.swift
-//  Timetable
+//   RGBAColor.swift
+//   Shared
 //
-//  Created by Adon Omeri on 25/4/2026.
+//   Created by Adon Omeri on 25/4/2026.
 //
 
 import Defaults
