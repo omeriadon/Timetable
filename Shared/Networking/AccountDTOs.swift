@@ -49,6 +49,17 @@ nonisolated struct UpdateProfileRequest: Codable {
 	let email: String?
 }
 
+nonisolated struct OwnerTimetableUpdateRequest: Codable {
+	let subjects: [Subject]
+	let expectedRevision: Int?
+}
+
+nonisolated struct OwnerTimetableResponse: Codable {
+	let subjects: [Subject]
+	let revision: Int
+	let updatedAt: Date?
+}
+
 extension AccountProfile {
 	init(_ response: UserProfileResponse) {
 		id = response.id.uuidString
