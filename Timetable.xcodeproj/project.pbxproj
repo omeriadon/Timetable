@@ -155,11 +155,6 @@
 			);
 			platformFiltersByRelativePath = {
 				LaunchScreen.storyboard = (ios, );
-				"Wallet/Shared Timetable.pkpasstemplate" = (ios, xros, );
-				Wallet/generatePass.swift = (ios, xros, );
-				Wallet/pass.pem = (ios, xros, );
-				Wallet/signDataWithBundleKey.swift = (ios, xros, );
-				Wallet/wallet_pass.pem = (ios, xros, );
 			};
 			target = 2A02378A2F9C8EA000AB1E1F /* Timetable */;
 		};
@@ -170,11 +165,6 @@
 				"Info/Watch Widget.plist",
 				Info/Widget.plist,
 				LaunchScreen.storyboard,
-				Wallet/generatePass.swift,
-				Wallet/pass.pem,
-				"Wallet/Shared Timetable.pkpasstemplate",
-				Wallet/signDataWithBundleKey.swift,
-				Wallet/wallet_pass.pem,
 			);
 			target = 2A25869F2FB5D6490030C8CD /* Watch Widget */;
 		};
@@ -186,11 +176,6 @@
 				Info/Widget.plist,
 				LaunchScreen.storyboard,
 				Timetable.icon,
-				Wallet/generatePass.swift,
-				Wallet/pass.pem,
-				"Wallet/Shared Timetable.pkpasstemplate",
-				Wallet/signDataWithBundleKey.swift,
-				Wallet/wallet_pass.pem,
 			);
 			target = 2AA6DF132FDFAC8F00BBC70E /* Widget */;
 		};
@@ -201,11 +186,6 @@
 				"Info/Watch Widget.plist",
 				Info/Widget.plist,
 				LaunchScreen.storyboard,
-				Wallet/generatePass.swift,
-				Wallet/pass.pem,
-				"Wallet/Shared Timetable.pkpasstemplate",
-				Wallet/signDataWithBundleKey.swift,
-				Wallet/wallet_pass.pem,
 			);
 			target = 2A098C822F9DB842002065BE /* Watch */;
 		};

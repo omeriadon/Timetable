@@ -10,12 +10,6 @@ import Foundation
 import PassKit
 import SwiftUI
 
-enum TimetableInWalletState {
-	case inWalletUpToDate
-	case inWalletNotUpToDate
-	case notInWallet
-}
-
 @Observable
 final class TimetablePassManager {
 	// Cached array to prevent constant re-computation across views
@@ -85,40 +79,6 @@ final class TimetablePassManager {
 			PrintError("pass not found")
 		}
 	}
-
-	#if !os(watchOS) && !os(macOS)
-		func isSelfTimetableUpToDate() -> TimetableInWalletState {
-			guard PKPassLibrary.isPassLibraryAvailable() else { return .inWalletUpToDate }
-
-			let systemPasses = passLibrary.passes()
-
-			Print("device deviceID = \(DeviceIDProvider().getDeviceID())")
-
-			let matchingPass: PKPass? = systemPasses.first { pass in
-				pass.serialNumber == DeviceIDProvider().getDeviceID()
-			}
-
-			if let matchingPass {
-				if let extractedTimetable = matchingPass.toReceivedTimetable() {
-					if extractedTimetable.sender == Defaults[.userDisplayName],
-					   extractedTimetable.subjects == Defaults[.timetable]
-					{
-						Print("pass found, up to date")
-						return .inWalletUpToDate
-					} else {
-						Print("pass found, not up to date")
-						return .inWalletNotUpToDate
-					}
-				} else {
-					return .notInWallet
-				}
-
-			} else {
-				PrintError("pass not found")
-				return .notInWallet
-			}
-		}
-	#endif // !os(watchOS) && !os(macOS)
 
 	/// Handles requests to replace old system metadata safely
 	func updatePass(for timetable: ReceivedTimetable, with _: [Subject]) {

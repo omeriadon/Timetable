@@ -19,8 +19,7 @@ enum PassState: Equatable {
 struct AddPassView: View {
 	@State private var currentState: PassState = .idle
 	@State private var walletButtonID = UUID()
-
-	@Environment(\.passManager) var passManager
+	@State private var passService = WalletPassService.shared
 
 	var body: some View {
 		ZStack {
@@ -31,29 +30,9 @@ struct AddPassView: View {
 			} else {
 				switch currentState {
 					case .idle:
-						ZStack {
-							switch passManager.isSelfTimetableUpToDate() {
-								case .notInWallet:
-									Button {
-										generatePassAsync()
-									} label: {
-										Label("Generate Apple Wallet Pass", systemImage: "wallet.pass")
-											.foregroundStyle(.accent)
-									}
-								case .inWalletNotUpToDate:
-									Button {
-										generatePassAsync()
-									} label: {
-										Label("Generate Apple Wallet Pass", systemImage: "wallet.pass")
-											.foregroundStyle(.accent)
-										Text("Your pass in Wallet is not up to date")
-											.foregroundStyle(.red)
-									}
-								case .inWalletUpToDate:
-									Label("Your pass in Wallet is up to date", systemImage: "checkmark")
-							}
-						}
-						.transition(.blurReplace)
+						Button("Download Apple Wallet Pass", systemImage: "wallet.pass", action: downloadPass)
+							.foregroundStyle(.accent)
+							.transition(.blurReplace)
 
 					case .generating:
 						HStack(spacing: 10) {
@@ -93,28 +72,21 @@ struct AddPassView: View {
 		.animation(.easeInOut, value: currentState)
 	}
 
-	private func generatePassAsync() {
+	private func downloadPass() {
 		withAnimation(.easeInOut) {
 			currentState = .generating
 		}
 
 		Task(priority: .userInitiated) {
 			do {
-				let url = try await generatePass()
-				let passData = try Data(contentsOf: url)
-				let pass = try PKPass(data: passData)
-
-				await MainActor.run {
-					withAnimation(.easeInOut) {
-						currentState = .ready(pass)
-					}
+				let pass = try await passService.downloadOwnerPass()
+				withAnimation(.easeInOut) {
+					currentState = .ready(pass)
 				}
 			} catch {
 				PrintError("[Wallet] Error generating pass: \(error)")
-				await MainActor.run {
-					withAnimation(.easeInOut) {
-						currentState = .error
-					}
+				withAnimation(.easeInOut) {
+					currentState = .error
 				}
 			}
 		}
@@ -124,11 +96,9 @@ struct AddPassView: View {
 		Task {
 			try? await Task.sleep(for: .seconds(5))
 
-			await MainActor.run {
-				withAnimation(.easeInOut) {
-					walletButtonID = UUID()
-					currentState = .idle
-				}
+			withAnimation(.easeInOut) {
+				walletButtonID = UUID()
+				currentState = .idle
 			}
 		}
 	}

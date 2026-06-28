@@ -149,8 +149,7 @@ struct ContentView: View {
 					guard let self, let tabBarController else { return }
 
 					do {
-						// Assuming generatePass() is an async function accessible here
-						let url = try await generatePass()
+						let url = try await WalletPassService.shared.ownerPassFileURL()
 						presentShareSheet(with: url, from: tabBarController)
 					} catch {
 						PrintError("[Wallet] Background Share Error: \(error)")
