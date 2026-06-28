@@ -137,6 +137,23 @@ final class SessionStore {
 		try apply(response)
 	}
 
+	@discardableResult
+	func refreshProfile() async throws -> AccountProfile {
+		Print("Refreshing account profile", category: .account)
+		let response: UserProfileResponse = try await networkManager.send(.v1Profile)
+		return persist(response)
+	}
+
+	@discardableResult
+	func updateProfile(displayName: String? = nil, email: String? = nil) async throws -> AccountProfile {
+		Print("Updating account profile", category: .account)
+		let response: UserProfileResponse = try await networkManager.send(
+			.v1ProfileUpdate,
+			body: UpdateProfileRequest(displayName: displayName, email: email)
+		)
+		return persist(response)
+	}
+
 	func signOut() async {
 		Print("Signing out account", category: .account)
 		if let refreshToken, accessToken != nil {
@@ -177,7 +194,6 @@ final class SessionStore {
 	}
 
 	private func apply(_ response: TokenResponse) throws {
-		let profile = AccountProfile(response.user)
 		guard KeychainManager.save(string: response.accessToken, forKey: accessTokenKey),
 		      KeychainManager.save(string: response.refreshToken, forKey: refreshTokenKey)
 		else {
@@ -185,12 +201,22 @@ final class SessionStore {
 			KeychainManager.delete(forKey: refreshTokenKey)
 			throw SessionStoreError.credentialPersistenceFailed
 		}
-		Defaults[.accountProfile] = profile
-		Defaults[.userDisplayName] = profile.displayName
+		let profile = persist(response.user)
 		Defaults[.hasCompletedAccountBootstrap] = true
-		Defaults[.lastServerSync] = Date.now
 		state = .authenticated(profile)
 		Print("Authenticated session for \(profile.id)", category: .account)
+	}
+
+	@discardableResult
+	private func persist(_ response: UserProfileResponse) -> AccountProfile {
+		let profile = AccountProfile(response)
+		Defaults[.accountProfile] = profile
+		Defaults[.userDisplayName] = profile.displayName
+		Defaults[.lastServerSync] = Date.now
+		if case .authenticated = state {
+			state = .authenticated(profile)
+		}
+		return profile
 	}
 
 	private func clearSessionState() {
@@ -210,5 +236,7 @@ private extension Endpoint {
 	static let v1AuthLogout = Endpoint("/v1/auth/logout", method: .delete)
 	static let v1AuthRefresh = Endpoint("/v1/auth/refresh", method: .post, requiresAuthentication: false)
 	static let v1AuthRegister = Endpoint("/v1/auth/register", method: .post, requiresAuthentication: false)
+	static let v1Profile = Endpoint("/v1/profile")
 	static let v1ProfileDelete = Endpoint("/v1/profile", method: .delete)
+	static let v1ProfileUpdate = Endpoint("/v1/profile", method: .put)
 }
