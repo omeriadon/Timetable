@@ -37,6 +37,8 @@ final class SessionStore {
 	private let networkManager: NetworkManager
 	private let accessTokenKey = "com.omeriadon.Timetable.session.accessToken"
 	private let refreshTokenKey = "com.omeriadon.Timetable.session.refreshToken"
+	private var watchAuthenticatedHandler: ((String, String, AccountProfile) -> Void)?
+	private var watchSignedOutHandler: (() -> Void)?
 
 	private init(networkManager: NetworkManager) {
 		self.networkManager = networkManager
@@ -55,6 +57,7 @@ final class SessionStore {
 
 		if let accessToken, !accessToken.isEmpty {
 			state = .authenticated(profile)
+			syncSessionToWatch(profile: profile)
 			Print("Restored authenticated session for \(profile.id)", category: .account)
 			return
 		}
@@ -173,6 +176,14 @@ final class SessionStore {
 		clearSessionState()
 	}
 
+	func configureWatchSessionDistribution(
+		authenticated: @escaping (String, String, AccountProfile) -> Void,
+		signedOut: @escaping () -> Void
+	) {
+		watchAuthenticatedHandler = authenticated
+		watchSignedOutHandler = signedOut
+	}
+
 	private var accessToken: String? {
 		KeychainManager.read(forKey: accessTokenKey)
 	}
@@ -204,6 +215,7 @@ final class SessionStore {
 		let profile = persist(response.user)
 		Defaults[.hasCompletedAccountBootstrap] = true
 		state = .authenticated(profile)
+		syncSessionToWatch(profile: profile)
 		Print("Authenticated session for \(profile.id)", category: .account)
 	}
 
@@ -226,7 +238,13 @@ final class SessionStore {
 		state = .signedOut
 		networkManager.clearAuthentication()
 		configureNetworkAuthentication()
+		watchSignedOutHandler?()
 		Print("Cleared local session state", category: .account)
+	}
+
+	private func syncSessionToWatch(profile: AccountProfile) {
+		guard let accessToken, let refreshToken else { return }
+		watchAuthenticatedHandler?(accessToken, refreshToken, profile)
 	}
 }
 

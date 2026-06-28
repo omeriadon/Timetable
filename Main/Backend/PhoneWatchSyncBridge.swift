@@ -5,12 +5,27 @@
 //   Created by Adon Omeri on 27/4/2026.
 //
 
-import Defaults
 import Foundation
 import WatchConnectivity
 
 final class PhoneWatchSyncBridge: NSObject, WCSessionDelegate {
 	private var isActivated = false
+
+	override init() {
+		super.init()
+		SessionStore.shared.configureWatchSessionDistribution(
+			authenticated: { [weak self] accessToken, refreshToken, profile in
+				self?.pushAuthenticatedSession(
+					accessToken: accessToken,
+					refreshToken: refreshToken,
+					profile: profile
+				)
+			},
+			signedOut: { [weak self] in
+				self?.pushSignedOutSession()
+			}
+		)
+	}
 
 	func activateIfNeeded() {
 		guard WCSession.isSupported() else {
@@ -27,31 +42,41 @@ final class PhoneWatchSyncBridge: NSObject, WCSessionDelegate {
 	}
 
 	func pushTimetable() {
-		activateIfNeeded()
+		Print("Skipped obsolete timetable transfer to watch", category: .watch)
+	}
 
-		let encoder = JSONEncoder()
-
+	func pushAuthenticatedSession(accessToken: String, refreshToken: String, profile: AccountProfile) {
 		do {
-			let timetableData = try encoder.encode(Defaults[.timetable])
-			let receivedData = try encoder.encode(Defaults[.receivedTimetables])
-
-			let payload: [String: Any] = [
-				"timetableData": timetableData,
-				"receivedTimetables": receivedData,
-				"updatedAt": Date().timeIntervalSince1970,
-			]
-
-			let session = WCSession.default
-
-			try session.updateApplicationContext(payload)
-
-			if session.isReachable {
-				session.sendMessage(payload, replyHandler: nil) { error in
-					PrintError("Watch live sync failed: \(error.localizedDescription)")
-				}
-			}
+			try send(.authenticated(
+				accessToken: accessToken,
+				refreshToken: refreshToken,
+				profile: profile
+			))
+			Print("Sent authenticated session state to watch", category: .watch)
 		} catch {
-			PrintError("Error encoding or updating application context: \(error.localizedDescription)")
+			PrintError("Failed to send authenticated session state to watch", category: .watch, error: error)
+		}
+	}
+
+	func pushSignedOutSession() {
+		do {
+			try send(.signedOut())
+			Print("Sent signed-out session state to watch", category: .watch)
+		} catch {
+			PrintError("Failed to send signed-out session state to watch", category: .watch, error: error)
+		}
+	}
+
+	private func send(_ envelope: WatchSessionEnvelope) throws {
+		activateIfNeeded()
+		let payload = try ["sessionEnvelope": JSONEncoder().encode(envelope)]
+		let session = WCSession.default
+		try session.updateApplicationContext(payload)
+
+		if session.isReachable {
+			session.sendMessage(payload, replyHandler: nil) { error in
+				PrintError("Watch live session sync failed", category: .watch, error: error)
+			}
 		}
 	}
 
