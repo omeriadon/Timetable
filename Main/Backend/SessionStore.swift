@@ -11,11 +11,14 @@ import Foundation
 import Observation
 
 enum SessionStoreError: LocalizedError {
+	case credentialPersistenceFailed
 	case invalidIdentityToken
 	case missingRefreshToken
 
 	var errorDescription: String? {
 		switch self {
+			case .credentialPersistenceFailed:
+				"The session credentials could not be stored securely."
 			case .invalidIdentityToken:
 				"The Apple identity token was invalid."
 			case .missingRefreshToken:
@@ -82,7 +85,7 @@ final class SessionStore {
 				displayName: displayName
 			)
 		)
-		apply(response)
+		try apply(response)
 	}
 
 	func signIn(email: String, password: String) async throws {
@@ -91,7 +94,7 @@ final class SessionStore {
 			.v1AuthLogin,
 			body: LoginRequest(email: email, password: password)
 		)
-		apply(response)
+		try apply(response)
 	}
 
 	func signInWithApple(_ authorization: ASAuthorization) async throws {
@@ -118,7 +121,7 @@ final class SessionStore {
 				displayName: displayName
 			)
 		)
-		apply(response)
+		try apply(response)
 	}
 
 	func refreshSilently() async throws {
@@ -131,7 +134,7 @@ final class SessionStore {
 			.v1AuthRefresh,
 			body: RefreshRequest(refreshToken: refreshToken)
 		)
-		apply(response)
+		try apply(response)
 	}
 
 	func signOut() async {
@@ -173,10 +176,15 @@ final class SessionStore {
 		)
 	}
 
-	private func apply(_ response: TokenResponse) {
+	private func apply(_ response: TokenResponse) throws {
 		let profile = AccountProfile(response.user)
-		KeychainManager.save(string: response.accessToken, forKey: accessTokenKey)
-		KeychainManager.save(string: response.refreshToken, forKey: refreshTokenKey)
+		guard KeychainManager.save(string: response.accessToken, forKey: accessTokenKey),
+		      KeychainManager.save(string: response.refreshToken, forKey: refreshTokenKey)
+		else {
+			KeychainManager.delete(forKey: accessTokenKey)
+			KeychainManager.delete(forKey: refreshTokenKey)
+			throw SessionStoreError.credentialPersistenceFailed
+		}
 		Defaults[.accountProfile] = profile
 		Defaults[.userDisplayName] = profile.displayName
 		Defaults[.hasCompletedAccountBootstrap] = true
