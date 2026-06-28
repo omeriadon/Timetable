@@ -8,7 +8,7 @@
 import Defaults
 import Foundation
 
-struct TimeOfDay: Codable, Defaults.Serializable, Hashable {
+nonisolated struct TimeOfDay: Codable, Defaults.Serializable, Hashable {
 	let hour: Int
 	let minute: Int
 
@@ -18,7 +18,7 @@ struct TimeOfDay: Codable, Defaults.Serializable, Hashable {
 	}
 }
 
-enum SchoolWeekday: String, Codable, Defaults.Serializable, Hashable {
+nonisolated enum SchoolWeekday: String, Codable, Defaults.Serializable, Hashable {
 	case monday
 	case tuesday
 	case wednesday
@@ -28,7 +28,7 @@ enum SchoolWeekday: String, Codable, Defaults.Serializable, Hashable {
 	case sunday
 }
 
-struct AccountSettings: Codable, Defaults.Serializable, Hashable {
+nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 	var liveActivitiesEnabled: Bool
 	var liveActivityStartTime: TimeOfDay
 	var liveActivityEndTime: TimeOfDay
