@@ -1,6 +1,6 @@
 //
 //   TimetablePassManager.swift
-//   Shared
+//   App Shared
 //
 //   Created by Adon Omeri on 23/6/2026.
 //

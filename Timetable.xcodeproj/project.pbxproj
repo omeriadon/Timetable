@@ -238,9 +238,9 @@
 			path = Shared;
 			sourceTree = "<group>";
 		};
-		2A324AAE2FF0E3A100E6A3D5 /* App Backend */ = {
+		2A324AAE2FF0E3A100E6A3D5 /* App Shared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "App Backend";
+			path = "App Shared";
 			sourceTree = "<group>";
 		};
 		2A5F92192FE66817007302CF /* App Intents */ = {
@@ -334,7 +334,7 @@
 				2A02379F2F9C908300AB1E1F /* Shared */,
 				2AD85A4F2FE8F213004EAB2B /* Widget */,
 				2A5F92192FE66817007302CF /* App Intents */,
-				2A324AAE2FF0E3A100E6A3D5 /* App Backend */,
+				2A324AAE2FF0E3A100E6A3D5 /* App Shared */,
 				2AAE62702FD839A7004B3FF4 /* Main */,
 				2A02378C2F9C8EA000AB1E1F /* Products */,
 			);
@@ -373,7 +373,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				2A02379F2F9C908300AB1E1F /* Shared */,
-				2A324AAE2FF0E3A100E6A3D5 /* App Backend */,
+				2A324AAE2FF0E3A100E6A3D5 /* App Shared */,
 				2A5F92192FE66817007302CF /* App Intents */,
 				2AAE62702FD839A7004B3FF4 /* Main */,
 				2AD85A712FE8F239004EAB2B /* Special */,
@@ -408,7 +408,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				2A02379F2F9C908300AB1E1F /* Shared */,
-				2A324AAE2FF0E3A100E6A3D5 /* App Backend */,
+				2A324AAE2FF0E3A100E6A3D5 /* App Shared */,
 				2A5F92192FE66817007302CF /* App Intents */,
 				2A60F50B2FD953D1009F4CE8 /* Watch */,
 				2AD85A712FE8F239004EAB2B /* Special */,

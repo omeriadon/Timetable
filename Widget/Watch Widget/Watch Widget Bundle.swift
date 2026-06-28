@@ -1,6 +1,6 @@
 //
 //   Watch Widget Bundle.swift
-//   Watch
+//   Widget
 //
 //   Created by Adon Omeri on 9/6/2026.
 //

@@ -1,6 +1,6 @@
 //
 //   NetworkManager.swift
-//   Shared
+//   App Shared
 //
 //   Created by Adon Omeri on 28/6/2026.
 //

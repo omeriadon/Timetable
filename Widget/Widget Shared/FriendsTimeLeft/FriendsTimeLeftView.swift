@@ -1,6 +1,6 @@
 //
 //   FriendsTimeLeftView.swift
-//   Watch
+//   Widget
 //
 //   Created by Adon Omeri on 13/5/2026.
 //
@@ -186,7 +186,7 @@ struct FriendsTimeLeftView: View {
 
 				Spacer()
 
-				let subjectLookup = TimetableLayout.subjectLookup(for: entry.subjects)
+//				let subjectLookup = TimetableLayout.subjectLookup(for: entry.subjects)
 //				let state = getSchoolState(at: Date().addingTimeInterval(debugOffset), subjectLookup: subjectLookup)
 
 //				switch state {

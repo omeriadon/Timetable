@@ -1,6 +1,6 @@
 //
 //   TimeLeftWidget.swift
-//   Watch
+//   Widget
 //
 //   Created by Adon Omeri on 13/5/2026.
 //

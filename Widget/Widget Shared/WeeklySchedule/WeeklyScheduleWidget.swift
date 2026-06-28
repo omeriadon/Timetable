@@ -1,6 +1,6 @@
 //
 //   WeeklyScheduleWidget.swift
-//   Watch
+//   Widget
 //
 //   Created by Adon Omeri on 13/6/2026.
 //
