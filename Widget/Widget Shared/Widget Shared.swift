@@ -7,14 +7,11 @@
 
 import Defaults
 import Foundation
-import PassKit
 import WidgetKit
 
 // MARK: - Provider
 
 struct Provider: TimelineProvider {
-	let passManager = TimetablePassManager()
-
 	func placeholder(in _: Context) -> TimetableEntry {
 		TimetableEntry(date: .now, subjects: [], relevance: nil)
 	}
@@ -31,13 +28,7 @@ struct Provider: TimelineProvider {
 	}
 
 	func getTimeline(in _: Context, completion: @escaping (Timeline<TimetableEntry>) -> Void) {
-		Print("widget deviceID = \(DeviceIDProvider().getDeviceID())")
-
-		let subjects = PKPassLibrary().passes()
-			.compactMap { $0.toReceivedTimetable() }
-//			.first(where: { $0.id == deviceID })?
-			.first?
-			.subjects ?? []
+		let subjects = Defaults[.timetable]
 
 		let calendar = Calendar.current
 

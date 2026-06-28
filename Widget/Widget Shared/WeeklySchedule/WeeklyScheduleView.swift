@@ -21,8 +21,6 @@ struct WeeklyScheduleView: View {
 		let subjectLookup = TimetableLayout.subjectLookup(for: subjects)
 
 		if subjects.isEmpty {
-			let _ = Print("widget deviceID = \(DeviceIDProvider().getDeviceID())")
-
 			Text("No timetable synced yet")
 				.lineLimit(2)
 

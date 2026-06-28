@@ -18,8 +18,6 @@
 		2A43AFCF2FE80ED900BBC8BD /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFCE2FE80ED900BBC8BD /* ZIPFoundation */; };
 		2A43AFD22FE810C900BBC8BD /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFD12FE810C900BBC8BD /* OpenSSL */; };
 		2A5F91F12FE650FE007302CF /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A5F91F02FE650FE007302CF /* IrregularGradient */; };
-		2AA6DF172FDFAC8F00BBC70E /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AA6DF162FDFAC8F00BBC70E /* WidgetKit.framework */; };
-		2AA6DF192FDFAC8F00BBC70E /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AA6DF182FDFAC8F00BBC70E /* SwiftUI.framework */; };
 		2AA6DF242FDFAC9000BBC70E /* Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2AA6DF142FDFAC8F00BBC70E /* Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2AA6DF2C2FDFADAE00BBC70E /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AA6DF2B2FDFADAE00BBC70E /* Defaults */; };
 		2AC5F7ED2FD8435700B813EA /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AC5F7EC2FD8435700B813EA /* Defaults */; };
@@ -101,35 +99,9 @@
 		2A098C832F9DB842002065BE /* Watch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Watch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A2586A02FB5D6490030C8CD /* Watch Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Watch Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2AA6DF142FDFAC8F00BBC70E /* Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Widget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		2AA6DF162FDFAC8F00BBC70E /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = /System/Library/Frameworks/WidgetKit.framework; sourceTree = "<absolute>"; };
-		2AA6DF182FDFAC8F00BBC70E /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = /System/Library/Frameworks/SwiftUI.framework; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		2A35BFAB2FEE0F5500EF5563 /* Exceptions for "Main" folder in "Watch Widget" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Backend/Keychain.swift,
-				Backend/SessionStore.swift,
-			);
-			target = 2A25869F2FB5D6490030C8CD /* Watch Widget */;
-		};
-		2A35BFAC2FEE0F5500EF5563 /* Exceptions for "Main" folder in "Widget" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Backend/Keychain.swift,
-				Backend/SessionStore.swift,
-			);
-			target = 2AA6DF132FDFAC8F00BBC70E /* Widget */;
-		};
-		2A35BFAD2FEE0F5500EF5563 /* Exceptions for "Main" folder in "Watch" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Backend/Keychain.swift,
-				Backend/SessionStore.swift,
-			);
-			target = 2A098C822F9DB842002065BE /* Watch */;
-		};
 		2AA9C7BD2FEE72DC00AD87A8 /* Exceptions for "Widget" folder in "Timetable" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -266,6 +238,11 @@
 			path = Shared;
 			sourceTree = "<group>";
 		};
+		2A324AAE2FF0E3A100E6A3D5 /* App Backend */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "App Backend";
+			sourceTree = "<group>";
+		};
 		2A5F92192FE66817007302CF /* App Intents */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -285,9 +262,6 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				2AC5F7EA2FD842F000B813EA /* Exceptions for "Main" folder in "Timetable" target */,
-				2A35BFAB2FEE0F5500EF5563 /* Exceptions for "Main" folder in "Watch Widget" target */,
-				2A35BFAC2FEE0F5500EF5563 /* Exceptions for "Main" folder in "Widget" target */,
-				2A35BFAD2FEE0F5500EF5563 /* Exceptions for "Main" folder in "Watch" target */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -347,8 +321,6 @@
 			files = (
 				2A43AFB12FE785E300BBC8BD /* IrregularGradient in Frameworks */,
 				2AA6DF2C2FDFADAE00BBC70E /* Defaults in Frameworks */,
-				2AA6DF192FDFAC8F00BBC70E /* SwiftUI.framework in Frameworks */,
-				2AA6DF172FDFAC8F00BBC70E /* WidgetKit.framework in Frameworks */,
 			);
 		};
 /* End PBXFrameworksBuildPhase section */
@@ -358,11 +330,11 @@
 			isa = PBXGroup;
 			children = (
 				2AD85A712FE8F239004EAB2B /* Special */,
-				2AA6DF152FDFAC8F00BBC70E /* Frameworks */,
 				2A60F50B2FD953D1009F4CE8 /* Watch */,
 				2A02379F2F9C908300AB1E1F /* Shared */,
 				2AD85A4F2FE8F213004EAB2B /* Widget */,
 				2A5F92192FE66817007302CF /* App Intents */,
+				2A324AAE2FF0E3A100E6A3D5 /* App Backend */,
 				2AAE62702FD839A7004B3FF4 /* Main */,
 				2A02378C2F9C8EA000AB1E1F /* Products */,
 			);
@@ -377,15 +349,6 @@
 				2AA6DF142FDFAC8F00BBC70E /* Widget.appex */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		2AA6DF152FDFAC8F00BBC70E /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				2AA6DF162FDFAC8F00BBC70E /* WidgetKit.framework */,
-				2AA6DF182FDFAC8F00BBC70E /* SwiftUI.framework */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -410,6 +373,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				2A02379F2F9C908300AB1E1F /* Shared */,
+				2A324AAE2FF0E3A100E6A3D5 /* App Backend */,
 				2A5F92192FE66817007302CF /* App Intents */,
 				2AAE62702FD839A7004B3FF4 /* Main */,
 				2AD85A712FE8F239004EAB2B /* Special */,
@@ -444,6 +408,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				2A02379F2F9C908300AB1E1F /* Shared */,
+				2A324AAE2FF0E3A100E6A3D5 /* App Backend */,
 				2A5F92192FE66817007302CF /* App Intents */,
 				2A60F50B2FD953D1009F4CE8 /* Watch */,
 				2AD85A712FE8F239004EAB2B /* Special */,

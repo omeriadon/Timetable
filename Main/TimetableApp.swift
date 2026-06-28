@@ -54,6 +54,9 @@ struct TimetableApp: App {
 		WindowGroup {
 			ContentView(expanded: $expanded)
 				.task {
+					sessionStore.configureAccountBootstrap {
+						try await AccountBootstrapService.shared.bootstrap()
+					}
 					if Defaults[.installationID].isEmpty {
 						Defaults[.installationID] = DeviceIDProvider.shared.getDeviceID()
 					}

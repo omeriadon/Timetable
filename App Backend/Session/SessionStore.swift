@@ -37,6 +37,7 @@ final class SessionStore {
 	private let networkManager: NetworkManager
 	private let accessTokenKey = "com.omeriadon.Timetable.session.accessToken"
 	private let refreshTokenKey = "com.omeriadon.Timetable.session.refreshToken"
+	private var accountBootstrapHandler: (() async throws -> Void)?
 	private var watchAuthenticatedHandler: ((String, String, AccountProfile) -> Void)?
 	private var watchSignedOutHandler: (() -> Void)?
 
@@ -58,6 +59,9 @@ final class SessionStore {
 		if let accessToken, !accessToken.isEmpty {
 			state = .authenticated(profile)
 			syncSessionToWatch(profile: profile)
+			if let accountBootstrapHandler {
+				try? await accountBootstrapHandler()
+			}
 			Print("Restored authenticated session for \(profile.id)", category: .account)
 			return
 		}
@@ -96,7 +100,7 @@ final class SessionStore {
 				displayName: displayName
 			)
 		)
-		try apply(response)
+		try await apply(response, bootstrap: true)
 	}
 
 	func signIn(email: String, password: String) async throws {
@@ -105,7 +109,7 @@ final class SessionStore {
 			.v1AuthLogin,
 			body: LoginRequest(email: email, password: password)
 		)
-		try apply(response)
+		try await apply(response, bootstrap: true)
 	}
 
 	func signInWithApple(_ authorization: ASAuthorization) async throws {
@@ -132,7 +136,7 @@ final class SessionStore {
 				displayName: displayName
 			)
 		)
-		try apply(response)
+		try await apply(response, bootstrap: true)
 	}
 
 	func refreshSilently() async throws {
@@ -146,7 +150,7 @@ final class SessionStore {
 				.v1AuthRefresh,
 				body: RefreshRequest(refreshToken: refreshToken)
 			)
-			try apply(response)
+			try await apply(response, bootstrap: false)
 		} catch let NetworkError.server(statusCode, response)
 			where statusCode == 401 || response.code == .sessionExpired
 		{
@@ -199,6 +203,10 @@ final class SessionStore {
 		watchSignedOutHandler = signedOut
 	}
 
+	func configureAccountBootstrap(_ bootstrap: @escaping () async throws -> Void) {
+		accountBootstrapHandler = bootstrap
+	}
+
 	private var accessToken: String? {
 		KeychainManager.read(forKey: accessTokenKey)
 	}
@@ -219,7 +227,7 @@ final class SessionStore {
 		)
 	}
 
-	private func apply(_ response: TokenResponse) throws {
+	private func apply(_ response: TokenResponse, bootstrap: Bool) async throws {
 		guard KeychainManager.save(string: response.accessToken, forKey: accessTokenKey),
 		      KeychainManager.save(string: response.refreshToken, forKey: refreshTokenKey)
 		else {
@@ -228,9 +236,11 @@ final class SessionStore {
 			throw SessionStoreError.credentialPersistenceFailed
 		}
 		let profile = persist(response.user)
-		Defaults[.hasCompletedAccountBootstrap] = true
 		state = .authenticated(profile)
 		syncSessionToWatch(profile: profile)
+		if bootstrap, let accountBootstrapHandler {
+			try await accountBootstrapHandler()
+		}
 		Print("Authenticated session for \(profile.id)", category: .account)
 	}
 
@@ -250,6 +260,7 @@ final class SessionStore {
 		KeychainManager.delete(forKey: accessTokenKey)
 		KeychainManager.delete(forKey: refreshTokenKey)
 		Defaults[.accountProfile] = nil
+		Defaults[.hasCompletedAccountBootstrap] = false
 		state = .signedOut
 		networkManager.clearAuthentication()
 		configureNetworkAuthentication()

@@ -12,13 +12,9 @@ import WidgetKit
 struct FriendsTimeLeftWidget: Widget {
 	let kind: String = "FriendsTimeLeft"
 
-	let passManager = TimetablePassManager()
-
 	var body: some WidgetConfiguration {
 		StaticConfiguration(kind: kind, provider: Provider()) { entry in
-			let friendsSubjects = passManager.receivedTimetables.filter {
-				$0.id != DeviceIDProvider().getDeviceID()
-			}
+			let friendsSubjects = Defaults[.receivedTimetables]
 
 			let friendScheduleItems: [ScheduleItem] = friendsSubjects.map {
 				let friendSubjectLookup = TimetableLayout.subjectLookup(for: $0.subjects)

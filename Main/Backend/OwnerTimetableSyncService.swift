@@ -22,6 +22,7 @@ final class OwnerTimetableSyncService {
 
 	private enum OperationKind {
 		case download
+		case reconcile
 		case upload
 	}
 
@@ -38,6 +39,12 @@ final class OwnerTimetableSyncService {
 	func downloadOwnerTimetable() async throws {
 		try await run(.download) { [self] in
 			try await performDownload()
+		}
+	}
+
+	func reconcileOwnerTimetable() async throws {
+		try await run(.reconcile) { [self] in
+			try await performReconciliation()
 		}
 	}
 
@@ -107,6 +114,32 @@ final class OwnerTimetableSyncService {
 			category: .network,
 			duration: start.duration(to: clock.now)
 		)
+	}
+
+	private func performReconciliation() async throws {
+		let response: OwnerTimetableResponse = try await networkManager.send(.v1OwnerTimetable)
+		let localTimetable = Defaults[.timetable]
+		let lastServerSync = Defaults[.lastServerSync]
+		let serverIsNewer = response.updatedAt.map { updatedAt in
+			guard let lastServerSync else { return true }
+			return updatedAt > lastServerSync
+		} ?? false
+
+		if localTimetable.isEmpty || serverIsNewer {
+			Defaults[.timetable] = response.subjects
+			Defaults[.lastServerSync] = Date.now
+			return
+		}
+
+		let updated: OwnerTimetableResponse = try await networkManager.send(
+			.v1OwnerTimetableUpdate,
+			body: OwnerTimetableUpdateRequest(
+				subjects: localTimetable,
+				expectedRevision: response.revision
+			)
+		)
+		Defaults[.lastServerSync] = Date.now
+		Print("Reconciled owner timetable revision \(updated.revision)", category: .network)
 	}
 }
 
