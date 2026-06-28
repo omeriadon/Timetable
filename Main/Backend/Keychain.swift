@@ -9,16 +9,32 @@ import Foundation
 import Security
 
 enum KeychainManager {
+	private static let service = "com.omeriadon.Timetable"
+
 	@discardableResult
 	static func save(data: Data, forKey key: String) -> Bool {
 		let query: [String: Any] = [
 			kSecClass as String: kSecClassGenericPassword,
 			kSecAttrAccount as String: key,
-			kSecValueData as String: data,
+			kSecAttrService as String: service,
 		]
 
-		SecItemDelete(query as CFDictionary)
-		return SecItemAdd(query as CFDictionary, nil) == errSecSuccess
+		let attributes: [String: Any] = [
+			kSecValueData as String: data,
+			kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
+		]
+
+		let updateStatus = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
+		if updateStatus == errSecSuccess {
+			return true
+		}
+
+		guard updateStatus == errSecItemNotFound else {
+			return false
+		}
+
+		let item = query.merging(attributes) { _, newValue in newValue }
+		return SecItemAdd(item as CFDictionary, nil) == errSecSuccess
 	}
 
 	@discardableResult
@@ -31,6 +47,7 @@ enum KeychainManager {
 		let query: [String: Any] = [
 			kSecClass as String: kSecClassGenericPassword,
 			kSecAttrAccount as String: key,
+			kSecAttrService as String: service,
 			kSecReturnData as String: kCFBooleanTrue as Any,
 			kSecMatchLimit as String: kSecMatchLimitOne,
 		]
@@ -55,6 +72,7 @@ enum KeychainManager {
 		let query: [String: Any] = [
 			kSecClass as String: kSecClassGenericPassword,
 			kSecAttrAccount as String: key,
+			kSecAttrService as String: service,
 		]
 
 		let status = SecItemDelete(query as CFDictionary)
