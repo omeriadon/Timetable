@@ -69,9 +69,17 @@ final class SessionStore {
 
 		do {
 			try await refreshSilently()
-		} catch NetworkError.offline {
+		} catch let NetworkError.server(statusCode, response)
+			where statusCode == 401 || response.code == .sessionExpired
+		{
+			clearSessionState()
+		} catch let error as NetworkError {
 			state = .authenticated(profile)
-			Print("Using cached authenticated session while offline for \(profile.id)", category: .account)
+			PrintError(
+				"Using cached authenticated session after refresh failure for \(profile.id)",
+				category: .account,
+				error: error
+			)
 		} catch {
 			PrintError("Silent restore failed", category: .account, error: error)
 			clearSessionState()
@@ -133,11 +141,18 @@ final class SessionStore {
 		}
 
 		Print("Refreshing session silently", category: .account)
-		let response: TokenResponse = try await networkManager.send(
-			.v1AuthRefresh,
-			body: RefreshRequest(refreshToken: refreshToken)
-		)
-		try apply(response)
+		do {
+			let response: TokenResponse = try await networkManager.send(
+				.v1AuthRefresh,
+				body: RefreshRequest(refreshToken: refreshToken)
+			)
+			try apply(response)
+		} catch let NetworkError.server(statusCode, response)
+			where statusCode == 401 || response.code == .sessionExpired
+		{
+			clearSessionState()
+			throw NetworkError.server(statusCode: statusCode, response: response)
+		}
 	}
 
 	@discardableResult
