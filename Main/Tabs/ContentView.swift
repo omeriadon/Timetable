@@ -15,6 +15,8 @@ import SwiftUI
 #endif
 
 struct ContentView: View {
+	@State private var networkManager = NetworkManager.shared
+
 	#if os(iOS)
 		@State private var watchSync = PhoneWatchSyncBridge()
 		@State private var rootSyncStatus = SyncMode.normal
@@ -24,27 +26,39 @@ struct ContentView: View {
 	@Binding var expanded: WindowMode
 
 	var body: some View {
-		#if os(iOS)
-			ProminentActionTabView(
-				watchSync: $watchSync,
-				rootSyncStatus: $rootSyncStatus,
-				isBlurred: $isBlurred
-			)
-			.ignoresSafeArea()
-			.blur(radius: isBlurred ? 2 : 0)
-			.opacity(isBlurred ? 0.8 : 1.0)
-			.animation(.easeInOut(duration: 0.35), value: isBlurred)
-		#else
-			TabView {
-				Tab("Timetable", systemImage: "calendar") {
-					TimetableView(expanded: $expanded)
-				}
+		Group {
+			#if os(iOS)
+				ProminentActionTabView(
+					watchSync: $watchSync,
+					rootSyncStatus: $rootSyncStatus,
+					isBlurred: $isBlurred
+				)
+				.ignoresSafeArea()
+				.blur(radius: isBlurred ? 2 : 0)
+				.opacity(isBlurred ? 0.8 : 1.0)
+				.animation(.easeInOut(duration: 0.35), value: isBlurred)
+			#else
+				TabView {
+					Tab("Timetable", systemImage: "calendar") {
+						TimetableView(expanded: $expanded)
+					}
 
-				Tab("Settings", systemImage: "gear") {
-					SettingsView(expanded: $expanded)
+					Tab("Settings", systemImage: "gear") {
+						SettingsView(expanded: $expanded)
+					}
 				}
-			}
-		#endif
+			#endif
+		}
+		.alert(item: $networkManager.presentedAlert) { alert in
+			Alert(
+				title: Text(alert.title),
+				message: Text(alert.message),
+				dismissButton: .default(Text("OK"))
+			)
+		}
+		.task {
+			networkManager.startMonitoring()
+		}
 	}
 }
 
