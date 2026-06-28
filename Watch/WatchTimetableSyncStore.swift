@@ -5,10 +5,8 @@
 //   Created by Adon Omeri on 11/6/2026.
 //
 
-import Defaults
 import SwiftUI
 import WatchConnectivity
-import WidgetKit
 
 @MainActor
 @Observable
@@ -16,6 +14,13 @@ final class WatchTimetableSyncStore: NSObject, WCSessionDelegate {
 	private var isActivated = false
 
 	var alertMessage: String?
+
+	override init() {
+		super.init()
+		SessionStore.shared.configureAccountBootstrap {
+			try await WatchAccountBootstrapService.shared.bootstrap()
+		}
+	}
 
 	func activateIfNeeded() {
 		guard WCSession.isSupported() else {
@@ -57,39 +62,24 @@ final class WatchTimetableSyncStore: NSObject, WCSessionDelegate {
 	}
 
 	private func handleIncomingPayload(_ payload: [String: Any], source _: String) {
-		// ERROR
 		if let payloadError = payload["error"] as? String {
 			alertMessage = payloadError
 			return
 		}
 
-		let previousTimetable = Defaults[.timetable]
-		let previousReceived = Defaults[.receivedTimetables]
-
-		// SUBJECTS
-		if let timetableData = payload["timetableData"] as? Data {
-			do {
-				Defaults[.timetable] = try JSONDecoder().decode([Subject].self, from: timetableData)
-			} catch {
-				PrintError("[Watch] timetable decode failed: \(error)")
+		guard let envelopeData = payload["sessionEnvelope"] as? Data else { return }
+		do {
+			let envelope = try JSONDecoder().decode(WatchSessionEnvelope.self, from: envelopeData)
+			Task { @MainActor [weak self] in
+				do {
+					try await SessionStore.shared.receiveWatchSession(envelope)
+				} catch {
+					self?.alertMessage = error.localizedDescription
+				}
 			}
-		}
-
-		// RECEIVED
-		if let receivedData = payload["receivedTimetables"] as? Data {
-			do {
-				Defaults[.receivedTimetables] = try JSONDecoder().decode([ReceivedTimetable].self, from: receivedData)
-			} catch {
-				PrintError("[Watch] receivedTimetables decode failed: \(error)")
-			}
-		}
-
-		let changed =
-			previousTimetable != Defaults[.timetable] ||
-			previousReceived != Defaults[.receivedTimetables]
-
-		if changed {
-			WidgetCenter.shared.reloadAllTimelines()
+		} catch {
+			alertMessage = "The iPhone sent invalid account data."
+			PrintError("[Watch] session envelope decode failed", category: .watch, error: error)
 		}
 	}
 }

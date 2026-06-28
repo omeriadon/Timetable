@@ -207,6 +207,36 @@ final class SessionStore {
 		accountBootstrapHandler = bootstrap
 	}
 
+	func receiveWatchSession(_ envelope: WatchSessionEnvelope) async throws {
+		switch envelope.event {
+			case .signedOut:
+				clearSessionState()
+			case .authenticated:
+				guard let accessToken = envelope.accessToken,
+				      let refreshToken = envelope.refreshToken,
+				      let profile = envelope.profile,
+				      !accessToken.isEmpty,
+				      !refreshToken.isEmpty
+				else {
+					throw SessionStoreError.credentialPersistenceFailed
+				}
+
+				guard KeychainManager.save(string: accessToken, forKey: accessTokenKey),
+				      KeychainManager.save(string: refreshToken, forKey: refreshTokenKey)
+				else {
+					throw SessionStoreError.credentialPersistenceFailed
+				}
+
+				Defaults[.accountProfile] = profile
+				Defaults[.userDisplayName] = profile.displayName
+				state = .authenticated(profile)
+				configureNetworkAuthentication()
+				if let accountBootstrapHandler {
+					try await accountBootstrapHandler()
+				}
+		}
+	}
+
 	private var accessToken: String? {
 		KeychainManager.read(forKey: accessTokenKey)
 	}

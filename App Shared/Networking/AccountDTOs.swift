@@ -60,6 +60,10 @@ nonisolated struct OwnerTimetableResponse: Codable {
 	let updatedAt: Date?
 }
 
+nonisolated struct RemoteAccountSettings: Codable {
+	let liveActivitiesEnabled: Bool
+}
+
 extension AccountProfile {
 	init(_ response: UserProfileResponse) {
 		id = response.id.uuidString
