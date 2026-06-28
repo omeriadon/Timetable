@@ -121,6 +121,7 @@ final class NetworkManager {
 	private var isMonitoring = false
 	private var accessTokenProvider: (@MainActor @Sendable () -> String?)?
 	private var refreshHandler: (@MainActor @Sendable () async throws -> Void)?
+	private var refreshTask: Task<Void, any Error>?
 
 	init(
 		baseURL: URL? = NetworkManager.configuredBaseURL,
@@ -180,7 +181,17 @@ final class NetworkManager {
 
 	private func refreshAuthentication() async throws -> Bool {
 		guard let refreshHandler else { return false }
-		try await refreshHandler()
+		if let refreshTask {
+			try await refreshTask.value
+			return true
+		}
+
+		let task = Task { @MainActor in
+			try await refreshHandler()
+		}
+		refreshTask = task
+		defer { refreshTask = nil }
+		try await task.value
 		return true
 	}
 
