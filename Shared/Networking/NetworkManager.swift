@@ -125,11 +125,11 @@ final class NetworkManager {
 
 	init(
 		baseURL: URL? = NetworkManager.configuredBaseURL,
-		session: URLSession = .shared,
+		session: URLSession? = nil,
 		monitor: NWPathMonitor = NWPathMonitor()
 	) {
 		self.baseURL = baseURL
-		self.session = session
+		self.session = session ?? Self.makeSession()
 		self.monitor = monitor
 
 		let decoder = JSONDecoder()
@@ -201,6 +201,15 @@ final class NetworkManager {
 		let processValue = ProcessInfo.processInfo.environment["TIMETABLE_SERVER_URL"]
 		let bundleValue = Bundle.main.object(forInfoDictionaryKey: "TIMETABLE_SERVER_URL") as? String
 		return (processValue ?? bundleValue).flatMap(URL.init(string:))
+	}
+
+	private nonisolated static func makeSession() -> URLSession {
+		let configuration = URLSessionConfiguration.default
+		configuration.timeoutIntervalForRequest = 30
+		configuration.timeoutIntervalForResource = 300
+		configuration.waitsForConnectivity = true
+		configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+		return URLSession(configuration: configuration)
 	}
 
 	private func makeRequest(for endpoint: Endpoint, body: Data?) throws -> URLRequest {
