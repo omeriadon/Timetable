@@ -13,7 +13,6 @@ import Observation
 enum SessionStoreError: LocalizedError {
 	case invalidIdentityToken
 	case missingRefreshToken
-	case signInWithAppleNotConfigured
 
 	var errorDescription: String? {
 		switch self {
@@ -21,8 +20,6 @@ enum SessionStoreError: LocalizedError {
 				"The Apple identity token was invalid."
 			case .missingRefreshToken:
 				"The session could not be refreshed because the refresh token is missing."
-			case .signInWithAppleNotConfigured:
-				"Apple sign-in is not configured in the current server contract."
 		}
 	}
 }
@@ -102,11 +99,26 @@ final class SessionStore {
 			throw SessionStoreError.invalidIdentityToken
 		}
 
-		guard credential.identityToken != nil else {
+		guard let identityTokenData = credential.identityToken,
+		      let identityToken = String(data: identityTokenData, encoding: .utf8)
+		else {
 			throw SessionStoreError.invalidIdentityToken
 		}
 
-		throw SessionStoreError.signInWithAppleNotConfigured
+		let formatter = PersonNameComponentsFormatter()
+		formatter.style = .default
+		let displayName = credential.fullName
+			.map { formatter.string(from: $0).trimmingCharacters(in: .whitespacesAndNewlines) }
+			.flatMap { $0.isEmpty ? nil : $0 }
+
+		let response: TokenResponse = try await networkManager.send(
+			.v1AuthApple,
+			body: AppleSignInRequest(
+				identityToken: identityToken,
+				displayName: displayName
+			)
+		)
+		apply(response)
 	}
 
 	func refreshSilently() async throws {
@@ -185,6 +197,7 @@ final class SessionStore {
 }
 
 private extension Endpoint {
+	static let v1AuthApple = Endpoint("/v1/auth/apple", method: .post, requiresAuthentication: false)
 	static let v1AuthLogin = Endpoint("/v1/auth/login", method: .post, requiresAuthentication: false)
 	static let v1AuthLogout = Endpoint("/v1/auth/logout", method: .delete)
 	static let v1AuthRefresh = Endpoint("/v1/auth/refresh", method: .post, requiresAuthentication: false)
