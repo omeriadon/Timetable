@@ -91,6 +91,14 @@ struct SettingsView: View {
 
 	@ContentBuilder
 	private var list: some View {
+		Section("Account") {
+			NavigationLink {
+				AccountView()
+			} label: {
+				Label("Account", systemImage: "person.crop.circle")
+			}
+		}
+
 		#if os(iOS)
 			Section("Sync to Watch") {
 				SyncButton(
