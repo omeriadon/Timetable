@@ -17,6 +17,7 @@ final class TimetablePassManager {
 	private(set) var isLoading = false
 
 	private let passLibrary = PKPassLibrary()
+	private var projectionUploadHandler: (() async throws -> Void)?
 
 	init() {
 		// Only load if PassKit is actually available on this device platform (e.g., Mac vs iOS)
@@ -29,6 +30,10 @@ final class TimetablePassManager {
 			)
 			refreshPasses()
 		}
+	}
+
+	func configureProjectionUpload(_ upload: @escaping () async throws -> Void) {
+		projectionUploadHandler = upload
 	}
 
 	@objc private func passLibraryDidChange(_: Notification) {
@@ -51,7 +56,19 @@ final class TimetablePassManager {
 			await MainActor.run {
 				withAnimation(.easeInOut) {
 					self.receivedTimetables = extractedTimetables
+					Defaults[.receivedTimetables] = extractedTimetables
+					Defaults[.walletRevision] += 1
 					self.isLoading = false
+				}
+			}
+
+			if let projectionUploadHandler {
+				do {
+					try await projectionUploadHandler()
+				} catch NetworkError.offline {
+					return
+				} catch {
+					PrintError("Failed to upload Wallet projection", category: .wallet, error: error)
 				}
 			}
 		}

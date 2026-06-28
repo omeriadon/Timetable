@@ -14,21 +14,25 @@ import Observation
 final class AccountBootstrapService {
 	static let shared = AccountBootstrapService(
 		ownerTimetableSync: .shared,
-		settingsSync: .shared
+		settingsSync: .shared,
+		receivedTimetableSync: .shared
 	)
 
 	private(set) var isBootstrapping = false
 
 	private let ownerTimetableSync: OwnerTimetableSyncService
 	private let settingsSync: AccountSettingsSyncService
+	private let receivedTimetableSync: ReceivedTimetableSyncService
 	private var bootstrapTask: Task<Void, any Error>?
 
 	private init(
 		ownerTimetableSync: OwnerTimetableSyncService,
-		settingsSync: AccountSettingsSyncService
+		settingsSync: AccountSettingsSyncService,
+		receivedTimetableSync: ReceivedTimetableSyncService
 	) {
 		self.ownerTimetableSync = ownerTimetableSync
 		self.settingsSync = settingsSync
+		self.receivedTimetableSync = receivedTimetableSync
 	}
 
 	func bootstrap() async throws {
@@ -40,7 +44,8 @@ final class AccountBootstrapService {
 		let task = Task { @MainActor in
 			async let timetable: Void = ownerTimetableSync.reconcileOwnerTimetable()
 			async let settings: Void = settingsSync.downloadSettings()
-			_ = try await (timetable, settings)
+			async let received: Void = receivedTimetableSync.downloadProjectionAndOverrides()
+			_ = try await (timetable, settings, received)
 		}
 		bootstrapTask = task
 		isBootstrapping = true

@@ -33,12 +33,30 @@ final class WatchAccountBootstrapService {
 		let task = Task { @MainActor in
 			async let timetable: OwnerTimetableResponse = networkManager.send(.v1OwnerTimetable)
 			async let settings: RemoteAccountSettings = networkManager.send(.v1Settings)
-			let (ownerTimetable, remoteSettings) = try await (timetable, settings)
+			async let received: [ReceivedPassMirrorDTO] = networkManager.send(.v1ReceivedTimetables)
+			async let overrides: [ReceivedNameOverrideResponse] = networkManager.send(.v1ReceivedNameOverrides)
+			let (ownerTimetable, remoteSettings, receivedTimetables, receivedOverrides) = try await (
+				timetable,
+				settings,
+				received,
+				overrides
+			)
 
 			Defaults[.timetable] = ownerTimetable.subjects
 			var accountSettings = Defaults[.accountSettings]
 			accountSettings.liveActivitiesEnabled = remoteSettings.liveActivitiesEnabled
 			Defaults[.accountSettings] = accountSettings
+			let names = Dictionary(
+				uniqueKeysWithValues: receivedOverrides.map { ($0.serialNumber, $0.displayName) }
+			)
+			Defaults[.receivedNameOverrides] = names
+			Defaults[.receivedTimetables] = receivedTimetables
+				.filter { !$0.isDeleted }
+				.map { dto in
+					var timetable = dto.receivedTimetable
+					timetable.sender = names[dto.id] ?? dto.signedDisplayName
+					return timetable
+				}
 			Defaults[.lastServerSync] = Date.now
 			Defaults[.hasCompletedAccountBootstrap] = true
 			WidgetCenter.shared.reloadAllTimelines()
@@ -56,4 +74,6 @@ final class WatchAccountBootstrapService {
 private extension Endpoint {
 	static let v1OwnerTimetable = Endpoint("/v1/timetables/owner")
 	static let v1Settings = Endpoint("/v1/settings")
+	static let v1ReceivedTimetables = Endpoint("/v1/timetables/received")
+	static let v1ReceivedNameOverrides = Endpoint("/v1/received-name-overrides")
 }

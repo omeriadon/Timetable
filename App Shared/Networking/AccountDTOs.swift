@@ -64,6 +64,56 @@ nonisolated struct RemoteAccountSettings: Codable {
 	let liveActivitiesEnabled: Bool
 }
 
+nonisolated struct ReceivedPassMirrorDTO: Codable {
+	let id: String
+	let issuerAccountID: String
+	let sourceKind: String
+	let signedDisplayName: String
+	let authorDisplayName: String?
+	let subjects: [Subject]
+	let receivedAt: Date
+	let passUpdatedAt: Date
+	let isDeleted: Bool
+	let walletRevision: Int
+
+	init(_ timetable: ReceivedTimetable, walletRevision: Int) {
+		id = timetable.id
+		issuerAccountID = timetable.id
+		sourceKind = "accountOwner"
+		signedDisplayName = timetable.sender
+		authorDisplayName = nil
+		subjects = timetable.subjects
+		receivedAt = timetable.receivedAt
+		passUpdatedAt = timetable.receivedAt
+		isDeleted = false
+		self.walletRevision = walletRevision
+	}
+
+	var receivedTimetable: ReceivedTimetable {
+		var timetable = ReceivedTimetable(
+			sender: signedDisplayName,
+			subjects: subjects,
+			receivedAt: receivedAt
+		)
+		timetable.id = id
+		return timetable
+	}
+}
+
+nonisolated struct ReceivedProjectionUpdateRequest: Codable {
+	let timetables: [ReceivedPassMirrorDTO]
+	let walletRevision: Int
+}
+
+nonisolated struct ReceivedNameOverrideResponse: Codable {
+	let serialNumber: String
+	let displayName: String
+}
+
+nonisolated struct UpdateReceivedNameOverrideRequest: Codable {
+	let displayName: String
+}
+
 extension AccountProfile {
 	init(_ response: UserProfileResponse) {
 		id = response.id.uuidString

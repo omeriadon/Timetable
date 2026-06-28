@@ -54,6 +54,9 @@ struct TimetableApp: App {
 		WindowGroup {
 			ContentView(expanded: $expanded)
 				.task {
+					passManager.configureProjectionUpload {
+						try await ReceivedTimetableSyncService.shared.uploadCurrentProjection()
+					}
 					sessionStore.configureAccountBootstrap {
 						try await AccountBootstrapService.shared.bootstrap()
 					}
