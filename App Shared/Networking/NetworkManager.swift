@@ -110,6 +110,7 @@ final class NetworkManager {
 	static let shared = NetworkManager()
 
 	private(set) var isOnline = true
+	private(set) var offlineRequestAttempted = false
 	var presentedAlert: NetworkAlert?
 
 	private let baseURL: URL?
@@ -163,7 +164,11 @@ final class NetworkManager {
 		isMonitoring = true
 		monitor.pathUpdateHandler = { [weak self] path in
 			Task { @MainActor [weak self] in
-				self?.isOnline = path.status != .unsatisfied
+				guard let self else { return }
+				isOnline = path.status != .unsatisfied
+				if isOnline {
+					offlineRequestAttempted = false
+				}
 			}
 		}
 		monitor.start(queue: monitorQueue)
@@ -171,10 +176,13 @@ final class NetworkManager {
 
 	func requireOnline() throws {
 		guard isOnline else {
-			let error = NetworkError.offline
-			present(error)
-			throw error
+			offlineRequestAttempted = true
+			throw NetworkError.offline
 		}
+	}
+
+	func dismissOfflineBanner() {
+		offlineRequestAttempted = false
 	}
 
 	// MARK: - Authentication
@@ -267,21 +275,31 @@ final class NetworkManager {
 			return data
 		} catch let error as NetworkError {
 			PrintError("Request failed for \(endpoint.path)", category: .network, error: error)
-			if case .cancelled = error {
-				throw error
+			switch error {
+				case .cancelled:
+					throw error
+				case .offline:
+					offlineRequestAttempted = true
+					throw error
+				default:
+					present(error)
+					throw error
 			}
-			present(error)
-			throw error
 		} catch is CancellationError {
 			throw NetworkError.cancelled
 		} catch let error as URLError {
 			let networkError = map(error)
-			if case .cancelled = networkError {
-				throw networkError
+			switch networkError {
+				case .cancelled:
+					throw networkError
+				case .offline:
+					offlineRequestAttempted = true
+					throw networkError
+				default:
+					PrintError("Transport failed for \(endpoint.path)", category: .network, error: error)
+					present(networkError)
+					throw networkError
 			}
-			PrintError("Transport failed for \(endpoint.path)", category: .network, error: error)
-			present(networkError)
-			throw networkError
 		} catch {
 			let networkError = NetworkError.transport(error.localizedDescription)
 			PrintError("Transport failed for \(endpoint.path)", category: .network, error: error)
