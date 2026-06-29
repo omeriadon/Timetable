@@ -3,6 +3,7 @@
 //  Timetable
 //
 
+import ColorfulX
 import SwiftUI
 
 struct StatusBadgeOverlay: View {
@@ -41,17 +42,24 @@ struct StatusBadgeOverlay: View {
 
 	@ViewBuilder
 	private func mainBadgeView(_ badge: StatusBadge, availableWidth: CGFloat) -> some View {
-		let content = StatusBadgeContent(
-			badge: badge,
-			showsClose: isHoveringMainBadge
-		)
-		.padding(.horizontal, horizontalPadding)
+		let content = ZStack {
+			StatusBadgeCapsuleFill(badge: badge)
+
+			StatusBadgeContent(
+				badge: badge,
+				showsClose: isHoveringMainBadge
+			)
+			.padding(.horizontal, horizontalPadding)
+		}
 		.frame(width: mainBadgeWidth(availableWidth))
 		.frame(height: badgeHeight)
 		.contentShape(.capsule)
 		.clipShape(.capsule)
 		.glassEffect(.regular.interactive(), in: .capsule)
 		.glassEffectID("status-badge-main", in: glassNamespace)
+		.overlay {
+			StatusBadgeBottomFlowLine(badge: badge)
+		}
 		.contentTransition(.interpolate)
 		.animation(animation, value: badge)
 
@@ -306,6 +314,222 @@ private struct StatusBadgeContent: View {
 		#else
 			20
 		#endif
+	}
+}
+
+private struct StatusBadgeCapsuleFill: View {
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+	let badge: StatusBadge
+
+	private let loadingPatternScale: CGFloat = 3.4
+
+	private static let loadingColors: [Color] = [
+		Color(red: 0.05, green: 0.26, blue: 1.00),
+		Color(red: 0.10, green: 0.52, blue: 1.00),
+		Color(red: 0.00, green: 0.74, blue: 1.00),
+		Color(red: 0.88, green: 0.96, blue: 1.00),
+		Color(red: 0.13, green: 0.92, blue: 0.70),
+		Color(red: 1.00, green: 0.82, blue: 0.18),
+		Color(red: 0.04, green: 0.34, blue: 0.95),
+		Color(red: 0.18, green: 0.42, blue: 1.00),
+	]
+
+	var body: some View {
+		ZStack {
+			switch badge.view {
+				case .success:
+					terminalFill(.green)
+
+				case .error:
+					terminalFill(.red)
+
+				case .warning:
+					terminalFill(.orange)
+
+				case .progressView, .progressViewAndGague:
+					loadingFill
+			}
+		}
+		.allowsHitTesting(false)
+	}
+
+	private func terminalFill(_ color: Color) -> some View {
+		LinearGradient(
+			stops: [
+				.init(color: color.opacity(0.0), location: 0.00),
+				.init(color: color.opacity(0.18), location: 0.5),
+				.init(color: color.opacity(0.50), location: 1.00),
+			],
+			startPoint: .top,
+			endPoint: .bottom
+		)
+	}
+
+	private var loadingFill: some View {
+		ColorfulView(
+			color: .constant(Self.loadingColors),
+			speed: .constant(reduceMotion ? 0 : 0.42),
+			bias: .constant(0.0012),
+			noise: .constant(30),
+			transitionSpeed: .constant(2.0),
+			frameLimit: .constant(30),
+			renderScale: .constant(0.9)
+		)
+		.mask {
+			LinearGradient(
+				stops: [
+					.init(color: .clear, location: 0.00),
+					.init(color: .white.opacity(0.05), location: 0.2),
+					.init(color: .white.opacity(0.28), location: 0.66),
+					.init(color: .white.opacity(0.58), location: 1.00),
+				],
+				startPoint: .top,
+				endPoint: .bottom
+			)
+		}
+	}
+}
+
+private struct StatusBadgeBottomFlowLine: View {
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+	let badge: StatusBadge
+
+	private let lineWidth: CGFloat = 2.2
+
+	private static let flowColors: [Color] = [
+		Color(red: 0.12, green: 0.44, blue: 1.00),
+		Color(red: 0.00, green: 0.76, blue: 1.00),
+		Color(red: 0.92, green: 0.98, blue: 1.00),
+		Color(red: 0.18, green: 0.94, blue: 0.70),
+		Color(red: 1.00, green: 0.82, blue: 0.20),
+		Color(red: 0.08, green: 0.32, blue: 1.00),
+		Color(red: 0.18, green: 0.55, blue: 1.00),
+	]
+
+	var body: some View {
+		if showsFlowLine {
+			if reduceMotion {
+				line(phase: 0.35, pulse: 0.82)
+			} else {
+				TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { context in
+					let time = context.date.timeIntervalSinceReferenceDate
+					let phase = CGFloat((time / 4.2).truncatingRemainder(dividingBy: 1))
+					let pulse = 0.70 + 0.22 * CGFloat((sin(time * Double.pi * 2 / 1.35) + 1) / 2)
+
+					line(phase: phase, pulse: pulse)
+				}
+			}
+		}
+	}
+
+	private var showsFlowLine: Bool {
+		switch badge.view {
+			case .progressView, .progressViewAndGague:
+				true
+			default:
+				false
+		}
+	}
+
+	private func line(phase: CGFloat, pulse: CGFloat) -> some View {
+		GeometryReader { proxy in
+			let width = max(proxy.size.width, 1)
+			let height = max(proxy.size.height, 1)
+
+			ZStack {
+				flowingStroke(
+					width: width,
+					height: height,
+					phase: phase,
+					lineWidth: lineWidth + 4
+				)
+				.blur(radius: 3)
+				.opacity(0.35 * pulse)
+
+				flowingStroke(
+					width: width,
+					height: height,
+					phase: phase,
+					lineWidth: lineWidth
+				)
+				.opacity(pulse)
+			}
+			.frame(width: width, height: height)
+		}
+		.allowsHitTesting(false)
+	}
+
+	private func flowingStroke(
+		width: CGFloat,
+		height: CGFloat,
+		phase: CGFloat,
+		lineWidth: CGFloat
+	) -> some View {
+		ZStack {
+			LinearGradient(
+				colors: Self.flowColors + Self.flowColors + Self.flowColors,
+				startPoint: .leading,
+				endPoint: .trailing
+			)
+			.frame(width: width * 3, height: height)
+			.offset(x: -width + phase * width)
+		}
+		.frame(width: width, height: height)
+		.mask {
+			BottomCapsuleArc(inset: lineWidth / 2)
+				.stroke(
+					style: StrokeStyle(
+						lineWidth: lineWidth,
+						lineCap: .round,
+						lineJoin: .round
+					)
+				)
+		}
+		.mask {
+			LinearGradient(
+				stops: [
+					.init(color: .clear, location: 0.00),
+					.init(color: .clear, location: 0.48),
+					.init(color: .white.opacity(0.28), location: 0.60),
+					.init(color: .white.opacity(0.86), location: 0.78),
+					.init(color: .white, location: 1.00),
+				],
+				startPoint: .top,
+				endPoint: .bottom
+			)
+		}
+	}
+}
+
+private struct BottomCapsuleArc: Shape {
+	let inset: CGFloat
+
+	func path(in rect: CGRect) -> Path {
+		let rect = rect.insetBy(dx: inset, dy: inset)
+		let radius = rect.height / 2
+		let control = radius * 0.5522847498
+
+		var path = Path()
+
+		path.move(to: CGPoint(x: rect.minX, y: rect.midY))
+
+		path.addCurve(
+			to: CGPoint(x: rect.minX + radius, y: rect.maxY),
+			control1: CGPoint(x: rect.minX, y: rect.midY + control),
+			control2: CGPoint(x: rect.minX + radius - control, y: rect.maxY)
+		)
+
+		path.addLine(to: CGPoint(x: rect.maxX - radius, y: rect.maxY))
+
+		path.addCurve(
+			to: CGPoint(x: rect.maxX, y: rect.midY),
+			control1: CGPoint(x: rect.maxX - radius + control, y: rect.maxY),
+			control2: CGPoint(x: rect.maxX, y: rect.midY + control)
+		)
+
+		return path
 	}
 }
 
