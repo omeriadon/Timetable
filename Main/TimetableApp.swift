@@ -37,6 +37,7 @@ struct TimetableApp: App {
 
 	@State private var passManager = TimetablePassManager()
 	@State private var sessionStore = SessionStore.shared
+	@State private var statusBadgeManager = StatusBadgeManager.shared
 
 	var showNameSheet: Bool {
 		userName.isEmpty
@@ -53,6 +54,9 @@ struct TimetableApp: App {
 	var body: some Scene {
 		WindowGroup {
 			ContentView(expanded: $expanded)
+				.overlay {
+					StatusBadgeOverlay()
+				}
 				.task {
 					passManager.configureProjectionUpload {
 						try await ReceivedTimetableSyncService.shared.uploadCurrentProjection()
@@ -77,6 +81,7 @@ struct TimetableApp: App {
 				.environment(\.passManager, passManager)
 			#endif // os(iOS)
 				.monospaced()
+				.environment(\.statusBadgeManager, statusBadgeManager)
 			#if os(macOS)
 				.onChange(of: expanded) { _, newValue in
 					resizeWindow(expanded: newValue)

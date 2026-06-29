@@ -1,0 +1,370 @@
+//
+//  StatusBadgeOverlay.swift
+//  Timetable
+//
+
+import SwiftUI
+
+struct StatusBadgeOverlay: View {
+	@Environment(\.statusBadgeManager) private var manager
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+	@Namespace private var glassNamespace
+	@State private var isHoveringMainBadge = false
+	@State private var dragOffset: CGFloat = 0
+
+	private var animation: Animation {
+		reduceMotion ? .easeInOut(duration: 0.16) : .spring(response: 0.34, dampingFraction: 0.92)
+	}
+
+	var body: some View {
+		GeometryReader { geometry in
+			VStack(spacing: 0) {
+				if let mainBadge = manager.mainBadge {
+					mainBadgeView(mainBadge, availableWidth: geometry.size.width)
+						.transition(mainTransition)
+				}
+
+				Spacer(minLength: 0)
+			}
+			.frame(maxWidth: .infinity)
+			.padding(.top, topPadding)
+		}
+		.allowsHitTesting(manager.mainBadge != nil)
+		.animation(animation, value: manager.badges)
+		.animation(animation, value: manager.activeBadgeID)
+		.onChange(of: manager.mainBadge?.id) {
+			isHoveringMainBadge = false
+			dragOffset = 0
+		}
+	}
+
+	@ViewBuilder
+	private func mainBadgeView(_ badge: StatusBadge, availableWidth: CGFloat) -> some View {
+		let content = StatusBadgeContent(
+			badge: badge,
+			showsClose: isHoveringMainBadge && badge.dismissible
+		)
+		.padding(.horizontal, horizontalPadding)
+		.frame(width: mainBadgeWidth(availableWidth))
+		.frame(height: badgeHeight)
+		.contentShape(.capsule)
+		.clipShape(.capsule)
+		.glassEffect(.regular.interactive(), in: .capsule)
+		.glassEffectID("status-badge-main", in: glassNamespace)
+		.contentTransition(.interpolate)
+		.animation(animation, value: badge)
+
+		#if os(iOS)
+			content
+				.offset(y: dragOffset)
+				.gesture(
+					DragGesture(minimumDistance: 12)
+						.onChanged { value in
+							guard badge.dismissible else { return }
+							dragOffset = min(0, value.translation.height)
+						}
+						.onEnded { value in
+							guard badge.dismissible else { return }
+							if value.translation.height < -36 {
+								withAnimation(animation) {
+									dragOffset = -300
+								} completion: {
+									manager.dismissMainBadge()
+									dragOffset = 0
+								}
+							} else {
+								withAnimation(animation) {
+									dragOffset = 0
+								}
+							}
+						}
+				)
+		#else
+			content
+				.onHover { hovering in
+					guard badge.dismissible else { return }
+					withAnimation(animation) {
+						isHoveringMainBadge = hovering
+					}
+				}
+				.onTapGesture {
+					guard badge.dismissible, isHoveringMainBadge else { return }
+					withAnimation(animation) {
+						manager.dismissMainBadge()
+					}
+				}
+		#endif
+	}
+
+	private func mainBadgeWidth(_ availableWidth: CGFloat) -> CGFloat {
+		#if os(iOS)
+			availableWidth * 0.64
+		#else
+			250
+		#endif
+	}
+
+	private var badgeHeight: CGFloat {
+		#if os(iOS)
+			56
+		#else
+			48
+		#endif
+	}
+
+	private var topPadding: CGFloat {
+		#if os(iOS)
+			12
+		#else
+			18
+		#endif
+	}
+
+	private var horizontalPadding: CGFloat {
+		#if os(iOS)
+			10
+		#else
+			8
+		#endif
+	}
+
+	private var mainTransition: some Transition {
+		#if os(iOS)
+			.offset(y: -300)
+		#else
+			.blurReplace
+		#endif
+	}
+}
+
+private struct StatusBadgeContent: View {
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+	let badge: StatusBadge
+	let showsClose: Bool
+
+	var body: some View {
+		HStack(spacing: 10) {
+			VStack(alignment: .leading, spacing: 2) {
+				Text(showsClose ? "Close" : badge.title)
+					.font(primaryFont)
+					.lineLimit(1)
+					.contentTransition(.numericText())
+					.animation(contentAnimation, value: showsClose ? "Close" : badge.title)
+
+				if !showsClose, let secondaryText = badge.view.secondaryText, !secondaryText.isEmpty {
+					Text(secondaryText)
+						.font(secondaryFont)
+						.foregroundStyle(.secondary)
+						.lineLimit(1)
+						.contentTransition(.numericText())
+						.animation(contentAnimation, value: secondaryText)
+				}
+			}
+			.frame(maxWidth: .infinity, alignment: .leading)
+			.padding(.leading, textLeadingPadding)
+
+			ZStack {
+				indicator
+					.id(indicatorID)
+					.transition(.blurReplace)
+			}
+			.frame(width: indicatorContainerSize, height: indicatorContainerSize)
+			.animation(contentAnimation, value: indicatorID)
+		}
+		.animation(
+			reduceMotion ? .easeInOut(duration: 0.16) : .spring(response: 0.34, dampingFraction: 0.92),
+			value: badge
+		)
+		.animation(
+			reduceMotion ? .easeInOut(duration: 0.16) : .spring(response: 0.34, dampingFraction: 0.92),
+			value: showsClose
+		)
+	}
+
+	private var contentAnimation: Animation {
+		reduceMotion ? .easeInOut(duration: 0.16) : .spring(response: 0.34, dampingFraction: 0.92)
+	}
+
+	private var indicatorID: String {
+		if showsClose { return "close" }
+		switch badge.view {
+			case .progressView: return "progress"
+			case .success: return "success"
+			case .error: return "error"
+			case .warning: return "warning"
+			case .circularGague: return "gauge"
+			case .progressViewAndGague: return "progress-gauge"
+		}
+	}
+
+	private var primaryFont: Font {
+		#if os(iOS)
+			.callout.weight(.semibold).scaled(by: 1.1)
+		#else
+			.system(size: 13, weight: .semibold)
+		#endif
+	}
+
+	private var secondaryFont: Font {
+		#if os(iOS)
+			.caption
+		#else
+			.system(size: 11)
+		#endif
+	}
+
+	private var indicatorContainerSize: CGFloat {
+		#if os(iOS)
+			38
+		#else
+			30
+		#endif
+	}
+
+	private var textLeadingPadding: CGFloat {
+		#if os(iOS)
+			8
+		#else
+			7
+		#endif
+	}
+
+	@ViewBuilder
+	private var indicator: some View {
+		if showsClose {
+			statusSymbol("xmark.circle", color: .secondary)
+		} else {
+			switch badge.view {
+				case .progressView:
+					ProgressView().controlSize(progressControlSize)
+				case .success:
+					statusSymbol("checkmark.circle.fill", color: .green, isTerminal: true)
+				case .error:
+					statusSymbol("xmark.circle.fill", color: .red, isTerminal: true)
+				case .warning:
+					statusSymbol("exclamationmark.triangle.fill", color: .orange, isTerminal: true)
+				case let .circularGague(currentStep, totalSteps, _):
+					stepGauge(currentStep: currentStep, totalSteps: totalSteps, containsProgress: false)
+				case let .progressViewAndGague(currentStep, totalSteps, _):
+					stepGauge(currentStep: currentStep, totalSteps: totalSteps, containsProgress: true)
+			}
+		}
+	}
+
+	private func statusSymbol(_ name: String, color: Color, isTerminal: Bool = false) -> some View {
+		Image(systemName: name)
+			.font(.system(size: isTerminal ? terminalSymbolSize : symbolSize, weight: .semibold))
+			.symbolRenderingMode(.hierarchical)
+			.foregroundStyle(color)
+			.contentTransition(.symbolEffect(.replace))
+	}
+
+	private func stepGauge(currentStep: Int, totalSteps: Int, containsProgress: Bool) -> some View {
+		Gauge(
+			value: Double(max(currentStep, 0)),
+			in: 0 ... Double(max(totalSteps, 1))
+		) {
+			EmptyView()
+		} currentValueLabel: {
+			EmptyView()
+		}
+		.gaugeStyle(.accessoryCircularCapacity)
+		.tint(.white)
+		.foregroundStyle(.white)
+		.scaleEffect(0.58)
+		.frame(width: 24, height: 24)
+		.overlay {
+			if containsProgress {
+				ProgressView()
+					.controlSize(combinedProgressControlSize)
+			}
+		}
+	}
+
+	private var progressControlSize: ControlSize {
+		#if os(iOS)
+			.regular
+		#else
+			.small
+		#endif
+	}
+
+	private var combinedProgressControlSize: ControlSize {
+		#if os(iOS)
+			.small
+		#else
+			.mini
+		#endif
+	}
+
+	private var symbolSize: CGFloat {
+		#if os(iOS)
+			25
+		#else
+			22
+		#endif
+	}
+
+	private var terminalSymbolSize: CGFloat {
+		#if os(iOS)
+			27
+		#else
+			20
+		#endif
+	}
+}
+
+#if DEBUG
+	private struct StatusBadgePreviewGrid: View {
+		private let completionDelay: Duration = .seconds(2)
+
+		private let badges: [StatusBadge] = [
+			.init(id: UUID(), title: "Progress", priority: 3, view: .progressView(secondaryText: "Working"), sequence: 1),
+			.init(id: UUID(), title: "Success", priority: 3, view: .success, sequence: 2),
+			.init(id: UUID(), title: "Error", priority: 3, view: .error, sequence: 3),
+			.init(id: UUID(), title: "Warning", priority: 3, view: .warning, sequence: 4),
+			.init(id: UUID(), title: "Gauge", priority: 3, view: .circularGague(currentStep: 2, totalSteps: 5, secondaryText: "Step 2 of 5"), sequence: 5),
+			.init(id: UUID(), title: "Progress + Gauge", priority: 3, view: .progressViewAndGague(currentStep: 2, totalSteps: 5, secondaryText: "Step 2 of 5"), sequence: 6),
+		]
+
+		var body: some View {
+			LazyVGrid(columns: [GridItem(.adaptive(minimum: 280))], spacing: 20) {
+				ForEach(badges) { badge in
+					StatusBadgePreviewTile(badge: badge, completionDelay: completionDelay)
+				}
+			}
+			.padding(24)
+			.frame(minWidth: 620, minHeight: 300)
+		}
+	}
+
+	private struct StatusBadgePreviewTile: View {
+		@State private var badge: StatusBadge
+		let completionDelay: Duration
+
+		init(badge: StatusBadge, completionDelay: Duration) {
+			_badge = State(initialValue: badge)
+			self.completionDelay = completionDelay
+		}
+
+		var body: some View {
+			StatusBadgeContent(badge: badge, showsClose: false)
+				.padding(.horizontal, 14)
+				.frame(width: 280, height: 56)
+				.glassEffect(.regular.interactive(), in: .capsule)
+				.task {
+					try? await Task.sleep(for: completionDelay)
+					withAnimation(.spring(response: 0.34, dampingFraction: 0.92)) {
+						badge.title = "Done"
+						badge.view = .success
+					}
+				}
+		}
+	}
+
+	#Preview("Status Badge Types") {
+		StatusBadgePreviewGrid()
+	}
+#endif // DEBUG

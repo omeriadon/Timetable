@@ -16,6 +16,10 @@ import SwiftUI
 
 struct ContentView: View {
 	@State private var networkManager = NetworkManager.shared
+	@Environment(\.statusBadgeManager) private var statusBadgeManager
+
+	private let networkErrorBadgeID = UUID(uuidString: "7D38B39C-D45D-4DDD-9D6D-E3F886CC853B")!
+	private let offlineBadgeID = UUID(uuidString: "5D75876A-CA6E-43BD-AC3E-0884A807BECD")!
 
 	#if os(iOS)
 		@State private var watchSync = PhoneWatchSyncBridge()
@@ -34,8 +38,12 @@ struct ContentView: View {
 					isBlurred: $isBlurred
 				)
 				.overlay {
-					VariableBlurView()
-						.ignoresSafeArea()
+					if isBlurred {
+						VariableBlurView()
+							.ignoresSafeArea()
+							.allowsHitTesting(false)
+							.transition(.opacity)
+					}
 				}
 				.ignoresSafeArea()
 				.opacity(isBlurred ? 0.8 : 1.0)
@@ -52,12 +60,25 @@ struct ContentView: View {
 				}
 			#endif
 		}
-		.alert(item: $networkManager.presentedAlert) { alert in
-			Alert(
-				title: Text(alert.title),
-				message: Text(alert.message),
-				dismissButton: .default(Text("OK"))
+		.onChange(of: networkManager.presentedAlert?.id) {
+			guard let alert = networkManager.presentedAlert else { return }
+			statusBadgeManager.addBadge(
+				id: networkErrorBadgeID,
+				title: alert.title,
+				priority: 5,
+				view: .error
 			)
+			networkManager.presentedAlert = nil
+		}
+		.onChange(of: networkManager.offlineRequestAttempted) {
+			guard networkManager.offlineRequestAttempted else { return }
+			statusBadgeManager.addBadge(
+				id: offlineBadgeID,
+				title: "No Internet Connection",
+				priority: 5,
+				view: .error
+			)
+			networkManager.dismissOfflineBanner()
 		}
 		.task {
 			networkManager.startMonitoring()

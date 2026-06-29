@@ -18,6 +18,7 @@ struct SettingsView: View {
 	@Default(.timetable) var subjects
 
 	@Environment(\.passManager) private var passManager
+	@Environment(\.statusBadgeManager) private var statusBadgeManager
 
 	@Default(.userDisplayName) var userDisplayName
 	@State private var username: String
@@ -211,6 +212,27 @@ struct SettingsView: View {
 		}
 
 		Section("Developer") {
+			#if DEBUG
+				Button("Test progress badge", systemImage: "progress.indicator") {
+					addDebugStatusBadge(title: "Syncing account", view: .progressView(secondaryText: "Working"))
+				}
+				Button("Test success badge", systemImage: "checkmark.circle") {
+					addDebugStatusBadge(title: "Saving timetable", view: .success)
+				}
+				Button("Test error badge", systemImage: "xmark.circle") {
+					addDebugStatusBadge(title: "Contacting server", view: .error)
+				}
+				Button("Test warning badge", systemImage: "exclamationmark.triangle") {
+					addDebugStatusBadge(title: "Checking timetable", view: .warning)
+				}
+				Button("Test gauge badge", systemImage: "gauge.with.dots.needle.0percent") {
+					addDebugStatusBadge(title: "Uploading timetable", view: .circularGague(currentStep: 2, totalSteps: 5, secondaryText: "Step 2 of 5"))
+				}
+				Button("Test progress and gauge badge", systemImage: "arrow.trianglehead.2.clockwise.rotate.90") {
+					addDebugStatusBadge(title: "Preparing Wallet pass", view: .progressViewAndGague(currentStep: 2, totalSteps: 5, secondaryText: "Step 2 of 5"))
+				}
+			#endif
+
 			Button {
 				widgetReloadState = true
 				WidgetCenter.shared.reloadAllTimelines()
@@ -240,6 +262,18 @@ struct SettingsView: View {
 			.disabled(widgetReloadState)
 		}
 	}
+
+	#if DEBUG
+		private func addDebugStatusBadge(title: String, view: StatusBadgeView) {
+			let id = UUID()
+			statusBadgeManager.addBadge(id: id, title: title, priority: 3, view: view)
+
+			Task {
+				try? await Task.sleep(for: .seconds(2))
+				statusBadgeManager.updateBadge(id: id, title: "Done", view: .success)
+			}
+		}
+	#endif
 }
 
 extension Array {
