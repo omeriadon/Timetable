@@ -51,6 +51,10 @@ struct TimetableApp: App {
 		}
 	#endif // os(macOS)
 
+	#if os(iOS) || os(visionOS)
+		@UIApplicationDelegateAdaptor(MobileAppDelegate.self) private var mobileAppDelegate
+	#endif
+
 	var body: some Scene {
 		WindowGroup {
 			ContentView(expanded: $expanded)
@@ -69,6 +73,9 @@ struct TimetableApp: App {
 					}
 					await indexEntities()
 					await sessionStore.restore()
+					#if os(iOS) || os(visionOS)
+						await NotificationRegistrationService.shared.reconcileWithStoredPreference()
+					#endif
 				}
 			#if os(iOS)
 				.sheet(isPresented: .constant(showNameSheet)) {

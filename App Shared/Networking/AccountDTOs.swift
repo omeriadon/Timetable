@@ -110,6 +110,22 @@ nonisolated struct UpdateReceivedNameOverrideRequest: Codable {
 	let displayName: String
 }
 
+nonisolated struct RegisterUserDeviceRequest: Codable {
+	let installationID: String
+	let platform: String
+	let apnsToken: String
+}
+
+nonisolated struct UserDeviceResponse: Codable {
+	let installationID: String
+	let platform: String
+	let lastSeenAt: Date
+}
+
+nonisolated struct TestNotificationResponse: Codable {
+	let deliveredDeviceCount: Int
+}
+
 extension AccountProfile {
 	init(_ response: UserProfileResponse) {
 		id = response.id.uuidString
