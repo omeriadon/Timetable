@@ -87,13 +87,7 @@ final class ReceivedTimetableSyncService {
 	}
 
 	private func applyLocalNames() {
-		let overrides = Defaults[.receivedNameOverrides]
-		Defaults[.receivedTimetables] = Defaults[.receivedTimetables].map { timetable in
-			guard let displayName = overrides[timetable.id] else { return timetable }
-			var updated = timetable
-			updated.sender = displayName
-			return updated
-		}
+		WidgetCenter.shared.reloadAllTimelines()
 	}
 }
 

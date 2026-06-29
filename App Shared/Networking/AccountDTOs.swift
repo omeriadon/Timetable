@@ -63,7 +63,7 @@ nonisolated struct OwnerTimetableResponse: Codable {
 nonisolated struct ReceivedPassMirrorDTO: Codable {
 	let id: String
 	let issuerAccountID: String
-	let sourceKind: String
+	let sourceKind: SourceKind
 	let signedDisplayName: String
 	let authorDisplayName: String?
 	let subjects: [Subject]
@@ -74,25 +74,29 @@ nonisolated struct ReceivedPassMirrorDTO: Codable {
 
 	init(_ timetable: ReceivedTimetable, walletRevision: Int) {
 		id = timetable.id
-		issuerAccountID = timetable.id
-		sourceKind = "accountOwner"
-		signedDisplayName = timetable.sender
-		authorDisplayName = nil
+		issuerAccountID = timetable.issuerAccountID
+		sourceKind = timetable.sourceKind
+		signedDisplayName = timetable.signedDisplayName
+		authorDisplayName = timetable.authorDisplayName
 		subjects = timetable.subjects
 		receivedAt = timetable.receivedAt
-		passUpdatedAt = timetable.receivedAt
-		isDeleted = false
+		passUpdatedAt = timetable.passUpdatedAt
+		isDeleted = timetable.isDeleted
 		self.walletRevision = walletRevision
 	}
 
 	var receivedTimetable: ReceivedTimetable {
-		var timetable = ReceivedTimetable(
-			sender: signedDisplayName,
+		ReceivedTimetable(
+			id: id,
+			issuerAccountID: issuerAccountID,
+			sourceKind: sourceKind,
+			signedDisplayName: signedDisplayName,
+			authorDisplayName: authorDisplayName,
 			subjects: subjects,
-			receivedAt: receivedAt
+			receivedAt: receivedAt,
+			passUpdatedAt: passUpdatedAt,
+			isDeleted: isDeleted
 		)
-		timetable.id = id
-		return timetable
 	}
 }
 

@@ -50,11 +50,7 @@ final class WatchAccountBootstrapService {
 			Defaults[.receivedNameOverrides] = names
 			Defaults[.receivedTimetables] = receivedTimetables
 				.filter { !$0.isDeleted }
-				.map { dto in
-					var timetable = dto.receivedTimetable
-					timetable.sender = names[dto.id] ?? dto.signedDisplayName
-					return timetable
-				}
+				.map(\.receivedTimetable)
 			Defaults[.lastServerSync] = Date.now
 			Defaults[.hasCompletedAccountBootstrap] = true
 			WidgetCenter.shared.reloadAllTimelines()

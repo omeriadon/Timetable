@@ -66,8 +66,12 @@ struct ReceivedTimetablesView: View {
 				TextField("Rename this timetable...", text: $renameText)
 
 				Button("Save", role: .confirm) {
-					if let index = receivedTimetables.firstIndex(where: { $0.id == item.timetable.id }) {
-						receivedTimetables.wrappedValue[index].sender = renameText
+					let displayName = renameText
+					Task {
+						try await ReceivedTimetableSyncService.shared.setReceivedNameOverride(
+							serialNumber: item.timetable.id,
+							displayName: displayName
+						)
 					}
 
 					renameItem = nil

@@ -168,13 +168,16 @@ extension PKPass {
 			sharedDate = Date()
 		}
 
-		var timetable = ReceivedTimetable(
-			sender: senderName,
+		return ReceivedTimetable(
+			id: serialNumber,
+			issuerAccountID: (userInfo["issuerAccountID"] as? String) ?? serialNumber,
+			sourceKind: (userInfo["sourceKind"] as? String).flatMap(SourceKind.init(rawValue:)) ?? .accountOwner,
+			signedDisplayName: senderName,
+			authorDisplayName: userInfo["authorDisplayName"] as? String,
 			subjects: subjects,
-			receivedAt: sharedDate
+			receivedAt: sharedDate,
+			passUpdatedAt: (userInfo["passUpdatedAt"] as? String).flatMap(ISO8601DateFormatter().date(from:)) ?? sharedDate,
+			isDeleted: userInfo["isDeleted"] as? Bool ?? false
 		)
-		timetable.id = serialNumber
-
-		return timetable
 	}
 }
