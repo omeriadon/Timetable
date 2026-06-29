@@ -59,10 +59,8 @@ final class AccountSettingsSyncService {
 	}
 
 	func downloadSettings() async throws {
-		let remoteSettings: RemoteAccountSettings = try await networkManager.send(.v1Settings)
-		var settings = Defaults[.accountSettings]
-		settings.liveActivitiesEnabled = remoteSettings.liveActivitiesEnabled
-		Defaults[.accountSettings] = settings
+		let remoteSettings: AccountSettings = try await networkManager.send(.v1Settings)
+		Defaults[.accountSettings] = remoteSettings
 		Defaults[.lastServerSync] = Date.now
 		pendingMutation = nil
 		applyLocalSideEffects()
@@ -110,11 +108,9 @@ final class AccountSettingsSyncService {
 			pendingMutation = nil
 
 			do {
-				let _: RemoteAccountSettings = try await networkManager.send(
+				let _: AccountSettings = try await networkManager.send(
 					.v1SettingsUpdate,
-					body: RemoteAccountSettings(
-						liveActivitiesEnabled: mutation.settings.liveActivitiesEnabled
-					)
+					body: mutation.settings
 				)
 				Defaults[.lastServerSync] = Date.now
 			} catch let NetworkError.server(_, response) where response.code == .invalidRequest {

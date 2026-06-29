@@ -60,10 +60,6 @@ nonisolated struct OwnerTimetableResponse: Codable {
 	let updatedAt: Date?
 }
 
-nonisolated struct RemoteAccountSettings: Codable {
-	let liveActivitiesEnabled: Bool
-}
-
 nonisolated struct ReceivedPassMirrorDTO: Codable {
 	let id: String
 	let issuerAccountID: String

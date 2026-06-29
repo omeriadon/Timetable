@@ -100,6 +100,14 @@ struct SettingsView: View {
 			}
 		}
 
+		Section("Account and Sync") {
+			NavigationLink {
+				AccountAndSyncSettingsView()
+			} label: {
+				Label("Account and Sync", systemImage: "arrow.trianglehead.2.clockwise")
+			}
+		}
+
 		#if os(iOS)
 			Section("Sync to Watch") {
 				SyncButton(

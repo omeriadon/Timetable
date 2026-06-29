@@ -32,7 +32,7 @@ final class WatchAccountBootstrapService {
 
 		let task = Task { @MainActor in
 			async let timetable: OwnerTimetableResponse = networkManager.send(.v1OwnerTimetable)
-			async let settings: RemoteAccountSettings = networkManager.send(.v1Settings)
+			async let settings: AccountSettings = networkManager.send(.v1Settings)
 			async let received: [ReceivedPassMirrorDTO] = networkManager.send(.v1ReceivedTimetables)
 			async let overrides: [ReceivedNameOverrideResponse] = networkManager.send(.v1ReceivedNameOverrides)
 			let (ownerTimetable, remoteSettings, receivedTimetables, receivedOverrides) = try await (
@@ -43,9 +43,7 @@ final class WatchAccountBootstrapService {
 			)
 
 			Defaults[.timetable] = ownerTimetable.subjects
-			var accountSettings = Defaults[.accountSettings]
-			accountSettings.liveActivitiesEnabled = remoteSettings.liveActivitiesEnabled
-			Defaults[.accountSettings] = accountSettings
+			Defaults[.accountSettings] = remoteSettings
 			let names = Dictionary(
 				uniqueKeysWithValues: receivedOverrides.map { ($0.serialNumber, $0.displayName) }
 			)

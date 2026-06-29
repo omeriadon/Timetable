@@ -9,8 +9,8 @@ import Defaults
 import Foundation
 
 nonisolated struct TimeOfDay: Codable, Defaults.Serializable, Hashable {
-	let hour: Int
-	let minute: Int
+	var hour: Int
+	var minute: Int
 
 	init(_ hour: Int, _ minute: Int) {
 		self.hour = hour
@@ -18,7 +18,7 @@ nonisolated struct TimeOfDay: Codable, Defaults.Serializable, Hashable {
 	}
 }
 
-nonisolated enum SchoolWeekday: String, Codable, Defaults.Serializable, Hashable {
+nonisolated enum SchoolWeekday: String, Codable, Defaults.Serializable, Hashable, CaseIterable {
 	case monday
 	case tuesday
 	case wednesday
@@ -38,6 +38,7 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 	var widgetShowsReceivedTimetables: Bool
 	var spotlightIndexingEnabled: Bool
 	var siriAccessEnabled: Bool
+	var notificationsEnabled: Bool
 
 	static let `default` = AccountSettings(
 		liveActivitiesEnabled: true,
@@ -48,6 +49,13 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 		showNextSubjectInLiveActivity: true,
 		widgetShowsReceivedTimetables: true,
 		spotlightIndexingEnabled: true,
-		siriAccessEnabled: true
+		siriAccessEnabled: true,
+		notificationsEnabled: false
 	)
+}
+
+extension SchoolWeekday {
+	var title: String {
+		rawValue.capitalized
+	}
 }
