@@ -12,13 +12,11 @@ enum StatusBadgeView: Equatable {
 	case success
 	case error
 	case warning
-	case circularGague(currentStep: Int, totalSteps: Int, secondaryText: String)
 	case progressViewAndGague(currentStep: Int, totalSteps: Int, secondaryText: String)
 
 	var secondaryText: String? {
 		switch self {
 			case let .progressView(secondaryText),
-			     let .circularGague(_, _, secondaryText),
 			     let .progressViewAndGague(_, _, secondaryText):
 				secondaryText
 			case .success, .error, .warning:
@@ -31,7 +29,7 @@ enum StatusBadgeView: Equatable {
 			case .error: 4
 			case .success: 3
 			case .warning: 2
-			case .progressView, .circularGague, .progressViewAndGague: 1
+			case .progressView, .progressViewAndGague: 1
 		}
 	}
 }
@@ -42,11 +40,6 @@ struct StatusBadge: Identifiable, Equatable {
 	var priority: Int
 	var view: StatusBadgeView
 	let sequence: UInt64
-
-	var dismissible: Bool {
-		if case .circularGague = view { return false }
-		return true
-	}
 }
 
 @MainActor
@@ -117,7 +110,7 @@ final class StatusBadgeManager {
 	}
 
 	func dismissMainBadge() {
-		guard let mainBadge, mainBadge.dismissible else { return }
+		guard let mainBadge else { return }
 		removeBadge(id: mainBadge.id)
 	}
 

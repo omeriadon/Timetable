@@ -12,6 +12,7 @@
 		2A098C8D2F9DB844002065BE /* Watch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 2A098C832F9DB842002065BE /* Watch.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2A1DB40E2F9DE9A300E5AE7C /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2A1DB40D2F9DE9A300E5AE7C /* Defaults */; };
 		2A1DB42D2F9ECEC300E5AE7C /* Watch Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2A2586A02FB5D6490030C8CD /* Watch Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2A324C072FF2980C00E6A3D5 /* ColorfulX in Frameworks */ = {isa = PBXBuildFile; productRef = 2A324C062FF2980C00E6A3D5 /* ColorfulX */; };
 		2A43AFA12FE7849E00BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFA02FE7849E00BBC8BD /* IrregularGradient */; };
 		2A43AFB12FE785E300BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFB02FE785E300BBC8BD /* IrregularGradient */; };
 		2A43AFB32FE785E700BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFB22FE785E700BBC8BD /* IrregularGradient */; };
@@ -274,6 +275,7 @@
 		2A0237882F9C8EA000AB1E1F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				2A324C072FF2980C00E6A3D5 /* ColorfulX in Frameworks */,
 				2A43AFA12FE7849E00BBC8BD /* IrregularGradient in Frameworks */,
 				2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */,
 				2A02379B2F9C907000AB1E1F /* Defaults in Frameworks */,
@@ -310,10 +312,10 @@
 			isa = PBXGroup;
 			children = (
 				2AD85A712FE8F239004EAB2B /* Special */,
-				2A02379F2F9C908300AB1E1F /* Shared */,
 				2A5F92192FE66817007302CF /* App Intents */,
 				2A60F50B2FD953D1009F4CE8 /* Watch */,
 				2AD85A4F2FE8F213004EAB2B /* Widget */,
+				2A02379F2F9C908300AB1E1F /* Shared */,
 				2A324AAE2FF0E3A100E6A3D5 /* App Shared */,
 				2AAE62702FD839A7004B3FF4 /* Main */,
 				2A02378C2F9C8EA000AB1E1F /* Products */,
@@ -366,6 +368,7 @@
 				2A43AFA02FE7849E00BBC8BD /* IrregularGradient */,
 				2A43AFCE2FE80ED900BBC8BD /* ZIPFoundation */,
 				2A43AFD12FE810C900BBC8BD /* OpenSSL */,
+				2A324C062FF2980C00E6A3D5 /* ColorfulX */,
 			);
 			productName = Timetable;
 			productReference = 2A02378B2F9C8EA000AB1E1F /* Timetable.app */;
@@ -492,6 +495,7 @@
 				2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */,
 				2A43AFCD2FE80ED900BBC8BD /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 				2A43AFD02FE810C900BBC8BD /* XCRemoteSwiftPackageReference "OpenSSL-Package" */,
+				2A324C052FF2980C00E6A3D5 /* XCRemoteSwiftPackageReference "ColorfulX" */,
 			);
 			preferredProjectObjectVersion = 110;
 			productRefGroup = 2A02378C2F9C8EA000AB1E1F /* Products */;
@@ -1188,6 +1192,14 @@
 				minimumVersion = 9.0.8;
 			};
 		};
+		2A324C052FF2980C00E6A3D5 /* XCRemoteSwiftPackageReference "ColorfulX" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Lakr233/ColorfulX";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.1.0;
+			};
+		};
 		2A43AFCD2FE80ED900BBC8BD /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/omeriadon/ZIPFoundation";
@@ -1237,6 +1249,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = Defaults;
+		};
+		2A324C062FF2980C00E6A3D5 /* ColorfulX */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A324C052FF2980C00E6A3D5 /* XCRemoteSwiftPackageReference "ColorfulX" */;
+			productName = ColorfulX;
 		};
 		2A43AFA02FE7849E00BBC8BD /* IrregularGradient */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -7,6 +7,17 @@
 
 import Foundation
 
+let sessions = [
+	"1",
+	"2",
+	"R",
+	"3",
+	"4",
+	"L",
+	"5",
+	"6",
+]
+
 let periodTimes: [(start: (hour: Int, min: Int), end: (hour: Int, min: Int))] = [
 	((8, 50), (9, 48)), // Period 1
 	((9, 48), (10, 46)), // Period 2

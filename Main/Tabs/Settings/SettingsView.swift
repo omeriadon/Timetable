@@ -225,13 +225,10 @@ struct SettingsView: View {
 				Button("Test warning badge", systemImage: "exclamationmark.triangle") {
 					addDebugStatusBadge(title: "Checking timetable", view: .warning)
 				}
-				Button("Test gauge badge", systemImage: "gauge.with.dots.needle.0percent") {
-					addDebugStatusBadge(title: "Uploading timetable", view: .circularGague(currentStep: 2, totalSteps: 5, secondaryText: "Step 2 of 5"))
-				}
 				Button("Test progress and gauge badge", systemImage: "arrow.trianglehead.2.clockwise.rotate.90") {
 					addDebugStatusBadge(title: "Preparing Wallet pass", view: .progressViewAndGague(currentStep: 2, totalSteps: 5, secondaryText: "Step 2 of 5"))
 				}
-			#endif
+			#endif // DEBUG
 
 			Button {
 				widgetReloadState = true

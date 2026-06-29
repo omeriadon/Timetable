@@ -43,7 +43,7 @@ struct StatusBadgeOverlay: View {
 	private func mainBadgeView(_ badge: StatusBadge, availableWidth: CGFloat) -> some View {
 		let content = StatusBadgeContent(
 			badge: badge,
-			showsClose: isHoveringMainBadge && badge.dismissible
+			showsClose: isHoveringMainBadge
 		)
 		.padding(.horizontal, horizontalPadding)
 		.frame(width: mainBadgeWidth(availableWidth))
@@ -61,11 +61,9 @@ struct StatusBadgeOverlay: View {
 				.gesture(
 					DragGesture(minimumDistance: 12)
 						.onChanged { value in
-							guard badge.dismissible else { return }
 							dragOffset = min(0, value.translation.height)
 						}
 						.onEnded { value in
-							guard badge.dismissible else { return }
 							if value.translation.height < -36 {
 								withAnimation(animation) {
 									dragOffset = -300
@@ -83,13 +81,11 @@ struct StatusBadgeOverlay: View {
 		#else
 			content
 				.onHover { hovering in
-					guard badge.dismissible else { return }
 					withAnimation(animation) {
 						isHoveringMainBadge = hovering
 					}
 				}
 				.onTapGesture {
-					guard badge.dismissible, isHoveringMainBadge else { return }
 					withAnimation(animation) {
 						manager.dismissMainBadge()
 					}
@@ -194,7 +190,6 @@ private struct StatusBadgeContent: View {
 			case .success: return "success"
 			case .error: return "error"
 			case .warning: return "warning"
-			case .circularGague: return "gauge"
 			case .progressViewAndGague: return "progress-gauge"
 		}
 	}
@@ -245,8 +240,6 @@ private struct StatusBadgeContent: View {
 					statusSymbol("xmark.circle.fill", color: .red, isTerminal: true)
 				case .warning:
 					statusSymbol("exclamationmark.triangle.fill", color: .orange, isTerminal: true)
-				case let .circularGague(currentStep, totalSteps, _):
-					stepGauge(currentStep: currentStep, totalSteps: totalSteps, containsProgress: false)
 				case let .progressViewAndGague(currentStep, totalSteps, _):
 					stepGauge(currentStep: currentStep, totalSteps: totalSteps, containsProgress: true)
 			}
@@ -325,7 +318,6 @@ private struct StatusBadgeContent: View {
 			.init(id: UUID(), title: "Success", priority: 3, view: .success, sequence: 2),
 			.init(id: UUID(), title: "Error", priority: 3, view: .error, sequence: 3),
 			.init(id: UUID(), title: "Warning", priority: 3, view: .warning, sequence: 4),
-			.init(id: UUID(), title: "Gauge", priority: 3, view: .circularGague(currentStep: 2, totalSteps: 5, secondaryText: "Step 2 of 5"), sequence: 5),
 			.init(id: UUID(), title: "Progress + Gauge", priority: 3, view: .progressViewAndGague(currentStep: 2, totalSteps: 5, secondaryText: "Step 2 of 5"), sequence: 6),
 		]
 
