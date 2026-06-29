@@ -8,7 +8,7 @@
 import Defaults
 import Foundation
 
-struct Subject: Hashable, Codable, Defaults.Serializable, Identifiable, Equatable {
+nonisolated struct Subject: Hashable, Codable, Defaults.Serializable, Identifiable, Equatable {
 	var id: String
 	var symbol: String
 	var colour: RGBAColor
@@ -19,7 +19,7 @@ struct Subject: Hashable, Codable, Defaults.Serializable, Identifiable, Equatabl
 	}
 }
 
-extension [Subject] {
+nonisolated extension [Subject] {
 	func toSubjectEntities() -> [SubjectEntity] {
 		map { $0.toSubjectEntity() }
 	}

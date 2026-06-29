@@ -14,7 +14,7 @@ enum DisplayMode: String, Codable, Equatable, Defaults.Serializable {
 	case textOnly
 }
 
-struct Slot: Hashable, Codable, Defaults.Serializable {
+nonisolated struct Slot: Hashable, Codable, Defaults.Serializable {
 	let day: Int
 	let session: Int
 

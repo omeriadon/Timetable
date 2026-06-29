@@ -39,8 +39,8 @@ final class AccountAuthenticationModel {
 
 	private let sessionStore: SessionStore
 
-	init(sessionStore: SessionStore = .shared) {
-		self.sessionStore = sessionStore
+	init(sessionStore: SessionStore? = nil) {
+		self.sessionStore = sessionStore ?? .shared
 	}
 
 	var displayNameProblems: [String] {

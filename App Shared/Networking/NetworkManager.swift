@@ -113,7 +113,7 @@ final class NetworkManager {
 	private(set) var offlineRequestAttempted = false
 	var presentedAlert: NetworkAlert?
 
-	private let baseURL: URL?
+	private let baseURL: URL = .init(string: "https://timetable.adonis.pt")!
 	private let decoder: JSONDecoder
 	private let encoder: JSONEncoder
 	private let monitor: NWPathMonitor
@@ -125,11 +125,9 @@ final class NetworkManager {
 	private var refreshTask: Task<Void, any Error>?
 
 	init(
-		baseURL: URL? = NetworkManager.configuredBaseURL,
 		session: URLSession? = nil,
 		monitor: NWPathMonitor = NWPathMonitor()
 	) {
-		self.baseURL = baseURL
 		self.session = session ?? Self.makeSession()
 		self.monitor = monitor
 
@@ -205,12 +203,6 @@ final class NetworkManager {
 
 	// MARK: - Request Construction
 
-	private nonisolated static var configuredBaseURL: URL? {
-		let processValue = ProcessInfo.processInfo.environment["TIMETABLE_SERVER_URL"]
-		let bundleValue = Bundle.main.object(forInfoDictionaryKey: "TIMETABLE_SERVER_URL") as? String
-		return (processValue ?? bundleValue).flatMap(URL.init(string:))
-	}
-
 	private nonisolated static func makeSession() -> URLSession {
 		let configuration = URLSessionConfiguration.default
 		configuration.timeoutIntervalForRequest = 30
@@ -221,10 +213,6 @@ final class NetworkManager {
 	}
 
 	private func makeRequest(for endpoint: Endpoint, body: Data?) throws -> URLRequest {
-		guard let baseURL else {
-			throw NetworkError.invalidConfiguration
-		}
-
 		let normalizedPath = endpoint.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
 		let url = baseURL.appending(path: normalizedPath)
 		guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {

@@ -9,7 +9,7 @@ import Defaults
 import Foundation
 
 typealias ReceivedTimetables = [ReceivedTimetable]
-struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiable, Hashable, Equatable {
+nonisolated struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiable, Hashable, Equatable {
 	var id: String
 
 	var sender: String

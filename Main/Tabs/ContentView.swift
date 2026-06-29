@@ -33,8 +33,11 @@ struct ContentView: View {
 					rootSyncStatus: $rootSyncStatus,
 					isBlurred: $isBlurred
 				)
+				.overlay {
+					VariableBlurView()
+						.ignoresSafeArea()
+				}
 				.ignoresSafeArea()
-				.blur(radius: isBlurred ? 2 : 0)
 				.opacity(isBlurred ? 0.8 : 1.0)
 				.animation(.easeInOut(duration: 0.35), value: isBlurred)
 			#else
