@@ -43,7 +43,14 @@ struct StatusBadgeOverlay: View {
 	@ViewBuilder
 	private func mainBadgeView(_ badge: StatusBadge, availableWidth: CGFloat) -> some View {
 		let content = ZStack {
+			#if os(iOS)
+				Capsule()
+					.fill(.black.opacity(0.25))
+			#endif
+
 			StatusBadgeCapsuleFill(badge: badge)
+
+			StatusBadgeBottomFlowLine(badge: badge)
 
 			StatusBadgeContent(
 				badge: badge,
@@ -57,9 +64,6 @@ struct StatusBadgeOverlay: View {
 		.clipShape(.capsule)
 		.glassEffect(.regular.interactive(), in: .capsule)
 		.glassEffectID("status-badge-main", in: glassNamespace)
-		.overlay {
-			StatusBadgeBottomFlowLine(badge: badge)
-		}
 		.contentTransition(.interpolate)
 		.animation(animation, value: badge)
 
@@ -198,7 +202,7 @@ private struct StatusBadgeContent: View {
 			case .success: return "success"
 			case .error: return "error"
 			case .warning: return "warning"
-			case .progressViewAndGague: return "progress-gauge"
+			case .progressViewAndGauge: return "progress-gauge"
 		}
 	}
 
@@ -248,7 +252,7 @@ private struct StatusBadgeContent: View {
 					statusSymbol("xmark.circle.fill", color: .red, isTerminal: true)
 				case .warning:
 					statusSymbol("exclamationmark.triangle.fill", color: .orange, isTerminal: true)
-				case let .progressViewAndGague(currentStep, totalSteps, _):
+				case let .progressViewAndGauge(currentStep, totalSteps, _):
 					stepGauge(currentStep: currentStep, totalSteps: totalSteps, containsProgress: true)
 			}
 		}
@@ -347,7 +351,7 @@ private struct StatusBadgeCapsuleFill: View {
 				case .warning:
 					terminalFill(.orange)
 
-				case .progressView, .progressViewAndGague:
+				case .progressView, .progressViewAndGauge:
 					loadingFill
 			}
 		}
@@ -366,23 +370,38 @@ private struct StatusBadgeCapsuleFill: View {
 		)
 	}
 
+	@State private var colourfulColors = Self.loadingColors
+	@State private var colourfulSpeed: Double = 2.5
+	@State private var colourfulBias: Double = 0.0012
+	@State private var colourfulNoise: Double = 30
+	@State private var colourfulTransitionSpeed: Double = 2.0
+	@State private var colourfulFrameLimit: Int = 30
+	@State private var colourfulRenderScale: Double = 0.9
+
 	private var loadingFill: some View {
 		ColorfulView(
-			color: .constant(Self.loadingColors),
-			speed: .constant(reduceMotion ? 0 : 0.42),
-			bias: .constant(0.0012),
-			noise: .constant(30),
-			transitionSpeed: .constant(2.0),
-			frameLimit: .constant(30),
-			renderScale: .constant(0.9)
+			color: $colourfulColors,
+			speed: $colourfulSpeed,
+			bias: $colourfulBias,
+			noise: $colourfulNoise,
+			transitionSpeed: $colourfulTransitionSpeed,
+			frameLimit: $colourfulFrameLimit,
+			renderScale: $colourfulRenderScale
 		)
+		.onAppear {
+			colourfulSpeed = reduceMotion ? 0 : 2.5
+		}
+		.onChange(of: reduceMotion) {
+			colourfulSpeed = reduceMotion ? 0 : 2.5
+		}
 		.mask {
 			LinearGradient(
 				stops: [
-					.init(color: .clear, location: 0.00),
-					.init(color: .white.opacity(0.05), location: 0.2),
-					.init(color: .white.opacity(0.28), location: 0.66),
-					.init(color: .white.opacity(0.58), location: 1.00),
+					.init(color: .white.opacity(0.0), location: 0.00),
+					.init(color: .white.opacity(0.15), location: 0.2),
+					.init(color: .white.opacity(0.6), location: 0.66),
+					.init(color: .white.opacity(1), location: 1.00),
+
 				],
 				startPoint: .top,
 				endPoint: .bottom
@@ -426,7 +445,7 @@ private struct StatusBadgeBottomFlowLine: View {
 
 	private var showsFlowLine: Bool {
 		switch badge.view {
-			case .progressView, .progressViewAndGague:
+			case .progressView, .progressViewAndGauge:
 				true
 			default:
 				false
@@ -542,7 +561,7 @@ private struct BottomCapsuleArc: Shape {
 			.init(id: UUID(), title: "Success", priority: 3, view: .success, sequence: 2),
 			.init(id: UUID(), title: "Error", priority: 3, view: .error, sequence: 3),
 			.init(id: UUID(), title: "Warning", priority: 3, view: .warning, sequence: 4),
-			.init(id: UUID(), title: "Progress + Gauge", priority: 3, view: .progressViewAndGague(currentStep: 2, totalSteps: 5, secondaryText: "Step 2 of 5"), sequence: 6),
+			.init(id: UUID(), title: "Progress + Gauge", priority: 3, view: .progressViewAndGauge(currentStep: 2, totalSteps: 5, secondaryText: "Step 2 of 5"), sequence: 6),
 		]
 
 		var body: some View {

@@ -226,7 +226,7 @@ struct SettingsView: View {
 					addDebugStatusBadge(title: "Checking timetable", view: .warning)
 				}
 				Button("Test progress and gauge badge", systemImage: "arrow.trianglehead.2.clockwise.rotate.90") {
-					addDebugStatusBadge(title: "Preparing Wallet pass", view: .progressViewAndGague(currentStep: 2, totalSteps: 5, secondaryText: "Step 2 of 5"))
+					addDebugStatusBadge(title: "Preparing Wallet pass", view: .progressViewAndGauge(currentStep: 2, totalSteps: 5, secondaryText: "Step 2 of 5"))
 				}
 			#endif // DEBUG
 

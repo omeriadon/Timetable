@@ -12,12 +12,12 @@ enum StatusBadgeView: Equatable {
 	case success
 	case error
 	case warning
-	case progressViewAndGague(currentStep: Int, totalSteps: Int, secondaryText: String)
+	case progressViewAndGauge(currentStep: Int, totalSteps: Int, secondaryText: String)
 
 	var secondaryText: String? {
 		switch self {
 			case let .progressView(secondaryText),
-			     let .progressViewAndGague(_, _, secondaryText):
+			     let .progressViewAndGauge(_, _, secondaryText):
 				secondaryText
 			case .success, .error, .warning:
 				nil
@@ -29,7 +29,16 @@ enum StatusBadgeView: Equatable {
 			case .error: 4
 			case .success: 3
 			case .warning: 2
-			case .progressView, .progressViewAndGague: 1
+			case .progressView, .progressViewAndGauge: 1
+		}
+	}
+
+	var showsProgressBackground: Bool {
+		switch self {
+			case .progressView, .progressViewAndGauge:
+				true
+			default:
+				false
 		}
 	}
 }
