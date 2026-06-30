@@ -253,7 +253,13 @@ private struct StatusBadgeContent: View {
 				case .warning:
 					statusSymbol("exclamationmark.triangle.fill", color: .orange, isTerminal: true)
 				case let .progressViewAndGauge(currentStep, totalSteps):
-					stepGauge(currentStep: currentStep, totalSteps: totalSteps, containsProgress: true)
+					StatusBadgeGauge(
+						currentStep: currentStep,
+						totalSteps: totalSteps,
+						containsProgress: true,
+						combinedProgressControlSize: combinedProgressControlSize,
+						reduceMotion: reduceMotion
+					)
 			}
 		}
 	}
@@ -264,28 +270,6 @@ private struct StatusBadgeContent: View {
 			.symbolRenderingMode(.hierarchical)
 			.foregroundStyle(color)
 			.contentTransition(.symbolEffect(.replace))
-	}
-
-	private func stepGauge(currentStep: Int, totalSteps: Int, containsProgress: Bool) -> some View {
-		Gauge(
-			value: Double(max(currentStep, 0)),
-			in: 0 ... Double(max(totalSteps, 1))
-		) {
-			EmptyView()
-		} currentValueLabel: {
-			EmptyView()
-		}
-		.gaugeStyle(.accessoryCircularCapacity)
-		.tint(.white)
-		.foregroundStyle(.white)
-		.scaleEffect(0.58)
-		.frame(width: 24, height: 24)
-		.overlay {
-			if containsProgress {
-				ProgressView()
-					.controlSize(combinedProgressControlSize)
-			}
-		}
 	}
 
 	private var progressControlSize: ControlSize {
@@ -318,6 +302,36 @@ private struct StatusBadgeContent: View {
 		#else
 			20
 		#endif
+	}
+}
+
+private struct StatusBadgeGauge: View {
+	let currentStep: Int
+	let totalSteps: Int
+	let containsProgress: Bool
+	let combinedProgressControlSize: ControlSize
+	let reduceMotion: Bool
+
+	var body: some View {
+		Gauge(
+			value: Double(currentStep),
+			in: 0 ... Double(totalSteps)
+		) {
+			EmptyView()
+		} currentValueLabel: {
+			EmptyView()
+		}
+		.gaugeStyle(.accessoryCircularCapacity)
+		.tint(.white)
+		.foregroundStyle(.white)
+		.scaleEffect(0.58)
+		.frame(width: 24, height: 24)
+		.overlay {
+			if containsProgress {
+				ProgressView()
+					.controlSize(combinedProgressControlSize)
+			}
+		}
 	}
 }
 
