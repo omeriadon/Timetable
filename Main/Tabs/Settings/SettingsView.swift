@@ -234,7 +234,22 @@ struct SettingsView: View {
 					addDebugStatusBadge(title: "Checking timetable", view: .warning)
 				}
 				Button("Test progress and gauge badge", systemImage: "arrow.trianglehead.2.clockwise.rotate.90") {
-					addDebugStatusBadge(title: "Preparing Wallet pass", secondaryText: "Step 2 of 5", view: .progressViewAndGauge(currentStep: 2, totalSteps: 5))
+					Task {
+						let id = UUID()
+						statusBadgeManager.addBadge(id: id, title: "Preparing Wallet pass", secondaryText: "Step 1", priority: 3, view: .progressViewAndGauge(currentStep: 1, totalSteps: 3))
+
+						try? await Task.sleep(for: .seconds(1))
+
+						statusBadgeManager.updateBadge(id: id, title: "Preparing Wallet pass", view: .progressViewAndGauge(currentStep: 2, totalSteps: 3))
+
+						try? await Task.sleep(for: .seconds(1))
+
+						statusBadgeManager.updateBadge(id: id, title: "Preparing Wallet pass", view: .progressViewAndGauge(currentStep: 3, totalSteps: 3))
+
+						try? await Task.sleep(for: .seconds(1))
+
+						statusBadgeManager.updateBadge(id: id, title: "Prepared Wallet pass", view: .success)
+					}
 				}
 			#endif // DEBUG
 

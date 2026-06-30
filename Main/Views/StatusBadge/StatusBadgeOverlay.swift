@@ -157,7 +157,7 @@ private struct StatusBadgeContent: View {
 			VStack(alignment: .leading, spacing: 2) {
 				Text(showsClose ? "Close" : badge.title)
 					.font(primaryFont)
-					.lineLimit(1)
+					.lineLimit(badge.secondaryText?.isEmpty ?? true ? 2 : 1)
 					.contentTransition(.numericText())
 					.animation(contentAnimation, value: showsClose ? "Close" : badge.title)
 
@@ -192,7 +192,7 @@ private struct StatusBadgeContent: View {
 	}
 
 	private var contentAnimation: Animation {
-		reduceMotion ? .easeInOut(duration: 0.16) : .spring(response: 0.34, dampingFraction: 0.92)
+		reduceMotion ? .easeInOut(duration: 0.16) : .easeInOut
 	}
 
 	private var indicatorID: String {

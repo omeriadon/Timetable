@@ -18,11 +18,11 @@ enum SessionStoreError: LocalizedError {
 	var errorDescription: String? {
 		switch self {
 			case .credentialPersistenceFailed:
-				"The session credentials could not be stored securely."
+				"Session credentials could not be stored."
 			case .invalidIdentityToken:
 				"The Apple identity token was invalid."
 			case .missingRefreshToken:
-				"The session could not be refreshed because the refresh token is missing."
+				"Refresh token is missing."
 		}
 	}
 }

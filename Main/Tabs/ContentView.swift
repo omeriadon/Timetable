@@ -180,7 +180,7 @@ struct ContentView: View {
 					} catch {
 						PrintError("[Wallet] Background Share Error: \(error)")
 						parent.isBlurred = false
-						presentErrorAlert(from: tabBarController)
+						StatusBadgeManager.shared.addBadge(id: UUID(), title: "Unable to generate your shareable pass.", priority: 4, view: .error)
 					}
 				}
 			}
@@ -215,16 +215,6 @@ struct ContentView: View {
 
 			func presentationControllerWillDismiss(_: UIPresentationController) {
 				parent.isBlurred = false
-			}
-
-			private func presentErrorAlert(from tabBarController: UITabBarController) {
-				let alert = UIAlertController(
-					title: "Error",
-					message: "Unable to generate your shareable pass.",
-					preferredStyle: .alert
-				)
-				alert.addAction(UIAlertAction(title: "OK", style: .default))
-				tabBarController.present(alert, animated: true)
 			}
 		}
 	}
