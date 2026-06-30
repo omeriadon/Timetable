@@ -274,7 +274,7 @@ struct SettingsView: View {
 			statusBadgeManager.addBadge(id: id, title: title, priority: 3, view: view)
 
 			Task {
-				try? await Task.sleep(for: .seconds(2))
+				try? await Task.sleep(for: .seconds(4))
 				statusBadgeManager.updateBadge(id: id, title: "Done", view: .success)
 			}
 		}
