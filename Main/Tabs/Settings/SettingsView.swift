@@ -222,7 +222,7 @@ struct SettingsView: View {
 		Section("Developer") {
 			#if DEBUG
 				Button("Test progress badge", systemImage: "progress.indicator") {
-					addDebugStatusBadge(title: "Syncing account", view: .progressView(secondaryText: "Working"))
+					addDebugStatusBadge(title: "Syncing account", secondaryText: "Working", view: .progressView)
 				}
 				Button("Test success badge", systemImage: "checkmark.circle") {
 					addDebugStatusBadge(title: "Saving timetable", view: .success)
@@ -234,7 +234,7 @@ struct SettingsView: View {
 					addDebugStatusBadge(title: "Checking timetable", view: .warning)
 				}
 				Button("Test progress and gauge badge", systemImage: "arrow.trianglehead.2.clockwise.rotate.90") {
-					addDebugStatusBadge(title: "Preparing Wallet pass", view: .progressViewAndGauge(currentStep: 2, totalSteps: 5, secondaryText: "Step 2 of 5"))
+					addDebugStatusBadge(title: "Preparing Wallet pass", secondaryText: "Step 2 of 5", view: .progressViewAndGauge(currentStep: 2, totalSteps: 5))
 				}
 			#endif // DEBUG
 
@@ -269,9 +269,9 @@ struct SettingsView: View {
 	}
 
 	#if DEBUG
-		private func addDebugStatusBadge(title: String, view: StatusBadgeView) {
+		private func addDebugStatusBadge(title: String, secondaryText: String? = nil, view: StatusBadgeView) {
 			let id = UUID()
-			statusBadgeManager.addBadge(id: id, title: title, priority: 3, view: view)
+			statusBadgeManager.addBadge(id: id, title: title, secondaryText: secondaryText, priority: 3, view: view)
 
 			Task {
 				try? await Task.sleep(for: .seconds(4))

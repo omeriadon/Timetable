@@ -65,6 +65,7 @@ struct ContentView: View {
 			statusBadgeManager.addBadge(
 				id: networkErrorBadgeID,
 				title: alert.title,
+				secondaryText: alert.message,
 				priority: 5,
 				view: .error
 			)
@@ -75,6 +76,7 @@ struct ContentView: View {
 			statusBadgeManager.addBadge(
 				id: offlineBadgeID,
 				title: "No Internet Connection",
+				secondaryText: "Please check your network settings.",
 				priority: 5,
 				view: .error
 			)

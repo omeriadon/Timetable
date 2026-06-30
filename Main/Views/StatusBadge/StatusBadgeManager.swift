@@ -8,21 +8,11 @@ import Observation
 import SwiftUI
 
 enum StatusBadgeView: Equatable {
-	case progressView(secondaryText: String)
+	case progressView
 	case success
 	case error
 	case warning
-	case progressViewAndGauge(currentStep: Int, totalSteps: Int, secondaryText: String)
-
-	var secondaryText: String? {
-		switch self {
-			case let .progressView(secondaryText),
-			     let .progressViewAndGauge(_, _, secondaryText):
-				secondaryText
-			case .success, .error, .warning:
-				nil
-		}
-	}
+	case progressViewAndGauge(currentStep: Int, totalSteps: Int)
 
 	fileprivate var rank: Int {
 		switch self {
@@ -46,6 +36,7 @@ enum StatusBadgeView: Equatable {
 struct StatusBadge: Identifiable, Equatable {
 	let id: UUID
 	var title: String
+	var secondaryText: String?
 	var priority: Int
 	var view: StatusBadgeView
 	let sequence: UInt64
@@ -74,6 +65,7 @@ final class StatusBadgeManager {
 	func addBadge(
 		id: UUID,
 		title: String,
+		secondaryText: String? = nil,
 		priority: Int,
 		view: StatusBadgeView
 	) {
@@ -82,6 +74,7 @@ final class StatusBadgeManager {
 			removalTasks[id]?.cancel()
 			removalTasks[id] = nil
 			badges[index].title = title
+			badges[index].secondaryText = secondaryText
 			badges[index].priority = min(max(priority, 1), 5)
 			badges[index].view = view
 		} else {
@@ -90,6 +83,7 @@ final class StatusBadgeManager {
 				StatusBadge(
 					id: id,
 					title: title,
+					secondaryText: secondaryText,
 					priority: min(max(priority, 1), 5),
 					view: view,
 					sequence: nextSequence
@@ -104,6 +98,7 @@ final class StatusBadgeManager {
 	func updateBadge(
 		id: UUID,
 		title: String,
+		secondaryText: String? = nil,
 		view: StatusBadgeView
 	) {
 		guard let index = badges.firstIndex(where: { $0.id == id }),
@@ -113,6 +108,7 @@ final class StatusBadgeManager {
 		removalTasks[id]?.cancel()
 		removalTasks[id] = nil
 		badges[index].title = title
+		badges[index].secondaryText = secondaryText
 		badges[index].view = view
 
 		scheduleRemovalIfNeeded(for: id, view: view)

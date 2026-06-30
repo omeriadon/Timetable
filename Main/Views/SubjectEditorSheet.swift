@@ -10,6 +10,7 @@ import SwiftUI
 
 struct SubjectEditorSheet: View {
 	@Environment(\.dismiss) var dismiss
+	@Environment(\.statusBadgeManager) private var statusBadgeManager
 
 	@Binding var subjects: [Subject]
 
@@ -21,7 +22,6 @@ struct SubjectEditorSheet: View {
 	@State private var draftSubjects: [EditableSubject] = []
 	@State private var pendingPrefillSlot: EditableSlot?
 	@State private var pendingConflict: SlotConflict?
-	@State private var validationMessage: String?
 	@State private var renameTargetSubjectID: EditableSubject.ID?
 	@State private var proposedSubjectName = ""
 	@State private var symbolPickerSubjectID: EditableSubject.ID?
@@ -113,25 +113,6 @@ struct SubjectEditorSheet: View {
 				if let conflict = pendingConflict {
 					Text("Both \(conflict.firstSubjectName) and \(conflict.secondSubjectName) use \(slotLabel(conflict.slot)). Which one should keep it?")
 				}
-			}
-		)
-		.alert(
-			"Invalid Subject Name",
-			isPresented: Binding(
-				get: { validationMessage != nil },
-				set: { newValue in
-					if !newValue {
-						validationMessage = nil
-					}
-				}
-			),
-			actions: {
-				Button("OK", role: .cancel) {
-					validationMessage = nil
-				}
-			},
-			message: {
-				Text(validationMessage ?? "")
 			}
 		)
 		.onAppear {
@@ -299,11 +280,11 @@ struct SubjectEditorSheet: View {
 	func validateAndSave() {
 		let names = draftSubjects.map { $0.name.trimmingCharacters(in: .whitespacesAndNewlines) }
 		if names.contains(where: \.isEmpty) {
-			validationMessage = "Subject name cannot be empty."
+			statusBadgeManager.addBadge(id: UUID(), title: "Subject name cannot be empty.", priority: 4, view: .error)
 			return
 		}
 		if Set(names).count != names.count {
-			validationMessage = "Subject names must be unique."
+			statusBadgeManager.addBadge(id: UUID(), title: "Subject names must be unique.", priority: 4, view: .error)
 			return
 		}
 		if let conflict = firstConflict(in: draftSubjects) {

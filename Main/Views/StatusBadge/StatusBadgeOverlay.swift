@@ -161,7 +161,7 @@ private struct StatusBadgeContent: View {
 					.contentTransition(.numericText())
 					.animation(contentAnimation, value: showsClose ? "Close" : badge.title)
 
-				if !showsClose, let secondaryText = badge.view.secondaryText, !secondaryText.isEmpty {
+				if !showsClose, let secondaryText = badge.secondaryText, !secondaryText.isEmpty {
 					Text(secondaryText)
 						.font(secondaryFont)
 						.foregroundStyle(.secondary)
@@ -252,7 +252,7 @@ private struct StatusBadgeContent: View {
 					statusSymbol("xmark.circle.fill", color: .red, isTerminal: true)
 				case .warning:
 					statusSymbol("exclamationmark.triangle.fill", color: .orange, isTerminal: true)
-				case let .progressViewAndGauge(currentStep, totalSteps, _):
+				case let .progressViewAndGauge(currentStep, totalSteps):
 					stepGauge(currentStep: currentStep, totalSteps: totalSteps, containsProgress: true)
 			}
 		}
@@ -557,11 +557,11 @@ private struct BottomCapsuleArc: Shape {
 		private let completionDelay: Duration = .seconds(2)
 
 		private let badges: [StatusBadge] = [
-			.init(id: UUID(), title: "Progress", priority: 3, view: .progressView(secondaryText: "Working"), sequence: 1),
-			.init(id: UUID(), title: "Success", priority: 3, view: .success, sequence: 2),
-			.init(id: UUID(), title: "Error", priority: 3, view: .error, sequence: 3),
+			.init(id: UUID(), title: "Progress", secondaryText: "Working", priority: 3, view: .progressView, sequence: 1),
+			.init(id: UUID(), title: "Success", priority: 2, view: .success, sequence: 2),
+			.init(id: UUID(), title: "Error", priority: 4, view: .error, sequence: 3),
 			.init(id: UUID(), title: "Warning", priority: 3, view: .warning, sequence: 4),
-			.init(id: UUID(), title: "Progress + Gauge", priority: 3, view: .progressViewAndGauge(currentStep: 2, totalSteps: 5, secondaryText: "Step 2 of 5"), sequence: 6),
+			.init(id: UUID(), title: "Progress + Gauge", secondaryText: "Step 2 of 5", priority: 3, view: .progressViewAndGauge(currentStep: 2, totalSteps: 5), sequence: 6),
 		]
 
 		var body: some View {
