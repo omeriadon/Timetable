@@ -48,7 +48,7 @@
 
 			UIApplication.shared.unregisterForRemoteNotifications()
 			do {
-				try await networkManager.send(.v1CurrentDeviceDelete(Defaults[.installationID]))
+				try await networkManager.send(.v1CurrentDeviceDelete, body: RemoveUserDeviceRequest(installationID: Defaults[.installationID]))
 			} catch NetworkError.offline {
 				return true
 			} catch {
@@ -94,12 +94,6 @@
 		static let v1CurrentDevice = Endpoint("/v1/devices/current", method: .put)
 		static let v1TestNotification = Endpoint("/v1/notifications/test", method: .post)
 
-		static func v1CurrentDeviceDelete(_ installationID: String) -> Endpoint {
-			Endpoint(
-				"/v1/devices/current",
-				method: .delete,
-				queryItems: [URLQueryItem(name: "installationID", value: installationID)]
-			)
-		}
+		static let v1CurrentDeviceDelete = Endpoint("/v1/devices/current", method: .delete)
 	}
 #endif

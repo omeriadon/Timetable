@@ -28,6 +28,11 @@ final class WalletPassService {
 		return try PKPass(data: data)
 	}
 
+	func downloadPass(timetableID: UUID) async throws -> PKPass {
+		let data = try await networkManager.download(Endpoint("/v1/timetables/\(timetableID.uuidString)/pass"))
+		return try PKPass(data: data)
+	}
+
 	func ownerPassFileURL() async throws -> URL {
 		let data = try await downloadOwnerPassData()
 		let fileURL = FileManager.default.temporaryDirectory

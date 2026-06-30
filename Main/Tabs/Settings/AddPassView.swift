@@ -20,6 +20,7 @@ struct AddPassView: View {
 	@State private var currentState: PassState = .idle
 	@State private var walletButtonID = UUID()
 	@State private var passService = WalletPassService.shared
+	@Environment(\.statusBadgeManager) private var statusBadgeManager
 
 	var body: some View {
 		ZStack {
@@ -73,6 +74,10 @@ struct AddPassView: View {
 	}
 
 	private func downloadPass() {
+		guard SessionStore.shared.isAuthenticated else {
+			statusBadgeManager.addBadge(id: UUID(), title: "Sign in required", secondaryText: "Sign in to add your timetable to Wallet.", priority: 3, view: .warning)
+			return
+		}
 		withAnimation(.easeInOut) {
 			currentState = .generating
 		}
@@ -94,7 +99,7 @@ struct AddPassView: View {
 
 	private func triggerResetTimer() {
 		Task {
-			try? await Task.sleep(for: .seconds(5))
+			try? await Task.sleep(for: .seconds(3))
 
 			withAnimation(.easeInOut) {
 				walletButtonID = UUID()

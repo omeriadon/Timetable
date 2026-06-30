@@ -51,7 +51,15 @@ final class TimetablePassManager {
 			let allPasses = self.passLibrary.passes()
 			Print("Found \(allPasses.count) raw passes in Wallet.")
 
-			let extractedTimetables = allPasses.compactMap { $0.toReceivedTimetable() }
+			var extractedTimetables: [ReceivedTimetable] = []
+			for pass in allPasses {
+				guard let timetable = pass.toReceivedTimetable() else { continue }
+				if timetable.isDeleted {
+					self.passLibrary.removePass(pass)
+					continue
+				}
+				extractedTimetables.append(timetable)
+			}
 
 			await MainActor.run {
 				withAnimation(.easeInOut) {

@@ -159,6 +159,7 @@ struct CalendarImportView: View {
 			subjects = translatedSubjects
 				.sorted { $0.id.localizedCaseInsensitiveCompare($1.id) == .orderedAscending }
 				.filter { !$0.slots.isEmpty }
+			ServerSyncCoordinator.shared.ownerTimetableChanged()
 
 			await moveForward(to: .done)
 			Print("[iOS] Calendar Import: Success!")

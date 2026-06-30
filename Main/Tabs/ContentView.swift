@@ -28,6 +28,9 @@ struct ContentView: View {
 	#endif
 
 	@Binding var expanded: WindowMode
+	#if !os(iOS)
+		@State private var selectedCompanionTab = "timetable"
+	#endif
 
 	var body: some View {
 		Group {
@@ -49,15 +52,16 @@ struct ContentView: View {
 				.opacity(isBlurred ? 0.8 : 1.0)
 				.animation(.easeInOut(duration: 0.35), value: isBlurred)
 			#else
-				TabView {
-					Tab("Timetable", systemImage: "calendar") {
+				TabView(selection: $selectedCompanionTab) {
+					Tab("Timetable", systemImage: "calendar", value: "timetable") {
 						TimetableView(expanded: $expanded)
 					}
 
-					Tab("Settings", systemImage: "gear") {
+					Tab("Settings", systemImage: "gear", value: "settings") {
 						SettingsView(expanded: $expanded)
 					}
 				}
+				.onReceive(NotificationCenter.default.publisher(for: .openSettingsTab)) { _ in selectedCompanionTab = "settings" }
 			#endif
 		}
 		.onChange(of: networkManager.presentedAlert?.id) {
@@ -88,6 +92,10 @@ struct ContentView: View {
 	}
 }
 
+extension Notification.Name {
+	static let openSettingsTab = Notification.Name("openSettingsTab")
+}
+
 #if os(iOS)
 
 	// MARK: - Tab View Bridge
@@ -116,6 +124,9 @@ struct ContentView: View {
 				},
 				UITab(title: "Settings", image: UIImage(systemName: "gear"), identifier: "settings") { _ in
 					UIHostingController(rootView: SettingsView(watchSync: watchSync, syncStatus: $rootSyncStatus))
+				},
+				UITab(title: "Search", image: UIImage(systemName: "magnifyingglass"), identifier: "search") { _ in
+					UIHostingController(rootView: TimetableSearchView())
 				},
 			]
 
@@ -173,6 +184,11 @@ struct ContentView: View {
 			private func presentSharePassWorkflow(from tabBarController: UITabBarController) {
 				Task { @MainActor [weak self, weak tabBarController] in
 					guard let self, let tabBarController else { return }
+					guard SessionStore.shared.isAuthenticated else {
+						parent.isBlurred = false
+						StatusBadgeManager.shared.addBadge(id: UUID(), title: "Sign in required", secondaryText: "Sign in to share your timetable pass.", priority: 3, view: .warning)
+						return
+					}
 
 					do {
 						let url = try await WalletPassService.shared.ownerPassFileURL()

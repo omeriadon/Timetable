@@ -18,6 +18,13 @@ struct SubjectEditorSheet: View {
 	@State private var editorReady = false
 
 	let initialRequest: EditorRequest?
+	let onSave: (() -> Void)?
+
+	init(subjects: Binding<[Subject]>, initialRequest: EditorRequest?, onSave: (() -> Void)? = nil) {
+		_subjects = subjects
+		self.initialRequest = initialRequest
+		self.onSave = onSave
+	}
 
 	@State private var draftSubjects: [EditableSubject] = []
 	@State private var pendingPrefillSlot: EditableSlot?
@@ -250,6 +257,7 @@ struct SubjectEditorSheet: View {
 			pendingConflict = nextConflict
 		} else {
 			commitDraftToModel()
+			onSave?()
 			dismiss()
 		}
 	}
@@ -292,6 +300,7 @@ struct SubjectEditorSheet: View {
 			return
 		}
 		commitDraftToModel()
+		onSave?()
 		dismiss()
 	}
 

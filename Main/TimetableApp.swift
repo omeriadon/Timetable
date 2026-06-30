@@ -104,6 +104,14 @@ struct TimetableApp: App {
 			#endif
 		}
 		.windowResizability(.contentSize)
+		#if os(macOS)
+			.commands {
+				CommandGroup(after: .appSettings) {
+					Button("Settings…") { NotificationCenter.default.post(name: .openSettingsTab, object: nil) }
+						.keyboardShortcut(",", modifiers: .command)
+				}
+			}
+		#endif
 	}
 
 	#if os(macOS)

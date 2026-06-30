@@ -52,12 +52,58 @@ nonisolated struct UpdateProfileRequest: Codable {
 nonisolated struct OwnerTimetableUpdateRequest: Codable {
 	let subjects: [Subject]
 	let expectedRevision: Int?
+	var isSearchable: Bool? = nil
 }
 
 nonisolated struct OwnerTimetableResponse: Codable {
 	let subjects: [Subject]
 	let revision: Int
 	let updatedAt: Date?
+	let isSearchable: Bool
+
+	private enum CodingKeys: String, CodingKey { case subjects, revision, updatedAt, isSearchable }
+
+	init(from decoder: any Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		subjects = try container.decode([Subject].self, forKey: .subjects)
+		revision = try container.decode(Int.self, forKey: .revision)
+		updatedAt = try container.decodeIfPresent(Date.self, forKey: .updatedAt)
+		isSearchable = try container.decodeIfPresent(Bool.self, forKey: .isSearchable) ?? true
+	}
+}
+
+nonisolated struct TimetableSearchResult: Codable, Identifiable, Hashable {
+	let id: UUID
+	let title: String
+	let authorAccountID: UUID
+	let authorDisplayName: String
+	let sourceKind: SourceKind
+	let confidence: Double
+}
+
+nonisolated struct TimetableDetailResponse: Codable, Identifiable, Hashable {
+	let id: UUID
+	let title: String
+	let authorAccountID: UUID
+	let authorDisplayName: String
+	let sourceKind: SourceKind
+	let subjects: [Subject]
+	let subjectCount: Int
+	let weeklyLessonCount: Int
+	let updatedAt: Date?
+	let activeInstallCount: Int
+	let isSearchable: Bool
+	let canEdit: Bool
+}
+
+nonisolated struct AuthoredTimetableUpdateRequest: Codable {
+	let title: String
+	let subjects: [Subject]
+	let isSearchable: Bool
+}
+
+nonisolated struct ReportUserRequest: Codable {
+	let reportedAccountID: String
 }
 
 nonisolated struct ReceivedPassMirrorDTO: Codable {
@@ -118,6 +164,10 @@ nonisolated struct RegisterUserDeviceRequest: Codable {
 	let installationID: String
 	let platform: String
 	let apnsToken: String
+}
+
+nonisolated struct RemoveUserDeviceRequest: Codable {
+	let installationID: String
 }
 
 nonisolated struct UserDeviceResponse: Codable {

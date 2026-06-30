@@ -19,9 +19,7 @@ struct SettingsView: View {
 
 	@Environment(\.passManager) private var passManager
 	@Environment(\.statusBadgeManager) private var statusBadgeManager
-
-	@Default(.userDisplayName) var userDisplayName
-	@State private var username: String
+	@State private var sessionStore = SessionStore.shared
 
 	#if os(iOS)
 		let watchSync: PhoneWatchSyncBridge
@@ -34,7 +32,8 @@ struct SettingsView: View {
 
 	@State private var showCalendarImportSheet = false
 	@State private var showEditTimetableSheet = false
-	@State private var widgetReloadState: Bool = false
+	@State private var ownerIsSearchable = true
+	@State private var ownerVisibilityLoaded = false
 
 	@State private var showEditReceivedTimetablesSheet = false
 
@@ -42,15 +41,12 @@ struct SettingsView: View {
 
 	#if os(iOS)
 		init(watchSync: PhoneWatchSyncBridge, syncStatus: Binding<SyncMode>) {
-			_username = State(initialValue: Defaults[.userDisplayName])
-
 			self.watchSync = watchSync
 			_syncStatus = syncStatus
 		}
 	#else
 		init(expanded: Binding<WindowMode>) {
 			_expanded = expanded
-			_username = State(initialValue: Defaults[.userDisplayName])
 		}
 	#endif
 
@@ -81,13 +77,13 @@ struct SettingsView: View {
 			.scrollContentBackground(.hidden)
 			.toolbar {
 				#if os(iOS)
-					ToolbarItem(placement: .title) {
-						Text("Settings")
-							.monospaced()
-					}
-				#endif // os(iOS)
+					ToolbarItem(placement: .largeSubtitle) { Text("Settings").monospaced() }
+				#else
+					ToolbarItem(placement: .principal) { Text("Settings").monospaced() }
+				#endif
 			}
 		}
+		.task { await loadOwnerVisibility() }
 	}
 
 	@ContentBuilder
@@ -100,124 +96,144 @@ struct SettingsView: View {
 			}
 		}
 
-		Section("Account and Sync") {
-			NavigationLink {
-				AccountAndSyncSettingsView()
-			} label: {
-				Label("Account and Sync", systemImage: "arrow.trianglehead.2.clockwise")
-			}
-		}
-
 		#if os(iOS)
-			Section("Sync to Watch") {
-				SyncButton(
-					syncStatus: syncStatus,
-					action: {
-						Task {
-							await syncToWatchAsync(
-								subjects: subjects,
-								watchSync: watchSync,
-								statusUpdate: { syncStatus = $0 }
-							)
-						}
-					}
-				)
-			}
-		#endif // os(iOS)
 
-		Section("Your Details") {
-			TextField("Your Name", text: $username)
-				.submitLabel(.done)
-		}
-		.onChange(of: username) {
-			Defaults[.userDisplayName] = username
-		}
-
-		Section("Your Timetable") {
-			Button {
-				showEditTimetableSheet = true
-			} label: {
-				Label {
-					Text("Edit Timetable")
-				} icon: {
-					Image(systemName: "pencil")
-						.foregroundStyle(.tint)
-				}
-			}
-			.matchedTransitionSource(id: "sheetMorph", in: ns)
-			.sheet(isPresented: $showEditTimetableSheet) {
-				SubjectEditorSheet(
-					subjects: $subjects,
-					initialRequest: nil
-				)
-				.presentationDetents([.fraction(0.85)])
-				.presentationDragIndicator(.hidden)
-				.interactiveDismissDisabled()
-				#if os(iOS)
-					.navigationTransition(.zoom(sourceID: "sheetMorph", in: ns))
-				#else
-					.frame(width: 600, height: 500)
-				#endif
-			}
-		}
-
-		#if !os(macOS)
-			Section("Add Timetable to Wallet") {
-				AddPassView()
-			}
-		#endif
-
-		Section("Calendar") {
-			Button {
-				showCalendarImportSheet = true
-			} label: {
-				HStack(alignment: .center) {
-					Image(systemName: "calendar")
-						.foregroundStyle(.tint)
-						.imageScale(.large)
-						.padding(.trailing, 10)
-
-					VStack(alignment: .leading) {
-						Text("Import from Calendar")
-							.foregroundStyle(.accent)
-						Text("Subscribe to Compass Schedule in Calendar")
-							.foregroundStyle(.secondary)
-							.font(.callout)
-					}
-				}
-			}
-			.sheet(isPresented: $showCalendarImportSheet) {
-				CalendarImportView()
-					.presentationDetents([.fraction(1 / 3)])
-					.presentationDragIndicator(.hidden)
-			}
-		}
-
-		if !passManager.receivedTimetables.isEmpty {
-			Section("Imported Timetables") {
-				Button {
-					showEditReceivedTimetablesSheet = true
+			Section("Account and Sync") {
+				NavigationLink {
+					AccountAndSyncSettingsView()
 				} label: {
-					Label("Edit Received Timetables...", systemImage: "calendar")
+					Label("Account and Sync", systemImage: "arrow.trianglehead.2.clockwise")
 				}
-				.matchedTransitionSource(id: "unique_transition_id", in: ns)
-				.sheet(isPresented: $showEditReceivedTimetablesSheet) {
-					ReceivedTimetablesView()
-						.presentationDetents([.fraction(0.8)])
-						.presentationDragIndicator(.hidden)
+			}
+
+			Section("Server Sync") {
+				Button("Sync Everything", systemImage: "arrow.trianglehead.2.clockwise") {
+					Task { await ServerSyncCoordinator.shared.syncEverything() }
+				}
+			}
+
+			#if os(iOS)
+				Section("Sync to Watch") {
+					SyncButton(
+						syncStatus: syncStatus,
+						action: {
+							Task {
+								await syncToWatchAsync(
+									subjects: subjects,
+									watchSync: watchSync,
+									statusUpdate: { syncStatus = $0 }
+								)
+							}
+						}
+					)
+				}
+			#endif // os(iOS)
+
+			Section("Your Timetable") {
+				Toggle("Searchable", isOn: $ownerIsSearchable)
+					.onChange(of: ownerIsSearchable) { _, newValue in
+						guard sessionStore.isAuthenticated else {
+							ownerIsSearchable.toggle()
+							showSignInRequired()
+							return
+						}
+						guard ownerVisibilityLoaded else { return }
+						Task { await saveOwnerVisibility(newValue) }
+					}
+				Button {
+					showEditTimetableSheet = true
+				} label: {
+					Label {
+						Text("Edit Timetable")
+					} icon: {
+						Image(systemName: "pencil")
+							.foregroundStyle(.tint)
+					}
+				}
+				.matchedTransitionSource(id: "sheetMorph", in: ns)
+				.sheet(isPresented: $showEditTimetableSheet) {
+					SubjectEditorSheet(
+						subjects: $subjects,
+						initialRequest: nil,
+						onSave: { ServerSyncCoordinator.shared.ownerTimetableChanged() }
+					)
+					.presentationDetents([.fraction(0.85)])
+					.presentationDragIndicator(.hidden)
+					.interactiveDismissDisabled()
 					#if os(iOS)
-						.navigationTransition(
-							.zoom(sourceID: "unique_transition_id", in: ns)
-						)
+						.navigationTransition(.zoom(sourceID: "sheetMorph", in: ns))
 					#else
 						.frame(width: 600, height: 500)
 					#endif
 				}
-				.onChange(of: passManager.receivedTimetables) { _, newValue in
-					if newValue.isEmpty {}
+			}
+
+			Section("Authored Timetables") {
+				if sessionStore.isAuthenticated {
+					NavigationLink { AuthoredTimetablesSettingsView() } label: { Label("Manage Authored Timetables", systemImage: "person.2.crop.square.stack") }
+				} else {
+					Button { showSignInRequired() } label: { Label("Manage Authored Timetables", systemImage: "person.2.crop.square.stack") }
 				}
 			}
-		}
+
+			#if !os(macOS)
+				Section("Add Timetable to Wallet") {
+					AddPassView()
+				}
+			#endif
+
+			Section("Calendar") {
+				Button {
+					showCalendarImportSheet = true
+				} label: {
+					HStack(alignment: .center) {
+						Image(systemName: "calendar")
+							.foregroundStyle(.tint)
+							.imageScale(.large)
+							.padding(.trailing, 10)
+
+						VStack(alignment: .leading) {
+							Text("Import from Calendar")
+								.foregroundStyle(.accent)
+							Text("Subscribe to Compass Schedule in Calendar")
+								.foregroundStyle(.secondary)
+								.font(.callout)
+						}
+					}
+				}
+				.sheet(isPresented: $showCalendarImportSheet) {
+					CalendarImportView()
+						.presentationDetents([.fraction(1 / 3)])
+						.presentationDragIndicator(.hidden)
+				}
+			}
+
+			if !passManager.receivedTimetables.isEmpty {
+				Section("Imported Timetables") {
+					Button {
+						showEditReceivedTimetablesSheet = true
+					} label: {
+						Label("Edit Received Timetables...", systemImage: "calendar")
+					}
+					.matchedTransitionSource(id: "unique_transition_id", in: ns)
+					.sheet(isPresented: $showEditReceivedTimetablesSheet) {
+						ReceivedTimetablesView()
+							.presentationDetents([.fraction(0.8)])
+							.presentationDragIndicator(.hidden)
+						#if os(iOS)
+							.navigationTransition(
+								.zoom(sourceID: "unique_transition_id", in: ns)
+							)
+						#else
+							.frame(width: 600, height: 500)
+						#endif
+					}
+					.onChange(of: passManager.receivedTimetables) { _, newValue in
+						if newValue.isEmpty {}
+					}
+				}
+			}
+		#endif // os(iOS)
 
 		Section("Developer") {
 			#if DEBUG
@@ -236,7 +252,7 @@ struct SettingsView: View {
 				Button("Test progress and gauge badge", systemImage: "arrow.trianglehead.2.clockwise.rotate.90") {
 					Task {
 						let id = UUID()
-						statusBadgeManager.addBadge(id: id, title: "Preparing Wallet pass", secondaryText: "Step 1", priority: 3, view: .progressViewAndGauge(currentStep: 1, totalSteps: 3))
+						statusBadgeManager.addBadge(id: id, title: "Preparing Wallet pass", priority: 3, view: .progressViewAndGauge(currentStep: 1, totalSteps: 3))
 
 						try? await Task.sleep(for: .seconds(1))
 
@@ -254,32 +270,12 @@ struct SettingsView: View {
 			#endif // DEBUG
 
 			Button {
-				widgetReloadState = true
 				WidgetCenter.shared.reloadAllTimelines()
-
-				Task {
-					try? await Task.sleep(nanoseconds: 5_000_000_000)
-					await MainActor.run {
-						withAnimation(.easeInOut) {
-							widgetReloadState = false
-						}
-					}
-				}
+				statusBadgeManager.addBadge(id: UUID(), title: "Widgets reloaded", priority: 3, view: .success)
 			} label: {
-				ZStack {
-					if widgetReloadState {
-						Label("Done", systemImage: "checkmark")
-
-							.transition(.blurReplace)
-					} else {
-						Label("Reload widgets now", systemImage: "widget.extralarge")
-							.foregroundStyle(.accent)
-							.transition(.blurReplace)
-					}
-				}
-				.animation(.easeInOut, value: widgetReloadState)
+				Label("Reload widgets now", systemImage: "widget.extralarge")
+					.foregroundStyle(.accent)
 			}
-			.disabled(widgetReloadState)
 		}
 	}
 
@@ -294,6 +290,33 @@ struct SettingsView: View {
 			}
 		}
 	#endif
+
+	private func loadOwnerVisibility() async {
+		guard sessionStore.isAuthenticated else { return }
+		do {
+			let response: OwnerTimetableResponse = try await NetworkManager.shared.send(Endpoint("/v1/timetables/owner"))
+			ownerIsSearchable = response.isSearchable
+			ownerVisibilityLoaded = true
+		} catch {
+			statusBadgeManager.addBadge(id: UUID(), title: "Unable to load timetable visibility", secondaryText: error.localizedDescription, priority: 4, view: .error)
+		}
+	}
+
+	private func saveOwnerVisibility(_ searchable: Bool) async {
+		guard sessionStore.isAuthenticated else { showSignInRequired(); return }
+		do {
+			let current: OwnerTimetableResponse = try await NetworkManager.shared.send(Endpoint("/v1/timetables/owner"))
+			let _: OwnerTimetableResponse = try await NetworkManager.shared.send(Endpoint("/v1/timetables/owner", method: .put), body: OwnerTimetableUpdateRequest(subjects: subjects, expectedRevision: current.revision, isSearchable: searchable))
+			statusBadgeManager.addBadge(id: UUID(), title: searchable ? "Timetable is searchable" : "Timetable is hidden", priority: 3, view: .success)
+		} catch {
+			ownerIsSearchable.toggle()
+			statusBadgeManager.addBadge(id: UUID(), title: "Unable to update visibility", secondaryText: error.localizedDescription, priority: 4, view: .error)
+		}
+	}
+
+	private func showSignInRequired() {
+		statusBadgeManager.addBadge(id: UUID(), title: "Sign in required", secondaryText: "Sign in to use this feature.", priority: 3, view: .warning)
+	}
 }
 
 extension Array {

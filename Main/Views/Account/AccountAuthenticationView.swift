@@ -82,7 +82,7 @@ struct AccountAuthenticationView: View {
 			.padding(20)
 		}
 		.scrollDismissesKeyboard(.interactively)
-		.navigationTitle("Account")
+		.appNavigationTitle("Account")
 		.animation(reduceMotion ? .none : .snappy, value: model.mode)
 	}
 

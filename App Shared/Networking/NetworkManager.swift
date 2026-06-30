@@ -76,6 +76,7 @@ struct NetworkAlert: Identifiable {
 }
 
 enum NetworkError: Error, LocalizedError {
+	case authenticationRequired
 	case cancelled
 	case invalidConfiguration
 	case invalidResponse
@@ -86,6 +87,8 @@ enum NetworkError: Error, LocalizedError {
 
 	var errorDescription: String? {
 		switch self {
+			case .authenticationRequired:
+				"Sign in to use this feature."
 			case .cancelled:
 				"The request was cancelled."
 			case .invalidConfiguration:
@@ -100,6 +103,17 @@ enum NetworkError: Error, LocalizedError {
 				"The server took too long to respond."
 			case let .transport(message):
 				message
+		}
+	}
+
+	var suppressesStatusBadge: Bool {
+		switch self {
+			case .authenticationRequired:
+				false
+			case let .server(statusCode, response):
+				statusCode == 404 || response.code == .notFound || response.code == .accountNotFound
+			default:
+				false
 		}
 	}
 }
@@ -240,6 +254,9 @@ final class NetworkManager {
 
 	private func execute(_ endpoint: Endpoint, body: Data?, mayRefresh: Bool = true) async throws -> Data {
 		try requireOnline()
+		if endpoint.requiresAuthentication, accessTokenProvider?() == nil {
+			throw NetworkError.authenticationRequired
+		}
 		let clock = ContinuousClock()
 		let start = clock.now
 
@@ -264,10 +281,12 @@ final class NetworkManager {
 		} catch let error as NetworkError {
 			PrintError("Request failed for \(endpoint.path)", category: .network, error: error)
 			switch error {
-				case .cancelled:
+				case .authenticationRequired, .cancelled:
 					throw error
 				case .offline:
 					offlineRequestAttempted = true
+					throw error
+				case let .server(statusCode, response) where statusCode == 404 || response.code == .notFound || response.code == .accountNotFound:
 					throw error
 				default:
 					present(error)
@@ -349,6 +368,7 @@ final class NetworkManager {
 		do {
 			return try decoder.decode(Response.self, from: data)
 		} catch {
+			PrintError("Failed to decode \(String(describing: Response.self))", category: .network, error: error)
 			throw NetworkError.invalidResponse
 		}
 	}

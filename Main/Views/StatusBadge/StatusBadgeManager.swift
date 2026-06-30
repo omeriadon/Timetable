@@ -69,6 +69,8 @@ final class StatusBadgeManager {
 		priority: Int,
 		view: StatusBadgeView
 	) {
+		Print(title)
+		Print(secondaryText ?? "")
 		if let index = badges.firstIndex(where: { $0.id == id }) {
 			guard badges[index].view != .success else { return }
 			removalTasks[id]?.cancel()

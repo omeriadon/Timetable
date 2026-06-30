@@ -14,6 +14,8 @@ func syncToWatchAsync(
 	statusUpdate: @escaping (SyncMode) -> Void
 ) async {
 	let startedAt = Date()
+	let badgeID = UUID()
+	StatusBadgeManager.shared.addBadge(id: badgeID, title: "Syncing to Apple Watch", priority: 3, view: .progressView)
 	statusUpdate(.loading)
 	Print("[iOS] Starting WatchConnectivity sync...")
 
@@ -27,6 +29,7 @@ func syncToWatchAsync(
 	}
 
 	statusUpdate(.success)
+	StatusBadgeManager.shared.updateBadge(id: badgeID, title: "Synced to Apple Watch", view: .success)
 	Print("[iOS] Sync completed, showing checkmark")
 
 	try? await Task.sleep(nanoseconds: 1_000_000_000)

@@ -40,7 +40,7 @@ struct AccountAndSyncSettingsView: View {
 				#endif
 			}
 		}
-		.navigationTitle("Account and Sync")
+		.appNavigationTitle("Account and Sync")
 		.onChange(of: settings) { oldValue, newValue in
 			guard oldValue != newValue else { return }
 			Task {

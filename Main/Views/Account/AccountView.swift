@@ -5,10 +5,12 @@
 //   Created by Adon Omeri on 28/6/2026.
 //
 
+import Defaults
 import SwiftUI
 
 struct AccountView: View {
 	@State private var sessionStore = SessionStore.shared
+	@Default(.userDisplayName) private var displayName
 
 	var body: some View {
 		Group {
@@ -16,7 +18,13 @@ struct AccountView: View {
 				case let .authenticated(profile):
 					List {
 						Section("Profile") {
-							LabeledContent("Name", value: profile.displayName)
+							#if os(iOS)
+								TextField("Name", text: $displayName)
+									.submitLabel(.done)
+									.onChange(of: displayName) { _, value in ServerSyncCoordinator.shared.scheduleProfileUpdate(value) }
+							#else
+								LabeledContent("Name", value: profile.displayName)
+							#endif
 							if let email = profile.email {
 								LabeledContent("Email", value: email)
 							}
@@ -27,7 +35,7 @@ struct AccountView: View {
 							Button("Delete Account", role: .destructive, action: deleteAccount)
 						}
 					}
-					.navigationTitle("Account")
+					.appNavigationTitle("Account")
 				case .restoring:
 					ProgressView("Restoring Account…")
 				case .signedOut:
