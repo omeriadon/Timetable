@@ -139,10 +139,12 @@ final class NetworkManager {
 	private var refreshTask: Task<Void, any Error>?
 
 	init(
-		session: URLSession? = nil,
 		monitor: NWPathMonitor = NWPathMonitor()
 	) {
-		self.session = session ?? Self.makeSession()
+		let config = URLSessionConfiguration.default
+		config.requestCachePolicy = .reloadIgnoringLocalCacheData
+
+		session = URLSession(configuration: config)
 		self.monitor = monitor
 
 		let decoder = JSONDecoder()

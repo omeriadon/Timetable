@@ -5,6 +5,7 @@
 //   Created by Adon Omeri on 28/6/2026.
 //
 
+import Defaults
 import Foundation
 import Observation
 import PassKit
@@ -17,9 +18,13 @@ final class WalletPassService {
 	private(set) var isDownloading = false
 
 	private let networkManager: NetworkManager
+	@ObservationIgnored private let statusBadgeManager: StatusBadgeManager = .shared
+
 	private var downloadTask: Task<Data, any Error>?
 
-	private init(networkManager: NetworkManager) {
+	private init(
+		networkManager: NetworkManager
+	) {
 		self.networkManager = networkManager
 	}
 
@@ -34,9 +39,19 @@ final class WalletPassService {
 	}
 
 	func ownerPassFileURL() async throws -> URL {
+		Task {
+			await triggerStatusBadgeAnimation()
+		}
+
+		let name = if let displayName = Defaults[.accountProfile]?.displayName {
+			"\(displayName)'s Timetable"
+		} else {
+			"Timetable"
+		}
+
 		let data = try await downloadOwnerPassData()
 		let fileURL = FileManager.default.temporaryDirectory
-			.appending(path: "Timetable-\(UUID().uuidString)")
+			.appending(path: "\(name)-\(UUID().uuidString)")
 			.appendingPathExtension("pkpass")
 		try data.write(to: fileURL, options: [.atomic, .completeFileProtection])
 		return fileURL
@@ -67,6 +82,48 @@ final class WalletPassService {
 			isDownloading = false
 		}
 		return try await task.value
+	}
+
+	private func triggerStatusBadgeAnimation() async {
+		let badgeID = UUID()
+		let totalSteps = 4
+
+		await MainActor.run {
+			statusBadgeManager.addBadge(
+				id: badgeID,
+				title: "Downloading Pass",
+				secondaryText: "Requesting pass...",
+				priority: 3,
+				view: .progressViewAndGauge(currentStep: 1, totalSteps: 5)
+			)
+		}
+
+		for step in 2 ... totalSteps {
+			try? await Task.sleep(for: .milliseconds(300))
+
+			let secondaryText = switch step {
+				case 2: "Generating pass..."
+				default: "Downloading pass..."
+			}
+
+			await MainActor.run {
+				statusBadgeManager.updateBadge(
+					id: badgeID,
+					title: "Downloading Pass",
+					secondaryText: secondaryText,
+					view: .progressViewAndGauge(currentStep: step, totalSteps: totalSteps)
+				)
+			}
+		}
+
+		await MainActor.run {
+			statusBadgeManager.updateBadge(
+				id: badgeID,
+				title: "Pass Ready",
+				secondaryText: "Ready to add to Wallet.",
+				view: .success
+			)
+		}
 	}
 }
 
