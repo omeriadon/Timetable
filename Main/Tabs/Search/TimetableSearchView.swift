@@ -181,17 +181,17 @@ private struct TimetableSearchRow: View {
 	let namespace: Namespace.ID
 
 	var body: some View {
-		HStack(alignment: .center, spacing: 16) {
-			Image(systemName: result.sourceKind == .accountOwner ? "person.crop.rectangle" : "person.2.crop.square.stack")
-				.font(.title2)
+		HStack(spacing: 12) {
+			Image(systemName: result.sourceKind == .accountOwner
+				? "person.crop.rectangle"
+				: "person.2.crop.square.stack")
+				.imageScale(.large)
 				.foregroundStyle(.tint)
-				.frame(width: 34)
+				.frame(width: 32)
 
 			TimetableIdentityView(result: result, prominence: .row)
 				.portal(item: result, as: .source, in: namespace)
 		}
-		.frame(maxWidth: .infinity, alignment: .leading)
 		.frame(height: 60)
-		.accessibilityElement(children: .combine)
 	}
 }

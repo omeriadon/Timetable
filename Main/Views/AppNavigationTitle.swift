@@ -13,10 +13,13 @@ extension View {
 			.navigationBarTitleDisplayMode(style == .main ? .large : .inline)
 			.toolbar {
 				ToolbarItem(placement: style == .main ? .largeTitle : .principal) {
-					Text(title)
-						.font(style == .main ? .largeTitle : .title2)
-						.bold()
-						.monospaced()
+					HStack {
+						Text(title)
+							.font(style == .main ? .largeTitle : .title2)
+							.bold()
+							.monospaced()
+						Spacer(minLength: 1)
+					}
 				}
 			}
 			.scrollEdgeEffectStyle(.soft, for: .top)

@@ -17,17 +17,16 @@ struct TimetableIdentityView: View {
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 4) {
-			Text(result.title.count > 19 ? "\(result.title.prefix(16))..." : result.title)
+			Text(result.title.count > 17 ? "\(result.title.prefix(14))..." : result.title)
 				.lineLimit(1)
-				.font(.system(size: 32, weight: .bold, design: .monospaced))
-				.fixedSize(horizontal: true, vertical: true)
+				.font(.system(size: 29, weight: .regular, design: .monospaced))
 
-			Text("By \(result.authorDisplayName)")
-				.font(.system(size: 25, design: .monospaced))
+			Text("By \(result.authorDisplayName.prefix(20))")
+				.font(.system(size: 27, design: .monospaced))
 				.foregroundStyle(Color.gray)
-				.fixedSize(horizontal: true, vertical: true)
 		}
 		.multilineTextAlignment(.leading)
-		.scaleEffect(scale, anchor: .topLeading)
+		.scaleEffect(scale, anchor: .leading)
+		.fixedSize(horizontal: true, vertical: true)
 	}
 }
