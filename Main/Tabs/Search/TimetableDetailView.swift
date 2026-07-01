@@ -26,8 +26,9 @@ struct TimetableDetailView: View {
 			ZStack {
 				ScrollView {
 					TimetableIdentityView(result: result, prominence: .header)
-						.padding(.horizontal)
 						.portal(item: result, as: .destination, in: portalNamespace)
+						.frame(maxWidth: .infinity, alignment: .leading)
+						.padding(.horizontal)
 
 					if let detail {
 						VStack(alignment: .leading, spacing: 20) {
@@ -53,6 +54,7 @@ struct TimetableDetailView: View {
 							.padding(.top, 80)
 					}
 				}
+				.scrollBounceBehavior(.basedOnSize)
 				.scrollEdgeEffectStyle(.soft, for: .bottom)
 				.scrollEdgeEffectStyle(.soft, for: .top)
 			}
@@ -97,7 +99,6 @@ struct TimetableDetailView: View {
 			}
 			.task { await load() }
 		}
-		.portalHeaderDebugOverlays(true)
 		.monospaced()
 	}
 

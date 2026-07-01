@@ -130,7 +130,6 @@ struct TimetableSearchView: View {
 			.onChange(of: selectedResult?.id) {
 				if selectedResult == nil { portalResult = nil }
 			}
-			.portalTransitionDebugOverlays(true)
 		}
 	}
 

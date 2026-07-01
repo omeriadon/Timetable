@@ -9,19 +9,25 @@ struct TimetableIdentityView: View {
 	let result: TimetableSearchResult
 	let prominence: Prominence
 
+	private var titleSize: CGFloat {
+		prominence == .row ? 17 : 28
+	}
+
+	private var subtitleSize: CGFloat {
+		prominence == .row ? 15 : 20
+	}
+
 	var body: some View {
-		VStack(alignment: prominence == .row ? .leading : .center, spacing: prominence == .row ? 6 : 4) {
+		VStack(alignment: .leading, spacing: prominence == .row ? 6 : 4) {
 			Text(result.title)
-				.font(prominence == .row ? .headline : .title)
-				.bold()
+				.font(.system(size: titleSize, weight: .bold, design: .monospaced))
 				.lineLimit(2)
 
 			Text("By \(result.authorDisplayName)")
-				.font(prominence == .row ? .subheadline : .title3)
+				.font(.system(size: subtitleSize, design: .monospaced))
 				.foregroundStyle(.secondary)
 				.lineLimit(1)
 		}
-		.monospaced()
-		.multilineTextAlignment(prominence == .row ? .leading : .center)
+		.multilineTextAlignment(.leading)
 	}
 }
