@@ -20,6 +20,7 @@ struct AddPassView: View {
 	@State private var currentState: PassState = .idle
 	@State private var walletButtonID = UUID()
 	@State private var passService = WalletPassService.shared
+	@State private var resetTask: Task<Void, Never>?
 	@Environment(\.statusBadgeManager) private var statusBadgeManager
 
 	var body: some View {
@@ -31,7 +32,7 @@ struct AddPassView: View {
 			} else {
 				switch currentState {
 					case .idle:
-						Button("Download Apple Wallet Pass", systemImage: "wallet.pass", action: downloadPass)
+						Button("Generate Your Timetable Pass", systemImage: "wallet.pass", action: downloadPass)
 							.foregroundStyle(.accent)
 							.transition(.blurReplace)
 
@@ -74,6 +75,7 @@ struct AddPassView: View {
 	}
 
 	private func downloadPass() {
+		resetTask?.cancel()
 		guard SessionStore.shared.isAuthenticated else {
 			statusBadgeManager.addBadge(id: UUID(), title: "Sign in required", secondaryText: "Sign in to add your timetable to Wallet.", priority: 3, view: .warning)
 			return
@@ -93,13 +95,17 @@ struct AddPassView: View {
 				withAnimation(.easeInOut) {
 					currentState = .error
 				}
+				statusBadgeManager.addBadge(id: UUID(), title: "Unable to generate your pass", secondaryText: error.localizedDescription, priority: 4, view: .error)
+				triggerResetTimer()
 			}
 		}
 	}
 
 	private func triggerResetTimer() {
-		Task {
-			try? await Task.sleep(for: .seconds(3))
+		resetTask?.cancel()
+		resetTask = Task {
+			try? await Task.sleep(for: .seconds(4))
+			guard !Task.isCancelled else { return }
 
 			withAnimation(.easeInOut) {
 				walletButtonID = UUID()
