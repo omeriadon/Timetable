@@ -220,17 +220,25 @@ extension Notification.Name {
 					guard let self, let tabBarController else { return }
 					guard SessionStore.shared.isAuthenticated else {
 						parent.isBlurred = false
-						StatusBadgeManager.shared.addBadge(id: UUID(), title: "Sign in required", secondaryText: "Sign in to share your timetable pass.", priority: 3, view: .warning)
+						StatusBadgeManager.shared.addBadge(id: UUID(), title: "Sign in required", secondaryText: "Sign in to use this feature.", priority: 3, view: .warning)
 						return
 					}
 
 					do {
 						let url = try await WalletPassService.shared.ownerPassFileURL()
 						presentShareSheet(with: url, from: tabBarController)
+					} catch where error.isCancellation {
+						parent.isBlurred = false
+						return
 					} catch {
 						PrintError("[Wallet] Background Share Error: \(error)")
 						parent.isBlurred = false
-						StatusBadgeManager.shared.addBadge(id: UUID(), title: "Unable to generate your shareable pass.", priority: 4, view: .error)
+						StatusBadgeManager.shared.addBadge(
+							id: UUID(),
+							title: "Unable to generate your shareable pass.",
+							priority: 4,
+							view: .error
+						)
 					}
 				}
 			}

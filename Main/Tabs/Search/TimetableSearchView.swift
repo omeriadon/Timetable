@@ -30,7 +30,7 @@ struct TimetableSearchView: View {
 			NavigationStack {
 				ZStack {
 					if !sessionStore.isAuthenticated {
-						ContentUnavailableView("Sign In Required", systemImage: "person.crop.circle.badge.exclamationmark", description: Text("Sign in to search timetables."))
+						ContentUnavailableView("Sign In Required", systemImage: "person.crop.circle.badge.exclamationmark", description: Text("Sign in to use this feature."))
 							.transition(.blurReplace)
 
 					} else if cleanedQuery.isEmpty {

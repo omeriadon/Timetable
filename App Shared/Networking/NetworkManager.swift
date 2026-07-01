@@ -75,7 +75,11 @@ struct NetworkAlert: Identifiable {
 	let message: String
 }
 
-enum NetworkError: Error, LocalizedError {
+enum NetworkError: Error, LocalizedError, Equatable {
+	static func == (lhs: borrowing NetworkError, rhs: borrowing NetworkError) -> Bool {
+		lhs.localizedDescription == rhs.localizedDescription
+	}
+
 	case authenticationRequired
 	case cancelled
 	case invalidConfiguration
@@ -90,7 +94,7 @@ enum NetworkError: Error, LocalizedError {
 			case .authenticationRequired:
 				"Sign in to use this feature."
 			case .cancelled:
-				"The request was cancelled."
+				nil
 			case .invalidConfiguration:
 				"The timetable server URL is not configured."
 			case .invalidResponse:
@@ -115,6 +119,24 @@ enum NetworkError: Error, LocalizedError {
 			default:
 				false
 		}
+	}
+}
+
+extension Error {
+	var isCancellation: Bool {
+		if self is CancellationError {
+			return true
+		}
+
+		if let networkError = self as? NetworkError {
+			return networkError == NetworkError.cancelled
+		}
+
+		if (self as? URLError)?.code == .cancelled {
+			return true
+		}
+
+		return false
 	}
 }
 
@@ -281,9 +303,10 @@ final class NetworkManager {
 			)
 			return data
 		} catch let error as NetworkError {
-			PrintError("Request failed for \(endpoint.path)", category: .network, error: error)
 			switch error {
-				case .authenticationRequired, .cancelled:
+				case .cancelled:
+					throw error
+				case .authenticationRequired:
 					throw error
 				case .offline:
 					offlineRequestAttempted = true
@@ -291,6 +314,7 @@ final class NetworkManager {
 				case let .server(statusCode, response) where statusCode == 404 || response.code == .notFound || response.code == .accountNotFound:
 					throw error
 				default:
+					PrintError("Request failed for \(endpoint.path)", category: .network, error: error)
 					present(error)
 					throw error
 			}
