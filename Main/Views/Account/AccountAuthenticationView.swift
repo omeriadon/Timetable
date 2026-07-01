@@ -14,8 +14,6 @@ struct AccountAuthenticationView: View {
 
 	var body: some View {
 		ScrollView {
-			AppNavigationHeader()
-
 			VStack(spacing: 18) {
 				Picker("Account action", selection: $model.mode) {
 					ForEach(AccountAuthenticationMode.allCases) { mode in

@@ -1,7 +1,4 @@
 import SwiftUI
-#if os(iOS)
-	import PortalHeaders
-#endif
 
 enum AppNavigationTitleStyle {
 	case main
@@ -10,25 +7,20 @@ enum AppNavigationTitleStyle {
 
 extension View {
 	@ViewBuilder
-	func appNavigationTitle(_ title: String, style _: AppNavigationTitleStyle = .subview) -> some View {
+	func appNavigationTitle(_ title: String, style: AppNavigationTitleStyle = .subview) -> some View {
+		navigationTitle(title)
 		#if os(iOS)
-			portalHeader(title: title, subtitle: "")
-				.portalHeaderDestination()
-				.scrollEdgeEffectStyle(.soft, for: .top)
-				.scrollEdgeEffectStyle(.soft, for: .bottom)
-		#else
-			navigationTitle(title)
+			.navigationBarTitleDisplayMode(style == .main ? .large : .inline)
+			.toolbar {
+				ToolbarItem(placement: style == .main ? .largeTitle : .principal) {
+					Text(title)
+						.font(style == .main ? .largeTitle : .title2)
+						.bold()
+						.monospaced()
+				}
+			}
+			.scrollEdgeEffectStyle(.soft, for: .top)
+			.scrollEdgeEffectStyle(.soft, for: .bottom)
 		#endif // os(iOS)
-	}
-}
-
-struct AppNavigationHeader: View {
-	var body: some View {
-		#if os(iOS)
-			PortalHeaderView()
-				.monospaced()
-		#else
-			EmptyView()
-		#endif
 	}
 }

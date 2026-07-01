@@ -6,21 +6,14 @@ struct AuthoredTimetablesSettingsView: View {
 	@State private var showCreate = false
 
 	var body: some View {
-		ScrollView {
-			AppNavigationHeader()
-
-			LazyVStack(alignment: .leading, spacing: 12) {
-				ForEach(service.timetables) { timetable in
-					NavigationLink { AuthoredTimetableEditorView(timetable: timetable) } label: {
-						VStack(alignment: .leading) { Text(timetable.title)
-							Text(timetable.isSearchable ? "Searchable" : "Hidden")
-								.font(.caption)
-								.foregroundStyle(.secondary)
-						}
-					}
+		List(service.timetables) { timetable in
+			NavigationLink { AuthoredTimetableEditorView(timetable: timetable) } label: {
+				VStack(alignment: .leading) { Text(timetable.title)
+					Text(timetable.isSearchable ? "Searchable" : "Hidden")
+						.font(.caption)
+						.foregroundStyle(.secondary)
 				}
 			}
-			.padding()
 		}
 		.appNavigationTitle("Authored Timetables")
 		.toolbar {
@@ -52,15 +45,10 @@ private struct AuthoredTimetableCreateView: View {
 
 	var body: some View {
 		NavigationStack {
-			ScrollView {
-				AppNavigationHeader()
-
-				LazyVStack(alignment: .leading, spacing: 20) {
-					TextField("Title", text: $title)
-					Toggle("Searchable", isOn: $isSearchable)
-					Button("Edit Subjects", systemImage: "pencil") { showSubjectEditor = true }
-				}
-				.padding()
+			Form {
+				TextField("Title", text: $title)
+				Toggle("Searchable", isOn: $isSearchable)
+				Button("Edit Subjects", systemImage: "pencil") { showSubjectEditor = true }
 			}
 			.appNavigationTitle("New Authored Timetable")
 			.toolbar {
@@ -104,32 +92,27 @@ private struct AuthoredTimetableEditorView: View {
 	}
 
 	var body: some View {
-		ScrollView {
-			AppNavigationHeader()
+		Form {
+			Section("Details") {
+				TextField("Title", text: $title)
+				Toggle("Searchable", isOn: $isSearchable)
+			}
+			Section("Timetable") {
+				TimetablePreviewGrid(subjects: subjects)
 
-			LazyVStack(alignment: .leading, spacing: 20) {
-				Section("Details") {
-					TextField("Title", text: $title)
-					Toggle("Searchable", isOn: $isSearchable)
-				}
-				Section("Timetable") {
-					TimetablePreviewGrid(subjects: subjects)
-
-					Button("Edit Subjects", systemImage: "pencil") {
-						showEditor = true
-					}
-				}
-				Section {
-					Button(
-						"Delete Timetable",
-						systemImage: "trash",
-						role: .destructive
-					) {
-						confirmDelete = true
-					}
+				Button("Edit Subjects", systemImage: "pencil") {
+					showEditor = true
 				}
 			}
-			.padding()
+			Section {
+				Button(
+					"Delete Timetable",
+					systemImage: "trash",
+					role: .destructive
+				) {
+					confirmDelete = true
+				}
+			}
 		}
 		.appNavigationTitle(title)
 		.toolbar {

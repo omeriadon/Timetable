@@ -15,8 +15,15 @@ struct TimetableSearchView: View {
 	@State private var service = TimetableDiscoveryService.shared
 	@State private var sessionStore = SessionStore.shared
 	@State private var selectedResult: TimetableSearchResult?
+	@State private var portalResult: TimetableSearchResult?
+	@State private var completedSearchQuery = ""
 	@State private var isSearchPresented = false
+
 	@Namespace private var portalNamespace
+
+	private var cleanedQuery: String {
+		query.trimmingCharacters(in: .whitespacesAndNewlines)
+	}
 
 	var body: some View {
 		PortalContainer {
@@ -26,22 +33,30 @@ struct TimetableSearchView: View {
 						ContentUnavailableView("Sign In Required", systemImage: "person.crop.circle.badge.exclamationmark", description: Text("Sign in to search timetables."))
 							.transition(.blurReplace)
 
-					} else if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+					} else if cleanedQuery.isEmpty {
 						SearchLandingView()
 							.transition(.blurReplace)
 
-					} else if !(3 ..< 50).contains(query.trimmingCharacters(in: .whitespacesAndNewlines).count) {
+					} else if !(3 ..< 50).contains(cleanedQuery.count) {
 						ContentUnavailableView("Keep Typing", systemImage: "text.magnifyingglass", description: Text("Search terms must contain 3 to 49 characters."))
 							.transition(.blurReplace)
 
-					} else if service.results.isEmpty, !service.isSearching {
-						ContentUnavailableView.search(text: query)
+					} else if service.results.isEmpty,
+					          service.isSearching || completedSearchQuery != cleanedQuery
+					{
+						Color.clear
+							.transition(.blurReplace)
+					} else if service.results.isEmpty,
+					          !service.isSearching,
+					          completedSearchQuery == cleanedQuery
+					{
+						ContentUnavailableView.search(text: cleanedQuery)
 							.transition(.blurReplace)
 					} else {
 						List {
 							ForEach(service.results) { result in
 								Button {
-									selectedResult = result
+									present(result)
 								} label: {
 									TimetableSearchRow(result: result, namespace: portalNamespace)
 								}
@@ -51,6 +66,8 @@ struct TimetableSearchView: View {
 						}
 						.animation(.snappy, value: service.results.map(\.id))
 						.refreshable { service.search(query, immediately: true) }
+						.scrollEdgeEffectStyle(.soft, for: .top)
+						.scrollEdgeEffectStyle(.soft, for: .bottom)
 						.transition(.blurReplace)
 					}
 				}
@@ -73,17 +90,52 @@ struct TimetableSearchView: View {
 								.transition(.blurReplace)
 						}
 					}
-					.animation(.easeInOut(duration: 0.2), value: service.isSearching)
+					.animation(.easeInOut(duration: 0.25), value: service.isSearching)
 				}
-				.searchable(text: $query, isPresented: $isSearchPresented, prompt: "Timetable or author")
+				.searchable(text: $query, isPresented: $isSearchPresented, prompt: "Search a Timetable or Author")
 				.onChange(of: query) {
-					if sessionStore.isAuthenticated { service.search(query) }
+					let cleaned = cleanedQuery
+
+					completedSearchQuery = ""
+
+					if sessionStore.isAuthenticated {
+						service.search(cleaned)
+					}
+				}
+				.onChange(of: service.isSearching) { _, isSearching in
+					if !isSearching {
+						completedSearchQuery = cleanedQuery
+					}
 				}
 			}
 			.sheet(item: $selectedResult) { result in
 				TimetableDetailView(result: result, portalNamespace: portalNamespace)
 			}
+			.portalTransition(
+				item: $portalResult,
+				in: portalNamespace,
+				animation: .smooth(duration: 0.48),
+				transition: .fade
+			) { _ in
+				AnimatedItemLayer(item: $portalResult, in: portalNamespace) { item, isActive in
+					if let item {
+						TimetablePortalIdentityView(
+							result: item,
+							progress: isActive ? 1 : 0
+						)
+						.animation(.smooth(duration: 0.48), value: isActive)
+					}
+				}
+			}
+			.onChange(of: selectedResult?.id) {
+				if selectedResult == nil { portalResult = nil }
+			}
 		}
+	}
+
+	private func present(_ result: TimetableSearchResult) {
+		portalResult = result
+		selectedResult = result
 	}
 }
 

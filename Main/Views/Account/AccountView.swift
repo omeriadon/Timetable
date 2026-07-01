@@ -19,33 +19,28 @@ struct AccountView: View {
 		Group {
 			switch sessionStore.state {
 				case let .authenticated(profile):
-					ScrollView {
-						AppNavigationHeader()
-
-						LazyVStack(alignment: .leading, spacing: 20) {
-							Section("Profile") {
-								#if os(iOS)
-									LabeledContent("Name") {
-										TextField("Name", text: $displayName)
-											.multilineTextAlignment(.trailing)
-											.submitLabel(.done)
-									}
-									.onChange(of: displayName) { _, value in ServerSyncCoordinator.shared.scheduleProfileUpdate(value) }
-								#else
-									LabeledContent("Name", value: profile.displayName)
-								#endif
-								if let email = profile.email {
-									LabeledContent("Email", value: email)
+					List {
+						Section("Profile") {
+							#if os(iOS)
+								LabeledContent("Name") {
+									TextField("Name", text: $displayName)
+										.multilineTextAlignment(.trailing)
+										.submitLabel(.done)
 								}
-							}
-
-							Section {
-								Button("Sign Out", role: .destructive, action: signOut)
-								Button("Delete Account", role: .destructive) { showDeleteConfirmation = true }
-									.disabled(isDeleting)
+								.onChange(of: displayName) { _, value in ServerSyncCoordinator.shared.scheduleProfileUpdate(value) }
+							#else
+								LabeledContent("Name", value: profile.displayName)
+							#endif
+							if let email = profile.email {
+								LabeledContent("Email", value: email)
 							}
 						}
-						.padding()
+
+						Section {
+							Button("Sign Out", role: .destructive, action: signOut)
+							Button("Delete Account", role: .destructive) { showDeleteConfirmation = true }
+								.disabled(isDeleting)
+						}
 					}
 					.appNavigationTitle("Account")
 				case .restoring:

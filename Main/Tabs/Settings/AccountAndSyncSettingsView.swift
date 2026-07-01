@@ -17,36 +17,31 @@ struct AccountAndSyncSettingsView: View {
 	@State private var saveGeneration = 0
 
 	var body: some View {
-		ScrollView {
-			AppNavigationHeader()
+		Form {
+			Section("Account Settings") {
+				Toggle("Live Activities", isOn: preferenceBinding(\.liveActivitiesEnabled))
+				Toggle("Allow Notifications", isOn: preferenceBinding(\.notificationsEnabled))
 
-			LazyVStack(alignment: .leading, spacing: 20) {
-				Section("Account Settings") {
-					Toggle("Live Activities", isOn: preferenceBinding(\.liveActivitiesEnabled))
-					Toggle("Allow Notifications", isOn: preferenceBinding(\.notificationsEnabled))
-
-					#if os(iOS)
-						Button("Send Test Notification", systemImage: "bell.badge") {
-							Task {
-								do {
-									let count = try await NotificationRegistrationService.shared.sendTestNotification()
-									testResult = count == 1 ? "Sent to 1 device." : "Sent to \(count) devices."
-								} catch {
-									testResult = error.localizedDescription
-								}
+				#if os(iOS)
+					Button("Send Test Notification", systemImage: "bell.badge") {
+						Task {
+							do {
+								let count = try await NotificationRegistrationService.shared.sendTestNotification()
+								testResult = count == 1 ? "Sent to 1 device." : "Sent to \(count) devices."
+							} catch {
+								testResult = error.localizedDescription
 							}
 						}
-						.disabled(!settings.notificationsEnabled)
+					}
+					.disabled(!settings.notificationsEnabled)
 
-						if let testResult {
-							Text(testResult)
-								.font(.footnote)
-								.foregroundStyle(.secondary)
-						}
-					#endif
-				}
+					if let testResult {
+						Text(testResult)
+							.font(.footnote)
+							.foregroundStyle(.secondary)
+					}
+				#endif
 			}
-			.padding()
 		}
 		.appNavigationTitle("Preferences")
 	}
