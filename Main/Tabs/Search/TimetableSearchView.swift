@@ -121,7 +121,7 @@ struct TimetableSearchView: View {
 					if let item {
 						TimetablePortalIdentityView(
 							result: item,
-							progress: isActive ? 1 : 0
+							isActive: isActive
 						)
 						.animation(.smooth(duration: 0.48), value: isActive)
 					}
@@ -172,7 +172,6 @@ private struct SearchLandingView: View {
 			Text("Search for a timetable by name or author.")
 				.multilineTextAlignment(.center)
 				.font(.title2)
-				.bold()
 		}
 	}
 }
@@ -182,14 +181,17 @@ private struct TimetableSearchRow: View {
 	let namespace: Namespace.ID
 
 	var body: some View {
-		HStack(spacing: 16) {
+		HStack(alignment: .center, spacing: 16) {
 			Image(systemName: result.sourceKind == .accountOwner ? "person.crop.rectangle" : "person.2.crop.square.stack")
-				.font(.title2).foregroundStyle(.tint).frame(width: 34)
+				.font(.title2)
+				.foregroundStyle(.tint)
+				.frame(width: 34)
+
 			TimetableIdentityView(result: result, prominence: .row)
 				.portal(item: result, as: .source, in: namespace)
 		}
-		.frame(maxWidth: .infinity, minHeight: 84, alignment: .leading)
-		.contentShape(.rect)
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.frame(height: 60)
 		.accessibilityElement(children: .combine)
 	}
 }
