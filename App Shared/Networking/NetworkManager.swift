@@ -219,9 +219,9 @@ final class NetworkManager {
 
 	private nonisolated static func makeSession() -> URLSession {
 		let configuration = URLSessionConfiguration.default
-		configuration.timeoutIntervalForRequest = 30
-		configuration.timeoutIntervalForResource = 300
-		configuration.waitsForConnectivity = true
+		configuration.timeoutIntervalForRequest = 20
+		configuration.timeoutIntervalForResource = 30
+		configuration.waitsForConnectivity = false
 		configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
 		return URLSession(configuration: configuration)
 	}

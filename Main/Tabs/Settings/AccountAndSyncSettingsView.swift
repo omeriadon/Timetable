@@ -12,12 +12,15 @@ struct AccountAndSyncSettingsView: View {
 	@State private var settings = Defaults[.accountSettings]
 	@State private var settingsSync = AccountSettingsSyncService.shared
 	@State private var testResult: String?
+	@Environment(\.statusBadgeManager) private var badges
+	@State private var committedSettings = Defaults[.accountSettings]
+	@State private var saveGeneration = 0
 
 	var body: some View {
 		Form {
 			Section("Account Settings") {
-				Toggle("Live Activities", isOn: $settings.liveActivitiesEnabled)
-				Toggle("Allow Notifications", isOn: $settings.notificationsEnabled)
+				Toggle("Live Activities", isOn: preferenceBinding(\.liveActivitiesEnabled))
+				Toggle("Allow Notifications", isOn: preferenceBinding(\.notificationsEnabled))
 
 				#if os(iOS) || os(visionOS)
 					Button("Send Test Notification", systemImage: "bell.badge") {
@@ -40,29 +43,46 @@ struct AccountAndSyncSettingsView: View {
 				#endif
 			}
 		}
-		.appNavigationTitle("Account and Sync")
-		.onChange(of: settings) { oldValue, newValue in
-			guard oldValue != newValue else { return }
-			Task {
-				do {
-					try await settingsSync.updateSettings(newValue)
-					#if os(iOS) || os(visionOS)
-						if oldValue.notificationsEnabled != newValue.notificationsEnabled {
-							let enabled = await NotificationRegistrationService.shared.reconcile(
-								enabled: newValue.notificationsEnabled
-							)
-							if newValue.notificationsEnabled, !enabled {
-								var disabledSettings = newValue
-								disabledSettings.notificationsEnabled = false
-								settings = disabledSettings
-								try await settingsSync.updateSettings(disabledSettings)
-							}
-						}
-					#endif
-				} catch {
-					settings = Defaults[.accountSettings]
-				}
+		.appNavigationTitle("Preferences")
+	}
+
+	private func preferenceBinding(_ keyPath: WritableKeyPath<AccountSettings, Bool>) -> Binding<Bool> {
+		Binding(
+			get: { settings[keyPath: keyPath] },
+			set: { value in
+				saveGeneration += 1
+				let generation = saveGeneration
+				let previous = committedSettings
+				settings[keyPath: keyPath] = value
+				let proposed = settings
+				Task { await save(proposed, previous: previous, generation: generation) }
 			}
+		)
+	}
+
+	private func save(_ proposed: AccountSettings, previous: AccountSettings, generation: Int) async {
+		do {
+			#if os(iOS) || os(visionOS)
+				if !previous.notificationsEnabled, proposed.notificationsEnabled {
+					guard await NotificationRegistrationService.shared.reconcile(enabled: true) else {
+						if generation == saveGeneration { settings = previous }
+						return
+					}
+				}
+			#endif
+			try await settingsSync.updateSettings(proposed)
+			#if os(iOS) || os(visionOS)
+				if previous.notificationsEnabled, !proposed.notificationsEnabled {
+					_ = await NotificationRegistrationService.shared.reconcile(enabled: false)
+				}
+			#endif
+			guard generation == saveGeneration else { return }
+			committedSettings = proposed
+			badges.addBadge(id: UUID(), title: "Preferences saved", priority: 3, view: .success)
+		} catch {
+			guard generation == saveGeneration else { return }
+			settings = previous
+			badges.addBadge(id: UUID(), title: "Unable to save preferences", secondaryText: error.localizedDescription, priority: 4, view: .error)
 		}
 	}
 }

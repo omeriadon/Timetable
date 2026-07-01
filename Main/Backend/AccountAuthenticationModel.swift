@@ -109,8 +109,6 @@ final class AccountAuthenticationModel {
 						displayName: displayName.trimmingCharacters(in: .whitespacesAndNewlines)
 					)
 			}
-		} catch NetworkError.offline {
-			return
 		} catch {
 			submissionError = error.localizedDescription
 		}
@@ -123,8 +121,6 @@ final class AccountAuthenticationModel {
 
 		do {
 			try await sessionStore.signInWithApple(authorization)
-		} catch NetworkError.offline {
-			return
 		} catch {
 			submissionError = error.localizedDescription
 		}

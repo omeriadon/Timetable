@@ -120,8 +120,10 @@ final class AccountSettingsSyncService {
 				}
 				throw NetworkError.server(statusCode: 400, response: response)
 			} catch {
-				if pendingMutation == nil {
-					pendingMutation = mutation
+				if syncGeneration == mutation.generation {
+					Defaults[.accountSettings] = mutation.previousSettings
+					pendingMutation = nil
+					applyLocalSideEffects()
 				}
 				throw error
 			}
