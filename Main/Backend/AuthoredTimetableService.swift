@@ -21,6 +21,17 @@ final class AuthoredTimetableService {
 		if let index = timetables.firstIndex(where: { $0.id == id }) { timetables[index] = value }
 	}
 
+	@discardableResult
+	func create(title: String, subjects: [Subject], isSearchable: Bool) async throws -> TimetableDetailResponse {
+		let value: TimetableDetailResponse = try await network.send(
+			Endpoint("/v1/timetables/authored", method: .post),
+			body: AuthoredTimetableUpdateRequest(title: title, subjects: subjects, isSearchable: isSearchable)
+		)
+		timetables.append(value)
+		timetables.sort { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+		return value
+	}
+
 	func delete(id: UUID) async throws {
 		try await network.send(Endpoint("/v1/timetables/authored/\(id.uuidString)", method: .delete))
 		timetables.removeAll { $0.id == id }
