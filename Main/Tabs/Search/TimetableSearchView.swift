@@ -159,7 +159,7 @@ struct SearchLandingView: View {
 						.stickerColorIntensity(1)
 						.stickerMotionEffect(.dragGesture(intensity: 0.7))
 				}
-				.shadow(color: .blue.mix(with: .white, by: 0.5).opacity(0.5), radius: 15, x: 0, y: 0)
+				.shadow(color: .blue.mix(with: .white, by: 0.5).opacity(0.35), radius: 17, x: 0, y: 0)
 				.simultaneousGesture(
 					DragGesture(minimumDistance: 0)
 						.onChanged { _ in
