@@ -22,8 +22,6 @@
 		2AA6DF2C2FDFADAE00BBC70E /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AA6DF2B2FDFADAE00BBC70E /* Defaults */; };
 		2ABBBA042FF4AD3A00878A9D /* PortalHeaders in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABBBA032FF4AD3A00878A9D /* PortalHeaders */; };
 		2ABBBA062FF4AD3A00878A9D /* PortalTransitions in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABBBA052FF4AD3A00878A9D /* PortalTransitions */; };
-		2ABBBA0D2FF4FC9800878A9D /* GlowGetter in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABBBA0C2FF4FC9800878A9D /* GlowGetter */; };
-		2ABBBA0F2FF4FC9800878A9D /* GlowGetterPrivate in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABBBA0E2FF4FC9800878A9D /* GlowGetterPrivate */; };
 		2AC5F7ED2FD8435700B813EA /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AC5F7EC2FD8435700B813EA /* Defaults */; };
 		2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */ = {isa = PBXBuildFile; platformFilters = (macos, ); productRef = 2AE0F13A2FE03989002B5D9D /* MaterialView */; };
 /* End PBXBuildFile section */
@@ -279,14 +277,12 @@
 		2A0237882F9C8EA000AB1E1F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
-				2ABBBA0D2FF4FC9800878A9D /* GlowGetter in Frameworks */,
 				2A324C072FF2980C00E6A3D5 /* ColorfulX in Frameworks */,
 				2A43AFA12FE7849E00BBC8BD /* IrregularGradient in Frameworks */,
 				2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */,
 				2A02379B2F9C907000AB1E1F /* Defaults in Frameworks */,
 				2A3EEF042FF39837005E0D87 /* Sticker in Frameworks */,
 				2ABBBA042FF4AD3A00878A9D /* PortalHeaders in Frameworks */,
-				2ABBBA0F2FF4FC9800878A9D /* GlowGetterPrivate in Frameworks */,
 				2ABBBA062FF4AD3A00878A9D /* PortalTransitions in Frameworks */,
 				2A0237AC2F9D9DE800AB1E1F /* SFSymbolsPicker in Frameworks */,
 			);
@@ -377,8 +373,6 @@
 				2A3EEF032FF39837005E0D87 /* Sticker */,
 				2ABBBA032FF4AD3A00878A9D /* PortalHeaders */,
 				2ABBBA052FF4AD3A00878A9D /* PortalTransitions */,
-				2ABBBA0C2FF4FC9800878A9D /* GlowGetter */,
-				2ABBBA0E2FF4FC9800878A9D /* GlowGetterPrivate */,
 			);
 			productName = Timetable;
 			productReference = 2A02378B2F9C8EA000AB1E1F /* Timetable.app */;
@@ -506,7 +500,6 @@
 				2A324C052FF2980C00E6A3D5 /* XCRemoteSwiftPackageReference "ColorfulX" */,
 				2A3EEF022FF39837005E0D87 /* XCRemoteSwiftPackageReference "sticker" */,
 				2ABBBA022FF4AD3A00878A9D /* XCRemoteSwiftPackageReference "Portal" */,
-				2ABBBA0B2FF4FC9800878A9D /* XCRemoteSwiftPackageReference "GlowGetter" */,
 			);
 			preferredProjectObjectVersion = 110;
 			productRefGroup = 2A02378C2F9C8EA000AB1E1F /* Products */;
@@ -1238,14 +1231,6 @@
 				minimumVersion = 6.0.0;
 			};
 		};
-		2ABBBA0B2FF4FC9800878A9D /* XCRemoteSwiftPackageReference "GlowGetter" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Aeastr/GlowGetter";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.0;
-			};
-		};
 		2AE0F1392FE03989002B5D9D /* XCRemoteSwiftPackageReference "MaterialView" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/OskarGroth/MaterialView";
@@ -1316,16 +1301,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2ABBBA022FF4AD3A00878A9D /* XCRemoteSwiftPackageReference "Portal" */;
 			productName = PortalTransitions;
-		};
-		2ABBBA0C2FF4FC9800878A9D /* GlowGetter */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2ABBBA0B2FF4FC9800878A9D /* XCRemoteSwiftPackageReference "GlowGetter" */;
-			productName = GlowGetter;
-		};
-		2ABBBA0E2FF4FC9800878A9D /* GlowGetterPrivate */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2ABBBA0B2FF4FC9800878A9D /* XCRemoteSwiftPackageReference "GlowGetter" */;
-			productName = GlowGetterPrivate;
 		};
 		2AC5F7EC2FD8435700B813EA /* Defaults */ = {
 			isa = XCSwiftPackageProductDependency;
