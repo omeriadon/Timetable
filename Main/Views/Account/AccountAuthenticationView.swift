@@ -63,18 +63,26 @@ struct AccountAuthenticationView: View {
 						.transition(.blurReplace)
 				}
 
-				Button(model.mode.rawValue, action: submit)
-					.buttonStyle(.borderedProminent)
-					.controlSize(.large)
-					.frame(maxWidth: .infinity)
-					.disabled(model.isSubmitting)
+				Button(action: submit) {
+					if model.isSubmitting {
+						ProgressView()
+							.frame(maxWidth: .infinity)
+					} else {
+						Text(model.mode.rawValue)
+							.frame(maxWidth: .infinity)
+					}
+				}
+				.buttonStyle(.borderedProminent)
+				.controlSize(.large)
+				.frame(maxWidth: .infinity)
+				.disabled(model.isSubmitting)
 
 				SignInWithAppleButton(.continue) { request in
 					request.requestedScopes = [.fullName, .email]
 				} onCompletion: { result in
 					handleAppleCompletion(result)
 				}
-				.signInWithAppleButtonStyle(.whiteOutline)
+				.signInWithAppleButtonStyle(.black)
 				.frame(height: 50)
 				.clipShape(.capsule)
 				.disabled(model.isSubmitting)

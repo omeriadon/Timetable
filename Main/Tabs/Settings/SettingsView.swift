@@ -8,6 +8,9 @@
 import Defaults
 import SwiftUI
 import WidgetKit
+#if os(iOS)
+	import WatchConnectivity
+#endif
 
 struct RenameTimetable: Identifiable {
 	let id: String
@@ -65,25 +68,21 @@ struct SettingsView: View {
 					}
 					.scrollEdgeEffectStyle(.soft, for: .top)
 					.formStyle(.grouped)
-					.onAppear {
-						expanded = .settings
-					}
-					.onDisappear {
-						expanded = .none
-					}
 				#endif
 			}
 			.scrollEdgeEffectStyle(.soft, for: .top)
 			.scrollContentBackground(.hidden)
 			.toolbar {
 				#if os(iOS)
-					ToolbarItem(placement: .largeSubtitle) { Text("Settings").monospaced() }
-				#else
-					ToolbarItem(placement: .principal) { Text("Settings").monospaced() }
+					ToolbarItem(placement: .largeTitle) { Text("Settings").monospaced() }
 				#endif
 			}
 		}
 		.task { await loadOwnerVisibility() }
+		#if os(macOS)
+			.onAppear { expanded = .settings }
+			.onDisappear { expanded = .none }
+		#endif
 	}
 
 	@ContentBuilder
@@ -96,38 +95,46 @@ struct SettingsView: View {
 			}
 		}
 
+		Section("Preferences") {
+			NavigationLink {
+				AccountAndSyncSettingsView()
+			} label: {
+				Label("Preferences", systemImage: "switch.2")
+			}
+		}
+
 		#if os(iOS)
 
-			Section("Account and Sync") {
-				NavigationLink {
-					AccountAndSyncSettingsView()
-				} label: {
-					Label("Account and Sync", systemImage: "arrow.trianglehead.2.clockwise")
-				}
-			}
+			Section("Sync") {
+				Menu {
+					Button {
+						Task { await ServerSyncCoordinator.shared.syncEverything() }
+					} label: {
+						Label("Cloud", systemImage: "cloud")
+					}
 
-			Section("Server Sync") {
-				Button("Sync Everything", systemImage: "arrow.trianglehead.2.clockwise") {
-					Task { await ServerSyncCoordinator.shared.syncEverything() }
-				}
-			}
-
-			#if os(iOS)
-				Section("Sync to Watch") {
-					SyncButton(
-						syncStatus: syncStatus,
-						action: {
-							Task {
-								await syncToWatchAsync(
-									subjects: subjects,
-									watchSync: watchSync,
-									statusUpdate: { syncStatus = $0 }
-								)
-							}
+					Button {
+						if !WCSession.default.isWatchAppInstalled {
+							statusBadgeManager.addBadge(id: UUID(), title: "Watch app not installed", priority: 4, view: .warning)
+							return
 						}
-					)
+
+						Task {
+							await syncToWatchAsync(
+								subjects: subjects,
+								watchSync: watchSync,
+								statusUpdate: { syncStatus = $0 }
+							)
+						}
+					} label: {
+						Label("Watch", systemImage: "applewatch")
+					}
+					.disabled(syncStatus == .loading)
+
+				} label: {
+					Label("Sync to...", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
 				}
-			#endif // os(iOS)
+			}
 
 			Section("Your Timetable") {
 				Toggle("Searchable", isOn: $ownerIsSearchable)
@@ -160,11 +167,7 @@ struct SettingsView: View {
 					.presentationDetents([.fraction(0.85)])
 					.presentationDragIndicator(.hidden)
 					.interactiveDismissDisabled()
-					#if os(iOS)
-						.navigationTransition(.zoom(sourceID: "sheetMorph", in: ns))
-					#else
-						.frame(width: 600, height: 500)
-					#endif
+					.navigationTransition(.zoom(sourceID: "sheetMorph", in: ns))
 				}
 			}
 
@@ -176,11 +179,9 @@ struct SettingsView: View {
 				}
 			}
 
-			#if !os(macOS)
-				Section("Add Timetable to Wallet") {
-					AddPassView()
-				}
-			#endif
+			Section("Add Timetable to Wallet") {
+				AddPassView()
+			}
 
 			Section("Calendar") {
 				Button {
@@ -289,7 +290,7 @@ struct SettingsView: View {
 				statusBadgeManager.updateBadge(id: id, title: "Done", view: .success)
 			}
 		}
-	#endif
+	#endif // DEBUG
 
 	private func loadOwnerVisibility() async {
 		guard sessionStore.isAuthenticated else { return }
@@ -303,11 +304,15 @@ struct SettingsView: View {
 	}
 
 	private func saveOwnerVisibility(_ searchable: Bool) async {
-		guard sessionStore.isAuthenticated else { showSignInRequired(); return }
+		guard sessionStore.isAuthenticated else {
+			showSignInRequired()
+			return
+		}
+
 		do {
 			let current: OwnerTimetableResponse = try await NetworkManager.shared.send(Endpoint("/v1/timetables/owner"))
 			let _: OwnerTimetableResponse = try await NetworkManager.shared.send(Endpoint("/v1/timetables/owner", method: .put), body: OwnerTimetableUpdateRequest(subjects: subjects, expectedRevision: current.revision, isSearchable: searchable))
-			statusBadgeManager.addBadge(id: UUID(), title: searchable ? "Timetable is searchable" : "Timetable is hidden", priority: 3, view: .success)
+			statusBadgeManager.addBadge(id: UUID(), title: "Preferences saved", priority: 3, view: .success)
 		} catch {
 			ownerIsSearchable.toggle()
 			statusBadgeManager.addBadge(id: UUID(), title: "Unable to update visibility", secondaryText: error.localizedDescription, priority: 4, view: .error)

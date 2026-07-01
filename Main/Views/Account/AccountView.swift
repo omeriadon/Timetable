@@ -11,6 +11,9 @@ import SwiftUI
 struct AccountView: View {
 	@State private var sessionStore = SessionStore.shared
 	@Default(.userDisplayName) private var displayName
+	@State private var showDeleteConfirmation = false
+	@State private var isDeleting = false
+	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
 		Group {
@@ -19,9 +22,12 @@ struct AccountView: View {
 					List {
 						Section("Profile") {
 							#if os(iOS)
-								TextField("Name", text: $displayName)
-									.submitLabel(.done)
-									.onChange(of: displayName) { _, value in ServerSyncCoordinator.shared.scheduleProfileUpdate(value) }
+								LabeledContent("Name") {
+									TextField("Name", text: $displayName)
+										.multilineTextAlignment(.trailing)
+										.submitLabel(.done)
+								}
+								.onChange(of: displayName) { _, value in ServerSyncCoordinator.shared.scheduleProfileUpdate(value) }
 							#else
 								LabeledContent("Name", value: profile.displayName)
 							#endif
@@ -32,7 +38,8 @@ struct AccountView: View {
 
 						Section {
 							Button("Sign Out", role: .destructive, action: signOut)
-							Button("Delete Account", role: .destructive, action: deleteAccount)
+							Button("Delete Account", role: .destructive) { showDeleteConfirmation = true }
+								.disabled(isDeleting)
 						}
 					}
 					.appNavigationTitle("Account")
@@ -42,8 +49,12 @@ struct AccountView: View {
 					AccountAuthenticationView()
 			}
 		}
-		.transition(.blurReplace)
-		.animation(.snappy, value: sessionStore.state)
+		.alert("Delete Account?", isPresented: $showDeleteConfirmation) {
+			Button("Cancel", role: .cancel) {}
+			Button("Delete Account", role: .destructive) { deleteAccount() }
+		} message: {
+			Text("This permanently deletes your account and server data.")
+		}
 	}
 
 	private func signOut() {
@@ -54,7 +65,13 @@ struct AccountView: View {
 
 	private func deleteAccount() {
 		Task {
-			try await sessionStore.deleteAccount()
+			isDeleting = true
+			defer { isDeleting = false }
+			do {
+				try await sessionStore.deleteAccount()
+			} catch {
+				badges.addBadge(id: UUID(), title: "Unable to delete account", secondaryText: error.localizedDescription, priority: 4, view: .error)
+			}
 		}
 	}
 }
