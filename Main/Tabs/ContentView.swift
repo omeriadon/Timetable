@@ -48,7 +48,8 @@ struct ContentView: View {
 					if isBlurMounted {
 						VariableBlurView(
 							topRadius: topBlurRadius,
-							bottomRadius: bottomBlurRadius
+							bottomRadius: bottomBlurRadius,
+							animationDuration: reduceMotion ? 0 : (isBlurred ? 0.9 : 0.25)
 						)
 						.ignoresSafeArea()
 						.allowsHitTesting(false)
@@ -106,19 +107,17 @@ struct ContentView: View {
 				Task { @MainActor in
 					await Task.yield()
 					guard isBlurred else { return }
-					withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.7)) {
-						topBlurRadius = 0
-						bottomBlurRadius = 8
-					}
+					topBlurRadius = 0
+					bottomBlurRadius = 8
 				}
 			} else {
-				withAnimation(
-					reduceMotion ? nil : .easeOut(duration: 0.25),
-					completionCriteria: .logicallyComplete
-				) {
-					topBlurRadius = 0
-					bottomBlurRadius = 0
-				} completion: {
+				topBlurRadius = 0
+				bottomBlurRadius = 0
+
+				Task { @MainActor in
+					if !reduceMotion {
+						try? await Task.sleep(for: .milliseconds(250))
+					}
 					guard !isBlurred else { return }
 					isBlurMounted = false
 				}

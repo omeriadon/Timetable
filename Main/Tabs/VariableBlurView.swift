@@ -10,21 +10,19 @@
 	import SwiftUI
 	import UIKit
 
-	public struct VariableBlurView: UIViewRepresentable, Animatable {
+	public struct VariableBlurView: UIViewRepresentable {
 		public var topRadius: CGFloat
 		public var bottomRadius: CGFloat
+		public var animationDuration: TimeInterval
 
-		public var animatableData: AnimatablePair<CGFloat, CGFloat> {
-			get { AnimatablePair(topRadius, bottomRadius) }
-			set {
-				topRadius = newValue.first
-				bottomRadius = newValue.second
-			}
-		}
-
-		public init(topRadius: CGFloat = 2, bottomRadius: CGFloat = 10) {
+		public init(
+			topRadius: CGFloat = 2,
+			bottomRadius: CGFloat = 10,
+			animationDuration: TimeInterval = 0
+		) {
 			self.topRadius = topRadius
 			self.bottomRadius = bottomRadius
+			self.animationDuration = animationDuration
 		}
 
 		public func makeUIView(context _: Context) -> VariableBlurUIView {
@@ -32,7 +30,15 @@
 		}
 
 		public func updateUIView(_ uiView: VariableBlurUIView, context _: Context) {
-			uiView.update(topRadius: topRadius, bottomRadius: bottomRadius)
+			uiView.animate(
+				toTopRadius: topRadius,
+				bottomRadius: bottomRadius,
+				duration: animationDuration
+			)
+		}
+
+		public static func dismantleUIView(_ uiView: VariableBlurUIView, coordinator _: Void) {
+			uiView.stopAnimating()
 		}
 	}
 
@@ -41,6 +47,9 @@
 		private var variableBlur: NSObject?
 		private let ciContext = CIContext()
 		private var maskRadii: (top: CGFloat, bottom: CGFloat)?
+		private var targetRadii: (top: CGFloat, bottom: CGFloat) = (0, 0)
+		private let radiusAnimationKey = "variableBlurRadius"
+		private let radiusKeyPath = "filters.variableBlur.inputRadius"
 
 		public init(topRadius: CGFloat = 0, bottomRadius: CGFloat = 8) {
 			super.init(effect: UIBlurEffect(style: .regular))
@@ -56,12 +65,14 @@
 			}
 
 			self.variableBlur = variableBlur
+			variableBlur.setValue("variableBlur", forKey: "name")
 
 			for subview in subviews.dropFirst() {
 				subview.alpha = 0
 			}
 
-			update(topRadius: topRadius, bottomRadius: bottomRadius)
+			apply(topRadius: topRadius, bottomRadius: bottomRadius)
+			targetRadii = (topRadius, bottomRadius)
 		}
 
 		@available(*, unavailable)
@@ -69,7 +80,43 @@
 			fatalError("init(coder:) has not been implemented")
 		}
 
-		public func update(topRadius: CGFloat, bottomRadius: CGFloat) {
+		public func animate(toTopRadius topRadius: CGFloat, bottomRadius: CGFloat, duration: TimeInterval) {
+			guard targetRadii.top != topRadius || targetRadii.bottom != bottomRadius else { return }
+			targetRadii = (topRadius, bottomRadius)
+			guard let backdropLayer = subviews.first?.layer, let variableBlur else { return }
+
+			let targetRadius = max(topRadius, bottomRadius)
+			let currentRadius = (backdropLayer.presentation()?.value(forKeyPath: radiusKeyPath) as? NSNumber)?.doubleValue
+				?? (variableBlur.value(forKey: "inputRadius") as? NSNumber)?.doubleValue
+				?? 0
+
+			if targetRadius > 0 {
+				updateMask(topRadius: topRadius, bottomRadius: bottomRadius, maxRadius: targetRadius)
+			}
+
+			isHidden = false
+			CATransaction.begin()
+			CATransaction.setDisableActions(true)
+			variableBlur.setValue(targetRadius, forKey: "inputRadius")
+			variableBlur.setValue(true, forKey: "inputNormalizeEdges")
+			backdropLayer.filters = [variableBlur]
+			CATransaction.commit()
+
+			guard duration > 0 else { return }
+
+			let animation = CABasicAnimation(keyPath: radiusKeyPath)
+			animation.fromValue = currentRadius
+			animation.toValue = targetRadius
+			animation.duration = duration
+			animation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+			backdropLayer.add(animation, forKey: radiusAnimationKey)
+		}
+
+		public func stopAnimating() {
+			subviews.first?.layer.removeAnimation(forKey: radiusAnimationKey)
+		}
+
+		private func apply(topRadius: CGFloat, bottomRadius: CGFloat) {
 			let maxRadius = max(topRadius, bottomRadius)
 
 			// Hide the effect once the radius animation reaches zero.
@@ -80,6 +127,17 @@
 				isHidden = false
 			}
 
+			updateMask(topRadius: topRadius, bottomRadius: bottomRadius, maxRadius: maxRadius)
+
+			variableBlur?.setValue(maxRadius, forKey: "inputRadius")
+			variableBlur?.setValue(true, forKey: "inputNormalizeEdges")
+
+			if let backdropLayer = subviews.first?.layer, let blur = variableBlur {
+				backdropLayer.filters = [blur]
+			}
+		}
+
+		private func updateMask(topRadius: CGFloat, bottomRadius: CGFloat, maxRadius: CGFloat) {
 			let normalizedRadii = (
 				top: topRadius / maxRadius,
 				bottom: bottomRadius / maxRadius
@@ -93,13 +151,6 @@
 			{
 				variableBlur?.setValue(gradientImage, forKey: "inputMaskImage")
 				maskRadii = normalizedRadii
-			}
-
-			variableBlur?.setValue(maxRadius, forKey: "inputRadius")
-			variableBlur?.setValue(true, forKey: "inputNormalizeEdges")
-
-			if let backdropLayer = subviews.first?.layer, let blur = variableBlur {
-				backdropLayer.filters = [blur]
 			}
 		}
 
