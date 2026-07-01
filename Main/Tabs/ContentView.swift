@@ -25,6 +25,10 @@ struct ContentView: View {
 		@State private var watchSync = PhoneWatchSyncBridge()
 		@State private var rootSyncStatus = SyncMode.normal
 		@State private var isBlurred = false
+		@State private var isBlurMounted = false
+		@State private var topBlurRadius: CGFloat = 0
+		@State private var bottomBlurRadius: CGFloat = 0
+		@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	#endif
 
 	@Binding var expanded: WindowMode
@@ -41,16 +45,17 @@ struct ContentView: View {
 					isBlurred: $isBlurred
 				)
 				.overlay {
-					if isBlurred {
-						VariableBlurView()
-							.ignoresSafeArea()
-							.allowsHitTesting(false)
-							.transition(.opacity)
+					if isBlurMounted {
+						VariableBlurView(
+							topRadius: topBlurRadius,
+							bottomRadius: bottomBlurRadius
+						)
+						.ignoresSafeArea()
+						.allowsHitTesting(false)
 					}
 				}
 				.ignoresSafeArea()
-				.opacity(isBlurred ? 0.8 : 1.0)
-				.animation(.easeInOut(duration: 0.35), value: isBlurred)
+				.onChange(of: isBlurred, updateBlur)
 			#else
 				TabView(selection: $selectedCompanionTab) {
 					Tab("Timetable", systemImage: "calendar", value: "timetable") {
@@ -90,6 +95,36 @@ struct ContentView: View {
 			networkManager.startMonitoring()
 		}
 	}
+
+	#if os(iOS)
+		private func updateBlur() {
+			if isBlurred {
+				isBlurMounted = true
+				topBlurRadius = 0
+				bottomBlurRadius = 0
+
+				Task { @MainActor in
+					await Task.yield()
+					guard isBlurred else { return }
+					withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.7)) {
+						topBlurRadius = 0
+						bottomBlurRadius = 8
+					}
+				}
+			} else {
+				withAnimation(
+					reduceMotion ? nil : .easeOut(duration: 0.25),
+					completionCriteria: .logicallyComplete
+				) {
+					topBlurRadius = 0
+					bottomBlurRadius = 0
+				} completion: {
+					guard !isBlurred else { return }
+					isBlurMounted = false
+				}
+			}
+		}
+	#endif
 }
 
 extension Notification.Name {

@@ -10,7 +10,7 @@
 	import SwiftUI
 	import UIKit
 
-	public struct VariableBlurView: UIViewRepresentable {
+	public struct VariableBlurView: UIViewRepresentable, Animatable {
 		public var topRadius: CGFloat
 		public var bottomRadius: CGFloat
 
@@ -40,6 +40,7 @@
 	open class VariableBlurUIView: UIVisualEffectView {
 		private var variableBlur: NSObject?
 		private let ciContext = CIContext()
+		private var maskRadii: (top: CGFloat, bottom: CGFloat)?
 
 		public init(topRadius: CGFloat = 0, bottomRadius: CGFloat = 8) {
 			super.init(effect: UIBlurEffect(style: .regular))
@@ -71,7 +72,7 @@
 		public func update(topRadius: CGFloat, bottomRadius: CGFloat) {
 			let maxRadius = max(topRadius, bottomRadius)
 
-			// Smoothly hide the view on the very last frame of the fade-out animation
+			// Hide the effect once the radius animation reaches zero.
 			if maxRadius <= 0 {
 				isHidden = true
 				return
@@ -79,14 +80,26 @@
 				isHidden = false
 			}
 
-			if let gradientImage = makeGradientImage(topRadius: topRadius, bottomRadius: bottomRadius) {
-				variableBlur?.setValue(maxRadius, forKey: "inputRadius")
-				variableBlur?.setValue(gradientImage, forKey: "inputMaskImage")
-				variableBlur?.setValue(true, forKey: "inputNormalizeEdges")
+			let normalizedRadii = (
+				top: topRadius / maxRadius,
+				bottom: bottomRadius / maxRadius
+			)
 
-				if let backdropLayer = subviews.first?.layer, let blur = variableBlur {
-					backdropLayer.filters = [blur]
-				}
+			if maskRadii?.top != normalizedRadii.top || maskRadii?.bottom != normalizedRadii.bottom,
+			   let gradientImage = makeGradientImage(
+			   	topRadius: normalizedRadii.top,
+			   	bottomRadius: normalizedRadii.bottom
+			   )
+			{
+				variableBlur?.setValue(gradientImage, forKey: "inputMaskImage")
+				maskRadii = normalizedRadii
+			}
+
+			variableBlur?.setValue(maxRadius, forKey: "inputRadius")
+			variableBlur?.setValue(true, forKey: "inputNormalizeEdges")
+
+			if let backdropLayer = subviews.first?.layer, let blur = variableBlur {
+				backdropLayer.filters = [blur]
 			}
 		}
 
