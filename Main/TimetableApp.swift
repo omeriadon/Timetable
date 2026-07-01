@@ -9,6 +9,7 @@
 	import AppKit
 #else
 	import Sticker
+	import WindowOverlay
 #endif
 import Defaults
 import Foundation
@@ -60,41 +61,48 @@ struct TimetableApp: App {
 	var body: some Scene {
 		WindowGroup {
 			ContentView(expanded: $expanded)
-				.overlay {
+			#if os(iOS)
+				.windowOverlay(isPresented: true, disableSafeArea: false) {
 					StatusBadgeOverlay()
 						.zIndex(9_999_999)
 				}
-				.task {
-					passManager.configureProjectionUpload {
-						try await ReceivedTimetableSyncService.shared.uploadCurrentProjection()
+			#else
+				.overlay {
+						StatusBadgeOverlay()
+							.zIndex(9_999_999)
 					}
-					sessionStore.configureAccountBootstrap {
-						try await AccountBootstrapService.shared.bootstrap()
-					}
-					if Defaults[.installationID].isEmpty {
-						Defaults[.installationID] = DeviceIDProvider.shared.getDeviceID()
-					}
-					await indexEntities()
-					await sessionStore.restore()
-					#if os(iOS)
-						await NotificationRegistrationService.shared.reconcileWithStoredPreference()
+			#endif
+					.task {
+						passManager.configureProjectionUpload {
+							try await ReceivedTimetableSyncService.shared.uploadCurrentProjection()
+						}
+						sessionStore.configureAccountBootstrap {
+							try await AccountBootstrapService.shared.bootstrap()
+						}
+						if Defaults[.installationID].isEmpty {
+							Defaults[.installationID] = DeviceIDProvider.shared.getDeviceID()
+						}
+						await indexEntities()
+						await sessionStore.restore()
+						#if os(iOS)
+							await NotificationRegistrationService.shared.reconcileWithStoredPreference()
 
-						try? await ShaderLibrary.compileStickerShaders()
+							try? await ShaderLibrary.compileStickerShaders()
 
-					#endif
-				}
+						#endif
+					}
 			#if os(iOS)
-				.sheet(isPresented: .constant(showNameSheet)) {
-					NameSheet()
-						.presentationDetents([.medium])
-						.presentationDragIndicator(.hidden)
-						.interactiveDismissDisabled()
-						.monospaced()
-				}
-				.environment(\.passManager, passManager)
+					.sheet(isPresented: .constant(showNameSheet)) {
+						NameSheet()
+							.presentationDetents([.medium])
+							.presentationDragIndicator(.hidden)
+							.interactiveDismissDisabled()
+							.monospaced()
+					}
+					.environment(\.passManager, passManager)
 			#endif // os(iOS)
-				.monospaced()
-				.environment(\.statusBadgeManager, statusBadgeManager)
+					.monospaced()
+					.environment(\.statusBadgeManager, statusBadgeManager)
 			#if os(macOS)
 				.onChange(of: expanded) { _, newValue in
 					resizeWindow(expanded: newValue)
