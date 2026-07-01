@@ -6,6 +6,7 @@
 //
 
 import PassKit
+import PortalHeaders
 import PortalTransitions
 import SwiftUI
 
@@ -96,6 +97,7 @@ struct TimetableDetailView: View {
 			}
 			.task { await load() }
 		}
+		.portalHeaderDebugOverlays(true)
 		.monospaced()
 	}
 
