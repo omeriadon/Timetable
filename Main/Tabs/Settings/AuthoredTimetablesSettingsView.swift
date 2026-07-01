@@ -6,20 +6,21 @@ struct AuthoredTimetablesSettingsView: View {
 	@State private var showCreate = false
 
 	var body: some View {
-		List {
+		ScrollView {
 			AppNavigationHeader()
-				.listRowBackground(Color.clear)
-				.listRowSeparator(.hidden)
 
-			ForEach(service.timetables) { timetable in
-				NavigationLink { AuthoredTimetableEditorView(timetable: timetable) } label: {
-					VStack(alignment: .leading) { Text(timetable.title)
-						Text(timetable.isSearchable ? "Searchable" : "Hidden")
-							.font(.caption)
-							.foregroundStyle(.secondary)
+			LazyVStack(alignment: .leading, spacing: 12) {
+				ForEach(service.timetables) { timetable in
+					NavigationLink { AuthoredTimetableEditorView(timetable: timetable) } label: {
+						VStack(alignment: .leading) { Text(timetable.title)
+							Text(timetable.isSearchable ? "Searchable" : "Hidden")
+								.font(.caption)
+								.foregroundStyle(.secondary)
+						}
 					}
 				}
 			}
+			.padding()
 		}
 		.appNavigationTitle("Authored Timetables")
 		.toolbar {
@@ -51,14 +52,15 @@ private struct AuthoredTimetableCreateView: View {
 
 	var body: some View {
 		NavigationStack {
-			Form {
+			ScrollView {
 				AppNavigationHeader()
-					.listRowBackground(Color.clear)
-					.listRowSeparator(.hidden)
 
-				TextField("Title", text: $title)
-				Toggle("Searchable", isOn: $isSearchable)
-				Button("Edit Subjects", systemImage: "pencil") { showSubjectEditor = true }
+				LazyVStack(alignment: .leading, spacing: 20) {
+					TextField("Title", text: $title)
+					Toggle("Searchable", isOn: $isSearchable)
+					Button("Edit Subjects", systemImage: "pencil") { showSubjectEditor = true }
+				}
+				.padding()
 			}
 			.appNavigationTitle("New Authored Timetable")
 			.toolbar {
@@ -102,31 +104,32 @@ private struct AuthoredTimetableEditorView: View {
 	}
 
 	var body: some View {
-		Form {
+		ScrollView {
 			AppNavigationHeader()
-				.listRowBackground(Color.clear)
-				.listRowSeparator(.hidden)
 
-			Section("Details") {
-				TextField("Title", text: $title)
-				Toggle("Searchable", isOn: $isSearchable)
-			}
-			Section("Timetable") {
-				TimetablePreviewGrid(subjects: subjects)
+			LazyVStack(alignment: .leading, spacing: 20) {
+				Section("Details") {
+					TextField("Title", text: $title)
+					Toggle("Searchable", isOn: $isSearchable)
+				}
+				Section("Timetable") {
+					TimetablePreviewGrid(subjects: subjects)
 
-				Button("Edit Subjects", systemImage: "pencil") {
-					showEditor = true
+					Button("Edit Subjects", systemImage: "pencil") {
+						showEditor = true
+					}
+				}
+				Section {
+					Button(
+						"Delete Timetable",
+						systemImage: "trash",
+						role: .destructive
+					) {
+						confirmDelete = true
+					}
 				}
 			}
-			Section {
-				Button(
-					"Delete Timetable",
-					systemImage: "trash",
-					role: .destructive
-				) {
-					confirmDelete = true
-				}
-			}
+			.padding()
 		}
 		.appNavigationTitle(title)
 		.toolbar {

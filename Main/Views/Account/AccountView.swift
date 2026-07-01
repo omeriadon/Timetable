@@ -19,32 +19,33 @@ struct AccountView: View {
 		Group {
 			switch sessionStore.state {
 				case let .authenticated(profile):
-					List {
+					ScrollView {
 						AppNavigationHeader()
-							.listRowBackground(Color.clear)
-							.listRowSeparator(.hidden)
 
-						Section("Profile") {
-							#if os(iOS)
-								LabeledContent("Name") {
-									TextField("Name", text: $displayName)
-										.multilineTextAlignment(.trailing)
-										.submitLabel(.done)
+						LazyVStack(alignment: .leading, spacing: 20) {
+							Section("Profile") {
+								#if os(iOS)
+									LabeledContent("Name") {
+										TextField("Name", text: $displayName)
+											.multilineTextAlignment(.trailing)
+											.submitLabel(.done)
+									}
+									.onChange(of: displayName) { _, value in ServerSyncCoordinator.shared.scheduleProfileUpdate(value) }
+								#else
+									LabeledContent("Name", value: profile.displayName)
+								#endif
+								if let email = profile.email {
+									LabeledContent("Email", value: email)
 								}
-								.onChange(of: displayName) { _, value in ServerSyncCoordinator.shared.scheduleProfileUpdate(value) }
-							#else
-								LabeledContent("Name", value: profile.displayName)
-							#endif
-							if let email = profile.email {
-								LabeledContent("Email", value: email)
+							}
+
+							Section {
+								Button("Sign Out", role: .destructive, action: signOut)
+								Button("Delete Account", role: .destructive) { showDeleteConfirmation = true }
+									.disabled(isDeleting)
 							}
 						}
-
-						Section {
-							Button("Sign Out", role: .destructive, action: signOut)
-							Button("Delete Account", role: .destructive) { showDeleteConfirmation = true }
-								.disabled(isDeleting)
-						}
+						.padding()
 					}
 					.appNavigationTitle("Account")
 				case .restoring:

@@ -57,14 +57,14 @@ struct SettingsView: View {
 		NavigationStack {
 			Group {
 				#if os(iOS)
-					List {
+					ScrollView {
 						AppNavigationHeader()
-							.listRowBackground(Color.clear)
-							.listRowSeparator(.hidden)
 
-						list
+						LazyVStack(alignment: .leading, spacing: 20) {
+							list
+						}
+						.padding()
 					}
-					.listStyle(.sidebar)
 
 				#else
 					Form {

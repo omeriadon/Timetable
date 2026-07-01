@@ -15,38 +15,30 @@ struct TimetableSearchView: View {
 	@State private var service = TimetableDiscoveryService.shared
 	@State private var sessionStore = SessionStore.shared
 	@State private var selectedResult: TimetableSearchResult?
+	@State private var isSearchPresented = false
 	@Namespace private var portalNamespace
 
 	var body: some View {
 		PortalContainer {
 			NavigationStack {
-				Group {
+				ZStack {
 					if !sessionStore.isAuthenticated {
-						ScrollView {
-							AppNavigationHeader()
-							ContentUnavailableView("Sign In Required", systemImage: "person.crop.circle.badge.exclamationmark", description: Text("Sign in to search timetables."))
-						}
+						ContentUnavailableView("Sign In Required", systemImage: "person.crop.circle.badge.exclamationmark", description: Text("Sign in to search timetables."))
+							.transition(.blurReplace)
+
 					} else if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-						ScrollView {
-							AppNavigationHeader()
-							SearchLandingView()
-						}
+						SearchLandingView()
+							.transition(.blurReplace)
+
 					} else if !(3 ..< 50).contains(query.trimmingCharacters(in: .whitespacesAndNewlines).count) {
-						ScrollView {
-							AppNavigationHeader()
-							ContentUnavailableView("Keep Typing", systemImage: "text.magnifyingglass", description: Text("Search terms must contain 3 to 49 characters."))
-						}
+						ContentUnavailableView("Keep Typing", systemImage: "text.magnifyingglass", description: Text("Search terms must contain 3 to 49 characters."))
+							.transition(.blurReplace)
+
 					} else if service.results.isEmpty, !service.isSearching {
-						ScrollView {
-							AppNavigationHeader()
-							ContentUnavailableView.search(text: query)
-						}
+						ContentUnavailableView.search(text: query)
+							.transition(.blurReplace)
 					} else {
 						List {
-							AppNavigationHeader()
-								.listRowBackground(Color.clear)
-								.listRowSeparator(.hidden)
-
 							ForEach(service.results) { result in
 								Button {
 									selectedResult = result
@@ -59,24 +51,37 @@ struct TimetableSearchView: View {
 						}
 						.animation(.snappy, value: service.results.map(\.id))
 						.refreshable { service.search(query, immediately: true) }
+						.transition(.blurReplace)
 					}
 				}
+				.animation(.easeOut(duration: 0.25), value: "\(sessionStore.isAuthenticated)\(query)\(service.results.isEmpty)\(service.isSearching)")
+				.toolbar {
+					if !isSearchPresented {
+						ToolbarItem(placement: .largeTitle) {
+							Text("Search")
+								.monospaced()
+								.font(.largeTitle)
+								.bold()
+						}
+					}
+				}
+				.navigationBarTitleDisplayMode(.large)
 				.overlay {
-					if service.isSearching {
-						ProgressView().controlSize(.large)
+					ZStack {
+						if service.isSearching {
+							ProgressView().controlSize(.large)
+								.transition(.blurReplace)
+						}
 					}
+					.animation(.easeInOut(duration: 0.2), value: service.isSearching)
 				}
-				.appNavigationTitle("Search", style: .main)
-				.searchable(text: $query, prompt: "Timetable or author")
+				.searchable(text: $query, isPresented: $isSearchPresented, prompt: "Timetable or author")
 				.onChange(of: query) {
 					if sessionStore.isAuthenticated { service.search(query) }
 				}
 			}
 			.sheet(item: $selectedResult) { result in
 				TimetableDetailView(result: result, portalNamespace: portalNamespace)
-			}
-			.portalTransition(item: $selectedResult, in: portalNamespace) { result in
-				TimetableIdentityView(result: result, prominence: .row)
 			}
 		}
 	}
