@@ -19,6 +19,26 @@ nonisolated struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiab
 	let receivedAt: Date
 	let passUpdatedAt: Date
 	let isDeleted: Bool
+	let isShareable: Bool
+
+	private enum CodingKeys: String, CodingKey {
+		case id, issuerAccountID, sourceKind, signedDisplayName, authorDisplayName
+		case subjects, receivedAt, passUpdatedAt, isDeleted, isShareable
+	}
+
+	init(from decoder: any Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		id = try container.decode(String.self, forKey: .id)
+		issuerAccountID = try container.decode(String.self, forKey: .issuerAccountID)
+		sourceKind = try container.decode(SourceKind.self, forKey: .sourceKind)
+		signedDisplayName = try container.decode(String.self, forKey: .signedDisplayName)
+		authorDisplayName = try container.decodeIfPresent(String.self, forKey: .authorDisplayName)
+		subjects = try container.decode([Subject].self, forKey: .subjects)
+		receivedAt = try container.decode(Date.self, forKey: .receivedAt)
+		passUpdatedAt = try container.decode(Date.self, forKey: .passUpdatedAt)
+		isDeleted = try container.decode(Bool.self, forKey: .isDeleted)
+		isShareable = try container.decodeIfPresent(Bool.self, forKey: .isShareable) ?? false
+	}
 
 	var sender: String {
 		if let override = Defaults[.receivedNameOverrides][id]?
@@ -41,6 +61,7 @@ nonisolated struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiab
 		self.receivedAt = receivedAt
 		passUpdatedAt = receivedAt
 		isDeleted = false
+		isShareable = false
 	}
 
 	init(
@@ -52,7 +73,8 @@ nonisolated struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiab
 		subjects: [Subject],
 		receivedAt: Date,
 		passUpdatedAt: Date,
-		isDeleted: Bool
+		isDeleted: Bool,
+		isShareable: Bool = false
 	) {
 		self.id = id
 		self.issuerAccountID = issuerAccountID
@@ -63,6 +85,7 @@ nonisolated struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiab
 		self.receivedAt = receivedAt
 		self.passUpdatedAt = passUpdatedAt
 		self.isDeleted = isDeleted
+		self.isShareable = isShareable
 	}
 
 	func toTimetableEntity() -> TimetableEntity {

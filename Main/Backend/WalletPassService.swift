@@ -42,6 +42,16 @@ final class WalletPassService {
 		return fileURL
 	}
 
+	func receivedPassFileURL(serialNumber: String) async throws -> URL {
+		let encodedSerial = serialNumber.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? serialNumber
+		let data = try await networkManager.download(Endpoint("/v1/passes/received/\(encodedSerial)"))
+		let fileURL = FileManager.default.temporaryDirectory
+			.appending(path: "Shared-Timetable-\(UUID().uuidString)")
+			.appendingPathExtension("pkpass")
+		try data.write(to: fileURL, options: [.atomic, .completeFileProtection])
+		return fileURL
+	}
+
 	private func downloadOwnerPassData() async throws -> Data {
 		if let downloadTask {
 			return try await downloadTask.value

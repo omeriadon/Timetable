@@ -6,6 +6,14 @@
 //
 
 import SwiftUI
+#if os(iOS)
+	import UIKit
+#endif
+
+private struct ShareablePassFile: Identifiable {
+	let id = UUID()
+	let url: URL
+}
 
 struct ReceivedTimetablesView: View {
 	@Environment(\.dismiss) var dismiss
@@ -38,6 +46,8 @@ struct ReceivedTimetablesView: View {
 
 	@State private var timetableToDelete: ReceivedTimetable?
 	@State private var showDeleteConfirmation = false
+	@State private var shareFile: ShareablePassFile?
+	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
 		NavigationStack {
@@ -92,11 +102,22 @@ struct ReceivedTimetablesView: View {
 			} message: { timetable in
 				Text("Are you sure you want to delete \(timetable.sender)'s timetable?")
 			}
+			#if os(iOS)
+			.sheet(item: $shareFile) { ShareSheet(items: [$0.url]) }
+			#endif
 		}
 	}
 
 	@ContentBuilder
 	func contextMenuButtons(for timetable: ReceivedTimetable) -> some View {
+		if timetable.isShareable {
+			Button {
+				Task { await share(timetable) }
+			} label: {
+				Label("Share Pass", systemImage: "square.and.arrow.up")
+			}
+		}
+
 		Button(role: .destructive) {
 			let timetable = receivedTimetables.wrappedValue.first { $0.id == timetable.id }
 			timetableToDelete = timetable
@@ -116,7 +137,28 @@ struct ReceivedTimetablesView: View {
 			Label("Rename", systemImage: "pencil")
 		}
 	}
+
+	private func share(_ timetable: ReceivedTimetable) async {
+		do {
+			shareFile = try await ShareablePassFile(url: WalletPassService.shared.receivedPassFileURL(serialNumber: timetable.id))
+		} catch {
+			try? await ReceivedTimetableSyncService.shared.downloadProjectionAndOverrides()
+			badges.addBadge(id: UUID(), title: "Unable to share timetable", secondaryText: error.localizedDescription, priority: 4, view: .error)
+		}
+	}
 }
+
+#if os(iOS)
+	private struct ShareSheet: UIViewControllerRepresentable {
+		let items: [Any]
+
+		func makeUIViewController(context _: Context) -> UIActivityViewController {
+			UIActivityViewController(activityItems: items, applicationActivities: nil)
+		}
+
+		func updateUIViewController(_: UIActivityViewController, context _: Context) {}
+	}
+#endif
 
 #Preview {
 	ReceivedTimetablesView()

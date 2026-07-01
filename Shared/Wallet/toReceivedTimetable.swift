@@ -177,7 +177,8 @@ extension PKPass {
 			subjects: subjects,
 			receivedAt: sharedDate,
 			passUpdatedAt: (userInfo["passUpdatedAt"] as? String).flatMap(ISO8601DateFormatter().date(from:)) ?? sharedDate,
-			isDeleted: userInfo["isDeleted"] as? Bool ?? false
+			isDeleted: userInfo["isDeleted"] as? Bool ?? false,
+			isShareable: userInfo["isShareable"] as? Bool ?? false
 		)
 	}
 }
