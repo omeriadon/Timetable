@@ -5,7 +5,7 @@
 //   Created by Codex on 29/6/2026.
 //
 
-#if os(iOS) || os(visionOS)
+#if os(iOS)
 	import Defaults
 	import Foundation
 	import Observation
@@ -80,11 +80,7 @@
 		}
 
 		private static var platform: String {
-			#if os(visionOS)
-				"visionOS"
-			#else
-				"iOS"
-			#endif
+			"iOS"
 		}
 	}
 

@@ -22,7 +22,7 @@ struct AccountAndSyncSettingsView: View {
 				Toggle("Live Activities", isOn: preferenceBinding(\.liveActivitiesEnabled))
 				Toggle("Allow Notifications", isOn: preferenceBinding(\.notificationsEnabled))
 
-				#if os(iOS) || os(visionOS)
+				#if os(iOS)
 					Button("Send Test Notification", systemImage: "bell.badge") {
 						Task {
 							do {
@@ -62,7 +62,7 @@ struct AccountAndSyncSettingsView: View {
 
 	private func save(_ proposed: AccountSettings, previous: AccountSettings, generation: Int) async {
 		do {
-			#if os(iOS) || os(visionOS)
+			#if os(iOS)
 				if !previous.notificationsEnabled, proposed.notificationsEnabled {
 					guard await NotificationRegistrationService.shared.reconcile(enabled: true) else {
 						if generation == saveGeneration { settings = previous }
@@ -71,7 +71,7 @@ struct AccountAndSyncSettingsView: View {
 				}
 			#endif
 			try await settingsSync.updateSettings(proposed)
-			#if os(iOS) || os(visionOS)
+			#if os(iOS)
 				if previous.notificationsEnabled, !proposed.notificationsEnabled {
 					_ = await NotificationRegistrationService.shared.reconcile(enabled: false)
 				}

@@ -16,28 +16,19 @@ struct CapsuleInputRow: View {
 	var body: some View {
 		HStack(spacing: 12) {
 			Image(systemName: systemImage)
-				.frame(width: 20)
 				.foregroundStyle(.secondary)
 
-			ScrollView(.horizontal) {
-				Group {
-					if isSecure {
-						SecureField(title, text: $text)
-					} else {
-						TextField(title, text: $text)
-					}
+			Group {
+				if isSecure {
+					SecureField(title, text: $text)
+				} else {
+					TextField(title, text: $text)
 				}
-				.textFieldStyle(.plain)
-				.frame(minWidth: 220, alignment: .leading)
 			}
-			.scrollIndicators(.hidden)
+			.textFieldStyle(.plain)
 		}
-		.padding(.horizontal, 16)
-		.frame(minHeight: 50)
-		.background(.background, in: .capsule)
-		.overlay {
-			Capsule()
-				.stroke(.secondary.opacity(0.4), lineWidth: 1)
-		}
+		.padding(.horizontal)
+		.frame(minHeight: 44)
+		.glassEffect(.clear, in: .capsule)
 	}
 }

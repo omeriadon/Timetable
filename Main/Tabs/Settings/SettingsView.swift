@@ -72,11 +72,7 @@ struct SettingsView: View {
 			}
 			.scrollEdgeEffectStyle(.soft, for: .top)
 			.scrollContentBackground(.hidden)
-			.toolbar {
-				#if os(iOS)
-					ToolbarItem(placement: .largeTitle) { Text("Settings").monospaced() }
-				#endif
-			}
+			.appNavigationTitle("Settings", style: .main)
 		}
 		.task { await loadOwnerVisibility() }
 		#if os(macOS)

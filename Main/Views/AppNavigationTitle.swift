@@ -1,11 +1,24 @@
 import SwiftUI
 
+enum AppNavigationTitleStyle {
+	case main
+	case subview
+}
+
 extension View {
 	@ViewBuilder
-	func appNavigationTitle(_ title: String) -> some View {
+	func appNavigationTitle(_ title: String, style: AppNavigationTitleStyle = .subview) -> some View {
 		navigationTitle(title)
 		#if os(iOS)
-			.navigationBarTitleDisplayMode(.large)
-		#endif
+			.navigationBarTitleDisplayMode(style == .main ? .large : .inline)
+			.toolbar {
+				ToolbarItem(placement: style == .main ? .largeTitle : .principal) {
+					Text(title)
+						.font(style == .main ? .largeTitle : .headline)
+						.bold()
+						.monospaced()
+				}
+			}
+		#endif // os(iOS)
 	}
 }

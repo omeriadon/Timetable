@@ -5,7 +5,7 @@
 //   Created by Codex on 29/6/2026.
 //
 
-#if os(iOS) || os(visionOS)
+#if os(iOS)
 	import UIKit
 	import UserNotifications
 

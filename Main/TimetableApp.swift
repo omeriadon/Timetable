@@ -7,6 +7,8 @@
 
 #if os(macOS)
 	import AppKit
+#else
+	import Sticker
 #endif
 import Defaults
 import Foundation
@@ -51,7 +53,7 @@ struct TimetableApp: App {
 		}
 	#endif // os(macOS)
 
-	#if os(iOS) || os(visionOS)
+	#if os(iOS)
 		@UIApplicationDelegateAdaptor(MobileAppDelegate.self) private var mobileAppDelegate
 	#endif
 
@@ -60,6 +62,7 @@ struct TimetableApp: App {
 			ContentView(expanded: $expanded)
 				.overlay {
 					StatusBadgeOverlay()
+						.zIndex(9_999_999)
 				}
 				.task {
 					passManager.configureProjectionUpload {
@@ -73,8 +76,11 @@ struct TimetableApp: App {
 					}
 					await indexEntities()
 					await sessionStore.restore()
-					#if os(iOS) || os(visionOS)
+					#if os(iOS)
 						await NotificationRegistrationService.shared.reconcileWithStoredPreference()
+
+						try? await ShaderLibrary.compileStickerShaders()
+
 					#endif
 				}
 			#if os(iOS)

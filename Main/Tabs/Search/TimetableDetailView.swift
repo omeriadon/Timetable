@@ -6,93 +6,112 @@
 //
 
 import PassKit
+import PortalHeaders
+import PortalTransitions
 import SwiftUI
 
 struct TimetableDetailView: View {
 	let result: TimetableSearchResult
+	let portalNamespace: Namespace.ID
+	let portalTransitionFinished: Bool
 	@State private var detail: TimetableDetailResponse?
 	@State private var pass: PKPass?
 	@State private var showReportConfirmation = false
 	@State private var isWorking = true
 	@State private var passLoadFailed = false
 	@Environment(\.statusBadgeManager) private var badges
+	@Environment(\.dismiss) private var dismiss
 
 	var body: some View {
-		ZStack {
-			if let detail {
+		NavigationStack {
+			ZStack {
 				ScrollView {
-					VStack(alignment: .leading, spacing: 20) {
-						VStack(spacing: 5) {
-							Text(detail.title)
-								.font(.title)
-								.bold()
+					ZStack {
+						PortalHeaderView()
+							.monospaced()
+							.opacity(portalTransitionFinished ? 1 : 0)
 
-							Text("By \(detail.authorDisplayName)")
-								.font(.title3)
-								.foregroundStyle(.secondary)
-						}
+						TimetableIdentityView(result: result, prominence: .header)
+							.padding(.horizontal)
+							.opacity(portalTransitionFinished ? 0 : 1)
+							.portal(item: result, as: .destination, in: portalNamespace)
+					}
 
-						TimetablePreviewGrid(subjects: detail.subjects)
+					if let detail {
+						VStack(alignment: .leading, spacing: 20) {
+							TimetablePreviewGrid(subjects: detail.subjects)
 
-						if detail.sourceKind != .accountOwner {
-							Label("This timetable is an authored timetable, which means this user has created this timetable for someone else. The contents of this timetable are not verified.", systemImage: "exclamationmark.triangle")
-								.foregroundStyle(.secondary)
-								.font(.callout)
-						}
-						Text("\(detail.activeInstallCount) \(detail.activeInstallCount == 1 ? "user has" : "users have") downloaded this pass.")
+							if detail.sourceKind != .accountOwner {
+								Label("This timetable is an authored timetable, which means this user has created this timetable for someone else. The contents of this timetable are not verified.", systemImage: "exclamationmark.triangle")
+									.foregroundStyle(.secondary)
+									.font(.callout)
+							}
+							Text("\(detail.activeInstallCount) \(detail.activeInstallCount == 1 ? "user has" : "users have") downloaded this pass.")
 
-						if let updatedAt = detail.updatedAt {
-							LabeledContent("Updated") {
-								Text(updatedAt, format: .dateTime.day().month().year())
+							if let updatedAt = detail.updatedAt {
+								LabeledContent("Updated") {
+									Text(updatedAt, format: .dateTime.day().month().year())
+								}
 							}
 						}
+						.padding()
+					} else {
+						ProgressView()
+							.frame(maxWidth: .infinity)
+							.padding(.top, 80)
 					}
-					.padding()
 				}
-				.transition(.opacity)
-			} else {
-				ProgressView()
-					.frame(maxWidth: .infinity, maxHeight: .infinity)
-					.transition(.opacity)
+				.portalHeaderDestination()
+				.scrollEdgeEffectStyle(.soft, for: .bottom)
+				.scrollEdgeEffectStyle(.soft, for: .top)
 			}
-		}
-		.animation(.easeIn(duration: 0.1), value: detail == nil)
-		.safeAreaBar(edge: .bottom, alignment: .center, spacing: 10) {
-			ZStack {
-				if let pass {
-					AddPassToWalletButton([pass]) {
-						added in if added { badges.addBadge(id: UUID(), title: "Pass added to Wallet", priority: 3, view: .success) }
-					}
-					.addPassToWalletButtonStyle(.black)
-					.clipShape(.capsule)
-					.transition(.blurReplace)
+			.animation(.easeIn(duration: 0.1), value: detail == nil)
+			.safeAreaBar(edge: .bottom, alignment: .center, spacing: 10) {
+				ZStack {
+					if let pass {
+						AddPassToWalletButton([pass]) {
+							added in if added { badges.addBadge(id: UUID(), title: "Pass added to Wallet", priority: 3, view: .success) }
+						}
+						.addPassToWalletButtonStyle(.black)
+						.clipShape(.capsule)
+						.transition(.blurReplace)
 
-				} else if isWorking {
-					ProgressView("Loading Pass…")
-						.transition(.blurReplace)
-				} else if passLoadFailed {
-					Button("Retry Pass Download", systemImage: "arrow.clockwise", action: download)
-						.buttonStyle(.glass)
-						.transition(.blurReplace)
+					} else if isWorking {
+						ProgressView()
+							.transition(.blurReplace)
+					} else if passLoadFailed {
+						Button("Retry Pass Download", systemImage: "arrow.clockwise", action: download)
+							.buttonStyle(.glass)
+							.transition(.blurReplace)
+					}
+				}
+				.frame(height: 50)
+				.animation(.easeInOut, value: pass == nil)
+				.padding([.bottom, .horizontal], 20)
+			}
+			.toolbar {
+				ToolbarItem(placement: .cancellationAction) {
+					Button("Close", systemImage: "xmark", action: dismiss.callAsFunction)
+				}
+
+				ToolbarItem(placement: .topBarPinnedTrailing) {
+					Button("Report Author", systemImage: "exclamationmark.bubble", role: .destructive) { showReportConfirmation = true }
+						.confirmationDialog("Report \(result.authorDisplayName)?", isPresented: $showReportConfirmation) {
+							Button("Report Author", role: .destructive) { Task { await report() } }
+							Button("Cancel", role: .cancel) {}
+						} message: {
+							Text("This reports the author account to Timetable moderation.")
+						}
 				}
 			}
-			.frame(height: 50)
-			.animation(.easeInOut, value: pass == nil)
-			.padding([.bottom, .horizontal], 20)
+			.task { await load() }
 		}
-		.toolbar {
-			ToolbarItem(placement: .topBarPinnedTrailing) {
-				Button("Report Author", systemImage: "exclamationmark.bubble", role: .destructive) { showReportConfirmation = true }
-					.confirmationDialog("Report \(result.authorDisplayName)?", isPresented: $showReportConfirmation) {
-						Button("Report Author", role: .destructive) { Task { await report() } }
-						Button("Cancel", role: .cancel) {}
-					} message: {
-						Text("This reports the author account to Timetable moderation.")
-					}
-			}
-		}
-		.navigationBarTitleDisplayMode(.large)
-		.task { await load() }
+		.monospaced()
+		.navigationSubtitle("By \(detail?.authorDisplayName ?? result.authorDisplayName)")
+		.portalHeader(
+			title: detail?.title ?? result.title,
+			subtitle: "By \(detail?.authorDisplayName ?? result.authorDisplayName)"
+		)
 	}
 
 	private func load() async {
@@ -140,9 +159,7 @@ struct TimetableDetailView: View {
 		do {
 			try await TimetableDiscoveryService.shared.report(authorID: result.authorAccountID)
 			badges.addBadge(id: UUID(), title: "Author reported", priority: 3, view: .success)
-		} catch {
-			show(error, title: "Unable to report author")
-		}
+		} catch {}
 	}
 
 	private func show(_ error: any Error, title: String) {

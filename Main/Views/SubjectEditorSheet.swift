@@ -465,6 +465,7 @@ struct SubjectEditorSheet: View {
 			HStack {
 				Image(systemName: draftSubjects[index].symbol)
 					.font(.title2)
+					.frame(height: 15)
 
 				Spacer()
 
@@ -478,6 +479,7 @@ struct SubjectEditorSheet: View {
 			.contentShape(.capsule)
 		}
 		.buttonStyle(.plain)
+		.frame(height: 25)
 	}
 
 	func slotEditorSection(index: Int) -> some View {

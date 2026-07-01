@@ -65,7 +65,7 @@ struct TimeLeftView: View {
 
 						Spacer()
 
-						Text("No more classes")
+						Text("No classes")
 							.font(Device.isWatchOS ? .caption : .headline)
 							.foregroundColor(.secondary)
 
