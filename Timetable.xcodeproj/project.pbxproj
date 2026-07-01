@@ -17,13 +17,13 @@
 		2A43AFA12FE7849E00BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFA02FE7849E00BBC8BD /* IrregularGradient */; };
 		2A43AFB12FE785E300BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFB02FE785E300BBC8BD /* IrregularGradient */; };
 		2A43AFB32FE785E700BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFB22FE785E700BBC8BD /* IrregularGradient */; };
-		2A43AFCF2FE80ED900BBC8BD /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFCE2FE80ED900BBC8BD /* ZIPFoundation */; };
-		2A43AFD22FE810C900BBC8BD /* OpenSSL in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFD12FE810C900BBC8BD /* OpenSSL */; };
 		2A5F91F12FE650FE007302CF /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A5F91F02FE650FE007302CF /* IrregularGradient */; };
 		2AA6DF242FDFAC9000BBC70E /* Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2AA6DF142FDFAC8F00BBC70E /* Widget.appex */; platformFilters = (ios, macos, ); settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2AA6DF2C2FDFADAE00BBC70E /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AA6DF2B2FDFADAE00BBC70E /* Defaults */; };
 		2ABBBA042FF4AD3A00878A9D /* PortalHeaders in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABBBA032FF4AD3A00878A9D /* PortalHeaders */; };
 		2ABBBA062FF4AD3A00878A9D /* PortalTransitions in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABBBA052FF4AD3A00878A9D /* PortalTransitions */; };
+		2ABBBA0D2FF4FC9800878A9D /* GlowGetter in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABBBA0C2FF4FC9800878A9D /* GlowGetter */; };
+		2ABBBA0F2FF4FC9800878A9D /* GlowGetterPrivate in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABBBA0E2FF4FC9800878A9D /* GlowGetterPrivate */; };
 		2AC5F7ED2FD8435700B813EA /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AC5F7EC2FD8435700B813EA /* Defaults */; };
 		2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */ = {isa = PBXBuildFile; platformFilters = (macos, ); productRef = 2AE0F13A2FE03989002B5D9D /* MaterialView */; };
 /* End PBXBuildFile section */
@@ -279,16 +279,16 @@
 		2A0237882F9C8EA000AB1E1F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				2ABBBA0D2FF4FC9800878A9D /* GlowGetter in Frameworks */,
 				2A324C072FF2980C00E6A3D5 /* ColorfulX in Frameworks */,
 				2A43AFA12FE7849E00BBC8BD /* IrregularGradient in Frameworks */,
 				2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */,
 				2A02379B2F9C907000AB1E1F /* Defaults in Frameworks */,
 				2A3EEF042FF39837005E0D87 /* Sticker in Frameworks */,
 				2ABBBA042FF4AD3A00878A9D /* PortalHeaders in Frameworks */,
-				2A43AFD22FE810C900BBC8BD /* OpenSSL in Frameworks */,
+				2ABBBA0F2FF4FC9800878A9D /* GlowGetterPrivate in Frameworks */,
 				2ABBBA062FF4AD3A00878A9D /* PortalTransitions in Frameworks */,
 				2A0237AC2F9D9DE800AB1E1F /* SFSymbolsPicker in Frameworks */,
-				2A43AFCF2FE80ED900BBC8BD /* ZIPFoundation in Frameworks */,
 			);
 		};
 		2A098C802F9DB842002065BE /* Frameworks */ = {
@@ -373,12 +373,12 @@
 				2A0237AB2F9D9DE800AB1E1F /* SFSymbolsPicker */,
 				2AE0F13A2FE03989002B5D9D /* MaterialView */,
 				2A43AFA02FE7849E00BBC8BD /* IrregularGradient */,
-				2A43AFCE2FE80ED900BBC8BD /* ZIPFoundation */,
-				2A43AFD12FE810C900BBC8BD /* OpenSSL */,
 				2A324C062FF2980C00E6A3D5 /* ColorfulX */,
 				2A3EEF032FF39837005E0D87 /* Sticker */,
 				2ABBBA032FF4AD3A00878A9D /* PortalHeaders */,
 				2ABBBA052FF4AD3A00878A9D /* PortalTransitions */,
+				2ABBBA0C2FF4FC9800878A9D /* GlowGetter */,
+				2ABBBA0E2FF4FC9800878A9D /* GlowGetterPrivate */,
 			);
 			productName = Timetable;
 			productReference = 2A02378B2F9C8EA000AB1E1F /* Timetable.app */;
@@ -503,11 +503,10 @@
 				2A0237AA2F9D9DE800AB1E1F /* XCLocalSwiftPackageReference "../../../Downloads/SFSymbolsPickerForSwiftUI-main" */,
 				2AE0F1392FE03989002B5D9D /* XCRemoteSwiftPackageReference "MaterialView" */,
 				2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */,
-				2A43AFCD2FE80ED900BBC8BD /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
-				2A43AFD02FE810C900BBC8BD /* XCRemoteSwiftPackageReference "OpenSSL-Package" */,
 				2A324C052FF2980C00E6A3D5 /* XCRemoteSwiftPackageReference "ColorfulX" */,
 				2A3EEF022FF39837005E0D87 /* XCRemoteSwiftPackageReference "sticker" */,
 				2ABBBA022FF4AD3A00878A9D /* XCRemoteSwiftPackageReference "Portal" */,
+				2ABBBA0B2FF4FC9800878A9D /* XCRemoteSwiftPackageReference "GlowGetter" */,
 			);
 			preferredProjectObjectVersion = 110;
 			productRefGroup = 2A02378C2F9C8EA000AB1E1F /* Products */;
@@ -1223,22 +1222,6 @@
 				minimumVersion = 1.4.0;
 			};
 		};
-		2A43AFCD2FE80ED900BBC8BD /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/omeriadon/ZIPFoundation";
-			requirement = {
-				branch = development;
-				kind = branch;
-			};
-		};
-		2A43AFD02FE810C900BBC8BD /* XCRemoteSwiftPackageReference "OpenSSL-Package" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/krzyzanowskim/OpenSSL-Package.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.6.2000;
-			};
-		};
 		2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/joogps/IrregularGradient";
@@ -1253,6 +1236,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 6.0.0;
+			};
+		};
+		2ABBBA0B2FF4FC9800878A9D /* XCRemoteSwiftPackageReference "GlowGetter" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Aeastr/GlowGetter";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
 			};
 		};
 		2AE0F1392FE03989002B5D9D /* XCRemoteSwiftPackageReference "MaterialView" */ = {
@@ -1306,16 +1297,6 @@
 			package = 2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */;
 			productName = IrregularGradient;
 		};
-		2A43AFCE2FE80ED900BBC8BD /* ZIPFoundation */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2A43AFCD2FE80ED900BBC8BD /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
-			productName = ZIPFoundation;
-		};
-		2A43AFD12FE810C900BBC8BD /* OpenSSL */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2A43AFD02FE810C900BBC8BD /* XCRemoteSwiftPackageReference "OpenSSL-Package" */;
-			productName = OpenSSL;
-		};
 		2A5F91F02FE650FE007302CF /* IrregularGradient */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */;
@@ -1335,6 +1316,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2ABBBA022FF4AD3A00878A9D /* XCRemoteSwiftPackageReference "Portal" */;
 			productName = PortalTransitions;
+		};
+		2ABBBA0C2FF4FC9800878A9D /* GlowGetter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2ABBBA0B2FF4FC9800878A9D /* XCRemoteSwiftPackageReference "GlowGetter" */;
+			productName = GlowGetter;
+		};
+		2ABBBA0E2FF4FC9800878A9D /* GlowGetterPrivate */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2ABBBA0B2FF4FC9800878A9D /* XCRemoteSwiftPackageReference "GlowGetter" */;
+			productName = GlowGetterPrivate;
 		};
 		2AC5F7EC2FD8435700B813EA /* Defaults */ = {
 			isa = XCSwiftPackageProductDependency;

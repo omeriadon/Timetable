@@ -149,7 +149,7 @@ private struct SearchLandingView: View {
 				.aspectRatio(contentMode: .fit)
 				.frame(maxWidth: .infinity)
 				.padding(.horizontal, 100)
-				.animation(.spring(duration: 0.5, bounce: 0.6, blendDuration: 0)) { view in
+				.animation(.spring(duration: 0.5, bounce: 0.8, blendDuration: 0)) { view in
 					view
 						.scaleEffect(isInteracting ? 1.05 : 0.95)
 						.stickerEffect()

@@ -1,5 +1,5 @@
 {
-  "originHash" : "72473b92704535aa06d83ec03538baf7c20a87963838b27e2e5ee91520a596fc",
+  "originHash" : "4e6875e1a1cb6df42a36d95e5cf0447b5e0ae2be25db72c0897354b1016b924f",
   "pins" : [
     {
       "identity" : "chronicle",
@@ -38,6 +38,15 @@
       }
     },
     {
+      "identity" : "glowgetter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Aeastr/GlowGetter",
+      "state" : {
+        "revision" : "12c0090e52dd97eda9d41dcaacdf2449f208bf7f",
+        "version" : "2.0.0"
+      }
+    },
+    {
       "identity" : "irregulargradient",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/joogps/IrregularGradient",
@@ -71,15 +80,6 @@
       "state" : {
         "revision" : "92971eac97d930bcbbac824333572fba22a31cae",
         "version" : "1.0.1"
-      }
-    },
-    {
-      "identity" : "openssl-package",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/krzyzanowskim/OpenSSL-Package.git",
-      "state" : {
-        "revision" : "2d180b33702e0e67fd58607d1f96d5fad0816d10",
-        "version" : "3.6.2000"
       }
     },
     {
@@ -143,15 +143,6 @@
       "state" : {
         "revision" : "fd542e0d66b305cd802fdbacd7f1a153c210c50a",
         "version" : "1.0.0"
-      }
-    },
-    {
-      "identity" : "zipfoundation",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/omeriadon/ZIPFoundation",
-      "state" : {
-        "branch" : "development",
-        "revision" : "2eaef551ae0385b1a06ae58320185255589001f4"
       }
     }
   ],
