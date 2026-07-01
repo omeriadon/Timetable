@@ -46,6 +46,9 @@ final class AccountBootstrapService {
 			async let settings: Void = settingsSync.downloadSettings()
 			async let received: Void = receivedTimetableSync.downloadProjectionAndOverrides()
 			_ = try await (timetable, settings, received)
+			#if os(iOS)
+				await NotificationRegistrationService.shared.reconcileWithStoredPreference()
+			#endif
 		}
 		bootstrapTask = task
 		isBootstrapping = true
