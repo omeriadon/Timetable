@@ -6,14 +6,12 @@
 //
 
 import PassKit
-import PortalHeaders
 import PortalTransitions
 import SwiftUI
 
 struct TimetableDetailView: View {
 	let result: TimetableSearchResult
 	let portalNamespace: Namespace.ID
-	let portalTransitionFinished: Bool
 	@State private var detail: TimetableDetailResponse?
 	@State private var pass: PKPass?
 	@State private var showReportConfirmation = false
@@ -26,16 +24,9 @@ struct TimetableDetailView: View {
 		NavigationStack {
 			ZStack {
 				ScrollView {
-					ZStack {
-						PortalHeaderView()
-							.monospaced()
-							.opacity(portalTransitionFinished ? 1 : 0)
-
-						TimetableIdentityView(result: result, prominence: .header)
-							.padding(.horizontal)
-							.opacity(portalTransitionFinished ? 0 : 1)
-							.portal(item: result, as: .destination, in: portalNamespace)
-					}
+					TimetableIdentityView(result: result, prominence: .header)
+						.padding(.horizontal)
+						.portal(item: result, as: .destination, in: portalNamespace)
 
 					if let detail {
 						VStack(alignment: .leading, spacing: 20) {
@@ -61,7 +52,6 @@ struct TimetableDetailView: View {
 							.padding(.top, 80)
 					}
 				}
-				.portalHeaderDestination()
 				.scrollEdgeEffectStyle(.soft, for: .bottom)
 				.scrollEdgeEffectStyle(.soft, for: .top)
 			}
@@ -107,11 +97,6 @@ struct TimetableDetailView: View {
 			.task { await load() }
 		}
 		.monospaced()
-		.navigationSubtitle("By \(detail?.authorDisplayName ?? result.authorDisplayName)")
-		.portalHeader(
-			title: detail?.title ?? result.title,
-			subtitle: "By \(detail?.authorDisplayName ?? result.authorDisplayName)"
-		)
 	}
 
 	private func load() async {

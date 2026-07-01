@@ -20,6 +20,10 @@ struct AccountView: View {
 			switch sessionStore.state {
 				case let .authenticated(profile):
 					List {
+						AppNavigationHeader()
+							.listRowBackground(Color.clear)
+							.listRowSeparator(.hidden)
+
 						Section("Profile") {
 							#if os(iOS)
 								LabeledContent("Name") {

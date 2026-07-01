@@ -6,7 +6,6 @@
 //
 
 import PassKit
-import PortalHeaders
 import PortalTransitions
 import Sticker
 import SwiftUI
@@ -16,7 +15,6 @@ struct TimetableSearchView: View {
 	@State private var service = TimetableDiscoveryService.shared
 	@State private var sessionStore = SessionStore.shared
 	@State private var selectedResult: TimetableSearchResult?
-	@State private var portalTransitionFinished = false
 	@Namespace private var portalNamespace
 
 	var body: some View {
@@ -24,22 +22,40 @@ struct TimetableSearchView: View {
 			NavigationStack {
 				Group {
 					if !sessionStore.isAuthenticated {
-						ContentUnavailableView("Sign In Required", systemImage: "person.crop.circle.badge.exclamationmark", description: Text("Sign in to search timetables."))
+						ScrollView {
+							AppNavigationHeader()
+							ContentUnavailableView("Sign In Required", systemImage: "person.crop.circle.badge.exclamationmark", description: Text("Sign in to search timetables."))
+						}
 					} else if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-						SearchLandingView()
+						ScrollView {
+							AppNavigationHeader()
+							SearchLandingView()
+						}
 					} else if !(3 ..< 50).contains(query.trimmingCharacters(in: .whitespacesAndNewlines).count) {
-						ContentUnavailableView("Keep Typing", systemImage: "text.magnifyingglass", description: Text("Search terms must contain 3 to 49 characters."))
+						ScrollView {
+							AppNavigationHeader()
+							ContentUnavailableView("Keep Typing", systemImage: "text.magnifyingglass", description: Text("Search terms must contain 3 to 49 characters."))
+						}
 					} else if service.results.isEmpty, !service.isSearching {
-						ContentUnavailableView.search(text: query)
+						ScrollView {
+							AppNavigationHeader()
+							ContentUnavailableView.search(text: query)
+						}
 					} else {
-						List(service.results) { result in
-							Button {
-								selectedResult = result
-							} label: {
-								TimetableSearchRow(result: result, namespace: portalNamespace)
+						List {
+							AppNavigationHeader()
+								.listRowBackground(Color.clear)
+								.listRowSeparator(.hidden)
+
+							ForEach(service.results) { result in
+								Button {
+									selectedResult = result
+								} label: {
+									TimetableSearchRow(result: result, namespace: portalNamespace)
+								}
+								.buttonStyle(.plain)
+								.listRowInsets(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
 							}
-							.buttonStyle(.plain)
-							.listRowInsets(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
 						}
 						.animation(.snappy, value: service.results.map(\.id))
 						.refreshable { service.search(query, immediately: true) }
@@ -57,34 +73,10 @@ struct TimetableSearchView: View {
 				}
 			}
 			.sheet(item: $selectedResult) { result in
-				TimetableDetailView(
-					result: result,
-					portalNamespace: portalNamespace,
-					portalTransitionFinished: portalTransitionFinished
-				)
+				TimetableDetailView(result: result, portalNamespace: portalNamespace)
 			}
-			.portalTransition(
-				item: $selectedResult,
-				in: portalNamespace,
-				animation: .smooth(duration: 0.48),
-				transition: .fade,
-				completion: { finished in
-					portalTransitionFinished = finished
-				}
-			) { result in
+			.portalTransition(item: $selectedResult, in: portalNamespace) { result in
 				TimetableIdentityView(result: result, prominence: .row)
-			} configuration: { content, isActive, sourceSize, destinationSize, sourcePosition, destinationPosition in
-				let destinationScale = sourceSize.height > 0 ? destinationSize.height / sourceSize.height : 1
-				content
-					.frame(width: sourceSize.width, height: sourceSize.height)
-					.scaleEffect(isActive ? destinationScale : 1)
-					.offset(
-						x: isActive ? destinationPosition.x : sourcePosition.x,
-						y: isActive ? destinationPosition.y : sourcePosition.y
-					)
-			}
-			.onChange(of: selectedResult?.id) {
-				if selectedResult != nil { portalTransitionFinished = false }
 			}
 		}
 	}

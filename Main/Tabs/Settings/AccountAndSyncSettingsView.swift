@@ -18,6 +18,10 @@ struct AccountAndSyncSettingsView: View {
 
 	var body: some View {
 		Form {
+			AppNavigationHeader()
+				.listRowBackground(Color.clear)
+				.listRowSeparator(.hidden)
+
 			Section("Account Settings") {
 				Toggle("Live Activities", isOn: preferenceBinding(\.liveActivitiesEnabled))
 				Toggle("Allow Notifications", isOn: preferenceBinding(\.notificationsEnabled))

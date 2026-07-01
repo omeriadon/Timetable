@@ -58,6 +58,10 @@ struct SettingsView: View {
 			Group {
 				#if os(iOS)
 					List {
+						AppNavigationHeader()
+							.listRowBackground(Color.clear)
+							.listRowSeparator(.hidden)
+
 						list
 					}
 					.listStyle(.sidebar)

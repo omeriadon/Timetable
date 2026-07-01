@@ -6,12 +6,18 @@ struct AuthoredTimetablesSettingsView: View {
 	@State private var showCreate = false
 
 	var body: some View {
-		List(service.timetables) { timetable in
-			NavigationLink { AuthoredTimetableEditorView(timetable: timetable) } label: {
-				VStack(alignment: .leading) { Text(timetable.title)
-					Text(timetable.isSearchable ? "Searchable" : "Hidden")
-						.font(.caption)
-						.foregroundStyle(.secondary)
+		List {
+			AppNavigationHeader()
+				.listRowBackground(Color.clear)
+				.listRowSeparator(.hidden)
+
+			ForEach(service.timetables) { timetable in
+				NavigationLink { AuthoredTimetableEditorView(timetable: timetable) } label: {
+					VStack(alignment: .leading) { Text(timetable.title)
+						Text(timetable.isSearchable ? "Searchable" : "Hidden")
+							.font(.caption)
+							.foregroundStyle(.secondary)
+					}
 				}
 			}
 		}
@@ -46,11 +52,15 @@ private struct AuthoredTimetableCreateView: View {
 	var body: some View {
 		NavigationStack {
 			Form {
+				AppNavigationHeader()
+					.listRowBackground(Color.clear)
+					.listRowSeparator(.hidden)
+
 				TextField("Title", text: $title)
 				Toggle("Searchable", isOn: $isSearchable)
 				Button("Edit Subjects", systemImage: "pencil") { showSubjectEditor = true }
 			}
-			.navigationTitle("New Authored Timetable")
+			.appNavigationTitle("New Authored Timetable")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.disabled(isSaving) }
 				ToolbarItem(placement: .confirmationAction) { Button("Create") { Task { await create() } }.disabled(isSaving || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) }
@@ -93,6 +103,10 @@ private struct AuthoredTimetableEditorView: View {
 
 	var body: some View {
 		Form {
+			AppNavigationHeader()
+				.listRowBackground(Color.clear)
+				.listRowSeparator(.hidden)
+
 			Section("Details") {
 				TextField("Title", text: $title)
 				Toggle("Searchable", isOn: $isSearchable)
