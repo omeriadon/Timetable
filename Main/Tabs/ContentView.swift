@@ -25,9 +25,7 @@ struct ContentView: View {
 		@State private var watchSync = PhoneWatchSyncBridge()
 		@State private var rootSyncStatus = SyncMode.normal
 		@State private var isBlurred = false
-		@State private var isBlurMounted = false
-		@State private var topBlurRadius: CGFloat = 0
-		@State private var bottomBlurRadius: CGFloat = 0
+		@State private var blurRadius: CGFloat = 3
 		@State private var showShareSelection = false
 		@State private var isShareSheetUpcoming = false
 		@Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -47,27 +45,10 @@ struct ContentView: View {
 					isBlurred: $isBlurred,
 					showShareSelection: $showShareSelection
 				)
-				.overlay {
-					if isBlurMounted {
-						VariableBlurView(
-							topRadius: topBlurRadius,
-							bottomRadius: bottomBlurRadius,
-							animationDuration: reduceMotion ? 0 : (isBlurred ? 0.9 : 0.25)
-						)
-						.ignoresSafeArea()
-						.allowsHitTesting(false)
-					}
-				}
+				.blur(radius: isBlurred ? blurRadius : 0)
+				.animation(.smooth, value: isBlurred)
 				.ignoresSafeArea()
-				.onChange(of: isBlurred, updateBlur)
 				.sheet(isPresented: $showShareSelection) {
-					if !isShareSheetUpcoming {
-						Task { @MainActor in
-							isBlurred = false
-						}
-					}
-					isShareSheetUpcoming = false
-				} content: {
 					ShareSelectionSheet(onSelect: { selectedItem in
 						isShareSheetUpcoming = true
 						showShareSelection = false
@@ -119,34 +100,6 @@ struct ContentView: View {
 			networkManager.startMonitoring()
 		}
 	}
-
-	#if os(iOS)
-		private func updateBlur() {
-			if isBlurred {
-				isBlurMounted = true
-				topBlurRadius = 0
-				bottomBlurRadius = 0
-
-				Task { @MainActor in
-					await Task.yield()
-					guard isBlurred else { return }
-					topBlurRadius = 0
-					bottomBlurRadius = 8
-				}
-			} else {
-				topBlurRadius = 0
-				bottomBlurRadius = 0
-
-				Task { @MainActor in
-					if !reduceMotion {
-						try? await Task.sleep(for: .milliseconds(250))
-					}
-					guard !isBlurred else { return }
-					isBlurMounted = false
-				}
-			}
-		}
-	#endif
 }
 
 extension Notification.Name {
@@ -161,7 +114,7 @@ extension Notification.Name {
 	struct ProminentActionTabView: UIViewControllerRepresentable {
 		@Binding var watchSync: PhoneWatchSyncBridge
 		@Binding var rootSyncStatus: SyncMode
-		@Binding var isBlurred: Bool // 4. Receive Binding
+		@Binding var isBlurred: Bool
 		@Binding var showShareSelection: Bool
 
 		let prominentTabIdentifier = "prominent-share-action"
@@ -260,7 +213,6 @@ extension Notification.Name {
 				Task { @MainActor [weak self] in
 					guard let self else { return }
 
-					// Wait for the SwiftUI sheet dismissal animation to complete
 					try? await Task.sleep(for: .milliseconds(350))
 
 					if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
@@ -322,7 +274,6 @@ extension Notification.Name {
 
 				activityViewController.presentationController?.delegate = self
 
-				// 6. Un-blur when sheet is dismissed fully
 				activityViewController.completionWithItemsHandler = { [weak self] _, _, _, _ in
 					self?.parent.isBlurred = false
 				}

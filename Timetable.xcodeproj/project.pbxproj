@@ -127,6 +127,8 @@
 				Backend/PhoneWatchSyncBridge.swift = (ios, );
 				Backend/syncToWatchAsync.swift = (ios, );
 				Tabs/Search/TimetableDetailView.swift = (ios, );
+				Tabs/Search/TimetableIdentityView.swift = (ios, );
+				Tabs/Search/TimetablePortalIdentityView.swift = (ios, );
 				Tabs/Search/TimetableSearchView.swift = (ios, );
 				Tabs/Settings/AddPassView.swift = (ios, xros, );
 				macOS/AppDelegate.swift = (macos, );
