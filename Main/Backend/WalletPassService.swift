@@ -67,6 +67,19 @@ final class WalletPassService {
 		return fileURL
 	}
 
+	func passFileURL(timetableID: UUID, name: String) async throws -> URL {
+		Task {
+			await triggerStatusBadgeAnimation()
+		}
+
+		let data = try await networkManager.download(Endpoint("/v1/timetables/\(timetableID.uuidString)/pass"))
+		let fileURL = FileManager.default.temporaryDirectory
+			.appending(path: "\(name)-\(UUID().uuidString)")
+			.appendingPathExtension("pkpass")
+		try data.write(to: fileURL, options: [.atomic, .completeFileProtection])
+		return fileURL
+	}
+
 	private func downloadOwnerPassData() async throws -> Data {
 		if let downloadTask {
 			return try await downloadTask.value

@@ -28,6 +28,8 @@ struct ContentView: View {
 		@State private var isBlurMounted = false
 		@State private var topBlurRadius: CGFloat = 0
 		@State private var bottomBlurRadius: CGFloat = 0
+		@State private var showShareSelection = false
+		@State private var isShareSheetUpcoming = false
 		@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	#endif
 
@@ -42,7 +44,8 @@ struct ContentView: View {
 				ProminentActionTabView(
 					watchSync: $watchSync,
 					rootSyncStatus: $rootSyncStatus,
-					isBlurred: $isBlurred
+					isBlurred: $isBlurred,
+					showShareSelection: $showShareSelection
 				)
 				.overlay {
 					if isBlurMounted {
@@ -57,6 +60,26 @@ struct ContentView: View {
 				}
 				.ignoresSafeArea()
 				.onChange(of: isBlurred, updateBlur)
+				.sheet(isPresented: $showShareSelection) {
+					if !isShareSheetUpcoming {
+						Task { @MainActor in
+							isBlurred = false
+						}
+					}
+					isShareSheetUpcoming = false
+				} content: {
+					ShareSelectionSheet(onSelect: { selectedItem in
+						isShareSheetUpcoming = true
+						showShareSelection = false
+						NotificationCenter.default.post(
+							name: .shareTimetableItem,
+							object: selectedItem
+						)
+					})
+					.presentationDetents([.fraction(0.5)])
+					.presentationDragIndicator(.hidden)
+					.interactiveDismissDisabled(false)
+				}
 			#else
 				TabView(selection: $selectedCompanionTab) {
 					Tab("Timetable", systemImage: "calendar", value: "timetable") {
@@ -128,6 +151,7 @@ struct ContentView: View {
 
 extension Notification.Name {
 	static let openSettingsTab = Notification.Name("openSettingsTab")
+	static let shareTimetableItem = Notification.Name("shareTimetableItem")
 }
 
 #if os(iOS)
@@ -138,6 +162,7 @@ extension Notification.Name {
 		@Binding var watchSync: PhoneWatchSyncBridge
 		@Binding var rootSyncStatus: SyncMode
 		@Binding var isBlurred: Bool // 4. Receive Binding
+		@Binding var showShareSelection: Bool
 
 		let prominentTabIdentifier = "prominent-share-action"
 
@@ -198,9 +223,20 @@ extension Notification.Name {
 
 			init(_ parent: ProminentActionTabView) {
 				self.parent = parent
+				super.init()
+				NotificationCenter.default.addObserver(
+					self,
+					selector: #selector(handleShareTimetableNotification(_:)),
+					name: .shareTimetableItem,
+					object: nil
+				)
 			}
 
-			func tabBarController(_ tabBarController: UITabBarController, shouldSelectTab tab: UITab) -> Bool {
+			deinit {
+				NotificationCenter.default.removeObserver(self)
+			}
+
+			func tabBarController(_: UITabBarController, shouldSelectTab tab: UITab) -> Bool {
 				guard tab.identifier == parent.prominentTabIdentifier else {
 					return true
 				}
@@ -210,14 +246,42 @@ extension Notification.Name {
 				}
 
 				parent.isBlurred = true
-				presentSharePassWorkflow(from: tabBarController)
+				parent.showShareSelection = true
 
 				return false
 			}
 
-			private func presentSharePassWorkflow(from tabBarController: UITabBarController) {
-				Task { @MainActor [weak self, weak tabBarController] in
-					guard let self, let tabBarController else { return }
+			@objc private func handleShareTimetableNotification(_ notification: Notification) {
+				guard let selectedItem = notification.object as? SelectedShareItem else {
+					parent.isBlurred = false
+					return
+				}
+
+				Task { @MainActor [weak self] in
+					guard let self else { return }
+
+					// Wait for the SwiftUI sheet dismissal animation to complete
+					try? await Task.sleep(for: .milliseconds(350))
+
+					if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+					   let window = windowScene.windows.first,
+					   let rootVC = window.rootViewController
+					{
+						var topController = rootVC
+						while let presented = topController.presentedViewController, !presented.isBeingDismissed {
+							topController = presented
+						}
+
+						presentSharePassWorkflow(for: selectedItem, from: topController)
+					} else {
+						parent.isBlurred = false
+					}
+				}
+			}
+
+			private func presentSharePassWorkflow(for selectedItem: SelectedShareItem, from targetVC: UIViewController) {
+				Task { @MainActor [weak self, weak targetVC] in
+					guard let self, let targetVC else { return }
 					guard SessionStore.shared.isAuthenticated else {
 						parent.isBlurred = false
 						StatusBadgeManager.shared.addBadge(id: UUID(), title: "Sign in required", secondaryText: "Sign in to use this feature.", priority: 3, view: .warning)
@@ -225,8 +289,15 @@ extension Notification.Name {
 					}
 
 					do {
-						let url = try await WalletPassService.shared.ownerPassFileURL()
-						presentShareSheet(with: url, from: tabBarController)
+						let url: URL = switch selectedItem {
+							case .owner:
+								try await WalletPassService.shared.ownerPassFileURL()
+							case let .authored(id, name):
+								try await WalletPassService.shared.passFileURL(timetableID: id, name: name)
+							case let .received(id, _):
+								try await WalletPassService.shared.receivedPassFileURL(serialNumber: id)
+						}
+						presentShareSheet(with: url, from: targetVC)
 					} catch where error.isCancellation {
 						parent.isBlurred = false
 						return
@@ -243,7 +314,7 @@ extension Notification.Name {
 				}
 			}
 
-			private func presentShareSheet(with fileURL: URL, from tabBarController: UITabBarController) {
+			private func presentShareSheet(with fileURL: URL, from targetVC: UIViewController) {
 				let activityViewController = UIActivityViewController(
 					activityItems: [fileURL],
 					applicationActivities: nil
@@ -257,18 +328,17 @@ extension Notification.Name {
 				}
 
 				if let popoverController = activityViewController.popoverPresentationController {
-					popoverController.sourceView = tabBarController.tabBar
-					let tabBarWidth = tabBarController.tabBar.frame.width
-
+					popoverController.sourceView = targetVC.view
 					popoverController.sourceRect = CGRect(
-						x: tabBarWidth / 2 - 25,
-						y: 0,
-						width: 50,
-						height: tabBarController.tabBar.frame.height
+						x: targetVC.view.bounds.midX,
+						y: targetVC.view.bounds.midY,
+						width: 0,
+						height: 0
 					)
+					popoverController.permittedArrowDirections = []
 				}
 
-				tabBarController.present(activityViewController, animated: true)
+				targetVC.present(activityViewController, animated: true)
 			}
 
 			func presentationControllerWillDismiss(_: UIPresentationController) {
