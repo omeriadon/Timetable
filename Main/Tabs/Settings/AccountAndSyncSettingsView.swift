@@ -24,6 +24,14 @@ struct AccountAndSyncSettingsView: View {
 			Section("Account Settings") {
 				Toggle("Live Activities", isOn: preferenceBinding(\.liveActivitiesEnabled))
 				Toggle("Allow Notifications", isOn: preferenceBinding(\.notificationsEnabled))
+				Picker("Notification Advance", selection: leadTimeBinding) {
+					ForEach(NotificationLeadTime.allCases, id: \.self) { leadTime in
+						Text("\(leadTime.minutes) \(leadTime.minutes == 1 ? "minute" : "minutes")")
+							.tag(leadTime)
+					}
+				}
+				.pickerStyle(.wheel)
+				.disabled(!settings.notificationsEnabled)
 
 				#if os(iOS)
 					Button("Send Test Notification", systemImage: "bell.badge") {
@@ -69,6 +77,20 @@ struct AccountAndSyncSettingsView: View {
 				let generation = saveGeneration
 				let previous = committedSettings
 				settings[keyPath: keyPath] = value
+				let proposed = settings
+				Task { await save(proposed, previous: previous, generation: generation) }
+			}
+		)
+	}
+
+	private var leadTimeBinding: Binding<NotificationLeadTime> {
+		Binding(
+			get: { settings.notificationLeadTime },
+			set: { value in
+				saveGeneration += 1
+				let generation = saveGeneration
+				let previous = committedSettings
+				settings.notificationLeadTime = value
 				let proposed = settings
 				Task { await save(proposed, previous: previous, generation: generation) }
 			}
