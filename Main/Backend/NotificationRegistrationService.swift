@@ -33,7 +33,8 @@
 		}
 
 		func reconcileWithStoredPreference() async {
-			_ = await reconcile(enabled: Defaults[.accountSettings].notificationsEnabled)
+			let settings = Defaults[.accountSettings]
+			_ = await reconcile(enabled: settings.notificationsEnabled || settings.broadcastNotificationsEnabled)
 		}
 
 		func reconcile(enabled: Bool) async -> Bool {
@@ -73,7 +74,8 @@
 		}
 
 		func upload(deviceToken: Data) async {
-			guard Defaults[.accountSettings].notificationsEnabled else { return }
+			let settings = Defaults[.accountSettings]
+			guard settings.notificationsEnabled || settings.broadcastNotificationsEnabled else { return }
 			let token = deviceToken.map { String(format: "%02x", $0) }.joined()
 			do {
 				let _: UserDeviceResponse = try await networkManager.send(

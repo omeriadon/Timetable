@@ -24,6 +24,7 @@ struct AccountAndSyncSettingsView: View {
 			Section("Account Settings") {
 				Toggle("Live Activities", isOn: preferenceBinding(\.liveActivitiesEnabled))
 				Toggle("Allow Notifications", isOn: preferenceBinding(\.notificationsEnabled))
+				Toggle("Special Event Notifications", isOn: preferenceBinding(\.broadcastNotificationsEnabled))
 				Picker("Notification Advance", selection: leadTimeBinding) {
 					ForEach(NotificationLeadTime.allCases, id: \.self) { leadTime in
 						Text("\(leadTime.minutes) \(leadTime.minutes == 1 ? "minute" : "minutes")")
@@ -46,13 +47,13 @@ struct AccountAndSyncSettingsView: View {
 					}
 					.disabled(!settings.notificationsEnabled || notificationRegistration.registrationState != .registered)
 
-					if settings.notificationsEnabled, notificationRegistration.registrationState == .registering {
+					if notificationsRequired, notificationRegistration.registrationState == .registering {
 						Text("Registering this device…")
 							.font(.footnote)
 							.foregroundStyle(.secondary)
 					}
 
-					if settings.notificationsEnabled, notificationRegistration.registrationState == .failed {
+					if notificationsRequired, notificationRegistration.registrationState == .failed {
 						Text("Device notification registration failed.")
 							.font(.footnote)
 							.foregroundStyle(.secondary)
@@ -64,6 +65,11 @@ struct AccountAndSyncSettingsView: View {
 							.foregroundStyle(.secondary)
 					}
 				#endif
+			}
+			Section {
+				Text("Special Event Notifications include announcements and limited-time events. This preference is independent from timetable notifications.")
+					.font(.footnote)
+					.foregroundStyle(.secondary)
 			}
 		}
 		.appNavigationTitle("Preferences")
@@ -100,7 +106,9 @@ struct AccountAndSyncSettingsView: View {
 	private func save(_ proposed: AccountSettings, previous: AccountSettings, generation: Int) async {
 		do {
 			#if os(iOS)
-				if !previous.notificationsEnabled, proposed.notificationsEnabled {
+				let previouslyRequired = previous.notificationsEnabled || previous.broadcastNotificationsEnabled
+				let proposedRequired = proposed.notificationsEnabled || proposed.broadcastNotificationsEnabled
+				if !previouslyRequired, proposedRequired {
 					guard await NotificationRegistrationService.shared.reconcile(enabled: true) else {
 						if generation == saveGeneration { settings = previous }
 						return
@@ -109,7 +117,7 @@ struct AccountAndSyncSettingsView: View {
 			#endif
 			try await settingsSync.updateSettings(proposed)
 			#if os(iOS)
-				if previous.notificationsEnabled, !proposed.notificationsEnabled {
+				if previouslyRequired, !proposedRequired {
 					_ = await NotificationRegistrationService.shared.reconcile(enabled: false)
 				}
 			#endif
@@ -121,5 +129,9 @@ struct AccountAndSyncSettingsView: View {
 			settings = previous
 			badges.addBadge(id: UUID(), title: "Unable to save preferences", secondaryText: error.localizedDescription, priority: 4, view: .error)
 		}
+	}
+
+	private var notificationsRequired: Bool {
+		settings.notificationsEnabled || settings.broadcastNotificationsEnabled
 	}
 }

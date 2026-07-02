@@ -24,17 +24,20 @@ nonisolated enum NotificationLeadTime: Int, Codable, CaseIterable, Defaults.Seri
 nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 	var liveActivitiesEnabled: Bool
 	var notificationsEnabled: Bool
+	var broadcastNotificationsEnabled: Bool
 	var notificationLeadTime: NotificationLeadTime
 
 	static let `default` = AccountSettings(
 		liveActivitiesEnabled: true,
 		notificationsEnabled: false,
+		broadcastNotificationsEnabled: true,
 		notificationLeadTime: .zero
 	)
 
-	init(liveActivitiesEnabled: Bool, notificationsEnabled: Bool, notificationLeadTime: NotificationLeadTime) {
+	init(liveActivitiesEnabled: Bool, notificationsEnabled: Bool, broadcastNotificationsEnabled: Bool, notificationLeadTime: NotificationLeadTime) {
 		self.liveActivitiesEnabled = liveActivitiesEnabled
 		self.notificationsEnabled = notificationsEnabled
+		self.broadcastNotificationsEnabled = broadcastNotificationsEnabled
 		self.notificationLeadTime = notificationLeadTime
 	}
 
@@ -42,6 +45,7 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		liveActivitiesEnabled = try container.decodeIfPresent(Bool.self, forKey: .liveActivitiesEnabled) ?? Self.default.liveActivitiesEnabled
 		notificationsEnabled = try container.decodeIfPresent(Bool.self, forKey: .notificationsEnabled) ?? Self.default.notificationsEnabled
+		broadcastNotificationsEnabled = try container.decodeIfPresent(Bool.self, forKey: .broadcastNotificationsEnabled) ?? Self.default.broadcastNotificationsEnabled
 		notificationLeadTime = try container.decodeIfPresent(NotificationLeadTime.self, forKey: .notificationLeadTime) ?? .zero
 	}
 }
