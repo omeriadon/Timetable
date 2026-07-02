@@ -35,7 +35,9 @@ struct SettingsView: View {
 
 	@State private var showCalendarImportSheet = false
 	@State private var showEditTimetableSheet = false
-	@Default(.ownerIsSearchable) var ownerIsSearchable
+	@State private var ownerIsSearchable = Defaults[.ownerIsSearchable]
+	@State private var committedOwnerIsSearchable = Defaults[.ownerIsSearchable]
+	@State private var visibilitySaveGeneration = 0
 	@State private var showEditReceivedTimetablesSheet = false
 
 	@Namespace private var ns
@@ -130,22 +132,7 @@ struct SettingsView: View {
 			}
 
 			Section("Your Timetable") {
-				Toggle("Searchable", isOn: $ownerIsSearchable)
-					.onChange(of: ownerIsSearchable) { _, _ in
-						guard sessionStore.isAuthenticated else {
-							ownerIsSearchable.toggle()
-							showSignInRequired()
-							return
-						}
-						Task {
-							do {
-								try await OwnerTimetableSyncService.shared.uploadOwnerTimetable()
-							} catch {
-								ownerIsSearchable.toggle()
-								statusBadgeManager.addBadge(id: UUID(), title: "Unable to update visibility", secondaryText: error.localizedDescription, priority: 4, view: .error)
-							}
-						}
-					}
+				Toggle("Searchable", isOn: ownerVisibilityBinding)
 				Button {
 					showEditTimetableSheet = true
 				} label: {
@@ -276,6 +263,39 @@ struct SettingsView: View {
 				Label("Reload widgets now", systemImage: "widget.extralarge")
 					.foregroundStyle(.accent)
 			}
+		}
+	}
+
+	private var ownerVisibilityBinding: Binding<Bool> {
+		Binding(
+			get: { ownerIsSearchable },
+			set: { value in
+				guard sessionStore.isAuthenticated else {
+					ownerIsSearchable = committedOwnerIsSearchable
+					showSignInRequired()
+					return
+				}
+
+				visibilitySaveGeneration += 1
+				let generation = visibilitySaveGeneration
+				let previous = committedOwnerIsSearchable
+				ownerIsSearchable = value
+				Task { await saveOwnerVisibility(value, previous: previous, generation: generation) }
+			}
+		)
+	}
+
+	private func saveOwnerVisibility(_ proposed: Bool, previous: Bool, generation: Int) async {
+		do {
+			let committed = try await OwnerTimetableSyncService.shared.updateVisibility(proposed)
+			guard generation == visibilitySaveGeneration else { return }
+			ownerIsSearchable = committed
+			committedOwnerIsSearchable = committed
+			statusBadgeManager.addBadge(id: UUID(), title: "Visibility updated", priority: 3, view: .success)
+		} catch {
+			guard generation == visibilitySaveGeneration else { return }
+			ownerIsSearchable = previous
+			statusBadgeManager.addBadge(id: UUID(), title: "Unable to update visibility", secondaryText: error.localizedDescription, priority: 4, view: .error)
 		}
 	}
 

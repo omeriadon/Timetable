@@ -36,8 +36,6 @@ struct TimetableApp: App {
 
 	@Default(.userDisplayName) var userName
 
-	private let cloudSync = CloudStore.shared
-
 	@State private var passManager = TimetablePassManager()
 	@State private var sessionStore = SessionStore.shared
 	@State private var statusBadgeManager = StatusBadgeManager.shared

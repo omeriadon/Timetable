@@ -55,6 +55,10 @@ nonisolated struct OwnerTimetableUpdateRequest: Codable {
 	var isSearchable: Bool? = nil
 }
 
+nonisolated struct OwnerTimetableVisibilityUpdateRequest: Codable {
+	let isSearchable: Bool
+}
+
 nonisolated struct OwnerTimetableResponse: Codable {
 	let subjects: [Subject]
 	let revision: Int

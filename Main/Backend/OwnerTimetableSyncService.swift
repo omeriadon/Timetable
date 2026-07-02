@@ -19,6 +19,8 @@ final class OwnerTimetableSyncService {
 	private let networkManager: NetworkManager
 	private var currentOperation: (kind: OperationKind, generation: Int, task: Task<Void, any Error>)?
 	private var operationGeneration = 0
+	private var pendingVisibility: Bool?
+	private var visibilityTask: Task<Void, any Error>?
 
 	private enum OperationKind {
 		case download
@@ -46,6 +48,39 @@ final class OwnerTimetableSyncService {
 		try await run(.reconcile) { [self] in
 			try await performReconciliation()
 		}
+	}
+
+	@discardableResult
+	func updateVisibility(_ isSearchable: Bool) async throws -> Bool {
+		pendingVisibility = isSearchable
+
+		if let visibilityTask {
+			try await visibilityTask.value
+			return Defaults[.ownerIsSearchable]
+		}
+
+		let task = Task { @MainActor in
+			while let proposed = pendingVisibility {
+				try Task.checkCancellation()
+				pendingVisibility = nil
+				let response: OwnerTimetableResponse = try await networkManager.send(
+					.v1OwnerTimetableVisibility,
+					body: OwnerTimetableVisibilityUpdateRequest(isSearchable: proposed)
+				)
+				Defaults[.ownerIsSearchable] = response.isSearchable
+				Defaults[.lastServerSync] = Date.now
+			}
+		}
+		visibilityTask = task
+		defer { visibilityTask = nil }
+
+		do {
+			try await task.value
+		} catch {
+			pendingVisibility = nil
+			throw error
+		}
+		return Defaults[.ownerIsSearchable]
 	}
 
 	private func run(
@@ -150,4 +185,5 @@ final class OwnerTimetableSyncService {
 private extension Endpoint {
 	static let v1OwnerTimetable = Endpoint("/v1/timetables/owner")
 	static let v1OwnerTimetableUpdate = Endpoint("/v1/timetables/owner", method: .put)
+	static let v1OwnerTimetableVisibility = Endpoint("/v1/timetables/owner/visibility", method: .put)
 }
