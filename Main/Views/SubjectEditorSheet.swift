@@ -133,11 +133,17 @@ struct SubjectEditorSheet: View {
 				symbolPickerSheet(for: id)
 			}
 		}
+		#if os(iOS)
+		.presentationDetents([.large])
+		.presentationDragIndicator(.hidden)
+		.interactiveDismissDisabled()
+		#endif
 	}
 
 	func subjectEditorPage(index: Int) -> some View {
 		VStack(spacing: 15) {
 			subjectHeaderRow(index: index)
+			metadataEditorRow(index: index)
 			symbolSelectionRow(index: index)
 
 			InlineColorPicker(selectedColor: selectedColorBinding(for: draftSubjects[index].id))
@@ -216,7 +222,9 @@ struct SubjectEditorSheet: View {
 				name: "New Subject",
 				symbol: "book.closed",
 				color: AvailableColors.sapphireVoid.SwiftUIColor,
-				slots: [newSlot, EditableSlot(day: 0, period: 2), EditableSlot(day: 0, period: 3), EditableSlot(day: 0, period: 4)]
+				slots: [newSlot, EditableSlot(day: 0, period: 2), EditableSlot(day: 0, period: 3), EditableSlot(day: 0, period: 4)],
+				classroom: "",
+				teacher: ""
 			)
 		)
 		pendingPrefillSlot = nil
@@ -276,7 +284,9 @@ struct SubjectEditorSheet: View {
 				id: EditableSubject.name.trimmingCharacters(in: .whitespacesAndNewlines),
 				symbol: EditableSubject.symbol,
 				colour: EditableSubject.color.toRGBA(),
-				slots: Array(uniqueSlots)
+				slots: Array(uniqueSlots),
+				classroom: Classroom(rawLocation: EditableSubject.classroom),
+				teacher: Teacher.editorValue(EditableSubject.teacher)
 			)
 		}
 
@@ -372,9 +382,21 @@ struct SubjectEditorSheet: View {
 				slots: original.slots.compactMap { slot in
 					guard let period = periodForSession(slot.session) else { return nil }
 					return EditableSlot(day: slot.day, period: period)
-				}
+				},
+				classroom: original.classroom.editorValue,
+				teacher: original.teacher.editorValue
 			)
 		}
+	}
+
+	func metadataEditorRow(index: Int) -> some View {
+		VStack(spacing: 10) {
+			TextField("Classroom code", text: $draftSubjects[index].classroom)
+				.textInputAutocapitalization(.characters)
+			TextField("Teacher surname", text: $draftSubjects[index].teacher)
+				.textInputAutocapitalization(.words)
+		}
+		.textFieldStyle(.roundedBorder)
 	}
 
 	var renameAlertPresented: Binding<Bool> {

@@ -37,6 +37,8 @@ struct EditableSubject: Identifiable {
 	var symbol: String
 	var color: Color
 	var slots: [EditableSlot]
+	var classroom: String
+	var teacher: String
 }
 
 enum TimetableLayout {

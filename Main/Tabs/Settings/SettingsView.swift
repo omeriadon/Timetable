@@ -150,7 +150,8 @@ struct SettingsView: View {
 						initialRequest: nil,
 						onSave: { ServerSyncCoordinator.shared.ownerTimetableChanged() }
 					)
-					.presentationDetents([.fraction(0.85)])
+					.presentationDetents([.large])
+					.presentationContentInteraction(.scrolls)
 					.presentationDragIndicator(.hidden)
 					.interactiveDismissDisabled()
 					.navigationTransition(.zoom(sourceID: "sheetMorph", in: ns))

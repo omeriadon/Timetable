@@ -56,7 +56,10 @@ private struct AuthoredTimetableCreateView: View {
 				ToolbarItem(placement: .confirmationAction) { Button("Create") { Task { await create() } }.disabled(isSaving || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) }
 			}
 			.sheet(isPresented: $showSubjectEditor) {
-				SubjectEditorSheet(subjects: $subjects, initialRequest: nil).interactiveDismissDisabled()
+				SubjectEditorSheet(subjects: $subjects, initialRequest: nil)
+					.presentationDetents([.large])
+					.presentationDragIndicator(.hidden)
+					.interactiveDismissDisabled()
 			}
 		}
 	}
@@ -122,7 +125,12 @@ private struct AuthoredTimetableEditorView: View {
 		}
 		.sheet(
 			isPresented: $showEditor
-		) { SubjectEditorSheet(subjects: $subjects, initialRequest: nil).interactiveDismissDisabled() }
+		) {
+			SubjectEditorSheet(subjects: $subjects, initialRequest: nil)
+				.presentationDetents([.large])
+				.presentationDragIndicator(.hidden)
+				.interactiveDismissDisabled()
+		}
 		.confirmationDialog(
 			"Delete this timetable?",
 			isPresented: $confirmDelete

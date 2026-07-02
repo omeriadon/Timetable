@@ -62,7 +62,9 @@ func translateSubjects(_ subjects: [Subject]) -> [Subject] {
 				id: translateTitle(c.id),
 				symbol: c.symbol,
 				colour: c.colour,
-				slots: c.slots
+				slots: c.slots,
+				classroom: c.classroom,
+				teacher: c.teacher
 			)
 		)
 	}
@@ -97,7 +99,7 @@ func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Subject] {
 	var slotScoreboard: [String: [String: Int]] = [:]
 
 	// Track overall metadata for subjects we discover
-	var subjectMeta: [String: (color: RGBAColor, symbol: String)] = [:]
+	var subjectMeta: [String: (color: RGBAColor, symbol: String, classroom: Classroom, teacher: Teacher)] = [:]
 
 	// 1. First Pass: Parse events and score frequencies across the 6 weeks
 	for event in events {
@@ -127,7 +129,9 @@ func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Subject] {
 		if subjectMeta[title] == nil {
 			subjectMeta[title] = (
 				color: RGBAColor(color: AvailableColors.allCases.randomElement()!.SwiftUIColor),
-				symbol: translateSymbol(title)
+				symbol: translateSymbol(title),
+				classroom: Classroom(rawLocation: event.location ?? ""),
+				teacher: Teacher(rawNotes: event.notes ?? "")
 			)
 		}
 
@@ -171,7 +175,9 @@ func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Subject] {
 				id: name,
 				symbol: meta.symbol,
 				colour: meta.color,
-				slots: sortedUniqueSlots
+				slots: sortedUniqueSlots,
+				classroom: meta.classroom,
+				teacher: meta.teacher
 			)
 		}
 		.sorted { $0.id < $1.id }
