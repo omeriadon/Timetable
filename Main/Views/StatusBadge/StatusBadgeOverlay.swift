@@ -70,6 +70,7 @@ struct StatusBadgeOverlay: View {
 		#if os(iOS)
 			content
 				.offset(y: dragOffset)
+				.animation(.spring(duration: 0.4, bounce: 0.3), value: dragOffset)
 				.gesture(
 					DragGesture(minimumDistance: 12)
 						.onChanged { value in

@@ -23,7 +23,7 @@
 		2ABBBA042FF4AD3A00878A9D /* PortalHeaders in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2ABBBA032FF4AD3A00878A9D /* PortalHeaders */; };
 		2ABBBA062FF4AD3A00878A9D /* PortalTransitions in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2ABBBA052FF4AD3A00878A9D /* PortalTransitions */; };
 		2AC5F7ED2FD8435700B813EA /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AC5F7EC2FD8435700B813EA /* Defaults */; };
-		2ADFCA822FF53BA000B4301E /* WindowOverlay in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2ADFCA812FF53BA000B4301E /* WindowOverlay */; };
+		2ADFCA8F2FF66F1A00B4301E /* WindowOverlay in Frameworks */ = {isa = PBXBuildFile; productRef = 2ADFCA8E2FF66F1A00B4301E /* WindowOverlay */; };
 		2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */ = {isa = PBXBuildFile; platformFilters = (macos, ); productRef = 2AE0F13A2FE03989002B5D9D /* MaterialView */; };
 /* End PBXBuildFile section */
 
@@ -284,7 +284,7 @@
 				2A43AFA12FE7849E00BBC8BD /* IrregularGradient in Frameworks */,
 				2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */,
 				2A02379B2F9C907000AB1E1F /* Defaults in Frameworks */,
-				2ADFCA822FF53BA000B4301E /* WindowOverlay in Frameworks */,
+				2ADFCA8F2FF66F1A00B4301E /* WindowOverlay in Frameworks */,
 				2A3EEF042FF39837005E0D87 /* Sticker in Frameworks */,
 				2ABBBA042FF4AD3A00878A9D /* PortalHeaders in Frameworks */,
 				2ABBBA062FF4AD3A00878A9D /* PortalTransitions in Frameworks */,
@@ -377,7 +377,7 @@
 				2A3EEF032FF39837005E0D87 /* Sticker */,
 				2ABBBA032FF4AD3A00878A9D /* PortalHeaders */,
 				2ABBBA052FF4AD3A00878A9D /* PortalTransitions */,
-				2ADFCA812FF53BA000B4301E /* WindowOverlay */,
+				2ADFCA8E2FF66F1A00B4301E /* WindowOverlay */,
 			);
 			productName = Timetable;
 			productReference = 2A02378B2F9C8EA000AB1E1F /* Timetable.app */;
@@ -505,7 +505,7 @@
 				2A324C052FF2980C00E6A3D5 /* XCRemoteSwiftPackageReference "ColorfulX" */,
 				2A3EEF022FF39837005E0D87 /* XCRemoteSwiftPackageReference "sticker" */,
 				2ABBBA022FF4AD3A00878A9D /* XCRemoteSwiftPackageReference "Portal" */,
-				2ADFCA802FF53BA000B4301E /* XCRemoteSwiftPackageReference "swiftui-window-overlay" */,
+				2ADFCA8D2FF66F1A00B4301E /* XCLocalSwiftPackageReference "../../../Downloads/swiftui-window-overlay-main" */,
 			);
 			preferredProjectObjectVersion = 110;
 			productRefGroup = 2A02378C2F9C8EA000AB1E1F /* Products */;
@@ -1191,6 +1191,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "../../../Downloads/SFSymbolsPickerForSwiftUI-main";
 		};
+		2ADFCA8D2FF66F1A00B4301E /* XCLocalSwiftPackageReference "../../../Downloads/swiftui-window-overlay-main" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../../Downloads/swiftui-window-overlay-main";
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -1232,14 +1236,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 6.0.0;
-			};
-		};
-		2ADFCA802FF53BA000B4301E /* XCRemoteSwiftPackageReference "swiftui-window-overlay" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sunghyun-k/swiftui-window-overlay";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.2;
 			};
 		};
 		2AE0F1392FE03989002B5D9D /* XCRemoteSwiftPackageReference "MaterialView" */ = {
@@ -1318,9 +1314,8 @@
 			package = 2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = Defaults;
 		};
-		2ADFCA812FF53BA000B4301E /* WindowOverlay */ = {
+		2ADFCA8E2FF66F1A00B4301E /* WindowOverlay */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 2ADFCA802FF53BA000B4301E /* XCRemoteSwiftPackageReference "swiftui-window-overlay" */;
 			productName = WindowOverlay;
 		};
 		2AE0F13A2FE03989002B5D9D /* MaterialView */ = {

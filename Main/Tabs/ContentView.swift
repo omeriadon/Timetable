@@ -48,7 +48,12 @@ struct ContentView: View {
 				.blur(radius: isBlurred ? blurRadius : 0)
 				.animation(.smooth, value: isBlurred)
 				.ignoresSafeArea()
-				.sheet(isPresented: $showShareSelection) {
+				.sheet(isPresented: $showShareSelection, onDismiss: {
+					if !isShareSheetUpcoming {
+						isBlurred = false
+					}
+					isShareSheetUpcoming = false
+				}) {
 					ShareSelectionSheet(onSelect: { selectedItem in
 						isShareSheetUpcoming = true
 						showShareSelection = false
