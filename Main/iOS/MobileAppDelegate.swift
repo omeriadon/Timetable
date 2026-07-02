@@ -32,6 +32,7 @@
 			_: UIApplication,
 			didFailToRegisterForRemoteNotificationsWithError error: any Error
 		) {
+			NotificationRegistrationService.shared.registrationFailed()
 			PrintError("APNs registration failed", category: .network, error: error)
 		}
 

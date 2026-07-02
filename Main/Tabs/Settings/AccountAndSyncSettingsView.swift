@@ -11,6 +11,9 @@ import SwiftUI
 struct AccountAndSyncSettingsView: View {
 	@State private var settings = Defaults[.accountSettings]
 	@State private var settingsSync = AccountSettingsSyncService.shared
+	#if os(iOS)
+		@State private var notificationRegistration = NotificationRegistrationService.shared
+	#endif
 	@State private var testResult: String?
 	@Environment(\.statusBadgeManager) private var badges
 	@State private var committedSettings = Defaults[.accountSettings]
@@ -26,14 +29,26 @@ struct AccountAndSyncSettingsView: View {
 					Button("Send Test Notification", systemImage: "bell.badge") {
 						Task {
 							do {
-								let count = try await NotificationRegistrationService.shared.sendTestNotification()
+								let count = try await notificationRegistration.sendTestNotification()
 								testResult = count == 1 ? "Sent to 1 device." : "Sent to \(count) devices."
 							} catch {
 								testResult = error.localizedDescription
 							}
 						}
 					}
-					.disabled(!settings.notificationsEnabled)
+					.disabled(!settings.notificationsEnabled || notificationRegistration.registrationState != .registered)
+
+					if settings.notificationsEnabled, notificationRegistration.registrationState == .registering {
+						Text("Registering this device…")
+							.font(.footnote)
+							.foregroundStyle(.secondary)
+					}
+
+					if settings.notificationsEnabled, notificationRegistration.registrationState == .failed {
+						Text("Device notification registration failed.")
+							.font(.footnote)
+							.foregroundStyle(.secondary)
+					}
 
 					if let testResult {
 						Text(testResult)

@@ -17,6 +17,15 @@
 	final class NotificationRegistrationService {
 		static let shared = NotificationRegistrationService(networkManager: .shared)
 
+		enum RegistrationState {
+			case idle
+			case registering
+			case registered
+			case failed
+		}
+
+		private(set) var registrationState: RegistrationState = .idle
+
 		private let networkManager: NetworkManager
 
 		private init(networkManager: NetworkManager) {
@@ -37,15 +46,21 @@
 					} else {
 						current == .authorized || current == .provisional || current == .ephemeral
 					}
-					guard granted else { return false }
+					guard granted else {
+						registrationState = .failed
+						return false
+					}
+					registrationState = .registering
 					UIApplication.shared.registerForRemoteNotifications()
 					return true
 				} catch {
+					registrationState = .failed
 					PrintError("Notification authorization failed", category: .network, error: error)
 					return false
 				}
 			}
 
+			registrationState = .idle
 			UIApplication.shared.unregisterForRemoteNotifications()
 			do {
 				try await networkManager.send(.v1CurrentDeviceDelete, body: RemoveUserDeviceRequest(installationID: Defaults[.installationID]))
@@ -69,9 +84,15 @@
 						apnsToken: token
 					)
 				)
+				registrationState = .registered
 			} catch {
+				registrationState = .failed
 				PrintError("APNs token upload failed", category: .network, error: error)
 			}
+		}
+
+		func registrationFailed() {
+			registrationState = .failed
 		}
 
 		func sendTestNotification() async throws -> Int {
