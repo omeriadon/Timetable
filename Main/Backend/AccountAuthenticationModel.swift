@@ -47,11 +47,9 @@ final class AccountAuthenticationModel {
 		guard mode == .signUp else { return [] }
 		var problems: [String] = []
 		let trimmed = displayName.trimmingCharacters(in: .whitespacesAndNewlines)
-		if trimmed.isEmpty {
-			problems.append("Enter your name.")
-		}
-		if trimmed.count > 100 {
-			problems.append("Your name must contain 100 characters or fewer.")
+
+		if trimmed.count > 30 {
+			problems.append("Your name must contain 30 characters or fewer.")
 		}
 		return problems
 	}
@@ -59,19 +57,18 @@ final class AccountAuthenticationModel {
 	var emailProblems: [String] {
 		var problems: [String] = []
 		let trimmed = email.trimmingCharacters(in: .whitespacesAndNewlines)
-		if trimmed.isEmpty {
-			problems.append("Enter your email address.")
-		} else if !trimmed.contains("@") || trimmed.hasPrefix("@") || trimmed.hasSuffix("@") {
+
+		if !trimmed.contains("@") || trimmed.hasPrefix("@") || trimmed.hasSuffix("@") {
 			problems.append("Enter a valid email address.")
+		}
+		if trimmed.count > 45 {
+			problems.append("Your email must contain 45 characters or fewer.")
 		}
 		return problems
 	}
 
 	var passwordProblems: [String] {
 		var problems: [String] = []
-		if password.isEmpty {
-			problems.append("Enter your password.")
-		}
 		if mode == .signUp, !password.isEmpty, password.count < 8 {
 			problems.append("Use at least eight characters.")
 		}
@@ -81,9 +78,6 @@ final class AccountAuthenticationModel {
 	var passwordConfirmationProblems: [String] {
 		guard mode == .signUp else { return [] }
 		var problems: [String] = []
-		if passwordConfirmation.isEmpty {
-			problems.append("Confirm your password.")
-		}
 		if !passwordConfirmation.isEmpty, passwordConfirmation != password {
 			problems.append("The passwords do not match.")
 		}
@@ -137,5 +131,13 @@ final class AccountAuthenticationModel {
 
 	private var allProblems: [String] {
 		displayNameProblems + emailProblems + passwordProblems + passwordConfirmationProblems
+	}
+
+	var problemText: String {
+		allProblems.joined()
+	}
+
+	var isAccountDetailsValid: Bool {
+		allProblems.isEmpty
 	}
 }

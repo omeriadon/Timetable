@@ -29,6 +29,6 @@ struct CapsuleInputRow: View {
 		}
 		.padding(.horizontal)
 		.frame(minHeight: 44)
-		.glassEffect(.clear, in: .capsule)
+		.glassEffect(.regular.tint(.black.mix(with: .white, by: 0.4)).interactive(), in: .capsule)
 	}
 }

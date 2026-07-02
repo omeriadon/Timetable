@@ -22,12 +22,15 @@ struct AccountAuthenticationView: View {
 				}
 				.pickerStyle(.segmented)
 
+				Spacer()
+					.frame(height: 20)
+
 				if model.mode == .signUp {
 					AccountInputGroup(
 						title: "Name",
 						systemImage: "person",
 						text: $model.displayName,
-						problems: visible(model.displayNameProblems)
+						problems: model.displayName.isEmpty ? [] : model.displayNameProblems
 					)
 					.transition(.blurReplace)
 				}
@@ -36,14 +39,14 @@ struct AccountAuthenticationView: View {
 					title: "Email",
 					systemImage: "envelope",
 					text: $model.email,
-					problems: visible(model.emailProblems)
+					problems: model.email.isEmpty ? [] : model.emailProblems
 				)
 
 				AccountInputGroup(
 					title: "Password",
 					systemImage: "lock",
 					text: $model.password,
-					problems: visible(model.passwordProblems),
+					problems: model.password.isEmpty ? [] : model.passwordProblems,
 					isSecure: true
 				)
 
@@ -52,30 +55,33 @@ struct AccountAuthenticationView: View {
 						title: "Confirm Password",
 						systemImage: "lock.badge.checkmark",
 						text: $model.passwordConfirmation,
-						problems: visible(model.passwordConfirmationProblems),
+						problems: model.passwordConfirmation.isEmpty ? [] : model.passwordConfirmationProblems,
 						isSecure: true
 					)
 					.transition(.blurReplace)
 				}
 
-				if let submissionError = model.submissionError {
-					ValidationMessagesView(messages: [submissionError])
-						.transition(.blurReplace)
-				}
+				Spacer()
+					.frame(height: 20)
 
 				Button(action: submit) {
-					if model.isSubmitting {
-						ProgressView()
-							.frame(maxWidth: .infinity)
-					} else {
-						Text(model.mode.rawValue)
-							.frame(maxWidth: .infinity)
+					ZStack {
+						if model.isSubmitting {
+							ProgressView()
+								.transition(.blurReplace)
+						} else {
+							Text(model.mode.rawValue)
+								.font(.title3)
+								.transition(.blurReplace)
+						}
 					}
 				}
-				.buttonStyle(.borderedProminent)
+				.buttonSizing(.flexible)
+				.animation(.easeInOut(duration: 0.2), value: model.isSubmitting)
+				.buttonStyle(.glassProminent)
 				.controlSize(.large)
 				.frame(maxWidth: .infinity)
-				.disabled(model.isSubmitting)
+				.disabled(model.isSubmitting || !model.isAccountDetailsValid)
 
 				SignInWithAppleButton(.continue) { request in
 					request.requestedScopes = [.fullName, .email]
@@ -91,11 +97,7 @@ struct AccountAuthenticationView: View {
 		}
 		.scrollDismissesKeyboard(.interactively)
 		.appNavigationTitle("Account")
-		.animation(reduceMotion ? .none : .snappy, value: model.mode)
-	}
-
-	private func visible(_ problems: [String]) -> [String] {
-		model.didAttemptSubmit ? problems : []
+		.animation(reduceMotion ? .none : .snappy, value: "\(model.mode)\(model.problemText)\(model.submissionError ?? "")")
 	}
 
 	private func submit() {
