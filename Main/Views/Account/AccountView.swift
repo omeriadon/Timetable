@@ -43,10 +43,13 @@ struct AccountView: View {
 						}
 					}
 					.appNavigationTitle("Account")
+					.transition(.blurReplace)
 				case .restoring:
 					ProgressView("Restoring Account…")
+						.transition(.blurReplace)
 				case .signedOut:
 					AccountAuthenticationView()
+						.transition(.blurReplace)
 			}
 		}
 		.alert("Delete Account?", isPresented: $showDeleteConfirmation) {
@@ -55,6 +58,7 @@ struct AccountView: View {
 		} message: {
 			Text("This permanently deletes your account and server data.")
 		}
+		.animation(.easeInOut, value: sessionStore.state)
 	}
 
 	private func signOut() {
