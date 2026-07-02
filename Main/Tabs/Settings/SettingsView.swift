@@ -35,9 +35,7 @@ struct SettingsView: View {
 
 	@State private var showCalendarImportSheet = false
 	@State private var showEditTimetableSheet = false
-	@State private var ownerIsSearchable = true
-	@State private var ownerVisibilityLoaded = false
-
+	@Default(.ownerIsSearchable) var ownerIsSearchable
 	@State private var showEditReceivedTimetablesSheet = false
 
 	@Namespace private var ns
@@ -74,10 +72,9 @@ struct SettingsView: View {
 			.scrollContentBackground(.hidden)
 			.appNavigationTitle("Settings", style: .main)
 		}
-		.task { await loadOwnerVisibility() }
 		#if os(macOS)
-			.onAppear { expanded = .settings }
-			.onDisappear { expanded = .none }
+		.onAppear { expanded = .settings }
+		.onDisappear { expanded = .none }
 		#endif
 	}
 
@@ -134,14 +131,20 @@ struct SettingsView: View {
 
 			Section("Your Timetable") {
 				Toggle("Searchable", isOn: $ownerIsSearchable)
-					.onChange(of: ownerIsSearchable) { _, newValue in
+					.onChange(of: ownerIsSearchable) { _, _ in
 						guard sessionStore.isAuthenticated else {
 							ownerIsSearchable.toggle()
 							showSignInRequired()
 							return
 						}
-						guard ownerVisibilityLoaded else { return }
-						Task { await saveOwnerVisibility(newValue) }
+						Task {
+							do {
+								try await OwnerTimetableSyncService.shared.uploadOwnerTimetable()
+							} catch {
+								ownerIsSearchable.toggle()
+								statusBadgeManager.addBadge(id: UUID(), title: "Unable to update visibility", secondaryText: error.localizedDescription, priority: 4, view: .error)
+							}
+						}
 					}
 				Button {
 					showEditTimetableSheet = true
@@ -287,33 +290,6 @@ struct SettingsView: View {
 			}
 		}
 	#endif // DEBUG
-
-	private func loadOwnerVisibility() async {
-		guard sessionStore.isAuthenticated else { return }
-		do {
-			let response: OwnerTimetableResponse = try await NetworkManager.shared.send(Endpoint("/v1/timetables/owner"))
-			ownerIsSearchable = response.isSearchable
-			ownerVisibilityLoaded = true
-		} catch {
-			statusBadgeManager.addBadge(id: UUID(), title: "Unable to load timetable visibility", secondaryText: error.localizedDescription, priority: 4, view: .error)
-		}
-	}
-
-	private func saveOwnerVisibility(_ searchable: Bool) async {
-		guard sessionStore.isAuthenticated else {
-			showSignInRequired()
-			return
-		}
-
-		do {
-			let current: OwnerTimetableResponse = try await NetworkManager.shared.send(Endpoint("/v1/timetables/owner"))
-			let _: OwnerTimetableResponse = try await NetworkManager.shared.send(Endpoint("/v1/timetables/owner", method: .put), body: OwnerTimetableUpdateRequest(subjects: subjects, expectedRevision: current.revision, isSearchable: searchable))
-			statusBadgeManager.addBadge(id: UUID(), title: "Preferences saved", priority: 3, view: .success)
-		} catch {
-			ownerIsSearchable.toggle()
-			statusBadgeManager.addBadge(id: UUID(), title: "Unable to update visibility", secondaryText: error.localizedDescription, priority: 4, view: .error)
-		}
-	}
 
 	private func showSignInRequired() {
 		statusBadgeManager.addBadge(id: UUID(), title: "Sign in required", secondaryText: "Sign in to use this feature.", priority: 3, view: .warning)

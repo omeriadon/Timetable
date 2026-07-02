@@ -92,7 +92,8 @@ final class OwnerTimetableSyncService {
 			.v1OwnerTimetableUpdate,
 			body: OwnerTimetableUpdateRequest(
 				subjects: Defaults[.timetable],
-				expectedRevision: current.revision
+				expectedRevision: current.revision,
+				isSearchable: Defaults[.ownerIsSearchable]
 			)
 		)
 		Defaults[.lastServerSync] = Date.now
@@ -108,6 +109,7 @@ final class OwnerTimetableSyncService {
 		let start = clock.now
 		let response: OwnerTimetableResponse = try await networkManager.send(.v1OwnerTimetable)
 		Defaults[.timetable] = response.subjects
+		Defaults[.ownerIsSearchable] = response.isSearchable
 		Defaults[.lastServerSync] = Date.now
 		Print(
 			"Downloaded owner timetable revision \(response.revision)",
@@ -127,6 +129,7 @@ final class OwnerTimetableSyncService {
 
 		if localTimetable.isEmpty || serverIsNewer {
 			Defaults[.timetable] = response.subjects
+			Defaults[.ownerIsSearchable] = response.isSearchable
 			Defaults[.lastServerSync] = Date.now
 			return
 		}
@@ -135,7 +138,8 @@ final class OwnerTimetableSyncService {
 			.v1OwnerTimetableUpdate,
 			body: OwnerTimetableUpdateRequest(
 				subjects: localTimetable,
-				expectedRevision: response.revision
+				expectedRevision: response.revision,
+				isSearchable: Defaults[.ownerIsSearchable]
 			)
 		)
 		Defaults[.lastServerSync] = Date.now

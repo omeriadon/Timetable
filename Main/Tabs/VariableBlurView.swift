@@ -17,7 +17,7 @@
 
 		public init(
 			topRadius: CGFloat = 2,
-			bottomRadius: CGFloat = 10,
+			bottomRadius: CGFloat = 6,
 			animationDuration: TimeInterval = 0
 		) {
 			self.topRadius = topRadius

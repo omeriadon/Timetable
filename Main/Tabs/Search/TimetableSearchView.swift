@@ -37,10 +37,6 @@ struct TimetableSearchView: View {
 						SearchLandingView()
 							.transition(.blurReplace)
 
-					} else if !(3 ..< 50).contains(cleanedQuery.count) {
-						ContentUnavailableView("Keep Typing", systemImage: "text.magnifyingglass", description: Text("Search terms must contain 3 to 49 characters."))
-							.transition(.blurReplace)
-
 					} else if service.results.isEmpty,
 					          service.isSearching || completedSearchQuery != cleanedQuery
 					{
@@ -73,16 +69,13 @@ struct TimetableSearchView: View {
 				}
 				.animation(.easeOut(duration: 0.25), value: "\(sessionStore.isAuthenticated)\(query)\(service.results.isEmpty)\(service.isSearching)")
 				.toolbar {
-					if !isSearchPresented {
-						ToolbarItem(placement: .largeTitle) {
-							Text("Search")
-								.monospaced()
-								.font(.largeTitle)
-								.bold()
-						}
+					ToolbarItem(placement: .subtitle) {
+						Text("Search")
+							.monospaced()
+							.font(.largeTitle)
+							.bold()
 					}
 				}
-				.navigationBarTitleDisplayMode(.large)
 				.overlay {
 					ZStack {
 						if service.isSearching {
@@ -149,7 +142,7 @@ struct SearchLandingView: View {
 				.aspectRatio(contentMode: .fit)
 				.frame(maxWidth: .infinity)
 				.padding(.horizontal, 100)
-				.animation(.spring(duration: 0.5, bounce: 0.8, blendDuration: 0)) { view in
+				.animation(.spring(duration: 0.5, bounce: 1, blendDuration: 0)) { view in
 					view
 						.scaleEffect(isInteracting ? 1.05 : 0.95)
 						.stickerEffect()

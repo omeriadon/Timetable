@@ -82,7 +82,7 @@ struct AccountAuthenticationView: View {
 				} onCompletion: { result in
 					handleAppleCompletion(result)
 				}
-				.signInWithAppleButtonStyle(.black)
+				.signInWithAppleButtonStyle(.white)
 				.frame(height: 50)
 				.clipShape(.capsule)
 				.disabled(model.isSubmitting)

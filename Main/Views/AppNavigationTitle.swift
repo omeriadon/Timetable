@@ -10,16 +10,13 @@ extension View {
 	func appNavigationTitle(_ title: String, style: AppNavigationTitleStyle = .subview) -> some View {
 		navigationTitle(title)
 		#if os(iOS)
-			.navigationBarTitleDisplayMode(style == .main ? .large : .inline)
+			.navigationBarTitleDisplayMode(.inline)
 			.toolbar {
-				ToolbarItem(placement: style == .main ? .largeTitle : .principal) {
-					HStack {
-						Text(title)
-							.font(style == .main ? .largeTitle : .title2)
-							.bold()
-							.monospaced()
-						Spacer(minLength: 1)
-					}
+				ToolbarItem(placement: .principal) {
+					Text(title)
+						.font(style == .main ? .largeTitle : .title2)
+						.bold()
+						.monospaced()
 				}
 			}
 			.scrollEdgeEffectStyle(.soft, for: .top)

@@ -22,4 +22,5 @@ extension Defaults.Keys {
 	static let receivedTimetables = Key<[ReceivedTimetable]>("receivedTimetables", default: [], suite: sharedDefaults)
 	static let userDisplayName = Key<String>("userDisplayName", default: "My Timetable", suite: sharedDefaults)
 	static let walletRevision = Key<Int>("walletRevision", default: 0, suite: sharedDefaults)
+	static let ownerIsSearchable = Key<Bool>("ownerIsSearchable", default: true, suite: sharedDefaults)
 }
