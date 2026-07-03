@@ -19,8 +19,6 @@ struct AccountAndSyncSettingsView: View {
 	@State private var committedSettings = Defaults[.accountSettings]
 	@State private var saveGeneration = 0
 
-	@State var statusUUID = UUID()
-
 	var body: some View {
 		Form {
 			Toggle(isOn: preferenceBinding(\.liveActivitiesEnabled)) {
@@ -58,52 +56,22 @@ struct AccountAndSyncSettingsView: View {
 							}
 						}
 					} label: {
-						Label("Send Test Notification", systemImage: "bell.badge")
-							.tint(.accent)
-							.opacity(settings.notificationsEnabled && notificationRegistration.registrationState != .registered ? 1 : 0.5)
-
-						ZStack {
+						VStack(alignment: .leading) {
+							Label("Send Test Notification", systemImage: "bell.badge")
 							switch notificationRegistration.registrationState {
-								case .idle:
-									EmptyView()
+								case let .failed(message):
+									Text(message).foregroundStyle(.red.secondary)
 								case .registering:
-									Text("Registering...")
+									Text("Registering this device…").foregroundStyle(.secondary)
+								case .idle, .tokenReceived:
+									Text("Sign in and wait for device registration to finish.").foregroundStyle(.secondary)
 								case .registered:
 									EmptyView()
-								case .failed:
-									Text("Notification registration failed. Signing out and back in might help.")
-										.foregroundStyle(.red.secondary)
-										.font(.callout)
-										.transition(.blurReplace)
 							}
 						}
+						.font(.callout)
 					}
 					.disabled(!settings.notificationsEnabled || notificationRegistration.registrationState != .registered)
-					.onChange(of: "\(notificationsRequired)\(notificationRegistration.registrationState)") {
-						if notificationsRequired, notificationRegistration.registrationState == .registering {
-							badges.addBadge(id: statusUUID, title: "Registering this device…", priority: 5, view: .progressView)
-						}
-
-						if notificationsRequired, notificationRegistration.registrationState == .failed {
-							badges.updateBadge(id: statusUUID, title: "Device notification registration failed.", view: .error)
-						}
-
-						if notificationsRequired,
-						   notificationRegistration.registrationState == .registered
-						{
-							badges.addBadge(
-								id: statusUUID,
-								title: "Device registered",
-								priority: 5,
-								view: .success
-							)
-						}
-					}
-					.onChange(of: notificationsRequired) {
-						if !notificationsRequired {
-							statusUUID = UUID()
-						}
-					}
 					.onChange(of: testResult) {
 						if let testResult {
 							if testResult == "Sent to 0 devices." {
@@ -115,8 +83,6 @@ struct AccountAndSyncSettingsView: View {
 							}
 						}
 					}
-					.opacity(settings.notificationsEnabled && notificationRegistration.registrationState != .registered ? 1 : 0.3)
-
 				#endif // os(iOS)
 			}
 
@@ -161,22 +127,7 @@ struct AccountAndSyncSettingsView: View {
 
 	private func save(_ proposed: AccountSettings, previous: AccountSettings, generation: Int) async {
 		do {
-			#if os(iOS)
-				let previouslyRequired = previous.notificationsEnabled || previous.broadcastNotificationsEnabled
-				let proposedRequired = proposed.notificationsEnabled || proposed.broadcastNotificationsEnabled
-				if !previouslyRequired, proposedRequired {
-					guard await NotificationRegistrationService.shared.reconcile(enabled: true) else {
-						if generation == saveGeneration { settings = previous }
-						return
-					}
-				}
-			#endif
 			try await settingsSync.updateSettings(proposed)
-			#if os(iOS)
-				if previouslyRequired, !proposedRequired {
-					_ = await NotificationRegistrationService.shared.reconcile(enabled: false)
-				}
-			#endif
 			guard generation == saveGeneration else { return }
 			committedSettings = proposed
 			badges.addBadge(id: UUID(), title: "Preferences saved", priority: 3, view: .success)
@@ -185,9 +136,5 @@ struct AccountAndSyncSettingsView: View {
 			settings = previous
 			badges.addBadge(id: UUID(), title: "Unable to save preferences", secondaryText: error.localizedDescription, priority: 4, view: .error)
 		}
-	}
-
-	private var notificationsRequired: Bool {
-		settings.notificationsEnabled || settings.broadcastNotificationsEnabled
 	}
 }

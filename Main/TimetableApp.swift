@@ -34,15 +34,11 @@ enum WindowMode: Int, Equatable, Identifiable {
 struct TimetableApp: App {
 	@State var expanded: WindowMode = .none
 
-	@Default(.userDisplayName) var userName
+	@Default(.hasCompletedOnboarding) private var hasCompletedOnboarding
 
 	@State private var passManager = TimetablePassManager()
 	@State private var sessionStore = SessionStore.shared
 	@State private var statusBadgeManager = StatusBadgeManager.shared
-
-	var showNameSheet: Bool {
-		userName.isEmpty
-	}
 
 	#if os(macOS)
 		@NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
@@ -77,25 +73,27 @@ struct TimetableApp: App {
 						sessionStore.configureAccountBootstrap {
 							try await AccountBootstrapService.shared.bootstrap()
 						}
+						sessionStore.configureDeviceLifecycle {
+							await NotificationRegistrationService.shared.uploadPendingToken()
+						} signingOut: {
+							await NotificationRegistrationService.shared.removeServerRegistration()
+						}
 						if Defaults[.installationID].isEmpty {
 							Defaults[.installationID] = DeviceIDProvider.shared.getDeviceID()
 						}
 						await indexEntities()
 						await sessionStore.restore()
 						#if os(iOS)
-							await NotificationRegistrationService.shared.reconcileWithStoredPreference()
+							NotificationRegistrationService.shared.requestRemoteRegistration()
 
 							try? await ShaderLibrary.compileStickerShaders()
 
 						#endif
 					}
 			#if os(iOS)
-					.sheet(isPresented: .constant(showNameSheet)) {
-						NameSheet()
-							.presentationDetents([.medium])
-							.presentationDragIndicator(.hidden)
+					.sheet(isPresented: .constant(!hasCompletedOnboarding)) {
+						OnboardingView()
 							.interactiveDismissDisabled()
-							.monospaced()
 					}
 					.environment(\.passManager, passManager)
 			#endif // os(iOS)

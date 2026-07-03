@@ -24,7 +24,7 @@
 			didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
 		) {
 			Task {
-				await NotificationRegistrationService.shared.upload(deviceToken: deviceToken)
+				await NotificationRegistrationService.shared.receive(deviceToken: deviceToken)
 			}
 		}
 
@@ -32,7 +32,7 @@
 			_: UIApplication,
 			didFailToRegisterForRemoteNotificationsWithError error: any Error
 		) {
-			NotificationRegistrationService.shared.registrationFailed()
+			NotificationRegistrationService.shared.registrationFailed(error)
 			PrintError("APNs registration failed", category: .network, error: error)
 		}
 

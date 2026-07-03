@@ -131,6 +131,11 @@
 				Tabs/Search/TimetablePortalIdentityView.swift = (ios, );
 				Tabs/Search/TimetableSearchView.swift = (ios, );
 				Tabs/Settings/AddPassView.swift = (ios, xros, );
+				Views/Onboarding/OnboardingPage.swift = (ios, );
+				Views/Onboarding/OnboardingPageContext.swift = (ios, );
+				Views/Onboarding/OnboardingView.swift = (ios, );
+				Views/Onboarding/Views/Calendar/CalendarPermission.swift = (ios, );
+				Views/Onboarding/Views/OnboardingAccountView.swift = (ios, );
 				macOS/AppDelegate.swift = (macos, );
 				macOS/CustomMaterialView.swift = (macos, );
 			};

@@ -11,10 +11,10 @@ import SwiftUI
 
 struct CalendarImportView: View {
 	@Environment(\.dismiss) var dismiss
+	var dismissesWhenFinished = true
+	var completion: ((Bool) -> Void)?
 
 	@Default(.timetable) var subjects
-
-	@State var sheetHeight = 0.0
 
 	@State private var calendarImportStatus = CalendarImportStatus.loading
 	@State private var calendarImportStep = CalendarImportStep.checkingAuthorisation
@@ -75,6 +75,17 @@ struct CalendarImportView: View {
 
 				Text("\(calendarImportStep.total)")
 			}
+
+			if case .error = calendarImportStatus {
+				if !dismissesWhenFinished {
+					Button("Try Again", systemImage: "arrow.clockwise") {
+						calendarImportStatus = .loading
+						calendarImportStep = .checkingAuthorisation
+						Task { await performCalendarImport() }
+					}
+					.buttonStyle(.glassProminent)
+				}
+			}
 		}
 		.animation(.easeInOut, value: calendarImportStep)
 		.task {
@@ -83,15 +94,7 @@ struct CalendarImportView: View {
 		.ignoresSafeArea()
 		.padding([.horizontal], 32)
 		.monospaced()
-		.background {
-			GeometryReader { proxy in
-				Color.clear
-					.onAppear {
-						sheetHeight = proxy.size.height
-					}
-			}
-		}
-		.presentationDetents([.height(sheetHeight)])
+		.presentationDetents(dismissesWhenFinished ? [.medium] : [.large])
 		.interactiveDismissDisabled()
 		.presentationDragIndicator(.hidden)
 	}
@@ -105,10 +108,13 @@ struct CalendarImportView: View {
 	func errorAndExit(_ error: String) {
 		calendarImportStep = .error(error)
 		calendarImportStatus = .error
+		completion?(false)
 		Task {
 			PrintError("[iOS] error: \(error)")
-			try? await Task.sleep(for: .seconds(2))
-			dismiss()
+			if dismissesWhenFinished {
+				try? await Task.sleep(for: .seconds(2))
+				dismiss()
+			}
 		}
 	}
 
@@ -164,9 +170,12 @@ struct CalendarImportView: View {
 			await moveForward(to: .done)
 			Print("[iOS] Calendar Import: Success!")
 			calendarImportStatus = .success
-			try? await Task.sleep(for: .seconds(2))
-			dismiss()
-			calendarImportStatus = .loading
+			completion?(true)
+			if dismissesWhenFinished {
+				try? await Task.sleep(for: .seconds(2))
+				dismiss()
+				calendarImportStatus = .loading
+			}
 
 		} catch {
 			errorAndExit(error.localizedDescription)

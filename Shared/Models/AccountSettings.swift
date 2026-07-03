@@ -29,7 +29,7 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 
 	static let `default` = AccountSettings(
 		liveActivitiesEnabled: true,
-		notificationsEnabled: false,
+		notificationsEnabled: true,
 		broadcastNotificationsEnabled: true,
 		notificationLeadTime: .zero
 	)

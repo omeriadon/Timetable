@@ -43,6 +43,8 @@ final class SessionStore {
 	private let accessTokenKey = "com.omeriadon.Timetable.session.accessToken"
 	private let refreshTokenKey = "com.omeriadon.Timetable.session.refreshToken"
 	private var accountBootstrapHandler: (() async throws -> Void)?
+	private var authenticatedHandler: (() async -> Void)?
+	private var signingOutHandler: (() async -> Void)?
 	private var watchAuthenticatedHandler: ((String, String, AccountProfile) -> Void)?
 	private var watchSignedOutHandler: (() -> Void)?
 
@@ -64,6 +66,7 @@ final class SessionStore {
 		if let accessToken, !accessToken.isEmpty {
 			state = .authenticated(profile)
 			syncSessionToWatch(profile: profile)
+			await authenticatedHandler?()
 			if let accountBootstrapHandler {
 				try? await accountBootstrapHandler()
 			}
@@ -183,6 +186,7 @@ final class SessionStore {
 
 	func signOut() async {
 		Print("Signing out account", category: .account)
+		await signingOutHandler?()
 		if let refreshToken, accessToken != nil {
 			do {
 				try await networkManager.send(.v1AuthLogout, body: LogoutRequest(refreshToken: refreshToken))
@@ -212,6 +216,14 @@ final class SessionStore {
 		accountBootstrapHandler = bootstrap
 	}
 
+	func configureDeviceLifecycle(
+		authenticated: @escaping () async -> Void,
+		signingOut: @escaping () async -> Void
+	) {
+		authenticatedHandler = authenticated
+		signingOutHandler = signingOut
+	}
+
 	func receiveWatchSession(_ envelope: WatchSessionEnvelope) async throws {
 		switch envelope.event {
 			case .signedOut:
@@ -236,6 +248,7 @@ final class SessionStore {
 				Defaults[.userDisplayName] = profile.displayName
 				state = .authenticated(profile)
 				configureNetworkAuthentication()
+				await authenticatedHandler?()
 				if let accountBootstrapHandler {
 					try await accountBootstrapHandler()
 				}
@@ -273,6 +286,7 @@ final class SessionStore {
 		let profile = persist(response.user)
 		state = .authenticated(profile)
 		syncSessionToWatch(profile: profile)
+		await authenticatedHandler?()
 		if bootstrap, let accountBootstrapHandler {
 			try await accountBootstrapHandler()
 		}
