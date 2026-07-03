@@ -13,13 +13,17 @@ private let sharedDefaults = UserDefaults(suiteName: "group.omeriadon.timetable"
 extension Defaults.Keys {
 	static let accountProfile = Key<AccountProfile?>("accountProfile", default: nil, suite: sharedDefaults)
 	static let accountSettings = Key<AccountSettings>("accountSettings", default: .default, suite: sharedDefaults)
+
 	static let hasCompletedAccountBootstrap = Key<Bool>("hasCompletedAccountBootstrap", default: false, suite: sharedDefaults)
 	static let hasCompletedOnboarding = Key<Bool>("hasCompletedOnboarding", default: false, suite: sharedDefaults)
 	static let hasRegisteredAPNsToken = Key<Bool>("hasRegisteredAPNsToken", default: false, suite: sharedDefaults)
 	static let pendingAPNsToken = Key<String>("pendingAPNsToken", default: "", suite: sharedDefaults)
+
 	static let installationID = Key<String>("installationID", default: "", suite: sharedDefaults)
+
 	static let lastServerSync = Key<Date?>("lastServerSync", default: nil, suite: sharedDefaults)
 	static let lastWalletReconciliation = Key<Date?>("lastWalletReconciliation", default: nil, suite: sharedDefaults)
+
 	static let receivedNameOverrides = Key<[String: String]>("receivedNameOverrides", default: [:], suite: sharedDefaults)
 	static let timetable = Key<[Subject]>("timetable", default: [], suite: sharedDefaults)
 	static let receivedTimetables = Key<[ReceivedTimetable]>("receivedTimetables", default: [], suite: sharedDefaults)

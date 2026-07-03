@@ -17,7 +17,7 @@ struct OnboardingCalendarPermissionView: View {
 	@State private var eventStore = EKEventStore()
 
 	var body: some View {
-		VStack(spacing: 24) {
+		VStack(spacing: 40) {
 			Image(systemName: "calendar.badge.checkmark")
 				.font(.system(size: 72))
 			Text("Timetable requires calendar access to import and maintain your school schedule.")
@@ -31,6 +31,7 @@ struct OnboardingCalendarPermissionView: View {
 				Button("Allow Calendar Access", systemImage: "calendar") {
 					Task { await requestAccess() }
 				}
+				.controlSize(.extraLarge)
 				.buttonStyle(.glassProminent)
 			}
 		}

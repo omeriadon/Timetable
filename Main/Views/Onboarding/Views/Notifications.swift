@@ -13,7 +13,6 @@ import UserNotifications
 
 struct OnboardingNotificationPermissionView: View {
 	@Environment(\.onboardingPageContext) private var context
-	@State private var hasDecided = false
 
 	var body: some View {
 		VStack(spacing: 40) {
@@ -32,13 +31,12 @@ struct OnboardingNotificationPermissionView: View {
 
 			Button("Not Now") {
 				disableNotificationPreferences()
-				hasDecided = true
 				context.configure(canAdvance: true, statusMessage: "Notifications remain disabled.")
 			}
 			.buttonStyle(.glass)
 		}
 		.onAppear {
-			context.configure(canAdvance: hasDecided)
+			context.isWorking = false
 		}
 	}
 
@@ -47,14 +45,12 @@ struct OnboardingNotificationPermissionView: View {
 		defer { context.isWorking = false }
 		do {
 			let granted = try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge])
-			hasDecided = true
 			if !granted { disableNotificationPreferences() }
 			context.configure(
 				canAdvance: true,
 				statusMessage: granted ? "Notifications enabled." : "Notifications remain disabled."
 			)
 		} catch {
-			hasDecided = true
 			disableNotificationPreferences()
 			context.configure(canAdvance: true, statusMessage: error.localizedDescription)
 		}

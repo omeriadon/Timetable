@@ -134,8 +134,8 @@
 				Views/Onboarding/OnboardingPage.swift = (ios, );
 				Views/Onboarding/OnboardingPageContext.swift = (ios, );
 				Views/Onboarding/OnboardingView.swift = (ios, );
-				Views/Onboarding/Views/Calendar/CalendarPermission.swift = (ios, );
-				Views/Onboarding/Views/OnboardingAccountView.swift = (ios, );
+				Views/Onboarding/Views/Account.swift = (ios, );
+				Views/Onboarding/Views/CalendarPermission.swift = (ios, );
 				macOS/AppDelegate.swift = (macos, );
 				macOS/CustomMaterialView.swift = (macos, );
 			};

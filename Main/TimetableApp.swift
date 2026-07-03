@@ -91,7 +91,7 @@ struct TimetableApp: App {
 						#endif
 					}
 			#if os(iOS)
-					.sheet(isPresented: .constant(!hasCompletedOnboarding)) {
+					.fullScreenCover(isPresented: .constant(!hasCompletedOnboarding)) {
 						OnboardingView()
 							.interactiveDismissDisabled()
 					}

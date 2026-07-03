@@ -11,9 +11,15 @@ import SwiftUI
 @MainActor
 @Observable
 final class OnboardingPageContext {
-	var canAdvance = false
-	var isWorking = false
+	var canAdvance: Bool
+	var isWorking: Bool
 	var statusMessage: String?
+
+	init(canAdvance: Bool = false, isWorking: Bool = false, statusMessage: String? = nil) {
+		self.canAdvance = canAdvance
+		self.isWorking = isWorking
+		self.statusMessage = statusMessage
+	}
 
 	func configure(canAdvance: Bool, isWorking: Bool = false, statusMessage: String? = nil) {
 		self.canAdvance = canAdvance

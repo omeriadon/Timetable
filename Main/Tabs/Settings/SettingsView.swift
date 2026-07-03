@@ -255,6 +255,10 @@ struct SettingsView: View {
 						statusBadgeManager.updateBadge(id: id, title: "Prepared Wallet pass", view: .success)
 					}
 				}
+
+				Button("reset onboarding") {
+					Defaults[.hasCompletedOnboarding] = false
+				}
 			#endif // DEBUG
 
 			Button {
