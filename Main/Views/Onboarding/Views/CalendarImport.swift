@@ -46,6 +46,10 @@ struct OnboardingCalendarImportView: View {
 							isWorking: false,
 							statusMessage: succeeded ? "Calendar imported." : "Calendar import failed."
 						)
+						Task {
+							try? await Task.sleep(for: .seconds(2))
+							clickedImport = false
+						}
 					}
 					.padding(10)
 					.padding(.top, 5)

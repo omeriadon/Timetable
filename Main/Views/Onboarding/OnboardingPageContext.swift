@@ -29,5 +29,7 @@ final class OnboardingPageContext {
 }
 
 extension EnvironmentValues {
-	@Entry var onboardingPageContext = OnboardingPageContext()
+	static var context = OnboardingPageContext()
+
+	@Entry var onboardingPageContext = context
 }

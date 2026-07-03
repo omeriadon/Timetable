@@ -1,0 +1,39 @@
+//
+//  NotifTutorial.swift
+//  Timetable
+//
+//  Created by Adon Omeri on 3/7/2026.
+//
+
+import SwiftUI
+
+struct NotifTutorial: View {
+	@Environment(\.onboardingPageContext) private var context
+
+	var body: some View {
+		VStack(spacing: 50) {
+			Text("Notifications can tell you your next class...")
+				.font(.title2)
+
+			Image("onboarding/nextClass")
+				.resizable()
+				.aspectRatio(contentMode: .fit)
+				.padding(.horizontal, 20)
+
+			Text("Or any special one-off events.")
+				.font(.title2)
+
+			Image("onboarding/broadcast")
+				.resizable()
+				.aspectRatio(contentMode: .fit)
+				.padding(.horizontal, 20)
+		}
+		.onAppear {
+			context.configure(canAdvance: true)
+		}
+	}
+}
+
+#Preview {
+	WidgetTutorial()
+}

@@ -17,6 +17,24 @@ struct OnboardingView: View {
 	@State private var selectedID = ""
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+	private var isBackDisabled: Bool {
+		#if DEBUG
+			selectedIndex == 0
+		#else
+			selectedIndex == 0 || selectedContext?.isWorking == true
+		#endif
+	}
+
+	private var isNextDisabled: Bool {
+		#if DEBUG
+			pages.isEmpty
+		#else
+			selectedContext?.canAdvance != true
+				|| selectedContext?.isWorking == true
+				|| pages.isEmpty
+		#endif
+	}
+
 	var body: some View {
 		GeometryReader { geometry in
 			ZStack {
@@ -88,7 +106,7 @@ struct OnboardingView: View {
 			.font(.title3)
 			.buttonStyle(.glassProminent)
 			.controlSize(.extraLarge)
-			.disabled(selectedIndex == 0 || selectedContext?.isWorking == true)
+			.disabled(isBackDisabled)
 
 			Spacer()
 
@@ -107,14 +125,16 @@ struct OnboardingView: View {
 				HStack {
 					Text(selectedIndex == pages.count - 1 ? "Finish" : "Next")
 
-					Image(systemName: "chevron.right")
+					if !(selectedIndex == pages.count - 1) {
+						Image(systemName: "chevron.right")
+					}
 				}
 			}
 			.buttonSizing(.flexible)
 			.font(.title3)
 			.buttonStyle(.glassProminent)
 			.controlSize(.extraLarge)
-			.disabled(selectedContext?.canAdvance != true || selectedContext?.isWorking == true || pages.isEmpty)
+			.disabled(isNextDisabled)
 		}
 		.padding(.horizontal, 30)
 	}
@@ -192,8 +212,20 @@ struct OnboardingView: View {
 				OnboardingAccountView()
 			},
 			OnboardingPage(id: "finished", title: "Ready to Begin") {
-//				OnboardingSimplePage(systemImage: "checkmark.circle.fill", text: "Timetable is configured for this device.")
-				Text("")
+				Text("Here's an overview of Timetable's features...")
+					.font(.title)
+			},
+			OnboardingPage(id: "widget", title: "Widgets") {
+				WidgetTutorial()
+			},
+			OnboardingPage(id: "notif", title: "Notifications") {
+				NotifTutorial()
+			},
+			OnboardingPage(id: "share", title: "Share Timetables") {
+				ShareTutorial()
+			},
+			OnboardingPage(id: "actualFinished", title: "Ready to use Timetable!") {
+				Text("monkey")
 			},
 		]
 	}
