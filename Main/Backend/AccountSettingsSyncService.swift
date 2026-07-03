@@ -132,6 +132,11 @@ final class AccountSettingsSyncService {
 
 	private func applyLocalSideEffects() {
 		WidgetCenter.shared.reloadAllTimelines()
+		#if os(iOS)
+			Task {
+				await LiveActivityRegistrationService.shared.reconcileAuthorization()
+			}
+		#endif
 	}
 }
 

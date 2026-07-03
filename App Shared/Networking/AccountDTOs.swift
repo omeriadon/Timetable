@@ -186,6 +186,22 @@ nonisolated struct UserDeviceResponse: Codable {
 	let lastSeenAt: Date
 }
 
+nonisolated struct LiveActivityPushToStartTokenRequest: Codable {
+	let installationID: String
+	let token: String
+	let isDebug: Bool
+}
+
+nonisolated struct RemoveLiveActivityTokenRequest: Codable {
+	let installationID: String
+}
+
+nonisolated struct LiveActivityUpdateTokenRequest: Codable {
+	let installationID: String
+	let token: String
+	let isDebug: Bool
+}
+
 nonisolated struct TestNotificationResponse: Codable {
 	let deliveredDeviceCount: Int
 }

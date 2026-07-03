@@ -75,7 +75,13 @@ struct TimetableApp: App {
 						}
 						sessionStore.configureDeviceLifecycle {
 							await NotificationRegistrationService.shared.uploadPendingToken()
+							#if os(iOS)
+								await LiveActivityRegistrationService.shared.startObserving()
+							#endif
 						} signingOut: {
+							#if os(iOS)
+								await LiveActivityRegistrationService.shared.removeLiveActivityToken()
+							#endif
 							await NotificationRegistrationService.shared.removeServerRegistration()
 						}
 						if Defaults[.installationID].isEmpty {
@@ -85,6 +91,7 @@ struct TimetableApp: App {
 						await sessionStore.restore()
 						#if os(iOS)
 							NotificationRegistrationService.shared.requestRemoteRegistration()
+							await LiveActivityRegistrationService.shared.startObserving()
 
 							try? await ShaderLibrary.compileStickerShaders()
 
