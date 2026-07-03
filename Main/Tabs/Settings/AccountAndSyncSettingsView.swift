@@ -21,18 +21,16 @@ struct AccountAndSyncSettingsView: View {
 
 	var body: some View {
 		Form {
-			Section("Account Settings") {
-				Toggle("Live Activities", isOn: preferenceBinding(\.liveActivitiesEnabled))
-				Toggle("Allow Notifications", isOn: preferenceBinding(\.notificationsEnabled))
-				Toggle("Special Event Notifications", isOn: preferenceBinding(\.broadcastNotificationsEnabled))
-				Picker("Notification Advance", selection: leadTimeBinding) {
-					ForEach(NotificationLeadTime.allCases, id: \.self) { leadTime in
-						Text("\(leadTime.minutes) \(leadTime.minutes == 1 ? "minute" : "minutes")")
-							.tag(leadTime)
-					}
+			Toggle(isOn: preferenceBinding(\.liveActivitiesEnabled)) {
+				Text("Live Activities")
+				Text("Show live countdowns and details throughout the day, including on your Watch.")
+			}
+
+			Section {
+				Toggle(isOn: preferenceBinding(\.notificationsEnabled)) {
+					Text("Allow Class Notifications")
+					Text("Send notifications for each class.")
 				}
-				.pickerStyle(.wheel)
-				.disabled(!settings.notificationsEnabled)
 
 				#if os(iOS)
 					Button("Send Test Notification", systemImage: "bell.badge") {
@@ -46,30 +44,47 @@ struct AccountAndSyncSettingsView: View {
 						}
 					}
 					.disabled(!settings.notificationsEnabled || notificationRegistration.registrationState != .registered)
+					.onChange(of: "\(notificationsRequired)\(notificationRegistration.registrationState)") {
+						if notificationsRequired, notificationRegistration.registrationState == .registering {
+							StatusBadgeManager().addBadge(id: UUID(), title: "Registering this device…", priority: 5, view: .progressView)
+						}
 
-					if notificationsRequired, notificationRegistration.registrationState == .registering {
-						Text("Registering this device…")
-							.font(.footnote)
-							.foregroundStyle(.secondary)
+						if notificationsRequired, notificationRegistration.registrationState == .failed {
+							StatusBadgeManager().addBadge(id: UUID(), title: "Device notification registration failed.", priority: 5, view: .error)
+						}
 					}
-
-					if notificationsRequired, notificationRegistration.registrationState == .failed {
-						Text("Device notification registration failed.")
-							.font(.footnote)
-							.foregroundStyle(.secondary)
+					.onChange(of: testResult) {
+						if let testResult {
+							if testResult == "Sent to 0 devices." {
+								StatusBadgeManager().addBadge(id: UUID(), title: testResult, priority: 4, view: .error)
+							} else if testResult.contains("devices") || testResult == "Sent to 1 device." {
+								StatusBadgeManager().addBadge(id: UUID(), title: testResult, priority: 4, view: .success)
+							} else {
+								StatusBadgeManager().addBadge(id: UUID(), title: testResult, priority: 4, view: .error)
+							}
+						}
 					}
-
-					if let testResult {
-						Text(testResult)
-							.font(.footnote)
-							.foregroundStyle(.secondary)
-					}
-				#endif
+				#endif // os(iOS)
 			}
+
 			Section {
-				Text("Special Event Notifications include announcements and limited-time events. This preference is independent from timetable notifications.")
-					.font(.footnote)
-					.foregroundStyle(.secondary)
+				Toggle(isOn: preferenceBinding(\.broadcastNotificationsEnabled)) {
+					Text("Special Event Notifications")
+					Text("Special Event Notifications include announcements and limited-time events. This preference is independent from timetable notifications.")
+				}
+
+				VStack {
+					Text("Send Notifications Early By...")
+					Picker("Send Notiications Early By...", selection: leadTimeBinding) {
+						ForEach(NotificationLeadTime.allCases, id: \.self) { leadTime in
+							Text("\(leadTime.minutes) \(leadTime.minutes == 1 ? "minute " : "minutes")")
+								.tag(leadTime)
+						}
+					}
+					.pickerStyle(.wheel)
+					.disabled(!settings.broadcastNotificationsEnabled)
+				}
+				.opacity(settings.broadcastNotificationsEnabled ? 1 : 0.5)
 			}
 		}
 		.appNavigationTitle("Preferences")

@@ -30,7 +30,7 @@ nonisolated enum Teacher: Codable, Hashable {
 
 	var displayName: String {
 		switch self {
-			case let .named(lastName): "Teacher: \(lastName)"
+			case let .named(lastName): lastName
 			case let .unknown(rawNotes): rawNotes
 		}
 	}

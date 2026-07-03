@@ -57,11 +57,13 @@ struct TimetableView: View {
 		NavigationStack {
 			VStack {
 				ScrollView {
-					if let selectedSlot, let subject = subjectLookup[selectedSlot] {
-						SelectedSubjectDetailsView(subject: subject)
-							.padding([.horizontal, .top])
+					let subject: Subject? = if let selectedSlot, let subject = subjectLookup[selectedSlot] {
+						subject
+					} else {
+						nil
 					}
-					TimetableComparison(selectedSlot: selectedSlot)
+
+					TimetableComparison(selectedSlot: selectedSlot, subject: subject)
 						.opacity(selectedSlot == nil ? 0 : 1)
 						.blur(radius: selectedSlot == nil ? 20 : 0)
 						.allowsHitTesting(selectedSlot != nil)

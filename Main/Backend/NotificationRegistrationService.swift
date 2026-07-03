@@ -83,7 +83,14 @@
 					body: RegisterUserDeviceRequest(
 						installationID: Defaults[.installationID],
 						platform: Self.platform,
-						apnsToken: token
+						apnsToken: token,
+						isDebug: {
+							#if DEBUG
+								true
+							#else
+								false
+							#endif
+						}()
 					)
 				)
 				registrationState = .registered

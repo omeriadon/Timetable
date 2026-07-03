@@ -171,6 +171,8 @@ nonisolated struct RegisterUserDeviceRequest: Codable {
 	let installationID: String
 	let platform: String
 	let apnsToken: String
+	/// `true` when the token is from a debug/sandbox build.
+	let isDebug: Bool
 }
 
 nonisolated struct RemoveUserDeviceRequest: Codable {
@@ -180,6 +182,7 @@ nonisolated struct RemoveUserDeviceRequest: Codable {
 nonisolated struct UserDeviceResponse: Codable {
 	let installationID: String
 	let platform: String
+	let isDebug: Bool
 	let lastSeenAt: Date
 }
 
