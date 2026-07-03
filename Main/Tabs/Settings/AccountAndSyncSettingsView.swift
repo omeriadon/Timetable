@@ -19,58 +19,19 @@ struct AccountAndSyncSettingsView: View {
 	@State private var committedSettings = Defaults[.accountSettings]
 	@State private var saveGeneration = 0
 
+	@State var statusUUID = UUID()
+
 	var body: some View {
 		Form {
 			Toggle(isOn: preferenceBinding(\.liveActivitiesEnabled)) {
 				Text("Live Activities")
-				Text("Show live countdowns and details throughout the day, including on your Watch.")
+				Text("Show live countdowns and details for your subjects and breaks throughout the school day, including on your Watch.")
 			}
 
 			Section {
 				Toggle(isOn: preferenceBinding(\.notificationsEnabled)) {
 					Text("Allow Class Notifications")
-					Text("Send notifications for each class.")
-				}
-
-				#if os(iOS)
-					Button("Send Test Notification", systemImage: "bell.badge") {
-						Task {
-							do {
-								let count = try await notificationRegistration.sendTestNotification()
-								testResult = count == 1 ? "Sent to 1 device." : "Sent to \(count) devices."
-							} catch {
-								testResult = error.localizedDescription
-							}
-						}
-					}
-					.disabled(!settings.notificationsEnabled || notificationRegistration.registrationState != .registered)
-					.onChange(of: "\(notificationsRequired)\(notificationRegistration.registrationState)") {
-						if notificationsRequired, notificationRegistration.registrationState == .registering {
-							StatusBadgeManager().addBadge(id: UUID(), title: "Registering this device…", priority: 5, view: .progressView)
-						}
-
-						if notificationsRequired, notificationRegistration.registrationState == .failed {
-							StatusBadgeManager().addBadge(id: UUID(), title: "Device notification registration failed.", priority: 5, view: .error)
-						}
-					}
-					.onChange(of: testResult) {
-						if let testResult {
-							if testResult == "Sent to 0 devices." {
-								StatusBadgeManager().addBadge(id: UUID(), title: testResult, priority: 4, view: .error)
-							} else if testResult.contains("devices") || testResult == "Sent to 1 device." {
-								StatusBadgeManager().addBadge(id: UUID(), title: testResult, priority: 4, view: .success)
-							} else {
-								StatusBadgeManager().addBadge(id: UUID(), title: testResult, priority: 4, view: .error)
-							}
-						}
-					}
-				#endif // os(iOS)
-			}
-
-			Section {
-				Toggle(isOn: preferenceBinding(\.broadcastNotificationsEnabled)) {
-					Text("Special Event Notifications")
-					Text("Special Event Notifications include announcements and limited-time events. This preference is independent from timetable notifications.")
+					Text("Send notifications for each class throughout the day.")
 				}
 
 				VStack {
@@ -82,11 +43,91 @@ struct AccountAndSyncSettingsView: View {
 						}
 					}
 					.pickerStyle(.wheel)
-					.disabled(!settings.broadcastNotificationsEnabled)
+					.disabled(!settings.notificationsEnabled)
 				}
-				.opacity(settings.broadcastNotificationsEnabled ? 1 : 0.5)
+				.opacity(settings.broadcastNotificationsEnabled ? 1 : 0.3)
+
+				#if os(iOS)
+					Button {
+						Task {
+							do {
+								let count = try await notificationRegistration.sendTestNotification()
+								testResult = count == 1 ? "Sent to 1 device." : "Sent to \(count) devices."
+							} catch {
+								testResult = error.localizedDescription
+							}
+						}
+					} label: {
+						Label("Send Test Notification", systemImage: "bell.badge")
+							.tint(.accent)
+							.opacity(settings.notificationsEnabled && notificationRegistration.registrationState != .registered ? 1 : 0.5)
+
+						ZStack {
+							switch notificationRegistration.registrationState {
+								case .idle:
+									EmptyView()
+								case .registering:
+									Text("Registering...")
+								case .registered:
+									EmptyView()
+								case .failed:
+									Text("Notification registration failed. Signing out and back in might help.")
+										.foregroundStyle(.red.secondary)
+										.font(.callout)
+										.transition(.blurReplace)
+							}
+						}
+					}
+					.disabled(!settings.notificationsEnabled || notificationRegistration.registrationState != .registered)
+					.onChange(of: "\(notificationsRequired)\(notificationRegistration.registrationState)") {
+						if notificationsRequired, notificationRegistration.registrationState == .registering {
+							badges.addBadge(id: statusUUID, title: "Registering this device…", priority: 5, view: .progressView)
+						}
+
+						if notificationsRequired, notificationRegistration.registrationState == .failed {
+							badges.updateBadge(id: statusUUID, title: "Device notification registration failed.", view: .error)
+						}
+
+						if notificationsRequired,
+						   notificationRegistration.registrationState == .registered
+						{
+							badges.addBadge(
+								id: statusUUID,
+								title: "Device registered",
+								priority: 5,
+								view: .success
+							)
+						}
+					}
+					.onChange(of: notificationsRequired) {
+						if !notificationsRequired {
+							statusUUID = UUID()
+						}
+					}
+					.onChange(of: testResult) {
+						if let testResult {
+							if testResult == "Sent to 0 devices." {
+								badges.addBadge(id: UUID(), title: testResult, priority: 4, view: .error)
+							} else if testResult.contains("devices") || testResult == "Sent to 1 device." {
+								badges.addBadge(id: UUID(), title: testResult, priority: 4, view: .success)
+							} else {
+								badges.addBadge(id: UUID(), title: testResult, priority: 4, view: .error)
+							}
+						}
+					}
+					.opacity(settings.notificationsEnabled && notificationRegistration.registrationState != .registered ? 1 : 0.3)
+
+				#endif // os(iOS)
+			}
+
+			Section {
+				Toggle(isOn: preferenceBinding(\.broadcastNotificationsEnabled)) {
+					Text("Special Event Notifications")
+					Text("Special Event Notifications include announcements and limited-time events, such as special school events.")
+				}
 			}
 		}
+		.animation(.easeInOut, value: notificationRegistration.registrationState)
 		.appNavigationTitle("Preferences")
 	}
 

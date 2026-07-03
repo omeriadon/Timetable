@@ -16,7 +16,7 @@ struct AccountView: View {
 	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
-		Group {
+		ZStack {
 			switch sessionStore.state {
 				case let .authenticated(profile):
 					List {

@@ -21,14 +21,18 @@ struct CapsuleInputRow: View {
 			Group {
 				if isSecure {
 					SecureField(title, text: $text)
+						.autocorrectionDisabled()
+						.textInputAutocapitalization(.never)
 				} else {
 					TextField(title, text: $text)
+						.autocorrectionDisabled()
+						.textInputAutocapitalization(.never)
 				}
 			}
 			.textFieldStyle(.plain)
 		}
 		.padding(.horizontal)
 		.frame(minHeight: 44)
-		.glassEffect(.regular.tint(.black.mix(with: .white, by: 0.4)).interactive(), in: .capsule)
+		.glassEffect(.regular.interactive(), in: .capsule)
 	}
 }

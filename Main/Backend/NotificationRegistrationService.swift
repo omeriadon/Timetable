@@ -62,7 +62,6 @@
 			}
 
 			registrationState = .idle
-			UIApplication.shared.unregisterForRemoteNotifications()
 			do {
 				try await networkManager.send(.v1CurrentDeviceDelete, body: RemoveUserDeviceRequest(installationID: Defaults[.installationID]))
 			} catch NetworkError.offline {
