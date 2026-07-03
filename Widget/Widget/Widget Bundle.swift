@@ -12,5 +12,8 @@ import WidgetKit
 struct TimetableWidgetBundle: WidgetBundle {
 	var body: some Widget {
 		SharedWidgetBundle()
+		#if os(iOS)
+			SchoolDayLiveActivityWidget()
+		#endif
 	}
 }
