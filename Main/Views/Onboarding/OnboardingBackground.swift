@@ -63,7 +63,7 @@ struct OnboardingBackground: View {
 			bias: .constant(0.00001),
 			noise: .constant(64),
 			transitionSpeed: $colorTransitionSpeed,
-			frameLimit: .constant(120),
+			frameLimit: .constant(60),
 			renderScale: .constant(1)
 		)
 		.background(.black)
