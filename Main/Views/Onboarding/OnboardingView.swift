@@ -224,6 +224,12 @@ struct OnboardingView: View {
 			OnboardingPage(id: "share", title: "Share Timetables") {
 				ShareTutorial()
 			},
+			OnboardingPage(id: "wallet", title: "Apple Wallet") {
+				WalletTutorial()
+			},
+			OnboardingPage(id: "timetableTypes", title: "Timetable Types") {
+				TimetableTypesTutorial()
+			},
 			OnboardingPage(id: "actualFinished", title: "Ready to use Timetable!") {
 				Text("monkey")
 			},

@@ -20,6 +20,9 @@ struct NotifTutorial: View {
 				.aspectRatio(contentMode: .fit)
 				.padding(.horizontal, 20)
 
+			Spacer()
+				.frame(height: 40)
+
 			Text("Or any special one-off events.")
 				.font(.title2)
 

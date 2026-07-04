@@ -11,34 +11,14 @@ struct ShareTutorial: View {
 	@Environment(\.onboardingPageContext) private var context
 
 	var body: some View {
-		ZStack {
+		VStack {
+			Text("Tap the share button at the right of the tab bar to bring up a list of timetables to share, select one, and then just tap your iPhone with your friend's iPhone to share a timetable.")
+				.font(.title2)
+
 			Image("onboarding/shareButton")
 				.resizable()
 				.aspectRatio(contentMode: .fit)
-				.mask {
-					LinearGradient(
-						stops: [
-							.init(color: .white, location: 0),
-							.init(color: .white, location: 0.55),
-							.init(color: .white.opacity(0.85), location: 0.72),
-							.init(color: .white.opacity(0.5), location: 0.90),
-							.init(color: .white.opacity(0.5), location: 1),
-						],
-						startPoint: .bottom,
-						endPoint: .top
-					)
-				}
-				.allowsHitTesting(false)
-
-			VariableBlurView(
-				maxBlurRadius: 24,
-				direction: .blurredTopClearBottom,
-				startOffset: 0.4
-			)
-		}
-		.overlay(alignment: .top) {
-			Text("Tap the share button at the right of the tab bar to bring up a list of timetables to share, select one, and then just tap your iPhone with your friend's iPhone to share a timetable.")
-				.font(.title2)
+				.padding(40)
 		}
 		.onAppear {
 			context.configure(canAdvance: true)

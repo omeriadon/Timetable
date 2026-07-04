@@ -16,21 +16,21 @@ enum OnboardingBackgroundStyle: Equatable {
 	static func style(for pageID: String) -> Self {
 		switch pageID {
 			case "splash":
-				.colorful(.aurora, opacity: 1, speed: 0.6)
+				.colorful(.aurora, opacity: 1, speed: 1)
 			case "calendar":
-				.colorful(.watermelon, opacity: 0.8, speed: 0.4)
+				.colorful(.watermelon, opacity: 0.8, speed: 0.6)
 			case "notifications":
-				.colorful(.dandelion, opacity: 0.6, speed: 0.4)
+				.colorful(.dandelion, opacity: 0.6, speed: 0.6)
 			case "calendar-import":
-				.colorful(.winter, opacity: 0.8, speed: 0.4)
+				.colorful(.winter, opacity: 0.8, speed: 0.6)
 			case "account":
-				.colorful(.summer, opacity: 0.8, speed: 0.4)
+				.colorful(.summer, opacity: 0.8, speed: 0.6)
 			case "apns":
-				.colorful(.sunset, opacity: 0.8, speed: 0.4)
+				.colorful(.sunset, opacity: 0.8, speed: 0.6)
 			case "finished":
-				.custom([.black, .black, .black, .black, .black, .black, .blue], opacity: 1, speed: 0.6)
+				.custom([.black, .black, .black, .black, .black, .black, .blue], opacity: 1, speed: 0.8)
 			case "actualFinished":
-				.colorful(.neon, opacity: 1, speed: 0.6)
+				.colorful(.neon, opacity: 1, speed: 0.8)
 			default:
 				.black
 		}
