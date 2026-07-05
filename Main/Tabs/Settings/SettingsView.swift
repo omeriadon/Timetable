@@ -225,6 +225,13 @@ struct SettingsView: View {
 
 		Section("Developer") {
 			#if DEBUG
+
+				#if os(iOS)
+					NavigationLink("Live Activity Debug") {
+						LiveActivityDebugView()
+					}
+				#endif
+
 				Button("Test progress badge", systemImage: "progress.indicator") {
 					addDebugStatusBadge(title: "Syncing account", secondaryText: "Working", view: .progressView)
 				}

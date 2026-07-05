@@ -11,9 +11,9 @@ import SwiftUI
 struct AccountAndSyncSettingsView: View {
 	@State private var settings = Defaults[.accountSettings]
 	@State private var settingsSync = AccountSettingsSyncService.shared
-	#if os(iOS)
-		@State private var notificationRegistration = NotificationRegistrationService.shared
-	#endif
+
+	@State private var notificationRegistration = NotificationRegistrationService.shared
+
 	@State private var testResult: String?
 	@Environment(\.statusBadgeManager) private var badges
 	@State private var committedSettings = Defaults[.accountSettings]
@@ -40,7 +40,11 @@ struct AccountAndSyncSettingsView: View {
 								.tag(leadTime)
 						}
 					}
+					#if os(iOS)
 					.pickerStyle(.wheel)
+					#else
+					.pickerStyle(.radioGroup)
+					#endif
 					.disabled(!settings.notificationsEnabled)
 				}
 				.opacity(settings.broadcastNotificationsEnabled ? 1 : 0.3)

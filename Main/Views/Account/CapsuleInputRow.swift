@@ -22,11 +22,15 @@ struct CapsuleInputRow: View {
 				if isSecure {
 					SecureField(title, text: $text)
 						.autocorrectionDisabled()
+					#if !os(macOS)
 						.textInputAutocapitalization(.never)
+					#endif
 				} else {
 					TextField(title, text: $text)
 						.autocorrectionDisabled()
+					#if !os(macOS)
 						.textInputAutocapitalization(.never)
+					#endif
 				}
 			}
 			.textFieldStyle(.plain)

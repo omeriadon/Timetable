@@ -23,7 +23,7 @@
 		2ABBBA042FF4AD3A00878A9D /* PortalHeaders in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2ABBBA032FF4AD3A00878A9D /* PortalHeaders */; };
 		2ABBBA062FF4AD3A00878A9D /* PortalTransitions in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2ABBBA052FF4AD3A00878A9D /* PortalTransitions */; };
 		2AC5F7ED2FD8435700B813EA /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AC5F7EC2FD8435700B813EA /* Defaults */; };
-		2ADFCA8F2FF66F1A00B4301E /* WindowOverlay in Frameworks */ = {isa = PBXBuildFile; productRef = 2ADFCA8E2FF66F1A00B4301E /* WindowOverlay */; };
+		2ADFCA8F2FF66F1A00B4301E /* WindowOverlay in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2ADFCA8E2FF66F1A00B4301E /* WindowOverlay */; };
 		2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */ = {isa = PBXBuildFile; platformFilters = (macos, ); productRef = 2AE0F13A2FE03989002B5D9D /* MaterialView */; };
 /* End PBXBuildFile section */
 
@@ -110,8 +110,12 @@
 			membershipExceptions = (
 				"Widget Shared/FriendsTimeLeft/FriendsTimeLeftView.swift",
 				"Widget Shared/FriendsTimeLeft/FriendsTimeLeftWidget.swift",
+				"Widget Shared/Live Activity/SchoolDayActivityAttributes.swift",
 				"Widget Shared/Widget Shared.swift",
 			);
+			platformFiltersByRelativePath = {
+				"Widget Shared/Live Activity/SchoolDayActivityAttributes.swift" = (ios, );
+			};
 			target = 2A02378A2F9C8EA000AB1E1F /* Timetable */;
 		};
 		2AA9C7C22FEE7C5400AD87A8 /* Exceptions for "Widget" folder in "Watch" target */ = {
@@ -124,18 +128,35 @@
 		2AC5F7EA2FD842F000B813EA /* Exceptions for "Main" folder in "Timetable" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			platformFiltersByRelativePath = {
+				Backend/LiveActivityRegistrationService.swift = (ios, );
 				Backend/PhoneWatchSyncBridge.swift = (ios, );
 				Backend/syncToWatchAsync.swift = (ios, );
 				Tabs/Search/TimetableDetailView.swift = (ios, );
 				Tabs/Search/TimetableIdentityView.swift = (ios, );
 				Tabs/Search/TimetablePortalIdentityView.swift = (ios, );
 				Tabs/Search/TimetableSearchView.swift = (ios, );
-				Tabs/Settings/AddPassView.swift = (ios, xros, );
+				Tabs/Settings/AddPassView.swift = (ios, );
+				Tabs/Settings/AuthoredTimetablesSettingsView.swift = (ios, );
+				Tabs/Settings/ReceivedTimetablesView.swift = (ios, );
+				Tabs/VariableBlur.swift = (ios, );
 				Views/Onboarding/OnboardingPage.swift = (ios, );
 				Views/Onboarding/OnboardingPageContext.swift = (ios, );
 				Views/Onboarding/OnboardingView.swift = (ios, );
+				Views/Onboarding/Views/APNsRegistration.swift = (ios, );
 				Views/Onboarding/Views/Account.swift = (ios, );
+				Views/Onboarding/Views/AnimatedGradientDemo.swift = (ios, );
+				Views/Onboarding/Views/CalendarImport.swift = (ios, );
 				Views/Onboarding/Views/CalendarPermission.swift = (ios, );
+				Views/Onboarding/Views/Notifications.swift = (ios, );
+				Views/Onboarding/Views/SplashView.swift = (ios, );
+				Views/Onboarding/Views/Tutorial/GeneratedSFSymbolShapes.swift = (ios, );
+				Views/Onboarding/Views/Tutorial/NotifTutorial.swift = (ios, );
+				Views/Onboarding/Views/Tutorial/ShareTutorial.swift = (ios, );
+				Views/Onboarding/Views/Tutorial/TimetableTypesTutorial.swift = (ios, );
+				Views/Onboarding/Views/Tutorial/WalletTutorial.swift = (ios, );
+				Views/Onboarding/Views/Tutorial/WidgetTutorial.swift = (ios, );
+				Views/SubjectEditorSheet.swift = (ios, );
+				iOS/LiveActivityDebugView.swift = (ios, );
 				macOS/AppDelegate.swift = (macos, );
 				macOS/CustomMaterialView.swift = (macos, );
 			};
@@ -144,6 +165,8 @@
 		2AD85A6F2FE8F219004EAB2B /* Exceptions for "Widget" folder in "Watch Widget" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				"Widget Shared/Live Activity/SchoolDayActivityAttributes.swift",
+				"Widget Shared/Live Activity/SchoolDayLiveActivityWidget.swift",
 				Widget/Assets.xcassets,
 				"Widget/Widget Bundle.swift",
 			);
@@ -155,6 +178,10 @@
 				"Watch Widget/Assets.xcassets",
 				"Watch Widget/Watch Widget Bundle.swift",
 			);
+			platformFiltersByRelativePath = {
+				"Widget Shared/Live Activity/SchoolDayActivityAttributes.swift" = (ios, );
+				"Widget Shared/Live Activity/SchoolDayLiveActivityWidget.swift" = (ios, );
+			};
 			target = 2AA6DF132FDFAC8F00BBC70E /* Widget */;
 		};
 		2AD85A872FE8F23A004EAB2B /* Exceptions for "Special" folder in "Timetable" target */ = {
@@ -770,7 +797,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -837,7 +864,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1078,12 +1105,13 @@
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 27.0;
 			};
 			name = Debug;
@@ -1136,12 +1164,13 @@
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 27.0;
 			};
 			name = Release;

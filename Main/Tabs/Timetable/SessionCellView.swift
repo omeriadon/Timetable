@@ -42,13 +42,16 @@ struct SessionCellView: View {
 					isBreak: false,
 					selected: Slot(day, session) == selectedSlot
 				) {
-					Image(systemName: c.symbol)
-						.font(Device.isIPhone ? .body : .title2)
-					Spacer(minLength: 0)
-					Text(c.id)
-						.lineLimit(2)
-						.fixedSize(horizontal: false, vertical: true)
-						.font(Device.isIPhone ? .footnote.scaled(by: 0.9) : .headline)
+					Group {
+						Image(systemName: c.symbol)
+							.font(Device.isIPhone ? .body : .title2)
+						Spacer(minLength: 0)
+						Text(c.id)
+							.lineLimit(2)
+							.fixedSize(horizontal: false, vertical: true)
+							.font(Device.isIPhone ? .footnote.scaled(by: 0.9) : .headline)
+					}
+					.dynamicTypeSize(.xSmall ... .large)
 				}
 				.frame(height: 60)
 

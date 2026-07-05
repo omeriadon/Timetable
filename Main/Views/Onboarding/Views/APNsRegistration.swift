@@ -24,7 +24,9 @@ struct OnboardingAPNsRegistrationView: View {
 			if case let .failed(message) = registration.registrationState {
 				Text(message).foregroundStyle(.red).multilineTextAlignment(.center)
 				Button("Try Again", systemImage: "arrow.clockwise") {
-					registration.requestRemoteRegistration()
+					Task {
+						await registration.requestRemoteRegistration()
+					}
 				}
 				.buttonStyle(.glassProminent)
 			} else if !registration.hasLocalToken {
@@ -33,7 +35,11 @@ struct OnboardingAPNsRegistrationView: View {
 		}
 		.onAppear {
 			context.configure(canAdvance: registration.hasLocalToken, isWorking: !registration.hasLocalToken)
-			if !registration.hasLocalToken { registration.requestRemoteRegistration() }
+			if !registration.hasLocalToken {
+				Task {
+					await registration.requestRemoteRegistration()
+				}
+			}
 		}
 		.onChange(of: registration.hasLocalToken) { _, hasToken in
 			context.configure(canAdvance: hasToken, isWorking: !hasToken)

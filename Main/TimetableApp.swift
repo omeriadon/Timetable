@@ -89,12 +89,13 @@ struct TimetableApp: App {
 						}
 						await indexEntities()
 						await sessionStore.restore()
+
+						await NotificationRegistrationService.shared.requestRemoteRegistration()
+
 						#if os(iOS)
-							NotificationRegistrationService.shared.requestRemoteRegistration()
 							await LiveActivityRegistrationService.shared.startObserving()
 
 							try? await ShaderLibrary.compileStickerShaders()
-
 						#endif
 					}
 			#if os(iOS)
