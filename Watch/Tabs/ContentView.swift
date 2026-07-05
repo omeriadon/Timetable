@@ -110,6 +110,7 @@ struct ContentView: View {
 					} else {
 						// empty periods
 						RoundedRectangle(cornerRadius: 5)
+							.fill(.gray)
 							.frame(height: 25)
 					}
 				}
