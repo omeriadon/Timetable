@@ -67,7 +67,7 @@ struct TimetableView: View {
 						.opacity(selectedSlot == nil ? 0 : 1)
 						.blur(radius: selectedSlot == nil ? 20 : 0)
 						.allowsHitTesting(selectedSlot != nil)
-						.animation(.snappy(duration: 0.3), value: selectedSlot)
+						.animation(.snappy(duration: 0.3), value: "\(String(describing: selectedSlot))\(String(describing: subject?.id))")
 				}
 				.scrollIndicators(.visible)
 				#if os(macOS)

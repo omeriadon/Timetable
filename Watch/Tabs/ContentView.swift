@@ -7,12 +7,9 @@
 
 import Defaults
 import SwiftUI
-import WatchConnectivity
 import WidgetKit
 
 struct ContentView: View {
-	@State private var syncStore = WatchTimetableSyncStore()
-
 	@State private var selectedDay = 0
 	@State private var isLoading = false
 	@State private var showSyncErrorIcon = false
@@ -55,16 +52,6 @@ struct ContentView: View {
 		.padding(.trailing, 8)
 		.environment(\.dynamicTypeSize, .xSmall)
 		.monospaced()
-		.onAppear {
-			Print("[Watch] ContentView appeared")
-			syncStore.activateIfNeeded()
-		}
-		.onChange(of: syncStore.alertMessage) { _, newValue in
-			guard let newValue else { return }
-			PrintError("[Watch] Surface error icon: \(newValue)")
-			flashSyncErrorIcon()
-			syncStore.alertMessage = nil
-		}
 	}
 
 	func mainContent(subjectLookup: [Slot: Subject]) -> some View {

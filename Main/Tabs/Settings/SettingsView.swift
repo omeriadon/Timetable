@@ -8,9 +8,6 @@
 import Defaults
 import SwiftUI
 import WidgetKit
-#if os(iOS)
-	import WatchConnectivity
-#endif
 
 struct RenameTimetable: Identifiable {
 	let id: String
@@ -91,43 +88,18 @@ struct SettingsView: View {
 		}
 
 		Section("Preferences") {
-			NavigationLink {
-				AccountAndSyncSettingsView()
-			} label: {
-				Label("Preferences", systemImage: "switch.2")
+			if sessionStore.isAuthenticated {
+				NavigationLink { AccountAndSyncSettingsView() } label: { Label("Preferences", systemImage: "switch.2") }
+			} else {
+				Button { showSignInRequired() } label: { Label("Preferences", systemImage: "switch.2") }
 			}
 		}
 
 		#if os(iOS)
 
 			Section("Sync") {
-				Menu {
-					Button {
-						Task { await ServerSyncCoordinator.shared.syncEverything() }
-					} label: {
-						Label("Cloud", systemImage: "cloud")
-					}
-
-					Button {
-						if !WCSession.default.isWatchAppInstalled {
-							statusBadgeManager.addBadge(id: UUID(), title: "Watch app not installed", priority: 4, view: .warning)
-							return
-						}
-
-						Task {
-							await syncToWatchAsync(
-								subjects: subjects,
-								watchSync: watchSync,
-								statusUpdate: { syncStatus = $0 }
-							)
-						}
-					} label: {
-						Label("Watch", systemImage: "applewatch")
-					}
-					.disabled(syncStatus == .loading)
-
-				} label: {
-					Label("Sync to...", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
+				Button { Task { await ServerSyncCoordinator.shared.syncEverything() } } label: {
+					Label("Sync with Server", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
 				}
 			}
 
@@ -199,7 +171,7 @@ struct SettingsView: View {
 			if !passManager.receivedTimetables.isEmpty {
 				Section("Imported Timetables") {
 					Button {
-						showEditReceivedTimetablesSheet = true
+						if sessionStore.isAuthenticated { showEditReceivedTimetablesSheet = true } else { showSignInRequired() }
 					} label: {
 						Label("Edit Received Timetables...", systemImage: "calendar")
 					}
@@ -272,6 +244,7 @@ struct SettingsView: View {
 			#endif // DEBUG
 
 			Button {
+				guard sessionStore.isAuthenticated else { showSignInRequired(); return }
 				WidgetCenter.shared.reloadAllTimelines()
 				statusBadgeManager.addBadge(id: UUID(), title: "Widgets reloaded", priority: 3, view: .success)
 			} label: {

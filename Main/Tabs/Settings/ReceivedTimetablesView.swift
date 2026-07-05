@@ -97,7 +97,12 @@ struct ReceivedTimetablesView: View {
 			.alert("Delete Timetable?", isPresented: $showDeleteConfirmation, presenting: timetableToDelete) { timetable in
 				Button("Cancel", role: .cancel) {}
 				Button("Delete", role: .destructive) {
-					receivedTimetables.wrappedValue.removeAll { $0.id == timetable.id }
+					Task {
+						do {
+							try await ReceivedTimetableSyncService.shared.deleteReceivedTimetable(serialNumber: timetable.id)
+							passManager.deletePass(for: timetable)
+						} catch { badges.present(error: error, title: "Unable to delete timetable") }
+					}
 				}
 			} message: { timetable in
 				Text("Are you sure you want to delete \(timetable.sender)'s timetable?")

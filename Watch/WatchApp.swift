@@ -14,29 +14,8 @@ import SwiftUI
 struct TimetableWatchApp: App {
 	@Default(.timetable) var subjects
 
-	@State private var passManager = TimetablePassManager()
-
-	private var receivedTimetables: Binding<ReceivedTimetables> {
-		Binding(
-			get: { passManager.receivedTimetables },
-			set: { newValue in
-				// Process the differences between the old array and the new array
-				let oldValues = passManager.receivedTimetables
-
-				// Example 1: Handle deletions if an item was removed from the list
-				for oldItem in oldValues where !newValue.contains(where: { $0.id == oldItem.id }) {
-					passManager.deletePass(for: oldItem)
-				}
-
-				// Example 2: Handle updates if an existing item's properties changed
-				for newItem in newValue {
-					if let oldItem = oldValues.first(where: { $0.id == newItem.id }), oldItem != newItem {
-						passManager.updatePass(for: newItem, with: newItem.subjects)
-					}
-				}
-			}
-		)
-	}
+	@Default(.receivedTimetables) private var receivedTimetables
+	@State private var sessionStore = SessionStore.shared
 
 	@State private var currentTab = 0
 	@State private var now = Date()
@@ -91,7 +70,7 @@ struct TimetableWatchApp: App {
 						}
 				}
 
-				ForEach(Array(receivedTimetables.wrappedValue.enumerated()), id: \.offset) { index, receivedTimetable in
+				ForEach(Array(receivedTimetables.enumerated()), id: \.element.id) { index, receivedTimetable in
 					Tab(receivedTimetable.sender, systemImage: "person", value: 2 + index) {
 						let friendLookup = TimetableLayout.subjectLookup(for: receivedTimetable.subjects)
 
@@ -139,7 +118,11 @@ struct TimetableWatchApp: App {
 			}
 			.monospaced()
 			.tabViewStyle(.verticalPage)
-			.environment(\.passManager, passManager)
+			.task {
+				SessionStore.shared.configureAccountBootstrap { try await WatchAccountBootstrapService.shared.bootstrap() }
+				NetworkManager.shared.startMonitoring()
+				await SessionStore.shared.restore()
+			}
 		}
 	}
 
