@@ -156,6 +156,6 @@ struct TimetableDetailView: View {
 	}
 
 	private func showSignInRequired() {
-		badges.addBadge(id: UUID(), title: "Sign in required", secondaryText: "Sign in to use this feature.", priority: 3, view: .warning)
+		badges.signInRequired()
 	}
 }

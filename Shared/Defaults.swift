@@ -27,6 +27,8 @@ extension Defaults.Keys {
 	static let receivedNameOverrides = Key<[String: String]>("receivedNameOverrides", default: [:], suite: sharedDefaults)
 	static let timetable = Key<[Subject]>("timetable", default: [], suite: sharedDefaults)
 	static let receivedTimetables = Key<[ReceivedTimetable]>("receivedTimetables", default: [], suite: sharedDefaults)
+	static let receivedTombstoneIDs = Key<Set<String>>("receivedTombstoneIDs", default: [], suite: sharedDefaults)
+	static let installedWalletTimetableIDs = Key<Set<String>>("installedWalletTimetableIDs", default: [], suite: sharedDefaults)
 	static let userDisplayName = Key<String>("userDisplayName", default: "My Timetable", suite: sharedDefaults)
 	static let walletRevision = Key<Int>("walletRevision", default: 0, suite: sharedDefaults)
 	static let ownerIsSearchable = Key<Bool>("ownerIsSearchable", default: true, suite: sharedDefaults)

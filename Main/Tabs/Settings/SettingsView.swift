@@ -238,6 +238,9 @@ struct SettingsView: View {
 				Button("Test success badge", systemImage: "checkmark.circle") {
 					addDebugStatusBadge(title: "Saving timetable", view: .success)
 				}
+				Button("Test info badge", systemImage: "info.circle") {
+					addDebugStatusBadge(title: "Info here", view: .info)
+				}
 				Button("Test error badge", systemImage: "xmark.circle") {
 					addDebugStatusBadge(title: "Contacting server", view: .error)
 				}
@@ -324,7 +327,7 @@ struct SettingsView: View {
 	#endif // DEBUG
 
 	private func showSignInRequired() {
-		statusBadgeManager.addBadge(id: UUID(), title: "Sign in required", secondaryText: "Sign in to use this feature.", priority: 3, view: .warning)
+		statusBadgeManager.signInRequired()
 	}
 }
 

@@ -67,6 +67,7 @@ struct TimetableApp: App {
 					}
 			#endif
 					.task {
+						NetworkManager.shared.configureFeedback { StatusBadgeManager.shared.present(networkError: $0) }
 						passManager.configureProjectionUpload {
 							try await ReceivedTimetableSyncService.shared.uploadCurrentProjection()
 						}

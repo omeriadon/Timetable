@@ -54,7 +54,7 @@ final class TimetablePassManager {
 			var extractedTimetables: [ReceivedTimetable] = []
 			for pass in allPasses {
 				guard let timetable = pass.toReceivedTimetable() else { continue }
-				if timetable.isDeleted {
+				if timetable.isDeleted || Defaults[.receivedTombstoneIDs].contains(timetable.id) {
 					self.passLibrary.removePass(pass)
 					continue
 				}
@@ -63,8 +63,15 @@ final class TimetablePassManager {
 
 			await MainActor.run {
 				withAnimation(.easeInOut) {
-					self.receivedTimetables = extractedTimetables
-					Defaults[.receivedTimetables] = extractedTimetables
+					var merged = Dictionary(uniqueKeysWithValues: Defaults[.receivedTimetables].map { ($0.id, $0) })
+					for observed in extractedTimetables {
+						if let current = merged[observed.id], current.contentRevision > observed.contentRevision { continue }
+						merged[observed.id] = observed
+					}
+					let active = merged.values.filter { !Defaults[.receivedTombstoneIDs].contains($0.id) }.sorted { $0.receivedAt < $1.receivedAt }
+					self.receivedTimetables = active
+					Defaults[.receivedTimetables] = active
+					Defaults[.installedWalletTimetableIDs] = Set(extractedTimetables.map(\.id))
 					Defaults[.walletRevision] += 1
 					self.isLoading = false
 				}

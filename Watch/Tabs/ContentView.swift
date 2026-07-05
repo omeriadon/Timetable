@@ -22,7 +22,9 @@ struct ContentView: View {
 	var body: some View {
 		let subjectLookup = TimetableLayout.subjectLookup(for: subjects)
 
-		NavigationStack {
+		Group { if subjects.isEmpty {
+			ContentUnavailableView("No Timetable", systemImage: "calendar.badge.exclamationmark", description: Text("Sign in and sync your timetable to view it here."))
+		} else { NavigationStack {
 			VStack {
 				HStack(spacing: 2) {
 					VStack(spacing: 2) {
@@ -49,7 +51,7 @@ struct ContentView: View {
 				}
 				Spacer()
 			}
-		}
+		} } }
 		.padding(.trailing, 8)
 		.environment(\.dynamicTypeSize, .xSmall)
 		.monospaced()

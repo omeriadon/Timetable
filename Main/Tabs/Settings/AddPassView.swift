@@ -77,7 +77,7 @@ struct AddPassView: View {
 	private func downloadPass() {
 		resetTask?.cancel()
 		guard SessionStore.shared.isAuthenticated else {
-			statusBadgeManager.addBadge(id: UUID(), title: "Sign in required", secondaryText: "Sign in to use this feature.", priority: 3, view: .warning)
+			statusBadgeManager.signInRequired()
 			return
 		}
 		withAnimation(.easeInOut) {

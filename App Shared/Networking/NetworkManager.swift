@@ -17,6 +17,11 @@ enum HTTPMethod: String {
 	case put = "PUT"
 }
 
+enum NetworkRequestContext {
+	case userInitiated
+	case background
+}
+
 struct Endpoint {
 	let path: String
 	let method: HTTPMethod
@@ -159,6 +164,7 @@ final class NetworkManager {
 	private var accessTokenProvider: (@MainActor @Sendable () -> String?)?
 	private var refreshHandler: (@MainActor @Sendable () async throws -> Void)?
 	private var refreshTask: Task<Void, any Error>?
+	private var feedbackHandler: (@MainActor (NetworkError) -> Void)?
 
 	init(
 		monitor: NWPathMonitor = NWPathMonitor()
@@ -191,6 +197,10 @@ final class NetworkManager {
 	func clearAuthentication() {
 		accessTokenProvider = nil
 		refreshHandler = nil
+	}
+
+	func configureFeedback(_ handler: @escaping @MainActor (NetworkError) -> Void) {
+		feedbackHandler = handler
 	}
 
 	// MARK: - Reachability
@@ -276,7 +286,7 @@ final class NetworkManager {
 
 	// MARK: - Request Execution
 
-	private func execute(_ endpoint: Endpoint, body: Data?, mayRefresh: Bool = true) async throws -> Data {
+	private func execute(_ endpoint: Endpoint, body: Data?, context: NetworkRequestContext, mayRefresh: Bool = true) async throws -> Data {
 		try requireOnline()
 		if endpoint.requiresAuthentication, accessTokenProvider?() == nil {
 			throw NetworkError.authenticationRequired
@@ -292,7 +302,7 @@ final class NetworkManager {
 			}
 
 			if response.statusCode == 401, endpoint.requiresAuthentication, mayRefresh, try await refreshAuthentication() {
-				return try await execute(endpoint, body: body, mayRefresh: false)
+				return try await execute(endpoint, body: body, context: context, mayRefresh: false)
 			}
 
 			try validate(response: response, data: data)
@@ -307,15 +317,17 @@ final class NetworkManager {
 				case .cancelled:
 					throw error
 				case .authenticationRequired:
+					if context == .userInitiated { feedbackHandler?(.authenticationRequired) }
 					throw error
 				case .offline:
 					offlineRequestAttempted = true
+					if context == .userInitiated { feedbackHandler?(.offline) }
 					throw error
 				case let .server(statusCode, response) where statusCode == 404 || response.code == .notFound || response.code == .accountNotFound:
 					throw error
 				default:
 					PrintError("Request failed for \(endpoint.path)", category: .network, error: error)
-					present(error)
+					if context == .userInitiated { feedbackHandler?(error) }
 					throw error
 			}
 		} catch is CancellationError {
@@ -327,16 +339,17 @@ final class NetworkManager {
 					throw networkError
 				case .offline:
 					offlineRequestAttempted = true
+					if context == .userInitiated { feedbackHandler?(.offline) }
 					throw networkError
 				default:
 					PrintError("Transport failed for \(endpoint.path)", category: .network, error: error)
-					present(networkError)
+					if context == .userInitiated { feedbackHandler?(networkError) }
 					throw networkError
 			}
 		} catch {
 			let networkError = NetworkError.transport(error.localizedDescription)
 			PrintError("Transport failed for \(endpoint.path)", category: .network, error: error)
-			present(networkError)
+			if context == .userInitiated { feedbackHandler?(networkError) }
 			throw networkError
 		}
 	}
@@ -371,23 +384,24 @@ final class NetworkManager {
 
 	// MARK: - Decoding
 
-	func send<Response: Decodable & Sendable>(_ endpoint: Endpoint) async throws -> Response {
-		try await decode(execute(endpoint, body: nil))
+	func send<Response: Decodable & Sendable>(_ endpoint: Endpoint, context: NetworkRequestContext = .background) async throws -> Response {
+		try await decode(execute(endpoint, body: nil, context: context))
 	}
 
 	func send<Response: Decodable & Sendable>(
 		_ endpoint: Endpoint,
-		body: some Encodable & Sendable
+		body: some Encodable & Sendable,
+		context: NetworkRequestContext = .background
 	) async throws -> Response {
-		try await decode(execute(endpoint, body: encoder.encode(body)))
+		try await decode(execute(endpoint, body: encoder.encode(body), context: context))
 	}
 
-	func send(_ endpoint: Endpoint) async throws {
-		_ = try await execute(endpoint, body: nil)
+	func send(_ endpoint: Endpoint, context: NetworkRequestContext = .background) async throws {
+		_ = try await execute(endpoint, body: nil, context: context)
 	}
 
-	func send(_ endpoint: Endpoint, body: some Encodable & Sendable) async throws {
-		_ = try await execute(endpoint, body: encoder.encode(body))
+	func send(_ endpoint: Endpoint, body: some Encodable & Sendable, context: NetworkRequestContext = .background) async throws {
+		_ = try await execute(endpoint, body: encoder.encode(body), context: context)
 	}
 
 	private func decode<Response: Decodable & Sendable>(_ data: Data) throws -> Response {
@@ -411,7 +425,7 @@ final class NetworkManager {
 	// MARK: - Downloads
 
 	func download(_ endpoint: Endpoint) async throws -> Data {
-		try await execute(endpoint, body: nil)
+		try await execute(endpoint, body: nil, context: .userInitiated)
 	}
 
 	// MARK: - Error Presentation

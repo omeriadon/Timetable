@@ -18,12 +18,13 @@ nonisolated struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiab
 	let subjects: [Subject]
 	let receivedAt: Date
 	let passUpdatedAt: Date
+	let contentRevision: Int
 	let isDeleted: Bool
 	let isShareable: Bool
 
 	private enum CodingKeys: String, CodingKey {
 		case id, issuerAccountID, sourceKind, signedDisplayName, authorDisplayName
-		case subjects, receivedAt, passUpdatedAt, isDeleted, isShareable
+		case subjects, receivedAt, passUpdatedAt, contentRevision, isDeleted, isShareable
 	}
 
 	init(from decoder: any Decoder) throws {
@@ -36,6 +37,7 @@ nonisolated struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiab
 		subjects = try container.decode([Subject].self, forKey: .subjects)
 		receivedAt = try container.decode(Date.self, forKey: .receivedAt)
 		passUpdatedAt = try container.decode(Date.self, forKey: .passUpdatedAt)
+		contentRevision = try container.decodeIfPresent(Int.self, forKey: .contentRevision) ?? 0
 		isDeleted = try container.decode(Bool.self, forKey: .isDeleted)
 		isShareable = try container.decodeIfPresent(Bool.self, forKey: .isShareable) ?? false
 	}
@@ -60,6 +62,7 @@ nonisolated struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiab
 		self.subjects = subjects
 		self.receivedAt = receivedAt
 		passUpdatedAt = receivedAt
+		contentRevision = 0
 		isDeleted = false
 		isShareable = false
 	}
@@ -73,6 +76,7 @@ nonisolated struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiab
 		subjects: [Subject],
 		receivedAt: Date,
 		passUpdatedAt: Date,
+		contentRevision: Int = 0,
 		isDeleted: Bool,
 		isShareable: Bool = false
 	) {
@@ -84,6 +88,7 @@ nonisolated struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiab
 		self.subjects = subjects
 		self.receivedAt = receivedAt
 		self.passUpdatedAt = passUpdatedAt
+		self.contentRevision = contentRevision
 		self.isDeleted = isDeleted
 		self.isShareable = isShareable
 	}

@@ -18,7 +18,6 @@ final class WalletPassService {
 	private(set) var isDownloading = false
 
 	private let networkManager: NetworkManager
-	@ObservationIgnored private let statusBadgeManager: StatusBadgeManager = .shared
 
 	private var downloadTask: Task<Data, any Error>?
 
@@ -39,10 +38,6 @@ final class WalletPassService {
 	}
 
 	func ownerPassFileURL() async throws -> URL {
-		Task {
-			await triggerStatusBadgeAnimation()
-		}
-
 		let name = if let displayName = Defaults[.accountProfile]?.displayName {
 			"\(displayName)'s Timetable"
 		} else {
@@ -68,10 +63,6 @@ final class WalletPassService {
 	}
 
 	func passFileURL(timetableID: UUID, name: String) async throws -> URL {
-		Task {
-			await triggerStatusBadgeAnimation()
-		}
-
 		let data = try await networkManager.download(Endpoint("/v1/timetables/\(timetableID.uuidString)/pass"))
 		let fileURL = FileManager.default.temporaryDirectory
 			.appending(path: "\(name)-\(UUID().uuidString)")
@@ -95,48 +86,6 @@ final class WalletPassService {
 			isDownloading = false
 		}
 		return try await task.value
-	}
-
-	private func triggerStatusBadgeAnimation() async {
-		let badgeID = UUID()
-		let totalSteps = 4
-
-		await MainActor.run {
-			statusBadgeManager.addBadge(
-				id: badgeID,
-				title: "Downloading Pass",
-				secondaryText: "Requesting pass...",
-				priority: 3,
-				view: .progressViewAndGauge(currentStep: 1, totalSteps: 5)
-			)
-		}
-
-		for step in 2 ... totalSteps {
-			try? await Task.sleep(for: .milliseconds(300))
-
-			let secondaryText = switch step {
-				case 2: "Generating pass..."
-				default: "Downloading pass..."
-			}
-
-			await MainActor.run {
-				statusBadgeManager.updateBadge(
-					id: badgeID,
-					title: "Downloading Pass",
-					secondaryText: secondaryText,
-					view: .progressViewAndGauge(currentStep: step, totalSteps: totalSteps)
-				)
-			}
-		}
-
-		await MainActor.run {
-			statusBadgeManager.updateBadge(
-				id: badgeID,
-				title: "Pass Ready",
-				secondaryText: "Ready to add to Wallet.",
-				view: .success
-			)
-		}
 	}
 }
 

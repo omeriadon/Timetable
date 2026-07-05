@@ -18,9 +18,6 @@ struct ContentView: View {
 	@State private var networkManager = NetworkManager.shared
 	@Environment(\.statusBadgeManager) private var statusBadgeManager
 
-	private let networkErrorBadgeID = UUID(uuidString: "7D38B39C-D45D-4DDD-9D6D-E3F886CC853B")!
-	private let offlineBadgeID = UUID(uuidString: "5D75876A-CA6E-43BD-AC3E-0884A807BECD")!
-
 	#if os(iOS)
 		@State private var watchSync = PhoneWatchSyncBridge()
 		@State private var rootSyncStatus = SyncMode.normal
@@ -78,28 +75,6 @@ struct ContentView: View {
 				}
 				.onReceive(NotificationCenter.default.publisher(for: .openSettingsTab)) { _ in selectedCompanionTab = "settings" }
 			#endif
-		}
-		.onChange(of: networkManager.presentedAlert?.id) {
-			guard let alert = networkManager.presentedAlert else { return }
-			statusBadgeManager.addBadge(
-				id: networkErrorBadgeID,
-				title: alert.title,
-				secondaryText: alert.message,
-				priority: 5,
-				view: .error
-			)
-			networkManager.presentedAlert = nil
-		}
-		.onChange(of: networkManager.offlineRequestAttempted) {
-			guard networkManager.offlineRequestAttempted else { return }
-			statusBadgeManager.addBadge(
-				id: offlineBadgeID,
-				title: "No Internet Connection",
-				secondaryText: "Please check your network settings.",
-				priority: 5,
-				view: .error
-			)
-			networkManager.dismissOfflineBanner()
 		}
 		.task {
 			networkManager.startMonitoring()
@@ -241,7 +216,7 @@ extension Notification.Name {
 					guard let self, let targetVC else { return }
 					guard SessionStore.shared.isAuthenticated else {
 						parent.isBlurred = false
-						StatusBadgeManager.shared.addBadge(id: UUID(), title: "Sign in required", secondaryText: "Sign in to use this feature.", priority: 3, view: .warning)
+						StatusBadgeManager.shared.signInRequired()
 						return
 					}
 

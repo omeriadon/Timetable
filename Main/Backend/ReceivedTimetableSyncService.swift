@@ -77,10 +77,26 @@ final class ReceivedTimetableSyncService {
 		try await downloadProjectionAndOverrides()
 	}
 
+	func deleteReceivedTimetable(serialNumber: String) async throws {
+		try await networkManager.send(.v1ReceivedTimetableDelete(serialNumber), context: .userInitiated)
+		Defaults[.receivedTombstoneIDs].insert(serialNumber)
+		Defaults[.receivedTimetables].removeAll { $0.id == serialNumber }
+		WidgetCenter.shared.reloadAllTimelines()
+	}
+
 	private func apply(_ response: [ReceivedPassMirrorDTO]) {
-		Defaults[.receivedTimetables] = response
-			.filter { !$0.isDeleted }
-			.map(\.receivedTimetable)
+		let tombstones = Set(response.filter(\.isDeleted).map(\.id))
+		Defaults[.receivedTombstoneIDs].formUnion(tombstones)
+		var merged = Dictionary(uniqueKeysWithValues: Defaults[.receivedTimetables].map { ($0.id, $0) })
+		for dto in response where !dto.isDeleted {
+			let incoming = dto.receivedTimetable
+			if let current = merged[dto.id], current.contentRevision > incoming.contentRevision { continue }
+			merged[dto.id] = incoming
+		}
+		for id in Defaults[.receivedTombstoneIDs] {
+			merged.removeValue(forKey: id)
+		}
+		Defaults[.receivedTimetables] = merged.values.sorted { $0.receivedAt < $1.receivedAt }
 		applyLocalNames()
 		Defaults[.lastServerSync] = Date.now
 		WidgetCenter.shared.reloadAllTimelines()
@@ -102,5 +118,9 @@ private extension Endpoint {
 
 	static func v1ReceivedNameOverrideDelete(_ serialNumber: String) -> Endpoint {
 		Endpoint("/v1/received-name-overrides/\(serialNumber)", method: .delete)
+	}
+
+	static func v1ReceivedTimetableDelete(_ serialNumber: String) -> Endpoint {
+		Endpoint("/v1/timetables/received/\(serialNumber)", method: .delete)
 	}
 }

@@ -12,13 +12,14 @@ enum StatusBadgeView: Equatable {
 	case success
 	case error
 	case warning
+	case info
 	case progressViewAndGauge(currentStep: Int, totalSteps: Int)
 
 	fileprivate var rank: Int {
 		switch self {
 			case .error: 4
 			case .success: 3
-			case .warning: 2
+			case .warning, .info: 2
 			case .progressView, .progressViewAndGauge: 1
 		}
 	}
@@ -49,6 +50,7 @@ final class StatusBadgeManager {
 
 	private(set) var badges: [StatusBadge] = []
 	private(set) var activeBadgeID: UUID?
+	private let offlineDuration: Duration = .seconds(1)
 
 	@ObservationIgnored private var nextSequence: UInt64 = 0
 	@ObservationIgnored private var removalTasks: [UUID: Task<Void, Never>] = [:]
@@ -121,6 +123,30 @@ final class StatusBadgeManager {
 		removeBadge(id: mainBadge.id)
 	}
 
+	func offline() {
+		let id = UUID()
+		addBadge(id: id, title: "No Internet Connection", secondaryText: "Connect to the internet and try again.", priority: 3, view: .info)
+		scheduleRemoval(for: id, after: offlineDuration)
+	}
+
+	func signInRequired() {
+		addBadge(id: UUID(), title: "Sign In Required", secondaryText: "Sign in to use this feature.", priority: 3, view: .info)
+	}
+
+	func present(networkError: NetworkError, title: String = "Network Error") {
+		switch networkError {
+			case .offline: offline()
+			case .authenticationRequired: signInRequired()
+			case .cancelled: break
+			default: addBadge(id: UUID(), title: title, secondaryText: networkError.localizedDescription, priority: 4, view: .error)
+		}
+	}
+
+	func present(error: any Error, title: String) {
+		if let networkError = error as? NetworkError { present(networkError: networkError, title: title); return }
+		addBadge(id: UUID(), title: title, secondaryText: error.localizedDescription, priority: 4, view: .error)
+	}
+
 	private var rankedBadges: [StatusBadge] {
 		badges.sorted {
 			if $0.view.rank != $1.view.rank { return $0.view.rank > $1.view.rank }
@@ -142,7 +168,7 @@ final class StatusBadgeManager {
 		switch view {
 			case .success:
 				duration = .seconds(2)
-			case .error, .warning:
+			case .error, .warning, .info:
 				duration = .seconds(5)
 			default:
 				return

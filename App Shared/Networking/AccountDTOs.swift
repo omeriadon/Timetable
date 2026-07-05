@@ -119,6 +119,7 @@ nonisolated struct ReceivedPassMirrorDTO: Codable {
 	let subjects: [Subject]
 	let receivedAt: Date
 	let passUpdatedAt: Date
+	let contentRevision: Int
 	let isDeleted: Bool
 	let isShareable: Bool
 	let walletRevision: Int
@@ -132,6 +133,7 @@ nonisolated struct ReceivedPassMirrorDTO: Codable {
 		subjects = timetable.subjects
 		receivedAt = timetable.receivedAt
 		passUpdatedAt = timetable.passUpdatedAt
+		contentRevision = timetable.contentRevision
 		isDeleted = timetable.isDeleted
 		isShareable = timetable.isShareable
 		self.walletRevision = walletRevision
@@ -147,6 +149,7 @@ nonisolated struct ReceivedPassMirrorDTO: Codable {
 			subjects: subjects,
 			receivedAt: receivedAt,
 			passUpdatedAt: passUpdatedAt,
+			contentRevision: contentRevision,
 			isDeleted: isDeleted,
 			isShareable: isShareable
 		)

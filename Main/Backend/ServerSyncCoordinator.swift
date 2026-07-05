@@ -80,7 +80,7 @@ final class ServerSyncCoordinator {
 	}
 
 	private func showSignInRequired() {
-		StatusBadgeManager.shared.addBadge(id: UUID(), title: "Sign in required", secondaryText: "Sign in to use this feature.", priority: 3, view: .warning)
+		StatusBadgeManager.shared.signInRequired()
 	}
 
 	private static func suppresses(_ error: any Error) -> Bool {

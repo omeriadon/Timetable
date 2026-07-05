@@ -10,7 +10,6 @@ struct StatusBadgeOverlay: View {
 	@Environment(\.statusBadgeManager) private var manager
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-	@Namespace private var glassNamespace
 	@State private var isHoveringMainBadge = false
 	@State private var dragOffset: CGFloat = 0
 
@@ -62,8 +61,7 @@ struct StatusBadgeOverlay: View {
 		.frame(height: badgeHeight)
 		.contentShape(.capsule)
 		.clipShape(.capsule)
-		.glassEffect(.regular.interactive(), in: .capsule)
-		.glassEffectID("status-badge-main", in: glassNamespace)
+		.glassEffect(.clear.interactive(), in: .capsule)
 		.contentTransition(.interpolate)
 		.animation(animation, value: badge)
 
@@ -203,6 +201,7 @@ private struct StatusBadgeContent: View {
 			case .success: return "success"
 			case .error: return "error"
 			case .warning: return "warning"
+			case .info: return "info"
 			case .progressViewAndGauge: return "progress-gauge"
 		}
 	}
@@ -253,6 +252,8 @@ private struct StatusBadgeContent: View {
 					statusSymbol("xmark.circle.fill", color: .red, isTerminal: true)
 				case .warning:
 					statusSymbol("exclamationmark.triangle.fill", color: .orange, isTerminal: true)
+				case .info:
+					statusSymbol("info.circle.fill", color: .blue, isTerminal: true)
 				case let .progressViewAndGauge(currentStep, totalSteps):
 					StatusBadgeGauge(
 						currentStep: currentStep,
@@ -365,6 +366,9 @@ private struct StatusBadgeCapsuleFill: View {
 
 				case .warning:
 					terminalFill(.orange)
+
+				case .info:
+					terminalFill(.blue)
 
 				case .progressView, .progressViewAndGauge:
 					loadingFill
@@ -566,55 +570,3 @@ private struct BottomCapsuleArc: Shape {
 		return path
 	}
 }
-
-#if DEBUG
-	private struct StatusBadgePreviewGrid: View {
-		private let completionDelay: Duration = .seconds(2)
-
-		private let badges: [StatusBadge] = [
-			.init(id: UUID(), title: "Progress", secondaryText: "Working", priority: 3, view: .progressView, sequence: 1),
-			.init(id: UUID(), title: "Success", priority: 2, view: .success, sequence: 2),
-			.init(id: UUID(), title: "Error", priority: 4, view: .error, sequence: 3),
-			.init(id: UUID(), title: "Warning", priority: 3, view: .warning, sequence: 4),
-			.init(id: UUID(), title: "Progress + Gauge", secondaryText: "Step 2 of 5", priority: 3, view: .progressViewAndGauge(currentStep: 2, totalSteps: 5), sequence: 6),
-		]
-
-		var body: some View {
-			LazyVGrid(columns: [GridItem(.adaptive(minimum: 280))], spacing: 20) {
-				ForEach(badges) { badge in
-					StatusBadgePreviewTile(badge: badge, completionDelay: completionDelay)
-				}
-			}
-			.padding(24)
-			.frame(minWidth: 620, minHeight: 300)
-		}
-	}
-
-	private struct StatusBadgePreviewTile: View {
-		@State private var badge: StatusBadge
-		let completionDelay: Duration
-
-		init(badge: StatusBadge, completionDelay: Duration) {
-			_badge = State(initialValue: badge)
-			self.completionDelay = completionDelay
-		}
-
-		var body: some View {
-			StatusBadgeContent(badge: badge, showsClose: false)
-				.padding(.horizontal, 14)
-				.frame(width: 280, height: 56)
-				.glassEffect(.regular.interactive(), in: .capsule)
-				.task {
-					try? await Task.sleep(for: completionDelay)
-					withAnimation(.spring(response: 0.34, dampingFraction: 0.92)) {
-						badge.title = "Done"
-						badge.view = .success
-					}
-				}
-		}
-	}
-
-	#Preview("Status Badge Types") {
-		StatusBadgePreviewGrid()
-	}
-#endif // DEBUG
