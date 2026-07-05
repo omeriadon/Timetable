@@ -12,7 +12,9 @@
 		private let networkManager: NetworkManager
 		private var authorizationTask: Task<Void, Never>?
 		private var pushToStartTask: Task<Void, Never>?
+		private var activityUpdatesTask: Task<Void, Never>?
 		private var activityTokenTasks: [String: Task<Void, Never>] = [:]
+		private var pendingCurrentActivityRequest = false
 
 		private init(networkManager: NetworkManager) {
 			self.networkManager = networkManager
@@ -34,7 +36,7 @@
 			await reconcileAuthorization()
 		}
 
-		func reconcileAuthorization() async {
+		func reconcileAuthorization(requestStartIfNeeded: Bool = false) async {
 			let allowed = ActivityAuthorizationInfo().areActivitiesEnabled
 			let enabled = Defaults[.accountSettings].liveActivitiesEnabled
 			guard allowed, enabled, SessionStore.shared.isAuthenticated else {
@@ -46,9 +48,15 @@
 			}
 
 			observePushToStartToken()
+			observeActivityUpdates()
 			observeExistingActivityTokens()
+			if requestStartIfNeeded {
+				pendingCurrentActivityRequest = true
+			}
 			if let token = Activity<SchoolDayActivityAttributes>.pushToStartToken {
-				await uploadLiveActivityPushToStartToken(token)
+				if await uploadLiveActivityPushToStartToken(token) {
+					await fulfillCurrentActivityRequestIfNeeded()
+				}
 			}
 		}
 
@@ -69,12 +77,24 @@
 			pushToStartTask = Task { [weak self] in
 				for await token in Activity<SchoolDayActivityAttributes>.pushToStartTokenUpdates {
 					guard let self, !Task.isCancelled else { return }
-					await uploadLiveActivityPushToStartToken(token)
+					if await uploadLiveActivityPushToStartToken(token) {
+						await fulfillCurrentActivityRequestIfNeeded()
+					}
 				}
 			}
 		}
 
-		private func uploadLiveActivityPushToStartToken(_ token: Data) async {
+		private func observeActivityUpdates() {
+			guard activityUpdatesTask == nil else { return }
+			activityUpdatesTask = Task { [weak self] in
+				for await activity in Activity<SchoolDayActivityAttributes>.activityUpdates {
+					guard let self, !Task.isCancelled else { return }
+					observeTokenUpdates(for: activity)
+				}
+			}
+		}
+
+		private func uploadLiveActivityPushToStartToken(_ token: Data) async -> Bool {
 			do {
 				try await networkManager.send(
 					.v1LiveActivityToken,
@@ -85,8 +105,10 @@
 					)
 				)
 				Print("Uploaded Live Activity push-to-start token", category: .liveActivity)
+				return true
 			} catch {
 				PrintError("Live Activity push-to-start token upload failed", category: .liveActivity, error: error)
+				return false
 			}
 		}
 
@@ -98,16 +120,38 @@
 				activityTokenTasks[id] = nil
 			}
 
-			for activity in activities where activityTokenTasks[activity.id] == nil {
-				activityTokenTasks[activity.id] = Task { [weak self] in
-					if let token = activity.pushToken {
-						await self?.uploadUpdateToken(token, activityKey: activity.attributes.activityKey)
-					}
-					for await token in activity.pushTokenUpdates {
-						guard !Task.isCancelled else { return }
-						await self?.uploadUpdateToken(token, activityKey: activity.attributes.activityKey)
-					}
+			for activity in activities {
+				observeTokenUpdates(for: activity)
+			}
+		}
+
+		private func observeTokenUpdates(for activity: Activity<SchoolDayActivityAttributes>) {
+			guard activityTokenTasks[activity.id] == nil else { return }
+			activityTokenTasks[activity.id] = Task { [weak self] in
+				if let token = activity.pushToken {
+					await self?.uploadUpdateToken(token, activityKey: activity.attributes.activityKey)
 				}
+				for await token in activity.pushTokenUpdates {
+					guard !Task.isCancelled else { return }
+					await self?.uploadUpdateToken(token, activityKey: activity.attributes.activityKey)
+				}
+			}
+		}
+
+		private func fulfillCurrentActivityRequestIfNeeded() async {
+			guard pendingCurrentActivityRequest else { return }
+			do {
+				let response: ReconcileLiveActivityResponse = try await networkManager.send(
+					.v1LiveActivityReconcile,
+					body: ReconcileLiveActivityRequest(installationID: Defaults[.installationID])
+				)
+				Print(
+					response.started ? "Requested current Live Activity" : "Current Live Activity not required",
+					category: .liveActivity
+				)
+				pendingCurrentActivityRequest = false
+			} catch {
+				PrintError("Live Activity reconciliation failed", category: .liveActivity, error: error)
 			}
 		}
 
@@ -129,6 +173,9 @@
 		private func stopTokenObservers() {
 			pushToStartTask?.cancel()
 			pushToStartTask = nil
+			activityUpdatesTask?.cancel()
+			activityUpdatesTask = nil
+			pendingCurrentActivityRequest = false
 			for task in activityTokenTasks.values {
 				task.cancel()
 			}
@@ -153,6 +200,7 @@
 	private extension Endpoint {
 		static let v1LiveActivityToken = Endpoint("/v1/devices/current/live-activity-token", method: .put)
 		static let v1LiveActivityTokenDelete = Endpoint("/v1/devices/current/live-activity-token", method: .delete)
+		static let v1LiveActivityReconcile = Endpoint("/v1/live-activities/current/reconcile", method: .post)
 
 		static func v1LiveActivityUpdateToken(activityKey: String) -> Endpoint {
 			Endpoint("/v1/live-activities/\(activityKey)/update-token", method: .put)

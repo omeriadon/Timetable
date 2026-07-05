@@ -22,7 +22,7 @@ struct SchoolDayLiveActivityWidget: Widget {
 			DynamicIsland {
 				DynamicIslandExpandedRegion(.leading) {
 					Image(systemName: context.state.symbol)
-						.font(.largeTitle)
+						.font(.system(size: 34))
 						.foregroundStyle(context.state.color.swiftUIColor)
 						.monospaced()
 				}
@@ -33,7 +33,7 @@ struct SchoolDayLiveActivityWidget: Widget {
 						.monospaced()
 						.bold()
 						.minimumScaleFactor(0.1)
-						.frame(maxWidth: 140, alignment: .trailing)
+						.frame(width: 140, alignment: .center)
 				}
 
 				DynamicIslandExpandedRegion(.bottom) {
@@ -50,6 +50,7 @@ struct SchoolDayLiveActivityWidget: Widget {
 								.bold()
 								.lineLimit(1)
 								.monospaced()
+								.foregroundStyle(context.state.color.swiftUIColor)
 
 							SchoolDayActivityProgress(state: context.state)
 
@@ -73,16 +74,26 @@ struct SchoolDayLiveActivityWidget: Widget {
 				}
 			} compactLeading: {
 				Image(systemName: context.state.symbol)
+					.font(.system(size: 16))
 					.foregroundStyle(context.state.color.swiftUIColor)
 					.monospaced()
 
 			} compactTrailing: {
 				SchoolDayActivityTimer(state: context.state)
 					.font(.system(size: 16))
-					.frame(maxWidth: 51)
+					.frame(width: 51, alignment: .center)
 			} minimal: {
-				SchoolDayActivityTimer(state: context.state)
-					.font(.system(size: 12))
+				if let startDate = context.state.startDate,
+				   let endDate = context.state.endDate,
+				   startDate < endDate
+				{
+					ProgressView(timerInterval: startDate ... endDate, countsDown: true)
+						.progressViewStyle(.circular)
+						.tint(context.state.color.swiftUIColor)
+				} else {
+					Image(systemName: context.state.symbol)
+						.foregroundStyle(context.state.color.swiftUIColor)
+				}
 			}
 			.keylineTint(context.state.color.swiftUIColor)
 			.widgetURL(URL(string: "timetable://timetable"))
@@ -104,32 +115,42 @@ private struct SchoolDayLiveActivityView: View {
 	}
 
 	private var watchView: some View {
-		VStack(alignment: .leading) {
-			HStack(spacing: 5) {
+		HStack(alignment: .bottom, spacing: 10) {
+			if let startDate = context.state.startDate,
+			   let endDate = context.state.endDate,
+			   startDate < endDate
+			{
+				ProgressView(timerInterval: startDate ... endDate, countsDown: false)
+					.progressViewStyle(.circular)
+					.controlSize(.extraLarge)
+					.tint(context.state.color.swiftUIColor)
+					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+			} else {
 				Image(systemName: context.state.symbol)
-					.monospaced()
-
-				Text(context.state.title)
-					.font(.headline)
-					.monospaced()
-					.lineLimit(1)
+					.font(.system(size: 34))
+					.foregroundStyle(context.state.color.swiftUIColor)
+					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
 			}
 
-			Spacer()
+			VStack(alignment: .trailing, spacing: 4) {
+				HStack(spacing: 4) {
+					Image(systemName: context.state.symbol)
+					Text(context.state.title)
+						.lineLimit(1)
+				}
+				.font(.system(size: 13, weight: .semibold))
 
-			if context.isStale {
-				Label("Updating", systemImage: "arrow.trianglehead.2.clockwise")
-					.font(.caption2)
-					.foregroundStyle(.secondary)
-			} else {
-				SchoolDayActivityTimer(state: context.state)
-					.font(.system(size: 17, design: .monospaced))
-					.bold()
-					.monospaced()
+				Spacer(minLength: 4)
 
-				Spacer()
-
-				SchoolDayActivityProgress(state: context.state)
+				if context.isStale {
+					Label("Updating", systemImage: "arrow.trianglehead.2.clockwise")
+						.font(.system(size: 11))
+						.foregroundStyle(.secondary)
+				} else {
+					SchoolDayActivityTimer(state: context.state)
+						.font(.system(size: 22, weight: .bold, design: .monospaced))
+						.frame(width: 76, alignment: .center)
+				}
 			}
 		}
 		.padding(.vertical, 5)
@@ -145,19 +166,19 @@ private struct SchoolDayLiveActivityView: View {
 
 					Text(context.state.title)
 				}
-				.font(.title2.bold())
+				.font(.system(size: 22, weight: .bold))
 				.lineLimit(1)
 
 				Spacer()
 
 				SchoolDayActivityTimer(state: context.state)
-					.font(.title)
-					.frame(maxWidth: 90)
+					.font(.system(size: 28, weight: .bold, design: .monospaced))
+					.frame(width: 90, alignment: .center)
 			}
 
 			if context.isStale {
 				Label("Updating", systemImage: "arrow.trianglehead.2.clockwise")
-					.font(.caption)
+					.font(.system(size: 12))
 					.foregroundStyle(.secondary)
 			} else {
 				SchoolDayActivityProgress(state: context.state)
@@ -166,17 +187,18 @@ private struct SchoolDayLiveActivityView: View {
 			if let nextText = context.state.nextText {
 				HStack(alignment: .firstTextBaseline) {
 					Text("Next:")
+						.font(.system(size: 17))
 						.foregroundStyle(.secondary)
 
 					Spacer()
 
 					Text(nextText)
-						.font(.title2)
+						.font(.system(size: 22))
 						.lineLimit(1)
 				}
 			} else if context.state.phase == .finished {
 				Text("No more subjects")
-					.font(.headline)
+					.font(.system(size: 17, weight: .semibold))
 					.foregroundStyle(.secondary)
 			}
 		}
@@ -192,19 +214,21 @@ private struct SchoolDayActivityTimer: View {
 
 	var body: some View {
 		if let endDate = state.endDate {
-			Text(endDate, style: .timer)
-				.contentTransition(.numericText(countsDown: true))
-				.monospaced()
-				.transition(.blurReplace)
+			ZStack {
+				Text("00:00")
+					.hidden()
+				Text(endDate, style: .timer)
+					.fixedSize()
+			}
+			.monospacedDigit()
+			.contentTransition(.numericText(countsDown: true))
 
 		} else if state.phase == .finished {
 			Text("Done")
-				.monospaced()
-				.transition(.blurReplace)
+				.monospacedDigit()
 		} else {
 			Text("--:--")
-				.monospaced()
-				.transition(.blurReplace)
+				.monospacedDigit()
 		}
 	}
 }
@@ -216,14 +240,13 @@ private struct SchoolDayActivityProgress: View {
 
 	var body: some View {
 		if let startDate = state.startDate, let endDate = state.endDate, startDate < endDate {
-			ProgressView(timerInterval: startDate ... endDate, countsDown: false)
+			ProgressView(timerInterval: startDate ... endDate, countsDown: true)
 				.labelsHidden()
-				.tint(activityFamily == .small ? state.color.swiftUIColor : .white)
-//				.tint(.white)
+				.tint(state.color.swiftUIColor)
 
 		} else if state.phase == .finished {
 			Text("No more classes")
-				.font(.caption)
+				.font(.system(size: 12))
 				.foregroundStyle(.secondary)
 		}
 	}

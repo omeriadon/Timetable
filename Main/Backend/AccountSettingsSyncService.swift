@@ -113,6 +113,13 @@ final class AccountSettingsSyncService {
 					body: mutation.settings
 				)
 				Defaults[.lastServerSync] = Date.now
+				#if os(iOS)
+					if mutation.settings.liveActivitiesEnabled,
+					   !mutation.previousSettings.liveActivitiesEnabled
+					{
+						await LiveActivityRegistrationService.shared.reconcileAuthorization(requestStartIfNeeded: true)
+					}
+				#endif
 			} catch let NetworkError.server(_, response) where response.code == .invalidRequest {
 				if syncGeneration == mutation.generation {
 					Defaults[.accountSettings] = mutation.previousSettings

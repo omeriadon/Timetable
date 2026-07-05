@@ -202,6 +202,14 @@ nonisolated struct LiveActivityUpdateTokenRequest: Codable {
 	let isDebug: Bool
 }
 
+nonisolated struct ReconcileLiveActivityRequest: Codable {
+	let installationID: String
+}
+
+nonisolated struct ReconcileLiveActivityResponse: Codable {
+	let started: Bool
+}
+
 nonisolated struct TestNotificationResponse: Codable {
 	let deliveredDeviceCount: Int
 }
