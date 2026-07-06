@@ -63,11 +63,63 @@ struct TimetableView: View {
 						nil
 					}
 
-					TimetableComparison(selectedSlot: selectedSlot, subject: subject)
-						.opacity(selectedSlot == nil ? 0 : 1)
-						.blur(radius: selectedSlot == nil ? 20 : 0)
-						.allowsHitTesting(selectedSlot != nil)
-						.animation(.snappy(duration: 0.3), value: "\(String(describing: selectedSlot))\(String(describing: subject?.id))")
+					VStack {
+						if let subject {
+							let rightView = VStack(alignment: .leading) {
+								Label {
+									switch subject.classroom {
+										case let .room(building, floor, number):
+											let secondaryText = if let floor {
+												"\(floor.displayName) \(building.displayName)"
+											} else {
+												building.displayName
+											}
+
+											HStack(spacing: 10) {
+												Text(secondaryText)
+													.textCase(.uppercase)
+													.foregroundStyle(.secondary)
+
+												Text(number.description)
+													.font(.headline)
+													.bold()
+											}
+
+										case let .unknown(rawLocation):
+											Text(rawLocation)
+									}
+
+								} icon: {
+									Image(systemName: "door.left.hand.open")
+								}
+
+								Label(subject.teacher.displayName, systemImage: "person.fill")
+							}
+
+							let leftView = VStack(alignment: .leading) {
+								Text("You")
+									.textCase(.uppercase)
+									.foregroundStyle(.secondary)
+								Label(subject.id, systemImage: subject.symbol)
+							}
+
+							item(left: leftView, right: rightView, colour: subject.colour.swiftUIColor, top: true)
+								.padding(.horizontal, 5)
+								.padding(10)
+								.id(subject.id)
+								.transition(.blurReplace)
+								.animation(.spring(.bouncy), value: subject.id)
+						}
+
+						Spacer()
+							.frame(height: 10)
+
+						TimetableComparison(selectedSlot: selectedSlot, subject: subject)
+							.opacity(selectedSlot == nil ? 0 : 1)
+							.blur(radius: selectedSlot == nil ? 20 : 0)
+							.allowsHitTesting(selectedSlot != nil)
+							.animation(.snappy(duration: 0.3), value: selectedSlot)
+					}
 				}
 				.scrollIndicators(.visible)
 				#if os(macOS)
@@ -165,10 +217,12 @@ struct TimetableView: View {
 					SessionCellView(day, session, subjectLookup, selectedSlot)
 						.contentShape(Rectangle())
 						.onTapGesture {
-							if selectedSlot == Slot(day, session) {
-								selectedSlot = nil
-							} else if subjectLookup[Slot(day, session)] != nil {
-								selectedSlot = Slot(day, session)
+							withAnimation(.snappy(duration: 0.3)) {
+								if selectedSlot == Slot(day, session) {
+									selectedSlot = nil
+								} else if subjectLookup[Slot(day, session)] != nil {
+									selectedSlot = Slot(day, session)
+								}
 							}
 						}
 				}
@@ -193,24 +247,3 @@ struct TimetableView: View {
 		return EditableSlot(day: day, period: period)
 	}
 }
-
-#if os(iOS)
-	#Preview {
-		@Previewable @State var showTimetableComparison = true
-
-		@Previewable @State var syncMode: SyncMode = .normal
-		@Previewable @State var bridge = PhoneWatchSyncBridge()
-
-		TimetableView(
-			watchSync: $bridge,
-			syncStatus: $syncMode,
-			startComparisonOpen: false
-		)
-	}
-#else
-	#Preview {
-		@Previewable @State var showTimetableComparison = true
-
-		TimetableView(expanded: .constant(.none), startComparisonOpen: false)
-	}
-#endif

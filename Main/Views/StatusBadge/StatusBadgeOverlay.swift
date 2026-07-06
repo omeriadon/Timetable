@@ -61,7 +61,7 @@ struct StatusBadgeOverlay: View {
 		.frame(height: badgeHeight)
 		.contentShape(.capsule)
 		.clipShape(.capsule)
-		.glassEffect(.clear.interactive(), in: .capsule)
+		.glassEffect(.regular.interactive(), in: .capsule)
 		.contentTransition(.interpolate)
 		.animation(animation, value: badge)
 
