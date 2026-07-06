@@ -10,8 +10,9 @@ struct WatchSessionRootView: View {
 					WatchSignInView()
 						.transition(.blurReplace)
 				case .restoring:
-					ProgressView("Restoring Account…")
-						.transition(.blurReplace)
+//					ProgressView("Restoring Account…")
+//						.transition(.blurReplace)
+					Color.clear
 				case .authenticated:
 					WatchRootTabView()
 						.transition(.identity)
