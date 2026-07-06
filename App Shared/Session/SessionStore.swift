@@ -45,8 +45,6 @@ final class SessionStore {
 	private var accountBootstrapHandler: (() async throws -> Void)?
 	private var authenticatedHandler: (() async -> Void)?
 	private var signingOutHandler: (() async -> Void)?
-	private var watchAuthenticatedHandler: ((String, String, AccountProfile) -> Void)?
-	private var watchSignedOutHandler: (() -> Void)?
 
 	private init(networkManager: NetworkManager) {
 		self.networkManager = networkManager
@@ -65,7 +63,6 @@ final class SessionStore {
 
 		if let accessToken, !accessToken.isEmpty {
 			state = .authenticated(profile)
-			syncSessionToWatch(profile: profile)
 			await authenticatedHandler?()
 			if let accountBootstrapHandler {
 				try? await accountBootstrapHandler()
@@ -117,6 +114,10 @@ final class SessionStore {
 			.v1AuthLogin,
 			body: LoginRequest(email: email, password: password)
 		)
+		try await apply(response, bootstrap: true)
+	}
+
+	func acceptProvisionedSession(_ response: TokenResponse) async throws {
 		try await apply(response, bootstrap: true)
 	}
 
@@ -204,14 +205,6 @@ final class SessionStore {
 		clearSessionState()
 	}
 
-	func configureWatchSessionDistribution(
-		authenticated: @escaping (String, String, AccountProfile) -> Void,
-		signedOut: @escaping () -> Void
-	) {
-		watchAuthenticatedHandler = authenticated
-		watchSignedOutHandler = signedOut
-	}
-
 	func configureAccountBootstrap(_ bootstrap: @escaping () async throws -> Void) {
 		accountBootstrapHandler = bootstrap
 	}
@@ -222,37 +215,6 @@ final class SessionStore {
 	) {
 		authenticatedHandler = authenticated
 		signingOutHandler = signingOut
-	}
-
-	func receiveWatchSession(_ envelope: WatchSessionEnvelope) async throws {
-		switch envelope.event {
-			case .signedOut:
-				clearSessionState()
-			case .authenticated:
-				guard let accessToken = envelope.accessToken,
-				      let refreshToken = envelope.refreshToken,
-				      let profile = envelope.profile,
-				      !accessToken.isEmpty,
-				      !refreshToken.isEmpty
-				else {
-					throw SessionStoreError.credentialPersistenceFailed
-				}
-
-				guard KeychainManager.save(string: accessToken, forKey: accessTokenKey),
-				      KeychainManager.save(string: refreshToken, forKey: refreshTokenKey)
-				else {
-					throw SessionStoreError.credentialPersistenceFailed
-				}
-
-				Defaults[.accountProfile] = profile
-				Defaults[.userDisplayName] = profile.displayName
-				state = .authenticated(profile)
-				configureNetworkAuthentication()
-				await authenticatedHandler?()
-				if let accountBootstrapHandler {
-					try await accountBootstrapHandler()
-				}
-		}
 	}
 
 	private var accessToken: String? {
@@ -285,7 +247,6 @@ final class SessionStore {
 		}
 		let profile = persist(response.user)
 		state = .authenticated(profile)
-		syncSessionToWatch(profile: profile)
 		await authenticatedHandler?()
 		if bootstrap, let accountBootstrapHandler {
 			try await accountBootstrapHandler()
@@ -313,13 +274,7 @@ final class SessionStore {
 		state = .signedOut
 		networkManager.clearAuthentication()
 		configureNetworkAuthentication()
-		watchSignedOutHandler?()
 		Print("Cleared local session state", category: .account)
-	}
-
-	private func syncSessionToWatch(profile: AccountProfile) {
-		guard let accessToken, let refreshToken else { return }
-		watchAuthenticatedHandler?(accessToken, refreshToken, profile)
 	}
 }
 

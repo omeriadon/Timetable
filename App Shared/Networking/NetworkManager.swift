@@ -169,10 +169,7 @@ final class NetworkManager {
 	init(
 		monitor: NWPathMonitor = NWPathMonitor()
 	) {
-		let config = URLSessionConfiguration.default
-		config.requestCachePolicy = .reloadIgnoringLocalCacheData
-
-		session = URLSession(configuration: config)
+		session = Self.makeSession()
 		self.monitor = monitor
 
 		let decoder = JSONDecoder()
@@ -207,16 +204,20 @@ final class NetworkManager {
 
 	func startMonitoring() {
 		guard !isMonitoring else { return }
+
 		isMonitoring = true
+
 		monitor.pathUpdateHandler = { [weak self] path in
 			Task { @MainActor [weak self] in
 				guard let self else { return }
-				isOnline = path.status != .unsatisfied
-				if isOnline {
+
+				if path.status == .satisfied {
+					isOnline = true
 					offlineRequestAttempted = false
 				}
 			}
 		}
+
 		monitor.start(queue: monitorQueue)
 	}
 
@@ -287,16 +288,20 @@ final class NetworkManager {
 	// MARK: - Request Execution
 
 	private func execute(_ endpoint: Endpoint, body: Data?, context: NetworkRequestContext, mayRefresh: Bool = true) async throws -> Data {
-		try requireOnline()
 		if endpoint.requiresAuthentication, accessTokenProvider?() == nil {
 			throw NetworkError.authenticationRequired
 		}
+
 		let clock = ContinuousClock()
 		let start = clock.now
 
 		do {
 			let request = try makeRequest(for: endpoint, body: body)
 			let (data, response) = try await session.data(for: request)
+
+			isOnline = true
+			offlineRequestAttempted = false
+
 			guard let response = response as? HTTPURLResponse else {
 				throw NetworkError.invalidResponse
 			}
@@ -306,12 +311,29 @@ final class NetworkManager {
 			}
 
 			try validate(response: response, data: data)
+
 			Print(
 				"\(endpoint.method.rawValue) \(endpoint.path) completed with status \(response.statusCode)",
 				category: .network,
 				duration: start.duration(to: clock.now)
 			)
+
 			return data
+		} catch is CancellationError {
+			throw NetworkError.cancelled
+		} catch let error as URLError {
+			let networkError = map(error)
+
+			if networkError == .offline {
+				isOnline = false
+				offlineRequestAttempted = true
+				if context == .userInitiated { feedbackHandler?(.offline) }
+			} else {
+				PrintError("Transport failed for \(endpoint.path)", category: .network, error: error)
+				if context == .userInitiated { feedbackHandler?(networkError) }
+			}
+
+			throw networkError
 		} catch let error as NetworkError {
 			switch error {
 				case .cancelled:
@@ -320,6 +342,7 @@ final class NetworkManager {
 					if context == .userInitiated { feedbackHandler?(.authenticationRequired) }
 					throw error
 				case .offline:
+					isOnline = false
 					offlineRequestAttempted = true
 					if context == .userInitiated { feedbackHandler?(.offline) }
 					throw error
@@ -329,22 +352,6 @@ final class NetworkManager {
 					PrintError("Request failed for \(endpoint.path)", category: .network, error: error)
 					if context == .userInitiated { feedbackHandler?(error) }
 					throw error
-			}
-		} catch is CancellationError {
-			throw NetworkError.cancelled
-		} catch let error as URLError {
-			let networkError = map(error)
-			switch networkError {
-				case .cancelled:
-					throw networkError
-				case .offline:
-					offlineRequestAttempted = true
-					if context == .userInitiated { feedbackHandler?(.offline) }
-					throw networkError
-				default:
-					PrintError("Transport failed for \(endpoint.path)", category: .network, error: error)
-					if context == .userInitiated { feedbackHandler?(networkError) }
-					throw networkError
 			}
 		} catch {
 			let networkError = NetworkError.transport(error.localizedDescription)

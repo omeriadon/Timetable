@@ -54,14 +54,27 @@ struct TimetableApp: App {
 
 	var body: some Scene {
 		WindowGroup {
-			ContentView(expanded: $expanded)
+			Group {
+				#if os(macOS)
+					switch sessionStore.state {
+						case .signedOut:
+						MacSignInGateView()
+						case .restoring:
+						ProgressView("Restoring Account…")
+						case .authenticated:
+						ContentView(expanded: $expanded)
+					}
+				#else
+					ContentView(expanded: $expanded)
+				#endif
+			}
 			#if os(iOS)
-				.windowOverlay(isPresented: true, disableSafeArea: false) {
-					StatusBadgeOverlay()
-						.zIndex(9_999_999)
-				}
+			.windowOverlay(isPresented: true, disableSafeArea: false) {
+				StatusBadgeOverlay()
+					.zIndex(9_999_999)
+			}
 			#else
-				.overlay {
+			.overlay {
 						StatusBadgeOverlay()
 							.zIndex(9_999_999)
 					}
@@ -175,3 +188,21 @@ struct TimetableApp: App {
 		}
 	#endif // os(macOS)
 }
+
+#if os(macOS)
+	private struct MacSignInGateView: View {
+		var body: some View {
+			Color.clear
+				.sheet(isPresented: .constant(true)) {
+					VStack(spacing: 16) {
+						Text("Sign In Required").font(.title2.bold())
+						Text("Sign in to view your timetable on this Mac.").foregroundStyle(.secondary)
+						AccountAuthenticationView(allowsSignUp: false)
+					}
+					.padding(30)
+					.frame(width: 520, height: 560)
+					.interactiveDismissDisabled()
+				}
+		}
+	}
+#endif

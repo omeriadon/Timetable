@@ -13,18 +13,6 @@ final class PhoneWatchSyncBridge: NSObject, WCSessionDelegate {
 
 	override init() {
 		super.init()
-		SessionStore.shared.configureWatchSessionDistribution(
-			authenticated: { [weak self] accessToken, refreshToken, profile in
-				self?.pushAuthenticatedSession(
-					accessToken: accessToken,
-					refreshToken: refreshToken,
-					profile: profile
-				)
-			},
-			signedOut: { [weak self] in
-				self?.pushSignedOutSession()
-			}
-		)
 	}
 
 	func activateIfNeeded() {
@@ -45,41 +33,6 @@ final class PhoneWatchSyncBridge: NSObject, WCSessionDelegate {
 		Print("Skipped obsolete timetable transfer to watch", category: .watch)
 	}
 
-	func pushAuthenticatedSession(accessToken: String, refreshToken: String, profile: AccountProfile) {
-		do {
-			try send(.authenticated(
-				accessToken: accessToken,
-				refreshToken: refreshToken,
-				profile: profile
-			))
-			Print("Sent authenticated session state to watch", category: .watch)
-		} catch {
-			PrintError("Failed to send authenticated session state to watch", category: .watch, error: error)
-		}
-	}
-
-	func pushSignedOutSession() {
-		do {
-			try send(.signedOut())
-			Print("Sent signed-out session state to watch", category: .watch)
-		} catch {
-			PrintError("Failed to send signed-out session state to watch", category: .watch, error: error)
-		}
-	}
-
-	private func send(_ envelope: WatchSessionEnvelope) throws {
-		activateIfNeeded()
-		let payload = try ["sessionEnvelope": JSONEncoder().encode(envelope)]
-		let session = WCSession.default
-		try session.updateApplicationContext(payload)
-
-		if session.isReachable {
-			session.sendMessage(payload, replyHandler: nil) { error in
-				PrintError("Watch live session sync failed", category: .watch, error: error)
-			}
-		}
-	}
-
 	func session(_: WCSession, activationDidCompleteWith _: WCSessionActivationState, error: Error?) {
 		if let error {
 			PrintError("WatchConnectivity activation failed: \(error.localizedDescription)")
@@ -87,6 +40,25 @@ final class PhoneWatchSyncBridge: NSObject, WCSessionDelegate {
 	}
 
 	func sessionDidBecomeInactive(_: WCSession) {}
+
+	func session(_: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
+		guard let installationID = message["watchSessionInstallationID"] as? String else {
+			replyHandler(["error": "The Watch sign-in request was invalid."])
+			return
+		}
+		Task { @MainActor in
+			do {
+				let response: TokenResponse = try await NetworkManager.shared.send(
+					Endpoint("/v1/auth/watch-session", method: .post),
+					body: WatchSessionRequest(installationID: installationID),
+					context: .background
+				)
+				try replyHandler(["watchSession": JSONEncoder().encode(response)])
+			} catch {
+				replyHandler(["error": "The iPhone could not sign in this Watch."])
+			}
+		}
+	}
 
 	func sessionDidDeactivate(_ session: WCSession) {
 		session.activate()

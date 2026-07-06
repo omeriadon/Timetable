@@ -1,6 +1,6 @@
 //
 //  StatusBadgeManager.swift
-//  Timetable
+//  App Shared
 //
 
 import Foundation

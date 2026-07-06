@@ -11,16 +11,23 @@ import SwiftUI
 struct AccountAuthenticationView: View {
 	@State private var model = AccountAuthenticationModel()
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
+	let allowsSignUp: Bool
+
+	init(allowsSignUp: Bool = true) {
+		self.allowsSignUp = allowsSignUp
+	}
 
 	var body: some View {
 		ScrollView {
 			VStack(spacing: 18) {
-				Picker("Account action", selection: $model.mode) {
-					ForEach(AccountAuthenticationMode.allCases) { mode in
-						Text(mode.rawValue).tag(mode)
+				if allowsSignUp {
+					Picker("Account action", selection: $model.mode) {
+						ForEach(AccountAuthenticationMode.allCases) { mode in
+							Text(mode.rawValue).tag(mode)
+						}
 					}
+					.pickerStyle(.segmented)
 				}
-				.pickerStyle(.segmented)
 
 				Spacer()
 					.frame(height: 20)

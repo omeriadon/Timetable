@@ -37,6 +37,10 @@ nonisolated struct TokenResponse: Codable {
 	let user: UserProfileResponse
 }
 
+nonisolated struct WatchSessionRequest: Codable {
+	let installationID: String
+}
+
 nonisolated struct UserProfileResponse: Codable {
 	let id: UUID
 	let email: String?
