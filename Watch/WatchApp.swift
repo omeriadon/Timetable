@@ -19,6 +19,7 @@ struct TimetableWatchApp: App {
 				WatchSessionRootView(sessionStore: sessionStore)
 				WatchStatusBadgeOverlay()
 			}
+			.monospaced()
 			.environment(\.statusBadgeManager, statusBadgeManager)
 			.task {
 				await configureAndRestore()
