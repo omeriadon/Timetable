@@ -14,7 +14,10 @@ struct WatchSessionRootView: View {
 						.transition(.blurReplace)
 				case .authenticated:
 					WatchRootTabView()
-						.transition(.blurReplace)
+						.transition(.identity)
+						.transaction { transaction in
+							transaction.animation = nil
+						}
 			}
 		}
 		.animation(.easeInOut, value: sessionStore.state)

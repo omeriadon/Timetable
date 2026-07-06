@@ -15,6 +15,15 @@ final class WatchProvisioningService: NSObject, WCSessionDelegate {
 		session.activate()
 	}
 
+	/// Whether the paired iPhone is currently reachable for a session push.
+	var isPhoneReachable: Bool {
+		guard WCSession.isSupported() else { return false }
+		let session = WCSession.default
+		return session.activationState == .activated && session.isReachable
+	}
+
+	/// Asks the paired iPhone to provision a session for this Watch.
+	/// Silently does nothing if the phone is unreachable — this is optional sugar, not required.
 	func requestSessionIfPossible() {
 		guard WCSession.isSupported(), !isRequesting else { return }
 		let session = WCSession.default
@@ -22,16 +31,8 @@ final class WatchProvisioningService: NSObject, WCSessionDelegate {
 		if session.activationState == .notActivated {
 			session.activate()
 		}
-		guard session.activationState == .activated, session.isReachable else {
-			StatusBadgeManager.shared.addBadge(
-				id: UUID(),
-				title: "iPhone Unavailable",
-				secondaryText: "Open Timetable on the paired iPhone and try again.",
-				priority: 3,
-				view: .info
-			)
-			return
-		}
+		// Silently bail if unreachable — no badge, no error. The Watch is independent.
+		guard session.activationState == .activated, session.isReachable else { return }
 		isRequesting = true
 		let installationID = Defaults[.installationID]
 		session.sendMessage(["watchSessionInstallationID": installationID], replyHandler: { reply in
@@ -40,26 +41,22 @@ final class WatchProvisioningService: NSObject, WCSessionDelegate {
 				guard let data = reply["watchSession"] as? Data,
 				      let response = try? JSONDecoder().decode(TokenResponse.self, from: data)
 				else {
-					self.presentReplyError(reply)
+					// Silent failure — user can try the Watch's own sign-in instead.
 					return
 				}
-				do {
-					try await SessionStore.shared.acceptProvisionedSession(response)
-					StatusBadgeManager.shared.addBadge(id: UUID(), title: "Watch Connected", priority: 3, view: .success)
-				} catch {
-					StatusBadgeManager.shared.present(error: error, title: "Connection Failed")
-				}
+				try? await SessionStore.shared.acceptProvisionedSession(response)
 			}
-		}, errorHandler: { error in
+		}, errorHandler: { _ in
 			Task { @MainActor in
 				self.isRequesting = false
-				StatusBadgeManager.shared.present(error: error, title: "iPhone Unavailable")
+				// Silent failure — phone connectivity is optional.
 			}
 		})
 	}
 
 	nonisolated func session(_: WCSession, activationDidCompleteWith _: WCSessionActivationState, error _: Error?) {
-		Task { @MainActor in self.requestSessionIfPossible() }
+		// Session activated — passively listen for iPhone-pushed sessions only.
+		// Do NOT auto-request: the Watch is fully independent of the iPhone.
 	}
 
 	nonisolated func session(_: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
@@ -69,16 +66,5 @@ final class WatchProvisioningService: NSObject, WCSessionDelegate {
 			else { return }
 			try? await SessionStore.shared.acceptProvisionedSession(response)
 		}
-	}
-
-	private func presentReplyError(_ reply: [String: Any]) {
-		let message = reply["error"] as? String ?? "The iPhone returned an invalid session."
-		StatusBadgeManager.shared.addBadge(
-			id: UUID(),
-			title: "Connection Failed",
-			secondaryText: message,
-			priority: 4,
-			view: .error
-		)
 	}
 }

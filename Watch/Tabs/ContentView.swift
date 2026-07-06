@@ -19,36 +19,43 @@ struct ContentView: View {
 	var body: some View {
 		let subjectLookup = TimetableLayout.subjectLookup(for: subjects)
 
-		Group { if subjects.isEmpty {
-			ContentUnavailableView("No Timetable", systemImage: "calendar.badge.exclamationmark", description: Text("Sign in and sync your timetable to view it here."))
-		} else { NavigationStack {
-			VStack {
-				HStack(spacing: 2) {
-					VStack(spacing: 2) {
-						Text("")
-							.frame(height: 15)
-							.font(.footnote)
-
-						ForEach(Array(TimetableLayout.sessions.enumerated()), id: \.offset) { index, session in
-							if TimetableLayout.isBreakSession(index: index) {
-								Text(session)
-									.font(.footnote.scaled(by: 0.7))
-									.foregroundStyle(.secondary)
-									.frame(height: 2)
-							} else {
-								Text(session)
+		NavigationStack {
+			ZStack {
+				if subjects.isEmpty {
+					ContentUnavailableView("No Timetable", systemImage: "calendar.badge.exclamationmark", description: Text("Sign in and sync your timetable to view it here."))
+						.transition(.blurReplace)
+				} else {
+					VStack {
+						HStack(spacing: 2) {
+							VStack(spacing: 2) {
+								Text("")
+									.frame(height: 15)
 									.font(.footnote)
-									.frame(height: 25)
-							}
-						}
-					}
-					.frame(width: 7)
 
-					mainContent(subjectLookup: subjectLookup)
+								ForEach(Array(TimetableLayout.sessions.enumerated()), id: \.offset) { index, session in
+									if TimetableLayout.isBreakSession(index: index) {
+										Text(session)
+											.font(.footnote.scaled(by: 0.7))
+											.foregroundStyle(.secondary)
+											.frame(height: 2)
+									} else {
+										Text(session)
+											.font(.footnote)
+											.frame(height: 25)
+									}
+								}
+							}
+							.frame(width: 7)
+
+							mainContent(subjectLookup: subjectLookup)
+						}
+						Spacer()
+					}
+					.transition(.blurReplace)
 				}
-				Spacer()
 			}
-		} } }
+		}
+		.animation(.easeInOut, value: subjects.isEmpty)
 		.padding(.trailing, 8)
 		.environment(\.dynamicTypeSize, .xSmall)
 		.monospaced()
@@ -99,7 +106,7 @@ struct ContentView: View {
 					} else {
 						// empty periods
 						RoundedRectangle(cornerRadius: 5)
-							.fill(.gray)
+							.fill(.gray).opacity(0.5)
 							.frame(height: 25)
 					}
 				}

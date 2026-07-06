@@ -40,15 +40,16 @@ private struct WatchBadgeMetrics {
 	}
 
 	var height: CGFloat {
-		48 * scale
+		60 * scale
 	}
 
 	var topPadding: CGFloat {
-		18 * scale
+//		18 * scale
+		0
 	}
 
 	var horizontalPadding: CGFloat {
-		8 * scale
+		14 * scale
 	}
 
 	var spacing: CGFloat {
@@ -64,11 +65,11 @@ private struct WatchBadgeMetrics {
 	}
 
 	var primaryFontSize: CGFloat {
-		15 * scale
+		18 * scale
 	}
 
 	var secondaryFontSize: CGFloat {
-		12.5 * scale
+		14 * scale
 	}
 
 	var symbolSize: CGFloat {
@@ -76,7 +77,7 @@ private struct WatchBadgeMetrics {
 	}
 
 	var terminalSymbolSize: CGFloat {
-		20 * scale
+		27 * scale
 	}
 
 	var gaugeSize: CGFloat {
@@ -115,7 +116,7 @@ private struct WatchBadgeCapsule: View {
 		}
 		.frame(width: metrics.width, height: metrics.height)
 		.clipShape(.capsule)
-		.glassEffect(.regular.interactive(), in: .capsule)
+		.glassEffect(.clear.interactive(), in: .capsule)
 		.contentTransition(.interpolate)
 		.animation(
 			reduceMotion ? .easeInOut(duration: 0.16) : .spring(response: 0.34, dampingFraction: 0.92),
@@ -178,7 +179,7 @@ private struct WatchBadgeContent: View {
 					.gaugeStyle(.accessoryCircularCapacity)
 					.tint(.white)
 					.foregroundStyle(.white)
-					.scaleEffect(0.5)
+					.scaleEffect(0.6)
 					.frame(width: metrics.gaugeSize, height: metrics.gaugeSize)
 					.overlay { ProgressView().controlSize(.mini) }
 		}

@@ -20,8 +20,5 @@ struct WatchSignInView: View {
 				.disabled(provisioningService.isRequesting)
 		}
 		.padding()
-		.task {
-			provisioningService.requestSessionIfPossible()
-		}
 	}
 }

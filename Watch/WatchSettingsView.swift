@@ -6,43 +6,66 @@ struct WatchSettingsView: View {
 	@Default(.accountProfile) private var profile
 	@Environment(\.statusBadgeManager) private var badges
 
+	@State private var signOutConfirm = false
+
 	var body: some View {
-		List {
-			Section("Account") {
-				if let profile {
-					LabeledContent("Name", value: profile.displayName)
-					if let email = profile.email {
-						LabeledContent("Email", value: email)
+		NavigationStack {
+			List {
+				Section("Account") {
+					if let profile {
+						LabeledContent("Name", value: profile.displayName)
+						if let email = profile.email {
+							LabeledContent("Email", value: email)
+								.lineLimit(2)
+						}
 					}
+					Button("Sign Out", systemImage: "door.left.hand.open", role: .destructive) {
+						signOutConfirm = true
+					}
+					.confirmationDialog(Text("Sign Out?"), isPresented: $signOutConfirm, actions: {
+						Button(role: .cancel) {}
+						Button(role: .destructive) {
+							Task { await SessionStore.shared.signOut() }
+						} label: {
+							Label("Sign out", systemImage: "door.left.hand.open")
+								.monospaced()
+						}
+					})
 				}
-				Button("Sign Out", role: .destructive) {
-					Task { await SessionStore.shared.signOut() }
+
+				#if DEBUG
+					Section("Developer") {
+						Button("Test Progress", systemImage: "progress.indicator") {
+							testBadge(title: "Syncing account", secondaryText: "Working", view: .progressView)
+						}
+						Button("Test Success", systemImage: "checkmark.circle") {
+							testBadge(title: "Saving timetable", view: .success)
+						}
+						Button("Test Info", systemImage: "info.circle") {
+							testBadge(title: "Info here", view: .info)
+						}
+						Button("Test Error", systemImage: "xmark.circle") {
+							testBadge(title: "Contacting server", view: .error)
+						}
+						Button("Test Warning", systemImage: "exclamationmark.triangle") {
+							testBadge(title: "Checking timetable", view: .warning)
+						}
+						Button("Test Progress and Gauge", systemImage: "arrow.trianglehead.2.clockwise.rotate.90") {
+							Task { await testProgressGauge() }
+						}
+						Button("Reload Widgets", systemImage: "arrow.clockwise", action: reloadWidgets)
+					}
+				#endif
+			}
+			.scrollEdgeEffectStyle(.soft, for: .top)
+			.toolbar {
+				ToolbarItem(placement: .topBarLeading) {
+					Text("Timetable")
+						.monospaced()
+						.bold()
+						.font(.title3)
 				}
 			}
-
-			#if DEBUG
-				Section("Developer") {
-					Button("Test Progress", systemImage: "progress.indicator") {
-						testBadge(title: "Syncing account", secondaryText: "Working", view: .progressView)
-					}
-					Button("Test Success", systemImage: "checkmark.circle") {
-						testBadge(title: "Saving timetable", view: .success)
-					}
-					Button("Test Info", systemImage: "info.circle") {
-						testBadge(title: "Info here", view: .info)
-					}
-					Button("Test Error", systemImage: "xmark.circle") {
-						testBadge(title: "Contacting server", view: .error)
-					}
-					Button("Test Warning", systemImage: "exclamationmark.triangle") {
-						testBadge(title: "Checking timetable", view: .warning)
-					}
-					Button("Test Progress and Gauge", systemImage: "arrow.trianglehead.2.clockwise.rotate.90") {
-						Task { await testProgressGauge() }
-					}
-					Button("Reload Widgets", systemImage: "arrow.clockwise", action: reloadWidgets)
-				}
-			#endif
 		}
 	}
 

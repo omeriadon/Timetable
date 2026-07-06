@@ -24,6 +24,8 @@ struct WatchTimetablesTabView: View {
 		TabView {
 			Tab("Timetable", systemImage: "calendar") {
 				ContentView()
+					.frame(maxWidth: .infinity, maxHeight: .infinity)
+					.containerRelativeFrame([.horizontal, .vertical])
 			}
 
 			Tab("Current Subject", systemImage: "timer") {
@@ -31,6 +33,8 @@ struct WatchTimetablesTabView: View {
 					.containerBackground(for: .tabView) {
 						WatchSchoolProgressBackground(state: ownerState, now: adjustedNow)
 					}
+					.frame(maxWidth: .infinity, maxHeight: .infinity)
+					.containerRelativeFrame([.horizontal, .vertical])
 			}
 
 			ForEach(receivedTimetables) { receivedTimetable in
@@ -42,6 +46,8 @@ struct WatchTimetablesTabView: View {
 								now: adjustedNow
 							)
 						}
+						.frame(maxWidth: .infinity, maxHeight: .infinity)
+						.containerRelativeFrame([.horizontal, .vertical])
 				}
 			}
 		}

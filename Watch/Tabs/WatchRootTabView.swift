@@ -3,11 +3,11 @@ import SwiftUI
 struct WatchRootTabView: View {
 	var body: some View {
 		TabView {
-			Tab("Timetables", systemImage: "calendar") {
+			Tab("Timetables", systemImage: "circle.fill") {
 				WatchTimetablesTabView()
 			}
 
-			Tab("Settings", systemImage: "gear") {
+			Tab("Settings", systemImage: "circle.fill") {
 				WatchSettingsView()
 			}
 		}
