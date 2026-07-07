@@ -11,6 +11,7 @@ struct WatchSignInView: View {
 
 			Text("Sign in on iPhone to sign this Watch in")
 				.multilineTextAlignment(.center)
+				.lineLimit(3)
 				.font(.headline)
 				.fontWeight(.regular)
 
@@ -39,7 +40,7 @@ struct WatchSignInView: View {
 			.disabled(provisioningService.isRequesting == true)
 		}
 		.ignoresSafeArea(.all, edges: .vertical)
-		.padding(.bottom, 10)
-		.padding(.top, 15)
+		.padding(.bottom, 1)
+		.padding(.top, 5)
 	}
 }
