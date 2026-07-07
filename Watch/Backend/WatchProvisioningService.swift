@@ -106,7 +106,7 @@ final class WatchProvisioningService: NSObject, WCSessionDelegate {
 		timeoutTask?.cancel()
 
 		timeoutTask = Task { [weak self] in
-			try? await Task.sleep(for: .seconds(10))
+			try? await Task.sleep(for: .seconds(4))
 
 			await MainActor.run {
 				guard let self, self.isRequesting else { return }

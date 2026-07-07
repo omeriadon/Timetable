@@ -33,7 +33,7 @@ struct WatchTimetablesTabView: View {
 					CurrentSubjectView(now: adjustedNow)
 						.containerBackground(for: .tabView) {
 							WatchSchoolProgressBackground(state: ownerState, now: adjustedNow)
-						}
+						}r4g4g4eeew4g4
 						.frame(maxWidth: .infinity, maxHeight: .infinity)
 						.containerRelativeFrame([.horizontal, .vertical])
 				}
