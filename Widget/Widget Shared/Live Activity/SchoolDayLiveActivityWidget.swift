@@ -58,8 +58,7 @@ struct SchoolDayLiveActivityWidget: Widget {
 							Text(context.state.title)
 							Spacer()
 						}
-						.padding(.top, isBreak ? 3 : 0)
-						.font(.system(size: 28))
+						.font(.system(size: 22))
 						.bold()
 						.lineLimit(1)
 						.monospaced()
@@ -74,7 +73,8 @@ struct SchoolDayLiveActivityWidget: Widget {
 								Spacer()
 
 								Text(nextText)
-									.font(.system(size: 22))
+									.font(.system(size: 19))
+									.bold()
 									.lineLimit(1)
 							}
 							.padding(.horizontal, 10)
@@ -82,7 +82,6 @@ struct SchoolDayLiveActivityWidget: Widget {
 
 						Spacer(minLength: 1)
 					}
-
 					.background {
 						if context.state.phase == .recess || context.state.phase == .lunch {
 							StaticIrregularGradient(
@@ -172,6 +171,8 @@ private struct SchoolDayLiveActivityView: View {
 					.font(.system(size: 16, weight: .semibold, design: .monospaced))
 			}
 
+			Spacer(minLength: 1)
+
 			if let startDate = context.state.startDate,
 			   let endDate = context.state.endDate,
 			   startDate < endDate
@@ -182,6 +183,7 @@ private struct SchoolDayLiveActivityView: View {
 			} else {
 				Text("Done")
 					.font(.system(size: 25, design: .monospaced))
+					.monospaced()
 			}
 
 			Spacer(minLength: 1)
@@ -189,13 +191,15 @@ private struct SchoolDayLiveActivityView: View {
 			if let nextText = context.state.nextText {
 				HStack {
 					Text("Next:")
-						.font(.system(size: 18, design: .monospaced))
+						.font(.system(size: 18))
 						.foregroundStyle(.secondary)
+						.monospaced()
 
 					Spacer()
 
 					Text(nextText)
-						.font(.system(size: 20, design: .monospaced))
+						.font(.system(size: 20))
+						.monospacedDigit()
 				}
 			} else {
 				HStack {
@@ -232,18 +236,17 @@ private struct SchoolDayLiveActivityView: View {
 							.monospaced()
 
 						Spacer()
-						Spacer()
+							.frame(width: 50)
 
 						if let nextText = context.state.nextText {
 							Text("Next:")
-								.font(.system(size: 17))
+								.font(.system(size: 15))
 								.foregroundStyle(.secondary)
 
 							Spacer()
 
 							Text(nextText)
-								.font(.system(size: 22))
-								.bold()
+								.font(.system(size: 18))
 								.lineLimit(1)
 								.foregroundStyle(.white)
 

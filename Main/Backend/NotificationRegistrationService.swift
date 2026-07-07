@@ -122,6 +122,7 @@ final class NotificationRegistrationService {
 			)
 			Defaults[.hasRegisteredAPNsToken] = true
 			registrationState = .registered
+			StatusBadgeManager.shared.updateBadge(id: badgeID, title: "Device registered", view: .success)
 		} catch {
 			Defaults[.hasRegisteredAPNsToken] = false
 			registrationState = .failed(error.localizedDescription)

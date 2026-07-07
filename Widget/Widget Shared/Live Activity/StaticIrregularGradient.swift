@@ -29,7 +29,6 @@ struct StaticIrregularGradient: View {
 							.blur(radius: blur(for: index))
 					}
 				}
-				.compositingGroup()
 				.blur(radius: outerBlur(for: geometry.size))
 			}
 			.frame(width: geometry.size.width)
