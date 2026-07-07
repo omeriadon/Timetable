@@ -111,6 +111,7 @@
 				"Widget Shared/FriendsTimeLeft/FriendsTimeLeftView.swift",
 				"Widget Shared/FriendsTimeLeft/FriendsTimeLeftWidget.swift",
 				"Widget Shared/Live Activity/SchoolDayActivityAttributes.swift",
+				"Widget Shared/Live Activity/StaticIrregularGradient.swift",
 				"Widget Shared/Widget Shared.swift",
 			);
 			platformFiltersByRelativePath = {
@@ -167,6 +168,7 @@
 			membershipExceptions = (
 				"Widget Shared/Live Activity/SchoolDayActivityAttributes.swift",
 				"Widget Shared/Live Activity/SchoolDayLiveActivityWidget.swift",
+				"Widget Shared/Live Activity/StaticIrregularGradient.swift",
 				Widget/Assets.xcassets,
 				"Widget/Widget Bundle.swift",
 			);

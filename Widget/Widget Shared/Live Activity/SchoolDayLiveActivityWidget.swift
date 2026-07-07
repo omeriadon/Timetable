@@ -28,68 +28,117 @@ struct SchoolDayLiveActivityWidget: Widget {
 				}
 
 				DynamicIslandExpandedRegion(.trailing) {
-					SchoolDayActivityTimer(state: context.state)
-						.font(.system(size: 100))
-						.monospaced()
-						.bold()
-						.minimumScaleFactor(0.1)
-						.frame(width: 140, alignment: .center)
+					ZStack {
+						if let startDate = context.state.startDate,
+						   let endDate = context.state.endDate,
+						   startDate < endDate
+						{
+							ProgressView(timerInterval: startDate ... endDate, countsDown: false) {
+								EmptyView()
+							} currentValueLabel: {
+								Text(timerInterval: startDate ... endDate, countsDown: true)
+									.monospaced()
+							}
+							.progressViewStyle(.circular)
+							.tint(context.state.color.swiftUIColor)
+						} else {
+							Text("Done")
+						}
+					}
 				}
 
 				DynamicIslandExpandedRegion(.bottom) {
-					ZStack {
-//						if context.state.phase == .lunch || context.state.phase == .recess {
-//							Color.blue
-//								.ignoresSafeArea()
-//								.clipShape(ContainerRelativeShape())
-//						}
+					var isBreak: Bool {
+						context.state.phase == .recess || context.state.phase == .lunch
+					}
 
-						VStack(alignment: .center, spacing: 6) {
+					VStack(alignment: .center, spacing: 6) {
+						HStack {
+							Spacer()
 							Text(context.state.title)
-								.font(.system(size: 28))
-								.bold()
-								.lineLimit(1)
-								.monospaced()
-								.foregroundStyle(context.state.color.swiftUIColor)
+							Spacer()
+						}
+						.padding(.top, isBreak ? 3 : 0)
+						.font(.system(size: 28))
+						.bold()
+						.lineLimit(1)
+						.monospaced()
+						.foregroundStyle(isBreak ? .white : context.state.color.swiftUIColor)
 
-							SchoolDayActivityProgress(state: context.state)
+						if let nextText = context.state.nextText {
+							HStack(alignment: .lastTextBaseline) {
+								Text("Next:")
+									.foregroundStyle(.secondary)
+									.font(.system(size: 13))
 
-							if let nextText = context.state.nextText {
-								HStack {
-									Text("Next:")
-										.foregroundStyle(.secondary)
-										.font(.system(size: 13))
+								Spacer()
 
-									Spacer()
-
-									Text(nextText)
-										.font(.system(size: 22))
-										.lineLimit(1)
-								}
-								.padding(.horizontal)
+								Text(nextText)
+									.font(.system(size: 22))
+									.lineLimit(1)
 							}
+							.padding(.horizontal, 10)
+						}
+
+						Spacer(minLength: 1)
+					}
+
+					.background {
+						if context.state.phase == .recess || context.state.phase == .lunch {
+							StaticIrregularGradient(
+								colors: [.blue, .green, .mint, .cyan],
+								background: .clear
+							)
+							.clipShape(RoundedRectangle(cornerRadius: 20))
 						}
 					}
 					.monospaced()
 				}
 			} compactLeading: {
 				Image(systemName: context.state.symbol)
-					.font(.system(size: 16))
 					.foregroundStyle(context.state.color.swiftUIColor)
-					.monospaced()
+					.background {
+						if context.state.phase == .recess || context.state.phase == .lunch {
+							StaticIrregularGradient(
+								colors: [.blue, .green, .mint, .cyan],
+								background: .clear
+							)
+							.clipShape(.circle)
+						}
+					}
 
 			} compactTrailing: {
-				SchoolDayActivityTimer(state: context.state)
-					.font(.system(size: 16))
-					.frame(width: 51, alignment: .center)
+				if let startDate = context.state.startDate,
+				   let endDate = context.state.endDate,
+				   startDate < endDate
+				{
+					ProgressView(timerInterval: startDate ... endDate, countsDown: false) {
+						EmptyView()
+					} currentValueLabel: {
+						Text(timerInterval: startDate ... endDate, countsDown: true)
+							.monospaced()
+					}
+					.progressViewStyle(.circular)
+					.tint(context.state.color.swiftUIColor)
+					.monospaced()
+
+				} else {
+					Text("Done")
+				}
 			} minimal: {
 				if let startDate = context.state.startDate,
 				   let endDate = context.state.endDate,
 				   startDate < endDate
 				{
-					ProgressView(timerInterval: startDate ... endDate, countsDown: true)
-						.progressViewStyle(.circular)
-						.tint(context.state.color.swiftUIColor)
+					ProgressView(timerInterval: startDate ... endDate, countsDown: false) {
+						EmptyView()
+					} currentValueLabel: {
+						Text(timerInterval: startDate ... endDate, countsDown: true)
+							.monospaced()
+					}
+					.progressViewStyle(.circular)
+					.tint(context.state.color.swiftUIColor)
+					.monospaced()
 				} else {
 					Image(systemName: context.state.symbol)
 						.foregroundStyle(context.state.color.swiftUIColor)
@@ -115,41 +164,45 @@ private struct SchoolDayLiveActivityView: View {
 	}
 
 	private var watchView: some View {
-		HStack(alignment: .bottom, spacing: 10) {
+		VStack(alignment: .leading, spacing: 0) {
+			HStack(spacing: 4) {
+				Image(systemName: context.state.symbol)
+				Text(context.state.title)
+					.lineLimit(1)
+					.font(.system(size: 16, weight: .semibold, design: .monospaced))
+			}
+
 			if let startDate = context.state.startDate,
 			   let endDate = context.state.endDate,
 			   startDate < endDate
 			{
-				ProgressView(timerInterval: startDate ... endDate, countsDown: false)
-					.progressViewStyle(.circular)
-					.controlSize(.extraLarge)
-					.tint(context.state.color.swiftUIColor)
-					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+				SchoolDayActivityTimer(state: context.state)
+					.font(.system(size: 25, design: .monospaced))
+
 			} else {
-				Image(systemName: context.state.symbol)
-					.font(.system(size: 34))
-					.foregroundStyle(context.state.color.swiftUIColor)
-					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+				Text("Done")
+					.font(.system(size: 25, design: .monospaced))
 			}
 
-			VStack(alignment: .trailing, spacing: 4) {
-				HStack(spacing: 4) {
-					Image(systemName: context.state.symbol)
-					Text(context.state.title)
-						.lineLimit(1)
-				}
-				.font(.system(size: 13, weight: .semibold))
+			Spacer(minLength: 1)
 
-				Spacer(minLength: 4)
-
-				if context.isStale {
-					Label("Updating", systemImage: "arrow.trianglehead.2.clockwise")
-						.font(.system(size: 11))
+			if let nextText = context.state.nextText {
+				HStack {
+					Text("Next:")
+						.font(.system(size: 18, design: .monospaced))
 						.foregroundStyle(.secondary)
-				} else {
-					SchoolDayActivityTimer(state: context.state)
-						.font(.system(size: 22, weight: .bold, design: .monospaced))
-						.frame(width: 76, alignment: .center)
+
+					Spacer()
+
+					Text(nextText)
+						.font(.system(size: 20, design: .monospaced))
+				}
+			} else {
+				HStack {
+					Spacer()
+					Text("No more classes")
+						.font(.system(size: 19, design: .monospaced))
+						.foregroundStyle(.secondary)
 				}
 			}
 		}
@@ -160,50 +213,59 @@ private struct SchoolDayLiveActivityView: View {
 
 	private var lockScreenView: some View {
 		VStack(alignment: .leading, spacing: 9) {
-			HStack(alignment: .center) {
-				HStack {
-					Image(systemName: context.state.symbol)
+			HStack {
+				Image(systemName: context.state.symbol)
 
-					Text(context.state.title)
-				}
-				.font(.system(size: 22, weight: .bold))
-				.lineLimit(1)
-
-				Spacer()
-
-				SchoolDayActivityTimer(state: context.state)
-					.font(.system(size: 28, weight: .bold, design: .monospaced))
-					.frame(width: 90, alignment: .center)
+				Text(context.state.title)
 			}
+			.font(.system(size: 22, weight: .bold))
+			.lineLimit(1)
 
-			if context.isStale {
-				Label("Updating", systemImage: "arrow.trianglehead.2.clockwise")
-					.font(.system(size: 12))
-					.foregroundStyle(.secondary)
-			} else {
-				SchoolDayActivityProgress(state: context.state)
-			}
+			if let startDate = context.state.startDate, let endDate = context.state.endDate, startDate < endDate {
+				ProgressView(timerInterval: startDate ... endDate, countsDown: false) {
+					EmptyView()
+				} currentValueLabel: {
+					HStack(alignment: .lastTextBaseline) {
+						Text(timerInterval: startDate ... endDate, countsDown: true)
+							.foregroundStyle(.white)
+							.font(.system(size: 20))
+							.monospaced()
 
-			if let nextText = context.state.nextText {
-				HStack(alignment: .firstTextBaseline) {
-					Text("Next:")
-						.font(.system(size: 17))
-						.foregroundStyle(.secondary)
+						Spacer()
+						Spacer()
 
-					Spacer()
+						if let nextText = context.state.nextText {
+							Text("Next:")
+								.font(.system(size: 17))
+								.foregroundStyle(.secondary)
 
-					Text(nextText)
-						.font(.system(size: 22))
-						.lineLimit(1)
+							Spacer()
+
+							Text(nextText)
+								.font(.system(size: 22))
+								.bold()
+								.lineLimit(1)
+								.foregroundStyle(.white)
+
+						} else if context.state.phase == .finished {
+							Text("No more subjects")
+								.font(.system(size: 17, weight: .semibold))
+								.foregroundStyle(.secondary)
+						}
+					}
 				}
+				.tint(.white)
+				.progressViewStyle(.linear)
+
 			} else if context.state.phase == .finished {
-				Text("No more subjects")
-					.font(.system(size: 17, weight: .semibold))
+				Text("No more classes")
+					.font(.system(size: 20))
 					.foregroundStyle(.secondary)
 			}
 		}
 		.monospaced()
-		.padding()
+		.padding([.horizontal])
+		.padding(.vertical, 10)
 		.tint(context.state.color.swiftUIColor)
 		.activityBackgroundTint(context.state.color.swiftUIColor)
 	}
@@ -213,22 +275,17 @@ private struct SchoolDayActivityTimer: View {
 	let state: SchoolDayActivityAttributes.ContentState
 
 	var body: some View {
-		if let endDate = state.endDate {
-			ZStack {
-				Text("00:00")
-					.hidden()
-				Text(endDate, style: .timer)
-					.fixedSize()
-			}
-			.monospacedDigit()
-			.contentTransition(.numericText(countsDown: true))
+		if let startDate = state.startDate, let endDate = state.endDate {
+			Text(timerInterval: startDate ... endDate, pauseTime: startDate, countsDown: true, showsHours: false)
+				.monospaced()
+				.contentTransition(.numericText(countsDown: true))
 
 		} else if state.phase == .finished {
 			Text("Done")
-				.monospacedDigit()
+				.monospaced()
 		} else {
 			Text("--:--")
-				.monospacedDigit()
+				.monospaced()
 		}
 	}
 }
@@ -236,13 +293,17 @@ private struct SchoolDayActivityTimer: View {
 private struct SchoolDayActivityProgress: View {
 	let state: SchoolDayActivityAttributes.ContentState
 
-	@Environment(\.activityFamily) var activityFamily
-
 	var body: some View {
 		if let startDate = state.startDate, let endDate = state.endDate, startDate < endDate {
-			ProgressView(timerInterval: startDate ... endDate, countsDown: true)
-				.labelsHidden()
-				.tint(state.color.swiftUIColor)
+			ProgressView(timerInterval: startDate ... endDate, countsDown: false) {
+				EmptyView()
+			} currentValueLabel: {
+				Text(timerInterval: startDate ... endDate, countsDown: true)
+					.foregroundStyle(.white)
+					.monospaced()
+			}
+			.tint(state.color.swiftUIColor)
+			.progressViewStyle(.linear)
 
 		} else if state.phase == .finished {
 			Text("No more classes")
