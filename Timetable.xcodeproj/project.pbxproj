@@ -131,7 +131,6 @@
 			platformFiltersByRelativePath = {
 				Backend/LiveActivityRegistrationService.swift = (ios, );
 				Backend/PhoneWatchSyncBridge.swift = (ios, );
-				Backend/syncToWatchAsync.swift = (ios, );
 				Tabs/Search/TimetableDetailView.swift = (ios, );
 				Tabs/Search/TimetableIdentityView.swift = (ios, );
 				Tabs/Search/TimetablePortalIdentityView.swift = (ios, );

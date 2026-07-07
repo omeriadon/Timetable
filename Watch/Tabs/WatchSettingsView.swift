@@ -6,6 +6,7 @@ struct WatchSettingsView: View {
 	@Default(.accountProfile) private var profile
 	@Environment(\.statusBadgeManager) private var badges
 
+	@State private var bootstrapService = WatchAccountBootstrapService.shared
 	@State private var signOutConfirm = false
 
 	var body: some View {
@@ -31,6 +32,21 @@ struct WatchSettingsView: View {
 								.monospaced()
 						}
 					})
+				}
+
+				Section("Server") {
+					Button {
+						Task(priority: .userInitiated) {
+							await syncFromServer()
+						}
+					} label: {
+						if bootstrapService.isSyncing {
+							Label("Syncing", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
+						} else {
+							Label("Sync from Server", systemImage: "arrow.down.circle")
+						}
+					}
+					.disabled(bootstrapService.isSyncing)
 				}
 
 				#if DEBUG
@@ -90,6 +106,18 @@ struct WatchSettingsView: View {
 			badges.updateBadge(id: id, title: "Prepared", view: .success)
 		}
 	#endif
+
+	private func syncFromServer() async {
+		guard !bootstrapService.isSyncing else { return }
+
+		do {
+			try await bootstrapService.bootstrap()
+			WidgetCenter.shared.reloadAllTimelines()
+			badges.addBadge(id: UUID(), title: "Synced from Server", priority: 3, view: .success)
+		} catch {
+			badges.present(error: error, title: "Unable to Sync")
+		}
+	}
 
 	private func reloadWidgets() {
 		WidgetCenter.shared.reloadAllTimelines()

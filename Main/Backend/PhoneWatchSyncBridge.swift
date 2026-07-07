@@ -29,10 +29,6 @@ final class PhoneWatchSyncBridge: NSObject, WCSessionDelegate {
 		Print("[iOS] WCSession activate() called")
 	}
 
-	func pushTimetable() {
-		Print("Skipped obsolete timetable transfer to watch", category: .watch)
-	}
-
 	func session(_: WCSession, activationDidCompleteWith _: WCSessionActivationState, error: Error?) {
 		if let error {
 			PrintError("WatchConnectivity activation failed: \(error.localizedDescription)")
@@ -48,6 +44,10 @@ final class PhoneWatchSyncBridge: NSObject, WCSessionDelegate {
 		}
 		Task { @MainActor in
 			do {
+				guard SessionStore.shared.isAuthenticated else {
+					replyHandler(["error": "Sign in on iPhone first."])
+					return
+				}
 				let response: TokenResponse = try await NetworkManager.shared.send(
 					Endpoint("/v1/auth/watch-session", method: .post),
 					body: WatchSessionRequest(installationID: installationID),

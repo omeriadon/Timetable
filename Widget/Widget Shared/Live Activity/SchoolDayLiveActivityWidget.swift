@@ -166,6 +166,8 @@ private struct SchoolDayLiveActivityView: View {
 		VStack(alignment: .leading, spacing: 0) {
 			HStack(spacing: 4) {
 				Image(systemName: context.state.symbol)
+					.font(.system(size: 16, weight: .semibold))
+
 				Text(context.state.title)
 					.lineLimit(1)
 					.font(.system(size: 16, weight: .semibold, design: .monospaced))
@@ -178,12 +180,11 @@ private struct SchoolDayLiveActivityView: View {
 			   startDate < endDate
 			{
 				SchoolDayActivityTimer(state: context.state)
-					.font(.system(size: 25, design: .monospaced))
-
+					.font(.system(size: 25, weight: .regular, design: .monospaced))
+					.monospacedDigit()
 			} else {
 				Text("Done")
-					.font(.system(size: 25, design: .monospaced))
-					.monospaced()
+					.font(.system(size: 25, weight: .regular, design: .monospaced))
 			}
 
 			Spacer(minLength: 1)
@@ -191,28 +192,27 @@ private struct SchoolDayLiveActivityView: View {
 			if let nextText = context.state.nextText {
 				HStack {
 					Text("Next:")
-						.font(.system(size: 18))
+						.font(.system(size: 18, weight: .regular, design: .monospaced))
 						.foregroundStyle(.secondary)
-						.monospaced()
 
 					Spacer()
 
 					Text(nextText)
-						.font(.system(size: 20))
-						.monospacedDigit()
+						.font(.system(size: 20, weight: .regular, design: .monospaced))
 				}
 			} else {
 				HStack {
 					Spacer()
+
 					Text("No more classes")
-						.font(.system(size: 19, design: .monospaced))
+						.font(.system(size: 19, weight: .regular, design: .monospaced))
 						.foregroundStyle(.secondary)
 				}
 			}
 		}
 		.padding(.vertical, 5)
+		.padding(.top, 2)
 		.padding(.horizontal, 7)
-		.monospaced()
 	}
 
 	private var lockScreenView: some View {
@@ -280,15 +280,12 @@ private struct SchoolDayActivityTimer: View {
 	var body: some View {
 		if let startDate = state.startDate, let endDate = state.endDate {
 			Text(timerInterval: startDate ... endDate, pauseTime: startDate, countsDown: true, showsHours: false)
-				.monospaced()
 				.contentTransition(.numericText(countsDown: true))
 
 		} else if state.phase == .finished {
 			Text("Done")
-				.monospaced()
 		} else {
 			Text("--:--")
-				.monospaced()
 		}
 	}
 }

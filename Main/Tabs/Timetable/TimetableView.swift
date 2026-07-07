@@ -154,10 +154,6 @@ struct TimetableView: View {
 			#if os(iOS)
 			.onAppear {
 				watchSync.activateIfNeeded()
-				watchSync.pushTimetable()
-			}
-			.onChange(of: subjects) {
-				watchSync.pushTimetable()
 			}
 			#else
 			.onChange(of: selectedSlot) {

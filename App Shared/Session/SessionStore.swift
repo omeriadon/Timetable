@@ -108,11 +108,12 @@ final class SessionStore {
 		try await apply(response, bootstrap: true)
 	}
 
-	func signIn(email: String, password: String) async throws {
+	func signIn(email: String, password: String, context: NetworkRequestContext = .background) async throws {
 		Print("Signing in account", category: .account)
 		let response: TokenResponse = try await networkManager.send(
 			.v1AuthLogin,
-			body: LoginRequest(email: email, password: password)
+			body: LoginRequest(email: email, password: password),
+			context: context
 		)
 		try await apply(response, bootstrap: true)
 	}
@@ -121,7 +122,7 @@ final class SessionStore {
 		try await apply(response, bootstrap: true)
 	}
 
-	func signInWithApple(_ authorization: ASAuthorization) async throws {
+	func signInWithApple(_ authorization: ASAuthorization, context: NetworkRequestContext = .background) async throws {
 		guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential else {
 			throw SessionStoreError.invalidIdentityToken
 		}
@@ -143,7 +144,8 @@ final class SessionStore {
 			body: AppleSignInRequest(
 				identityToken: identityToken,
 				displayName: displayName
-			)
+			),
+			context: context
 		)
 		try await apply(response, bootstrap: true)
 	}
@@ -284,7 +286,7 @@ private extension Endpoint {
 	static let v1AuthLogout = Endpoint("/v1/auth/logout", method: .delete)
 	static let v1AuthRefresh = Endpoint("/v1/auth/refresh", method: .post, requiresAuthentication: false)
 	static let v1AuthRegister = Endpoint("/v1/auth/register", method: .post, requiresAuthentication: false)
-	static let v1Profile = Endpoint("/v1/profile")
-	static let v1ProfileDelete = Endpoint("/v1/profile", method: .delete)
-	static let v1ProfileUpdate = Endpoint("/v1/profile", method: .put)
+	static let v1Profile = Endpoint("/v1/account")
+	static let v1ProfileDelete = Endpoint("/v1/account", method: .delete)
+	static let v1ProfileUpdate = Endpoint("/v1/account", method: .put)
 }

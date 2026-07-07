@@ -6,19 +6,12 @@ struct WatchSessionRootView: View {
 	var body: some View {
 		ZStack {
 			switch sessionStore.state {
-				case .signedOut:
+				case .signedOut, .restoring:
 					WatchSignInView()
 						.transition(.blurReplace)
-				case .restoring:
-//					ProgressView("Restoring Account…")
-//						.transition(.blurReplace)
-					Color.clear
 				case .authenticated:
 					WatchRootTabView()
-						.transition(.identity)
-						.transaction { transaction in
-							transaction.animation = nil
-						}
+						.transition(.opacity)
 			}
 		}
 		.animation(.easeInOut, value: sessionStore.state)

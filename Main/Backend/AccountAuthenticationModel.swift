@@ -104,6 +104,7 @@ final class AccountAuthenticationModel {
 					)
 			}
 		} catch {
+			StatusBadgeManager.shared.addBadge(id: UUID(), title: "Unable to Sign in", secondaryText: error.localizedDescription, priority: 5, view: .error)
 			submissionError = error.localizedDescription
 		}
 	}

@@ -28,13 +28,15 @@ struct WatchTimetablesTabView: View {
 					.containerRelativeFrame([.horizontal, .vertical])
 			}
 
-			Tab("Current Subject", systemImage: "timer") {
-				CurrentSubjectView(now: adjustedNow)
-					.containerBackground(for: .tabView) {
-						WatchSchoolProgressBackground(state: ownerState, now: adjustedNow)
-					}
-					.frame(maxWidth: .infinity, maxHeight: .infinity)
-					.containerRelativeFrame([.horizontal, .vertical])
+			if !subjects.isEmpty {
+				Tab("Current Subject", systemImage: "timer") {
+					CurrentSubjectView(now: adjustedNow)
+						.containerBackground(for: .tabView) {
+							WatchSchoolProgressBackground(state: ownerState, now: adjustedNow)
+						}
+						.frame(maxWidth: .infinity, maxHeight: .infinity)
+						.containerRelativeFrame([.horizontal, .vertical])
+				}
 			}
 
 			ForEach(receivedTimetables) { receivedTimetable in
