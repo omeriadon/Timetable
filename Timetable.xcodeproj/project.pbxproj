@@ -170,6 +170,7 @@
 				"Widget Shared/Live Activity/StaticIrregularGradient.swift",
 				Widget/Assets.xcassets,
 				"Widget/Widget Bundle.swift",
+				"Widget/Widget-InfoPlist.xcstrings",
 			);
 			target = 2A25869F2FB5D6490030C8CD /* Watch Widget */;
 		};
@@ -178,6 +179,7 @@
 			membershipExceptions = (
 				"Watch Widget/Assets.xcassets",
 				"Watch Widget/Watch Widget Bundle.swift",
+				"Watch Widget/Watch Widget-InfoPlist.xcstrings",
 			);
 			platformFiltersByRelativePath = {
 				"Widget Shared/Live Activity/SchoolDayActivityAttributes.swift" = (ios, );
@@ -192,28 +194,25 @@
 				"Info/Watch Widget.plist",
 				Info/Widget.plist,
 			);
-			platformFiltersByRelativePath = {
-				LaunchScreen.storyboard = (ios, );
-			};
 			target = 2A02378A2F9C8EA000AB1E1F /* Timetable */;
 		};
 		2AD85A882FE8F23A004EAB2B /* Exceptions for "Special" folder in "Watch Widget" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				"/Localized: LaunchScreen.storyboard",
 				Info/Message.plist,
 				"Info/Watch Widget.plist",
 				Info/Widget.plist,
-				LaunchScreen.storyboard,
 			);
 			target = 2A25869F2FB5D6490030C8CD /* Watch Widget */;
 		};
 		2AD85A892FE8F23A004EAB2B /* Exceptions for "Special" folder in "Widget" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				"/Localized: LaunchScreen.storyboard",
 				Info/Message.plist,
 				"Info/Watch Widget.plist",
 				Info/Widget.plist,
-				LaunchScreen.storyboard,
 				Timetable.icon,
 			);
 			target = 2AA6DF132FDFAC8F00BBC70E /* Widget */;
@@ -221,10 +220,10 @@
 		2AD85A8B2FE8F23A004EAB2B /* Exceptions for "Special" folder in "Watch" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				"/Localized: LaunchScreen.storyboard",
 				Info/Message.plist,
 				"Info/Watch Widget.plist",
 				Info/Widget.plist,
-				LaunchScreen.storyboard,
 			);
 			target = 2A098C822F9DB842002065BE /* Watch */;
 		};
@@ -527,6 +526,8 @@
 			knownRegions = (
 				en,
 				Base,
+				it,
+				fr,
 			);
 			mainGroup = 2A0237822F9C8EA000AB1E1F;
 			minimizedProjectReferenceProxies = 1;
@@ -622,6 +623,7 @@
 		2A0237942F9C8EA100AB1E1F /* Debug configuration for PBXProject "Timetable" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -672,6 +674,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -680,6 +683,7 @@
 				SDKROOT = iphoneos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -687,6 +691,7 @@
 		2A0237952F9C8EA100AB1E1F /* Release configuration for PBXProject "Timetable" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -731,6 +736,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -738,6 +744,7 @@
 				SDKROOT = iphoneos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
