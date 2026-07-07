@@ -65,17 +65,17 @@ final class WatchProvisioningService: NSObject, WCSessionDelegate {
 		let installationID = Defaults[.installationID]
 
 		session.sendMessage(
-			["watchSessionInstallationID": installationID],
+			[WatchSessionMessage.installationIDKey: installationID],
 			replyHandler: { reply in
 				Task { @MainActor in
 					self.finishRequest()
 
 					do {
-						if let message = reply["error"] as? String {
+						if let message = reply[WatchSessionMessage.errorKey] as? String {
 							throw WatchProvisioningError.provisioningFailed(message)
 						}
 
-						guard let data = reply["watchSession"] as? Data else {
+						guard let data = reply[WatchSessionMessage.sessionKey] as? Data else {
 							throw WatchProvisioningError.invalidResponse
 						}
 
@@ -133,5 +133,20 @@ final class WatchProvisioningService: NSObject, WCSessionDelegate {
 		error _: Error?
 	) {
 		// Nothing required here if requestSessionIfPossible only sends when already activated.
+	}
+
+	nonisolated func session(_: WCSession, didReceiveMessage message: [String: Any]) {
+		guard let action = message[WatchSessionMessage.actionKey] as? String else { return }
+
+		Task { @MainActor in
+			switch action {
+				case WatchSessionMessage.authenticatedAction:
+					self.requestSessionIfPossible()
+				case WatchSessionMessage.signedOutAction:
+					await SessionStore.shared.signOut()
+				default:
+					return
+			}
+		}
 	}
 }

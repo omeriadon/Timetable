@@ -22,8 +22,12 @@ struct ContentView: View {
 		NavigationStack {
 			ZStack {
 				if subjects.isEmpty {
-					ContentUnavailableView("No Timetable", systemImage: "calendar.badge.exclamationmark", description: Text("Sign in and sync your timetable to view it here."))
-						.transition(.blurReplace)
+					VStack {
+						Spacer()
+						ContentUnavailableView("No Timetable", systemImage: "calendar.badge.exclamationmark", description: Text("Sync your timetable from iPhone to view it here."))
+						Spacer()
+					}
+					.transition(.blurReplace)
 				} else {
 					VStack {
 						HStack(spacing: 2) {

@@ -19,24 +19,43 @@ final class ReceivedTimetableSyncService {
 
 	private let networkManager: NetworkManager
 	private var syncTask: Task<Void, any Error>?
+	private var uploadTask: Task<Void, any Error>?
 
 	private init(networkManager: NetworkManager) {
 		self.networkManager = networkManager
 	}
 
 	func uploadCurrentProjection() async throws {
-		let walletRevision = Defaults[.walletRevision]
-		let request = ReceivedProjectionUpdateRequest(
-			timetables: Defaults[.receivedTimetables].map {
-				ReceivedPassMirrorDTO($0, walletRevision: walletRevision)
-			},
-			walletRevision: walletRevision
-		)
-		let response: [ReceivedPassMirrorDTO] = try await networkManager.send(
-			.v1ReceivedTimetablesUpdate,
-			body: request
-		)
-		apply(response)
+		if let uploadTask {
+			try await uploadTask.value
+			return
+		}
+
+		let task = Task { @MainActor in
+			let walletRevision = Defaults[.walletRevision]
+			let request = ReceivedProjectionUpdateRequest(
+				timetables: Defaults[.receivedTimetables].map {
+					ReceivedPassMirrorDTO($0, walletRevision: walletRevision)
+				},
+				walletRevision: walletRevision
+			)
+			let response: [ReceivedPassMirrorDTO] = try await networkManager.send(
+				.v1ReceivedTimetablesUpdate,
+				body: request
+			)
+			apply(response)
+		}
+		uploadTask = task
+		isSyncing = true
+		defer {
+			uploadTask = nil
+			isSyncing = false
+		}
+		try await withTaskCancellationHandler {
+			try await task.value
+		} onCancel: {
+			task.cancel()
+		}
 	}
 
 	func downloadProjectionAndOverrides() async throws {

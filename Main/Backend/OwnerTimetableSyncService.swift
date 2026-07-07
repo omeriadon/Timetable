@@ -89,7 +89,12 @@ final class OwnerTimetableSyncService {
 	) async throws {
 		if let currentOperation {
 			if currentOperation.kind == kind {
-				try await currentOperation.task.value
+				let task = currentOperation.task
+				try await withTaskCancellationHandler {
+					try await task.value
+				} onCancel: {
+					task.cancel()
+				}
 				return
 			}
 
@@ -116,7 +121,11 @@ final class OwnerTimetableSyncService {
 				isSyncing = false
 			}
 		}
-		try await task.value
+		try await withTaskCancellationHandler {
+			try await task.value
+		} onCancel: {
+			task.cancel()
+		}
 	}
 
 	private func performUpload() async throws {

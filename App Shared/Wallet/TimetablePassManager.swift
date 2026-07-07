@@ -28,7 +28,7 @@ final class TimetablePassManager {
 				name: NSNotification.Name(rawValue: PKPassLibraryNotificationName.PKPassLibraryDidChange.rawValue),
 				object: nil
 			)
-			refreshPasses()
+			refreshPasses(uploadProjection: false)
 		}
 	}
 
@@ -42,7 +42,7 @@ final class TimetablePassManager {
 	}
 
 	/// Scans Apple Wallet on a background thread and updates the cached list
-	func refreshPasses() {
+	func refreshPasses(uploadProjection: Bool = true) {
 		Print("refreshing")
 		guard PKPassLibrary.isPassLibraryAvailable() else { return }
 		isLoading = true
@@ -77,7 +77,7 @@ final class TimetablePassManager {
 				}
 			}
 
-			if let projectionUploadHandler {
+			if uploadProjection, let projectionUploadHandler {
 				do {
 					try await projectionUploadHandler()
 				} catch NetworkError.offline {

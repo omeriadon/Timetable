@@ -7,53 +7,18 @@ import WidgetKit
 @Observable
 final class ServerSyncCoordinator {
 	static let shared = ServerSyncCoordinator()
-	private var fullSyncTask: Task<Void, any Error>?
 	private var profileTask: Task<Void, Never>?
 
-	func syncEverything() async {
-		guard SessionStore.shared.isAuthenticated else {
-			showSignInRequired()
-			return
-		}
-		if let fullSyncTask {
-			_ = try? await fullSyncTask.value
-			return
-		}
-		let badgeID = UUID()
-		let total = 5
-		var currentStage = "Profile"
-		StatusBadgeManager.shared.addBadge(id: badgeID, title: "Syncing everything", secondaryText: "Profile", priority: 4, view: .progressViewAndGauge(currentStep: 1, totalSteps: total))
-		let task = Task { @MainActor in
-			try await Self.withTimeout { _ = try await SessionStore.shared.updateProfile(displayName: Defaults[.userDisplayName]) }
-			currentStage = "Timetable"
-			StatusBadgeManager.shared.updateBadge(id: badgeID, title: "Syncing everything", secondaryText: "Timetable", view: .progressViewAndGauge(currentStep: 2, totalSteps: total))
-			try await Self.withTimeout { try await OwnerTimetableSyncService.shared.uploadOwnerTimetable() }
-			currentStage = "Account settings"
-			StatusBadgeManager.shared.updateBadge(id: badgeID, title: "Syncing everything", secondaryText: "Account settings", view: .progressViewAndGauge(currentStep: 3, totalSteps: total))
-			try await Self.withTimeout { try await AccountSettingsSyncService.shared.flushPendingSettings() }
-			currentStage = "Received timetables"
-			StatusBadgeManager.shared.updateBadge(id: badgeID, title: "Syncing everything", secondaryText: "Received timetables", view: .progressViewAndGauge(currentStep: 4, totalSteps: total))
-			try await Self.withTimeout { try await ReceivedTimetableSyncService.shared.uploadCurrentProjection() }
-			currentStage = "Authored timetables"
-			StatusBadgeManager.shared.updateBadge(id: badgeID, title: "Syncing everything", secondaryText: "Authored timetables", view: .progressViewAndGauge(currentStep: 5, totalSteps: total))
-			try await Self.withTimeout { try await AuthoredTimetableService.shared.refresh() }
-			WidgetCenter.shared.reloadAllTimelines()
-		}
-		fullSyncTask = task
-		do {
-			try await task.value
-			StatusBadgeManager.shared.updateBadge(id: badgeID, title: "Everything is synced", secondaryText: nil, view: .success)
-		} catch {
-			if !Self.suppresses(error) { StatusBadgeManager.shared.updateBadge(id: badgeID, title: "Sync failed at \(currentStage)", secondaryText: error.localizedDescription, view: .error) }
-		}
-		fullSyncTask = nil
-	}
-
 	private static func withTimeout(_ operation: @escaping @MainActor @Sendable () async throws -> Void) async throws {
+		let operationTask = Task { @MainActor in
+			try await operation()
+		}
+
 		try await withThrowingTaskGroup(of: Void.self) { group in
-			group.addTask { try await operation() }
+			group.addTask { try await operationTask.value }
 			group.addTask {
 				try await Task.sleep(for: .seconds(25))
+				operationTask.cancel()
 				throw NetworkError.timedOut
 			}
 			_ = try await group.next()

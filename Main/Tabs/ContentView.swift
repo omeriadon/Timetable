@@ -19,7 +19,7 @@ struct ContentView: View {
 	@Environment(\.statusBadgeManager) private var statusBadgeManager
 
 	#if os(iOS)
-		@State private var watchSync = PhoneWatchSyncBridge()
+		@State private var watchSync = PhoneWatchSyncBridge.shared
 		@State private var rootSyncStatus = SyncMode.normal
 		@State private var isBlurred = false
 		@State private var blurRadius: CGFloat = 3

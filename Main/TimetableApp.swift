@@ -82,6 +82,7 @@ struct TimetableApp: App {
 					.task {
 						NetworkManager.shared.configureFeedback { StatusBadgeManager.shared.present(networkError: $0) }
 						passManager.configureProjectionUpload {
+							guard sessionStore.isAuthenticated else { return }
 							try await ReceivedTimetableSyncService.shared.uploadCurrentProjection()
 						}
 						sessionStore.configureAccountBootstrap {
@@ -91,9 +92,11 @@ struct TimetableApp: App {
 							await NotificationRegistrationService.shared.uploadPendingToken()
 							#if os(iOS)
 								await LiveActivityRegistrationService.shared.startObserving()
+								PhoneWatchSyncBridge.shared.sendAuthenticatedStateIfPossible()
 							#endif
 						} signingOut: {
 							#if os(iOS)
+								PhoneWatchSyncBridge.shared.sendSignedOutStateIfPossible()
 								await LiveActivityRegistrationService.shared.removeLiveActivityToken()
 							#endif
 							await NotificationRegistrationService.shared.removeServerRegistration()

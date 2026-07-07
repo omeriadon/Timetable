@@ -96,13 +96,6 @@ struct SettingsView: View {
 		}
 
 		#if os(iOS)
-
-			Section("Sync") {
-				Button { Task { await ServerSyncCoordinator.shared.syncEverything() } } label: {
-					Label("Sync with Server", systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
-				}
-			}
-
 			Section("Your Timetable") {
 				Toggle("Searchable", isOn: ownerVisibilityBinding)
 				Button {
@@ -196,8 +189,7 @@ struct SettingsView: View {
 		#endif // os(iOS)
 
 		Section("Developer") {
-			#if DEBUG
-
+			if _isDebugAssertConfiguration() || Defaults[.userDisplayName].contains("Adon") {
 				#if os(iOS)
 					NavigationLink("Live Activity Debug") {
 						LiveActivityDebugView()
@@ -241,14 +233,14 @@ struct SettingsView: View {
 				Button("reset onboarding") {
 					Defaults[.hasCompletedOnboarding] = false
 				}
-			#endif // DEBUG
+			}
 
 			Button {
 				guard sessionStore.isAuthenticated else { showSignInRequired(); return }
 				WidgetCenter.shared.reloadAllTimelines()
 				statusBadgeManager.addBadge(id: UUID(), title: "Widgets reloaded", priority: 3, view: .success)
 			} label: {
-				Label("Reload widgets now", systemImage: "widget.extralarge")
+				Label("Reload widgets now", systemImage: "widget.large")
 					.foregroundStyle(.accent)
 			}
 		}
