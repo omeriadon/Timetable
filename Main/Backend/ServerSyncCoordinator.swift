@@ -93,8 +93,7 @@ final class ServerSyncCoordinator {
 
 			StatusBadgeManager.shared.updateBadge(
 				id: badgeID,
-				title: "Timetable sync failed",
-				secondaryText: error.localizedDescription,
+				title: error.localizedDescription,
 				view: .error
 			)
 

@@ -264,31 +264,43 @@ final class NetworkManager {
 	private func makeRequest(for endpoint: Endpoint, body: Data?) throws -> URLRequest {
 		let normalizedPath = endpoint.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
 		let url = baseURL.appending(path: normalizedPath)
+
 		guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
 			throw NetworkError.invalidConfiguration
 		}
+
 		components.queryItems = endpoint.queryItems.isEmpty ? nil : endpoint.queryItems
+
 		guard let requestURL = components.url else {
 			throw NetworkError.invalidConfiguration
 		}
 
 		var request = URLRequest(url: requestURL)
 		request.httpMethod = endpoint.method.rawValue
-		request.httpBody = body
+		request.cachePolicy = .reloadIgnoringLocalCacheData
+
 		request.setValue(UUID().uuidString, forHTTPHeaderField: "X-Request-ID")
 		request.setValue("application/json", forHTTPHeaderField: "Accept")
+
 		if body != nil {
 			request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 		}
+
 		if endpoint.requiresAuthentication, let accessToken = accessTokenProvider?() {
 			request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
 		}
+
 		return request
 	}
 
 	// MARK: - Request Execution
 
-	private func execute(_ endpoint: Endpoint, body: Data?, context: NetworkRequestContext, mayRefresh: Bool = true) async throws -> Data {
+	private func execute(
+		_ endpoint: Endpoint,
+		body: Data?,
+		context: NetworkRequestContext,
+		mayRefresh: Bool = true
+	) async throws -> Data {
 		if endpoint.requiresAuthentication, accessTokenProvider?() == nil {
 			throw NetworkError.authenticationRequired
 		}
@@ -302,11 +314,18 @@ final class NetworkManager {
 			requestID = request.value(forHTTPHeaderField: "X-Request-ID") ?? requestID
 
 			Print(
-				"Sending \(endpoint.method.rawValue) \(endpoint.path) [request_id=\(requestID)] [body_bytes=\(body?.count ?? 0)]",
+				"Sending \(endpoint.method.rawValue) \(endpoint.path) [request_id=\(requestID)] [body_bytes=\(body?.count ?? 0)] [transport=\(body == nil ? "data" : "upload")]",
 				category: .network
 			)
 
-			let (data, response) = try await session.data(for: request)
+			let data: Data
+			let response: URLResponse
+
+			if let body {
+				(data, response) = try await session.upload(for: request, from: body)
+			} else {
+				(data, response) = try await session.data(for: request)
+			}
 
 			isOnline = true
 			offlineRequestAttempted = false
@@ -315,7 +334,11 @@ final class NetworkManager {
 				throw NetworkError.invalidResponse
 			}
 
-			if response.statusCode == 401, endpoint.requiresAuthentication, mayRefresh, try await refreshAuthentication() {
+			if response.statusCode == 401,
+			   endpoint.requiresAuthentication,
+			   mayRefresh,
+			   try await refreshAuthentication()
+			{
 				return try await execute(endpoint, body: body, context: context, mayRefresh: false)
 			}
 
@@ -336,10 +359,20 @@ final class NetworkManager {
 			if networkError == .offline {
 				isOnline = false
 				offlineRequestAttempted = true
-				if context == .userInitiated { feedbackHandler?(.offline) }
+
+				if context == .userInitiated {
+					feedbackHandler?(.offline)
+				}
 			} else {
-				PrintError("Transport failed for \(endpoint.method.rawValue) \(endpoint.path) [request_id=\(requestID)]", category: .network, error: error)
-				if context == .userInitiated { feedbackHandler?(networkError) }
+				PrintError(
+					"Transport failed for \(endpoint.method.rawValue) \(endpoint.path) [request_id=\(requestID)]",
+					category: .network,
+					error: error
+				)
+
+				if context == .userInitiated {
+					feedbackHandler?(networkError)
+				}
 			}
 
 			throw networkError
@@ -347,25 +380,54 @@ final class NetworkManager {
 			switch error {
 				case .cancelled:
 					throw error
+
 				case .authenticationRequired:
-					if context == .userInitiated { feedbackHandler?(.authenticationRequired) }
+					if context == .userInitiated {
+						feedbackHandler?(.authenticationRequired)
+					}
+
 					throw error
+
 				case .offline:
 					isOnline = false
 					offlineRequestAttempted = true
-					if context == .userInitiated { feedbackHandler?(.offline) }
+
+					if context == .userInitiated {
+						feedbackHandler?(.offline)
+					}
+
 					throw error
-				case let .server(statusCode, response) where statusCode == 404 || response.code == .notFound || response.code == .accountNotFound:
+
+				case let .server(statusCode, response)
+				where statusCode == 404 || response.code == .notFound || response.code == .accountNotFound:
 					throw error
+
 				default:
-					PrintError("Request failed for \(endpoint.method.rawValue) \(endpoint.path) [request_id=\(requestID)]", category: .network, error: error)
-					if context == .userInitiated { feedbackHandler?(error) }
+					PrintError(
+						"Request failed for \(endpoint.method.rawValue) \(endpoint.path) [request_id=\(requestID)]",
+						category: .network,
+						error: error
+					)
+
+					if context == .userInitiated {
+						feedbackHandler?(error)
+					}
+
 					throw error
 			}
 		} catch {
 			let networkError = NetworkError.transport(error.localizedDescription)
-			PrintError("Transport failed for \(endpoint.method.rawValue) \(endpoint.path) [request_id=\(requestID)]", category: .network, error: error)
-			if context == .userInitiated { feedbackHandler?(networkError) }
+
+			PrintError(
+				"Transport failed for \(endpoint.method.rawValue) \(endpoint.path) [request_id=\(requestID)]",
+				category: .network,
+				error: error
+			)
+
+			if context == .userInitiated {
+				feedbackHandler?(networkError)
+			}
+
 			throw networkError
 		}
 	}
