@@ -41,11 +41,17 @@ final class AccountBootstrapService {
 			return
 		}
 
-		let task = Task { @MainActor in
-			async let timetable: Void = ownerTimetableSync.reconcileOwnerTimetable()
-			async let settings: Void = settingsSync.downloadSettings()
-			async let received: Void = receivedTimetableSync.downloadProjectionAndOverrides()
-			_ = try await (timetable, settings, received)
+		let task = Task<Void, any Error> { @MainActor in
+			async let timetable: Void = self.runBootstrapStage("Owner timetable") {
+				try await self.ownerTimetableSync.reconcileOwnerTimetable()
+			}
+			async let settings: Void = self.runBootstrapStage("Account settings") {
+				try await self.settingsSync.downloadSettings()
+			}
+			async let received: Void = self.runBootstrapStage("Received timetables") {
+				try await self.receivedTimetableSync.downloadProjectionAndOverrides()
+			}
+			_ = await (timetable, settings, received)
 		}
 		bootstrapTask = task
 		isBootstrapping = true
@@ -56,5 +62,13 @@ final class AccountBootstrapService {
 		try await task.value
 		Defaults[.hasCompletedAccountBootstrap] = true
 		Defaults[.lastServerSync] = Date.now
+	}
+
+	private func runBootstrapStage(_ name: String, operation: @escaping @MainActor () async throws -> Void) async {
+		do {
+			try await operation()
+		} catch {
+			PrintError("\(name) bootstrap failed", category: .account, error: error)
+		}
 	}
 }

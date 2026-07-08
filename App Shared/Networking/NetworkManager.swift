@@ -275,6 +275,7 @@ final class NetworkManager {
 		var request = URLRequest(url: requestURL)
 		request.httpMethod = endpoint.method.rawValue
 		request.httpBody = body
+		request.setValue(UUID().uuidString, forHTTPHeaderField: "X-Request-ID")
 		request.setValue("application/json", forHTTPHeaderField: "Accept")
 		if body != nil {
 			request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -294,9 +295,11 @@ final class NetworkManager {
 
 		let clock = ContinuousClock()
 		let start = clock.now
+		var requestID = "missing-request-id"
 
 		do {
 			let request = try makeRequest(for: endpoint, body: body)
+			requestID = request.value(forHTTPHeaderField: "X-Request-ID") ?? requestID
 			let (data, response) = try await session.data(for: request)
 
 			isOnline = true
@@ -313,7 +316,7 @@ final class NetworkManager {
 			try validate(response: response, data: data)
 
 			Print(
-				"\(endpoint.method.rawValue) \(endpoint.path) completed with status \(response.statusCode)",
+				"\(endpoint.method.rawValue) \(endpoint.path) completed with status \(response.statusCode) [request_id=\(requestID)]",
 				category: .network,
 				duration: start.duration(to: clock.now)
 			)
@@ -329,7 +332,7 @@ final class NetworkManager {
 				offlineRequestAttempted = true
 				if context == .userInitiated { feedbackHandler?(.offline) }
 			} else {
-				PrintError("Transport failed for \(endpoint.path)", category: .network, error: error)
+				PrintError("Transport failed for \(endpoint.method.rawValue) \(endpoint.path) [request_id=\(requestID)]", category: .network, error: error)
 				if context == .userInitiated { feedbackHandler?(networkError) }
 			}
 
@@ -349,13 +352,13 @@ final class NetworkManager {
 				case let .server(statusCode, response) where statusCode == 404 || response.code == .notFound || response.code == .accountNotFound:
 					throw error
 				default:
-					PrintError("Request failed for \(endpoint.path)", category: .network, error: error)
+					PrintError("Request failed for \(endpoint.method.rawValue) \(endpoint.path) [request_id=\(requestID)]", category: .network, error: error)
 					if context == .userInitiated { feedbackHandler?(error) }
 					throw error
 			}
 		} catch {
 			let networkError = NetworkError.transport(error.localizedDescription)
-			PrintError("Transport failed for \(endpoint.path)", category: .network, error: error)
+			PrintError("Transport failed for \(endpoint.method.rawValue) \(endpoint.path) [request_id=\(requestID)]", category: .network, error: error)
 			if context == .userInitiated { feedbackHandler?(networkError) }
 			throw networkError
 		}

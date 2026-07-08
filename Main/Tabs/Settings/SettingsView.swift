@@ -57,6 +57,12 @@ struct SettingsView: View {
 					List {
 						list
 					}
+					.toolbarMinimizationBehavior(
+						.onScrollDown, for: .navigationBar
+					)
+					.toolbarMinimizationSafeAreaAdjustment(
+						.disabled, for: .navigationBar
+					)
 					.listStyle(.sidebar)
 
 				#else
@@ -113,7 +119,9 @@ struct SettingsView: View {
 					SubjectEditorSheet(
 						subjects: $subjects,
 						initialRequest: nil,
-						onSave: { ServerSyncCoordinator.shared.ownerTimetableChanged() }
+						onSave: { proposedSubjects in
+							try await ServerSyncCoordinator.shared.saveOwnerTimetable(proposedSubjects)
+						}
 					)
 					.presentationDetents([.large])
 					.presentationContentInteraction(.scrolls)

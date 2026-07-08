@@ -17,7 +17,7 @@ final class OwnerTimetableSyncService {
 	private(set) var isSyncing = false
 
 	private let networkManager: NetworkManager
-	private var currentOperation: (kind: OperationKind, generation: Int, task: Task<Void, any Error>)?
+	private var currentOperation: CurrentOperation?
 	private var operationGeneration = 0
 	private var pendingVisibility: Bool?
 	private var visibilityTask: Task<Void, any Error>?
@@ -28,13 +28,38 @@ final class OwnerTimetableSyncService {
 		case upload
 	}
 
+	private struct ErasedOperationResult: @unchecked Sendable {
+		let value: Any
+	}
+
+	private struct CurrentOperation {
+		let kind: OperationKind
+		let generation: Int
+		let task: Task<ErasedOperationResult, any Error>
+	}
+
+	private enum OperationRunError: LocalizedError {
+		case mismatchedResult(OperationKind)
+
+		var errorDescription: String? {
+			switch self {
+				case let .mismatchedResult(kind):
+					"Sync operation \(kind) returned an unexpected result type."
+			}
+		}
+	}
+
 	private init(networkManager: NetworkManager) {
 		self.networkManager = networkManager
 	}
 
-	func uploadOwnerTimetable() async throws {
+	func uploadOwnerTimetable(subjects: [Subject]? = nil) async throws {
+		_ = try await uploadOwnerTimetableResponse(subjects: subjects)
+	}
+
+	func uploadOwnerTimetableResponse(subjects: [Subject]? = nil) async throws -> OwnerTimetableResponse {
 		try await run(.upload) { [self] in
-			try await performUpload()
+			try await performUpload(subjects: subjects)
 		}
 	}
 
@@ -63,14 +88,17 @@ final class OwnerTimetableSyncService {
 			while let proposed = pendingVisibility {
 				try Task.checkCancellation()
 				pendingVisibility = nil
+
 				let response: OwnerTimetableResponse = try await networkManager.send(
 					.v1OwnerTimetableVisibility,
 					body: OwnerTimetableVisibilityUpdateRequest(isSearchable: proposed)
 				)
+
 				Defaults[.ownerIsSearchable] = response.isSearchable
 				Defaults[.lastServerSync] = Date.now
 			}
 		}
+
 		visibilityTask = task
 		defer { visibilityTask = nil }
 
@@ -80,81 +108,117 @@ final class OwnerTimetableSyncService {
 			pendingVisibility = nil
 			throw error
 		}
+
 		return Defaults[.ownerIsSearchable]
 	}
 
-	private func run(
+	@discardableResult
+	private func run<T>(
 		_ kind: OperationKind,
-		operation: @escaping @MainActor () async throws -> Void
-	) async throws {
+		operation: @escaping @MainActor () async throws -> T
+	) async throws -> T {
 		if let currentOperation {
 			if currentOperation.kind == kind {
 				let task = currentOperation.task
-				try await withTaskCancellationHandler {
+
+				let result = try await withTaskCancellationHandler {
 					try await task.value
 				} onCancel: {
 					task.cancel()
 				}
-				return
+
+				if T.self == Void.self {
+					return () as! T
+				}
+
+				guard let value = result.value as? T else {
+					throw OperationRunError.mismatchedResult(kind)
+				}
+
+				return value
 			}
 
 			_ = try? await currentOperation.task.value
+
 			if self.currentOperation?.generation == currentOperation.generation {
 				self.currentOperation = nil
 				isSyncing = false
 			}
-			try await run(kind, operation: operation)
-			return
+
+			return try await run(kind, operation: operation)
 		}
 
 		operationGeneration += 1
 		let generation = operationGeneration
+
 		let task = Task { @MainActor in
 			try Task.checkCancellation()
-			try await operation()
+			let value = try await operation()
+			return ErasedOperationResult(value: value)
 		}
-		currentOperation = (kind, generation, task)
+
+		currentOperation = CurrentOperation(
+			kind: kind,
+			generation: generation,
+			task: task
+		)
+
 		isSyncing = true
+
 		defer {
 			if currentOperation?.generation == generation {
 				currentOperation = nil
 				isSyncing = false
 			}
 		}
-		try await withTaskCancellationHandler {
+
+		let result = try await withTaskCancellationHandler {
 			try await task.value
 		} onCancel: {
 			task.cancel()
 		}
+
+		if T.self == Void.self {
+			return () as! T
+		}
+
+		guard let value = result.value as? T else {
+			throw OperationRunError.mismatchedResult(kind)
+		}
+
+		return value
 	}
 
-	private func performUpload() async throws {
-		let clock = ContinuousClock()
-		let start = clock.now
-		let current: OwnerTimetableResponse = try await networkManager.send(.v1OwnerTimetable)
+	private func performUpload(subjects: [Subject]?) async throws -> OwnerTimetableResponse {
+		let subjects = subjects ?? Defaults[.timetable]
+
 		let response: OwnerTimetableResponse = try await networkManager.send(
 			.v1OwnerTimetableUpdate,
 			body: OwnerTimetableUpdateRequest(
-				subjects: Defaults[.timetable],
-				expectedRevision: current.revision,
+				subjects: subjects,
+				expectedRevision: nil,
 				isSearchable: Defaults[.ownerIsSearchable]
 			)
 		)
+
+		Defaults[.ownerIsSearchable] = response.isSearchable
 		Defaults[.lastServerSync] = Date.now
-		Print(
-			"Uploaded owner timetable revision \(response.revision)",
-			category: .network,
-			duration: start.duration(to: clock.now)
-		)
+
+		Print("Uploaded owner timetable revision \(response.revision)", category: .network)
+
+		return response
 	}
 
 	private func performDownload() async throws {
 		let clock = ContinuousClock()
 		let start = clock.now
+
 		let response: OwnerTimetableResponse = try await networkManager.send(.v1OwnerTimetable)
+
 		Defaults[.timetable] = response.subjects
 		Defaults[.ownerIsSearchable] = response.isSearchable
 		Defaults[.lastServerSync] = Date.now
+
 		Print(
 			"Downloaded owner timetable revision \(response.revision)",
 			category: .network,
@@ -164,14 +228,16 @@ final class OwnerTimetableSyncService {
 
 	private func performReconciliation() async throws {
 		let response: OwnerTimetableResponse = try await networkManager.send(.v1OwnerTimetable)
+
 		let localTimetable = Defaults[.timetable]
 		let lastServerSync = Defaults[.lastServerSync]
+
 		let serverIsNewer = response.updatedAt.map { updatedAt in
 			guard let lastServerSync else { return true }
 			return updatedAt > lastServerSync
 		} ?? false
 
-		if localTimetable.isEmpty || serverIsNewer {
+		if localTimetable.isEmpty || (serverIsNewer && !response.subjects.isEmpty) {
 			Defaults[.timetable] = response.subjects
 			Defaults[.ownerIsSearchable] = response.isSearchable
 			Defaults[.lastServerSync] = Date.now
@@ -186,7 +252,10 @@ final class OwnerTimetableSyncService {
 				isSearchable: Defaults[.ownerIsSearchable]
 			)
 		)
+
+		Defaults[.ownerIsSearchable] = updated.isSearchable
 		Defaults[.lastServerSync] = Date.now
+
 		Print("Reconciled owner timetable revision \(updated.revision)", category: .network)
 	}
 }

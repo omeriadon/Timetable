@@ -19,7 +19,7 @@ final class TimetablePassManager {
 	private let passLibrary = PKPassLibrary()
 	private var projectionUploadHandler: (() async throws -> Void)?
 
-	init() {
+	init(loadImmediately: Bool = true) {
 		// Only load if PassKit is actually available on this device platform (e.g., Mac vs iOS)
 		if PKPassLibrary.isPassLibraryAvailable() {
 			NotificationCenter.default.addObserver(
@@ -28,7 +28,9 @@ final class TimetablePassManager {
 				name: NSNotification.Name(rawValue: PKPassLibraryNotificationName.PKPassLibraryDidChange.rawValue),
 				object: nil
 			)
-			refreshPasses(uploadProjection: false)
+			if loadImmediately {
+				refreshPasses(uploadProjection: false)
+			}
 		}
 	}
 
@@ -122,7 +124,7 @@ final class TimetablePassManager {
 }
 
 extension EnvironmentValues {
-	private static let defaultPassManager = TimetablePassManager()
+	private static let defaultPassManager = TimetablePassManager(loadImmediately: false)
 
 	@Entry var passManager: TimetablePassManager = Self.defaultPassManager
 }

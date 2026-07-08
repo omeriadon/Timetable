@@ -155,7 +155,7 @@
 				Views/Onboarding/Views/Tutorial/TimetableTypesTutorial.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/WalletTutorial.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/WidgetTutorial.swift = (ios, );
-				Views/SubjectEditorSheet.swift = (ios, );
+				"Views/Subject Editor/SubjectEditorSheet.swift" = (ios, );
 				iOS/LiveActivityDebugView.swift = (ios, );
 				macOS/AppDelegate.swift = (macos, );
 				macOS/CustomMaterialView.swift = (macos, );

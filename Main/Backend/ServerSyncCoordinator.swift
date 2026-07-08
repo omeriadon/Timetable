@@ -7,40 +7,115 @@ import WidgetKit
 @Observable
 final class ServerSyncCoordinator {
 	static let shared = ServerSyncCoordinator()
+
 	private var profileTask: Task<Void, Never>?
 
-	private static func withTimeout(_ operation: @escaping @MainActor @Sendable () async throws -> Void) async throws {
+	private static func withTimeout<T>(
+		_ operation: @escaping @MainActor () async throws -> T
+	) async throws -> T {
 		let operationTask = Task { @MainActor in
 			try await operation()
 		}
 
-		try await withThrowingTaskGroup(of: Void.self) { group in
-			group.addTask { try await operationTask.value }
+		return try await withThrowingTaskGroup(of: T.self) { group in
+			defer {
+				operationTask.cancel()
+				group.cancelAll()
+			}
+
+			group.addTask {
+				try await operationTask.value
+			}
+
 			group.addTask {
 				try await Task.sleep(for: .seconds(25))
 				operationTask.cancel()
 				throw NetworkError.timedOut
 			}
-			_ = try await group.next()
-			group.cancelAll()
+
+			guard let result = try await group.next() else {
+				throw CancellationError()
+			}
+
+			return result
 		}
 	}
 
-	func ownerTimetableChanged() {
-		guard SessionStore.shared.isAuthenticated else { return }
-		Task { do { try await OwnerTimetableSyncService.shared.uploadOwnerTimetable() } catch { Self.showSyncFailure(error, title: "Timetable sync failed") } }
+	func ownerTimetableChanged(subjects: [Subject]? = nil) {
+		guard SessionStore.shared.isAuthenticated else {
+			showSignInRequired()
+			return
+		}
+
+		let snapshot = subjects ?? Defaults[.timetable]
+
+		Task {
+			do {
+				_ = try await saveOwnerTimetable(snapshot)
+			} catch {
+				// saveOwnerTimetable already handles the visible error badge.
+			}
+		}
+	}
+
+	func saveOwnerTimetable(_ subjects: [Subject]) async throws -> [Subject] {
+		guard SessionStore.shared.isAuthenticated else {
+			showSignInRequired()
+			throw NetworkError.transport("Sign in required.")
+		}
+
+		let badgeID = UUID()
+
+		StatusBadgeManager.shared.addBadge(
+			id: badgeID,
+			title: "Syncing timetable",
+			priority: 3,
+			view: .progressView
+		)
+
+		do {
+			let response = try await Self.withTimeout {
+				try await OwnerTimetableSyncService.shared.uploadOwnerTimetableResponse(subjects: subjects)
+			}
+
+			Defaults[.ownerIsSearchable] = response.isSearchable
+			Defaults[.lastServerSync] = Date.now
+
+			StatusBadgeManager.shared.updateBadge(
+				id: badgeID,
+				title: "Timetable synced",
+				view: .success
+			)
+
+			return response.subjects
+		} catch {
+			guard !error.isCancellation else { throw error }
+			Self.showSyncFailure(error, title: "Timetable sync failed")
+			throw error
+		}
 	}
 
 	func scheduleProfileUpdate(_ displayName: String) {
 		guard SessionStore.shared.isAuthenticated else { return }
+
 		profileTask?.cancel()
+
 		profileTask = Task {
 			try? await Task.sleep(for: .milliseconds(500))
 			guard !Task.isCancelled else { return }
+
 			do {
 				_ = try await SessionStore.shared.updateProfile(displayName: displayName)
-				StatusBadgeManager.shared.addBadge(id: UUID(), title: "Preferences saved", priority: 3, view: .success)
-			} catch { Self.showSyncFailure(error, title: "Profile sync failed") }
+
+				StatusBadgeManager.shared.addBadge(
+					id: UUID(),
+					title: "Preferences saved",
+					priority: 3,
+					view: .success
+				)
+			} catch {
+				Self.showSyncFailure(error, title: "Profile sync failed")
+			}
 		}
 	}
 
@@ -55,6 +130,12 @@ final class ServerSyncCoordinator {
 	private static func showSyncFailure(_ error: any Error, title: String) {
 		guard !suppresses(error) else { return }
 
-		StatusBadgeManager.shared.addBadge(id: UUID(), title: title, secondaryText: error.localizedDescription, priority: 4, view: .error)
+		StatusBadgeManager.shared.addBadge(
+			id: UUID(),
+			title: title,
+			secondaryText: error.localizedDescription,
+			priority: 4,
+			view: .error
+		)
 	}
 }
