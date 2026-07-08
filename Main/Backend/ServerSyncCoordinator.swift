@@ -53,7 +53,7 @@ final class ServerSyncCoordinator {
 			do {
 				_ = try await saveOwnerTimetable(snapshot)
 			} catch {
-				// saveOwnerTimetable already handles the visible error badge.
+				// saveOwnerTimetable already updates the visible badge.
 			}
 		}
 	}
@@ -61,7 +61,7 @@ final class ServerSyncCoordinator {
 	func saveOwnerTimetable(_ subjects: [Subject]) async throws -> [Subject] {
 		guard SessionStore.shared.isAuthenticated else {
 			showSignInRequired()
-			throw NetworkError.transport("Sign in required.")
+			throw NetworkError.authenticationRequired
 		}
 
 		let badgeID = UUID()
@@ -90,7 +90,14 @@ final class ServerSyncCoordinator {
 			return response.subjects
 		} catch {
 			guard !error.isCancellation else { throw error }
-			Self.showSyncFailure(error, title: "Timetable sync failed")
+
+			StatusBadgeManager.shared.updateBadge(
+				id: badgeID,
+				title: "Timetable sync failed",
+				secondaryText: error.localizedDescription,
+				view: .error
+			)
+
 			throw error
 		}
 	}

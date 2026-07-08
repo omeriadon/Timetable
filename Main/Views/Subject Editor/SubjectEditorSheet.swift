@@ -391,13 +391,8 @@ struct SubjectEditorSheet: View {
 				commitToLocalModel(savedSubjects)
 				dismiss()
 			} catch {
-				statusBadgeManager.addBadge(
-					id: UUID(),
-					title: "Timetable sync failed",
-					secondaryText: error.localizedDescription,
-					priority: 4,
-					view: .error
-				)
+				// ServerSyncCoordinator already displays the sync errors.
+				// Keep the sheet open and do not commit local Defaults.
 			}
 		}
 	}

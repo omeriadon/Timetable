@@ -300,6 +300,12 @@ final class NetworkManager {
 		do {
 			let request = try makeRequest(for: endpoint, body: body)
 			requestID = request.value(forHTTPHeaderField: "X-Request-ID") ?? requestID
+
+			Print(
+				"Sending \(endpoint.method.rawValue) \(endpoint.path) [request_id=\(requestID)] [body_bytes=\(body?.count ?? 0)]",
+				category: .network
+			)
+
 			let (data, response) = try await session.data(for: request)
 
 			isOnline = true
