@@ -577,15 +577,19 @@ git push production
 
 ---
 
-## Unit 5: Legacy architecture cleanup
+## Unit 5: Legacy architecture cleanup — completed
 
 ### Goal
 
 Remove superseded code only after Spotlight, Wallet, and Live Activity work builds and behaves correctly.
 
-### Required audit
+### Audit result
 
-Run:
+The audit found no superseded school-state implementation, observable-object architecture, CloudKit timetable synchronization, client pass signing, or duplicate `PKPassLibrary` consumers. WatchConnectivity remains limited to paired-iPhone authentication and account-state messages. The retained `FriendsTimeLeftWidget` is the approved Friends' Current Subjects widget, not the removed standalone Time Left widget.
+
+The specific correctness checks remain satisfied: `SchoolStateEngine` is the active state engine, owner data is included in the timetable and subject queries, and no legacy timetable payload is sent through WatchConnectivity. No speculative deletions were made.
+
+Commands reviewed:
 
 ```sh
 rg -n 'ObservableObject|StateObject|ObservedObject|EnvironmentObject' . --glob '*.swift'
@@ -624,11 +628,9 @@ rg -n 'signDataWithBundleKey|generatePass|PKPass' . --glob '*.swift'
 
 ### Verification
 
-- iOS build.
-- macOS build.
-- Widget build.
-- Timetable scheme dependency build covering Watch and Watch Widget.
-- `git diff --check`.
+- `git diff --check` passed.
+- Unit 5 source audit completed without source removals.
+- Xcode validation pending.
 
 ### Commit
 
