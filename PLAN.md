@@ -1,575 +1,389 @@
-# Timetable Rebuild Implementation Plan
+# Timetable Continuation Plan
 
-## Architecture Rules
+## Purpose
 
-- SwiftUI views, widgets, App Intents, Spotlight, and snippets read persistent timetable/account data only through `Defaults`.
-- Only Wallet infrastructure may instantiate or call `PKPassLibrary`.
-- Wallet infrastructure reconciles Wallet state into `Defaults`; presentation code never reads Wallet.
-- Views use `@Default(.key)` for the smallest required state.
-- No `ObservableObject`, `@StateObject`, `@ObservedObject`, or `@EnvironmentObject`.
-- Shared mutable service state uses `@MainActor @Observable`.
-- Services are passed only when a view executes commands or displays transient progress/errors.
-- Existing UI designs remain unchanged.
-- Existing folder structure remains; focused subfolders may be added.
-- No legacy data migrations. Old implementations may be removed once their replacements build.
-- Every change is an atomic commit.
-- Every commit requires a successful Xcode MCP build before further work.
-- Every new Fluent model requires explicit field approval before implementation.
+This document is the execution handoff for the remaining Timetable rebuild work after commit `aeedf2c` (`Add unified school state widgets and intents`). It describes the current implementation, the remaining client and server work, the contracts that must not be changed, the exact files to inspect, the required build commands, and the atomic commit order.
 
-## Source-of-Truth Rules
+Do not restart from the old rebuild plan. Most server foundation work and a large portion of the client architecture already exist. Work from the current source tree and this document.
 
-### Owner timetable
+## Project locations
 
-- `Defaults[.timetable]` is the immediate local owner timetable.
-- It works without an account and without Wallet.
-- Once authenticated, the server stores and synchronizes it.
-- The owner Wallet pass is optional.
-- Owner-pass presence never controls app data.
+- Client application: `/Users/omeriadon/Documents/Xcode_App_Library/Timetable`
+- Server: `/Users/omeriadon/Documents/Xcode_App_Library/pmstt`
+- Client Xcode project: `/Users/omeriadon/Documents/Xcode_App_Library/Timetable/Timetable.xcodeproj`
+- Server Swift package: `/Users/omeriadon/Documents/Xcode_App_Library/pmstt/Package.swift`
 
-### Received timetables
+## Supported platforms
 
-On iOS:
+- iOS
+- iPadOS through the iOS target
+- macOS
+- watchOS
+- iOS Widget extension
+- watchOS Widget extension
 
-1. Wallet infrastructure reads `PKPassLibrary`.
-2. It parses all timetable passes.
-3. It removes deleted passes.
-4. It writes the complete resulting list to `Defaults[.receivedTimetables]`.
-5. It uploads that projection to the server.
+visionOS is not supported. Do not add visionOS destinations, build settings, conditionals, tests, documentation, or acceptance criteria.
 
-On macOS and visionOS:
+## Required build tool
 
-1. The app downloads the received-timetable projection from the server.
-2. It writes the result to `Defaults[.receivedTimetables]`.
-3. All UI and extensions read that key.
+Use `xcodebuild`. The active `xcode-select` path points at Command Line Tools, so every Xcode command must set:
 
-On watchOS:
-
-1. Authentication state and credentials originate from the paired iPhone.
-2. The watch always downloads timetable data from the server.
-3. WatchConnectivity distributes credentials and account-state changes, not timetable data.
-4. The watch never independently chooses between Wallet, phone data, and server data.
-
-## Received Timetable Model
-
-```swift
-struct ReceivedTimetable: Codable, Hashable, Identifiable, Sendable {
-    let id: String
-    let issuerAccountID: String
-    let sourceKind: SourceKind
-    let signedDisplayName: String
-    let authorDisplayName: String?
-    let subjects: [Subject]
-    let receivedAt: Date
-    let passUpdatedAt: Date
-    let isDeleted: Bool
-}
+```sh
+DEVELOPER_DIR='/Applications/Xcode 27 beta 3.app/Contents/Developer'
 ```
 
-```swift
-enum SourceKind: String, Codable, Hashable, Sendable {
-    case accountOwner
-    case authoredForThirdParty
-}
+Primary client build commands:
+
+```sh
+DEVELOPER_DIR='/Applications/Xcode 27 beta 3.app/Contents/Developer' \
+xcodebuild \
+  -project Timetable.xcodeproj \
+  -scheme Timetable \
+  -configuration Debug \
+  -destination 'generic/platform=iOS' \
+  build \
+  CODE_SIGNING_ALLOWED=NO
 ```
 
-Identity rules:
-
-- All account identifiers are represented as `String` in shared DTOs.
-- Server UUIDs are converted with `uuid.uuidString`.
-- For `.accountOwner`, `id == issuerAccountID`.
-- For `.authoredForThirdParty`, `id` is the server-generated pass serial number.
-- `id` is always the pass serial number presented to Wallet.
-- Name overrides do not modify `signedDisplayName`.
-
-## Deleted Pass Protocol
-
-Every pass payload contains:
-
-```swift
-let isDeleted: Bool
+```sh
+DEVELOPER_DIR='/Applications/Xcode 27 beta 3.app/Contents/Developer' \
+xcodebuild \
+  -project Timetable.xcodeproj \
+  -scheme Timetable \
+  -configuration Debug \
+  -destination 'generic/platform=macOS' \
+  build \
+  CODE_SIGNING_ALLOWED=NO
 ```
 
-Every local `ReceivedTimetable` also contains `isDeleted`.
+The Timetable iOS scheme builds the embedded Widget, Watch, and Watch Widget dependency graph. This is currently the reliable watch compilation gate.
 
-When an account or authored timetable is deleted:
+The standalone `Watch` scheme currently fails from the command line because Xcode looks for iPhoneOS `MaterialView.o` products while resolving the companion target. Do not treat that product-path error as a Swift source failure. Diagnose the scheme/configuration separately during final build cleanup. Do not hide genuine Watch Swift errors behind this known issue.
 
-1. Server marks every corresponding pass record `isDeleted = true`.
-2. Server regenerates the pass.
-3. The first back field is inserted as:
+Server gates:
+
+```sh
+cd /Users/omeriadon/Documents/Xcode_App_Library/pmstt
+swift build -c release
+```
+
+Run `swift test` only when changing the existing Live Activity scheduler/projector tests or another server behavior that already has a directly relevant suite.
+
+## Repository state at handoff
+
+### Timetable client
+
+The client repository was clean immediately after commit `aeedf2c`, before this document replacement.
+
+The commit hook runs SwiftFormat. During `aeedf2c`, that hook formatted and automatically included all pre-existing dirty client files, not only the explicitly staged paths. No source work was lost. The commit is broader than its intended staged unit and includes the pre-existing Spotlight, notification, subject metadata, localization, and Live Activity UI edits.
+
+Do not attempt to split or rewrite `aeedf2c`. Continue forward with new atomic commits.
+
+### pmstt server
+
+The server has one uncommitted change owned by the existing work:
 
 ```text
-Status
-This timetable has been deleted and will be removed from Wallet.
+M Sources/pmstt/Services/LiveActivities/SchoolDayActivityProjector.swift
 ```
 
-4. Server sends PassKit update pushes to every registration.
-5. Wallet downloads the updated pass.
-6. `PKPassLibraryDidChange` triggers reconciliation.
-7. Reconciliation detects `isDeleted == true`.
-8. Wallet infrastructure calls `PKPassLibrary.removePass(_:)`.
-9. The deleted timetable is excluded from `Defaults[.receivedTimetables]`.
-10. The updated projection is uploaded to the account server.
-11. macOS, visionOS, widgets, intents, snippets, and Spotlight remove it during their next Defaults refresh.
-
-Startup reconciliation also deletes any previously downloaded tombstoned passes.
-
-Server records retain a revocation tombstone so an old `.pkpass` cannot be reimported as active.
-
-Functions:
+The change makes the `next` argument to `lesson(...)` optional:
 
 ```swift
-func deleteTombstonedPasses() async
-func removePass(_ pass: PKPass) async
-func isPassRevoked(serialNumber: String) async throws -> Bool
-func revokePass(serialNumber: String, on database: Database) async throws
+private func lesson(
+    period: Int,
+    date baseDate: Date,
+    dayIndex: Int,
+    subjects: [TimetableSubjectDTO],
+    next: String?,
+    end: (Int, Int)
+) -> SchoolDayActivityContentState
 ```
 
-## Defaults
+Preserve this change. Validate and commit it only as part of the Live Activity projector unit described below.
+
+## Completed implementation
+
+### Server foundation
+
+The server already contains:
+
+- PostgreSQL and Fluent configuration.
+- Structured error responses and request IDs.
+- `User`, `UserToken`, `OwnerTimetable`, `AuthoredTimetable`, `ReceivedPassMirror`, `ReceivedNameOverride`, `UserDevice`, `PassRegistration`, and `PassRecord` models and migrations.
+- Email authentication, Sign in with Apple, refresh, logout, profile, and account deletion routes.
+- Owner, authored, received, settings, device, discovery, report, notification, PassKit web-service, and Live Activity controllers.
+- Pass generation and signing.
+- Wallet update push infrastructure.
+- Notification scheduling and APNs infrastructure.
+- Persistent Live Activity records and transition claims.
+- Push-to-start and update-token endpoints.
+
+Do not recreate these systems.
+
+### Client account and synchronization foundation
+
+The client already contains:
+
+- `NetworkManager` with authentication refresh and structured server errors.
+- `SessionStore` with Keychain-backed credentials and silent refresh.
+- Paired-iPhone watch provisioning through WatchConnectivity.
+- Owner timetable server synchronization.
+- Received timetable projection synchronization.
+- Account settings synchronization.
+- APNs device registration.
+- Live Activity token registration.
+
+Watch authentication remains paired-iPhone provisioned. Never add independent signup, email login, or Sign in with Apple to watchOS.
+
+### Unified school-state engine
+
+Commit `aeedf2c` replaced the legacy global `getSchoolState` API with:
+
+- `TimeOfDay`
+- `SchoolPeriod`
+- `SchoolInterval`
+- `ScheduledSubject`
+- `CurrentLesson`
+- `CurrentFreePeriod`
+- `BreakState`
+- `SchoolStateDestination`
+- `SchoolState`
+- `ReceivedSchoolState`
+- `TimetableClock`
+- `SchoolStateEngine`
+
+The formal state cases are:
 
 ```swift
-extension Defaults.Keys {
-    static let timetable: Key<[Subject]>
-    static let receivedTimetables: Key<[ReceivedTimetable]>
-    static let accountProfile: Key<AccountProfile?>
-    static let userDisplayName: Key<String>
-    static let receivedNameOverrides: Key<[String: String]>
-    static let walletRevision: Key<Int>
-    static let lastWalletReconciliation: Key<Date?>
-    static let lastServerSync: Key<Date?>
-    static let hasCompletedAccountBootstrap: Key<Bool>
-    static let accountSettings: Key<AccountSettings>
-    static let installationID: Key<String>
-}
+case beforeSchool(next: ScheduledSubject)
+case lesson(CurrentLesson)
+case freePeriod(CurrentFreePeriod)
+case recess(BreakState)
+case lunch(BreakState)
+case afterSchool
+case weekend
+case noTimetable
 ```
 
-Transient credentials remain in Keychain.
+All current client, watch, widget, and Current Subject intent consumers were migrated to this engine. Do not reintroduce `getSchoolState`, tuple-based intervals, or optional current-subject state.
 
-Views use direct declarations:
+All timetable-sensitive current-time access must use `TimetableClock.now`. Timeline-provider calculations for an explicit real date may use `TimetableClock.adjusted(date)`.
+
+### Widgets
+
+The active widget set is deliberately limited to:
+
+1. Weekly timetable.
+2. Next break.
+3. Friends' current subjects.
+4. School-day Live Activity.
+
+The old standalone Time Left widget was removed.
+
+The weekly timetable is now configurable with `WeeklyScheduleConfigurationIntent`. Its Person picker defaults to the owner and can select an active received timetable.
+
+The Next Break widget supports system-small and accessory-rectangular presentation where the platform supports those families.
+
+All timeline widgets now provide representative placeholders and apply `.redacted(reason: .placeholder)`.
+
+Do not add School Day Progress or Shared Free Period widgets. Do not add widgets merely because an intent exists. New widgets require a distinct, useful glanceable purpose.
+
+### App Intents and Siri
+
+Implemented entities and queries:
+
+- `TimetableEntity`
+- `SubjectEntity`
+- `PersonTimetableEntity`
+- `SchoolDayEntity`
+- `TimetableQuery`
+- `SubjectQuery`
+- `PersonTimetableQuery`
+- `SchoolDayQuery`
+
+Implemented intents:
+
+- Current Subject
+- Next Subject
+- Next Break
+- Subjects for Day
+- Get Timetable for Person
+- Get Received Timetables
+
+Implemented Siri shortcut phrases are registered in `App Intents/TimetableShortcuts.swift`.
+
+Do not implement School Day Progress or Shared Free Period intents unless the product scope is explicitly reopened.
+
+### Cross-platform build fixes
+
+- `SymbolPickerSheet` uses `SFSymbolsPicker` only on iOS and provides a macOS fallback.
+- The iOS launch storyboard is platform-filtered out of macOS resource compilation.
+- The URL scheme `timetable://` is registered for widget and Spotlight navigation.
+
+## Architecture rules that remain binding
+
+1. Views, widgets, App Intents, snippets, and Spotlight read persistent timetable/account data through Defaults.
+2. Only Wallet infrastructure may instantiate or call `PKPassLibrary`.
+3. Wallet infrastructure reconciles Wallet state into Defaults. Presentation code never reads Wallet.
+4. Use `@Default(.key)` for the smallest required persistent state in SwiftUI views.
+5. Do not introduce `ObservableObject`, `@StateObject`, `@ObservedObject`, or `@EnvironmentObject`.
+6. Shared mutable service state uses `@MainActor @Observable`.
+7. Services are passed into views only for commands or transient progress/error state.
+8. Preserve current UI designs unless a remaining task explicitly requires a new surface.
+9. Do not introduce CloudKit as a timetable source of truth.
+10. Do not synchronize timetable payloads through WatchConnectivity.
+11. The owner timetable always exists locally independently of account or Wallet state.
+12. Received timetable signed identity is immutable. Local names remain overrides keyed by pass serial number.
+13. Do not widen `AccountSettings` from the checked-in client/server contract without explicit product approval.
+14. No visionOS work.
+15. Keep commits behavior-scoped and build before each commit.
+
+## Remaining execution order
+
+Complete the remaining work in the order below. Do not combine these units into one commit.
+
+---
+
+## Unit 1: Complete Spotlight indexing and navigation
+
+### Goal
+
+Make the owner timetable, active received timetables, and subjects searchable with stable metadata and functional deep links. Remove deleted/tombstoned records immediately.
+
+### Primary files
+
+- `App Intents/Entities/Spotlight.swift`
+- `App Intents/Entities/TimetableEntity.swift`
+- `App Intents/Entities/SubjectEntity.swift`
+- `App Intents/Queries/TimetableQuery.swift`
+- `App Intents/Queries/SubjectQuery.swift`
+- `Main/TimetableApp.swift`
+- `Main/Tabs/ContentView.swift`
+- `Main/Tabs/Timetable/TimetableView.swift`
+- `Main/Backend/OwnerTimetableSyncService.swift`
+- `Main/Backend/ReceivedTimetableSyncService.swift`
+- `App Shared/Wallet/TimetablePassManager.swift`
+- `Main/Views/Subject Editor/main sheet.swift`
+
+### Current state
+
+`SpotlightIndexer` currently owns named timetable and subject indexes and rebuilds from Defaults. It filters deleted received timetables and tombstone IDs. It indexes the owner timetable and received timetables through App Entity indexing.
+
+The implementation still needs explicit stable identifiers, richer metadata, reliable mutation triggers, and destination routing.
+
+### Required implementation
+
+1. Define stable Spotlight identifiers.
+   - Owner timetable: `timetable.owner`.
+   - Received timetable: `timetable.received.<serial>`.
+   - Owner subject: `subject.owner.<normalized-subject-id>`.
+   - Received subject: `subject.received.<serial>.<normalized-subject-id>`.
+2. Include:
+   - Display title.
+   - Signed or locally overridden person name.
+   - Subject name.
+   - Source kind.
+   - Keywords including timetable, subject, teacher, and classroom where available.
+   - `timetable://timetable` or a more specific stable URL.
+3. Ensure subject identifiers do not collide when the same subject name appears in multiple timetables.
+4. Add explicit methods:
 
 ```swift
-@Default(.timetable) private var timetable
-@Default(.receivedTimetables) private var receivedTimetables
-@Default(.receivedNameOverrides) private var nameOverrides
-@Default(.accountSettings) private var accountSettings
+func rebuildFromDefaults() async
+func indexOwnerTimetable() async
+func indexReceivedTimetables() async
+func removeDeletedTimetables() async
+func removeAll() async
 ```
 
-Functions whose input already exists in Defaults read it internally:
+5. Trigger a rebuild after:
+   - Owner timetable mutation.
+   - Received projection replacement.
+   - Wallet reconciliation.
+   - Name override update/removal.
+   - Account bootstrap.
+   - Account deletion/sign-out cleanup if local indexes should disappear.
+6. Route Spotlight URLs through one typed deep-link parser.
+7. When a specific received timetable is addressed, select that timetable in `TimetableView` instead of only switching to the Timetable tab.
+8. When a subject is addressed, select its timetable and slot if the indexed result contains a resolvable slot.
+9. Do not perform indexing from SwiftUI `body`.
+10. Coalesce rapid successive rebuilds so Wallet and server bootstrap cannot start redundant full indexing jobs.
 
-```swift
-func currentOwnerSchoolState() -> SchoolState
-func currentReceivedSchoolStates() -> [ReceivedSchoolState]
-func rebuildSpotlightIndex() async
-func makeFriendsWidgetEntry(at date: Date) -> FriendsTimetableEntry
-func uploadOwnerTimetable() async throws
-```
+### Verification
 
-Do not pass `Defaults[.timetable]`, `Defaults[.receivedTimetables]`, profile, settings, or overrides through view hierarchies.
+- Build iOS.
+- Build macOS.
+- Confirm owner and received entities resolve from their queries.
+- Confirm a tombstoned timetable cannot be returned by Spotlight or entity queries.
+- Manually invoke representative deep links.
 
-Pure internal overloads may accept explicit values for tests:
-
-```swift
-static func calculate(
-    at date: Date,
-    subjects: [Subject],
-    schedule: SchoolSchedule
-) -> SchoolState
-```
-
-## Name Overrides
-
-```swift
-func receivedDisplayName(for serialNumber: String) -> String {
-    if let override = Defaults[.receivedNameOverrides][serialNumber],
-       !override.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-        return override
-    }
-
-    return Defaults[.receivedTimetables]
-        .first(where: { $0.id == serialNumber })?
-        .signedDisplayName ?? ""
-}
-```
-
-Commands:
-
-```swift
-func setReceivedNameOverride(
-    serialNumber: String,
-    displayName: String
-) async throws
-
-func removeReceivedNameOverride(
-    serialNumber: String
-) async throws
-```
-
-The override editor displays both:
-
-- Current local override.
-- Signed account/pass display name.
-
-Removing the override immediately restores the signed name.
-
-## Account Settings
-
-Use one syncable settings value instead of many unrelated Defaults keys:
-
-```swift
-struct AccountSettings: Codable, Hashable, Sendable {
-    var liveActivitiesEnabled: Bool
-    var liveActivityStartTime: TimeOfDay
-    var liveActivityEndTime: TimeOfDay
-    var liveActivityWeekdays: Set<SchoolWeekday>
-    var showBreaksInLiveActivity: Bool
-    var showNextSubjectInLiveActivity: Bool
-    var widgetShowsReceivedTimetables: Bool
-    var spotlightIndexingEnabled: Bool
-    var siriAccessEnabled: Bool
-}
-```
-
-Defaults:
-
-- Live Activities enabled.
-- Start at 08:00.
-- End at 15:40.
-- Monday through Friday.
-- Breaks and next subject visible.
-- Received timetable widget data enabled.
-- Spotlight and Siri enabled.
-
-Settings UI reads:
-
-```swift
-@Default(.accountSettings) private var settings
-```
-
-Add a dedicated “Account and Sync” settings subsection when the existing settings screen becomes crowded.
-
-Every settings mutation:
-
-1. Updates Defaults immediately.
-2. Reloads affected widgets or indexes.
-3. Synchronizes the complete settings struct to the server.
-4. Reverts only when the server rejects invalid data.
-5. Remains locally queued when the network disappears after mutation.
-
-## Server Foundation
-
-Use `moneyServer` as the structural base:
+### Commit
 
 ```text
-Sources/pmstt/
-  Controllers/
-  DTOs/
-  Functions/
-  Migrations/
-  Models/
-    Types/
-  Services/
-    Authentication/
-    LiveActivities/
-    Passes/
-  configure.swift
-  routes.swift
+Complete timetable Spotlight indexing
 ```
 
-Use its established patterns for:
+---
 
-- Fluent models.
-- PostgreSQL configuration.
-- migrations.
-- route collections.
-- DTO validation.
-- Bcrypt password hashing.
-- token authenticators.
-- authenticated route groups.
-- account deletion.
-- profile updates.
+## Unit 2: Replace the legacy Wallet manager with deterministic reconciliation
 
-Improve its security model by storing refresh-token hashes rather than plaintext tokens.
+### Goal
 
-Do not force periodic interactive sign-in. Sessions use:
+Make iPhone Wallet reconciliation a complete replacement projection, remove tombstoned passes deterministically, prevent stale pass resurrection, and coalesce Wallet notifications.
 
-- Short-lived access token.
-- Long-lived rotating refresh token.
-- Silent refresh.
-- Refresh-token invalidation only on logout, account deletion, credential reset, explicit server revocation, or suspected compromise.
+### Primary client files
 
-## Server Models
+- `App Shared/Wallet/TimetablePassManager.swift`
+- `Shared/Wallet/toReceivedTimetable.swift`
+- `Main/Backend/ReceivedTimetableSyncService.swift`
+- `Shared/Defaults.swift`
+- `Shared/Models/ReceivedTimetable.swift`
+- `Main/TimetableApp.swift`
 
-Each model receives a separate approval, implementation, build, test, and commit cycle.
+### Primary server files
 
-### `User`
+- `Sources/pmstt/Models/PassRecord.swift`
+- `Sources/pmstt/Controllers/AuthoredTimetableController.swift`
+- `Sources/pmstt/Controllers/AccountController.swift`
+- `Sources/pmstt/Controllers/WalletWebServiceController.swift`
+- `Sources/pmstt/Services/Passes/PassFactory.swift`
+- `Sources/pmstt/Services/Passes/WalletPushService.swift`
+- `Sources/pmstt/Services/Passes/generatePass.swift`
 
-```swift
-id: UUID
-email: String?
-passwordHash: String?
-appleSubject: String?
-displayName: String
-selfPassSerialNumber: String
-settingsData: Data
-createdAt: Date
-updatedAt: Date
-```
+### Current state
 
-### `UserToken`
+The client manager already:
 
-```swift
-id: UUID
-tokenHash: String
-userID: UUID
-expiresAt: Date
-createdAt: Date
-lastUsedAt: Date?
-```
+- Observes `PKPassLibraryDidChange`.
+- Parses timetable passes.
+- Removes passes whose payload says `isDeleted`.
+- Removes passes whose serial appears in `receivedTombstoneIDs`.
+- Writes received timetables to Defaults.
+- Uploads the resulting projection.
 
-### `OwnerTimetable`
+The server already:
 
-```swift
-id: UUID
-userID: UUID
-subjectsData: Data
-revision: Int
-createdAt: Date
-updatedAt: Date
-```
+- Marks pass records deleted.
+- Generates deleted-pass responses.
+- Includes `isDeleted` in pass user info.
+- Serves deleted passes from the PassKit web service.
+- Pushes Wallet updates.
 
-### `AuthoredTimetable`
+### Existing correctness defects
 
-```swift
-id: UUID
-authorUserID: UUID
-subjectDisplayName: String
-passSerialNumber: String
-subjectsData: Data
-revision: Int
-isDeleted: Bool
-createdAt: Date
-updatedAt: Date
-```
+1. Client reconciliation merges newly observed passes into the existing Defaults dictionary. This can preserve a pass that was removed from Wallet.
+2. `deletePass(for:)` matches sender and received timestamp instead of stable serial ID.
+3. Wallet notifications are not coalesced.
+4. A new task can overlap an existing reconciliation.
+5. `isLoading` can remain true on early failure.
+6. The manager mixes reader, reconciliation, command, state, animation, and upload responsibilities.
+7. Wallet infrastructure uses `withAnimation`, which is presentation behavior inside persistence infrastructure.
+8. Server `WalletWebServiceController.unregister` deletes a deleted `PassRecord` after its final registration disappears. That conflicts with the requirement to retain a revocation tombstone so an old `.pkpass` cannot be reimported as active.
 
-### `ReceivedPassMirror`
+### Required client implementation
 
-```swift
-id: UUID
-userID: UUID
-passSerialNumber: String
-issuerAccountID: String
-sourceKind: String
-signedDisplayName: String
-authorDisplayName: String?
-subjectsData: Data
-isDeleted: Bool
-walletRevision: Int
-receivedAt: Date
-passUpdatedAt: Date
-updatedAt: Date
-```
-
-### `ReceivedNameOverride`
-
-```swift
-id: UUID
-userID: UUID
-passSerialNumber: String
-displayName: String
-createdAt: Date
-updatedAt: Date
-```
-
-### `UserDevice`
-
-```swift
-id: UUID
-userID: UUID
-installationID: String
-platform: String
-apnsToken: String?
-liveActivityPushToStartToken: String?
-lastSeenAt: Date
-createdAt: Date
-updatedAt: Date
-```
-
-### `PassRegistration`
-
-```swift
-id: UUID
-deviceLibraryIdentifier: String
-passTypeIdentifier: String
-serialNumber: String
-pushToken: String
-createdAt: Date
-updatedAt: Date
-```
-
-### `PassRecord`
-
-```swift
-id: UUID
-serialNumber: String
-issuerAccountID: String
-sourceKind: String
-authoredTimetableID: UUID?
-revision: Int
-authenticationTokenHash: String
-isDeleted: Bool
-createdAt: Date
-updatedAt: Date
-```
-
-## NetworkManager
-
-Keep client networking in one organized file:
-
-```text
-Shared/Networking/NetworkManager.swift
-```
-
-Use `// MARK: -` sections:
-
-```swift
-// MARK: - State
-// MARK: - Reachability
-// MARK: - Authentication
-// MARK: - Request Construction
-// MARK: - Request Execution
-// MARK: - Response Validation
-// MARK: - Decoding
-// MARK: - Uploads
-// MARK: - Downloads
-// MARK: - Error Presentation
-// MARK: - Logging
-```
-
-```swift
-@MainActor
-@Observable
-final class NetworkManager {
-    static let shared = NetworkManager()
-
-    private(set) var isOnline: Bool
-    var presentedAlert: NetworkAlert?
-
-    func startMonitoring()
-    func requireOnline() throws
-    func send<Response: Decodable & Sendable>(
-        _ endpoint: Endpoint,
-        body: (some Encodable & Sendable)?
-    ) async throws -> Response
-    func send(_ endpoint: Endpoint) async throws
-    func download(_ endpoint: Endpoint) async throws -> Data
-    func upload<Response: Decodable & Sendable>(
-        _ endpoint: Endpoint,
-        body: some Encodable & Sendable
-    ) async throws -> Response
-    func present(_ error: Error)
-}
-```
-
-Before any request:
-
-```swift
-guard isOnline else {
-    presentedAlert = .offline
-    throw NetworkError.offline
-}
-```
-
-No URL request is created or resumed while known offline.
-
-The root content view owns the transient alert presentation:
-
-```swift
-@State private var networkManager = NetworkManager.shared
-```
-
-```swift
-.alert(item: $networkManager.presentedAlert) { alert in
-    Alert(
-        title: Text(alert.title),
-        message: Text(alert.message),
-        dismissButton: .default(Text("OK"))
-    )
-}
-```
-
-Server errors use stable codes:
-
-```swift
-struct ServerErrorResponse: Codable, Sendable {
-    let code: ServerErrorCode
-    let message: String
-    let field: String?
-    let requestID: String
-}
-```
-
-Examples:
-
-```swift
-enum ServerErrorCode: String, Codable, Sendable {
-    case offline
-    case invalidCredentials
-    case emailAlreadyExists
-    case invalidAppleIdentityToken
-    case sessionExpired
-    case accountNotFound
-    case timetableConflict
-    case invalidTimetable
-    case passGenerationFailed
-    case passRevoked
-    case liveActivityDisabled
-    case rateLimited
-    case internalServerError
-}
-```
-
-RapidAPI testing is supported by:
-
-- Stable JSON request/response DTOs.
-- Bearer-token authentication.
-- Predictable status codes.
-- Human-readable messages.
-- Machine-readable error codes.
-- Request IDs.
-- A complete endpoint test collection documented beside the server.
-
-## Authentication and Watch
-
-`SessionStore` is `@MainActor @Observable`, not an environment object.
-
-```swift
-@MainActor
-@Observable
-final class SessionStore {
-    static let shared = SessionStore()
-
-    private(set) var state: AuthenticationState
-
-    func restore() async
-    func signUp(email: String, password: String, displayName: String) async throws
-    func signIn(email: String, password: String) async throws
-    func signInWithApple(_ authorization: ASAuthorization) async throws
-    func refreshSilently() async throws
-    func signOut() async
-    func deleteAccount() async throws
-}
-```
-
-Watch behavior:
-
-- The phone sends the active session material to the paired watch through WatchConnectivity.
-- The watch stores it in its own Keychain.
-- The watch uses `NetworkManager` to call the server directly.
-- The phone sends logout, token rotation, and account deletion events to the watch.
-- The watch does not expose independent signup or login.
-- If the watch loses a valid session, it displays a “Sign in on iPhone” state.
-- Timetable payloads are never synchronized through WatchConnectivity.
-
-## Wallet Infrastructure
+1. Introduce a pure reader:
 
 ```swift
 struct WalletTimetableReader {
@@ -578,561 +392,343 @@ struct WalletTimetableReader {
 }
 ```
 
-```swift
-@MainActor
-@Observable
-final class WalletReconciliationService {
-    static let shared = WalletReconciliationService()
+2. Replace `TimetablePassManager` with or refactor it into a `@MainActor @Observable` reconciliation service.
+3. Maintain at most one reconciliation task.
+4. Coalesce repeated notifications with a short cancellable debounce.
+5. Compute projection as a complete replacement from currently installed active timetable passes.
+6. Preserve received timestamps only when needed and only by stable serial identity.
+7. Remove tombstoned passes before projection calculation.
+8. Set:
+   - `Defaults[.receivedTimetables]` to the complete active projection.
+   - `Defaults[.installedWalletTimetableIDs]` to exactly the installed active IDs.
+   - `Defaults[.lastWalletReconciliation]` after successful local reconciliation.
+   - `Defaults[.walletRevision]` once per effective projection change, not every scan.
+9. Upload only when the effective projection changes or when explicitly forced during account bootstrap.
+10. Delete by serial ID, never sender/timestamp.
+11. Trigger widget reload, App Shortcut parameter refresh, and Spotlight rebuild after an effective change.
+12. Remove infrastructure animations.
 
-    private(set) var isReconciling: Bool
+### Required server implementation
 
-    func startObserving()
-    func stopObserving()
-    func reconcile() async
-    func deleteTombstonedPasses() async
-    func uploadCurrentProjection() async
-}
+1. Retain deleted `PassRecord` tombstones after all registrations disappear.
+2. Ensure deleted owner-account passes and authored passes both receive:
+
+```text
+Status
+This timetable has been deleted and will be removed from Wallet.
 ```
 
-Only these files import PassKit for library access.
+3. Confirm `PassFactory.deletedResponse` preserves serial number and valid authentication behavior long enough for Wallet to fetch the tombstone.
+4. Confirm an old `.pkpass` import cannot reactivate a deleted record.
+5. Confirm `changedSerials` reports deleted records to every still-registered device.
+6. Remove only obsolete `PassRegistration` rows, not the revocation record.
 
-UI command services may request pass data from the server and present the system add-pass controller, but views never query the pass library.
+### Verification
 
-Reconciliation coalesces repeated Wallet notifications to avoid duplicate parsing and network calls.
+- Client iOS build.
+- Client macOS build because shared models/services compile there even though Wallet library access is iPhone-scoped.
+- Server release build.
+- Relevant server tests.
+- Manual test: remove an active pass from Wallet and confirm it disappears from Defaults/server projection.
+- Manual test: delete an authored timetable, receive the update, and confirm Wallet removes it.
+- Manual test: import an old deleted pass and confirm it is rejected or immediately removed.
 
-## Logging
+### Commits
 
-Extend the existing logging utilities:
+Use separate commits if client and server compile independently:
 
-```swift
-enum LogCategory: String {
-    case account
-    case network
-    case wallet
-    case defaults
-    case widget
-    case intents
-    case spotlight
-    case liveActivity
-    case watch
-    case server
-    case database
-    case passes
-}
+```text
+Retain Wallet pass revocation tombstones
+Rebuild received timetables from Wallet state
 ```
 
-```swift
-func Print(
-    _ message: @autoclosure () -> String,
-    category: LogCategory,
-    function: StaticString = #function
-)
+---
 
-func PrintError(
-    _ message: @autoclosure () -> String,
-    category: LogCategory,
-    function: StaticString = #function,
-    error: Error? = nil
-)
+## Unit 3: Harden Live Activity client lifecycle
+
+### Goal
+
+Ensure Live Activity authorization, push-to-start tokens, update tokens, existing activities, settings changes, sign-out, and relaunch all converge on one correct state.
+
+### Primary files
+
+- `Main/Backend/LiveActivityRegistrationService.swift`
+- `Main/Backend/NotificationRegistrationService.swift`
+- `Main/TimetableApp.swift`
+- `Shared/Models/AccountSettings.swift`
+- `Widget/Widget Shared/Live Activity/SchoolDayActivityAttributes.swift`
+- `Widget/Widget Shared/Live Activity/SchoolDayLiveActivityWidget.swift`
+
+### Current state
+
+The service already:
+
+- Observes Activity authorization changes.
+- Observes push-to-start token rotation.
+- Observes new Activity instances.
+- Uploads current and rotating update tokens.
+- Discovers existing activities on reconciliation.
+- Removes the server token when authorization/settings/authentication disallow activities.
+- Requests reconciliation of the current activity.
+
+### Required implementation
+
+1. Observe `activityStateUpdates` for every discovered activity.
+2. Cancel and remove the activity token task when an activity reaches ended or dismissed state.
+3. On relaunch, reconcile every existing activity and upload its current update token before requesting a new activity.
+4. Ensure only one current-activity reconciliation request runs at a time.
+5. Add bounded retry for token uploads after transient network failure.
+6. Do not retry authentication failures indefinitely.
+7. When Live Activities are disabled:
+   - Stop observers.
+   - Remove push-to-start token server-side.
+   - Ask the server to end active activities, or call the existing settings path that performs this action.
+8. When the user signs out:
+   - Remove server token while authentication is still valid.
+   - End or invalidate active activities.
+   - Then clear credentials.
+9. When authorization becomes enabled again, restart all observers and upload current tokens.
+10. Ensure the Live Activity UI handles `context.isStale` with a restrained “Updating” state.
+11. Keep `ContentState` compact and exactly aligned with server JSON keys.
+12. Do not add app-driven per-second timers; system timer/progress views must drive countdown rendering.
+
+### Verification
+
+- iOS build.
+- Widget scheme build.
+- Manual physical-device test for push-to-start and token rotation.
+- Manual setting-disable test.
+- Manual sign-out test.
+- Manual relaunch with an existing active Live Activity.
+
+### Commit
+
+```text
+Harden Live Activity client lifecycle
 ```
 
-Instrument:
+---
 
-- Function entry for service, controller, route, reconciliation, persistence, token, Wallet, and synchronization functions.
-- Success with duration and non-sensitive identifiers.
-- Every caught error.
-- Every skipped operation and reason.
-- Every state transition.
-- Every server request with request ID and status.
-- Database mutations without private payloads.
-- Pass-generation stages.
-- Live Activity scheduling and APNs results.
+## Unit 4: Harden Live Activity server scheduling and APNs failure handling
 
-Do not print:
+### Goal
 
-- Passwords.
-- access tokens.
-- refresh tokens.
-- Apple identity tokens.
-- APNs tokens in full.
-- pass authentication tokens.
-- raw timetable JSON in production.
+Make every school-day start/update/end transition idempotent, recoverable, and correctly cleaned up when tokens become invalid or settings change.
 
-Hot calculation and SwiftUI rendering functions use debug-only or rate-limited logs. Unconditional logging inside widget bodies, timers, collection loops, or school-state calculations would violate the performance requirement.
+### Primary files
 
-## School-State Refactor
+- `Sources/pmstt/Services/LiveActivities/SchoolDayActivityProjector.swift`
+- `Sources/pmstt/Services/LiveActivities/SchoolDayActivityScheduler.swift`
+- `Sources/pmstt/Services/LiveActivities/SchoolDayActivityCoordinator.swift`
+- `Sources/pmstt/Services/LiveActivities/LiveActivityAPNSService.swift`
+- `Sources/pmstt/Services/LiveActivities/LiveActivityPayloads.swift`
+- `Sources/pmstt/Controllers/LiveActivityController.swift`
+- `Sources/pmstt/Models/SchoolDayLiveActivity.swift`
+- `Sources/pmstt/Models/SchoolDayLiveActivityTransition.swift`
+- Relevant tests under `Tests/pmsttTests`
 
-Use an enum namespace:
+### Preserve existing work
 
-```swift
-enum SchoolStateEngine {
-    static func currentOwnerState() -> SchoolState
-    static func currentReceivedStates() -> [ReceivedSchoolState]
-    static func state(forReceivedTimetableID id: String) -> SchoolState
-    static func timelineTransitions(forReceivedTimetableID id: String) -> [Date]
+The uncommitted optional-`next` projector change belongs in this unit. Do not discard it.
 
-    static func calculate(
-        at date: Date,
-        subjects: [Subject],
-        schedule: SchoolSchedule
-    ) -> SchoolState
-}
+### Required implementation
+
+1. Validate the projector for:
+   - Before school.
+   - Lesson.
+   - Free period.
+   - Recess.
+   - Lunch.
+   - Final period with `next == nil` or the agreed final label.
+   - Finished day.
+   - Wednesday/Friday early finish.
+   - Weekend, holiday, and term-boundary exclusion.
+2. Confirm projector JSON matches `SchoolDayActivityAttributes.ContentState` exactly.
+3. Ensure transition claims remain unique and are deleted only when APNs delivery genuinely failed and retry is appropriate.
+4. Distinguish transient APNs failures from permanent token invalidation.
+5. Clear permanently invalid push-to-start tokens from `UserDevice`.
+6. Clear permanently invalid update tokens from `SchoolDayLiveActivity`.
+7. Mark ended activities ended even if APNs says the token is permanently invalid.
+8. Prevent creation of duplicate active records for one device/school date.
+9. Reconciliation must return false when an equivalent active activity already exists.
+10. Settings disable and account deletion must end all active records.
+11. Scheduler shutdown must cancel its task cleanly.
+12. Add structured request/activity/device metadata without logging full tokens.
+
+### Verification
+
+```sh
+cd /Users/omeriadon/Documents/Xcode_App_Library/pmstt
+swift test
+swift build -c release
 ```
 
-Defaults-facing functions read Defaults internally. The explicit calculation function exists for deterministic tests.
+### Commit
 
-Typed models:
-
-```swift
-struct TimeOfDay: Codable, Hashable, Sendable {
-    let hour: Int
-    let minute: Int
-
-    init(_ hour: Int, _ minute: Int) {
-        self.hour = hour
-        self.minute = minute
-    }
-}
+```text
+Harden school day Live Activity delivery
 ```
 
-```swift
-struct SchoolPeriod: Codable, Hashable, Sendable {
-    let number: Int
-    let start: TimeOfDay
-    let end: TimeOfDay
+Deploy only if explicitly requested:
 
-    init(_ number: Int, _ start: TimeOfDay, _ end: TimeOfDay) {
-        self.number = number
-        self.start = start
-        self.end = end
-    }
-}
+```sh
+git push production
 ```
 
-Retain simple unlabeled initializers for `Slot` and similar compact value types.
+---
 
-`SchoolState` removes unsafe optionals:
+## Unit 5: Legacy architecture cleanup
 
-```swift
-enum SchoolState: Hashable, Sendable {
-    case beforeSchool(next: ScheduledSubject)
-    case lesson(CurrentLesson)
-    case freePeriod(CurrentFreePeriod)
-    case recess(BreakState)
-    case lunch(BreakState)
-    case afterSchool
-    case weekend
-    case noTimetable
-}
+### Goal
+
+Remove superseded code only after Spotlight, Wallet, and Live Activity work builds and behaves correctly.
+
+### Required audit
+
+Run:
+
+```sh
+rg -n 'ObservableObject|StateObject|ObservedObject|EnvironmentObject' . --glob '*.swift'
+rg -n 'PKPassLibrary' . --glob '*.swift'
+rg -n 'getSchoolState|inClass|inBreak|outsideSchool' . --glob '*.swift'
+rg -n 'Date\(\)|Date\.now|\.now' Shared Main Watch Widget 'App Intents' --glob '*.swift'
+rg -n 'CloudKit|CKContainer|NSUbiquitous|identifierForVendor|deviceIdentifier' . --glob '*.swift'
+rg -n 'WCSession|WatchConnectivity' . --glob '*.swift'
+rg -n 'signDataWithBundleKey|generatePass|PKPass' . --glob '*.swift'
 ```
 
-Every current-time access uses:
+### Removal rules
 
-```swift
-enum TimetableClock {
-    static var now: Date {
-        Date().addingTimeInterval(debugOffset)
-    }
-}
+1. Remove obsolete school-state helpers. `SchoolStateEngine` is the only school-state implementation.
+2. Remove duplicate current-subject calculations from views.
+3. Remove any widget/provider that reads Wallet or performs state calculation in `body`.
+4. Remove old WatchConnectivity timetable payload keys and handlers. Preserve only credentials and account-state messages.
+5. Remove client-side pass signing/generation code if any remains in the client target.
+6. Remove CloudKit timetable synchronization remnants.
+7. Remove device-identifier-derived identity. Preserve server-issued IDs and Defaults installation ID.
+8. Remove obsolete pass-manager UI state once Wallet reconciliation owns the projection.
+9. Remove dead Defaults keys only after proving there are no consumers.
+10. Remove dead localized strings and project references created by deleted widgets/services.
+11. Do not remove compatibility decoding for persisted models unless the data is newly introduced and has no deployed legacy shape.
+12. Do not perform unrelated UI redesign.
+
+### Specific correctness audit
+
+- Ensure `TimetableLayout.subjectLookup` remains the only slot-to-subject map builder.
+- Ensure Wednesday and Friday cannot show a sixth period.
+- Ensure `SubjectQuery` and `TimetableQuery` include owner data where the intent contract expects it.
+- Deduplicate subject entities returned from multiple received timetables when an intent asks for generic subjects.
+- Ensure App Shortcut dynamic parameters update after received timetable changes.
+- Ensure all icon-only controls have accessibility labels.
+- Replace tappable `onTapGesture` usage with `Button` where tap position/count is not required.
+
+### Verification
+
+- iOS build.
+- macOS build.
+- Widget build.
+- Timetable scheme dependency build covering Watch and Watch Widget.
+- `git diff --check`.
+
+### Commit
+
+```text
+Remove superseded timetable architecture
 ```
 
-No timetable-sensitive code directly calls `Date()`, `.now`, or `Date.now`.
+---
 
-## Widgets and Snippets
+## Unit 6: Final scheme and device verification
 
-Providers read Defaults and create complete entries.
+### Goal
 
-Views render entries only.
+Prove the supported product surfaces work together without visionOS.
 
-Remove from widget views:
+### Command-line gates
 
-- `PKPassLibrary`.
-- `TimetablePassManager`.
-- `NetworkManager`.
-- Defaults reads.
-- school-state calculation.
-- current-date calculation.
-- device identifiers.
+1. Timetable generic iOS Debug build.
+2. Timetable generic macOS Debug build.
+3. Widget generic iOS Debug build.
+4. Diagnose and repair standalone Watch scheme command-line product resolution if it still fails.
+5. Watch Widget scheme build after Watch scheme repair.
+6. pmstt release build.
+7. Relevant pmstt tests.
 
-Functions:
+### Standalone Watch scheme diagnosis
 
-```swift
-enum WidgetEntryFactory {
-    static func ownerEntry() -> TimetableEntry
-    static func friendsEntry() -> FriendsTimetableEntry
-    static func weeklyEntry() -> WeeklyScheduleEntry
-}
-```
+The known failure references missing iPhoneOS `MaterialView.o` products while building the Watch scheme. Inspect:
 
-Timer displays use WidgetKit-compatible timer rendering:
+- Scheme build-action target order.
+- Whether the Timetable companion target is unnecessarily included for a generic watchOS destination.
+- Package product platform filters.
+- Derived-data product paths.
+- Whether Watch should build through a paired iOS destination instead of generic watchOS.
 
-```swift
-Text(timerInterval: start...end, countsDown: true)
-```
+Do not “fix” this by deleting the Mac or iPhone app dependency blindly.
 
-Do not drive widget timers with app timers or scheduled tasks.
+### Manual iPhone checks
 
-Apply fixed Dynamic Type behavior to layout-sensitive widgets and snippet views:
+- Owner timetable works signed out.
+- Sign in restores account and bootstrap state.
+- Owner timetable sync works both directions.
+- Received Wallet projection is complete replacement.
+- Removing a Wallet pass removes it from Defaults and server projection.
+- Deleted/tombstoned pass removes itself.
+- Weekly widget defaults to owner.
+- Weekly widget can select a received person.
+- Next Break widget shows recess/lunch and handles after-school state.
+- Friends widget placeholder and real content render correctly.
+- Siri Current Subject, Next Subject, Next Break, Subjects for Day, and Timetable for Person resolve correctly.
+- Spotlight owner, received, and subject results open the correct destination.
+- Live Activity starts, updates at transitions, handles final period, and ends.
+- Disabling Live Activities ends the current activity.
+- Signing out clears server registration and activity state.
 
-```swift
-.dynamicTypeSize(.medium)
-```
+### Manual watch checks
 
-Preserve the existing widget designs. New widgets may be added only with separate types and designs.
+- Watch provisions from paired authenticated iPhone.
+- Watch shows “Sign in on iPhone” without a valid provisioned session.
+- Watch downloads timetable data directly from the server.
+- Watch never receives timetable payloads through WatchConnectivity.
+- Current Subject, received timetable pages, progress backgrounds, and watch widgets use the unified state engine.
+- Wednesday/Friday early finish is correct.
 
-Potential additions:
+### Manual macOS checks
 
-- Next lesson.
-- Today’s lesson sequence.
-- Selected person’s current lesson.
-- Shared free period.
-- Tomorrow’s first lesson.
-- School-day progress.
+- Owner and received timetable projections load from Defaults/server.
+- Subject editor symbol fallback compiles and works.
+- Spotlight results open the Timetable tab.
+- No iOS launch storyboard is compiled into the Mac target.
 
-## App Intents and Siri
+### Final commit policy
 
-Add complete entity/query coverage:
+Do not create a catch-all “fix everything” commit. Any issue found in final verification gets its own smallest behavior-scoped commit and must pass its affected build gate.
 
-```swift
-TimetableEntity
-SubjectEntity
-SchoolDayEntity
-PersonTimetableEntity
-```
+## Final acceptance criteria
 
-```swift
-TimetableQuery
-SubjectQuery
-SchoolDayQuery
-PersonTimetableQuery
-```
-
-Intents:
-
-```swift
-GetCurrentSubjectIntent
-GetNextSubjectIntent
-GetReceivedTimetablesIntent
-GetTimetableForPersonIntent
-GetSubjectsForDayIntent
-GetNextBreakIntent
-GetSchoolDayProgressIntent
-FindSharedFreePeriodIntent
-```
-
-All queries read Defaults internally.
-
-Snippet views:
-
-- Use `.dynamicTypeSize(.medium)`.
-- Receive fully prepared intent results.
-- Never query Wallet or the network.
-- Use stable fixed-height layouts.
-- Avoid optional-driven layout changes.
-
-## Spotlight
-
-```swift
-actor SpotlightIndexer {
-    static let shared = SpotlightIndexer()
-
-    func rebuildFromDefaults() async
-    func indexOwnerTimetable() async
-    func indexReceivedTimetables() async
-    func removeDeletedTimetables() async
-    func removeAll() async
-}
-```
-
-`rebuildFromDefaults()` reads Defaults internally.
-
-Index:
-
-- Owner timetable.
-- Every active received timetable.
-- Every subject.
-- Current signed or overridden display name.
-- Source kind.
-- Deep-link identifiers.
-
-Trigger indexing after Defaults mutations, not after Wallet events directly.
-
-When indexing is disabled:
-
-1. Remove all existing app indexes.
-2. Stop future indexing.
-3. Preserve local timetable data.
-
-## Live Activities
-
-Complete the existing server APNs work and add missing client support.
-
-Settings are read from `Defaults[.accountSettings]`.
-
-Client functions:
-
-```swift
-func observeLiveActivityPushToStartToken() async
-func uploadLiveActivityPushToStartToken(_ token: Data) async
-func removeLiveActivityToken() async
-func reconcileLiveActivityAuthorization() async
-```
-
-Server functions:
-
-```swift
-func startSchoolDayActivities(at date: Date) async
-func updateSchoolDayActivities(at date: Date) async
-func endSchoolDayActivities(at date: Date) async
-func sendLiveActivityPush(
-    to token: String,
-    event: LiveActivityEvent
-) async throws
-```
-
-Rules:
-
-- Disabled accounts receive no starts.
-- Existing activities are ended when the setting is turned off.
-- Start and end times come from account settings.
-- Default schedule remains weekdays from 08:00 to 15:40.
-- Updates occur at typed school-state transitions.
+- visionOS remains unsupported and untouched.
+- No legacy global school-state implementation exists.
+- All timetable-sensitive current-time calculations use `TimetableClock`.
+- Widgets are limited to the approved useful set.
+- Every timeline widget has representative placeholders.
+- Weekly timetable configuration defaults to the owner and supports received people.
+- No School Day Progress or Shared Free Period widget/intent is added.
+- App Intents resolve owner and received data correctly.
+- Siri shortcut phrases include the application-name token.
+- Spotlight has stable identifiers, metadata, tombstone removal, and working deep links.
+- Only Wallet infrastructure calls `PKPassLibrary`.
+- Wallet state becomes a complete replacement received projection on iPhone.
+- Removed Wallet passes cannot persist through merge behavior.
+- Deleted pass records remain revocation tombstones server-side.
+- Old deleted `.pkpass` files cannot reactivate.
+- Watch authentication remains paired-iPhone provisioned.
+- WatchConnectivity carries credentials/account state, never timetable payloads.
+- Live Activity token rotations are observed for push-to-start and update tokens.
 - Invalid APNs tokens are removed.
-- Jobs are idempotent.
-- Push-to-start token rotation replaces the previous token.
-- Server token persistence uses PostgreSQL, never JSON files.
-
-## Performance Requirements
-
-Before every commit:
-
-- Inspect new `.onAppear`, `.task`, notification observers, Defaults observations, and repeated computations.
-- Move startup work to one root `.task`.
-- Ensure `.task` operations are cancellable.
-- Coalesce Wallet and Defaults-triggered refreshes.
-- Do not perform network, pass parsing, Spotlight indexing, or expensive mapping inside `body`.
-- Precompute widget entries in providers.
-- Keep logging out of hot rendering loops.
-- Measure pass parsing and large Defaults encoding with `ContinuousClock`.
-- Reject changes that introduce visible main-thread stalls.
-- Use `@concurrent` only for proven CPU-heavy encoding, hashing, ZIP, or indexing preparation.
-- Use no `DispatchQueue`, semaphores, or detached tasks.
-
-## Immediate Timeline
-
-### Step 1: Establish build baselines
-
-- Inspect git state in Timetable, `pmstt`, and `moneyServer`.
-- Build every existing Timetable scheme through Xcode MCP.
-- Build `pmstt`.
-- Build `moneyServer`.
-- Record existing warnings and failures.
-- Make no commit.
-
-Stop until all baseline failures are understood.
-
-### Step 2: Replace the planning document
-
-- Replace the existing architecture document with this specification.
-- Commit only the document.
-
-Build gate: none for documentation.
-
-Commit:
-
-```text
-Document account and Wallet rebuild architecture
-```
-
-### Step 3: Refactor logging utilities
-
-- Extend `Print` and `PrintError`.
-- Add categories, function names, durations, and redaction.
-- Adopt them in new code only; avoid a project-wide logging rewrite.
-
-Build gate: all Timetable schemes.
-
-Commit:
-
-```text
-Add structured client diagnostic logging
-```
-
-### Step 4: Create server infrastructure
-
-- Add Fluent and PostgreSQL.
-- Copy the clean configuration structure from `moneyServer`.
-- Add structured server errors and request IDs.
-- Replace file-based Live Activity token storage.
-- Add health and error-response tests.
-
-Build gate: `pmstt`.
-
-Commit:
-
-```text
-Configure persistent timetable server foundation
-```
-
-### Step 5: Approve and add `User`
-
-Before editing:
-
-- Present the exact `User` model.
-- Confirm nullable email/password behavior for Apple-only users.
-- Confirm settings storage.
-- Confirm deletion relationships.
-
-Then implement model, migration, DTOs, and tests.
-
-Build gate: `pmstt`.
-
-Commit:
-
-```text
-Add timetable account user model
-```
-
-### Step 6: Approve and add `UserToken`
-
-- Present exact token fields and expiration policy.
-- Implement access and refresh token behavior based on `moneyServer`.
-- Add silent refresh and revocation tests.
-
-Build gate: `pmstt`.
-
-Commit:
-
-```text
-Add secure persistent account sessions
-```
-
-### Step 7: Implement authentication routes
-
-- Email signup.
-- Email login.
-- Sign in with Apple.
-- refresh.
-- logout.
-- profile fetch/update.
-- structured errors.
-
-Build gate: `pmstt`.
-
-Commits:
-
-```text
-Add email account authentication
-Add Sign in with Apple authentication
-Add account profile endpoints
-```
-
-### Step 8: Add client `NetworkManager`
-
-- Add reachability.
-- Prevent known-offline calls.
-- Add server-error decoding.
-- Add silent token refresh.
-- Add top-level alert presentation.
-- Add logging and tests.
-
-Build gate: every Timetable scheme.
-
-Commits:
-
-```text
-Add centralized account NetworkManager
-Present network failures from the app root
-```
-
-### Step 9: Add client session state
-
-- Keychain credentials.
-- Defaults account profile.
-- email/password flows.
-- Sign in with Apple flow.
-- phone-to-watch credential distribution.
-
-Build gate: iOS, macOS, visionOS, and watchOS.
-
-Commit:
-
-```text
-Add synchronized account session state
-```
-
-### Step 10: Continue model-by-model
-
-Proceed separately through:
-
-1. `OwnerTimetable`
-2. `AuthoredTimetable`
-3. `PassRecord`
-4. `PassRegistration`
-5. `ReceivedPassMirror`
-6. `ReceivedNameOverride`
-7. `UserDevice`
-
-Each model has:
-
-1. Field approval.
-2. One model/migration commit.
-3. Xcode MCP server build.
-4. Model tests.
-5. No work on the next model before success.
-
-## Later Execution Order
-
-1. Server timetable APIs.
-2. Server pass generation.
-3. PassKit web service.
-4. Client Defaults model replacement.
-5. Wallet parsing and tombstone deletion.
-6. iOS Wallet reconciliation.
-7. macOS/visionOS server projection.
-8. watch online-only synchronization.
-9. account bootstrap progress UI.
-10. school-state engine.
-11. widget provider refactor.
-12. App Intents and snippets.
-13. Spotlight.
-14. Live Activity completion.
-15. account deletion.
-16. removal of CloudKit, device IDs, client pass signing, old pass manager, and obsolete watch timetable payload sync.
-17. full multiplatform build and device verification.
-
-## Atomic Commit Protocol
-
-For every implementation unit:
-
-1. Read `git status`.
-2. Limit edits to one behavior.
-3. Run focused tests.
-4. Build every affected scheme through Xcode MCP.
-5. Stop on failure.
-6. Repair the same unit.
-7. Rebuild.
-8. Inspect the diff.
-9. Commit only after success.
-10. Start the next unit.
-
-No catch-all commits. No mixed server/client commits unless a single protocol cannot compile independently.
-
-## Acceptance Criteria
-
-- No UI, widget, App Intent, snippet, or Spotlight type calls `PKPassLibrary`.
-- Persistent UI data is read through `@Default`.
-- No `ObservableObject` remains.
-- iPhone Wallet state completely determines received timetables.
-- macOS, visionOS, and watchOS receive server projections.
-- Deleted passes update with a visible deletion back field and then remove themselves during reconciliation.
-- `.accountOwner` uses the issuer account ID string as its serial number and local ID.
-- Network operations fail before request creation when known offline.
-- Server errors carry stable codes and produce app alerts.
-- Sessions silently refresh without routine user sign-in.
-- Widgets remain entry-driven and use WidgetKit-compatible timers.
-- Timetable-sensitive dates always use `debugOffset`.
-- Spotlight, Siri, snippets, and widgets read the same Defaults projection.
-- Live Activity behavior is controlled by syncable account settings.
-- Every server model is approved independently.
-- Every atomic change builds successfully through Xcode MCP before further work.
+- Live Activity transition delivery is idempotent.
+- Disabling Live Activities and signing out end active activities.
+- iOS and macOS client builds pass with `xcodebuild`.
+- Watch and Watch Widget compile through the supported dependency/build path.
+- pmstt release build passes.
+- No unrelated dirty changes are discarded.
+- Every completed implementation unit has its own commit.
