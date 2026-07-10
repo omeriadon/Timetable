@@ -14,6 +14,13 @@ import SwiftUI
 	}
 #endif
 
+enum MainTab: String, Hashable {
+	case timetable
+	case share
+	case settings
+	case search
+}
+
 struct ContentView: View {
 	@State private var networkManager = NetworkManager.shared
 	@Environment(\.statusBadgeManager) private var statusBadgeManager
@@ -29,14 +36,13 @@ struct ContentView: View {
 	#endif
 
 	@Binding var expanded: WindowMode
-	#if !os(iOS)
-		@State private var selectedCompanionTab = "timetable"
-	#endif
+	@State private var selectedTab: MainTab = .timetable
 
 	var body: some View {
 		Group {
 			#if os(iOS)
 				ProminentActionTabView(
+					selectedTab: $selectedTab,
 					watchSync: $watchSync,
 					rootSyncStatus: $rootSyncStatus,
 					isBlurred: $isBlurred,
@@ -64,17 +70,20 @@ struct ContentView: View {
 					.interactiveDismissDisabled(false)
 				}
 			#else
-				TabView(selection: $selectedCompanionTab) {
-					Tab("Timetable", systemImage: "calendar", value: "timetable") {
+				TabView(selection: $selectedTab) {
+					Tab("Timetable", systemImage: "calendar", value: .timetable) {
 						TimetableView(expanded: $expanded)
 					}
 
-					Tab("Settings", systemImage: "gear", value: "settings") {
+					Tab("Settings", systemImage: "gear", value: .settings) {
 						SettingsView(expanded: $expanded)
 					}
 				}
-				.onReceive(NotificationCenter.default.publisher(for: .openSettingsTab)) { _ in selectedCompanionTab = "settings" }
+				.onReceive(NotificationCenter.default.publisher(for: .openSettingsTab)) { _ in selectedTab = .settings }
 			#endif
+		}
+		.onReceive(NotificationCenter.default.publisher(for: .openTimetableTab)) { _ in
+			selectedTab = .timetable
 		}
 		.task {
 			networkManager.startMonitoring()
@@ -84,6 +93,7 @@ struct ContentView: View {
 
 extension Notification.Name {
 	static let openSettingsTab = Notification.Name("openSettingsTab")
+	static let openTimetableTab = Notification.Name("openTimetableTab")
 	static let shareTimetableItem = Notification.Name("shareTimetableItem")
 }
 
@@ -92,6 +102,7 @@ extension Notification.Name {
 	// MARK: - Tab View Bridge
 
 	struct ProminentActionTabView: UIViewControllerRepresentable {
+		@Binding var selectedTab: MainTab
 		@Binding var watchSync: PhoneWatchSyncBridge
 		@Binding var rootSyncStatus: SyncMode
 		@Binding var isBlurred: Bool
@@ -106,6 +117,7 @@ extension Notification.Name {
 		func makeUIViewController(context: Context) -> UITabBarController {
 			let tabBarController = UITabBarController()
 			tabBarController.delegate = context.coordinator
+			context.coordinator.tabBarController = tabBarController
 
 			tabBarController.tabs = [
 				UITab(title: "Timetable", image: UIImage(systemName: "calendar"), identifier: "timetable") { _ in
@@ -129,8 +141,8 @@ extension Notification.Name {
 		}
 
 		func updateUIViewController(_: UITabBarController, context: Context) {
-			// Update coordinator parent if needed
 			context.coordinator.parent = self
+			context.coordinator.selectTab(selectedTab)
 		}
 
 		private func makeCustomShareImage() -> UIImage? {
@@ -153,6 +165,7 @@ extension Notification.Name {
 
 		final class Coordinator: NSObject, UITabBarControllerDelegate, UIAdaptivePresentationControllerDelegate {
 			var parent: ProminentActionTabView
+			weak var tabBarController: UITabBarController?
 
 			init(_ parent: ProminentActionTabView) {
 				self.parent = parent
@@ -182,6 +195,28 @@ extension Notification.Name {
 				parent.showShareSelection = true
 
 				return false
+			}
+
+			func tabBarController(_ tabBarController: UITabBarController, didSelect _: UIViewController) {
+				parent.selectedTab = switch tabBarController.selectedTab?.identifier {
+					case "settings": .settings
+					case "search": .search
+					default: .timetable
+				}
+			}
+
+			func selectTab(_ tab: MainTab) {
+				guard let tabBarController else { return }
+				let identifier = switch tab {
+					case .timetable: "timetable"
+					case .share: parent.prominentTabIdentifier
+					case .settings: "settings"
+					case .search: "search"
+				}
+				guard let target = tabBarController.tabs.first(where: { $0.identifier == identifier }) else { return }
+				if tabBarController.selectedTab?.identifier != target.identifier {
+					tabBarController.selectedTab = target
+				}
 			}
 
 			@objc private func handleShareTimetableNotification(_ notification: Notification) {

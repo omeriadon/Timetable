@@ -171,38 +171,21 @@ struct TimetableView: View {
 			#endif
 		}
 		.padding(.trailing, 2)
+		.dynamicTypeSize(.medium)
+		.onReceive(NotificationCenter.default.publisher(for: .openTimetableTab)) { _ in
+			selectedSlot = nil
+		}
 	}
 
 	private func findCurrentSubject(in timetable: [Subject]) -> Subject? {
-		let today = Date().addingTimeInterval(debugOffset)
-		let weekday = Calendar.current.component(.weekday, from: today)
-		let dayIndex = (weekday + 5) % 7
-
-		guard dayIndex < 5 else { return nil }
-
-		let hour = Calendar.current.component(.hour, from: today)
-		let minute = Calendar.current.component(.minute, from: today)
-		let timeInMinutes = hour * 60 + minute
-
-		let periodSchedule = [
-			(8, 50, 9, 48), // Period 1
-			(9, 48, 10, 46), // Period 2
-			(11, 8, 12, 6), // Period 3
-			(12, 6, 13, 4), // Period 4
-			(13, 34, 14, 32), // Period 5
-			(14, 32, 15, 30), // Period 6
-		]
-
-		for (sessionIndex, (startH, startM, endH, endM)) in periodSchedule.enumerated() {
-			let startMinutes = startH * 60 + startM
-			let endMinutes = endH * 60 + endM
-
-			if timeInMinutes >= startMinutes, timeInMinutes < endMinutes {
-				let subjectLookup = TimetableLayout.subjectLookup(for: timetable)
-				return subjectLookup[Slot(dayIndex, sessionIndex)]
-			}
+		guard case let .lesson(lesson) = SchoolStateEngine.calculate(
+			at: TimetableClock.now,
+			subjects: timetable
+		) else {
+			return nil
 		}
-		return nil
+
+		return lesson.subject
 	}
 
 	func mainContent(subjectLookup: [Slot: Subject]) -> some View {

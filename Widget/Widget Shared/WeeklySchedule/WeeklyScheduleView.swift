@@ -5,12 +5,11 @@
 //   Created by Adon Omeri on 27/4/2026.
 //
 
-import Defaults
 import SwiftUI
 import WidgetKit
 
 struct WeeklyScheduleView: View {
-	let entry: TimetableEntry
+	let entry: WeeklyScheduleEntry
 
 	@Environment(\.widgetRenderingMode) var widgetRenderingMode
 
@@ -187,7 +186,7 @@ struct WeeklyScheduleView: View {
 	// MARK: - currentWeekdayIndex
 
 	private var currentWeekdayIndex: Int {
-		let weekday = Calendar.current.component(.weekday, from: Date().addingTimeInterval(debugOffset))
+		let weekday = Calendar.current.component(.weekday, from: TimetableClock.adjusted(entry.date))
 		// weekday: 1 = Sunday ... 7 = Saturday
 		// convert to 0 = Monday ... 4 = Friday
 		return (weekday + 5) % 7

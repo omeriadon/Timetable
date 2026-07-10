@@ -78,10 +78,14 @@ struct ReceivedTimetablesView: View {
 				Button("Save", role: .confirm) {
 					let displayName = renameText
 					Task {
-						try await ReceivedTimetableSyncService.shared.setReceivedNameOverride(
-							serialNumber: item.timetable.id,
-							displayName: displayName
-						)
+						do {
+							try await ReceivedTimetableSyncService.shared.setReceivedNameOverride(
+								serialNumber: item.timetable.id,
+								displayName: displayName
+							)
+						} catch {
+							badges.present(error: error, title: "Unable to rename timetable")
+						}
 					}
 
 					renameItem = nil

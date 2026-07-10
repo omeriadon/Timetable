@@ -17,44 +17,52 @@ struct CurrentSubjectView: View {
 	private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
 	var body: some View {
-		let subjectLookup = TimetableLayout.subjectLookup(for: subjects)
-		let state = getSchoolState(at: now, subjectLookup: subjectLookup)
+		let state = SchoolStateEngine.calculate(at: now, subjects: subjects)
 
 		Group {
 			switch state {
 				case let .beforeSchool(next):
 					createProgressView(
-						title: next.id,
-						symbol: next.symbol,
-						color: next.colour.swiftUIColor,
+						title: next.subject.id,
+						symbol: next.subject.symbol,
+						color: next.subject.colour.swiftUIColor,
 						nextText: nil,
-						start: nil,
-						end: nil
+						start: now,
+						end: next.interval.start
 					)
 
-				case let .inClass(current, nextText, info):
+				case let .lesson(lesson):
 					createProgressView(
-						title: current?.id ?? "Free Period",
-						symbol: current?.symbol ?? "studentdesk",
-						color: current?.colour.swiftUIColor ?? .blue,
-						nextText: nextText,
-						start: info.start,
-						end: info.end
+						title: lesson.subject.id,
+						symbol: lesson.subject.symbol,
+						color: lesson.subject.colour.swiftUIColor,
+						nextText: lesson.next.title,
+						start: lesson.interval.start,
+						end: lesson.interval.end
 					)
 
-				case let .inBreak(breakType, nextText, info):
+				case let .freePeriod(period):
 					createProgressView(
-						title: breakType == .lunch ? "Lunch" : "Recess",
-						symbol: breakType == .lunch
-							? "takeoutbag.and.cup.and.straw.fill"
-							: "cup.and.saucer.fill",
+						title: "Free Period",
+						symbol: "studentdesk",
+						color: .blue,
+						nextText: period.next.title,
+						start: period.interval.start,
+						end: period.interval.end
+					)
+
+				case let .recess(breakState), let .lunch(breakState):
+					let type: BreakType = if case .recess = state { .recess } else { .lunch }
+					createProgressView(
+						title: type.description,
+						symbol: type.symbol,
 						color: .orange,
-						nextText: nextText,
-						start: info.start,
-						end: info.end
+						nextText: breakState.next.title,
+						start: breakState.interval.start,
+						end: breakState.interval.end
 					)
 
-				case .outsideSchool:
+				case .afterSchool, .weekend:
 					VStack(alignment: .center) {
 						Label("School's Out", systemImage: "house.fill")
 							.font(.title3)
@@ -63,6 +71,9 @@ struct CurrentSubjectView: View {
 						Text("No more subjects")
 							.foregroundStyle(.secondary)
 					}
+
+				case .noTimetable:
+					ContentUnavailableView("No Timetable", systemImage: "calendar.badge.exclamationmark")
 			}
 		}
 	}
@@ -158,15 +169,10 @@ struct CurrentSubjectView: View {
 
 					Spacer()
 
-					let targetDate = Calendar.current.date(
-						bySettingHour: 8,
-						minute: 50,
-						second: 0,
-						of: Date()
-					)!
-					Text(timerInterval: Date.now ... targetDate, countsDown: true)
+					let targetDate = end ?? now
+					Text(timerInterval: now ... targetDate, countsDown: true)
 						.contentTransition(.numericText(countsDown: true))
-						.animation(.easeInOut(duration: 0.5), value: Date.now)
+						.animation(.easeInOut(duration: 0.5), value: now)
 						.font(.title2)
 						.lineLimit(1)
 						.bold()
@@ -185,6 +191,6 @@ struct CurrentSubjectView: View {
 }
 
 #Preview {
-	CurrentSubjectView(now: Date().addingTimeInterval(debugOffset))
+	CurrentSubjectView(now: TimetableClock.now)
 		.monospaced()
 }

@@ -43,7 +43,8 @@ nonisolated struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiab
 	}
 
 	var sender: String {
-		if let override = Defaults[.receivedNameOverrides][id]?
+		let sharedDefaults = UserDefaults(suiteName: "group.omeriadon.timetable") ?? .standard
+		if let override = (sharedDefaults.dictionary(forKey: "receivedNameOverrides") as? [String: String])?[id]?
 			.trimmingCharacters(in: .whitespacesAndNewlines),
 			!override.isEmpty
 		{
@@ -93,6 +94,7 @@ nonisolated struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiab
 		self.isShareable = isShareable
 	}
 
+	@MainActor
 	func toTimetableEntity() -> TimetableEntity {
 		let entity = TimetableEntity(
 			id: id,
@@ -104,6 +106,7 @@ nonisolated struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiab
 }
 
 extension [ReceivedTimetable] {
+	@MainActor
 	func toTimetableEntities() -> [TimetableEntity] {
 		map { $0.toTimetableEntity() }
 	}

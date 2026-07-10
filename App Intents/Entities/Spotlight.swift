@@ -9,7 +9,8 @@ import AppIntents
 import CoreSpotlight
 import Defaults
 
-actor SpotlightIndexer {
+@MainActor
+final class SpotlightIndexer {
 	static let shared = SpotlightIndexer()
 	private let timetableIndex = CSSearchableIndex(name: "Timetables")
 	private let subjectIndex = CSSearchableIndex(name: "Subjects")

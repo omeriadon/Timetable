@@ -66,13 +66,7 @@ struct SchoolDayLiveActivityWidget: Widget {
 
 						if let nextText = context.state.nextText {
 							HStack(alignment: .lastTextBaseline) {
-								Text("Next:")
-									.foregroundStyle(.secondary)
-									.font(.system(size: 13))
-
-								Spacer()
-
-								Text(nextText)
+								Text(nextText == "Last Period" ? "Last Period" : "Next: \(nextText)")
 									.font(.system(size: 19))
 									.bold()
 									.lineLimit(1)
@@ -115,7 +109,9 @@ struct SchoolDayLiveActivityWidget: Widget {
 						EmptyView()
 					} currentValueLabel: {
 						Text(timerInterval: startDate ... endDate, countsDown: true)
-							.monospaced()
+							.font(.system(size: 12, design: .monospaced))
+							.fontDesign(.monospaced)
+							.monospacedDigit()
 					}
 					.progressViewStyle(.circular)
 					.tint(context.state.color.swiftUIColor)
@@ -131,13 +127,10 @@ struct SchoolDayLiveActivityWidget: Widget {
 				{
 					ProgressView(timerInterval: startDate ... endDate, countsDown: false) {
 						EmptyView()
-					} currentValueLabel: {
-						Text(timerInterval: startDate ... endDate, countsDown: true)
-							.monospaced()
 					}
 					.progressViewStyle(.circular)
 					.tint(context.state.color.swiftUIColor)
-					.monospaced()
+					.frame(width: 24, height: 24)
 				} else {
 					Image(systemName: context.state.symbol)
 						.foregroundStyle(context.state.color.swiftUIColor)
@@ -155,11 +148,14 @@ private struct SchoolDayLiveActivityView: View {
 	let context: ActivityViewContext<SchoolDayActivityAttributes>
 
 	var body: some View {
-		if activityFamily == .small {
-			watchView
-		} else {
-			lockScreenView
+		Group {
+			if activityFamily == .small {
+				watchView
+			} else {
+				lockScreenView
+			}
 		}
+		.dynamicTypeSize(.medium)
 	}
 
 	private var watchView: some View {
@@ -179,8 +175,9 @@ private struct SchoolDayLiveActivityView: View {
 			   let endDate = context.state.endDate,
 			   startDate < endDate
 			{
-				SchoolDayActivityTimer(state: context.state)
+				Text(timerInterval: startDate ... endDate, countsDown: true, showsHours: false)
 					.font(.system(size: 25, weight: .regular, design: .monospaced))
+					.fontDesign(.monospaced)
 					.monospacedDigit()
 			} else {
 				Text("Done")
@@ -191,14 +188,10 @@ private struct SchoolDayLiveActivityView: View {
 
 			if let nextText = context.state.nextText {
 				HStack {
-					Text("Next:")
-						.font(.system(size: 18, weight: .regular, design: .monospaced))
-						.foregroundStyle(.secondary)
-
-					Spacer()
-
-					Text(nextText)
+					Text(nextText == "Last Period" ? "Last Period" : "Next: \(nextText)")
 						.font(.system(size: 20, weight: .regular, design: .monospaced))
+						.fontDesign(.monospaced)
+						.lineLimit(1)
 				}
 			} else {
 				HStack {
@@ -226,43 +219,35 @@ private struct SchoolDayLiveActivityView: View {
 			.lineLimit(1)
 
 			if let startDate = context.state.startDate, let endDate = context.state.endDate, startDate < endDate {
-				ProgressView(timerInterval: startDate ... endDate, countsDown: false) {
-					EmptyView()
-				} currentValueLabel: {
-					HStack(alignment: .lastTextBaseline) {
-						Text(timerInterval: startDate ... endDate, countsDown: true)
+				ProgressView(timerInterval: startDate ... endDate, countsDown: false)
+					.tint(.white)
+					.progressViewStyle(.linear)
+
+				HStack(alignment: .lastTextBaseline) {
+					Text(timerInterval: startDate ... endDate, countsDown: true)
+						.foregroundStyle(.white)
+						.font(.system(size: 20, design: .monospaced))
+						.fontDesign(.monospaced)
+						.monospacedDigit()
+
+					Spacer(minLength: 8)
+
+					if let nextText = context.state.nextText {
+						Text(nextText == "Last Period" ? "Last Period" : "Next: \(nextText)")
+							.font(.system(size: 18, design: .monospaced))
+							.fontDesign(.monospaced)
+							.lineLimit(1)
 							.foregroundStyle(.white)
-							.font(.system(size: 20))
-							.monospaced()
-
-						Spacer()
-							.frame(width: 50)
-
-						if let nextText = context.state.nextText {
-							Text("Next:")
-								.font(.system(size: 15))
-								.foregroundStyle(.secondary)
-
-							Spacer()
-
-							Text(nextText)
-								.font(.system(size: 18))
-								.lineLimit(1)
-								.foregroundStyle(.white)
-
-						} else if context.state.phase == .finished {
-							Text("No more subjects")
-								.font(.system(size: 17, weight: .semibold))
-								.foregroundStyle(.secondary)
-						}
 					}
 				}
-				.tint(.white)
-				.progressViewStyle(.linear)
 
 			} else if context.state.phase == .finished {
 				Text("No more classes")
 					.font(.system(size: 20))
+					.foregroundStyle(.secondary)
+			} else {
+				Text("No more classes today")
+					.font(.system(size: 17, weight: .semibold))
 					.foregroundStyle(.secondary)
 			}
 		}
@@ -271,45 +256,6 @@ private struct SchoolDayLiveActivityView: View {
 		.padding(.vertical, 10)
 		.tint(context.state.color.swiftUIColor)
 		.activityBackgroundTint(context.state.color.swiftUIColor)
-	}
-}
-
-private struct SchoolDayActivityTimer: View {
-	let state: SchoolDayActivityAttributes.ContentState
-
-	var body: some View {
-		if let startDate = state.startDate, let endDate = state.endDate {
-			Text(timerInterval: startDate ... endDate, pauseTime: startDate, countsDown: true, showsHours: false)
-				.contentTransition(.numericText(countsDown: true))
-
-		} else if state.phase == .finished {
-			Text("Done")
-		} else {
-			Text("--:--")
-		}
-	}
-}
-
-private struct SchoolDayActivityProgress: View {
-	let state: SchoolDayActivityAttributes.ContentState
-
-	var body: some View {
-		if let startDate = state.startDate, let endDate = state.endDate, startDate < endDate {
-			ProgressView(timerInterval: startDate ... endDate, countsDown: false) {
-				EmptyView()
-			} currentValueLabel: {
-				Text(timerInterval: startDate ... endDate, countsDown: true)
-					.foregroundStyle(.white)
-					.monospaced()
-			}
-			.tint(state.color.swiftUIColor)
-			.progressViewStyle(.linear)
-
-		} else if state.phase == .finished {
-			Text("No more classes")
-				.font(.system(size: 12))
-				.foregroundStyle(.secondary)
-		}
 	}
 }
 

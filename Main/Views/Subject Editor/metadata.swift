@@ -114,6 +114,36 @@ struct SubjectMetadataEditorView: View {
 				subject.teacher = cleaned
 		}
 	}
+
+	private func metadataRow(
+		title: String,
+		value: String,
+		placeholder: String,
+		systemImage: String
+	) -> some View {
+		HStack(spacing: 12) {
+			Image(systemName: systemImage)
+				.foregroundStyle(.secondary)
+				.frame(width: 24)
+
+			VStack(alignment: .leading, spacing: 2) {
+				Text(title)
+					.font(.caption)
+					.foregroundStyle(.secondary)
+
+				Text(value.isEmpty ? placeholder : value)
+					.font(.headline)
+					.foregroundStyle(value.isEmpty ? .secondary : .primary)
+					.lineLimit(1)
+			}
+
+			Spacer(minLength: 0)
+		}
+		.padding(.horizontal, 12)
+		.padding(.vertical, 10)
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
+	}
 }
 
 private enum MetadataEditTarget: Identifiable {

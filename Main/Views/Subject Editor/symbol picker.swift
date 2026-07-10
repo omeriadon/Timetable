@@ -5,8 +5,10 @@
 //  Created by Adon Omeri on 8/7/2026.
 //
 
-import SFSymbolsPicker
 import SwiftUI
+#if os(iOS)
+	import SFSymbolsPicker
+#endif
 
 struct SymbolPickerSheet: View {
 	let subjectID: EditableSubject.ID
@@ -14,12 +16,20 @@ struct SymbolPickerSheet: View {
 	@Binding var draftSubjects: [EditableSubject]
 
 	var body: some View {
-		SymbolsPicker(
-			selection: selectedSymbolBinding,
-			title: "",
-			searchLabel: "Search symbols...",
-			autoDismiss: true
-		)
+		#if os(iOS)
+			SymbolsPicker(
+				selection: selectedSymbolBinding,
+				title: "",
+				searchLabel: "Search symbols...",
+				autoDismiss: true
+			)
+		#else
+			Form {
+				TextField("SF Symbol name", text: selectedSymbolBinding)
+				Label("Preview", systemImage: selectedSymbolBinding.wrappedValue)
+			}
+			.padding()
+		#endif
 	}
 
 	private var selectedSymbolBinding: Binding<String> {

@@ -12,16 +12,11 @@ import SwiftUI
 struct FriendsTimetablesView: View {
 	let receivedTimetable: ReceivedTimetable
 
-	@State private var now = Date()
+	@State private var now = TimetableClock.now
 	private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-	private var adjustedNow: Date {
-		now.addingTimeInterval(debugOffset)
-	}
-
 	var body: some View {
-		let subjectLookup = TimetableLayout.subjectLookup(for: receivedTimetable.subjects)
-		let state = getSchoolState(at: adjustedNow, subjectLookup: subjectLookup)
+		let state = SchoolStateEngine.calculate(at: now, subjects: receivedTimetable.subjects)
 
 		let title: String
 		let symbol: String
@@ -30,28 +25,43 @@ struct FriendsTimetablesView: View {
 
 		switch state {
 			case let .beforeSchool(next):
-				title = next.id
-				symbol = next.symbol
-				color = next.colour.swiftUIColor
+				title = next.subject.id
+				symbol = next.subject.symbol
+				color = next.subject.colour.swiftUIColor
 				nextText = ""
 
-			case let .inClass(current, next, _):
-				title = current?.id ?? "Free Period"
-				symbol = current?.symbol ?? "studentdesk"
-				color = current?.colour.swiftUIColor ?? .blue
-				nextText = next
+			case let .lesson(lesson):
+				title = lesson.subject.id
+				symbol = lesson.subject.symbol
+				color = lesson.subject.colour.swiftUIColor
+				nextText = lesson.next.title
 
-			case let .inBreak(breakType, next, _):
-				title = breakType == .lunch ? "Lunch" : "Recess"
-				symbol = breakType == .lunch
-					? "takeoutbag.and.cup.and.straw.fill"
-					: "cup.and.saucer.fill"
+			case let .freePeriod(period):
+				title = "Free Period"
+				symbol = "studentdesk"
+				color = .blue
+				nextText = period.next.title
+
+			case let .recess(breakState):
+				title = BreakType.recess.description
+				symbol = BreakType.recess.symbol
 				color = .orange
-				nextText = next
+				nextText = breakState.next.title
 
-			case .outsideSchool:
+			case let .lunch(breakState):
+				title = BreakType.lunch.description
+				symbol = BreakType.lunch.symbol
+				color = .orange
+				nextText = breakState.next.title
+
+			case .afterSchool, .weekend:
 				title = "School's Out"
 				symbol = "house.fill"
+				color = .secondary
+
+			case .noTimetable:
+				title = "No Timetable"
+				symbol = "calendar.badge.exclamationmark"
 				color = .secondary
 		}
 
@@ -74,14 +84,14 @@ struct FriendsTimetablesView: View {
 
 				Spacer()
 
-				let isAfter850 = Date().addingTimeInterval(debugOffset) >= Calendar.current.date(
-					bySettingHour: 8,
-					minute: 50,
+				let isAfterSchoolStart = now >= Calendar.current.date(
+					bySettingHour: SchoolStateEngine.schoolStart.hour,
+					minute: SchoolStateEngine.schoolStart.minute,
 					second: 0,
-					of: Date()
+					of: now
 				)!
 
-				Text(!nextText.isEmpty ? nextText : isAfter850 ? "Done for the day" : "")
+				Text(!nextText.isEmpty ? nextText : isAfterSchoolStart ? "Done for the day" : "")
 					.font(.caption)
 					.foregroundStyle(.secondary)
 					.frame(maxWidth: geo.size.width * 0.8)
@@ -95,7 +105,7 @@ struct FriendsTimetablesView: View {
 		.tint(color)
 		.onReceive(timer) { value in
 			withAnimation(.default) {
-				now = value
+				now = TimetableClock.adjusted(value)
 			}
 		}
 	}

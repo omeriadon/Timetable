@@ -8,23 +8,25 @@ struct WatchSchoolProgressBackground: View {
 	var body: some View {
 		switch state {
 			case let .beforeSchool(next):
-				WatchProgressFill(color: next.colour.swiftUIColor, now: now)
-			case let .inClass(current, _, info):
+				WatchProgressFill(color: next.subject.colour.swiftUIColor, now: now)
+			case let .lesson(lesson):
 				WatchProgressFill(
-					color: current?.colour.swiftUIColor ?? .blue,
-					start: info.start,
-					end: info.end,
+					color: lesson.subject.colour.swiftUIColor,
+					start: lesson.interval.start,
+					end: lesson.interval.end,
 					now: now
 				)
-			case let .inBreak(_, _, info):
+			case let .freePeriod(period):
+				WatchProgressFill(color: .blue, start: period.interval.start, end: period.interval.end, now: now)
+			case let .recess(state), let .lunch(state):
 				WatchProgressFill(
 					color: .black,
-					start: info.start,
-					end: info.end,
+					start: state.interval.start,
+					end: state.interval.end,
 					now: now,
 					isBreak: true
 				)
-			case .outsideSchool:
+			case .afterSchool, .weekend, .noTimetable:
 				Color.clear
 		}
 	}

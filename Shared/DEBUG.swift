@@ -8,9 +8,9 @@
 import Foundation
 
 #if DEBUG
-	let debugOffset: TimeInterval = -43393
+	nonisolated let debugOffset: TimeInterval = -43393
 #else
-	let debugOffset: TimeInterval = 0
+	nonisolated let debugOffset: TimeInterval = 0
 #endif
 
 let debugTimetable: [Subject] = [

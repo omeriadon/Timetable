@@ -68,6 +68,10 @@ struct TimetableApp: App {
 					ContentView(expanded: $expanded)
 				#endif
 			}
+			.onOpenURL { url in
+				guard url.scheme == "timetable" else { return }
+				NotificationCenter.default.post(name: .openTimetableTab, object: nil)
+			}
 			#if os(iOS)
 			.windowOverlay(isPresented: true, disableSafeArea: false) {
 				StatusBadgeOverlay()

@@ -42,7 +42,7 @@ struct TimetableEntity: Identifiable, AppEntity, SyncableEntity {
 	extension TimetableEntity: IndexedEntity {}
 #endif
 
-struct SharedInfo: Codable, Identifiable, TransientAppEntity {
+nonisolated struct SharedInfo: Codable, Identifiable, TransientAppEntity {
 	var id: String {
 		"\(sender)\(receivedAt.description)"
 	}

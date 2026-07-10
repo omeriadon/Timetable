@@ -56,13 +56,6 @@ final class NotificationRegistrationService {
 			badgeID = UUID()
 			registrationState = .registering
 
-			StatusBadgeManager.shared.addBadge(
-				id: badgeID,
-				title: "Registering this device…",
-				priority: 5,
-				view: .progressView
-			)
-
 			#if os(iOS)
 				UIApplication.shared.registerForRemoteNotifications()
 
@@ -122,7 +115,8 @@ final class NotificationRegistrationService {
 			)
 			Defaults[.hasRegisteredAPNsToken] = true
 			registrationState = .registered
-			StatusBadgeManager.shared.updateBadge(id: badgeID, title: "Device registered", view: .success)
+
+			Print("Device registered")
 		} catch {
 			Defaults[.hasRegisteredAPNsToken] = false
 			registrationState = .failed(error.localizedDescription)

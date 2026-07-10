@@ -41,7 +41,7 @@ struct EditableSubject: Identifiable {
 	var teacher: String
 }
 
-enum TimetableLayout {
+nonisolated enum TimetableLayout {
 	static let sessions = ["1", "2", "R", "3", "4", "L", "5", "6"]
 	static let shortDayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri"]
 	static let fullDayLabels = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]

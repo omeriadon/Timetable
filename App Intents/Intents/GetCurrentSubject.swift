@@ -25,25 +25,24 @@ struct GetCurrentSubjectIntent: SnippetIntent {
 	func perform() async -> some IntentResult & ProvidesDialog & ShowsSnippetView {
 		let subjects = Defaults[.timetable]
 
-		let adjustedNow = Date().addingTimeInterval(debugOffset)
-
-		let subjectLookup = TimetableLayout.subjectLookup(for: subjects)
-		let state = getSchoolState(at: adjustedNow, subjectLookup: subjectLookup)
+		let adjustedNow = TimetableClock.now
+		let state = SchoolStateEngine.calculate(at: adjustedNow, subjects: subjects)
 
 		let text: String = switch state {
 			case .beforeSchool:
 				"Before School"
-			case let .inClass(current, _, _):
-				current?.id ?? "Unknown Subject"
-			case let .inBreak(breakType, _, _):
-				switch breakType {
-					case .recess:
-						"Recess"
-					case .lunch:
-						"Lunch"
-				}
-			case .outsideSchool:
+			case let .lesson(lesson):
+				lesson.subject.id
+			case .freePeriod:
+				"Free Period"
+			case .recess:
+				"Recess"
+			case .lunch:
+				"Lunch"
+			case .afterSchool, .weekend:
 				"Outside School Time"
+			case .noTimetable:
+				"No Timetable"
 		}
 
 		return .result(dialog: IntentDialog(stringLiteral: text), view: GetCurrentSubjectIntentView(state: state, now: adjustedNow))
@@ -67,37 +66,41 @@ struct GetCurrentSubjectIntentView: View {
 			switch state {
 				case let .beforeSchool(next):
 					createProgressView(
-						title: next.id,
-						symbol: next.symbol,
-						color: next.colour.swiftUIColor,
+						title: next.subject.id,
+						symbol: next.subject.symbol,
+						color: next.subject.colour.swiftUIColor,
 						nextText: nil,
-						start: nil,
-						end: nil
+						start: now,
+						end: next.interval.start
 					)
 
-				case let .inClass(current, nextText, info):
+				case let .lesson(lesson):
 					createProgressView(
-						title: current?.id ?? "Free Period",
-						symbol: current?.symbol ?? "studentdesk",
-						color: current?.colour.swiftUIColor ?? .blue,
-						nextText: nextText,
-						start: info.start,
-						end: info.end
+						title: lesson.subject.id,
+						symbol: lesson.subject.symbol,
+						color: lesson.subject.colour.swiftUIColor,
+						nextText: lesson.next.title,
+						start: lesson.interval.start,
+						end: lesson.interval.end
 					)
 
-				case let .inBreak(breakType, nextText, info):
+				case let .freePeriod(period):
 					createProgressView(
-						title: breakType == .lunch ? "Lunch" : "Recess",
-						symbol: breakType == .lunch
-							? "takeoutbag.and.cup.and.straw.fill"
-							: "cup.and.saucer.fill",
-						color: .orange,
-						nextText: nextText,
-						start: info.start,
-						end: info.end
+						title: "Free Period",
+						symbol: "studentdesk",
+						color: .blue,
+						nextText: period.next.title,
+						start: period.interval.start,
+						end: period.interval.end
 					)
 
-				case .outsideSchool:
+				case let .recess(breakState):
+					createProgressView(title: "Recess", symbol: BreakType.recess.symbol, color: .orange, nextText: breakState.next.title, start: breakState.interval.start, end: breakState.interval.end)
+
+				case let .lunch(breakState):
+					createProgressView(title: "Lunch", symbol: BreakType.lunch.symbol, color: .orange, nextText: breakState.next.title, start: breakState.interval.start, end: breakState.interval.end)
+
+				case .afterSchool, .weekend:
 					VStack(alignment: .leading) {
 						Label("School's Out", systemImage: "house.fill")
 							.font(.title)
@@ -108,6 +111,9 @@ struct GetCurrentSubjectIntentView: View {
 					}
 					.padding()
 					.frame(maxWidth: .infinity, alignment: .leading)
+
+				case .noTimetable:
+					ContentUnavailableView("No Timetable", systemImage: "calendar.badge.exclamationmark")
 			}
 		}
 		.background {
@@ -117,30 +123,33 @@ struct GetCurrentSubjectIntentView: View {
 						switch state {
 							case let .beforeSchool(next):
 								createProgressBackground(
-									color: next.colour.swiftUIColor,
+									color: next.subject.colour.swiftUIColor,
 									start: nil,
 									end: nil,
 									geo: geo
 								)
 
-							case let .inClass(current, _, info):
+							case let .lesson(lesson):
 								createProgressBackground(
-									color: current?.colour.swiftUIColor ?? .blue,
-									start: info.start,
-									end: info.end,
+									color: lesson.subject.colour.swiftUIColor,
+									start: lesson.interval.start,
+									end: lesson.interval.end,
 									geo: geo
 								)
 
-							case let .inBreak(_, _, info):
+							case let .freePeriod(period):
+								createProgressBackground(color: .blue, start: period.interval.start, end: period.interval.end, geo: geo)
+
+							case let .recess(state), let .lunch(state):
 								createProgressBackground(
 									color: .black,
-									start: info.start,
-									end: info.end,
+									start: state.interval.start,
+									end: state.interval.end,
 									isBreak: true,
 									geo: geo
 								)
 
-							case .outsideSchool:
+							case .afterSchool, .weekend, .noTimetable:
 								ContainerRelativeShape()
 									.fill(.black)
 						}

@@ -5,20 +5,8 @@
 //   Created by Adon Omeri on 13/5/2026.
 //
 
-import Defaults
 import SwiftUI
 import WidgetKit
-
-struct ScheduleItem: Identifiable {
-	var id: String {
-		name
-	}
-
-	let name: String
-
-	let currentState: SchoolState
-	let backgroundColour: Color
-}
 
 let mathematics = Subject(
 	id: "mathematics",
@@ -95,155 +83,154 @@ struct FriendsTimeLeftView: View {
 
 	let schedules: [ScheduleItem]
 
-	init(entry: TimetableEntry, schedules: [ScheduleItem]) {
-		self.entry = entry
+	var body: some View {
+		let owner = entry.ownerSchedule ?? ScheduleItem(name: "You", currentState: .noTimetable, backgroundColour: .black)
 
-		if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
-			self.schedules = [
-				ScheduleItem(
-					name: "Alex",
-					currentState: .beforeSchool(next: english),
-					backgroundColour: .red
-				),
+		return VStack(alignment: .leading, spacing: 0) {
+			FriendsCurrentRow(schedule: owner, now: TimetableClock.adjusted(entry.date))
+				.padding(7)
+				.padding(.leading, 4)
+				.padding(.trailing, 2)
+				.overlay {
+					ContainerRelativeShape()
+						.stroke(.white.opacity(0.7), lineWidth: 1)
+				}
 
-				ScheduleItem(
-					name: "Emily",
-					currentState: .inBreak(
-						breakType: .recess,
-						nextText: "Science",
-						info: (start: Date(), end: Date().addingTimeInterval(20 * 60))
-					),
-					backgroundColour: .green
-				),
+			Spacer()
 
-				ScheduleItem(
-					name: "Noah",
-					currentState: .inClass(
-						current: history,
-						nextText: "Geography",
-						info: (start: Date(), end: Date().addingTimeInterval(55 * 60))
-					),
-					backgroundColour: .orange
-				),
+			ForEach(Array(schedules.prefix(3).enumerated()), id: \.element.id) { index, schedule in
+				if index > 0 {
+					Divider()
+				}
+				FriendsScheduleRow(schedule: schedule)
+			}
+		}
+		.foregroundStyle(.white)
+		.fontDesign(.monospaced)
+		.dynamicTypeSize(.medium)
+	}
+}
 
-				ScheduleItem(
-					name: "Sophia",
-					currentState: .outsideSchool,
-					backgroundColour: .purple
-				),
+private struct FriendsCurrentRow: View {
+	let schedule: ScheduleItem
+	let now: Date
 
-				ScheduleItem(
-					name: "Liam",
-					currentState: .inBreak(
-						breakType: .lunch,
-						nextText: "Physics",
-						info: (start: Date(), end: Date().addingTimeInterval(40 * 60))
-					),
-					backgroundColour: .pink
-				),
+	var body: some View {
+		HStack(alignment: .center, spacing: 8) {
+			currentTimer
+			Spacer()
+			VStack(alignment: .leading, spacing: 2) {
+				Text(nextText)
+					.font(.system(size: 11, weight: .regular, design: .monospaced))
+					.foregroundStyle(.secondary)
+					.lineLimit(1)
 
-				ScheduleItem(
-					name: "Olivia",
-					currentState: .inClass(
-						current: chemistry,
-						nextText: "Computer Science",
-						info: (start: Date(), end: Date().addingTimeInterval(50 * 60))
-					),
-					backgroundColour: .cyan
-				),
-
-				ScheduleItem(
-					name: "Ethan",
-					currentState: .beforeSchool(next: pe),
-					backgroundColour: .mint
-				),
-
-				ScheduleItem(
-					name: "Mia",
-					currentState: .inClass(
-						current: art,
-						nextText: "Home",
-						info: (start: Date(), end: Date().addingTimeInterval(45 * 60))
-					),
-					backgroundColour: .yellow
-				),
-
-				ScheduleItem(
-					name: "Lucas",
-					currentState: .outsideSchool,
-					backgroundColour: .gray
-				),
-			]
-		} else {
-			self.schedules = schedules
+				Label(title, systemImage: symbol)
+					.font(.system(size: 14, weight: .semibold, design: .monospaced))
+					.lineLimit(2)
+			}
 		}
 	}
 
-	var body: some View {
-		VStack(spacing: 0) {
-			HStack {
-				Text("You")
-
-				Spacer()
-
-//				let subjectLookup = TimetableLayout.subjectLookup(for: entry.subjects)
-//				let state = getSchoolState(at: Date().addingTimeInterval(debugOffset), subjectLookup: subjectLookup)
-
-//				switch state {
-//					case let .beforeSchool(next):
-//						Text("before school")
-//
-//					case let .inClass(current, nextText, info):
-//						Text(timerInterval: Date.now.addingTimeInterval(debugOffset) ... info.end, countsDown: true)
-//							.contentTransition(.numericText(countsDown: true))
-//
-//					case let .inBreak(breakType, nextText, info):
-//						Text(timerInterval: Date.now.addingTimeInterval(debugOffset) ... info.end, countsDown: true)
-//							.contentTransition(.numericText(countsDown: true))
-//
-//					case .outsideSchool:
-//						Text("after")
-//				}
-			}
-			.frame(height: 40)
-			.padding(.horizontal, 15)
-
-			ForEach(schedules.prefix(4)) { schedule in
-				HStack(spacing: 0) {
-					Text(schedule.name)
-
-					Spacer()
-
-					Group {
-//						switch schedule.currentState {
-//							case let .beforeSchool(next: next):
-//								Text(next.id.capitalized)
-//
-//							case let .inBreak(breakType: breakType, nextText: nextText, info: info):
-//								Label(breakType.description, systemImage: breakType.symbol)
-//									.imageScale(.small)
-//
-//							case let .inClass(current: current, nextText: nextText, info: info):
-//								Label(current?.id ?? "unknown", systemImage: current?.symbol ?? "circle")
-//
-//							case .outsideSchool:
-//								Label("Outside School Time", systemImage: "zzz")
-//						}
-					}
-					.animation(.easeInOut, value: schedule.id)
-					.font(.callout)
-				}
-				.frame(maxHeight: 37)
-				.padding(.horizontal, 15)
-				.background {
-					schedule.backgroundColour
-				}
-			}
-
-			Spacer(minLength: 0)
+	@ViewBuilder
+	private var currentTimer: some View {
+		switch schedule.currentState {
+			case let .lesson(lesson):
+				Text(timerInterval: now ... lesson.interval.end, countsDown: true, showsHours: false)
+					.font(.system(size: 18, weight: .regular, design: .monospaced))
+					.monospacedDigit()
+			case let .freePeriod(period):
+				Text(timerInterval: now ... period.interval.end, countsDown: true, showsHours: false)
+					.font(.system(size: 18, weight: .regular, design: .monospaced))
+					.monospacedDigit()
+			case let .recess(state), let .lunch(state):
+				Text(timerInterval: now ... state.interval.end, countsDown: true, showsHours: false)
+					.font(.system(size: 18, weight: .regular, design: .monospaced))
+					.monospacedDigit()
+			case .afterSchool, .weekend, .noTimetable:
+				Text("—")
+					.font(.system(size: 18, design: .monospaced))
+			case let .beforeSchool(next):
+				Text(timerInterval: now ... next.interval.start, countsDown: true)
+					.font(.system(size: 18, design: .monospaced))
 		}
-		.foregroundStyle(.white)
-		.monospaced()
-		.dynamicTypeSize(.medium)
+	}
+
+	private var title: String {
+		switch schedule.currentState {
+			case let .beforeSchool(next): next.subject.id.capitalized
+			case let .lesson(lesson): lesson.subject.id.capitalized
+			case .freePeriod: "Free Period"
+			case .recess: BreakType.recess.description
+			case .lunch: BreakType.lunch.description
+			case .afterSchool, .weekend: "School's Out"
+			case .noTimetable: "No Timetable"
+		}
+	}
+
+	private var symbol: String {
+		switch schedule.currentState {
+			case let .beforeSchool(next): next.subject.symbol
+			case let .lesson(lesson): lesson.subject.symbol
+			case .freePeriod: "studentdesk"
+			case .recess: BreakType.recess.symbol
+			case .lunch: BreakType.lunch.symbol
+			case .afterSchool, .weekend: "house.fill"
+			case .noTimetable: "calendar.badge.exclamationmark"
+		}
+	}
+
+	private var nextText: String {
+		switch schedule.currentState {
+			case let .beforeSchool(next): "First Period: \(next.subject.id.capitalized)"
+			case let .lesson(lesson): lesson.next.title
+			case let .freePeriod(period): period.next.title
+			case let .recess(state), let .lunch(state): state.next.title
+			case .afterSchool, .weekend: "No more classes"
+			case .noTimetable: "Sync a timetable"
+		}
+	}
+}
+
+private struct FriendsScheduleRow: View {
+	let schedule: ScheduleItem
+
+	var body: some View {
+		HStack(spacing: 8) {
+			Text(schedule.name)
+				.font(.system(size: 13, weight: .regular, design: .monospaced))
+
+			Spacer()
+
+			Label(title, systemImage: symbol)
+				.font(.system(size: 13, weight: .medium, design: .monospaced))
+				.lineLimit(1)
+		}
+		.padding(.horizontal, 8)
+		.padding(.vertical, 5)
+	}
+
+	private var title: String {
+		switch schedule.currentState {
+			case let .beforeSchool(next): next.subject.id.capitalized
+			case let .lesson(lesson): lesson.subject.id.capitalized
+			case .freePeriod: "Free Period"
+			case .recess: BreakType.recess.description
+			case .lunch: BreakType.lunch.description
+			case .afterSchool, .weekend: "School's Out"
+			case .noTimetable: "No Timetable"
+		}
+	}
+
+	private var symbol: String {
+		switch schedule.currentState {
+			case let .beforeSchool(next): next.subject.symbol
+			case let .lesson(lesson): lesson.subject.symbol
+			case .freePeriod: "studentdesk"
+			case .recess: BreakType.recess.symbol
+			case .lunch: BreakType.lunch.symbol
+			case .afterSchool, .weekend: "house.fill"
+			case .noTimetable: "calendar.badge.exclamationmark"
+		}
 	}
 }
