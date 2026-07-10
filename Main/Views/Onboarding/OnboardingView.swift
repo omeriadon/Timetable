@@ -110,8 +110,13 @@ struct OnboardingView: View {
 
 			Spacer()
 
-			Text("\(min(selectedIndex + 1, pages.count)) of \(pages.count)")
-				.contentTransition(.numericText())
+			VStack(spacing: 5) {
+				Text("\(min(selectedIndex + 1, pages.count)) of \(pages.count)")
+					.contentTransition(.numericText())
+				ProgressView(value: pages.isEmpty ? 0 : Double(selectedIndex + 1), total: Double(max(pages.count, 1)))
+					.progressViewStyle(.linear)
+					.frame(width: 90)
+			}
 
 			Spacer()
 
