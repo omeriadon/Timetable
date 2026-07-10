@@ -8,6 +8,10 @@
 import Defaults
 import SwiftUI
 
+extension Notification.Name {
+	static let openTimetableDestination = Notification.Name("openTimetableDestination")
+}
+
 struct TimetableView: View {
 	#if os(iOS)
 		@Binding var watchSync: PhoneWatchSyncBridge
@@ -174,6 +178,17 @@ struct TimetableView: View {
 		.dynamicTypeSize(.medium)
 		.onReceive(NotificationCenter.default.publisher(for: .openTimetableTab)) { _ in
 			selectedSlot = nil
+		}
+		.onReceive(NotificationCenter.default.publisher(for: .openTimetableDestination)) { notification in
+			guard let destination = notification.object as? TimetableDeepLink else { return }
+			switch destination {
+				case let .timetable(id):
+					selectedTimetable = id.flatMap { received in passManager.receivedTimetables.first { $0.id == received } }
+					selectedSlot = nil
+				case let .subject(timetableID, subjectID, slot):
+					selectedTimetable = timetableID.flatMap { received in passManager.receivedTimetables.first { $0.id == received } }
+					selectedSlot = slot ?? selectedTimetable?.subjects.first(where: { $0.id == subjectID })?.slots.first
+			}
 		}
 	}
 

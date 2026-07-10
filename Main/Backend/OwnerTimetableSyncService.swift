@@ -216,6 +216,7 @@ final class OwnerTimetableSyncService {
 		let response: OwnerTimetableResponse = try await networkManager.send(.v1OwnerTimetable)
 
 		Defaults[.timetable] = response.subjects
+		Task { await SpotlightIndexer.shared.indexOwnerTimetable() }
 		Defaults[.ownerIsSearchable] = response.isSearchable
 		Defaults[.lastServerSync] = Date.now
 
@@ -239,6 +240,7 @@ final class OwnerTimetableSyncService {
 
 		if localTimetable.isEmpty || (serverIsNewer && !response.subjects.isEmpty) {
 			Defaults[.timetable] = response.subjects
+			Task { await SpotlightIndexer.shared.indexOwnerTimetable() }
 			Defaults[.ownerIsSearchable] = response.isSearchable
 			Defaults[.lastServerSync] = Date.now
 			return

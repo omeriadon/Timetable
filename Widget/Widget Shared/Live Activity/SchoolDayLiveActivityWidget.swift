@@ -13,6 +13,14 @@ struct SchoolDayLiveActivityWidget: Widget {
 	var body: some WidgetConfiguration {
 		ActivityConfiguration(for: SchoolDayActivityAttributes.self) { context in
 			SchoolDayLiveActivityView(context: context)
+				.overlay(alignment: .topTrailing) {
+					if context.isStale {
+						Text("Updating")
+							.font(.caption2.bold())
+							.padding(5)
+							.background(.black.opacity(0.35), in: Capsule())
+					}
+				}
 				.activityBackgroundTint(context.state.color.swiftUIColor)
 				.activitySystemActionForegroundColor(.white)
 				.contentMargins(.vertical, 0, for: .automatic)

@@ -12,8 +12,8 @@ struct SubjectEntity: Identifiable, AppEntity, SyncableEntity {
 
 	static var typeDisplayRepresentation = TypeDisplayRepresentation(name: "Subject")
 
-	init(name: String, symbol: String, colour: RGBAColor, slots: [Slot]) {
-		id = name
+	init(id: String? = nil, name: String, symbol: String, colour: RGBAColor, slots: [Slot]) {
+		self.id = id ?? name
 		self.symbol = symbol
 		self.colour = colour
 		self.slots = slots

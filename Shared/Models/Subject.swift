@@ -46,14 +46,14 @@ nonisolated struct Subject: Hashable, Codable, Defaults.Serializable, Identifiab
 		teacher = try container.decodeIfPresent(Teacher.self, forKey: .teacher) ?? .unknown(rawNotes: "Unknown teacher")
 	}
 
-	func toSubjectEntity() -> SubjectEntity {
-		SubjectEntity(name: id, symbol: symbol, colour: colour, slots: slots)
+	func toSubjectEntity(identifier: String? = nil) -> SubjectEntity {
+		SubjectEntity(id: identifier ?? id, name: id, symbol: symbol, colour: colour, slots: slots)
 	}
 }
 
 nonisolated extension [Subject] {
-	func toSubjectEntities() -> [SubjectEntity] {
-		map { $0.toSubjectEntity() }
+	func toSubjectEntities(prefix: String? = nil) -> [SubjectEntity] {
+		map { subject in subject.toSubjectEntity(identifier: prefix.map { "\($0).\(subject.id)" }) }
 	}
 
 	func toTimetableEntity() -> TimetableEntity {

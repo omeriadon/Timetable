@@ -100,6 +100,7 @@ final class ReceivedTimetableSyncService {
 		try await networkManager.send(.v1ReceivedTimetableDelete(serialNumber), context: .userInitiated)
 		Defaults[.receivedTombstoneIDs].insert(serialNumber)
 		Defaults[.receivedTimetables].removeAll { $0.id == serialNumber }
+		Task { await SpotlightIndexer.shared.removeDeletedTimetables() }
 		WidgetCenter.shared.reloadAllTimelines()
 	}
 
@@ -117,6 +118,7 @@ final class ReceivedTimetableSyncService {
 		}
 		Defaults[.receivedTimetables] = merged.values.sorted { $0.receivedAt < $1.receivedAt }
 		applyLocalNames()
+		Task { await SpotlightIndexer.shared.indexReceivedTimetables() }
 		Defaults[.lastServerSync] = Date.now
 		WidgetCenter.shared.reloadAllTimelines()
 	}

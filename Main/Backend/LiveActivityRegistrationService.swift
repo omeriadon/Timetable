@@ -14,6 +14,8 @@
 		private var pushToStartTask: Task<Void, Never>?
 		private var activityUpdatesTask: Task<Void, Never>?
 		private var activityTokenTasks: [String: Task<Void, Never>] = [:]
+		private var activityStateTasks: [String: Task<Void, Never>] = [:]
+		private var currentActivityRequestTask: Task<Void, Never>?
 		private var pendingCurrentActivityRequest = false
 
 		private init(networkManager: NetworkManager) {
@@ -42,6 +44,7 @@
 			guard allowed, enabled, SessionStore.shared.isAuthenticated else {
 				stopTokenObservers()
 				if SessionStore.shared.isAuthenticated {
+					await endActiveActivities()
 					await removeLiveActivityToken()
 				}
 				return
@@ -122,6 +125,7 @@
 
 			for activity in activities {
 				observeTokenUpdates(for: activity)
+				observeStateUpdates(for: activity)
 			}
 		}
 
@@ -138,8 +142,38 @@
 			}
 		}
 
+		private func observeStateUpdates(for activity: Activity<SchoolDayActivityAttributes>) {
+			guard activityStateTasks[activity.id] == nil else { return }
+			activityStateTasks[activity.id] = Task { [weak self] in
+				for await state in activity.activityStateUpdates {
+					guard !Task.isCancelled else { return }
+					if state == .ended || state == .dismissed {
+						await self?.removeActivityObservers(for: activity.id)
+						return
+					}
+				}
+			}
+		}
+
+		private func removeActivityObservers(for id: String) {
+			activityTokenTasks[id]?.cancel()
+			activityTokenTasks[id] = nil
+			activityStateTasks[id]?.cancel()
+			activityStateTasks[id] = nil
+		}
+
 		private func fulfillCurrentActivityRequestIfNeeded() async {
 			guard pendingCurrentActivityRequest else { return }
+			if let currentActivityRequestTask { await currentActivityRequestTask.value; return }
+			let task = Task { @MainActor in
+				await self.performCurrentActivityRequest()
+			}
+			currentActivityRequestTask = task
+			await task.value
+			currentActivityRequestTask = nil
+		}
+
+		private func performCurrentActivityRequest() async {
 			do {
 				let response: ReconcileLiveActivityResponse = try await networkManager.send(
 					.v1LiveActivityReconcile,
@@ -180,6 +214,16 @@
 				task.cancel()
 			}
 			activityTokenTasks.removeAll()
+			for task in activityStateTasks.values {
+				task.cancel()
+			}
+			activityStateTasks.removeAll()
+		}
+
+		private func endActiveActivities() async {
+			for activity in Activity<SchoolDayActivityAttributes>.activities {
+				await activity.end(nil, dismissalPolicy: .immediate)
+			}
 		}
 
 		private static var isDebug: Bool {

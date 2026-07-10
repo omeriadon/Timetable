@@ -69,8 +69,8 @@ struct TimetableApp: App {
 				#endif
 			}
 			.onOpenURL { url in
-				guard url.scheme == "timetable" else { return }
-				NotificationCenter.default.post(name: .openTimetableTab, object: nil)
+				guard let destination = TimetableDeepLink(url: url) else { return }
+				NotificationCenter.default.post(name: .openTimetableDestination, object: destination)
 			}
 			#if os(iOS)
 			.windowOverlay(isPresented: true, disableSafeArea: false) {

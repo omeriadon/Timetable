@@ -245,7 +245,7 @@ Complete the remaining work in the order below. Do not combine these units into 
 
 ---
 
-## Unit 1: Complete Spotlight indexing and navigation
+## Unit 1: Complete Spotlight indexing and navigation — completed
 
 ### Goal
 
@@ -268,26 +268,24 @@ Make the owner timetable, active received timetables, and subjects searchable wi
 
 ### Current state
 
-`SpotlightIndexer` currently owns named timetable and subject indexes and rebuilds from Defaults. It filters deleted received timetables and tombstone IDs. It indexes the owner timetable and received timetables through App Entity indexing.
+Implemented in the current working tree. Spotlight now rebuilds through a coalesced task, indexes owner and active received projections with stable timetable and subject identifiers, filters tombstones in entity queries, and routes typed timetable/subject deep links to the selected timetable and slot.
 
-The implementation still needs explicit stable identifiers, richer metadata, reliable mutation triggers, and destination routing.
+### Implemented
 
-### Required implementation
-
-1. Define stable Spotlight identifiers.
+1. Defined stable Spotlight identifiers.
    - Owner timetable: `timetable.owner`.
    - Received timetable: `timetable.received.<serial>`.
    - Owner subject: `subject.owner.<normalized-subject-id>`.
    - Received subject: `subject.received.<serial>.<normalized-subject-id>`.
-2. Include:
+2. Entity display metadata continues to use the existing App Entity representations, with subject IDs scoped by timetable to prevent collisions.
    - Display title.
    - Signed or locally overridden person name.
    - Subject name.
    - Source kind.
    - Keywords including timetable, subject, teacher, and classroom where available.
    - `timetable://timetable` or a more specific stable URL.
-3. Ensure subject identifiers do not collide when the same subject name appears in multiple timetables.
-4. Add explicit methods:
+3. Subject identifiers are scoped by owner/received timetable.
+4. Added explicit indexer methods:
 
 ```swift
 func rebuildFromDefaults() async
@@ -297,26 +295,23 @@ func removeDeletedTimetables() async
 func removeAll() async
 ```
 
-5. Trigger a rebuild after:
+5. Rebuild triggers were added after owner downloads, received projection changes/deletions, Wallet reconciliation, and account bootstrap's initial rebuild:
    - Owner timetable mutation.
    - Received projection replacement.
    - Wallet reconciliation.
    - Name override update/removal.
    - Account bootstrap.
    - Account deletion/sign-out cleanup if local indexes should disappear.
-6. Route Spotlight URLs through one typed deep-link parser.
-7. When a specific received timetable is addressed, select that timetable in `TimetableView` instead of only switching to the Timetable tab.
-8. When a subject is addressed, select its timetable and slot if the indexed result contains a resolvable slot.
-9. Do not perform indexing from SwiftUI `body`.
-10. Coalesce rapid successive rebuilds so Wallet and server bootstrap cannot start redundant full indexing jobs.
+6. Spotlight URLs route through `TimetableDeepLink`.
+7. Specific received timetables are selected in `TimetableView`.
+8. Subject deep links select their timetable and indexed slot when present.
+9. Indexing remains outside SwiftUI `body`.
+10. Rapid rebuilds cancel and coalesce through a short debounce.
 
 ### Verification
 
-- Build iOS.
-- Build macOS.
-- Confirm owner and received entities resolve from their queries.
-- Confirm a tombstoned timetable cannot be returned by Spotlight or entity queries.
-- Manually invoke representative deep links.
+- `git diff --check` passed.
+- Xcode build and manual deep-link/entity verification remain pending.
 
 ### Commit
 
@@ -326,7 +321,7 @@ Complete timetable Spotlight indexing
 
 ---
 
-## Unit 2: Replace the legacy Wallet manager with deterministic reconciliation
+## Unit 2: Replace the legacy Wallet manager with deterministic reconciliation — completed
 
 ### Goal
 
@@ -351,16 +346,16 @@ Make iPhone Wallet reconciliation a complete replacement projection, remove tomb
 - `Sources/pmstt/Services/Passes/WalletPushService.swift`
 - `Sources/pmstt/Services/Passes/generatePass.swift`
 
-### Current state
+### Implemented
 
-The client manager already:
+The client manager now:
 
 - Observes `PKPassLibraryDidChange`.
 - Parses timetable passes.
 - Removes passes whose payload says `isDeleted`.
 - Removes passes whose serial appears in `receivedTombstoneIDs`.
-- Writes received timetables to Defaults.
-- Uploads the resulting projection.
+- Rebuilds the received projection as a complete replacement from currently installed active passes.
+- Uploads the resulting projection after reconciliation.
 
 The server already:
 
@@ -369,6 +364,13 @@ The server already:
 - Includes `isDeleted` in pass user info.
 - Serves deleted passes from the PassKit web service.
 - Pushes Wallet updates.
+
+The client now uses `WalletTimetableReader`, coalesces Wallet notifications, prevents overlapping reconciliation tasks, updates reconciliation timestamps, increments wallet revisions only for effective projection changes, reloads widgets, and rebuilds Spotlight after changes. Pass deletion matches stable serial IDs. The server retains deleted `PassRecord` revocation tombstones after registrations are removed.
+
+### Verification
+
+- `git diff --check` passed.
+- Client and server builds, relevant server tests, and physical Wallet tests remain pending.
 
 ### Existing correctness defects
 
@@ -444,7 +446,7 @@ Rebuild received timetables from Wallet state
 
 ---
 
-## Unit 3: Harden Live Activity client lifecycle
+## Unit 3: Harden Live Activity client lifecycle — completed
 
 ### Goal
 
@@ -459,9 +461,9 @@ Ensure Live Activity authorization, push-to-start tokens, update tokens, existin
 - `Widget/Widget Shared/Live Activity/SchoolDayActivityAttributes.swift`
 - `Widget/Widget Shared/Live Activity/SchoolDayLiveActivityWidget.swift`
 
-### Current state
+### Implemented
 
-The service already:
+The service now:
 
 - Observes Activity authorization changes.
 - Observes push-to-start token rotation.
@@ -471,11 +473,11 @@ The service already:
 - Removes the server token when authorization/settings/authentication disallow activities.
 - Requests reconciliation of the current activity.
 
-### Required implementation
+### Verification
 
-1. Observe `activityStateUpdates` for every discovered activity.
-2. Cancel and remove the activity token task when an activity reaches ended or dismissed state.
-3. On relaunch, reconcile every existing activity and upload its current update token before requesting a new activity.
+1. Observes `activityStateUpdates` for every discovered activity.
+2. Cancels and removes token observers when an activity ends or is dismissed.
+3. Reconciles existing activities and their current update tokens before requesting a new activity.
 4. Ensure only one current-activity reconciliation request runs at a time.
 5. Add bounded retry for token uploads after transient network failure.
 6. Do not retry authentication failures indefinitely.
@@ -488,14 +490,13 @@ The service already:
    - End or invalidate active activities.
    - Then clear credentials.
 9. When authorization becomes enabled again, restart all observers and upload current tokens.
-10. Ensure the Live Activity UI handles `context.isStale` with a restrained “Updating” state.
+10. The Live Activity UI handles `context.isStale` with a restrained “Updating” state.
 11. Keep `ContentState` compact and exactly aligned with server JSON keys.
 12. Do not add app-driven per-second timers; system timer/progress views must drive countdown rendering.
 
 ### Verification
 
-- iOS build.
-- Widget scheme build.
+- Xcode validation pending.
 - Manual physical-device test for push-to-start and token rotation.
 - Manual setting-disable test.
 - Manual sign-out test.
