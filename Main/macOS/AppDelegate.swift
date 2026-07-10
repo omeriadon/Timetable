@@ -6,8 +6,10 @@
 //
 
 import SwiftUI
+import UserNotifications
 
-class AppDelegate: NSObject, NSApplicationDelegate {
+@MainActor
+class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
 	func applicationDidFinishLaunching(_: Notification) {
 		guard let window = NSApplication.shared.windows.first else { return }
 
@@ -15,5 +17,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 		window.backgroundColor = .clear
 
 		window.titlebarAppearsTransparent = true
+		UNUserNotificationCenter.current().delegate = self
+		Task {
+			await NotificationRegistrationService.shared.uploadPendingToken()
+		}
+	}
+
+	func application(_: NSApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+		Task { await NotificationRegistrationService.shared.receive(deviceToken: deviceToken) }
+	}
+
+	func application(_: NSApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+		NotificationRegistrationService.shared.registrationFailed(error)
+	}
+
+	func userNotificationCenter(
+		_: UNUserNotificationCenter,
+		willPresent _: UNNotification
+	) async -> UNNotificationPresentationOptions {
+		[.banner, .sound, .badge]
 	}
 }

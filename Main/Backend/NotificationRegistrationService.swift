@@ -163,7 +163,11 @@ final class NotificationRegistrationService {
 	}
 
 	private static var platform: String {
-		"iOS"
+		#if os(macOS)
+			"macOS"
+		#else
+			"iOS"
+		#endif
 	}
 
 	private static var isDebug: Bool {
