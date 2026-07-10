@@ -48,6 +48,7 @@ struct ReceivedTimetablesView: View {
 	@State private var showDeleteConfirmation = false
 	@State private var shareFile: ShareablePassFile?
 	@Environment(\.statusBadgeManager) private var badges
+	@State private var networkManager = NetworkManager.shared
 
 	var body: some View {
 		NavigationStack {
@@ -75,6 +76,12 @@ struct ReceivedTimetablesView: View {
 					EmptyView()
 				} footer: {
 					Text("Reorder timetables to put your highest-priority timetable first. Widgets and timetable comparisons use this order.")
+				}
+			}
+			.disabled(!networkManager.isOnline)
+			.overlay {
+				if !networkManager.isOnline {
+					ContentUnavailableView("Offline", systemImage: "wifi.slash", description: Text("Received timetable changes are unavailable until a connection is restored."))
 				}
 			}
 			.alert("Rename Timetable", item: $renameItem) { item in

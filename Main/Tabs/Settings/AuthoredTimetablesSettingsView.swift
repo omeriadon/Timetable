@@ -4,6 +4,7 @@ struct AuthoredTimetablesSettingsView: View {
 	@State private var service = AuthoredTimetableService.shared
 	@Environment(\.statusBadgeManager) private var badges
 	@State private var showCreate = false
+	@State private var networkManager = NetworkManager.shared
 
 	var body: some View {
 		List(service.timetables) { timetable in
@@ -22,9 +23,15 @@ struct AuthoredTimetablesSettingsView: View {
 			}
 		}
 		.sheet(isPresented: $showCreate) { AuthoredTimetableCreateView() }
-		.overlay { if service.timetables.isEmpty { ContentUnavailableView("No Authored Timetables", systemImage: "person.2.crop.square.stack") } }
+		.overlay {
+			if !networkManager.isOnline {
+				ContentUnavailableView("Offline", systemImage: "wifi.slash", description: Text("Authored timetables are unavailable until a connection is restored."))
+			} else if service.timetables.isEmpty {
+				ContentUnavailableView("No Authored Timetables", systemImage: "person.2.crop.square.stack")
+			}
+		}
 		.refreshable { await refresh() }
-		.task { await refresh() }
+		.task { if networkManager.isOnline { await refresh() } }
 	}
 
 	private func refresh() async {

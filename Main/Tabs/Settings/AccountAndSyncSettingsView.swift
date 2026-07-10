@@ -10,6 +10,7 @@ import SwiftUI
 
 struct AccountAndSyncSettingsView: View {
 	@State private var settings = Defaults[.accountSettings]
+	@State private var networkManager = NetworkManager.shared
 	@State private var settingsSync = AccountSettingsSyncService.shared
 
 	@State private var notificationRegistration = NotificationRegistrationService.shared
@@ -95,6 +96,12 @@ struct AccountAndSyncSettingsView: View {
 					Text("Special Event Notifications")
 					Text("Special Event Notifications include announcements and limited-time events, such as special school events.")
 				}
+			}
+		}
+		.disabled(!networkManager.isOnline)
+		.overlay {
+			if !networkManager.isOnline {
+				ContentUnavailableView("Offline", systemImage: "wifi.slash", description: Text("Account preferences are unavailable until a connection is restored."))
 			}
 		}
 		.animation(.easeInOut, value: notificationRegistration.registrationState)
