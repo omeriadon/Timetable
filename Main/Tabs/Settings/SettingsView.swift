@@ -94,6 +94,7 @@ struct SettingsView: View {
 		}
 
 		Section("Preferences") {
+			Toggle("Highlight Current Day", isOn: $highlightsCurrentDay)
 			if sessionStore.isAuthenticated {
 				NavigationLink { AccountAndSyncSettingsView() } label: { Label("Preferences", systemImage: "switch.2") }
 			} else {
@@ -253,6 +254,8 @@ struct SettingsView: View {
 			}
 		}
 	}
+
+	@Default(.timetableHighlightsCurrentDay) private var highlightsCurrentDay
 
 	private var ownerVisibilityBinding: Binding<Bool> {
 		Binding(

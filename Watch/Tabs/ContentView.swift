@@ -15,6 +15,7 @@ struct ContentView: View {
 	@State private var showSyncErrorIcon = false
 
 	@Default(.timetable) var subjects
+	@Default(.timetableHighlightsCurrentDay) private var highlightsCurrentDay
 
 	var body: some View {
 		let subjectLookup = TimetableLayout.subjectLookup(for: subjects)
@@ -75,7 +76,20 @@ struct ContentView: View {
 					sessionCell(day, session, subjectLookup: subjectLookup)
 				}
 			}
+			.background {
+				if highlightsCurrentDay, currentDayIndex == day {
+					RoundedRectangle(cornerRadius: 5)
+						.stroke(.white, lineWidth: 1.5)
+						.padding(-1)
+				}
+			}
 		}
+	}
+
+	private var currentDayIndex: Int? {
+		let weekday = Calendar.current.component(.weekday, from: TimetableClock.now)
+		guard (2 ... 6).contains(weekday) else { return nil }
+		return weekday - 2
 	}
 
 	func sessionCell(_ day: Int, _ session: Int, subjectLookup: [Slot: Subject]) -> some View {

@@ -21,6 +21,7 @@ struct TimetableView: View {
 	#endif
 
 	@Default(.timetable) var subjects
+	@Default(.timetableHighlightsCurrentDay) private var highlightsCurrentDay
 
 	@Environment(\.passManager) private var passManager
 
@@ -221,7 +222,20 @@ struct TimetableView: View {
 						}
 				}
 			}
+			.background {
+				if highlightsCurrentDay, currentDayIndex == day {
+					RoundedRectangle(cornerRadius: 8)
+						.stroke(.white, lineWidth: 2)
+						.padding(-2)
+				}
+			}
 		}
+	}
+
+	private var currentDayIndex: Int? {
+		let weekday = Calendar.current.component(.weekday, from: TimetableClock.now)
+		guard (2 ... 6).contains(weekday) else { return nil }
+		return weekday - 2
 	}
 
 	func sessionLabel(for session: String) -> some View {
