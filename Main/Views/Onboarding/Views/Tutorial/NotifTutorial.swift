@@ -30,6 +30,10 @@ struct NotifTutorial: View {
 				.resizable()
 				.aspectRatio(contentMode: .fit)
 				.padding(.horizontal, 20)
+
+			Text("Live Activities keep your current class and remaining time visible on the Lock Screen and Dynamic Island.")
+				.font(.title2)
+				.multilineTextAlignment(.center)
 		}
 		.onAppear {
 			context.configure(canAdvance: true)
