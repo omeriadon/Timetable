@@ -72,6 +72,12 @@ final class SessionStore {
 		}
 
 		guard refreshToken != nil else {
+			#if os(watchOS)
+				// The Watch keeps the last known signed-in surface until the server
+				// proves that the session was revoked or the account was deleted.
+				state = .authenticated(profile)
+				return
+			#endif
 			clearSessionState()
 			return
 		}

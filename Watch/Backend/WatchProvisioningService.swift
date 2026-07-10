@@ -141,6 +141,7 @@ final class WatchProvisioningService: NSObject, WCSessionDelegate {
 		Task { @MainActor in
 			switch action {
 				case WatchSessionMessage.authenticatedAction:
+					guard !SessionStore.shared.isAuthenticated else { return }
 					self.requestSessionIfPossible()
 				case WatchSessionMessage.signedOutAction:
 					await SessionStore.shared.signOut()
