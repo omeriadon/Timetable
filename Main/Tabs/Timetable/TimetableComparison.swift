@@ -17,38 +17,47 @@ struct TimetableComparison: View {
 
 	var body: some View {
 		VStack(spacing: 14) {
-			ForEach(passManager.receivedTimetables) { timetable in
-				ZStack {
-					if let slot = selectedSlot,
-					   let theirSubject = getSubjectAtSlot(day: slot.day, session: slot.session, in: timetable.subjects)
-					{
-						Button {
-							presentedSubject = PresentedSubject(
-								owner: timetable.sender,
-								subject: theirSubject
-							)
-						} label: {
+			let friends = passManager.receivedTimetables.filter { $0.sourceKind != .accountOwner }
+			if friends.isEmpty {
+				ContentUnavailableView {
+					Label("No Friend Timetables", systemImage: "person.2")
+				} description: {
+					Text("Import a friend's timetable to compare it with yours here.")
+				}
+			} else {
+				ForEach(friends) { timetable in
+					ZStack {
+						if let slot = selectedSlot,
+						   let theirSubject = getSubjectAtSlot(day: slot.day, session: slot.session, in: timetable.subjects)
+						{
+							Button {
+								presentedSubject = PresentedSubject(
+									owner: timetable.sender,
+									subject: theirSubject
+								)
+							} label: {
+								item(
+									left: Text(timetable.sender),
+									right: Label(theirSubject.id, systemImage: theirSubject.symbol),
+									colour: theirSubject.colour.swiftUIColor
+								)
+								.tint(.white)
+							}
+							.buttonStyle(.plain)
+							.popover(item: $presentedSubject) { presented in
+								SubjectContextPopover(
+									owner: presented.owner,
+									subject: presented.subject
+								)
+								.presentationCompactAdaptation(.popover)
+							}
+						} else {
 							item(
 								left: Text(timetable.sender),
-								right: Label(theirSubject.id, systemImage: theirSubject.symbol),
-								colour: theirSubject.colour.swiftUIColor
+								right: Label("Free period", systemImage: "square.dotted"),
+								colour: .gray
 							)
-							.tint(.white)
 						}
-						.buttonStyle(.plain)
-						.popover(item: $presentedSubject) { presented in
-							SubjectContextPopover(
-								owner: presented.owner,
-								subject: presented.subject
-							)
-							.presentationCompactAdaptation(.popover)
-						}
-					} else {
-						item(
-							left: Text(timetable.sender),
-							right: Label("Free period", systemImage: "square.dotted"),
-							colour: .gray
-						)
 					}
 				}
 			}
