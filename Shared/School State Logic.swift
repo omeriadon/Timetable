@@ -222,6 +222,7 @@ nonisolated enum SchoolStateEngine {
 		}
 
 		for (index, period) in periods.enumerated() {
+			guard TimetableLayout.canUse(period: period.number, on: dayIndex) else { continue }
 			guard let periodInterval = interval(for: period, on: date, calendar: calendar) else { continue }
 
 			if periodInterval.start <= date, date < periodInterval.end {
