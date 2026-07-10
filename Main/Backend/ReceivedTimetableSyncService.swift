@@ -39,11 +39,18 @@ final class ReceivedTimetableSyncService {
 				},
 				walletRevision: walletRevision
 			)
-			let response: [ReceivedPassMirrorDTO] = try await networkManager.send(
-				.v1ReceivedTimetablesUpdate,
-				body: request
-			)
-			apply(response)
+			let existing: [ReceivedPassMirrorDTO] = try await networkManager.send(.v1ReceivedTimetables)
+			let currentIDs = Set(request.timetables.map(\.id))
+			for existingTimetable in existing where !currentIDs.contains(existingTimetable.id) {
+				try await networkManager.send(.v1ReceivedTimetableDelete(existingTimetable.id), context: .userInitiated)
+			}
+			for timetable in request.timetables {
+				let _: [ReceivedPassMirrorDTO] = try await networkManager.send(
+					.v1ReceivedTimetableUpdate(timetable.id),
+					body: requestFor(timetable: timetable, walletRevision: walletRevision)
+				)
+			}
+			try await downloadProjectionAndOverrides()
 		}
 		uploadTask = task
 		isSyncing = true
@@ -126,11 +133,14 @@ final class ReceivedTimetableSyncService {
 	private func applyLocalNames() {
 		WidgetCenter.shared.reloadAllTimelines()
 	}
+
+	private func requestFor(timetable: ReceivedPassMirrorDTO, walletRevision: Int) -> ReceivedProjectionUpdateRequest {
+		ReceivedProjectionUpdateRequest(timetables: [timetable], walletRevision: walletRevision)
+	}
 }
 
 private extension Endpoint {
 	static let v1ReceivedTimetables = Endpoint("/v1/timetables/received")
-	static let v1ReceivedTimetablesUpdate = Endpoint("/v1/timetables/received", method: .put)
 	static let v1ReceivedNameOverrides = Endpoint("/v1/received-name-overrides")
 
 	static func v1ReceivedNameOverride(_ serialNumber: String) -> Endpoint {
@@ -143,5 +153,9 @@ private extension Endpoint {
 
 	static func v1ReceivedTimetableDelete(_ serialNumber: String) -> Endpoint {
 		Endpoint("/v1/timetables/received/\(serialNumber)", method: .delete)
+	}
+
+	static func v1ReceivedTimetableUpdate(_ serialNumber: String) -> Endpoint {
+		Endpoint("/v1/timetables/received/\(serialNumber)", method: .put)
 	}
 }
