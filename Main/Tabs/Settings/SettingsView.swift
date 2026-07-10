@@ -20,6 +20,7 @@ struct SettingsView: View {
 	@Environment(\.passManager) private var passManager
 	@Environment(\.statusBadgeManager) private var statusBadgeManager
 	@State private var sessionStore = SessionStore.shared
+	@State private var networkManager = NetworkManager.shared
 
 	#if os(iOS)
 		let watchSync: PhoneWatchSyncBridge
@@ -105,6 +106,7 @@ struct SettingsView: View {
 		#if os(iOS)
 			Section("Your Timetable") {
 				Toggle("Searchable", isOn: ownerVisibilityBinding)
+					.disabled(!networkManager.isOnline)
 				Button {
 					showEditTimetableSheet = true
 				} label: {
@@ -115,6 +117,7 @@ struct SettingsView: View {
 							.foregroundStyle(.tint)
 					}
 				}
+				.disabled(!networkManager.isOnline)
 				.matchedTransitionSource(id: "sheetMorph", in: ns)
 				.sheet(isPresented: $showEditTimetableSheet) {
 					SubjectEditorSheet(
