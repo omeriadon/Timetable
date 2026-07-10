@@ -68,14 +68,33 @@ struct CurrentSubjectView: View {
 							.font(.title3)
 							.padding(.bottom)
 
-						Text("No more subjects")
-							.foregroundStyle(.secondary)
+						if let next = nextSchoolDaySubject() {
+							Text("Next: \(next.subject.id)")
+								.foregroundStyle(.secondary)
+						} else {
+							Text("No more subjects")
+								.foregroundStyle(.secondary)
+						}
 					}
 
 				case .noTimetable:
 					ContentUnavailableView("No Timetable", systemImage: "calendar.badge.exclamationmark")
 			}
 		}
+	}
+
+	private func nextSchoolDaySubject() -> ScheduledSubject? {
+		var calendar = Calendar.current
+		calendar.timeZone = .current
+		var candidate = now
+		for _ in 0 ..< 7 {
+			candidate = calendar.date(byAdding: .day, value: 1, to: candidate) ?? candidate
+			let startOfDay = calendar.startOfDay(for: candidate)
+			if let next = SchoolStateEngine.nextSubject(after: startOfDay, subjects: subjects) {
+				return next
+			}
+		}
+		return nil
 	}
 
 	private func createProgressView(
