@@ -264,6 +264,7 @@ struct SettingsView: View {
 			} label: {
 				Label("Report Feedback or Bug", systemImage: "exclamationmark.bubble")
 			}
+			.disabled(!networkManager.isOnline)
 			.sheet(isPresented: $showFeedbackSheet) {
 				FeedbackView()
 			}
