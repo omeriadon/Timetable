@@ -96,12 +96,12 @@ struct ContentView: View {
 		Group {
 			if TimetableLayout.isBreakSession(index: session) {
 				// recess and lunch
-				rectangle(.clear, true)
+				rectangle(.clear, isBreak: true)
 					.frame(height: 2)
 			} else {
 				// early finish days
 				if TimetableLayout.isUnavailable(day: day, session: session) {
-					rectangle(.clear, true)
+					rectangle(.clear, isBreak: true)
 						.frame(height: 25)
 
 				} else {

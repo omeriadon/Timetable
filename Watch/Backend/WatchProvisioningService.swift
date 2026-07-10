@@ -150,4 +150,12 @@ final class WatchProvisioningService: NSObject, WCSessionDelegate {
 			}
 		}
 	}
+
+	nonisolated func session(
+		_: WCSession,
+		didReceiveMessage _: [String: Any],
+		replyHandler: @escaping ([String: Any]) -> Void
+	) {
+		replyHandler([:])
+	}
 }

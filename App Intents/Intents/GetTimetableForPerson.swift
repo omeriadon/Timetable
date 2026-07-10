@@ -1,5 +1,6 @@
 import AppIntents
 import Defaults
+import SwiftUI
 
 struct GetTimetableForPersonIntent: SnippetIntent {
 	static var title: LocalizedStringResource = "Get Timetable for Person"

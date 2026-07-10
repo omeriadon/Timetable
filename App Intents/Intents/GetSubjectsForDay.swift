@@ -1,5 +1,6 @@
 import AppIntents
 import Defaults
+import SwiftUI
 
 struct GetSubjectsForDayIntent: SnippetIntent {
 	static var title: LocalizedStringResource = "Get Subjects for Day"

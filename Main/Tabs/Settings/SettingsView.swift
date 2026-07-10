@@ -55,16 +55,15 @@ struct SettingsView: View {
 		NavigationStack {
 			Group {
 				#if os(iOS)
-					List {
-						list
+					if #available(iOS 27.0, *) {
+						List { list }
+							.toolbarMinimizationBehavior(.onScrollDown, for: .navigationBar)
+							.toolbarMinimizationSafeAreaAdjustment(.disabled, for: .navigationBar)
+							.listStyle(.sidebar)
+					} else {
+						List { list }
+							.listStyle(.sidebar)
 					}
-					.toolbarMinimizationBehavior(
-						.onScrollDown, for: .navigationBar
-					)
-					.toolbarMinimizationSafeAreaAdjustment(
-						.disabled, for: .navigationBar
-					)
-					.listStyle(.sidebar)
 
 				#else
 					Form {
@@ -317,30 +316,5 @@ struct SettingsView: View {
 
 	private func showSignInRequired() {
 		statusBadgeManager.signInRequired()
-	}
-}
-
-extension Array {
-	mutating func apply(
-		difference: ReorderDifference<Element.ID, some Hashable & Sendable>
-	) where Element: Identifiable, Element.ID: Sendable {
-		// Find the source card that moved.
-		guard let sourceIndex = firstIndex(
-			where: { $0.id == difference.sources[0] }
-		)
-		else { return }
-		let movedCard = remove(at: sourceIndex)
-
-		// Find the destination of that card.
-		var destination: Int
-		switch difference.destination.position {
-			case let .before(value):
-				guard let index = firstIndex(where: { $0.id == value })
-				else { return }
-				destination = index
-			case .end:
-				destination = endIndex
-		}
-		insert(movedCard, at: destination)
 	}
 }

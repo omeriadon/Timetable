@@ -1,5 +1,6 @@
 import AppIntents
 import Defaults
+import SwiftUI
 
 struct GetNextBreakIntent: SnippetIntent {
 	static var title: LocalizedStringResource = "Get Next Break"

@@ -135,7 +135,9 @@ extension Notification.Name {
 			]
 
 			tabBarController.selectedTab = tabBarController.tabs.first
-			tabBarController.prominentTabIdentifier = prominentTabIdentifier
+			if #available(iOS 27.0, *) {
+				tabBarController.prominentTabIdentifier = prominentTabIdentifier
+			}
 
 			return tabBarController
 		}

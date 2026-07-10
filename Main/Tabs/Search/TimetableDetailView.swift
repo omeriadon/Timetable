@@ -87,7 +87,7 @@ struct TimetableDetailView: View {
 					Button("Close", systemImage: "xmark", action: dismiss.callAsFunction)
 				}
 
-				ToolbarItem(placement: .topBarPinnedTrailing) {
+				ToolbarItem(placement: .topBarTrailing) {
 					Button("Report Author", systemImage: "exclamationmark.bubble", role: .destructive) { showReportConfirmation = true }
 						.confirmationDialog("Report \(result.authorDisplayName)?", isPresented: $showReportConfirmation) {
 							Button("Report Author", role: .destructive) { Task { await report() } }

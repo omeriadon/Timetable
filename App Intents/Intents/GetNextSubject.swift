@@ -1,5 +1,6 @@
 import AppIntents
 import Defaults
+import SwiftUI
 
 struct GetNextSubjectIntent: SnippetIntent {
 	static var title: LocalizedStringResource = "Get Next Subject"
