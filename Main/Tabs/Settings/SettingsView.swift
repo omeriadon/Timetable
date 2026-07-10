@@ -36,6 +36,7 @@ struct SettingsView: View {
 	@State private var committedOwnerIsSearchable = Defaults[.ownerIsSearchable]
 	@State private var visibilitySaveGeneration = 0
 	@State private var showEditReceivedTimetablesSheet = false
+	@State private var showFeedbackSheet = false
 
 	@Namespace private var ns
 
@@ -252,6 +253,17 @@ struct SettingsView: View {
 				Label("Reload widgets now", systemImage: "widget.large")
 					.foregroundStyle(.accent)
 			}
+		}
+
+		Section("Support") {
+			Button {
+				guard sessionStore.isAuthenticated else { showSignInRequired(); return }
+				showFeedbackSheet = true
+			} label: {
+				Label("Report Feedback or Bug", systemImage: "exclamationmark.bubble")
+			}
+			.sheet(isPresented: $showFeedbackSheet) {
+				FeedbackView()
 		}
 	}
 

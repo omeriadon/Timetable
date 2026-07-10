@@ -114,6 +114,11 @@ nonisolated struct ReportUserRequest: Codable {
 	let reportedAccountID: String
 }
 
+nonisolated struct FeedbackRequest: Codable {
+	let category: String
+	let message: String
+}
+
 nonisolated struct ReceivedPassMirrorDTO: Codable {
 	let id: String
 	let issuerAccountID: String
