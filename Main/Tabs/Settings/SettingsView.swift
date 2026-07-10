@@ -264,6 +264,7 @@ struct SettingsView: View {
 			}
 			.sheet(isPresented: $showFeedbackSheet) {
 				FeedbackView()
+			}
 		}
 	}
 
