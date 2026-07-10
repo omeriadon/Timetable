@@ -31,7 +31,7 @@ struct SessionCellView: View {
 				rectangle(.clear, isBreak: true) {
 					IrregularGradient(
 						colors: [.yellow, .orange, .pink, .red, .purple, .blue, .cyan, .mint, .green],
-						background: .clear,
+						background: Color.clear,
 						speed: 2,
 						animate: true
 					)
