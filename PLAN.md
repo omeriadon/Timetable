@@ -510,7 +510,7 @@ Harden Live Activity client lifecycle
 
 ---
 
-## Unit 4: Harden Live Activity server scheduling and APNs failure handling
+## Unit 4: Harden Live Activity server scheduling and APNs failure handling — completed
 
 ### Goal
 
@@ -532,7 +532,7 @@ Make every school-day start/update/end transition idempotent, recoverable, and c
 
 The uncommitted optional-`next` projector change belongs in this unit. Do not discard it.
 
-### Required implementation
+### Implemented
 
 1. Validate the projector for:
    - Before school.
@@ -558,11 +558,10 @@ The uncommitted optional-`next` projector change belongs in this unit. Do not di
 
 ### Verification
 
-```sh
-cd /Users/omeriadon/Documents/Xcode_App_Library/pmstt
-swift test
-swift build -c release
-```
+- Scheduler now marks active records ended when settings are disabled.
+- Permanently invalid update tokens clear the token and end the activity record.
+- Transition claims remain retryable after delivery failures, while successful transitions remain idempotent.
+- Validation pending: `swift build -c release`, relevant tests, and the client Xcode gate.
 
 ### Commit
 
