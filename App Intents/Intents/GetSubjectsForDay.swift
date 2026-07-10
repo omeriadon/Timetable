@@ -1,7 +1,7 @@
 import AppIntents
 import Defaults
 
-struct GetSubjectsForDayIntent: AppIntent {
+struct GetSubjectsForDayIntent: SnippetIntent {
 	static var title: LocalizedStringResource = "Get Subjects for Day"
 	static var description = IntentDescription("Lists your scheduled subjects for a school day.")
 	static var authenticationPolicy: IntentAuthenticationPolicy = .alwaysAllowed
@@ -14,13 +14,17 @@ struct GetSubjectsForDayIntent: AppIntent {
 	}
 
 	@MainActor
-	func perform() async -> some IntentResult & ProvidesDialog & ReturnsValue<[SubjectEntity]> {
+	func perform() async -> some IntentResult & ProvidesDialog & ReturnsValue<[SubjectEntity]> & ShowsSnippetView {
 		let defaultDay = await SchoolDayQuery().defaultResult()
 		let selectedDay = day ?? defaultDay ?? SchoolDayEntity(id: 0, name: "Monday")
 		let subjects = SchoolStateEngine.subjects(onDayIndex: selectedDay.id, from: Defaults[.timetable])
 		let dialog = subjects.isEmpty
 			? "You have no subjects on \(selectedDay.name)."
 			: "You have \(subjects.count) subjects on \(selectedDay.name)."
-		return .result(value: subjects.toSubjectEntities(), dialog: IntentDialog(stringLiteral: dialog))
+		return .result(
+			value: subjects.toSubjectEntities(),
+			dialog: IntentDialog(stringLiteral: dialog),
+			view: IntentListView(title: selectedDay.name, values: subjects.map(\.id))
+		)
 	}
 }
