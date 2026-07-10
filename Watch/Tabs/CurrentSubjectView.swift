@@ -105,6 +105,8 @@ struct CurrentSubjectView: View {
 					Image(systemName: symbol)
 						.font(.title)
 						.bold()
+						.contentTransition(.symbolEffect(.replace))
+						.symbolEffect(.bounce, value: symbol)
 
 					Text(title)
 						.font(.title2.scaled(by: 0.9))
@@ -112,6 +114,8 @@ struct CurrentSubjectView: View {
 						.multilineTextAlignment(.center)
 						.frame(maxWidth: geo.size.width * 0.9)
 						.bold()
+						.contentTransition(.opacity)
+						.animation(.smooth, value: title)
 
 					Spacer()
 
@@ -159,6 +163,8 @@ struct CurrentSubjectView: View {
 					Image(systemName: symbol)
 						.font(.title)
 						.bold()
+						.contentTransition(.symbolEffect(.replace))
+						.symbolEffect(.bounce, value: symbol)
 
 					Text(title)
 						.font(.title2.scaled(by: 0.9))
@@ -166,6 +172,8 @@ struct CurrentSubjectView: View {
 						.multilineTextAlignment(.center)
 						.frame(maxWidth: geo.size.width * 0.9)
 						.bold()
+						.contentTransition(.opacity)
+						.animation(.smooth, value: title)
 
 					Spacer()
 

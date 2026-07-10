@@ -24,6 +24,7 @@ struct WatchTimetablesTabView: View {
 					CurrentSubjectView(now: now)
 						.containerBackground(for: .tabView) {
 							WatchSchoolProgressBackground(state: ownerState, now: now)
+								.animation(.smooth, value: ownerState)
 						}
 				}
 			}
@@ -36,6 +37,7 @@ struct WatchTimetablesTabView: View {
 								state: schoolState(for: receivedTimetable),
 								now: now
 							)
+							.animation(.smooth, value: schoolState(for: receivedTimetable))
 						}
 				}
 			}

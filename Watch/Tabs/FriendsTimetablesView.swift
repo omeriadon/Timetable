@@ -77,7 +77,11 @@ struct FriendsTimetablesView: View {
 
 				HStack {
 					Image(systemName: symbol)
+						.contentTransition(.symbolEffect(.replace))
+						.symbolEffect(.bounce, value: symbol)
 					Text(title)
+						.contentTransition(.opacity)
+						.animation(.smooth, value: title)
 				}
 				.font(.title2.scaled(by: 0.9))
 				.bold()
