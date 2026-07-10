@@ -14,6 +14,7 @@ struct TimetableSearchView: View {
 	@State private var query = ""
 	@State private var service = TimetableDiscoveryService.shared
 	@State private var sessionStore = SessionStore.shared
+	@State private var networkManager = NetworkManager.shared
 	@State private var selectedResult: TimetableSearchResult?
 	@State private var portalResult: TimetableSearchResult?
 	@State private var completedSearchQuery = ""
@@ -29,7 +30,11 @@ struct TimetableSearchView: View {
 		PortalContainer {
 			NavigationStack {
 				ZStack {
-					if !sessionStore.isAuthenticated {
+					if !networkManager.isOnline {
+						ContentUnavailableView("Offline", systemImage: "wifi.slash", description: Text("Search is unavailable until an internet connection is restored."))
+							.transition(.blurReplace)
+
+					} else if !sessionStore.isAuthenticated {
 						ContentUnavailableView("Sign In Required", systemImage: "person.crop.circle.badge.exclamationmark", description: Text("Sign in to use this feature."))
 							.transition(.blurReplace)
 
