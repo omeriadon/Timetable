@@ -313,6 +313,22 @@ nonisolated enum SchoolStateEngine {
 		return nil
 	}
 
+	static func nextSubjectOnFollowingSchoolDay(
+		after date: Date,
+		subjects: [Subject],
+		calendar: Calendar = .current
+	) -> ScheduledSubject? {
+		guard !subjects.isEmpty else { return nil }
+		var candidate = date
+		for _ in 0 ..< 7 {
+			candidate = calendar.date(byAdding: .day, value: 1, to: candidate) ?? candidate
+			if let next = nextSubject(after: calendar.startOfDay(for: candidate), subjects: subjects, calendar: calendar) {
+				return next
+			}
+		}
+		return nil
+	}
+
 	static func subjects(onDayIndex dayIndex: Int, from subjects: [Subject]) -> [Subject] {
 		guard (0 ..< 5).contains(dayIndex) else { return [] }
 		let lookup = TimetableLayout.subjectLookup(for: subjects)

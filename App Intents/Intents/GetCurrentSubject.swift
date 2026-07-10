@@ -45,7 +45,7 @@ struct GetCurrentSubjectIntent: SnippetIntent {
 				"No Timetable"
 		}
 
-		return .result(dialog: IntentDialog(stringLiteral: text), view: GetCurrentSubjectIntentView(state: state, now: adjustedNow))
+		return .result(dialog: IntentDialog(stringLiteral: text), view: GetCurrentSubjectIntentView(state: state, now: adjustedNow, subjects: subjects))
 	}
 }
 
@@ -53,6 +53,7 @@ struct GetCurrentSubjectIntentView: View {
 	let state: SchoolState
 
 	let now: Date
+	let subjects: [Subject]
 
 	var body: some View {
 		ZStack {
@@ -106,8 +107,13 @@ struct GetCurrentSubjectIntentView: View {
 							.font(.title)
 							.padding(.bottom)
 
-						Text("No more subjects")
-							.foregroundStyle(.secondary)
+						if let next = SchoolStateEngine.nextSubjectOnFollowingSchoolDay(after: now, subjects: subjects) {
+							Text("Next: \(next.subject.id)")
+								.foregroundStyle(.secondary)
+						} else {
+							Text("No more subjects")
+								.foregroundStyle(.secondary)
+						}
 					}
 					.padding()
 					.frame(maxWidth: .infinity, alignment: .leading)
