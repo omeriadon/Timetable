@@ -5,6 +5,7 @@
 //   Created by Adon Omeri on 16/6/2026.
 //
 
+import IrregularGradient
 import SwiftUI
 
 struct SessionCellView: View {
@@ -27,8 +28,15 @@ struct SessionCellView: View {
 		Group {
 			// break
 			if TimetableLayout.isBreakSession(index: session) {
-				rectangle(.gray.opacity(0.5), isBreak: true) { EmptyView() }
-					.frame(height: 20)
+				rectangle(.clear, isBreak: true) {
+					IrregularGradient(
+						colors: [.yellow, .orange, .pink, .red, .purple, .blue, .cyan, .mint, .green],
+						background: .clear,
+						speed: 2,
+						animate: true
+					)
+				}
+				.frame(height: 20)
 
 				// unavailable
 			} else if TimetableLayout.isUnavailable(day: day, session: session) {

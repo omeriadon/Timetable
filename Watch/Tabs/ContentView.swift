@@ -6,6 +6,7 @@
 //
 
 import Defaults
+import IrregularGradient
 import SwiftUI
 import WidgetKit
 
@@ -97,8 +98,15 @@ struct ContentView: View {
 		Group {
 			if TimetableLayout.isBreakSession(index: session) {
 				// recess and lunch
-				rectangle(.clear, isBreak: true)
-					.frame(height: 2)
+				rectangle(.clear, isBreak: true) {
+					IrregularGradient(
+						colors: [.yellow, .orange, .pink, .red, .purple, .blue, .cyan, .mint, .green],
+						background: .clear,
+						speed: 2,
+						animate: true
+					)
+				}
+				.frame(height: 2)
 			} else {
 				// early finish days
 				if TimetableLayout.isUnavailable(day: day, session: session) {
