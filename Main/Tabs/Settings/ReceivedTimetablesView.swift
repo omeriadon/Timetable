@@ -71,6 +71,11 @@ struct ReceivedTimetablesView: View {
 						contextMenuButtons(for: timetable)
 					}
 				}
+				Section {
+					EmptyView()
+				} footer: {
+					Text("Reorder timetables to put your highest-priority timetable first. Widgets and timetable comparisons use this order.")
+				}
 			}
 			.alert("Rename Timetable", item: $renameItem) { item in
 				TextField("Rename this timetable...", text: $renameText)

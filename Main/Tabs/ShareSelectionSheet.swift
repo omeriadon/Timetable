@@ -70,7 +70,7 @@ struct ShareSelectionSheet: View {
 					}
 				}
 
-				let received = receivedTimetables.filter(\.isShareable)
+				let received = receivedTimetables.filter { $0.isShareable && $0.sourceKind != .accountOwner }
 				if !received.isEmpty {
 					Section("Saved Timetables") {
 						ForEach(received) { timetable in
