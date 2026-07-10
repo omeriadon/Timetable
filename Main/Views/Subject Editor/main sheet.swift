@@ -1,5 +1,5 @@
 //
-//   SubjectEditorSheet.swift
+//   main sheet.swift
 //   Main
 //
 //   Created by Adon Omeri on 25/4/2026.
@@ -136,7 +136,7 @@ struct SubjectEditorSheet: View {
 			}
 		}
 		#if os(iOS)
-		.presentationDetents([.large])
+		.presentationDetents([.height(750), .large])
 		.presentationDragIndicator(.hidden)
 		.interactiveDismissDisabled()
 		#endif

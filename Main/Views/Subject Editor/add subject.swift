@@ -1,5 +1,5 @@
 //
-//  AddSubjectPageView.swift
+//  add subject.swift
 //  Timetable
 //
 //  Created by Adon Omeri on 8/7/2026.

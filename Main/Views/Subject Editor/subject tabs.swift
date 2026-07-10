@@ -1,5 +1,5 @@
 //
-//  SubjectEditorPager.swift
+//  subject tabs.swift
 //  Timetable
 //
 //  Created by Adon Omeri on 8/7/2026.

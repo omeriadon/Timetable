@@ -1,5 +1,5 @@
 //
-//  SlotRowView.swift
+//  class slot row.swift
 //  Timetable
 //
 //  Created by Adon Omeri on 8/7/2026.
@@ -37,10 +37,11 @@ struct SlotRowView: View {
 
 			Picker("Period:", selection: $slot.period) {
 				ForEach(allowedPeriods(slot.day), id: \.self) { period in
-					Text("\(period)").tag(period)
+					Text("Period \(period)").tag(period)
 				}
 			}
-			.frame(width: 140)
+			.tint(.white)
+			.frame(width: 120)
 			.pickerStyle(.menu)
 			.disabled(isSaving)
 

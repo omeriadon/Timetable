@@ -1,5 +1,5 @@
 //
-//  SlotEditorSectionView.swift
+//  class slot rows.swift
 //  Timetable
 //
 //  Created by Adon Omeri on 8/7/2026.
