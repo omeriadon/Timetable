@@ -185,6 +185,17 @@ extension Notification.Name {
 			}
 
 			func tabBarController(_: UITabBarController, shouldSelectTab tab: UITab) -> Bool {
+				if tab.identifier != parent.prominentTabIdentifier,
+				   let tabBarController,
+				   tab.identifier != tabBarController.selectedTab?.identifier
+				{
+					UIView.transition(
+						with: tabBarController.view,
+						duration: 0.2,
+						options: [.transitionCrossDissolve, .allowAnimatedContent]
+					)
+				}
+
 				guard tab.identifier == parent.prominentTabIdentifier else {
 					return true
 				}
