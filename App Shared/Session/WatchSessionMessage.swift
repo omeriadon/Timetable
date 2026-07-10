@@ -1,4 +1,4 @@
-enum WatchSessionMessage {
+nonisolated enum WatchSessionMessage {
 	static let actionKey = "watchSessionAction"
 	static let installationIDKey = "watchSessionInstallationID"
 	static let sessionKey = "watchSession"
