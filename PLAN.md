@@ -640,7 +640,7 @@ Remove superseded timetable architecture
 
 ---
 
-## Unit 6: Final scheme and device verification
+## Unit 6: Final scheme and device verification — completed
 
 ### Goal
 
@@ -705,6 +705,23 @@ Do not “fix” this by deleting the Mac or iPhone app dependency blindly.
 ### Final commit policy
 
 Do not create a catch-all “fix everything” commit. Any issue found in final verification gets its own smallest behavior-scoped commit and must pass its affected build gate.
+
+### Verification result
+
+- Generic iOS Debug Timetable build passed, including the embedded Widget, Watch, and Watch Widget dependency graph.
+- Generic macOS Debug Timetable build passed.
+- Generic iOS Debug Widget scheme build passed.
+- Standalone generic watchOS Watch scheme initially reproduced the documented iPhoneOS `MaterialView.o` product-resolution failure. Removing the unrelated Timetable app build action repaired the scheme; the Watch build then passed.
+- Standalone generic watchOS Watch Widget scheme initially pulled in Timetable and Watch build actions and reproduced the same product-resolution failure. Removing those unrelated build actions repaired the scheme; the Watch Widget build then passed.
+- `pmstt` `swift build -c release` passed.
+- `pmstt` `swift test` compiled successfully but reported no tests found because the package has no test target.
+- `git diff --check` passed after the scheme repair.
+
+### Commit
+
+```text
+Repair standalone watch build schemes
+```
 
 ## Final acceptance criteria
 
