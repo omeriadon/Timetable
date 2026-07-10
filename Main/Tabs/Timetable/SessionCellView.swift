@@ -51,7 +51,7 @@ struct SessionCellView: View {
 							.fixedSize(horizontal: false, vertical: true)
 							.font(Device.isIPhone ? .footnote.scaled(by: 0.9) : .headline)
 					}
-					.dynamicTypeSize(.xSmall ... .large)
+					.dynamicTypeSize(.medium)
 				}
 				.frame(height: 60)
 

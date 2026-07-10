@@ -64,6 +64,7 @@ struct ContentView: View {
 		.padding(.trailing, 8)
 		.environment(\.dynamicTypeSize, .xSmall)
 		.monospaced()
+		.dynamicTypeSize(.xSmall)
 	}
 
 	func mainContent(subjectLookup: [Slot: Subject]) -> some View {
