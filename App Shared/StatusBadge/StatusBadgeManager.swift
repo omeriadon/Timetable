@@ -61,6 +61,20 @@ final class HapticManager {
 	}
 }
 
+struct HapticButtonStyle: ButtonStyle {
+	func makeBody(configuration: Configuration) -> some View {
+		configuration.label
+			.opacity(configuration.isPressed ? 0.8 : 1)
+			.onChange(of: configuration.isPressed) { _, isPressed in
+				if isPressed { HapticManager.shared.play(.button) }
+			}
+	}
+}
+
+extension ButtonStyle where Self == HapticButtonStyle {
+	static var haptic: HapticButtonStyle { HapticButtonStyle() }
+}
+
 enum StatusBadgeView: Equatable {
 	case progressView
 	case success

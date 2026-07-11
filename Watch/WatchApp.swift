@@ -21,6 +21,7 @@ struct TimetableWatchApp: App {
 			}
 			.monospaced()
 			.environment(\.statusBadgeManager, statusBadgeManager)
+			.buttonStyle(.haptic)
 			.task {
 				await configureAndRestore()
 			}

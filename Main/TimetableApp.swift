@@ -128,6 +128,7 @@ struct TimetableApp: App {
 			#endif // os(iOS)
 					.monospaced()
 					.environment(\.statusBadgeManager, statusBadgeManager)
+					.buttonStyle(.haptic)
 			#if os(macOS)
 				.onChange(of: expanded) { _, newValue in
 					resizeWindow(expanded: newValue)
