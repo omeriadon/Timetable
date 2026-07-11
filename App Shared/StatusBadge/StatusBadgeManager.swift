@@ -3,9 +3,63 @@
 //  App Shared
 //
 
+import Defaults
 import Foundation
 import Observation
 import SwiftUI
+
+#if os(iOS)
+	import UIKit
+#elseif os(watchOS)
+	import WatchKit
+#endif
+
+enum HapticEvent {
+	case button
+	case selection
+	case success
+	case warning
+	case error
+}
+
+@MainActor
+final class HapticManager {
+	static let shared = HapticManager()
+
+	private init() {}
+
+	func play(_ event: HapticEvent) {
+		guard Defaults[.hapticsEnabled] else { return }
+
+		#if os(iOS)
+			switch event {
+				case .button, .selection:
+					let generator = UISelectionFeedbackGenerator()
+					generator.prepare()
+					generator.selectionChanged()
+				case .success, .warning, .error:
+					let generator = UINotificationFeedbackGenerator()
+					generator.prepare()
+					let type: UINotificationFeedbackGenerator.FeedbackType
+					switch event {
+						case .success: type = .success
+						case .warning: type = .warning
+						case .error: type = .error
+						default: type = .success
+					}
+					generator.notificationOccurred(type)
+			}
+		#elseif os(watchOS)
+			let type: WKHapticType = switch event {
+				case .button, .selection: .click
+				case .success: .success
+				case .warning: .retry
+				case .error: .failure
+			}
+			WKInterfaceDevice.current().play(type)
+		#endif
+	}
+}
 
 enum StatusBadgeView: Equatable {
 	case progressView
@@ -71,6 +125,9 @@ final class StatusBadgeManager {
 		priority: Int,
 		view: StatusBadgeView
 	) {
+		if view == .success { HapticManager.shared.play(.success) }
+		if view == .error { HapticManager.shared.play(.error) }
+		if view == .warning { HapticManager.shared.play(.warning) }
 		Print(title)
 		Print(secondaryText ?? "")
 		if let index = badges.firstIndex(where: { $0.id == id }) {
@@ -114,6 +171,9 @@ final class StatusBadgeManager {
 		badges[index].title = title
 		badges[index].secondaryText = secondaryText
 		badges[index].view = view
+		if view == .success { HapticManager.shared.play(.success) }
+		if view == .error { HapticManager.shared.play(.error) }
+		if view == .warning { HapticManager.shared.play(.warning) }
 
 		scheduleRemovalIfNeeded(for: id, view: view)
 	}

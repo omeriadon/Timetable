@@ -210,6 +210,7 @@ final class SessionStore {
 	func deleteAccount() async throws {
 		Print("Deleting account", category: .account)
 		try await networkManager.send(.v1ProfileDelete)
+		await signingOutHandler?()
 		clearSessionState()
 	}
 

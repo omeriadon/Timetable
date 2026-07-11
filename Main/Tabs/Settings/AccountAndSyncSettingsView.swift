@@ -9,6 +9,7 @@ import Defaults
 import SwiftUI
 
 struct AccountAndSyncSettingsView: View {
+	@Default(.hapticsEnabled) private var hapticsEnabled
 	@State private var settings = Defaults[.accountSettings]
 	@State private var networkManager = NetworkManager.shared
 	@State private var settingsSync = AccountSettingsSyncService.shared
@@ -22,6 +23,8 @@ struct AccountAndSyncSettingsView: View {
 
 	var body: some View {
 		Form {
+			Toggle("Haptic Feedback", isOn: $hapticsEnabled)
+
 			Toggle(isOn: preferenceBinding(\.liveActivitiesEnabled)) {
 				Text("Live Activities")
 				Text("Show live countdowns and details for your subjects and breaks throughout the school day, including on your Watch.")
