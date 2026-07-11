@@ -52,7 +52,7 @@ struct TimetableTypesTutorial: View {
 			}
 
 			GlassEffectContainer(spacing: 130) {
-				TimelineView(.animation) { timeline in
+				TimelineView(.animation(minimumInterval: 1.0 / 60.0)) { timeline in
 					GeometryReader { proxy in
 						let time = timeline.date.timeIntervalSinceReferenceDate
 						let size = proxy.size

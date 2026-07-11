@@ -11,9 +11,9 @@ struct NotifTutorial: View {
 	@Environment(\.onboardingPageContext) private var context
 
 	var body: some View {
-		VStack(spacing: 50) {
+		VStack {
 			Text("Notifications can tell you your next class...")
-				.font(.title2)
+				.font(.title3)
 
 			Image("onboarding/nextClass")
 				.resizable()
@@ -21,18 +21,19 @@ struct NotifTutorial: View {
 				.padding(.horizontal, 20)
 
 			Spacer()
-				.frame(height: 40)
 
 			Text("Or any special one-off events.")
-				.font(.title2)
+				.font(.title3)
 
 			Image("onboarding/broadcast")
 				.resizable()
 				.aspectRatio(contentMode: .fit)
 				.padding(.horizontal, 20)
 
+			Spacer()
+
 			Text("Live Activities keep your current class and remaining time visible on the Lock Screen and Dynamic Island.")
-				.font(.title2)
+				.font(.title3)
 				.multilineTextAlignment(.center)
 		}
 		.onAppear {

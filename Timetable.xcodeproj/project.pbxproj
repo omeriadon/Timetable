@@ -165,7 +165,6 @@
 				Views/Onboarding/OnboardingView.swift = (ios, );
 				Views/Onboarding/Views/APNsRegistration.swift = (ios, );
 				Views/Onboarding/Views/Account.swift = (ios, );
-				Views/Onboarding/Views/AnimatedGradientDemo.swift = (ios, );
 				Views/Onboarding/Views/CalendarImport.swift = (ios, );
 				Views/Onboarding/Views/CalendarPermission.swift = (ios, );
 				Views/Onboarding/Views/Notifications.swift = (ios, );

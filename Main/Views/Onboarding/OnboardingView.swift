@@ -117,6 +117,7 @@ struct OnboardingView: View {
 					.progressViewStyle(.linear)
 					.frame(width: 90)
 			}
+			.animation(.easeInOut, value: selectedIndex)
 
 			Spacer()
 
@@ -217,8 +218,7 @@ struct OnboardingView: View {
 				OnboardingAccountView()
 			},
 			OnboardingPage(id: "finished", title: "Ready to Begin") {
-				Text("Here's an overview of Timetable's features...")
-					.font(.title)
+				OnboardingOverview()
 			},
 			OnboardingPage(id: "widget", title: "Widgets") {
 				WidgetTutorial()
@@ -229,6 +229,12 @@ struct OnboardingView: View {
 			OnboardingPage(id: "share", title: "Share Timetables") {
 				ShareTutorial()
 			},
+			OnboardingPage(id: "search", title: "Search Timetables") {
+				SearchTutorial()
+			},
+			OnboardingPage(id: "friends", title: "Friends' Timetables") {
+				FriendsTutorial()
+			},
 			OnboardingPage(id: "wallet", title: "Apple Wallet") {
 				WalletTutorial()
 			},
@@ -236,7 +242,7 @@ struct OnboardingView: View {
 				TimetableTypesTutorial()
 			},
 			OnboardingPage(id: "actualFinished", title: "Ready to use Timetable!") {
-				Text("monkey")
+				OnboardingCompletion()
 			},
 		]
 	}
