@@ -184,20 +184,20 @@ extension Notification.Name {
 				NotificationCenter.default.removeObserver(self)
 			}
 
-			func tabBarController(_: UITabBarController, shouldSelectTab tab: UITab) -> Bool {
-				if tab.identifier != parent.prominentTabIdentifier,
-				   let tabBarController,
-				   tab.identifier != tabBarController.selectedTab?.identifier
-				{
-					UIView.transition(
-						with: tabBarController.view,
-						duration: 0.2,
-						options: [.transitionCrossDissolve, .allowAnimatedContent],
-						animations: {}
-					)
-				}
-
+			func tabBarController(
+				_ tabBarController: UITabBarController,
+				shouldSelectTab tab: UITab
+			) -> Bool {
 				guard tab.identifier == parent.prominentTabIdentifier else {
+					if tab.identifier != tabBarController.selectedTab?.identifier {
+						UIView.transition(
+							with: tabBarController.view,
+							duration: 0.2,
+							options: [.transitionCrossDissolve, .allowAnimatedContent],
+							animations: {}
+						)
+					}
+
 					return true
 				}
 
@@ -205,8 +205,14 @@ extension Notification.Name {
 					return false
 				}
 
+				let currentTab = tabBarController.selectedTab
+
 				parent.isBlurred = true
 				parent.showShareSelection = true
+
+				DispatchQueue.main.async {
+					tabBarController.selectedTab = currentTab
+				}
 
 				return false
 			}
