@@ -192,7 +192,8 @@ extension Notification.Name {
 					UIView.transition(
 						with: tabBarController.view,
 						duration: 0.2,
-						options: [.transitionCrossDissolve, .allowAnimatedContent]
+						options: [.transitionCrossDissolve, .allowAnimatedContent],
+						animations: {}
 					)
 				}
 
