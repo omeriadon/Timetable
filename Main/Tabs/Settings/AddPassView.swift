@@ -21,6 +21,7 @@ struct AddPassView: View {
 	@State private var walletButtonID = UUID()
 	@State private var passService = WalletPassService.shared
 	@State private var resetTask: Task<Void, Never>?
+	@State private var networkManager = NetworkManager.shared
 	@Environment(\.statusBadgeManager) private var statusBadgeManager
 
 	var body: some View {
@@ -72,10 +73,16 @@ struct AddPassView: View {
 			}
 		}
 		.animation(.easeInOut, value: currentState)
+		.overlay {
+			if !networkManager.isOnline {
+				ContentUnavailableView("Offline", systemImage: "wifi.slash", description: Text("Wallet passes are unavailable until a connection is restored."))
+			}
+		}
 	}
 
 	private func downloadPass() {
 		resetTask?.cancel()
+		guard networkManager.isOnline else { return }
 		guard SessionStore.shared.isAuthenticated else {
 			statusBadgeManager.signInRequired()
 			return
