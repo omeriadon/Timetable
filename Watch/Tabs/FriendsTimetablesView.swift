@@ -58,6 +58,9 @@ struct FriendsTimetablesView: View {
 				title = "School's Out"
 				symbol = "house.fill"
 				color = .secondary
+				if let next = SchoolStateEngine.nextSubjectOnFollowingSchoolDay(after: now, subjects: receivedTimetable.subjects) {
+					nextText = "Next: \(next.subject.id)"
+				}
 
 			case .noTimetable:
 				title = "No Timetable"
