@@ -5,21 +5,21 @@
 //   Created by Adon Omeri on 22/6/2026.
 //
 
-//MARK: - There is no use for this anymore, it may be needed later.
+// MARK: - There is no use for this anymore, it may be needed later.
 
 //
-//import PassKit
-//import SwiftUI
+// import PassKit
+// import SwiftUI
 //
-//enum PassState: Equatable {
+// enum PassState: Equatable {
 //	case idle
 //	case generating
 //	case ready(PKPass)
 //	case added
 //	case error
-//}
+// }
 //
-//struct AddPassView: View {
+// struct AddPassView: View {
 //	@State private var currentState: PassState = .idle
 //	@State private var walletButtonID = UUID()
 //	@State private var passService = WalletPassService.shared
@@ -123,4 +123,4 @@
 //			}
 //		}
 //	}
-//}
+// }

@@ -148,7 +148,7 @@
 				for await state in activity.activityStateUpdates {
 					guard !Task.isCancelled else { return }
 					if state == .ended || state == .dismissed {
-						await self?.removeActivityObservers(for: activity.id)
+						self?.removeActivityObservers(for: activity.id)
 						return
 					}
 				}
