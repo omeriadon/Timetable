@@ -95,11 +95,11 @@ struct SettingsView: View {
 		}
 
 		Section("Preferences") {
-			Toggle("Highlight Current Day", isOn: $highlightsCurrentDay)
+			Toggle("Highlight Current Day in timetables", isOn: $highlightsCurrentDay)
 			if sessionStore.isAuthenticated {
-				NavigationLink { AccountAndSyncSettingsView() } label: { Label("Preferences", systemImage: "switch.2") }
+				NavigationLink { AccountAndSyncSettingsView() } label: { Label("Live Updates", systemImage: "switch.2") }
 			} else {
-				Button { showSignInRequired() } label: { Label("Preferences", systemImage: "switch.2") }
+				Button { showSignInRequired() } label: { Label("Live Updates", systemImage: "switch.2") }
 			}
 		}
 

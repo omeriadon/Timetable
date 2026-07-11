@@ -105,7 +105,7 @@ struct AccountAndSyncSettingsView: View {
 			}
 		}
 		.animation(.easeInOut, value: notificationRegistration.registrationState)
-		.appNavigationTitle("Preferences")
+		.appNavigationTitle("Live Updates")
 	}
 
 	private func preferenceBinding(_ keyPath: WritableKeyPath<AccountSettings, Bool>) -> Binding<Bool> {
