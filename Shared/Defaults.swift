@@ -10,6 +10,14 @@ import Foundation
 
 private let sharedDefaults = UserDefaults(suiteName: "group.omeriadon.timetable") ?? UserDefaults.standard
 
+enum SharedDefaultsStore {
+	static let suiteName = "group.omeriadon.timetable"
+
+	static func removeAll() {
+		UserDefaults(suiteName: suiteName)?.removePersistentDomain(forName: suiteName)
+	}
+}
+
 extension Defaults.Keys {
 	static let accountProfile = Key<AccountProfile?>("accountProfile", default: nil, suite: sharedDefaults)
 	static let accountSettings = Key<AccountSettings>("accountSettings", default: .default, suite: sharedDefaults)

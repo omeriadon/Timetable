@@ -277,8 +277,7 @@ final class SessionStore {
 	private func clearSessionState() {
 		KeychainManager.delete(forKey: accessTokenKey)
 		KeychainManager.delete(forKey: refreshTokenKey)
-		Defaults[.accountProfile] = nil
-		Defaults[.hasCompletedAccountBootstrap] = false
+		SharedDefaultsStore.removeAll()
 		state = .signedOut
 		networkManager.clearAuthentication()
 		configureNetworkAuthentication()

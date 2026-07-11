@@ -143,10 +143,6 @@ struct SettingsView: View {
 				}
 			}
 
-			Section("Add Timetable to Wallet") {
-				AddPassView()
-			}
-
 			Section("Calendar") {
 				Button {
 					showCalendarImportSheet = true
