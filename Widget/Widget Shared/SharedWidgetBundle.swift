@@ -11,7 +11,5 @@ import WidgetKit
 @WidgetBundleBuilder
 func SharedWidgetBundle() -> some Widget {
 	WeeklyScheduleWidget()
-	NextBreakWidget()
-	NextSubjectWidget()
 	FriendsTimeLeftWidget()
 }
