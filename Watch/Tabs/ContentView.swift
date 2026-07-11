@@ -98,7 +98,7 @@ struct ContentView: View {
 		Group {
 			if TimetableLayout.isBreakSession(index: session) {
 				// recess and lunch
-				rectangle(.clear, true) {
+				rectangle(.clear, isBreak: true) {
 					IrregularGradient(
 						colors: [.yellow, .orange, .pink, .red, .purple, .blue, .cyan, .mint, .green],
 						background: Color.clear,
