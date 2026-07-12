@@ -87,7 +87,7 @@ struct ContentView: View {
 				}
 			}
 		}
-		.drawingGroup()
+		.drawingGroup(opaque: false)
 	}
 
 	private var currentDayIndex: Int? {

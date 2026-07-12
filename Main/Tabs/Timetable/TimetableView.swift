@@ -109,8 +109,7 @@ struct TimetableView: View {
 							}
 
 							item(left: leftView, right: rightView, colour: subject.colour.swiftUIColor, top: true)
-								.padding(.horizontal, 5)
-								.padding(10)
+								.padding(.horizontal, 10)
 								.id(subject.id)
 								.transition(.blurReplace)
 								.animation(.spring(.bouncy), value: subject.id)

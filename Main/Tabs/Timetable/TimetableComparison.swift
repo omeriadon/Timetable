@@ -23,18 +23,16 @@ struct TimetableComparison: View {
 					ContentUnavailableView {
 						Label {
 							Text("No Friend Timetables")
-								.font(.headline)
 						} icon: {
 							Image(systemName: "person.2")
-								.font(.title3)
 						}
+						.font(.callout)
+						.foregroundStyle(.secondary)
 					} description: {
 						Text("Import a friend's timetable to compare it with yours here.")
 							.font(.caption)
 					}
-					.frame(maxWidth: .infinity)
-					.frame(height: 100)
-				#endif
+				#endif // os(iOS)
 			} else {
 				ForEach(friends) { timetable in
 					ZStack {
@@ -106,6 +104,6 @@ func item(
 			.padding(.trailing, 5)
 	}
 	.padding(15)
-	.glassEffect(.clear.tint(colour).interactive(), in: top ? AnyShape(RoundedRectangle(cornerRadius: 25)) : AnyShape(Capsule()))
+	.glassEffect(.clear.tint(colour).interactive(), in: top ? AnyShape(RoundedRectangle(cornerRadius: 30)) : AnyShape(Capsule()))
 	.contentShape(Rectangle())
 }
