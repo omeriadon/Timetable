@@ -6,9 +6,17 @@ struct WatchSessionRootView: View {
 	var body: some View {
 		ZStack {
 			switch sessionStore.state {
-				case .signedOut, .restoring:
+				case .signedOut:
 					WatchSignInView()
 						.transition(.blurReplace)
+				case .restoring:
+					if sessionStore.hasCachedAccount {
+						WatchRootTabView()
+							.transition(.opacity)
+					} else {
+						WatchSignInView()
+							.transition(.blurReplace)
+					}
 				case .authenticated:
 					WatchRootTabView()
 						.transition(.opacity)

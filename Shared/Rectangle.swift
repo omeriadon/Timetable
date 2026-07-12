@@ -36,8 +36,11 @@ import SwiftUI
 					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
 			}
 			.padding(2)
-			.background(fill)
-			.clipShape(RoundedRectangle(cornerRadius: isBreak ? 1 : 4))
+			.glassEffect(
+				!isBreak ? .clear.tint(fill).interactive()
+					: .identity,
+				in: RoundedRectangle(cornerRadius: isBreak ? 2 : 6)
+			)
 		}
 	}
 

@@ -12,6 +12,20 @@ private let sharedDefaults = UserDefaults(suiteName: "group.omeriadon.timetable"
 
 enum SharedDefaultsStore {
 	static let suiteName = "group.omeriadon.timetable"
+	private static let resetMarker = "com.omeriadon.Timetable.sharedDefaultsResetVersion"
+	private static let currentResetVersion = 1
+
+	/// Removes the pre-release shared defaults once when this release first launches.
+	/// The marker lives in the app's standard defaults so clearing the app-group suite
+	/// cannot cause the reset to repeat on every launch.
+	static func resetPreReleaseStateIfNeeded() {
+		let markerDefaults = UserDefaults.standard
+		guard markerDefaults.integer(forKey: resetMarker) < currentResetVersion else { return }
+
+		let defaults = UserDefaults(suiteName: suiteName) ?? markerDefaults
+		defaults.removePersistentDomain(forName: suiteName)
+		markerDefaults.set(currentResetVersion, forKey: resetMarker)
+	}
 
 	static func removeAll() {
 		UserDefaults(suiteName: suiteName)?.removePersistentDomain(forName: suiteName)

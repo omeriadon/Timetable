@@ -119,13 +119,6 @@
 			);
 			target = 2AA6DF132FDFAC8F00BBC70E /* Widget */;
 		};
-		2A0DF9573001EBE700AA3439 /* Exceptions for "Shared" folder in "Timetable" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			platformFiltersByRelativePath = {
-				HapticManager.swift = (ios, );
-			};
-			target = 2A02378A2F9C8EA000AB1E1F /* Timetable */;
-		};
 		2AA9C7BD2FEE72DC00AD87A8 /* Exceptions for "Widget" folder in "Timetable" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -160,6 +153,7 @@
 				Tabs/Settings/AuthoredTimetablesSettingsView.swift = (ios, );
 				Tabs/Settings/ReceivedTimetablesView.swift = (ios, );
 				Tabs/VariableBlur.swift = (ios, );
+				Views/Onboarding/OnboardingBackground.swift = (ios, );
 				Views/Onboarding/OnboardingPage.swift = (ios, );
 				Views/Onboarding/OnboardingPageContext.swift = (ios, );
 				Views/Onboarding/OnboardingView.swift = (ios, );
@@ -169,8 +163,12 @@
 				Views/Onboarding/Views/CalendarPermission.swift = (ios, );
 				Views/Onboarding/Views/Notifications.swift = (ios, );
 				Views/Onboarding/Views/SplashView.swift = (ios, );
+				Views/Onboarding/Views/Tutorial/FriendsTutorial.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/GeneratedSFSymbolShapes.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/NotifTutorial.swift = (ios, );
+				Views/Onboarding/Views/Tutorial/OnboardingCompletion.swift = (ios, );
+				Views/Onboarding/Views/Tutorial/OnboardingOverview.swift = (ios, );
+				Views/Onboarding/Views/Tutorial/SearchTutorial.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/ShareTutorial.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/TimetableTypesTutorial.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/WalletTutorial.swift = (ios, );
@@ -179,6 +177,7 @@
 				iOS/LiveActivityDebugView.swift = (ios, );
 				macOS/AppDelegate.swift = (macos, );
 				macOS/CustomMaterialView.swift = (macos, );
+				macOS/StatusBadgeOverlayWindow.swift = (macos, );
 			};
 			target = 2A02378A2F9C8EA000AB1E1F /* Timetable */;
 		};
@@ -277,7 +276,6 @@
 		2A02379F2F9C908300AB1E1F /* Shared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				2A0DF9573001EBE700AA3439 /* Exceptions for "Shared" folder in "Timetable" target */,
 				2A0DF9533001EBD400AA3439 /* Exceptions for "Shared" folder in "Watch Widget" target */,
 				2A0DF9543001EBD400AA3439 /* Exceptions for "Shared" folder in "Widget" target */,
 			);

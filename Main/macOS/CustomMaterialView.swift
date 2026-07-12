@@ -6,20 +6,24 @@
 //
 
 import AppKit
-import MaterialView
 import SwiftUI
 
 struct CustomMaterialView: NSViewRepresentable {
 	@Environment(\.colorScheme) private var colorScheme
 
 	final class Container: NSView {
-		let effectView = NSMaterialView()
+		let effectView = NSVisualEffectView()
+		let tintView = NSView()
 
 		override init(frame frameRect: NSRect) {
 			super.init(frame: frameRect)
 			addSubview(effectView)
+			addSubview(tintView)
 			effectView.autoresizingMask = [.width, .height]
 			effectView.frame = bounds
+			tintView.autoresizingMask = [.width, .height]
+			tintView.frame = bounds
+			tintView.wantsLayer = true
 		}
 
 		required init?(coder: NSCoder) {
@@ -30,37 +34,23 @@ struct CustomMaterialView: NSViewRepresentable {
 	func makeNSView(context: Context) -> Container {
 		let view = Container()
 
-		view.effectView.effect = makeEffect(for: context.environment.colorScheme)
+		configure(view, for: context.environment.colorScheme)
 
 		return view
 	}
 
 	func updateNSView(_ nsView: Container, context: Context) {
-		nsView.effectView.effect = makeEffect(for: context.environment.colorScheme)
+		configure(nsView, for: context.environment.colorScheme)
 	}
 
-	private func makeEffect(for scheme: ColorScheme) -> NSMaterialView.Effect {
+	private func configure(_ view: Container, for scheme: ColorScheme) {
 		let isDark = scheme == .dark
-
-		return NSMaterialView.Effect(
-			active: NSMaterialView.Effect.MaterialStyle(
-				backgroundColor: isDark ? NSColor.black.withAlphaComponent(0.2) : NSColor.white.withAlphaComponent(0.3),
-				tintColor: NSColor(white: 0.0, alpha: 0.0),
-				tintFilter: kCAFilterLightenBlendMode,
-				saturationFactor: 1.0,
-				brightnessFactor: 0.0,
-				blurRadius: 8
-			),
-			inactive: NSMaterialView.Effect.MaterialStyle(
-				backgroundColor: isDark ? NSColor.black.withAlphaComponent(0.35) : NSColor.white.withAlphaComponent(0.5),
-				tintColor: NSColor(white: 0.0, alpha: 0.0),
-				tintFilter: kCAFilterDarkenBlendMode,
-				saturationFactor: 1.0,
-				brightnessFactor: 0.0,
-				blurRadius: 8
-			),
-			rimColor: (inner: .clear, outer: .clear),
-			rimWidth: (inner: 0, outer: 0)
-		)
+		view.effectView.material = .underWindowBackground
+		view.effectView.blendingMode = .behindWindow
+		view.effectView.state = .active
+		view.effectView.appearance = NSAppearance(named: isDark ? .darkAqua : .aqua)
+		view.tintView.layer?.backgroundColor = (isDark ? NSColor.black : NSColor.white)
+			.withAlphaComponent(isDark ? 0.025 : 0.02)
+			.cgColor
 	}
 }

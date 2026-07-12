@@ -39,6 +39,10 @@ final class SessionStore {
 		return false
 	}
 
+	var hasCachedAccount: Bool {
+		Defaults[.accountProfile] != nil
+	}
+
 	private let networkManager: NetworkManager
 	private let accessTokenKey = "com.omeriadon.Timetable.session.accessToken"
 	private let refreshTokenKey = "com.omeriadon.Timetable.session.refreshToken"

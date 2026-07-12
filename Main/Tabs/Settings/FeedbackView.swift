@@ -9,21 +9,37 @@ struct FeedbackView: View {
 
 	var body: some View {
 		NavigationStack {
-			Form {
-				Picker("Type", selection: $category) {
-					Text("Feedback").tag("Feedback")
-					Text("Bug Report").tag("Bug Report")
+			VStack(spacing: 0) {
+				Text("Report Feedback or Bug")
+					.font(.largeTitle)
+					.lineLimit(2)
+					.bold()
+					.padding(.bottom, 20)
+
+				Form {
+					Section {
+						Picker("Type", selection: $category) {
+							Label("Feedback", systemImage: "text.bubble")
+								.tag("Feedback")
+
+							Label("Bug Report", systemImage: "ant")
+								.tag("Bug Report")
+						}
+					}
+
+					TextField("Describe the feedback or bug", text: $message, axis: .vertical)
+						.lineLimit(5 ... 12)
 				}
-				TextField("Describe the feedback or bug", text: $message, axis: .vertical)
-					.lineLimit(5 ... 12)
 			}
-			.appNavigationTitle("Report Feedback or Bug", style: .subview)
+			#if os(macOS)
+			.padding(24)
+			#endif
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
-					Button("Cancel", role: .cancel) { dismiss() }
+					Button(role: .cancel) { dismiss() }
 				}
 				ToolbarItem(placement: .confirmationAction) {
-					Button("Send") { submit() }
+					Button("Send", systemImage: "checkmark", role: .confirm) { submit() }
 						.disabled(message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSubmitting)
 				}
 			}

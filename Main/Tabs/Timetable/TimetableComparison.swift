@@ -19,11 +19,22 @@ struct TimetableComparison: View {
 		VStack(spacing: 14) {
 			let friends = passManager.receivedTimetables.filter { $0.sourceKind != .accountOwner }
 			if friends.isEmpty {
-				ContentUnavailableView {
-					Label("No Friend Timetables", systemImage: "person.2")
-				} description: {
-					Text("Import a friend's timetable to compare it with yours here.")
-				}
+				#if os(iOS)
+					ContentUnavailableView {
+						Label {
+							Text("No Friend Timetables")
+								.font(.headline)
+						} icon: {
+							Image(systemName: "person.2")
+								.font(.title3)
+						}
+					} description: {
+						Text("Import a friend's timetable to compare it with yours here.")
+							.font(.caption)
+					}
+					.frame(maxWidth: .infinity)
+					.frame(height: 100)
+				#endif
 			} else {
 				ForEach(friends) { timetable in
 					ZStack {
@@ -91,7 +102,7 @@ func item(
 		Spacer()
 
 		right
-			.frame(height: top ? 40 : 20)
+			.frame(height: top ? 70 : 20)
 			.padding(.trailing, 5)
 	}
 	.padding(15)

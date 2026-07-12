@@ -70,7 +70,6 @@ struct SettingsView: View {
 					Form {
 						list
 					}
-					.scrollEdgeEffectStyle(.soft, for: .top)
 					.formStyle(.grouped)
 				#endif
 			}
@@ -101,6 +100,9 @@ struct SettingsView: View {
 			} else {
 				Button { showSignInRequired() } label: { Label("Live Updates", systemImage: "switch.2") }
 			}
+			#if os(iOS)
+				Toggle("Haptic Feedback", isOn: hapticsBinding)
+			#endif
 		}
 
 		#if os(iOS)
@@ -268,6 +270,11 @@ struct SettingsView: View {
 	}
 
 	@Default(.timetableHighlightsCurrentDay) private var highlightsCurrentDay
+	@Default(.hapticsEnabled) private var hapticsEnabled
+
+	private var hapticsBinding: Binding<Bool> {
+		Binding(get: { hapticsEnabled }, set: { hapticsEnabled = $0 })
+	}
 
 	private var ownerVisibilityBinding: Binding<Bool> {
 		Binding(

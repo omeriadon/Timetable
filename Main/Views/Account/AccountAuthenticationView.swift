@@ -95,10 +95,14 @@ struct AccountAuthenticationView: View {
 				} onCompletion: { result in
 					handleAppleCompletion(result)
 				}
+				.controlSize(.large)
+				.buttonSizing(.flexible)
 				.signInWithAppleButtonStyle(.white)
-				.frame(height: 50)
-				.clipShape(.capsule)
-				.disabled(model.isSubmitting)
+				#if os(iOS)
+					.frame(height: 50)
+				#endif
+					.clipShape(.capsule)
+					.disabled(model.isSubmitting)
 			}
 			.padding(20)
 		}

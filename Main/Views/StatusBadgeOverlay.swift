@@ -30,6 +30,7 @@ struct StatusBadgeOverlay: View {
 			.frame(maxWidth: .infinity)
 			.padding(.top, topPadding)
 		}
+		.monospaced()
 		.allowsHitTesting(manager.mainBadge != nil)
 		.animation(animation, value: manager.badges)
 		.animation(animation, value: manager.activeBadgeID)
@@ -61,9 +62,13 @@ struct StatusBadgeOverlay: View {
 		.frame(height: badgeHeight)
 		.contentShape(.capsule)
 		.clipShape(.capsule)
-		.glassEffect(.regular.interactive(), in: .capsule)
-		.contentTransition(.interpolate)
-		.animation(animation, value: badge)
+		#if os(iOS)
+			.glassEffect(.regular.interactive(), in: .capsule)
+		#else
+			.glassEffect(.clear.interactive(), in: .capsule)
+		#endif
+			.contentTransition(.interpolate)
+			.animation(animation, value: badge)
 
 		#if os(iOS)
 			content

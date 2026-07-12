@@ -19,28 +19,14 @@ struct AccountView: View {
 		ZStack {
 			switch sessionStore.state {
 				case let .authenticated(profile):
-					List {
-						Section("Profile") {
-							#if os(iOS)
-								LabeledContent("Name") {
-									TextField("Name", text: $displayName)
-										.multilineTextAlignment(.trailing)
-										.submitLabel(.done)
-								}
-								.onChange(of: displayName) { _, value in ServerSyncCoordinator.shared.scheduleProfileUpdate(value) }
-							#else
-								LabeledContent("Name", value: profile.displayName)
-							#endif
-							if let email = profile.email {
-								LabeledContent("Email", value: email)
-							}
-						}
-
-						Section {
-							Button("Sign Out", role: .destructive, action: signOut)
-							Button("Delete Account", role: .destructive) { showDeleteConfirmation = true }
-								.disabled(isDeleting)
-						}
+					Group {
+						#if os(macOS)
+							Form { accountRows(profile: profile) }
+								.formStyle(.grouped)
+						#else
+							List { accountRows(profile: profile) }
+								.listStyle(.insetGrouped)
+						#endif
 					}
 					.appNavigationTitle("Account")
 					.transition(.blurReplace)
@@ -59,6 +45,33 @@ struct AccountView: View {
 			Text("This permanently deletes your account and server data.")
 		}
 		.animation(.easeInOut, value: sessionStore.state)
+	}
+
+	@ContentBuilder
+	private func accountRows(profile: AccountProfile) -> some View {
+		Section("Profile") {
+			#if os(iOS)
+				LabeledContent("Name") {
+					TextField("Name", text: $displayName)
+						.multilineTextAlignment(.trailing)
+						.submitLabel(.done)
+				}
+				.onChange(of: displayName) { _, value in ServerSyncCoordinator.shared.scheduleProfileUpdate(value) }
+			#else
+				LabeledContent("Name", value: profile.displayName)
+			#endif
+			if let email = profile.email {
+				LabeledContent("Email", value: email)
+			}
+		}
+
+		Section {
+			Button("Sign Out", role: .destructive, action: signOut)
+			#if os(iOS)
+				Button("Delete Account", role: .destructive) { showDeleteConfirmation = true }
+					.disabled(isDeleting)
+			#endif
+		}
 	}
 
 	private func signOut() {

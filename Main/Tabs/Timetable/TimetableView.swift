@@ -138,8 +138,8 @@ struct TimetableView: View {
 								VStack(spacing: 4) {
 									Text("")
 
-									ForEach(TimetableLayout.sessions, id: \.self) { session in
-										sessionLabel(for: session)
+									ForEach(Array(TimetableLayout.sessions.enumerated()), id: \.offset) { index, session in
+										sessionLabel(for: session, index: index)
 									}
 								}
 								.frame(width: 15)
@@ -205,28 +205,42 @@ struct TimetableView: View {
 	}
 
 	func mainContent(subjectLookup: [Slot: Subject]) -> some View {
-		ForEach(0 ..< 5) { day in
-			VStack(spacing: 4) {
-				Text(TimetableLayout.shortDayLabels[day])
-				ForEach(0 ..< 8) { session in
-					SessionCellView(day, session, subjectLookup, selectedSlot)
-						.contentShape(Rectangle())
-						.onTapGesture {
-							withAnimation(.snappy(duration: 0.3)) {
-								if selectedSlot == Slot(day, session) {
-									selectedSlot = nil
-								} else if subjectLookup[Slot(day, session)] != nil {
-									selectedSlot = Slot(day, session)
-								}
-							}
-						}
+		VStack(spacing: 4) {
+			HStack(spacing: 4) {
+				ForEach(0 ..< 5) { day in
+					Text(TimetableLayout.shortDayLabels[day])
+						.frame(maxWidth: .infinity)
 				}
 			}
-			.background {
-				if highlightsCurrentDay, currentDayIndex == day {
-					RoundedRectangle(cornerRadius: 8)
-						.stroke(.white, lineWidth: 2)
-						.padding(-2)
+
+			ForEach(0 ..< 8) { session in
+				if TimetableLayout.isBreakSession(index: session) {
+					BreakSessionView()
+						.frame(maxWidth: .infinity)
+						.frame(height: 20)
+				} else {
+					HStack(alignment: .top, spacing: 4) {
+						ForEach(0 ..< 5) { day in
+							SessionCellView(day, session, subjectLookup, selectedSlot)
+								.contentShape(Rectangle())
+								.background {
+									if highlightsCurrentDay, currentDayIndex == day {
+										RoundedRectangle(cornerRadius: 8)
+											.stroke(.white, lineWidth: 2)
+											.padding(-2)
+									}
+								}
+								.onTapGesture {
+									withAnimation(.snappy(duration: 0.3)) {
+										if selectedSlot == Slot(day, session) {
+											selectedSlot = nil
+										} else if subjectLookup[Slot(day, session)] != nil {
+											selectedSlot = Slot(day, session)
+										}
+									}
+								}
+						}
+					}
 				}
 			}
 		}
@@ -238,11 +252,11 @@ struct TimetableView: View {
 		return weekday - 2
 	}
 
-	func sessionLabel(for session: String) -> some View {
+	func sessionLabel(for session: String, index: Int) -> some View {
 		let isBreakSession = TimetableLayout.isBreakSession(label: session)
 
 		return Text(session)
-			.frame(height: isBreakSession ? 20 : 60)
+			.frame(height: isBreakSession ? 20 : (selectedSlot?.session == index ? 90 : 60))
 			.foregroundStyle(isBreakSession ? Color.secondary : Color.primary)
 	}
 

@@ -12,6 +12,7 @@ import UserNotifications
 class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
 	func applicationDidFinishLaunching(_: Notification) {
 		guard let window = NSApplication.shared.windows.first else { return }
+		StatusBadgeOverlayWindowController.shared.start()
 
 		window.isOpaque = false
 		window.backgroundColor = .clear

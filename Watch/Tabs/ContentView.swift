@@ -81,8 +81,7 @@ struct ContentView: View {
 				}
 				.background {
 					if highlightsCurrentDay, currentDayIndex == day {
-						Color.clear
-							.glassEffect(.clear, in: RoundedRectangle(cornerRadius: 5))
+						Color.white
 							.padding(-1)
 					}
 				}

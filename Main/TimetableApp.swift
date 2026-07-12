@@ -11,6 +11,7 @@
 	import Sticker
 	import WindowOverlay
 #endif
+import ColorfulX
 import Defaults
 import Foundation
 import SwiftUI
@@ -43,10 +44,15 @@ struct TimetableApp: App {
 	#if os(macOS)
 		@NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
-		init() {
+	#endif
+
+	init() {
+		SharedDefaultsStore.resetPreReleaseStateIfNeeded()
+
+		#if os(macOS)
 			UserDefaults.standard.set(false, forKey: "NSFullScreenMenuItemEverywhere")
-		}
-	#endif // os(macOS)
+		#endif
+	}
 
 	#if os(iOS)
 		@UIApplicationDelegateAdaptor(MobileAppDelegate.self) private var mobileAppDelegate
@@ -77,58 +83,53 @@ struct TimetableApp: App {
 				StatusBadgeOverlay()
 					.zIndex(9_999_999)
 			}
-			#else
-			.overlay {
-						StatusBadgeOverlay()
-							.zIndex(9_999_999)
-					}
 			#endif
-					.task {
-						NetworkManager.shared.configureFeedback { StatusBadgeManager.shared.present(networkError: $0) }
-						passManager.configureProjectionUpload {
-							guard sessionStore.isAuthenticated else { return }
-							try await ReceivedTimetableSyncService.shared.uploadCurrentProjection()
-						}
-						sessionStore.configureAccountBootstrap {
-							try await AccountBootstrapService.shared.bootstrap()
-						}
-						sessionStore.configureDeviceLifecycle {
-							await NotificationRegistrationService.shared.uploadPendingToken()
-							#if os(iOS)
-								await LiveActivityRegistrationService.shared.startObserving()
-								PhoneWatchSyncBridge.shared.sendAuthenticatedStateIfPossible()
-							#endif
-						} signingOut: {
-							#if os(iOS)
-								PhoneWatchSyncBridge.shared.sendSignedOutStateIfPossible()
-								await LiveActivityRegistrationService.shared.removeLiveActivityToken()
-							#endif
-							await NotificationRegistrationService.shared.removeServerRegistration()
-						}
-						if Defaults[.installationID].isEmpty {
-							Defaults[.installationID] = DeviceIDProvider.shared.getDeviceID()
-						}
-						await indexEntities()
-						await sessionStore.restore()
+			.task {
+				NetworkManager.shared.configureFeedback { StatusBadgeManager.shared.present(networkError: $0) }
+				passManager.configureProjectionUpload {
+					guard sessionStore.isAuthenticated else { return }
+					try await ReceivedTimetableSyncService.shared.uploadCurrentProjection()
+				}
+				sessionStore.configureAccountBootstrap {
+					try await AccountBootstrapService.shared.bootstrap()
+				}
+				sessionStore.configureDeviceLifecycle {
+					await NotificationRegistrationService.shared.uploadPendingToken()
+					#if os(iOS)
+						await LiveActivityRegistrationService.shared.startObserving()
+						PhoneWatchSyncBridge.shared.sendAuthenticatedStateIfPossible()
+					#endif
+				} signingOut: {
+					#if os(iOS)
+						PhoneWatchSyncBridge.shared.sendSignedOutStateIfPossible()
+						await LiveActivityRegistrationService.shared.removeLiveActivityToken()
+					#endif
+					await NotificationRegistrationService.shared.removeServerRegistration()
+				}
+				if Defaults[.installationID].isEmpty {
+					Defaults[.installationID] = DeviceIDProvider.shared.getDeviceID()
+				}
+				await indexEntities()
+				await sessionStore.restore()
 
-						await NotificationRegistrationService.shared.requestRemoteRegistration()
+				await NotificationRegistrationService.shared.requestRemoteRegistration()
 
-						#if os(iOS)
-							await LiveActivityRegistrationService.shared.startObserving()
+				#if os(iOS)
+					await LiveActivityRegistrationService.shared.startObserving()
 
-							try? await ShaderLibrary.compileStickerShaders()
-						#endif
-					}
+					try? await ShaderLibrary.compileStickerShaders()
+				#endif
+			}
 			#if os(iOS)
-					.fullScreenCover(isPresented: .constant(!hasCompletedOnboarding)) {
-						OnboardingView()
-							.interactiveDismissDisabled()
-					}
-					.environment(\.passManager, passManager)
+			.fullScreenCover(isPresented: .constant(!hasCompletedOnboarding)) {
+				OnboardingView()
+					.interactiveDismissDisabled()
+			}
+			.environment(\.passManager, passManager)
 			#endif // os(iOS)
-					.monospaced()
-					.environment(\.statusBadgeManager, statusBadgeManager)
-					.buttonStyle(.haptic)
+			.monospaced()
+			.environment(\.statusBadgeManager, statusBadgeManager)
+			.buttonStyle(.haptic)
 			#if os(macOS)
 				.onChange(of: expanded) { _, newValue in
 					resizeWindow(expanded: newValue)
@@ -199,17 +200,39 @@ struct TimetableApp: App {
 
 #if os(macOS)
 	private struct MacSignInGateView: View {
+		@State private var colors = ColorfulPreset.aurora
+		@State private var speed = 1.2
+		@State private var colorTransitionSpeed = 10.0
+
 		var body: some View {
 			Color.clear
 				.sheet(isPresented: .constant(true)) {
-					VStack(spacing: 16) {
+					VStack(spacing: 20) {
+						Image("Icon")
+							.resizable()
+							.frame(width: 150, height: 150)
+							.shadow(color: .black, radius: 15)
+
 						Text("Sign In Required").font(.title2.bold())
-						Text("Sign in to view your timetable on this Mac.").foregroundStyle(.secondary)
+						Text("Sign in to view your timetable on this Mac.")
+
 						AccountAuthenticationView(allowsSignUp: false)
 					}
 					.padding(30)
-					.frame(width: 520, height: 560)
 					.interactiveDismissDisabled()
+					.presentationBackground {
+						ColorfulView(
+							color: $colors,
+							speed: $speed,
+							bias: .constant(0.00001),
+							noise: .constant(200),
+							transitionSpeed: $colorTransitionSpeed,
+							frameLimit: .constant(60),
+							renderScale: .constant(1)
+						)
+						.opacity(0.8)
+					}
+					.presentationSizing(.fitted)
 				}
 		}
 	}

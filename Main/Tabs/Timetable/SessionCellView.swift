@@ -5,7 +5,7 @@
 //   Created by Adon Omeri on 16/6/2026.
 //
 
-import IrregularGradient
+import ColorfulX
 import SwiftUI
 
 struct SessionCellView: View {
@@ -28,15 +28,8 @@ struct SessionCellView: View {
 		Group {
 			// break
 			if TimetableLayout.isBreakSession(index: session) {
-				rectangle(.clear, isBreak: true) {
-					IrregularGradient(
-						colors: [.yellow, .orange, .pink, .red, .purple, .blue, .cyan, .mint, .green],
-						background: Color.clear,
-						speed: 2,
-						animate: true
-					)
-				}
-				.frame(height: 20)
+				BreakSessionView()
+					.frame(height: 20)
 
 				// unavailable
 			} else if TimetableLayout.isUnavailable(day: day, session: session) {
@@ -61,7 +54,7 @@ struct SessionCellView: View {
 					}
 					.dynamicTypeSize(.medium)
 				}
-				.frame(height: 60)
+				.frame(height: Slot(day, session) == selectedSlot ? 90 : 60)
 
 				// idk
 			} else {
@@ -71,5 +64,24 @@ struct SessionCellView: View {
 			}
 		}
 		.foregroundStyle(.white)
+	}
+}
+
+struct BreakSessionView: View {
+	@State private var colors: [Color] = [.yellow, .orange, .pink, .red, .purple, .blue, .cyan, .mint, .green]
+	@State private var speed = 0.5
+	@State private var transitionSpeed = 10.0
+
+	var body: some View {
+		ColorfulView(
+			color: $colors,
+			speed: $speed,
+			bias: .constant(0.00001),
+			noise: .constant(64),
+			transitionSpeed: $transitionSpeed,
+			frameLimit: .constant(60),
+			renderScale: .constant(1)
+		)
+		.clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
 	}
 }
