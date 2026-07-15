@@ -2,12 +2,30 @@
 
 # Timetable for PMS
 
-- iOS, iPadOS, macOS, watchOS, Messages
+- iOS, iPadOS, macOS, watchOS app for tracking the school timetable for my school.
+
+> [!Note]
+> Only available for iOS27, macOS27, and watchOS 26 or later.
+
+> [!Note]
+> The structure of this app is heavily centered around the timetable structure my school has, so it won't work with other schools. This is so that I can optimise features and backend code to only need to handle one type of school.
 
 <br>
 
-SwiftUI app that shows the timetable for the school that I go to.
+- Imports your calendar from Apple Calendar
+- Fully integrated with Siri and Apple Intelligence
+- Import and export timetables using Apple Wallet passes
+- Live Activities throught the school day showing next subject, etc
+- Notifications for each period
+- iOS, macOS, watchOS widgets
+- Search friend's timetables and add them to check them faster
 
-- Fully integrated with Siri
-- Import and export timetables using Messages
-- watchOS and iOS widgets
+<br>
+
+This project also has uses a server, the source code for which is at [omeriadon/pmstt](https://github.com/omeriadon/pmstt).
+
+<br>
+
+## Build and Run
+1. Open proejct in Xcode
+2. Run watchOS or iOS/macOS scheme.
