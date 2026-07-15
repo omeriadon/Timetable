@@ -23,6 +23,7 @@ struct AccountView: View {
 						#if os(macOS)
 							Form { accountRows(profile: profile) }
 								.formStyle(.grouped)
+								.scrollContentBackground(.hidden)
 						#else
 							List { accountRows(profile: profile) }
 								.listStyle(.insetGrouped)
@@ -67,6 +68,7 @@ struct AccountView: View {
 
 		Section {
 			Button("Sign Out", role: .destructive, action: signOut)
+				.foregroundStyle(.red)
 			#if os(iOS)
 				Button("Delete Account", role: .destructive) { showDeleteConfirmation = true }
 					.disabled(isDeleting)

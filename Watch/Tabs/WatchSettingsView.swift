@@ -23,6 +23,7 @@ struct WatchSettingsView: View {
 					Button("Sign Out", systemImage: "door.left.hand.open", role: .destructive) {
 						signOutConfirm = true
 					}
+					.foregroundStyle(.red)
 					.confirmationDialog(Text("Sign Out?"), isPresented: $signOutConfirm, actions: {
 						Button(role: .cancel) {}
 						Button(role: .destructive) {
@@ -30,6 +31,7 @@ struct WatchSettingsView: View {
 						} label: {
 							Label("Sign out", systemImage: "door.left.hand.open")
 								.monospaced()
+								.foregroundStyle(.red)
 						}
 					})
 				}

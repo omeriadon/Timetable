@@ -309,17 +309,15 @@ struct SettingsView: View {
 		}
 	}
 
-	#if DEBUG
-		private func addDebugStatusBadge(title: String, secondaryText: String? = nil, view: StatusBadgeView) {
-			let id = UUID()
-			statusBadgeManager.addBadge(id: id, title: title, secondaryText: secondaryText, priority: 3, view: view)
+	private func addDebugStatusBadge(title: String, secondaryText: String? = nil, view: StatusBadgeView) {
+		let id = UUID()
+		statusBadgeManager.addBadge(id: id, title: title, secondaryText: secondaryText, priority: 3, view: view)
 
-			Task {
-				try? await Task.sleep(for: .seconds(4))
-				statusBadgeManager.updateBadge(id: id, title: "Done", view: .success)
-			}
+		Task {
+			try? await Task.sleep(for: .seconds(4))
+			statusBadgeManager.updateBadge(id: id, title: "Done", view: .success)
 		}
-	#endif // DEBUG
+	}
 
 	private func showSignInRequired() {
 		statusBadgeManager.signInRequired()

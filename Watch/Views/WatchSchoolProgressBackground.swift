@@ -1,4 +1,3 @@
-import IrregularGradient
 import SwiftUI
 
 struct WatchSchoolProgressBackground: View {
@@ -50,15 +49,6 @@ private struct WatchProgressFill: View {
 		GeometryReader { geometry in
 			if let progress {
 				ZStack(alignment: .leading) {
-					if isBreak {
-						IrregularGradient(
-							colors: [.yellow, .orange, .pink, .red, .purple, .blue, .cyan, .mint, .green],
-							background: Color.blue,
-							speed: 2,
-							animate: true
-						)
-					}
-
 					UnevenRoundedRectangle(
 						cornerRadii: .init(bottomTrailing: 30, topTrailing: 30)
 					)

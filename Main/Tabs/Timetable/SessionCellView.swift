@@ -5,7 +5,6 @@
 //   Created by Adon Omeri on 16/6/2026.
 //
 
-import ColorfulX
 import SwiftUI
 
 struct SessionCellView: View {
@@ -54,7 +53,7 @@ struct SessionCellView: View {
 					}
 					.dynamicTypeSize(.medium)
 				}
-				.frame(height: Slot(day, session) == selectedSlot ? 90 : 60)
+				.frame(height: 60)
 
 				// idk
 			} else {
@@ -68,20 +67,12 @@ struct SessionCellView: View {
 }
 
 struct BreakSessionView: View {
-	@State private var colors: [Color] = [.yellow, .orange, .pink, .red, .purple, .blue, .cyan, .mint, .green]
-	@State private var speed = 0.5
-	@State private var transitionSpeed = 10.0
-
 	var body: some View {
-		ColorfulView(
-			color: $colors,
-			speed: $speed,
-			bias: .constant(0.00001),
-			noise: .constant(64),
-			transitionSpeed: $transitionSpeed,
-			frameLimit: .constant(60),
-			renderScale: .constant(1)
-		)
-		.clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+		RoundedRectangle(cornerRadius: 10, style: .continuous)
+			.fill(.thinMaterial)
+			.overlay {
+				RoundedRectangle(cornerRadius: 10, style: .continuous)
+					.stroke(.white.opacity(0.12), lineWidth: 1)
+			}
 	}
 }

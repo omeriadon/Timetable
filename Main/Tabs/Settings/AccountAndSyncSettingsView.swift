@@ -39,7 +39,7 @@ struct AccountAndSyncSettingsView: View {
 					#if os(iOS)
 						Text("Send Notifications Early By...")
 					#endif
-					Picker("Send Notiications Early By...", selection: leadTimeBinding) {
+					Picker("Send Notifications Early By...", selection: leadTimeBinding) {
 						ForEach(NotificationLeadTime.allCases, id: \.self) { leadTime in
 							Text("\(leadTime.minutes) \(leadTime.minutes == 1 ? "minute " : "minutes")")
 								.tag(leadTime)
@@ -52,7 +52,7 @@ struct AccountAndSyncSettingsView: View {
 					#endif
 					.disabled(!settings.notificationsEnabled)
 				}
-				.opacity(settings.broadcastNotificationsEnabled ? 1 : 0.3)
+				.opacity(settings.notificationsEnabled ? 1 : 0.3)
 
 				#if os(iOS)
 					Button {
@@ -109,7 +109,12 @@ struct AccountAndSyncSettingsView: View {
 			}
 		}
 		.animation(.easeInOut, value: notificationRegistration.registrationState)
-		.appNavigationTitle("Live Updates")
+		#if os(macOS)
+			.formStyle(.grouped)
+			.scrollContentBackground(.hidden)
+			.frame(maxWidth: 560)
+		#endif
+			.appNavigationTitle("Live Updates")
 	}
 
 	private func preferenceBinding(_ keyPath: WritableKeyPath<AccountSettings, Bool>) -> Binding<Bool> {

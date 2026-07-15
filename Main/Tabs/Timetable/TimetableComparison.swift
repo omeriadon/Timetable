@@ -100,7 +100,7 @@ func item(
 		Spacer()
 
 		right
-			.frame(height: top ? 70 : 20)
+			.frame(height: top ? 40 : 20)
 			.padding(.trailing, 5)
 	}
 	.padding(15)
