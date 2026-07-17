@@ -22,6 +22,7 @@ struct StatusBadgeOverlay: View {
 			VStack(spacing: 0) {
 				if let mainBadge = manager.mainBadge {
 					mainBadgeView(mainBadge, availableWidth: geometry.size.width)
+						.allowsHitTesting(true)
 						.transition(mainTransition)
 				}
 
@@ -31,7 +32,6 @@ struct StatusBadgeOverlay: View {
 			.padding(.top, topPadding)
 		}
 		.monospaced()
-		.allowsHitTesting(manager.mainBadge != nil)
 		.animation(animation, value: manager.badges)
 		.animation(animation, value: manager.activeBadgeID)
 		.onChange(of: manager.mainBadge?.id) {

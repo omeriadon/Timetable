@@ -40,6 +40,7 @@ final class StatusBadgeOverlayWindowController {
 			NSWindow.didResizeNotification,
 			NSWindow.didEndSheetNotification,
 			NSApplication.didBecomeActiveNotification,
+			NSApplication.didResignActiveNotification,
 		] {
 			let token = notificationCenter.addObserver(forName: name, object: nil, queue: .main) { [weak controller] _ in
 				Task { @MainActor [weak controller] in controller?.refresh() }
@@ -49,6 +50,14 @@ final class StatusBadgeOverlayWindowController {
 
 		observeBadgeChanges()
 		refresh()
+	}
+
+	deinit {
+		observationTask?.cancel()
+		for token in notificationTokens {
+			NotificationCenter.default.removeObserver(token)
+		}
+		panel?.orderOut(nil)
 	}
 
 	private func observeBadgeChanges() {
@@ -71,7 +80,7 @@ final class StatusBadgeOverlayWindowController {
 
 	private func refresh() {
 		guard let panel else { return }
-		guard manager.mainBadge != nil, let hostWindow else {
+		guard NSApp.isActive, manager.mainBadge != nil, let hostWindow else {
 			panel.orderOut(nil)
 			return
 		}

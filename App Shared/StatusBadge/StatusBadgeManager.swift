@@ -55,6 +55,7 @@ final class StatusBadgeManager {
 
 	@ObservationIgnored private var nextSequence: UInt64 = 0
 	@ObservationIgnored private var removalTasks: [UUID: Task<Void, Never>] = [:]
+	@ObservationIgnored private var removalGenerations: [UUID: UInt64] = [:]
 
 	var mainBadge: StatusBadge? {
 		if let activeBadgeID,
@@ -85,8 +86,7 @@ final class StatusBadgeManager {
 		Print(secondaryText ?? "")
 		if let index = badges.firstIndex(where: { $0.id == id }) {
 			guard badges[index].view != .success else { return }
-			removalTasks[id]?.cancel()
-			removalTasks[id] = nil
+			invalidateRemoval(for: id)
 			badges[index].title = title
 			badges[index].secondaryText = secondaryText
 			badges[index].priority = min(max(priority, 1), 5)
@@ -119,8 +119,7 @@ final class StatusBadgeManager {
 		      badges[index].view != .success
 		else { return }
 
-		removalTasks[id]?.cancel()
-		removalTasks[id] = nil
+		invalidateRemoval(for: id)
 		badges[index].title = title
 		badges[index].secondaryText = secondaryText
 		badges[index].view = view
@@ -153,6 +152,7 @@ final class StatusBadgeManager {
 	}
 
 	func present(networkError: NetworkError, title: String = "Network Error") {
+		guard !networkError.suppressesStatusBadge else { return }
 		switch networkError {
 			case .offline: offline()
 			case .authenticationRequired: signInRequired()
@@ -162,6 +162,7 @@ final class StatusBadgeManager {
 	}
 
 	func present(error: any Error, title: String) {
+		guard !error.isCancellation else { return }
 		if let networkError = error as? NetworkError {
 			present(networkError: networkError, title: title); return
 		}
@@ -203,7 +204,8 @@ final class StatusBadgeManager {
 	}
 
 	private func scheduleRemoval(for id: UUID, after duration: Duration) {
-		removalTasks[id]?.cancel()
+		invalidateRemoval(for: id)
+		let generation = removalGenerations[id, default: 0]
 		removalTasks[id] = Task { [weak self] in
 			do {
 				try await Task.sleep(for: duration)
@@ -211,13 +213,20 @@ final class StatusBadgeManager {
 				return
 			}
 			guard !Task.isCancelled else { return }
-			self?.removeBadge(id: id)
+			guard let self, self.removalGenerations[id] == generation else { return }
+			self.removeBadge(id: id, generation: generation)
 		}
 	}
 
-	private func removeBadge(id: UUID) {
+	private func invalidateRemoval(for id: UUID) {
+		removalGenerations[id, default: 0] &+= 1
 		removalTasks[id]?.cancel()
 		removalTasks[id] = nil
+	}
+
+	private func removeBadge(id: UUID, generation: UInt64? = nil) {
+		if let generation, removalGenerations[id] != generation { return }
+		invalidateRemoval(for: id)
 		badges.removeAll(where: { $0.id == id })
 		if activeBadgeID == id {
 			activeBadgeID = nil
