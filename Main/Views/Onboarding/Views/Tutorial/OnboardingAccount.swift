@@ -19,6 +19,7 @@ struct OnboardingAccountView: View {
 				
 				AccountAuthenticationView()
 			}
+			.padding(.vertical, 8)
 		}
 		.onAppear {
 			context.configure(canAdvance: true, statusMessage: "Account creation is optional.")

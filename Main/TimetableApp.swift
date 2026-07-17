@@ -34,7 +34,7 @@ enum WindowMode: Int, Equatable, Identifiable {
 struct TimetableApp: App {
 	@State var expanded: WindowMode = .none
 
-	@Default(.hasCompletedOnboarding) private var hasCompletedOnboarding
+	@Default(.hasSeenOnboardingBefore) private var hasSeenOnboardingBefore
 
 	@State private var passManager = TimetablePassManager()
 	@State private var sessionStore = SessionStore.shared
@@ -120,7 +120,7 @@ struct TimetableApp: App {
 				#endif
 			}
 			#if os(iOS)
-			.fullScreenCover(isPresented: .constant(!hasCompletedOnboarding)) {
+			.fullScreenCover(isPresented: .constant(!hasSeenOnboardingBefore)) {
 				OnboardingView()
 					.interactiveDismissDisabled()
 			}

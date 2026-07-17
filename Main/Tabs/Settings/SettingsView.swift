@@ -246,6 +246,7 @@ struct SettingsView: View {
 
 				Button("reset onboarding") {
 					Defaults[.hasCompletedOnboarding] = false
+					Defaults[.hasSeenOnboardingBefore] = false
 				}
 			}
 

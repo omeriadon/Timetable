@@ -12,6 +12,7 @@ import UserNotifications
 
 struct OnboardingView: View {
 	@Default(.hasCompletedOnboarding) private var hasCompletedOnboarding
+	@Default(.hasSeenOnboardingBefore) private var hasSeenOnboardingBefore
 	@State private var pages: [OnboardingPage] = []
 	@State private var pageContexts: [String: OnboardingPageContext] = [:]
 	@State private var selectedID = ""
@@ -60,8 +61,29 @@ struct OnboardingView: View {
 				}
 			}
 		}
+		.safeAreaBar(edge: .top, alignment: .center, spacing: 0) {
+			Text(pages.first(where: { $0.id == selectedID })?.title ?? "")
+				.font(.title.bold())
+				.multilineTextAlignment(.center)
+				.frame(maxWidth: .infinity)
+				.padding(.vertical, 8)
+		}
 		.safeAreaBar(edge: .bottom, alignment: .center, spacing: 0) {
-			controls
+			VStack(spacing: 0) {
+				if let context = selectedContext {
+					Text(context.statusMessage ?? " ")
+						.contentTransition(.opacity)
+						.font(.footnote)
+						.multilineTextAlignment(.center)
+						.opacity(context.statusMessage == nil ? 0 : 1)
+						.frame(maxWidth: .infinity)
+						.frame(minHeight: 20)
+						.padding(.bottom, 20)
+						.padding(.top, 8)
+						.animation(.easeInOut, value: context.statusMessage)
+				}
+				controls
+			}
 		}
 		.task { await buildPages() }
 	}
@@ -74,27 +96,6 @@ struct OnboardingView: View {
 					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
 					.padding(.horizontal, 24)
 					.environment(\.onboardingPageContext, context)
-			}
-		}
-		.safeAreaBar(edge: .top, alignment: .center, spacing: 0) {
-			Text(page.title)
-				.font(.title.bold())
-				.multilineTextAlignment(.center)
-				.frame(maxWidth: .infinity)
-				.padding(.vertical, 8)
-		}
-		.safeAreaBar(edge: .bottom, alignment: .center, spacing: 0) {
-			if let context = pageContexts[page.id] {
-				Text(context.statusMessage ?? " ")
-					.contentTransition(.opacity)
-					.font(.footnote)
-					.multilineTextAlignment(.center)
-					.opacity(context.statusMessage == nil ? 0 : 1)
-					.frame(maxWidth: .infinity)
-					.frame(minHeight: 20)
-					.padding(.bottom, 20)
-					.padding(.top, 8)
-					.animation(.easeInOut, value: context.statusMessage)
 			}
 		}
 	}
@@ -133,6 +134,7 @@ struct OnboardingView: View {
 			Button {
 				if selectedIndex == pages.count - 1 {
 					hasCompletedOnboarding = true
+					hasSeenOnboardingBefore = true
 				} else {
 					move(by: 1)
 				}
