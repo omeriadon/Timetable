@@ -59,6 +59,7 @@ final class ServerSyncCoordinator {
 	}
 
 	func saveOwnerTimetable(_ subjects: [Subject]) async throws -> [Subject] {
+		try Platform.require(Platform.current.allowsOwnerMutation)
 		guard SessionStore.shared.isAuthenticated else {
 			showSignInRequired()
 			throw NetworkError.authenticationRequired
@@ -102,7 +103,7 @@ final class ServerSyncCoordinator {
 	}
 
 	func scheduleProfileUpdate(_ displayName: String) {
-		guard SessionStore.shared.isAuthenticated else { return }
+		guard SessionStore.shared.isAuthenticated, Platform.current.isAuthoritative else { return }
 
 		profileTask?.cancel()
 

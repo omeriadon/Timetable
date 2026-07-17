@@ -67,10 +67,19 @@ struct TimetableApp: App {
 						case .restoring:
 						ProgressView("Restoring Account…")
 						case .authenticated:
-						ContentView(expanded: $expanded)
+						if Platform.current == .macOS { NonAuthoritativeRootView() } else { ContentView(expanded: $expanded) }
 					}
 				#else
-					ContentView(expanded: $expanded)
+					if Platform.current == .iPadOS {
+						switch sessionStore.state {
+						case .signedOut:
+							AccountAuthenticationView(allowsSignUp: false, allowsAppleSignIn: false)
+						case .restoring:
+							ProgressView("Restoring Account…")
+						case .authenticated:
+							NonAuthoritativeRootView()
+						}
+					} else { ContentView(expanded: $expanded) }
 				#endif
 			}
 			.onOpenURL { url in
@@ -95,7 +104,9 @@ struct TimetableApp: App {
 				sessionStore.configureDeviceLifecycle {
 					await NotificationRegistrationService.shared.uploadPendingToken()
 					#if os(iOS)
-						await LiveActivityRegistrationService.shared.startObserving()
+						if Platform.current == .iOS {
+							await LiveActivityRegistrationService.shared.startObserving()
+						}
 						PhoneWatchSyncBridge.shared.sendAuthenticatedStateIfPossible()
 					#endif
 				} signingOut: {
@@ -105,22 +116,22 @@ struct TimetableApp: App {
 					#endif
 					await NotificationRegistrationService.shared.removeServerRegistration()
 				}
-				if Defaults[.installationID].isEmpty {
-					Defaults[.installationID] = DeviceIDProvider.shared.getDeviceID()
-				}
+				_ = ClientIdentityProvider.shared.identity()
 				await indexEntities()
 				await sessionStore.restore()
 
 				await NotificationRegistrationService.shared.requestRemoteRegistration()
 
 				#if os(iOS)
+				if Platform.current == .iOS {
 					await LiveActivityRegistrationService.shared.startObserving()
+				}
 
 					try? await ShaderLibrary.compileStickerShaders()
 				#endif
 			}
 			#if os(iOS)
-			.fullScreenCover(isPresented: .constant(!hasSeenOnboardingBefore)) {
+			.fullScreenCover(isPresented: .constant(Platform.current == .iOS && !hasSeenOnboardingBefore)) {
 				OnboardingView()
 					.interactiveDismissDisabled()
 			}
@@ -206,7 +217,7 @@ struct TimetableApp: App {
 						Text("Sign In Required").font(.title2.bold())
 						Text("Sign in to view your timetable on this Mac.").foregroundStyle(.secondary)
 
-						AccountAuthenticationView(allowsSignUp: false)
+						AccountAuthenticationView(allowsSignUp: false, allowsAppleSignIn: false)
 					}
 					.frame(width: 520, height: 580, alignment: .center)
 					.padding(30)

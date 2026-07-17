@@ -33,6 +33,11 @@ final class AccountSettingsSyncService {
 	}
 
 	func updateSettings(_ settings: AccountSettings) async throws {
+		guard Platform.current.isAuthoritative else {
+			Defaults[.accountSettings] = settings
+			applyLocalSideEffects()
+			return
+		}
 		let previousSettings = Defaults[.accountSettings]
 		syncGeneration += 1
 		pendingMutation = PendingMutation(
@@ -46,6 +51,7 @@ final class AccountSettingsSyncService {
 	}
 
 	func flushPendingSettings() async throws {
+		try Platform.require(Platform.current.isAuthoritative)
 		if pendingMutation == nil {
 			syncGeneration += 1
 			let settings = Defaults[.accountSettings]
@@ -59,6 +65,7 @@ final class AccountSettingsSyncService {
 	}
 
 	func downloadSettings() async throws {
+		try Platform.require(Platform.current.isAuthoritative)
 		let remoteSettings: AccountSettings = try await networkManager.send(.v1Settings)
 		Defaults[.accountSettings] = remoteSettings
 		Defaults[.lastServerSync] = Date.now
@@ -140,6 +147,7 @@ final class AccountSettingsSyncService {
 	private func applyLocalSideEffects() {
 		WidgetCenter.shared.reloadAllTimelines()
 		#if os(iOS)
+			guard Platform.current == .iOS else { return }
 			Task {
 				await LiveActivityRegistrationService.shared.reconcileAuthorization()
 			}

@@ -12,9 +12,11 @@ struct AccountAuthenticationView: View {
 	@State private var model = AccountAuthenticationModel()
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	let allowsSignUp: Bool
+	let allowsAppleSignIn: Bool
 
-	init(allowsSignUp: Bool = true) {
+	init(allowsSignUp: Bool = true, allowsAppleSignIn: Bool = true) {
 		self.allowsSignUp = allowsSignUp
+		self.allowsAppleSignIn = allowsAppleSignIn
 	}
 
 	var body: some View {
@@ -89,6 +91,7 @@ struct AccountAuthenticationView: View {
 			.frame(maxWidth: .infinity)
 			.disabled(model.isSubmitting || !model.isAccountDetailsValid)
 
+			if allowsAppleSignIn {
 			SignInWithAppleButton(.continue) { request in
 				request.requestedScopes = [.fullName, .email]
 			} onCompletion: { result in
@@ -102,6 +105,7 @@ struct AccountAuthenticationView: View {
 			#endif
 				.clipShape(.capsule)
 				.disabled(model.isSubmitting)
+			}
 		}
 		.padding(20)
 		.appNavigationTitle("Account")

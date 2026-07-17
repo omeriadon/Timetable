@@ -7,38 +7,10 @@
 
 import Foundation
 
-nonisolated struct RegisterRequest: Codable {
-	let email: String
-	let password: String
-	let displayName: String
-}
-
-nonisolated struct LoginRequest: Codable {
-	let email: String
-	let password: String
-}
-
-nonisolated struct RefreshRequest: Codable {
-	let refreshToken: String
-}
-
-nonisolated struct LogoutRequest: Codable {
-	let refreshToken: String
-}
-
-nonisolated struct AppleSignInRequest: Codable {
-	let identityToken: String
-	let displayName: String?
-}
-
 nonisolated struct TokenResponse: Codable {
 	let accessToken: String
 	let refreshToken: String
 	let user: UserProfileResponse
-}
-
-nonisolated struct WatchSessionRequest: Codable {
-	let installationID: String
 }
 
 nonisolated struct UserProfileResponse: Codable {

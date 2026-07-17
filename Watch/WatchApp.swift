@@ -29,9 +29,7 @@ struct TimetableWatchApp: App {
 	}
 
 	private func configureAndRestore() async {
-		if Defaults[.installationID].isEmpty {
-			Defaults[.installationID] = UUID().uuidString
-		}
+		_ = ClientIdentityProvider.shared.identity(for: .watchOS)
 		SessionStore.shared.configureAccountBootstrap {
 			try await WatchAccountBootstrapService.shared.bootstrap()
 		}

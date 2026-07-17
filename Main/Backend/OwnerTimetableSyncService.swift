@@ -54,11 +54,13 @@ final class OwnerTimetableSyncService {
 	}
 
 	func uploadOwnerTimetable(subjects: [Subject]? = nil) async throws {
+		try Platform.require(Platform.current.allowsOwnerMutation)
 		_ = try await uploadOwnerTimetableResponse(subjects: subjects)
 	}
 
 	func uploadOwnerTimetableResponse(subjects: [Subject]? = nil) async throws -> OwnerTimetableResponse {
-		try await run(.upload) { [self] in
+		try Platform.require(Platform.current.allowsOwnerMutation)
+		return try await run(.upload) { [self] in
 			try await performUpload(subjects: subjects)
 		}
 	}
@@ -77,6 +79,7 @@ final class OwnerTimetableSyncService {
 
 	@discardableResult
 	func updateVisibility(_ isSearchable: Bool) async throws -> Bool {
+		try Platform.require(Platform.current.allowsOwnerMutation)
 		pendingVisibility = isSearchable
 
 		if let visibilityTask {

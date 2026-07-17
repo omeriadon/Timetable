@@ -44,6 +44,7 @@ final class TimetableDiscoveryService {
 	}
 
 	func report(authorID: UUID) async throws {
+		try Platform.require(Platform.current.allowsSharing)
 		try await network.send(Endpoint("/v1/report/user", method: .post), body: ReportUserRequest(reportedAccountID: authorID.uuidString))
 	}
 }

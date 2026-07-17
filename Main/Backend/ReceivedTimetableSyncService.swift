@@ -26,6 +26,7 @@ final class ReceivedTimetableSyncService {
 	}
 
 	func uploadCurrentProjection() async throws {
+		try Platform.require(Platform.current.allowsReceivedTimetableMutation)
 		if let uploadTask {
 			try await uploadTask.value
 			return
@@ -90,6 +91,7 @@ final class ReceivedTimetableSyncService {
 	}
 
 	func setReceivedNameOverride(serialNumber: String, displayName: String) async throws {
+		try Platform.require(Platform.current.allowsReceivedTimetableMutation)
 		let response: ReceivedNameOverrideResponse = try await networkManager.send(
 			.v1ReceivedNameOverride(serialNumber),
 			body: UpdateReceivedNameOverrideRequest(displayName: displayName)
@@ -99,11 +101,13 @@ final class ReceivedTimetableSyncService {
 	}
 
 	func removeReceivedNameOverride(serialNumber: String) async throws {
+		try Platform.require(Platform.current.allowsReceivedTimetableMutation)
 		try await networkManager.send(.v1ReceivedNameOverrideDelete(serialNumber))
 		try await downloadProjectionAndOverrides()
 	}
 
 	func deleteReceivedTimetable(serialNumber: String) async throws {
+		try Platform.require(Platform.current.allowsReceivedTimetableMutation)
 		try await networkManager.send(.v1ReceivedTimetableDelete(serialNumber), context: .userInitiated)
 		Defaults[.receivedTombstoneIDs].insert(serialNumber)
 		Defaults[.receivedTimetables].removeAll { $0.id == serialNumber }

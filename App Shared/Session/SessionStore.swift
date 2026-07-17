@@ -14,6 +14,7 @@ enum SessionStoreError: LocalizedError {
 	case credentialPersistenceFailed
 	case invalidIdentityToken
 	case missingRefreshToken
+	case platformActionUnavailable
 
 	var errorDescription: String? {
 		switch self {
@@ -23,6 +24,8 @@ enum SessionStoreError: LocalizedError {
 				"The Apple identity token was invalid."
 			case .missingRefreshToken:
 				"Refresh token is missing."
+			case .platformActionUnavailable:
+				PlatformPolicyError.platformActionUnavailable.localizedDescription
 		}
 	}
 }
@@ -108,13 +111,17 @@ final class SessionStore {
 	}
 
 	func signUp(email: String, password: String, displayName: String) async throws {
+		guard Platform.current.allowsAccountCreation else { throw SessionStoreError.platformActionUnavailable }
+		let identity = ClientIdentityProvider.shared.identity()
 		Print("Signing up account", category: .account)
 		let response: TokenResponse = try await networkManager.send(
 			.v1AuthRegister,
 			body: RegisterRequest(
 				email: email,
 				password: password,
-				displayName: displayName
+				displayName: displayName,
+				platform: identity.platform.rawValue,
+				installationID: identity.installationID
 			)
 		)
 		try await apply(response, bootstrap: true)
@@ -122,9 +129,10 @@ final class SessionStore {
 
 	func signIn(email: String, password: String, context: NetworkRequestContext = .background) async throws {
 		Print("Signing in account", category: .account)
+		let identity = ClientIdentityProvider.shared.identity()
 		let response: TokenResponse = try await networkManager.send(
 			.v1AuthLogin,
-			body: LoginRequest(email: email, password: password),
+			body: LoginRequest(email: email, password: password, platform: identity.platform.rawValue, installationID: identity.installationID),
 			context: context
 		)
 		try await apply(response, bootstrap: true)
@@ -135,6 +143,7 @@ final class SessionStore {
 	}
 
 	func signInWithApple(_ authorization: ASAuthorization, context: NetworkRequestContext = .background) async throws {
+		guard Platform.current.allowsAccountCreation else { throw SessionStoreError.platformActionUnavailable }
 		guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential else {
 			throw SessionStoreError.invalidIdentityToken
 		}
@@ -151,11 +160,14 @@ final class SessionStore {
 			.map { formatter.string(from: $0).trimmingCharacters(in: .whitespacesAndNewlines) }
 			.flatMap { $0.isEmpty ? nil : $0 }
 
+		let identity = ClientIdentityProvider.shared.identity()
 		let response: TokenResponse = try await networkManager.send(
 			.v1AuthApple,
 			body: AppleSignInRequest(
 				identityToken: identityToken,
-				displayName: displayName
+				displayName: displayName,
+				platform: identity.platform.rawValue,
+				installationID: identity.installationID
 			),
 			context: context
 		)
@@ -191,6 +203,7 @@ final class SessionStore {
 
 	@discardableResult
 	func updateProfile(displayName: String? = nil, email: String? = nil) async throws -> AccountProfile {
+		try Platform.require(Platform.current.isAuthoritative)
 		Print("Updating account profile", category: .account)
 		let response: UserProfileResponse = try await networkManager.send(
 			.v1ProfileUpdate,
@@ -214,6 +227,7 @@ final class SessionStore {
 	}
 
 	func deleteAccount() async throws {
+		try Platform.require(Platform.current.isAuthoritative)
 		Print("Deleting account", category: .account)
 		try await networkManager.send(.v1ProfileDelete)
 		await signingOutHandler?()

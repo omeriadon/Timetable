@@ -107,8 +107,8 @@ final class NotificationRegistrationService {
 			let _: UserDeviceResponse = try await networkManager.send(
 				.v1CurrentDevice,
 				body: RegisterUserDeviceRequest(
-					installationID: Defaults[.installationID],
-					platform: Self.platform,
+					installationID: ClientIdentityProvider.shared.identity().installationID,
+					platform: ClientIdentityProvider.shared.identity().platform.rawValue,
 					apnsToken: token,
 					isDebug: Self.isDebug
 				)
@@ -136,7 +136,7 @@ final class NotificationRegistrationService {
 		do {
 			try await networkManager.send(
 				.v1CurrentDeviceDelete,
-				body: RemoveUserDeviceRequest(installationID: Defaults[.installationID])
+				body: RemoveUserDeviceRequest(installationID: ClientIdentityProvider.shared.identity().installationID)
 			)
 			Defaults[.hasRegisteredAPNsToken] = false
 			registrationState = hasLocalToken ? .tokenReceived : .idle
@@ -160,14 +160,6 @@ final class NotificationRegistrationService {
 	func sendTestNotification() async throws -> Int {
 		let response: TestNotificationResponse = try await networkManager.send(.v1TestNotification, body: EmptyRequest())
 		return response.deliveredDeviceCount
-	}
-
-	private static var platform: String {
-		#if os(macOS)
-			"macOS"
-		#else
-			"iOS"
-		#endif
 	}
 
 	private static var isDebug: Bool {

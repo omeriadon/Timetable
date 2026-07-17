@@ -17,6 +17,7 @@ final class AuthoredTimetableService {
 	}
 
 	func update(id: UUID, title: String, subjects: [Subject], isSearchable: Bool) async throws {
+		try Platform.require(Platform.current.allowsAuthoredTimetableMutation)
 		let value: TimetableDetailResponse = try await network.send(Endpoint("/v1/timetables/authored/\(id.uuidString)", method: .put), body: AuthoredTimetableUpdateRequest(title: title, subjects: subjects, isSearchable: isSearchable))
 		if let index = timetables.firstIndex(where: { $0.id == id }) {
 			timetables[index] = value
@@ -25,6 +26,7 @@ final class AuthoredTimetableService {
 
 	@discardableResult
 	func create(title: String, subjects: [Subject], isSearchable: Bool) async throws -> TimetableDetailResponse {
+		try Platform.require(Platform.current.allowsAuthoredTimetableMutation)
 		let value: TimetableDetailResponse = try await network.send(
 			Endpoint("/v1/timetables/authored", method: .post),
 			body: AuthoredTimetableUpdateRequest(title: title, subjects: subjects, isSearchable: isSearchable)
@@ -35,6 +37,7 @@ final class AuthoredTimetableService {
 	}
 
 	func delete(id: UUID) async throws {
+		try Platform.require(Platform.current.allowsAuthoredTimetableMutation)
 		try await network.send(Endpoint("/v1/timetables/authored/\(id.uuidString)", method: .delete))
 		timetables.removeAll { $0.id == id }
 	}

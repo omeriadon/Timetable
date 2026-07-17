@@ -23,6 +23,7 @@
 		}
 
 		func startObserving() async {
+			guard Platform.current == .iOS else { return }
 			guard authorizationTask == nil else {
 				await reconcileAuthorization()
 				return
@@ -39,6 +40,7 @@
 		}
 
 		func reconcileAuthorization(requestStartIfNeeded: Bool = false) async {
+			guard Platform.current == .iOS else { return }
 			let allowed = ActivityAuthorizationInfo().areActivitiesEnabled
 			let enabled = Defaults[.accountSettings].liveActivitiesEnabled
 			guard allowed, enabled, SessionStore.shared.isAuthenticated else {
@@ -64,11 +66,12 @@
 		}
 
 		func removeLiveActivityToken() async {
+			guard Platform.current == .iOS else { return }
 			guard SessionStore.shared.isAuthenticated else { return }
 			do {
 				try await networkManager.send(
 					.v1LiveActivityTokenDelete,
-					body: RemoveLiveActivityTokenRequest(installationID: Defaults[.installationID])
+					body: RemoveLiveActivityTokenRequest(installationID: ClientIdentityProvider.shared.identity().installationID)
 				)
 			} catch {
 				PrintError("Live Activity token removal failed", category: .liveActivity, error: error)
@@ -102,7 +105,7 @@
 				try await networkManager.send(
 					.v1LiveActivityToken,
 					body: LiveActivityPushToStartTokenRequest(
-						installationID: Defaults[.installationID],
+						installationID: ClientIdentityProvider.shared.identity().installationID,
 						token: token.hexString,
 						isDebug: Self.isDebug
 					)
@@ -179,7 +182,7 @@
 			do {
 				let response: ReconcileLiveActivityResponse = try await networkManager.send(
 					.v1LiveActivityReconcile,
-					body: ReconcileLiveActivityRequest(installationID: Defaults[.installationID])
+					body: ReconcileLiveActivityRequest(installationID: ClientIdentityProvider.shared.identity().installationID)
 				)
 				Print(
 					response.started ? "Requested current Live Activity" : "Current Live Activity not required",
@@ -196,7 +199,7 @@
 				try await networkManager.send(
 					.v1LiveActivityUpdateToken(activityKey: activityKey),
 					body: LiveActivityUpdateTokenRequest(
-						installationID: Defaults[.installationID],
+						installationID: ClientIdentityProvider.shared.identity().installationID,
 						token: token.hexString,
 						isDebug: Self.isDebug
 					)

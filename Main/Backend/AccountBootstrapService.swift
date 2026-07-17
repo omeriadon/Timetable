@@ -43,10 +43,17 @@ final class AccountBootstrapService {
 
 		let task = Task<Void, any Error> { @MainActor in
 			async let timetable: Void = self.runBootstrapStage("Owner timetable") {
-				try await self.ownerTimetableSync.reconcileOwnerTimetable()
+				if Platform.current.allowsOwnerMutation {
+					try await self.ownerTimetableSync.reconcileOwnerTimetable()
+				} else {
+					try await self.ownerTimetableSync.downloadOwnerTimetable()
+				}
 			}
 			async let settings: Void = self.runBootstrapStage("Account settings") {
-				try await self.settingsSync.downloadSettings()
+				// Notification preferences are device-local on non-authoritative clients.
+				if Platform.current.isAuthoritative {
+					try await self.settingsSync.downloadSettings()
+				}
 			}
 			async let received: Void = self.runBootstrapStage("Received timetables") {
 				try await self.receivedTimetableSync.downloadProjectionAndOverrides()

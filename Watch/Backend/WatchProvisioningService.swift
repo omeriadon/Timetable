@@ -1,4 +1,3 @@
-import Defaults
 import Foundation
 import WatchConnectivity
 
@@ -62,7 +61,7 @@ final class WatchProvisioningService: NSObject, WCSessionDelegate {
 		isRequesting = true
 		startTimeout()
 
-		let installationID = Defaults[.installationID]
+		let installationID = ClientIdentityProvider.shared.identity(for: .watchOS).installationID
 
 		session.sendMessage(
 			[WatchSessionMessage.installationIDKey: installationID],
