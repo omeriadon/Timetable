@@ -377,8 +377,8 @@ struct SubjectEditorSheet: View {
 
 		let proposedSubjects = buildCommittedSubjects()
 
+		isSaving = true
 		Task { @MainActor in
-			isSaving = true
 			defer { isSaving = false }
 
 			do {
