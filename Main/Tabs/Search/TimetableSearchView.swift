@@ -126,7 +126,9 @@ struct TimetableSearchView: View {
 				}
 			}
 			.onChange(of: selectedResult?.id) {
-				if selectedResult == nil { portalResult = nil }
+				if selectedResult == nil {
+					portalResult = nil
+				}
 			}
 		}
 	}
@@ -171,7 +173,6 @@ struct SearchLandingView: View {
 
 			Text("Search for a timetable by name or author.")
 				.multilineTextAlignment(.center)
-				.font(.title2)
 		}
 	}
 }

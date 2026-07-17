@@ -37,7 +37,9 @@ final class TimetablePassManager {
 			name: NSNotification.Name(rawValue: PKPassLibraryNotificationName.PKPassLibraryDidChange.rawValue),
 			object: nil
 		)
-		if loadImmediately { refreshPasses(uploadProjection: false) }
+		if loadImmediately {
+			refreshPasses(uploadProjection: false)
+		}
 	}
 
 	func configureProjectionUpload(_ upload: @escaping () async throws -> Void) {
@@ -59,7 +61,9 @@ final class TimetablePassManager {
 	}
 
 	private func reconcile(uploadProjection: Bool) async {
-		if let refreshTask { await refreshTask.value; return }
+		if let refreshTask {
+			await refreshTask.value; return
+		}
 		isLoading = true
 		let task = Task { @MainActor in
 			var extracted: [ReceivedTimetable] = []
@@ -77,7 +81,9 @@ final class TimetablePassManager {
 			Defaults[.receivedTimetables] = extracted
 			Defaults[.installedWalletTimetableIDs] = Set(extracted.map(\.id))
 			Defaults[.lastWalletReconciliation] = .now
-			if changed { Defaults[.walletRevision] += 1 }
+			if changed {
+				Defaults[.walletRevision] += 1
+			}
 			if changed {
 				WidgetCenter.shared.reloadAllTimelines()
 			}

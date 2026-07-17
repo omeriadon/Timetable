@@ -55,7 +55,9 @@ struct WeeklyScheduleProvider: AppIntentTimelineProvider {
 	}
 
 	func snapshot(for configuration: WeeklyScheduleConfigurationIntent, in context: Context) async -> WeeklyScheduleEntry {
-		if context.isPreview { return placeholder(in: context) }
+		if context.isPreview {
+			return placeholder(in: context)
+		}
 		return await entry(for: configuration, at: .now, isPlaceholder: false)
 	}
 

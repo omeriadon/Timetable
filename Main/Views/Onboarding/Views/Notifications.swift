@@ -45,7 +45,9 @@ struct OnboardingNotificationPermissionView: View {
 		defer { context.isWorking = false }
 		do {
 			let granted = try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge])
-			if !granted { disableNotificationPreferences() }
+			if !granted {
+				disableNotificationPreferences()
+			}
 			context.configure(
 				canAdvance: true,
 				statusMessage: granted ? "Notifications enabled." : "Notifications remain disabled."

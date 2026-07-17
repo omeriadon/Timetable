@@ -18,7 +18,9 @@ struct TimetableQuery: EntityStringQuery {
 					identifiers.contains(t.sender) ||
 					t.subjects.contains { identifiers.contains($0.id) }
 			}.toTimetableEntities()
-			if identifiers.contains("timetable.owner") { result.append(TimetableEntity(id: "timetable.owner", subjects: Defaults[.timetable].toSubjectEntities(prefix: "subject.owner"))) }
+			if identifiers.contains("timetable.owner") {
+				result.append(TimetableEntity(id: "timetable.owner", subjects: Defaults[.timetable].toSubjectEntities(prefix: "subject.owner")))
+			}
 			return result
 		}
 	}

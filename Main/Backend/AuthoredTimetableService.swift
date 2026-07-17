@@ -18,7 +18,9 @@ final class AuthoredTimetableService {
 
 	func update(id: UUID, title: String, subjects: [Subject], isSearchable: Bool) async throws {
 		let value: TimetableDetailResponse = try await network.send(Endpoint("/v1/timetables/authored/\(id.uuidString)", method: .put), body: AuthoredTimetableUpdateRequest(title: title, subjects: subjects, isSearchable: isSearchable))
-		if let index = timetables.firstIndex(where: { $0.id == id }) { timetables[index] = value }
+		if let index = timetables.firstIndex(where: { $0.id == id }) {
+			timetables[index] = value
+		}
 	}
 
 	@discardableResult

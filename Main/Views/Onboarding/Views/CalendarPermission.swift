@@ -37,7 +37,9 @@ struct OnboardingCalendarPermissionView: View {
 		}
 		.onAppear { refreshStatus() }
 		.onChange(of: scenePhase) { _, phase in
-			if phase == .active { refreshStatus() }
+			if phase == .active {
+				refreshStatus()
+			}
 		}
 	}
 

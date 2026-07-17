@@ -117,7 +117,9 @@ final class ReceivedTimetableSyncService {
 		var merged = Dictionary(uniqueKeysWithValues: Defaults[.receivedTimetables].map { ($0.id, $0) })
 		for dto in response where !dto.isDeleted {
 			let incoming = dto.receivedTimetable
-			if let current = merged[dto.id], current.contentRevision > incoming.contentRevision { continue }
+			if let current = merged[dto.id], current.contentRevision > incoming.contentRevision {
+				continue
+			}
 			merged[dto.id] = incoming
 		}
 		for id in Defaults[.receivedTombstoneIDs] {

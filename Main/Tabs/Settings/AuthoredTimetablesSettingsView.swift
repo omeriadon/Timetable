@@ -6,9 +6,20 @@ struct AuthoredTimetablesSettingsView: View {
 	@State private var showCreate = false
 	@State private var networkManager = NetworkManager.shared
 
+	@Namespace var ns
+
 	var body: some View {
+		Text("Authored Timetables")
+			.bold()
+			.padding(.leading, 4)
+			.font(.largeTitle)
+			.lineLimit(3)
+			.frame(maxWidth: .infinity, alignment: .leading)
+
 		List(service.timetables) { timetable in
-			NavigationLink { AuthoredTimetableEditorView(timetable: timetable) } label: {
+			NavigationLink {
+				AuthoredTimetableEditorView(timetable: timetable)
+			} label: {
 				VStack(alignment: .leading) { Text(timetable.title)
 					Text(timetable.isSearchable ? "Searchable" : "Hidden")
 						.font(.caption)
@@ -16,22 +27,35 @@ struct AuthoredTimetablesSettingsView: View {
 				}
 			}
 		}
-		.appNavigationTitle("Authored Timetables")
 		.toolbar {
 			ToolbarItem(placement: .topBarTrailing) {
 				Button("Create Timetable", systemImage: "plus") { showCreate = true }
+					.buttonStyle(.glassProminent)
 			}
+			.matchedTransitionSource(id: "1", in: ns)
 		}
-		.sheet(isPresented: $showCreate) { AuthoredTimetableCreateView() }
+		.sheet(isPresented: $showCreate) {
+			AuthoredTimetableCreateView()
+				.presentationDetents([.medium])
+				.navigationTransition(
+					.zoom(sourceID: "1", in: ns)
+				)
+		}
 		.overlay {
 			if !networkManager.isOnline {
 				ContentUnavailableView("Offline", systemImage: "wifi.slash", description: Text("Authored timetables are unavailable until a connection is restored."))
 			} else if service.timetables.isEmpty {
 				ContentUnavailableView("No Authored Timetables", systemImage: "person.2.crop.square.stack")
+					.fontWeight(.regular)
+					.foregroundStyle(.secondary)
 			}
 		}
 		.refreshable { await refresh() }
-		.task { if networkManager.isOnline { await refresh() } }
+		.task {
+			if networkManager.isOnline {
+				await refresh()
+			}
+		}
 	}
 
 	private func refresh() async {
@@ -52,15 +76,35 @@ private struct AuthoredTimetableCreateView: View {
 
 	var body: some View {
 		NavigationStack {
+			Text("New Authored Timetable")
+				.bold()
+				.padding(.leading, 4)
+				.font(.largeTitle)
+				.lineLimit(3)
+				.frame(maxWidth: .infinity, alignment: .leading)
+
 			Form {
 				TextField("Title", text: $title)
 				Toggle("Searchable", isOn: $isSearchable)
 				Button("Edit Subjects", systemImage: "pencil") { showSubjectEditor = true }
 			}
-			.appNavigationTitle("New Authored Timetable")
 			.toolbar {
-				ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.disabled(isSaving) }
-				ToolbarItem(placement: .confirmationAction) { Button("Create") { Task { await create() } }.disabled(isSaving || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) }
+				ToolbarItem(placement: .cancellationAction) {
+					Button("Cancel", systemImage: "xmark", role: .cancel) {
+						dismiss()
+					}
+					.disabled(isSaving)
+				}
+
+				ToolbarItem(placement: .confirmationAction) {
+					Button("Create", systemImage: "checkmark", role: .confirm) {
+						Task {
+							await create()
+						}
+					}
+					.buttonStyle(.glassProminent)
+					.disabled(isSaving || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+				}
 			}
 			.sheet(isPresented: $showSubjectEditor) {
 				SubjectEditorSheet(subjects: $subjects, initialRequest: nil)

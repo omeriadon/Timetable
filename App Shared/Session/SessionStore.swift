@@ -35,7 +35,9 @@ final class SessionStore {
 	private(set) var state: AuthenticationState = .restoring
 
 	var isAuthenticated: Bool {
-		if case .authenticated = state { return true }
+		if case .authenticated = state {
+			return true
+		}
 		return false
 	}
 

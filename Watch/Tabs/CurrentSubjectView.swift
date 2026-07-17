@@ -52,7 +52,11 @@ struct CurrentSubjectView: View {
 					)
 
 				case let .recess(breakState), let .lunch(breakState):
-					let type: BreakType = if case .recess = state { .recess } else { .lunch }
+					let type: BreakType = if case .recess = state {
+						.recess
+					} else {
+						.lunch
+					}
 					createProgressView(
 						title: type.description,
 						symbol: type.symbol,

@@ -174,7 +174,11 @@ struct SettingsView: View {
 			if !passManager.receivedTimetables.isEmpty {
 				Section("Imported Timetables") {
 					Button {
-						if sessionStore.isAuthenticated { showEditReceivedTimetablesSheet = true } else { showSignInRequired() }
+						if sessionStore.isAuthenticated {
+							showEditReceivedTimetablesSheet = true
+						} else {
+							showSignInRequired()
+						}
 					} label: {
 						Label("Edit Received Timetables...", systemImage: "calendar")
 					}

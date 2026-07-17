@@ -200,7 +200,9 @@ private struct StatusBadgeContent: View {
 	}
 
 	private var indicatorID: String {
-		if showsClose { return "close" }
+		if showsClose {
+			return "close"
+		}
 		switch badge.view {
 			case .progressView: return "progress"
 			case .success: return "success"

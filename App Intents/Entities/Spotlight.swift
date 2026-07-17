@@ -70,7 +70,9 @@ enum TimetableDeepLink: Equatable {
 			let id = String(parts[1])
 			if parts.count >= 4, parts[2] == "subject" {
 				self = .subject(timetableID: id, subjectID: String(parts[3]), slot: Self.slot(from: url))
-			} else { self = .timetable(id: id) }
+			} else {
+				self = .timetable(id: id)
+			}
 			return
 		}
 		self = .timetable(id: first == "owner" ? nil : first)

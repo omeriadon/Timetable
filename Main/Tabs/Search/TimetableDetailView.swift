@@ -63,7 +63,9 @@ struct TimetableDetailView: View {
 				ZStack {
 					if let pass {
 						AddPassToWalletButton([pass]) {
-							added in if added { badges.addBadge(id: UUID(), title: "Pass added to Wallet", priority: 3, view: .success) }
+							added in if added {
+								badges.addBadge(id: UUID(), title: "Pass added to Wallet", priority: 3, view: .success)
+							}
 						}
 						.addPassToWalletButtonStyle(.black)
 						.clipShape(.capsule)
@@ -151,7 +153,9 @@ struct TimetableDetailView: View {
 	}
 
 	private func show(_ error: any Error, title: String) {
-		if let networkError = error as? NetworkError, networkError.suppressesStatusBadge { return }
+		if let networkError = error as? NetworkError, networkError.suppressesStatusBadge {
+			return
+		}
 		badges.addBadge(id: UUID(), title: title, secondaryText: error.localizedDescription, priority: 4, view: .error)
 	}
 

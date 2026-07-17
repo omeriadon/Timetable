@@ -72,9 +72,15 @@ final class StatusBadgeManager {
 		priority: Int,
 		view: StatusBadgeView
 	) {
-		if view == .success { HapticManager.shared.play(.success) }
-		if view == .error { HapticManager.shared.play(.error) }
-		if view == .warning { HapticManager.shared.play(.warning) }
+		if view == .success {
+			HapticManager.shared.play(.success)
+		}
+		if view == .error {
+			HapticManager.shared.play(.error)
+		}
+		if view == .warning {
+			HapticManager.shared.play(.warning)
+		}
 		Print(title)
 		Print(secondaryText ?? "")
 		if let index = badges.firstIndex(where: { $0.id == id }) {
@@ -118,9 +124,15 @@ final class StatusBadgeManager {
 		badges[index].title = title
 		badges[index].secondaryText = secondaryText
 		badges[index].view = view
-		if view == .success { HapticManager.shared.play(.success) }
-		if view == .error { HapticManager.shared.play(.error) }
-		if view == .warning { HapticManager.shared.play(.warning) }
+		if view == .success {
+			HapticManager.shared.play(.success)
+		}
+		if view == .error {
+			HapticManager.shared.play(.error)
+		}
+		if view == .warning {
+			HapticManager.shared.play(.warning)
+		}
 
 		scheduleRemovalIfNeeded(for: id, view: view)
 	}
@@ -150,14 +162,20 @@ final class StatusBadgeManager {
 	}
 
 	func present(error: any Error, title: String) {
-		if let networkError = error as? NetworkError { present(networkError: networkError, title: title); return }
+		if let networkError = error as? NetworkError {
+			present(networkError: networkError, title: title); return
+		}
 		addBadge(id: UUID(), title: title, secondaryText: error.localizedDescription, priority: 4, view: .error)
 	}
 
 	private var rankedBadges: [StatusBadge] {
 		badges.sorted {
-			if $0.view.rank != $1.view.rank { return $0.view.rank > $1.view.rank }
-			if $0.priority != $1.priority { return $0.priority > $1.priority }
+			if $0.view.rank != $1.view.rank {
+				return $0.view.rank > $1.view.rank
+			}
+			if $0.priority != $1.priority {
+				return $0.priority > $1.priority
+			}
 			return $0.sequence < $1.sequence
 		}
 	}

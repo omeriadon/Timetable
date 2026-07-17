@@ -32,6 +32,7 @@ struct TimetableComparison: View {
 						Text("Import a friend's timetable to compare it with yours here.")
 							.font(.caption)
 					}
+					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
 				#endif // os(iOS)
 			} else {
 				ForEach(friends) { timetable in

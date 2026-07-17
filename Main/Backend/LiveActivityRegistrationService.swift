@@ -164,7 +164,9 @@
 
 		private func fulfillCurrentActivityRequestIfNeeded() async {
 			guard pendingCurrentActivityRequest else { return }
-			if let currentActivityRequestTask { await currentActivityRequestTask.value; return }
+			if let currentActivityRequestTask {
+				await currentActivityRequestTask.value; return
+			}
 			let task = Task { @MainActor in
 				await self.performCurrentActivityRequest()
 			}

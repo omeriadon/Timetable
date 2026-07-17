@@ -65,7 +65,9 @@ struct HapticButtonStyle: ButtonStyle {
 		configuration.label
 			.opacity(configuration.isPressed ? 0.8 : 1)
 			.onChange(of: configuration.isPressed) { _, isPressed in
-				if isPressed { HapticManager.shared.play(.button) }
+				if isPressed {
+					HapticManager.shared.play(.button)
+				}
 			}
 	}
 }

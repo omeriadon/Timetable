@@ -21,7 +21,9 @@ final class TimetableDiscoveryService {
 			return
 		}
 		task = Task {
-			if !immediately { try? await Task.sleep(for: .milliseconds(250)) }
+			if !immediately {
+				try? await Task.sleep(for: .milliseconds(250))
+			}
 			guard !Task.isCancelled else { return }
 			isSearching = true
 			defer { isSearching = false }
@@ -30,7 +32,9 @@ final class TimetableDiscoveryService {
 				guard !Task.isCancelled else { return }
 				withAnimation(.snappy) { results = response }
 			} catch is CancellationError {} catch {
-				if !Task.isCancelled { results = [] }
+				if !Task.isCancelled {
+					results = []
+				}
 			}
 		}
 	}

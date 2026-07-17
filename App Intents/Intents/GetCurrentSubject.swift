@@ -263,70 +263,69 @@ struct GetCurrentSubjectIntentView: View {
 		.padding(.bottom, 10)
 	}
 
+	@ViewBuilder
 	private func createProgressBackground(color: Color, start: Date?, end: Date?, isBreak: Bool = false, geo: GeometryProxy) -> some View {
-		Group {
-			if let start, let end {
-				let total = end.timeIntervalSince(start)
-				let elapsed = now.timeIntervalSince(start)
-				let progress = total > 0 ? max(0, min(1, elapsed / total)) : 0
+		if let start, let end {
+			let total = end.timeIntervalSince(start)
+			let elapsed = now.timeIntervalSince(start)
+			let progress = total > 0 ? max(0, min(1, elapsed / total)) : 0
 
-				ZStack {
-					if isBreak {
-						IrregularGradient(
-							colors: [
-								.yellow,
-								.orange,
-								.pink,
-								.red,
-								.purple,
-								.blue,
-								.cyan,
-								.mint,
-								.green,
-								Color(red: 1.0, green: 0.84, blue: 0.0),
-								Color(red: 1.0, green: 0.72, blue: 0.82),
-								Color(red: 0.60, green: 0.90, blue: 1.0),
-								Color(red: 0.70, green: 1.0, blue: 0.70),
-								Color(red: 1.0, green: 0.60, blue: 0.40),
-								Color(red: 0.80, green: 0.60, blue: 1.0),
-							],
-							background: Color.blue,
-							speed: 2,
-							animate: true
+			ZStack {
+				if isBreak {
+					IrregularGradient(
+						colors: [
+							.yellow,
+							.orange,
+							.pink,
+							.red,
+							.purple,
+							.blue,
+							.cyan,
+							.mint,
+							.green,
+							Color(red: 1.0, green: 0.84, blue: 0.0),
+							Color(red: 1.0, green: 0.72, blue: 0.82),
+							Color(red: 0.60, green: 0.90, blue: 1.0),
+							Color(red: 0.70, green: 1.0, blue: 0.70),
+							Color(red: 1.0, green: 0.60, blue: 0.40),
+							Color(red: 0.80, green: 0.60, blue: 1.0),
+						],
+						background: Color.blue,
+						speed: 2,
+						animate: true
+					)
+					.frame(width: geo.size.width, height: geo.size.height)
+				}
+
+				HStack(spacing: 0) {
+					let fill: AnyShapeStyle = isBreak
+						? AnyShapeStyle(.thinMaterial)
+						: AnyShapeStyle(color)
+
+					UnevenRoundedRectangle(
+						cornerRadii: RectangleCornerRadii(
+							topLeading: 0,
+							bottomLeading: 0,
+							bottomTrailing: 20,
+							topTrailing: 20
 						)
-						.frame(width: geo.size.width, height: geo.size.height)
-					}
+					)
+					.fill(fill)
+					.frame(width: geo.size.width * progress)
 
-					HStack(spacing: 0) {
-						let fill: AnyShapeStyle = isBreak
-							? AnyShapeStyle(.thinMaterial)
-							: AnyShapeStyle(color)
-
-						UnevenRoundedRectangle(
-							cornerRadii: RectangleCornerRadii(
-								topLeading: 0,
-								bottomLeading: 0,
-								bottomTrailing: 20,
-								topTrailing: 20
-							)
-						)
-						.fill(fill)
-						.frame(width: geo.size.width * progress)
-
-						Rectangle()
-							.fill(.clear)
-					}
-					.background {
-						if !isBreak {
-							ContainerRelativeShape()
-								.fill(.black)
-						}
+					Rectangle()
+						.fill(.clear)
+				}
+				.background {
+					if !isBreak {
+						ContainerRelativeShape()
+							.fill(.black)
 					}
 				}
-			} else {
-				Rectangle()
-					.fill(color)
 			}
+		} else {
+			Rectangle()
+				.fill(color)
 		}
 	}
 }

@@ -67,32 +67,35 @@ struct OnboardingView: View {
 		.task { await buildPages() }
 	}
 
-	@ViewBuilder
 	private func pageView(_ page: OnboardingPage) -> some View {
-		if let context = pageContexts[page.id] {
-			VStack(spacing: 24) {
-				Text(page.title)
-					.font(.largeTitle.bold())
-					.multilineTextAlignment(.center)
+		VStack(spacing: 24) {
+			if let context = pageContexts[page.id] {
 				page.content()
-					.frame(maxWidth: 620, maxHeight: .infinity)
-				Text(context.statusMessage ?? " ")
-					.contentTransition(.opacity)
-					.font(.callout)
-					.multilineTextAlignment(.center)
-					.opacity(context.statusMessage == nil ? 0 : 1)
-					.frame(minHeight: 20)
-					.padding(.bottom, 20)
-					.animation(.easeInOut, value: context.statusMessage)
+					.padding(.horizontal, 24)
+					.padding(.top, 24)
+					.scrollEdgeEffectStyle(.soft, for: .all)
+					.safeAreaBar(edge: .top, alignment: .center, spacing: 1) {
+						Text(page.title)
+							.font(.title.bold())
+							.multilineTextAlignment(.center)
+					}
+					.safeAreaBar(edge: .bottom, alignment: .center, spacing: 1) {
+						Text(context.statusMessage ?? " ")
+							.contentTransition(.opacity)
+							.font(.footnote)
+							.multilineTextAlignment(.center)
+							.opacity(context.statusMessage == nil ? 0 : 1)
+							.frame(minHeight: 20)
+							.padding(.bottom, 20)
+							.animation(.easeInOut, value: context.statusMessage)
+					}
+					.environment(\.onboardingPageContext, context)
 			}
-			.padding(.horizontal, 24)
-			.padding(.top, 24)
-			.environment(\.onboardingPageContext, context)
 		}
 	}
 
 	private var controls: some View {
-		HStack(spacing: 12) {
+		HStack(spacing: 0) {
 			Button {
 				move(by: -1)
 			} label: {
@@ -102,13 +105,14 @@ struct OnboardingView: View {
 					Text("Back")
 				}
 			}
-			.buttonSizing(.flexible)
-			.font(.title3)
+			.buttonSizing(.fitted)
+			.font(.headline)
 			.buttonStyle(.glassProminent)
 			.controlSize(.extraLarge)
 			.disabled(isBackDisabled)
+			.animation(.easeInOut, value: selectedIndex)
 
-			Spacer()
+			Spacer(minLength: 1)
 
 			VStack(spacing: 5) {
 				Text("\(min(selectedIndex + 1, pages.count)) of \(pages.count)")
@@ -119,7 +123,7 @@ struct OnboardingView: View {
 			}
 			.animation(.easeInOut, value: selectedIndex)
 
-			Spacer()
+			Spacer(minLength: 1)
 
 			Button {
 				if selectedIndex == pages.count - 1 {
@@ -135,9 +139,10 @@ struct OnboardingView: View {
 						Image(systemName: "chevron.right")
 					}
 				}
+				.animation(.easeInOut, value: selectedIndex)
 			}
-			.buttonSizing(.flexible)
-			.font(.title3)
+			.buttonSizing(.fitted)
+			.font(.headline)
 			.buttonStyle(.glassProminent)
 			.controlSize(.extraLarge)
 			.disabled(isNextDisabled)
