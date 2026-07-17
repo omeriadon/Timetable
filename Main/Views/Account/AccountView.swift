@@ -35,8 +35,12 @@ struct AccountView: View {
 					ProgressView("Restoring Account…")
 						.transition(.blurReplace)
 				case .signedOut:
-					AccountAuthenticationView()
-						.transition(.blurReplace)
+					ScrollView {
+						AccountAuthenticationView()
+					}
+					.scrollBounceBehavior(.basedOnSize)
+							.transition(.blurReplace)
+
 			}
 		}
 		.alert("Delete Account?", isPresented: $showDeleteConfirmation) {

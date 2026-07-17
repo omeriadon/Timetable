@@ -208,7 +208,7 @@ struct TimetableApp: App {
 
 						AccountAuthenticationView(allowsSignUp: false)
 					}
-					.frame(width: 520, height: 560)
+					.frame(width: 520, height: 580, alignment: .center)
 					.padding(30)
 					.interactiveDismissDisabled()
 				}

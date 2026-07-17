@@ -158,7 +158,6 @@
 				Views/Onboarding/OnboardingPageContext.swift = (ios, );
 				Views/Onboarding/OnboardingView.swift = (ios, );
 				Views/Onboarding/Views/APNsRegistration.swift = (ios, );
-				Views/Onboarding/Views/Account.swift = (ios, );
 				Views/Onboarding/Views/CalendarImport.swift = (ios, );
 				Views/Onboarding/Views/CalendarPermission.swift = (ios, );
 				Views/Onboarding/Views/Notifications.swift = (ios, );
@@ -166,6 +165,7 @@
 				Views/Onboarding/Views/Tutorial/FriendsTutorial.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/GeneratedSFSymbolShapes.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/NotifTutorial.swift = (ios, );
+				Views/Onboarding/Views/Tutorial/OnboardingAccount.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/OnboardingCompletion.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/OnboardingOverview.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/SearchTutorial.swift = (ios, );

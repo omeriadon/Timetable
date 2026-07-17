@@ -62,34 +62,39 @@ struct OnboardingView: View {
 		}
 		.safeAreaBar(edge: .bottom, alignment: .center, spacing: 0) {
 			controls
-				.ignoresSafeArea()
 		}
 		.task { await buildPages() }
 	}
 
 	private func pageView(_ page: OnboardingPage) -> some View {
-		VStack(spacing: 24) {
+		ZStack {
 			if let context = pageContexts[page.id] {
 				page.content()
+					.scrollEdgeEffectStyle(.soft, for: .vertical)
+					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
 					.padding(.horizontal, 24)
-					.padding(.top, 24)
-					.scrollEdgeEffectStyle(.soft, for: .all)
-					.safeAreaBar(edge: .top, alignment: .center, spacing: 1) {
-						Text(page.title)
-							.font(.title.bold())
-							.multilineTextAlignment(.center)
-					}
-					.safeAreaBar(edge: .bottom, alignment: .center, spacing: 1) {
-						Text(context.statusMessage ?? " ")
-							.contentTransition(.opacity)
-							.font(.footnote)
-							.multilineTextAlignment(.center)
-							.opacity(context.statusMessage == nil ? 0 : 1)
-							.frame(minHeight: 20)
-							.padding(.bottom, 20)
-							.animation(.easeInOut, value: context.statusMessage)
-					}
 					.environment(\.onboardingPageContext, context)
+			}
+		}
+		.safeAreaBar(edge: .top, alignment: .center, spacing: 0) {
+			Text(page.title)
+				.font(.title.bold())
+				.multilineTextAlignment(.center)
+				.frame(maxWidth: .infinity)
+				.padding(.vertical, 8)
+		}
+		.safeAreaBar(edge: .bottom, alignment: .center, spacing: 0) {
+			if let context = pageContexts[page.id] {
+				Text(context.statusMessage ?? " ")
+					.contentTransition(.opacity)
+					.font(.footnote)
+					.multilineTextAlignment(.center)
+					.opacity(context.statusMessage == nil ? 0 : 1)
+					.frame(maxWidth: .infinity)
+					.frame(minHeight: 20)
+					.padding(.bottom, 20)
+					.padding(.top, 8)
+					.animation(.easeInOut, value: context.statusMessage)
 			}
 		}
 	}

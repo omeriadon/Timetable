@@ -27,7 +27,7 @@ struct SplashView: View {
 						.stickerMotionEffect(.dragGesture(intensity: 0.6))
 				}
 
-			Text("Timetable 2.0")
+			Text("Timetable \(Bundle.main.appVersion)")
 				.font(.largeTitle.scaled(by: 1.1))
 				.multilineTextAlignment(.center)
 		}
