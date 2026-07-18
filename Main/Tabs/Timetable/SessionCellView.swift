@@ -28,7 +28,7 @@ struct SessionCellView: View {
 			// break
 			if TimetableLayout.isBreakSession(index: session) {
 				BreakSessionView()
-					.frame(height: 20)
+					.frame(height: TimetableLayout.breakCellHeight)
 
 				// unavailable
 			} else if TimetableLayout.isUnavailable(day: day, session: session) {
@@ -53,13 +53,13 @@ struct SessionCellView: View {
 					}
 					.dynamicTypeSize(.medium)
 				}
-				.frame(height: 60)
+				.frame(height: TimetableLayout.sessionCellHeight)
 
 				// idk
 			} else {
 				RoundedRectangle(cornerRadius: 10)
 					.fill(.white.opacity(0.05))
-					.frame(height: 60)
+					.frame(height: TimetableLayout.sessionCellHeight)
 			}
 		}
 		.foregroundStyle(.white)
@@ -68,11 +68,6 @@ struct SessionCellView: View {
 
 struct BreakSessionView: View {
 	var body: some View {
-		RoundedRectangle(cornerRadius: 10, style: .continuous)
-			.fill(.thinMaterial)
-			.overlay {
-				RoundedRectangle(cornerRadius: 10, style: .continuous)
-					.stroke(.white.opacity(0.12), lineWidth: 1)
-			}
+		Color.clear
 	}
 }

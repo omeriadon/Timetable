@@ -16,6 +16,7 @@ struct SubjectEditorSheet: View {
 	@State private var editorPage = 0
 	@State private var editorReady = false
 	@State private var isSaving = false
+	@State private var saveTask: Task<Void, Never>?
 	@State private var draftSubjects: [EditableSubject] = []
 	@State private var pendingPrefillSlot: EditableSlot?
 	@State private var pendingConflict: SlotConflict?
@@ -125,6 +126,8 @@ struct SubjectEditorSheet: View {
 			prepareEditor()
 		}
 		.onDisappear {
+			saveTask?.cancel()
+			saveTask = nil
 			editorReady = false
 		}
 		.sheet(isPresented: symbolPickerPresented) {
@@ -378,7 +381,7 @@ struct SubjectEditorSheet: View {
 		let proposedSubjects = buildCommittedSubjects()
 
 		isSaving = true
-		Task { @MainActor in
+		saveTask = Task { @MainActor in
 			defer { isSaving = false }
 
 			do {
@@ -394,6 +397,7 @@ struct SubjectEditorSheet: View {
 				// ServerSyncCoordinator already displays the sync errors.
 				// Keep the sheet open and do not commit local Defaults.
 			}
+			saveTask = nil
 		}
 	}
 

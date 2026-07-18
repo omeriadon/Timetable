@@ -35,7 +35,9 @@ struct OnboardingAPNsRegistrationView: View {
 		}
 		.onAppear {
 			context.configure(canAdvance: registration.hasLocalToken, isWorking: !registration.hasLocalToken)
-			if !registration.hasLocalToken {
+			if registration.hasLocalToken, SessionStore.shared.isAuthenticated {
+				Task { await registration.uploadPendingToken() }
+			} else if !registration.hasLocalToken {
 				Task {
 					await registration.requestRemoteRegistration()
 				}

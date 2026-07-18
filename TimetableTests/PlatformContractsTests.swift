@@ -10,8 +10,8 @@ final class PlatformContractsTests: XCTestCase {
 		XCTAssertFalse(Platform.macOS.allowsOwnerMutation)
 	}
 
-	func testInstallationIDsAreStableAndPlatformScoped() {
-	let defaults = UserDefaults(suiteName: "TimetableTests.\(UUID().uuidString)")!
+	func testInstallationIDsAreStableAndPlatformScoped() throws {
+		let defaults = try XCTUnwrap(UserDefaults(suiteName: "TimetableTests.\(UUID().uuidString)"))
 		let provider = ClientIdentityProvider(defaults: defaults)
 		let phone = provider.identity(for: .iOS)
 		let phoneAgain = provider.identity(for: .iOS)

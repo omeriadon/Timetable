@@ -8,7 +8,9 @@ struct NonAuthoritativeAccountView: View {
 			if case let .authenticated(profile) = sessionStore.state {
 				Section("Profile") {
 					LabeledContent("Name", value: profile.displayName)
-					if let email = profile.email { LabeledContent("Email", value: email) }
+					if let email = profile.email {
+						LabeledContent("Email", value: email)
+					}
 				}
 			}
 			Section {

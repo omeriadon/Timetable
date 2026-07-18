@@ -39,14 +39,11 @@ struct ContentView: View {
 
 								ForEach(Array(TimetableLayout.sessions.enumerated()), id: \.offset) { index, session in
 									if TimetableLayout.isBreakSession(index: index) {
-										Text(session)
-											.font(.footnote.scaled(by: 0.7))
-											.foregroundStyle(.secondary)
-											.frame(height: 2)
+										Color.clear.frame(height: TimetableLayout.breakCellHeight)
 									} else {
 										Text(session)
 											.font(.footnote)
-											.frame(height: 25)
+											.frame(height: TimetableLayout.sessionCellHeight)
 									}
 								}
 							}
@@ -99,15 +96,12 @@ struct ContentView: View {
 		Group {
 			if TimetableLayout.isBreakSession(index: session) {
 				// recess and lunch
-				RoundedRectangle(cornerRadius: 2, style: .continuous)
-					.fill(.thinMaterial)
-					.overlay { RoundedRectangle(cornerRadius: 2).stroke(.white.opacity(0.12), lineWidth: 0.5) }
-					.frame(height: 2)
+				Color.clear.frame(height: TimetableLayout.breakCellHeight)
 			} else {
 				// early finish days
 				if TimetableLayout.isUnavailable(day: day, session: session) {
 					rectangle(.clear, true)
-						.frame(height: 25)
+						.frame(height: TimetableLayout.sessionCellHeight)
 
 				} else {
 					// actual session
@@ -124,13 +118,13 @@ struct ContentView: View {
 								.fixedSize(horizontal: false, vertical: true)
 								.font(.footnote.scaled(by: 0.5))
 						}
-						.frame(height: 25)
+						.frame(height: TimetableLayout.sessionCellHeight)
 
 					} else {
 						// empty periods
 						RoundedRectangle(cornerRadius: 5)
 							.fill(.gray).opacity(0.5)
-							.frame(height: 25)
+							.frame(height: TimetableLayout.sessionCellHeight)
 					}
 				}
 			}

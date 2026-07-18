@@ -161,6 +161,7 @@ nonisolated struct RegisterUserDeviceRequest: Codable {
 
 nonisolated struct RemoveUserDeviceRequest: Codable {
 	let installationID: String
+	let platform: String
 }
 
 nonisolated struct UserDeviceResponse: Codable {

@@ -27,6 +27,7 @@
 		2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */ = {isa = PBXBuildFile; platformFilters = (macos, ); productRef = 2AE0F13A2FE03989002B5D9D /* MaterialView */; };
 		2AF3B0103000000000000010 /* Platform.swift in TimetableTests Sources */ = {isa = PBXBuildFile; fileRef = 2AF3B00E300000000000000E /* Platform.swift */; };
 		2AF3B0113000000000000011 /* AuthRequestDTOs.swift in TimetableTests Sources */ = {isa = PBXBuildFile; fileRef = 2AF3B00F300000000000000F /* AuthRequestDTOs.swift */; };
+		2AF3B0123000000000000012 /* OnboardingState.swift in TimetableTests Sources */ = {isa = PBXBuildFile; fileRef = 2AF3B0133000000000000013 /* OnboardingState.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -107,6 +108,7 @@
 		2AF3B0073000000000000007 /* TimetableTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TimetableTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2AF3B00E300000000000000E /* Platform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/Platform.swift; sourceTree = SOURCE_ROOT; };
 		2AF3B00F300000000000000F /* AuthRequestDTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "App Shared/Networking/AuthRequestDTOs.swift"; sourceTree = SOURCE_ROOT; };
+		2AF3B0133000000000000013 /* OnboardingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/OnboardingState.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -679,6 +681,7 @@
 			files = (
 				2AF3B0103000000000000010 /* Platform.swift in TimetableTests Sources */,
 				2AF3B0113000000000000011 /* AuthRequestDTOs.swift in TimetableTests Sources */,
+				2AF3B0123000000000000012 /* OnboardingState.swift in TimetableTests Sources */,
 			);
 		};
 /* End PBXSourcesBuildPhase section */

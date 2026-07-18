@@ -46,6 +46,13 @@ nonisolated enum TimetableLayout {
 	static let shortDayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri"]
 	static let fullDayLabels = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 	static let teachingSessionIndices = [0, 1, 3, 4, 6, 7]
+	#if os(watchOS)
+		static let sessionCellHeight: CGFloat = 25
+		static let breakCellHeight: CGFloat = 2
+	#else
+		static let sessionCellHeight: CGFloat = 60
+		static let breakCellHeight: CGFloat = 20
+	#endif
 
 	static func isBreakSession(index: Int) -> Bool {
 		index == 2 || index == 5

@@ -26,7 +26,7 @@
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="e8C-qh-1V2"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="waB-er-gsb" firstAttribute="centerX" secondItem="zjd-bs-al8" secondAttribute="centerX" id="8TQ-cZ-veq"/>
                             <constraint firstItem="waB-er-gsb" firstAttribute="centerY" secondItem="zjd-bs-al8" secondAttribute="centerY" id="tFT-HL-c6m"/>
@@ -40,8 +40,5 @@
     </scenes>
     <resources>
         <image name="Icon" width="1024" height="1024"/>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
     </resources>
 </document>

@@ -39,8 +39,8 @@ struct AccountView: View {
 						AccountAuthenticationView()
 					}
 					.scrollBounceBehavior(.basedOnSize)
-							.transition(.blurReplace)
-
+					.scrollEdgeEffectStyle(.none, for: .vertical)
+					.transition(.blurReplace)
 			}
 		}
 		.alert("Delete Account?", isPresented: $showDeleteConfirmation) {

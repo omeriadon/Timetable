@@ -213,8 +213,8 @@ final class StatusBadgeManager {
 				return
 			}
 			guard !Task.isCancelled else { return }
-			guard let self, self.removalGenerations[id] == generation else { return }
-			self.removeBadge(id: id, generation: generation)
+			guard let self, removalGenerations[id] == generation else { return }
+			removeBadge(id: id, generation: generation)
 		}
 	}
 
@@ -225,7 +225,9 @@ final class StatusBadgeManager {
 	}
 
 	private func removeBadge(id: UUID, generation: UInt64? = nil) {
-		if let generation, removalGenerations[id] != generation { return }
+		if let generation, removalGenerations[id] != generation {
+			return
+		}
 		invalidateRemoval(for: id)
 		badges.removeAll(where: { $0.id == id })
 		if activeBadgeID == id {

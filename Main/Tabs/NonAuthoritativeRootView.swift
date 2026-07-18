@@ -14,9 +14,9 @@ struct NonAuthoritativeRootView: View {
 		TabView(selection: $selectedTab) {
 			Tab("Timetable", systemImage: "calendar", value: 0) {
 				#if os(iOS)
-				TimetableView(watchSync: $watchSync, syncStatus: $syncStatus)
+					TimetableView(watchSync: $watchSync, syncStatus: $syncStatus)
 				#else
-				TimetableView(expanded: $expanded)
+					TimetableView(expanded: $expanded)
 				#endif
 			}
 			Tab("Settings", systemImage: "gear", value: 1) { NonAuthoritativeSettingsView() }

@@ -92,19 +92,19 @@ struct AccountAuthenticationView: View {
 			.disabled(model.isSubmitting || !model.isAccountDetailsValid)
 
 			if allowsAppleSignIn {
-			SignInWithAppleButton(.continue) { request in
-				request.requestedScopes = [.fullName, .email]
-			} onCompletion: { result in
-				handleAppleCompletion(result)
-			}
-			.controlSize(.large)
-			.buttonSizing(.flexible)
-			.signInWithAppleButtonStyle(.white)
-			#if os(iOS)
-				.frame(height: 50)
-			#endif
-				.clipShape(.capsule)
-				.disabled(model.isSubmitting)
+				SignInWithAppleButton(.continue) { request in
+					request.requestedScopes = [.fullName, .email]
+				} onCompletion: { result in
+					handleAppleCompletion(result)
+				}
+				.controlSize(.large)
+				.buttonSizing(.flexible)
+				.signInWithAppleButtonStyle(.white)
+				#if os(iOS)
+					.frame(height: 50)
+				#endif
+					.clipShape(.capsule)
+					.disabled(model.isSubmitting)
 			}
 		}
 		.padding(20)

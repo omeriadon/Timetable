@@ -153,7 +153,7 @@ struct TimetableView: View {
 						#endif
 					}
 					.scrollEdgeEffectStyle(.soft, for: .bottom)
-					.scrollEdgeEffectStyle(.hard, for: .top)
+					.scrollEdgeEffectStyle(.none, for: .top)
 			}
 			#if os(iOS)
 			.onAppear {
@@ -241,8 +241,8 @@ struct TimetableView: View {
 		let isBreakSession = TimetableLayout.isBreakSession(label: session)
 
 		return Text(session)
-			.frame(height: isBreakSession ? 20 : 60)
-			.foregroundStyle(isBreakSession ? Color.secondary : Color.primary)
+			.frame(height: isBreakSession ? TimetableLayout.breakCellHeight : TimetableLayout.sessionCellHeight)
+			.foregroundStyle(isBreakSession ? Color.clear : Color.primary)
 	}
 
 	func editableSlot(fromDay day: Int, session: Int) -> EditableSlot? {

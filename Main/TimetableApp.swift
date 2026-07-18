@@ -34,7 +34,10 @@ enum WindowMode: Int, Equatable, Identifiable {
 struct TimetableApp: App {
 	@State var expanded: WindowMode = .none
 
-	@Default(.hasSeenOnboardingBefore) private var hasSeenOnboardingBefore
+	@Default(.hasCompletedOnboarding) private var hasCompletedOnboarding
+	#if os(iOS)
+		@State private var launchIllusionVisible = true
+	#endif
 
 	@State private var passManager = TimetablePassManager()
 	@State private var sessionStore = SessionStore.shared
@@ -67,19 +70,25 @@ struct TimetableApp: App {
 						case .restoring:
 						ProgressView("Restoring Account…")
 						case .authenticated:
-						if Platform.current == .macOS { NonAuthoritativeRootView() } else { ContentView(expanded: $expanded) }
+						if Platform.current == .macOS {
+							NonAuthoritativeRootView()
+						} else {
+							ContentView(expanded: $expanded)
+						}
 					}
 				#else
 					if Platform.current == .iPadOS {
 						switch sessionStore.state {
-						case .signedOut:
-							AccountAuthenticationView(allowsSignUp: false, allowsAppleSignIn: false)
-						case .restoring:
-							ProgressView("Restoring Account…")
-						case .authenticated:
-							NonAuthoritativeRootView()
+							case .signedOut:
+								AccountAuthenticationView(allowsSignUp: false, allowsAppleSignIn: false)
+							case .restoring:
+								ProgressView("Restoring Account…")
+							case .authenticated:
+								NonAuthoritativeRootView()
 						}
-					} else { ContentView(expanded: $expanded) }
+					} else {
+						ContentView(expanded: $expanded)
+					}
 				#endif
 			}
 			.onOpenURL { url in
@@ -123,15 +132,15 @@ struct TimetableApp: App {
 				await NotificationRegistrationService.shared.requestRemoteRegistration()
 
 				#if os(iOS)
-				if Platform.current == .iOS {
-					await LiveActivityRegistrationService.shared.startObserving()
-				}
+					if Platform.current == .iOS {
+						await LiveActivityRegistrationService.shared.startObserving()
+					}
 
 					try? await ShaderLibrary.compileStickerShaders()
 				#endif
 			}
 			#if os(iOS)
-			.fullScreenCover(isPresented: .constant(Platform.current == .iOS && !hasSeenOnboardingBefore)) {
+			.fullScreenCover(isPresented: .constant(Platform.current == .iOS && !hasCompletedOnboarding)) {
 				OnboardingView()
 					.interactiveDismissDisabled()
 			}
@@ -152,6 +161,15 @@ struct TimetableApp: App {
 				}
 			#else
 				.preferredColorScheme(.dark)
+					.overlay {
+						if launchIllusionVisible {
+							LaunchIllusionView {
+								launchIllusionVisible = false
+							}
+							.ignoresSafeArea()
+							.allowsHitTesting(false)
+						}
+					}
 			#endif
 		}
 		.windowResizability(.contentSize)

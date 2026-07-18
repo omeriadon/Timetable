@@ -13,6 +13,10 @@ import UserNotifications
 struct OnboardingView: View {
 	@Default(.hasCompletedOnboarding) private var hasCompletedOnboarding
 	@Default(.hasSeenOnboardingBefore) private var hasSeenOnboardingBefore
+	@Default(.onboardingPageID) private var onboardingPageID
+	@Default(.hasCompletedAccountBootstrap) private var hasCompletedAccountBootstrap
+	@Default(.timetable) private var subjects
+	@State private var sessionStore = SessionStore.shared
 	@State private var pages: [OnboardingPage] = []
 	@State private var pageContexts: [String: OnboardingPageContext] = [:]
 	@State private var selectedID = ""
@@ -53,6 +57,9 @@ struct OnboardingView: View {
 					.scrollIndicators(.hidden)
 					.scrollDisabled(true)
 					.onChange(of: selectedID) { oldID, newID in
+						if !newID.isEmpty {
+							onboardingPageID = newID
+						}
 						guard !oldID.isEmpty, oldID != newID else { return }
 						withAnimation(reduceMotion ? .none : .smooth(duration: 0.65)) {
 							proxy.scrollTo(newID, anchor: .center)
@@ -86,13 +93,22 @@ struct OnboardingView: View {
 			}
 		}
 		.task { await buildPages() }
+		.onChange(of: sessionStore.state) { _, _ in
+			Task { await buildPages(preserving: selectedID) }
+		}
+		.onChange(of: hasCompletedAccountBootstrap) { _, _ in
+			Task { await buildPages(preserving: selectedID) }
+		}
+		.onChange(of: subjects) { _, _ in
+			Task { await buildPages(preserving: selectedID) }
+		}
 	}
 
 	private func pageView(_ page: OnboardingPage) -> some View {
 		ZStack {
 			if let context = pageContexts[page.id] {
 				page.content()
-					.scrollEdgeEffectStyle(.soft, for: .vertical)
+					.scrollEdgeEffectStyle(.none, for: .vertical)
 					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
 					.padding(.horizontal, 24)
 					.environment(\.onboardingPageContext, context)
@@ -135,6 +151,7 @@ struct OnboardingView: View {
 				if selectedIndex == pages.count - 1 {
 					hasCompletedOnboarding = true
 					hasSeenOnboardingBefore = true
+					onboardingPageID = ""
 				} else {
 					move(by: 1)
 				}
@@ -176,7 +193,18 @@ struct OnboardingView: View {
 		let notificationStatus = await UNUserNotificationCenter.current().notificationSettings().authorizationStatus
 		let notificationGranted = [.authorized, .provisional, .ephemeral].contains(notificationStatus)
 
-		let candidates = makePages(calendarGranted: calendarGranted, notificationGranted: notificationGranted)
+		let isAuthenticated = sessionStore.isAuthenticated
+		let hasServerTimetable = OnboardingStateLogic.shouldSkipCalendarImport(
+			isAuthenticated: isAuthenticated,
+			bootstrapCompleted: hasCompletedAccountBootstrap,
+			timetableIsEmpty: subjects.isEmpty
+		)
+		let candidates = makePages(
+			calendarGranted: calendarGranted,
+			notificationGranted: notificationGranted,
+			isAuthenticated: isAuthenticated,
+			hasServerTimetable: hasServerTimetable
+		)
 		let visiblePages = candidates.filter { $0.isVisible() }
 		var retainedContexts: [String: OnboardingPageContext] = [:]
 		for page in visiblePages {
@@ -185,7 +213,11 @@ struct OnboardingView: View {
 		pageContexts = retainedContexts
 		pages = visiblePages
 		let retainedID = currentID.flatMap { id in visiblePages.contains(where: { $0.id == id }) ? id : nil }
-		selectedID = retainedID ?? visiblePages.first?.id ?? ""
+		selectedID = OnboardingStateLogic.restoredPageID(
+			savedID: onboardingPageID,
+			currentID: retainedID,
+			visiblePageIDs: visiblePages.map(\.id)
+		) ?? ""
 	}
 
 	private func makeContext(for pageID: String) -> OnboardingPageContext {
@@ -197,7 +229,12 @@ struct OnboardingView: View {
 		}
 	}
 
-	private func makePages(calendarGranted: Bool, notificationGranted: Bool) -> [OnboardingPage] {
+	private func makePages(
+		calendarGranted: Bool,
+		notificationGranted: Bool,
+		isAuthenticated _: Bool,
+		hasServerTimetable: Bool
+	) -> [OnboardingPage] {
 		[
 			OnboardingPage(id: "splash", title: "") {
 				SplashView()
@@ -211,7 +248,12 @@ struct OnboardingView: View {
 			}) {
 				OnboardingCalendarPermissionView()
 			},
-			OnboardingPage(id: "calendar-import", title: "Import Your Timetable") {
+			OnboardingPage(id: "account", title: "Your Account") {
+				OnboardingAccountView()
+			},
+			OnboardingPage(id: "calendar-import", title: "Import Your Timetable", isVisible: {
+				!hasServerTimetable
+			}) {
 				OnboardingCalendarImportView()
 			},
 			OnboardingPage(id: "notifications", title: "Notifications", isVisible: {
@@ -225,9 +267,6 @@ struct OnboardingView: View {
 			},
 			OnboardingPage(id: "apns", title: "Register This Device") {
 				OnboardingAPNsRegistrationView()
-			},
-			OnboardingPage(id: "account", title: "Your Account") {
-				OnboardingAccountView()
 			},
 			OnboardingPage(id: "finished", title: "Ready to Begin") {
 				OnboardingOverview()

@@ -132,17 +132,22 @@ final class NotificationRegistrationService {
 	}
 
 	func removeServerRegistration() async {
-		guard SessionStore.shared.isAuthenticated else { return }
-		do {
-			try await networkManager.send(
-				.v1CurrentDeviceDelete,
-				body: RemoveUserDeviceRequest(installationID: ClientIdentityProvider.shared.identity().installationID)
-			)
-			Defaults[.hasRegisteredAPNsToken] = false
-			registrationState = hasLocalToken ? .tokenReceived : .idle
-		} catch {
-			PrintError("Device notification removal failed", category: .network, error: error)
+		if SessionStore.shared.isAuthenticated {
+			do {
+				let identity = ClientIdentityProvider.shared.identity()
+				try await networkManager.send(
+					.v1CurrentDeviceDelete,
+					body: RemoveUserDeviceRequest(
+						installationID: identity.installationID,
+						platform: identity.platform.rawValue
+					)
+				)
+			} catch {
+				PrintError("Device notification removal failed", category: .network, error: error)
+			}
 		}
+		Defaults[.hasRegisteredAPNsToken] = false
+		registrationState = hasLocalToken ? .tokenReceived : .idle
 	}
 
 	func registrationFailed(_ error: (any Error)? = nil) {
