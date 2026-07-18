@@ -33,23 +33,17 @@ final class WatchAccountBootstrapService {
 		let task = Task { @MainActor in
 			async let timetable: OwnerTimetableResponse = networkManager.send(.v1OwnerTimetable)
 			async let settings: AccountSettings = networkManager.send(.v1Settings)
-			async let received: [ReceivedPassMirrorDTO] = networkManager.send(.v1ReceivedTimetables)
-			async let overrides: [ReceivedNameOverrideResponse] = networkManager.send(.v1ReceivedNameOverrides)
-			let (ownerTimetable, remoteSettings, receivedTimetables, receivedOverrides) = try await (
+			async let received: [AuthoritativeReceivedTimetableDTO] = networkManager.send(.v1ReceivedTimetables)
+			let (ownerTimetable, remoteSettings, receivedTimetables) = try await (
 				timetable,
 				settings,
-				received,
-				overrides
+				received
 			)
 
 			Defaults[.timetable] = ownerTimetable.subjects
 			Defaults[.accountSettings] = remoteSettings
-			let names = Dictionary(
-				uniqueKeysWithValues: receivedOverrides.map { ($0.serialNumber, $0.displayName) }
-			)
-			Defaults[.receivedNameOverrides] = names
 			Defaults[.receivedTimetables] = receivedTimetables
-				.filter { !$0.isDeleted }
+				.filter { $0.availability == .available }
 				.map(\.receivedTimetable)
 			Defaults[.lastServerSync] = Date.now
 			Defaults[.hasCompletedAccountBootstrap] = true
@@ -68,6 +62,5 @@ final class WatchAccountBootstrapService {
 private extension Endpoint {
 	static let v1OwnerTimetable = Endpoint("/v1/timetables/owner")
 	static let v1Settings = Endpoint("/v1/settings")
-	static let v1ReceivedTimetables = Endpoint("/v1/timetables/received")
-	static let v1ReceivedNameOverrides = Endpoint("/v1/received-name-overrides")
+	static let v1ReceivedTimetables = Endpoint("/v1/timetables/received/authoritative", queryItems: [URLQueryItem(name: "limit", value: "50")])
 }

@@ -166,7 +166,7 @@ nonisolated enum SchoolStateEngine {
 	@MainActor
 	static func currentReceivedStates() -> [ReceivedSchoolState] {
 		Defaults[.receivedTimetables]
-			.filter { !$0.isDeleted && !Defaults[.receivedTombstoneIDs].contains($0.id) }
+			.filter { !$0.isDeleted }
 			.map {
 				ReceivedSchoolState(
 					id: $0.id,
@@ -179,8 +179,7 @@ nonisolated enum SchoolStateEngine {
 	@MainActor
 	static func state(forReceivedTimetableID id: String) -> SchoolState {
 		guard let timetable = Defaults[.receivedTimetables].first(where: { $0.id == id }),
-		      !timetable.isDeleted,
-		      !Defaults[.receivedTombstoneIDs].contains(id)
+		      !timetable.isDeleted
 		else {
 			return .noTimetable
 		}

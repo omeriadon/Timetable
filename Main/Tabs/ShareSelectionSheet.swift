@@ -9,13 +9,13 @@ import Defaults
 import SwiftUI
 
 enum SelectedShareItem: Identifiable, Hashable {
-	case owner
+	case owner(id: UUID)
 	case authored(id: UUID, name: String)
 	case received(id: String, name: String)
 
 	var id: String {
 		switch self {
-			case .owner: "owner"
+			case let .owner(id): "owner-\(id.uuidString)"
 			case let .authored(id, _): "authored-\(id.uuidString)"
 			case let .received(id, _): "received-\(id)"
 		}
@@ -33,11 +33,11 @@ struct ShareSelectionSheet: View {
 	var body: some View {
 		NavigationStack {
 			List {
-				if ownerIsSearchable {
+				if ownerIsSearchable, let ownerID = UUID(uuidString: Defaults[.ownerTimetableID]) {
 					Section("Your Timetable") {
 						Button {
 							dismiss()
-							onSelect(.owner)
+							onSelect(.owner(id: ownerID))
 						} label: {
 							HStack {
 								Text(verbatim: Defaults[.accountProfile].map { "\($0.displayName)'s Timetable" } ?? "Your Timetable")

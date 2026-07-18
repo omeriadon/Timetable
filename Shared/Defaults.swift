@@ -46,16 +46,13 @@ extension Defaults.Keys {
 	static let installationID = Key<String>("installationID", default: "", suite: sharedDefaults)
 
 	static let lastServerSync = Key<Date?>("lastServerSync", default: nil, suite: sharedDefaults)
-	static let lastWalletReconciliation = Key<Date?>("lastWalletReconciliation", default: nil, suite: sharedDefaults)
-
 	static let receivedNameOverrides = Key<[String: String]>("receivedNameOverrides", default: [:], suite: sharedDefaults)
 	static let timetable = Key<[Subject]>("timetable", default: [], suite: sharedDefaults)
 	static let receivedTimetables = Key<[ReceivedTimetable]>("receivedTimetables", default: [], suite: sharedDefaults)
-	static let receivedTombstoneIDs = Key<Set<String>>("receivedTombstoneIDs", default: [], suite: sharedDefaults)
-	static let installedWalletTimetableIDs = Key<Set<String>>("installedWalletTimetableIDs", default: [], suite: sharedDefaults)
+	static let pendingMessageTimetableIDs = Key<[String]>("pendingMessageTimetableIDs", default: [], suite: sharedDefaults)
 	static let userDisplayName = Key<String>("userDisplayName", default: "My Timetable", suite: sharedDefaults)
-	static let walletRevision = Key<Int>("walletRevision", default: 0, suite: sharedDefaults)
 	static let ownerIsSearchable = Key<Bool>("ownerIsSearchable", default: true, suite: sharedDefaults)
+	static let ownerTimetableID = Key<String>("ownerTimetableID", default: "", suite: sharedDefaults)
 	static let timetableHighlightsCurrentDay = Key<Bool>("timetableHighlightsCurrentDay", default: true, suite: sharedDefaults)
 	static let hapticsEnabled = Key<Bool>("hapticsEnabled", default: true, suite: sharedDefaults)
 }

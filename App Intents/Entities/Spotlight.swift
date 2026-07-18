@@ -42,7 +42,7 @@ final class SpotlightIndexer {
 		do {
 			try await removeAll()
 			var timetables = Defaults[.receivedTimetables]
-				.filter { !$0.isDeleted && !Defaults[.receivedTombstoneIDs].contains($0.id) }
+				.filter { !$0.isDeleted }
 				.toTimetableEntities()
 			timetables.append(TimetableEntity(id: "timetable.owner", subjects: Defaults[.timetable].toSubjectEntities(prefix: "subject.owner")))
 			try await timetableIndex.indexAppEntities(timetables)

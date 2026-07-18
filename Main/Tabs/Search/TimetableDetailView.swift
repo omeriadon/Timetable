@@ -5,7 +5,6 @@
 //  Created by Adon Omeri on 1/7/2026.
 //
 
-import PassKit
 import PortalHeaders
 import PortalTransitions
 import SwiftUI
@@ -14,10 +13,9 @@ struct TimetableDetailView: View {
 	let result: TimetableSearchResult
 	let portalNamespace: Namespace.ID
 	@State private var detail: TimetableDetailResponse?
-	@State private var pass: PKPass?
 	@State private var showReportConfirmation = false
 	@State private var isWorking = true
-	@State private var passLoadFailed = false
+	@State private var imported = false
 	@Environment(\.statusBadgeManager) private var badges
 	@Environment(\.dismiss) private var dismiss
 
@@ -39,7 +37,7 @@ struct TimetableDetailView: View {
 									.foregroundStyle(.secondary)
 									.font(.callout)
 							}
-							Text("\(detail.activeInstallCount) \(detail.activeInstallCount == 1 ? "user has" : "users have") downloaded this pass.")
+							Text("\(detail.savedByCount) \(detail.savedByCount == 1 ? "person has" : "people have") saved this timetable.")
 
 							if let updatedAt = detail.updatedAt {
 								LabeledContent("Updated") {
@@ -61,27 +59,20 @@ struct TimetableDetailView: View {
 			.animation(.easeIn(duration: 0.1), value: detail == nil)
 			.safeAreaBar(edge: .bottom, alignment: .center, spacing: 10) {
 				ZStack {
-					if let pass {
-						AddPassToWalletButton([pass]) {
-							added in if added {
-								badges.addBadge(id: UUID(), title: "Pass added to Wallet", priority: 3, view: .success)
-							}
-						}
-						.addPassToWalletButtonStyle(.black)
-						.clipShape(.capsule)
-						.transition(.blurReplace)
-
+					if imported {
+						Label("Saved", systemImage: "checkmark.circle.fill")
+							.foregroundStyle(.green)
+							.transition(.blurReplace)
 					} else if isWorking {
 						ProgressView()
 							.transition(.blurReplace)
-					} else if passLoadFailed {
-						Button("Retry Pass Download", systemImage: "arrow.clockwise", action: download)
-							.buttonStyle(.glass)
-							.transition(.blurReplace)
+					} else {
+						Button("Save Timetable", systemImage: "square.and.arrow.down", action: importTimetable)
+							.buttonStyle(.glassProminent)
 					}
 				}
 				.frame(height: 50)
-				.animation(.easeInOut, value: pass == nil)
+				.animation(.easeInOut, value: imported)
 				.padding([.bottom, .horizontal], 20)
 			}
 			.toolbar {
@@ -105,37 +96,27 @@ struct TimetableDetailView: View {
 	}
 
 	private func load() async {
-		async let detailResult = TimetableDiscoveryService.shared.detail(id: result.id)
-		async let passResult = WalletPassService.shared.downloadPass(timetableID: result.id)
-		do { detail = try await detailResult } catch { show(error, title: "Unable to load timetable") }
-		do {
-			pass = try await passResult
-			passLoadFailed = false
-		} catch is CancellationError {
-			return
-		} catch {
-			passLoadFailed = true
-			show(error, title: "Unable to download pass")
-		}
+		do { detail = try await TimetableDiscoveryService.shared.detail(id: result.id) } catch { show(error, title: "Unable to load timetable") }
 		isWorking = false
 	}
 
-	private func download() {
+	private func importTimetable() {
 		guard SessionStore.shared.isAuthenticated else {
 			showSignInRequired()
 			return
 		}
 
 		isWorking = true
-		passLoadFailed = false
 
 		Task {
 			defer { isWorking = false }
 
 			do {
-				pass = try await WalletPassService.shared.downloadPass(timetableID: result.id)
+				_ = try await ReceivedTimetableSyncService.shared.importTimetable(id: result.id)
+				imported = true
+				badges.addBadge(id: UUID(), title: "Timetable saved", priority: 3, view: .success)
 			} catch {
-				show(error, title: "Unable to download pass")
+				show(error, title: "Unable to save timetable")
 			}
 		}
 	}

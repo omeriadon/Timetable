@@ -23,7 +23,7 @@ struct TimetableView: View {
 	@Default(.timetable) var subjects
 	@Default(.timetableHighlightsCurrentDay) private var highlightsCurrentDay
 
-	@Environment(\.passManager) private var passManager
+	@Default(.receivedTimetables) private var receivedTimetables
 
 	@State private var selectedTimetable: ReceivedTimetable?
 	@State private var showTimetableComparison = false
@@ -183,10 +183,10 @@ struct TimetableView: View {
 			guard let destination = notification.object as? TimetableDeepLink else { return }
 			switch destination {
 				case let .timetable(id):
-					selectedTimetable = id.flatMap { received in passManager.receivedTimetables.first { $0.id == received } }
+					selectedTimetable = id.flatMap { received in receivedTimetables.first { $0.id == received && !$0.isDeleted } }
 					selectedSlot = nil
 				case let .subject(timetableID, subjectID, slot):
-					selectedTimetable = timetableID.flatMap { received in passManager.receivedTimetables.first { $0.id == received } }
+					selectedTimetable = timetableID.flatMap { received in receivedTimetables.first { $0.id == received && !$0.isDeleted } }
 					selectedSlot = slot ?? selectedTimetable?.subjects.first(where: { $0.id == subjectID })?.slots.first
 			}
 		}

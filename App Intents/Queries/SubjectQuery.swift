@@ -11,7 +11,7 @@ import Defaults
 struct SubjectQuery: EntityStringQuery {
 	func entities(for identifiers: [String]) async -> [SubjectEntity] {
 		await MainActor.run {
-			let receivedTimetables = Defaults[.receivedTimetables].filter { !$0.isDeleted && !Defaults[.receivedTombstoneIDs].contains($0.id) }
+			let receivedTimetables = Defaults[.receivedTimetables].filter { !$0.isDeleted }
 			let identifierSet = Set(identifiers)
 
 			var result = Defaults[.timetable].filter { identifierSet.contains("subject.owner.\($0.id)") || identifierSet.contains($0.id) }.toSubjectEntities(prefix: "subject.owner")
@@ -22,7 +22,7 @@ struct SubjectQuery: EntityStringQuery {
 
 	func entities(matching string: String) async -> [SubjectEntity] {
 		await MainActor.run {
-			let receivedTimetables = Defaults[.receivedTimetables].filter { !$0.isDeleted && !Defaults[.receivedTombstoneIDs].contains($0.id) }
+			let receivedTimetables = Defaults[.receivedTimetables].filter { !$0.isDeleted }
 
 			return Defaults[.timetable].filter { $0.id.localizedCaseInsensitiveContains(string) }.toSubjectEntities(prefix: "subject.owner") + receivedTimetables.flatMap { timetable in
 				timetable.subjects.filter { $0.id.localizedCaseInsensitiveContains(string) }.toSubjectEntities(prefix: "subject.received.\(timetable.id)")
@@ -32,7 +32,7 @@ struct SubjectQuery: EntityStringQuery {
 
 	func suggestedEntities() async -> [SubjectEntity] {
 		await MainActor.run {
-			let receivedTimetables = Defaults[.receivedTimetables].filter { !$0.isDeleted && !Defaults[.receivedTombstoneIDs].contains($0.id) }
+			let receivedTimetables = Defaults[.receivedTimetables].filter { !$0.isDeleted }
 
 			return Defaults[.timetable].toSubjectEntities(prefix: "subject.owner") + receivedTimetables
 				.flatMap { timetable -> [SubjectEntity] in

@@ -16,8 +16,8 @@ struct RenameTimetable: Identifiable {
 
 struct SettingsView: View {
 	@Default(.timetable) var subjects
+	@Default(.receivedTimetables) private var receivedTimetables
 
-	@Environment(\.passManager) private var passManager
 	@Environment(\.statusBadgeManager) private var statusBadgeManager
 	@State private var sessionStore = SessionStore.shared
 	@State private var networkManager = NetworkManager.shared
@@ -171,7 +171,7 @@ struct SettingsView: View {
 				}
 			}
 
-			if !passManager.receivedTimetables.isEmpty {
+			if receivedTimetables.contains(where: { !$0.isDeleted }) {
 				Section("Imported Timetables") {
 					Button {
 						if sessionStore.isAuthenticated {
@@ -195,7 +195,7 @@ struct SettingsView: View {
 							.frame(width: 600, height: 500)
 						#endif
 					}
-					.onChange(of: passManager.receivedTimetables) { _, newValue in
+					.onChange(of: receivedTimetables) { _, newValue in
 						if newValue.isEmpty {}
 					}
 				}
@@ -228,19 +228,19 @@ struct SettingsView: View {
 				Button("Test progress and gauge badge", systemImage: "arrow.trianglehead.2.clockwise.rotate.90") {
 					Task {
 						let id = UUID()
-						statusBadgeManager.addBadge(id: id, title: "Preparing Wallet pass", priority: 3, view: .progressViewAndGauge(currentStep: 1, totalSteps: 3))
+						statusBadgeManager.addBadge(id: id, title: "Preparing timetable", priority: 3, view: .progressViewAndGauge(currentStep: 1, totalSteps: 3))
 
 						try? await Task.sleep(for: .seconds(1))
 
-						statusBadgeManager.updateBadge(id: id, title: "Preparing Wallet pass", view: .progressViewAndGauge(currentStep: 2, totalSteps: 3))
+						statusBadgeManager.updateBadge(id: id, title: "Preparing timetable", view: .progressViewAndGauge(currentStep: 2, totalSteps: 3))
 
 						try? await Task.sleep(for: .seconds(1))
 
-						statusBadgeManager.updateBadge(id: id, title: "Preparing Wallet pass", view: .progressViewAndGauge(currentStep: 3, totalSteps: 3))
+						statusBadgeManager.updateBadge(id: id, title: "Preparing timetable", view: .progressViewAndGauge(currentStep: 3, totalSteps: 3))
 
 						try? await Task.sleep(for: .seconds(1))
 
-						statusBadgeManager.updateBadge(id: id, title: "Prepared Wallet pass", view: .success)
+						statusBadgeManager.updateBadge(id: id, title: "Prepared timetable", view: .success)
 					}
 				}
 

@@ -10,6 +10,7 @@ import Security
 
 enum KeychainManager {
 	private static let service = "com.omeriadon.Timetable"
+	private static let sharedAccessGroup = "P6PV2R9443.com.omeriadon.Timetable.keychain.shared"
 
 	@discardableResult
 	static func save(data: Data, forKey key: String) -> Bool {
@@ -17,6 +18,7 @@ enum KeychainManager {
 			kSecClass as String: kSecClassGenericPassword,
 			kSecAttrAccount as String: key,
 			kSecAttrService as String: service,
+			kSecAttrAccessGroup as String: sharedAccessGroup,
 		]
 
 		let attributes: [String: Any] = [
@@ -44,13 +46,25 @@ enum KeychainManager {
 	}
 
 	static func readData(forKey key: String) -> Data? {
-		let query: [String: Any] = [
+		if let data = readData(forKey: key, accessGroup: sharedAccessGroup) {
+			return data
+		}
+		guard let legacyData = readData(forKey: key, accessGroup: nil) else { return nil }
+		_ = save(data: legacyData, forKey: key)
+		return legacyData
+	}
+
+	private static func readData(forKey key: String, accessGroup: String?) -> Data? {
+		var query: [String: Any] = [
 			kSecClass as String: kSecClassGenericPassword,
 			kSecAttrAccount as String: key,
 			kSecAttrService as String: service,
 			kSecReturnData as String: kCFBooleanTrue as Any,
 			kSecMatchLimit as String: kSecMatchLimitOne,
 		]
+		if let accessGroup {
+			query[kSecAttrAccessGroup as String] = accessGroup
+		}
 
 		var dataTypeRef: AnyObject?
 		let status = SecItemCopyMatching(query as CFDictionary, &dataTypeRef)
@@ -69,14 +83,18 @@ enum KeychainManager {
 
 	@discardableResult
 	static func delete(forKey key: String) -> Bool {
-		let query: [String: Any] = [
+		let sharedQuery: [String: Any] = [
 			kSecClass as String: kSecClassGenericPassword,
 			kSecAttrAccount as String: key,
 			kSecAttrService as String: service,
+			kSecAttrAccessGroup as String: sharedAccessGroup,
 		]
 
-		let status = SecItemDelete(query as CFDictionary)
-		return status == errSecSuccess || status == errSecItemNotFound
+		let sharedStatus = SecItemDelete(sharedQuery as CFDictionary)
+		var legacyQuery = sharedQuery
+		legacyQuery.removeValue(forKey: kSecAttrAccessGroup as String)
+		let legacyStatus = SecItemDelete(legacyQuery as CFDictionary)
+		return [sharedStatus, legacyStatus].allSatisfy { $0 == errSecSuccess || $0 == errSecItemNotFound }
 	}
 }
 

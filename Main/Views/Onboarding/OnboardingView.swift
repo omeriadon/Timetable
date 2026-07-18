@@ -93,13 +93,13 @@ struct OnboardingView: View {
 			}
 		}
 		.task { await buildPages() }
-		.onChange(of: sessionStore.state) { _, _ in
+		.onChange(of: sessionStore.state) {
 			Task { await buildPages(preserving: selectedID) }
 		}
-		.onChange(of: hasCompletedAccountBootstrap) { _, _ in
+		.onChange(of: hasCompletedAccountBootstrap) {
 			Task { await buildPages(preserving: selectedID) }
 		}
-		.onChange(of: subjects) { _, _ in
+		.onChange(of: subjects) {
 			Task { await buildPages(preserving: selectedID) }
 		}
 	}
@@ -285,9 +285,6 @@ struct OnboardingView: View {
 			},
 			OnboardingPage(id: "friends", title: "Friends' Timetables") {
 				FriendsTutorial()
-			},
-			OnboardingPage(id: "wallet", title: "Apple Wallet") {
-				WalletTutorial()
 			},
 			OnboardingPage(id: "timetableTypes", title: "Timetable Types") {
 				TimetableTypesTutorial()

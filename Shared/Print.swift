@@ -19,7 +19,6 @@ enum LogCategory: String {
 	case passes = "Passes"
 	case server = "Server"
 	case spotlight = "Spotlight"
-	case wallet = "Wallet"
 	case watch = "Watch"
 	case widget = "Widget"
 }

@@ -15,7 +15,7 @@
 
 - Imports your calendar from Apple Calendar
 - Fully integrated with Siri and Apple Intelligence
-- Import and export timetables using Apple Wallet passes
+- Share and import timetables through Messages and canonical links
 - Live Activities throught the school day showing next subject, etc
 - Notifications for each period
 - iOS, macOS, watchOS widgets

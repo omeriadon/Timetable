@@ -36,15 +36,17 @@ nonisolated struct OwnerTimetableVisibilityUpdateRequest: Codable {
 }
 
 nonisolated struct OwnerTimetableResponse: Codable {
+	let id: UUID?
 	let subjects: [Subject]
 	let revision: Int
 	let updatedAt: Date?
 	let isSearchable: Bool
 
-	private enum CodingKeys: String, CodingKey { case subjects, revision, updatedAt, isSearchable }
+	private enum CodingKeys: String, CodingKey { case id, subjects, revision, updatedAt, isSearchable }
 
 	init(from decoder: any Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
+		id = try container.decodeIfPresent(UUID.self, forKey: .id)
 		subjects = try container.decode([Subject].self, forKey: .subjects)
 		revision = try container.decode(Int.self, forKey: .revision)
 		updatedAt = try container.decodeIfPresent(Date.self, forKey: .updatedAt)
@@ -71,7 +73,7 @@ nonisolated struct TimetableDetailResponse: Codable, Identifiable, Hashable {
 	let subjectCount: Int
 	let weeklyLessonCount: Int
 	let updatedAt: Date?
-	let activeInstallCount: Int
+	let savedByCount: Int
 	let isSearchable: Bool
 	let canEdit: Bool
 }
@@ -91,64 +93,44 @@ nonisolated struct FeedbackRequest: Codable {
 	let message: String
 }
 
-nonisolated struct ReceivedPassMirrorDTO: Codable {
-	let id: String
-	let issuerAccountID: String
-	let sourceKind: SourceKind
-	let signedDisplayName: String
-	let authorDisplayName: String?
-	let subjects: [Subject]
-	let receivedAt: Date
-	let passUpdatedAt: Date
-	let contentRevision: Int
-	let isDeleted: Bool
-	let isShareable: Bool
-	let walletRevision: Int
+nonisolated enum ReceivedTimetableAvailability: String, Codable {
+	case available
+	case deleted
+}
 
-	init(_ timetable: ReceivedTimetable, walletRevision: Int) {
-		id = timetable.id
-		issuerAccountID = timetable.issuerAccountID
-		sourceKind = timetable.sourceKind
-		signedDisplayName = timetable.signedDisplayName
-		authorDisplayName = timetable.authorDisplayName
-		subjects = timetable.subjects
-		receivedAt = timetable.receivedAt
-		passUpdatedAt = timetable.passUpdatedAt
-		contentRevision = timetable.contentRevision
-		isDeleted = timetable.isDeleted
-		isShareable = timetable.isShareable
-		self.walletRevision = walletRevision
-	}
+nonisolated struct AuthoritativeReceivedTimetableDTO: Codable {
+	let importID: UUID
+	let id: UUID
+	let title: String?
+	let authorAccountID: UUID?
+	let authorDisplayName: String?
+	let sourceKind: SourceKind
+	let subjects: [Subject]
+	let revision: Int?
+	let updatedAt: Date?
+	let importedAt: Date
+	let availability: ReceivedTimetableAvailability
 
 	var receivedTimetable: ReceivedTimetable {
 		ReceivedTimetable(
-			id: id,
-			issuerAccountID: issuerAccountID,
+			id: id.uuidString,
+			importID: importID.uuidString,
+			issuerAccountID: authorAccountID?.uuidString ?? "",
 			sourceKind: sourceKind,
-			signedDisplayName: signedDisplayName,
+			signedDisplayName: title ?? "Unavailable Timetable",
 			authorDisplayName: authorDisplayName,
 			subjects: subjects,
-			receivedAt: receivedAt,
-			passUpdatedAt: passUpdatedAt,
-			contentRevision: contentRevision,
-			isDeleted: isDeleted,
-			isShareable: isShareable
+			receivedAt: importedAt,
+			passUpdatedAt: updatedAt ?? importedAt,
+			contentRevision: revision ?? 0,
+			isDeleted: availability == .deleted,
+			isShareable: availability == .available
 		)
 	}
 }
 
-nonisolated struct ReceivedProjectionUpdateRequest: Codable {
-	let timetables: [ReceivedPassMirrorDTO]
-	let walletRevision: Int
-}
-
-nonisolated struct ReceivedNameOverrideResponse: Codable {
-	let serialNumber: String
-	let displayName: String
-}
-
-nonisolated struct UpdateReceivedNameOverrideRequest: Codable {
-	let displayName: String
+nonisolated struct ReceivedTimetableImportRequest: Codable {
+	let timetableID: UUID
 }
 
 nonisolated struct RegisterUserDeviceRequest: Codable {

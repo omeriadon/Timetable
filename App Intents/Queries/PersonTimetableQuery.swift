@@ -26,7 +26,7 @@ struct PersonTimetableQuery: EntityStringQuery {
 	private func allEntities() -> [PersonTimetableEntity] {
 		let owner = PersonTimetableEntity(id: PersonTimetableEntity.ownerID, displayName: "You")
 		let received = Defaults[.receivedTimetables]
-			.filter { !$0.isDeleted && !Defaults[.receivedTombstoneIDs].contains($0.id) }
+			.filter { !$0.isDeleted }
 			.map { PersonTimetableEntity(id: $0.id, displayName: $0.sender) }
 		return [owner] + received
 	}

@@ -8,7 +8,7 @@ struct OnboardingOverview: View {
 			Image(systemName: "calendar.badge.checkmark")
 				.font(.system(size: 76))
 
-			Text("Timetable brings your schedule, reminders, sharing, widgets, and Wallet passes together.")
+			Text("Timetable brings your schedule, reminders, sharing, and widgets together.")
 				.font(.title2)
 				.multilineTextAlignment(.center)
 

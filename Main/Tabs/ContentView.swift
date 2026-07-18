@@ -259,14 +259,14 @@ extension Notification.Name {
 							topController = presented
 						}
 
-						presentSharePassWorkflow(for: selectedItem, from: topController)
+						presentShareWorkflow(for: selectedItem, from: topController)
 					} else {
 						parent.isBlurred = false
 					}
 				}
 			}
 
-			private func presentSharePassWorkflow(for selectedItem: SelectedShareItem, from targetVC: UIViewController) {
+			private func presentShareWorkflow(for selectedItem: SelectedShareItem, from targetVC: UIViewController) {
 				Task { @MainActor [weak self, weak targetVC] in
 					guard let self, let targetVC else { return }
 					guard SessionStore.shared.isAuthenticated else {
@@ -276,24 +276,24 @@ extension Notification.Name {
 					}
 
 					do {
-						let url: URL = switch selectedItem {
-							case .owner:
-								try await WalletPassService.shared.ownerPassFileURL()
-							case let .authored(id, name):
-								try await WalletPassService.shared.passFileURL(timetableID: id, name: name)
-							case let .received(id, _):
-								try await WalletPassService.shared.receivedPassFileURL(serialNumber: id)
+						let id: UUID? = switch selectedItem {
+							case let .owner(id): id
+							case let .authored(id, _): id
+							case let .received(id, _): UUID(uuidString: id)
+						}
+						guard let id, let url = URL(string: "https://timetable.adonis.pt/sharedtimetable/\(id.uuidString)") else {
+							throw URLError(.badURL)
 						}
 						presentShareSheet(with: url, from: targetVC)
 					} catch where error.isCancellation {
 						parent.isBlurred = false
 						return
 					} catch {
-						PrintError("[Wallet] Background Share Error: \(error)")
+						PrintError("Background share error: \(error)")
 						parent.isBlurred = false
 						StatusBadgeManager.shared.addBadge(
 							id: UUID(),
-							title: "Unable to generate your shareable pass.",
+							title: "Unable to share timetable.",
 							priority: 4,
 							view: .error
 						)
@@ -301,9 +301,9 @@ extension Notification.Name {
 				}
 			}
 
-			private func presentShareSheet(with fileURL: URL, from targetVC: UIViewController) {
+			private func presentShareSheet(with url: URL, from targetVC: UIViewController) {
 				let activityViewController = UIActivityViewController(
-					activityItems: [fileURL],
+					activityItems: [url],
 					applicationActivities: nil
 				)
 

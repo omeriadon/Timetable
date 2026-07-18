@@ -5,10 +5,11 @@
 //   Created by Adon Omeri on 11/6/2026.
 //
 
+import Defaults
 import SwiftUI
 
 struct TimetableComparison: View {
-	@Environment(\.passManager) private var passManager
+	@Default(.receivedTimetables) private var receivedTimetables
 
 	let selectedSlot: Slot?
 	let subject: Subject?
@@ -17,7 +18,7 @@ struct TimetableComparison: View {
 
 	var body: some View {
 		VStack(spacing: 14) {
-			let friends = passManager.receivedTimetables.filter { $0.sourceKind != .accountOwner }
+			let friends = receivedTimetables.filter { !$0.isDeleted && $0.sourceKind != .accountOwner }
 			if friends.isEmpty {
 				#if os(iOS)
 					ContentUnavailableView {

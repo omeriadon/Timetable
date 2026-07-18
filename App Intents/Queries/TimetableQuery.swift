@@ -11,7 +11,7 @@ import Defaults
 struct TimetableQuery: EntityStringQuery {
 	func entities(for identifiers: [String]) async throws -> [TimetableEntity] {
 		await MainActor.run {
-			let receivedTimetables = Defaults[.receivedTimetables].filter { !$0.isDeleted && !Defaults[.receivedTombstoneIDs].contains($0.id) }
+			let receivedTimetables = Defaults[.receivedTimetables].filter { !$0.isDeleted }
 
 			var result = receivedTimetables.filter { t in
 				identifiers.contains(t.id) || identifiers.contains("timetable.received.\(t.id)") ||
@@ -27,7 +27,7 @@ struct TimetableQuery: EntityStringQuery {
 
 	func entities(matching string: String) async throws -> [TimetableEntity] {
 		await MainActor.run {
-			let receivedTimetables = Defaults[.receivedTimetables].filter { !$0.isDeleted && !Defaults[.receivedTombstoneIDs].contains($0.id) }
+			let receivedTimetables = Defaults[.receivedTimetables].filter { !$0.isDeleted }
 
 			return receivedTimetables.filter { t in
 				t.sender.localizedCaseInsensitiveContains(string) ||
@@ -40,7 +40,7 @@ struct TimetableQuery: EntityStringQuery {
 
 	func suggestedEntities() async throws -> [TimetableEntity] {
 		await MainActor.run {
-			let received = Defaults[.receivedTimetables].filter { !$0.isDeleted && !Defaults[.receivedTombstoneIDs].contains($0.id) }.toTimetableEntities()
+			let received = Defaults[.receivedTimetables].filter { !$0.isDeleted }.toTimetableEntities()
 			return [TimetableEntity(id: "timetable.owner", subjects: Defaults[.timetable].toSubjectEntities(prefix: "subject.owner"))] + received
 		}
 	}

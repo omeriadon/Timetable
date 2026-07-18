@@ -11,6 +11,7 @@ import Foundation
 typealias ReceivedTimetables = [ReceivedTimetable]
 nonisolated struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiable, Hashable, Equatable {
 	let id: String
+	let importID: String?
 	let issuerAccountID: String
 	let sourceKind: SourceKind
 	let signedDisplayName: String
@@ -23,13 +24,14 @@ nonisolated struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiab
 	let isShareable: Bool
 
 	private enum CodingKeys: String, CodingKey {
-		case id, issuerAccountID, sourceKind, signedDisplayName, authorDisplayName
+		case id, importID, issuerAccountID, sourceKind, signedDisplayName, authorDisplayName
 		case subjects, receivedAt, passUpdatedAt, contentRevision, isDeleted, isShareable
 	}
 
 	init(from decoder: any Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		id = try container.decode(String.self, forKey: .id)
+		importID = try container.decodeIfPresent(String.self, forKey: .importID)
 		issuerAccountID = try container.decode(String.self, forKey: .issuerAccountID)
 		sourceKind = try container.decode(SourceKind.self, forKey: .sourceKind)
 		signedDisplayName = try container.decode(String.self, forKey: .signedDisplayName)
@@ -56,6 +58,7 @@ nonisolated struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiab
 	init(sender: String, subjects: [Subject], receivedAt: Date) {
 		let id = UUID().uuidString
 		self.id = id
+		importID = nil
 		issuerAccountID = id
 		sourceKind = .accountOwner
 		signedDisplayName = sender
@@ -70,6 +73,7 @@ nonisolated struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiab
 
 	init(
 		id: String,
+		importID: String? = nil,
 		issuerAccountID: String,
 		sourceKind: SourceKind,
 		signedDisplayName: String,
@@ -82,6 +86,7 @@ nonisolated struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiab
 		isShareable: Bool = false
 	) {
 		self.id = id
+		self.importID = importID
 		self.issuerAccountID = issuerAccountID
 		self.sourceKind = sourceKind
 		self.signedDisplayName = signedDisplayName

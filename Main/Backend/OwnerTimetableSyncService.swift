@@ -60,14 +60,22 @@ final class OwnerTimetableSyncService {
 
 	func uploadOwnerTimetableResponse(subjects: [Subject]? = nil) async throws -> OwnerTimetableResponse {
 		try Platform.require(Platform.current.allowsOwnerMutation)
-		return try await run(.upload) { [self] in
+		let response: OwnerTimetableResponse = try await run(.upload) { [self] in
 			try await performUpload(subjects: subjects)
 		}
+		cacheID(response.id)
+		return response
 	}
 
 	func downloadOwnerTimetable() async throws {
 		try await run(.download) { [self] in
 			try await performDownload()
+		}
+	}
+
+	private func cacheID(_ id: UUID?) {
+		if let id {
+			Defaults[.ownerTimetableID] = id.uuidString
 		}
 	}
 
@@ -205,6 +213,7 @@ final class OwnerTimetableSyncService {
 		)
 
 		Defaults[.ownerIsSearchable] = response.isSearchable
+		cacheID(response.id)
 		Defaults[.lastServerSync] = Date.now
 
 		Print("Uploaded owner timetable revision \(response.revision)", category: .network)
@@ -219,6 +228,7 @@ final class OwnerTimetableSyncService {
 		let response: OwnerTimetableResponse = try await networkManager.send(.v1OwnerTimetable)
 
 		Defaults[.timetable] = response.subjects
+		cacheID(response.id)
 		Task { await SpotlightIndexer.shared.indexOwnerTimetable() }
 		Defaults[.ownerIsSearchable] = response.isSearchable
 		Defaults[.lastServerSync] = Date.now
@@ -232,6 +242,7 @@ final class OwnerTimetableSyncService {
 
 	private func performReconciliation() async throws {
 		let response: OwnerTimetableResponse = try await networkManager.send(.v1OwnerTimetable)
+		cacheID(response.id)
 
 		let localTimetable = Defaults[.timetable]
 		let lastServerSync = Defaults[.lastServerSync]
@@ -259,6 +270,7 @@ final class OwnerTimetableSyncService {
 		)
 
 		Defaults[.ownerIsSearchable] = updated.isSearchable
+		cacheID(updated.id)
 		Defaults[.lastServerSync] = Date.now
 
 		Print("Reconciled owner timetable revision \(updated.revision)", category: .network)

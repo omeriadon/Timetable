@@ -33,13 +33,13 @@ enum WindowMode: Int, Equatable, Identifiable {
 @main
 struct TimetableApp: App {
 	@State var expanded: WindowMode = .none
+	@Environment(\.scenePhase) private var scenePhase
 
 	@Default(.hasCompletedOnboarding) private var hasCompletedOnboarding
 	#if os(iOS)
 		@State private var launchIllusionVisible = true
 	#endif
 
-	@State private var passManager = TimetablePassManager()
 	@State private var sessionStore = SessionStore.shared
 	@State private var statusBadgeManager = StatusBadgeManager.shared
 
@@ -103,10 +103,6 @@ struct TimetableApp: App {
 			#endif
 			.task {
 				NetworkManager.shared.configureFeedback { StatusBadgeManager.shared.present(networkError: $0) }
-				passManager.configureProjectionUpload {
-					guard sessionStore.isAuthenticated else { return }
-					try await ReceivedTimetableSyncService.shared.uploadCurrentProjection()
-				}
 				sessionStore.configureAccountBootstrap {
 					try await AccountBootstrapService.shared.bootstrap()
 				}
@@ -144,8 +140,11 @@ struct TimetableApp: App {
 				OnboardingView()
 					.interactiveDismissDisabled()
 			}
-			.environment(\.passManager, passManager)
 			#endif // os(iOS)
+			.onChange(of: scenePhase) { _, phase in
+				guard phase == .active else { return }
+				Task { await MessageImportReconciliationService.reconcile() }
+			}
 			.monospaced()
 			.environment(\.statusBadgeManager, statusBadgeManager)
 			.buttonStyle(.haptic)

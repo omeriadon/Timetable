@@ -24,10 +24,12 @@
 		2ABBBA062FF4AD3A00878A9D /* PortalTransitions in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2ABBBA052FF4AD3A00878A9D /* PortalTransitions */; };
 		2AC5F7ED2FD8435700B813EA /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AC5F7EC2FD8435700B813EA /* Defaults */; };
 		2ADFCA8F2FF66F1A00B4301E /* WindowOverlay in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2ADFCA8E2FF66F1A00B4301E /* WindowOverlay */; };
+		2AE0586F300B591D00473DBD /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2A02379A2F9C907000AB1E1F /* Defaults */; };
 		2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */ = {isa = PBXBuildFile; platformFilters = (macos, ); productRef = 2AE0F13A2FE03989002B5D9D /* MaterialView */; };
-		2AF3B0103000000000000010 /* Platform.swift in TimetableTests Sources */ = {isa = PBXBuildFile; fileRef = 2AF3B00E300000000000000E /* Platform.swift */; };
-		2AF3B0113000000000000011 /* AuthRequestDTOs.swift in TimetableTests Sources */ = {isa = PBXBuildFile; fileRef = 2AF3B00F300000000000000F /* AuthRequestDTOs.swift */; };
-		2AF3B0123000000000000012 /* OnboardingState.swift in TimetableTests Sources */ = {isa = PBXBuildFile; fileRef = 2AF3B0133000000000000013 /* OnboardingState.swift */; };
+		2AF3B0103000000000000010 /* Shared/Platform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF3B00E300000000000000E /* Shared/Platform.swift */; };
+		2AF3B0113000000000000011 /* App Shared/Networking/AuthRequestDTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF3B00F300000000000000F /* App Shared/Networking/AuthRequestDTOs.swift */; };
+		2AF3B0123000000000000012 /* Shared/OnboardingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF3B0133000000000000013 /* Shared/OnboardingState.swift */; };
+		2B0000013000000000000001 /* Messages.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2B0000023000000000000002 /* Messages.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +53,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 2AA6DF132FDFAC8F00BBC70E;
 			remoteInfo = WidgetExtension;
+		};
+		2B0000033000000000000003 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2A0237832F9C8EA000AB1E1F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2B0000043000000000000004;
+			remoteInfo = Messages;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -95,6 +104,7 @@
 			dstSubfolder = PlugIns;
 			files = (
 				2AA6DF242FDFAC9000BBC70E /* Widget.appex in Embed Foundation Extensions */,
+				2B0000013000000000000001 /* Messages.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 		};
@@ -106,12 +116,21 @@
 		2A2586A02FB5D6490030C8CD /* Watch Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Watch Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2AA6DF142FDFAC8F00BBC70E /* Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Widget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2AF3B0073000000000000007 /* TimetableTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TimetableTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		2AF3B00E300000000000000E /* Platform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/Platform.swift; sourceTree = SOURCE_ROOT; };
-		2AF3B00F300000000000000F /* AuthRequestDTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "App Shared/Networking/AuthRequestDTOs.swift"; sourceTree = SOURCE_ROOT; };
-		2AF3B0133000000000000013 /* OnboardingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/OnboardingState.swift; sourceTree = SOURCE_ROOT; };
+		2AF3B00E300000000000000E /* Shared/Platform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/Platform.swift; sourceTree = SOURCE_ROOT; };
+		2AF3B00F300000000000000F /* App Shared/Networking/AuthRequestDTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "App Shared/Networking/AuthRequestDTOs.swift"; sourceTree = SOURCE_ROOT; };
+		2AF3B0133000000000000013 /* Shared/OnboardingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/OnboardingState.swift; sourceTree = SOURCE_ROOT; };
+		2B0000023000000000000002 /* Messages.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Messages.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		2B00000D300000000000000D /* Exceptions for "Messages" folder in "Messages" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				Messages.entitlements,
+			);
+			target = 2B0000043000000000000004 /* Messages */;
+		};
 		2A0DF9533001EBD400AA3439 /* Exceptions for "Shared" folder in "Watch Widget" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -156,7 +175,6 @@
 				Tabs/Search/TimetableIdentityView.swift = (ios, );
 				Tabs/Search/TimetablePortalIdentityView.swift = (ios, );
 				Tabs/Search/TimetableSearchView.swift = (ios, );
-				Tabs/Settings/AddPassView.swift = (ios, );
 				Tabs/Settings/AuthoredTimetablesSettingsView.swift = (ios, );
 				Tabs/Settings/ReceivedTimetablesView.swift = (ios, );
 				Tabs/VariableBlur.swift = (ios, );
@@ -178,7 +196,6 @@
 				Views/Onboarding/Views/Tutorial/SearchTutorial.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/ShareTutorial.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/TimetableTypesTutorial.swift = (ios, );
-				Views/Onboarding/Views/Tutorial/WalletTutorial.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/WidgetTutorial.swift = (ios, );
 				"Views/Subject Editor/main sheet.swift" = (ios, );
 				iOS/LiveActivityDebugView.swift = (ios, );
@@ -280,14 +297,9 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		2AF3B0013000000000000001 /* TimetableTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = TimetableTests;
-			sourceTree = "<group>";
-		};
 		2A02379F2F9C908300AB1E1F /* Shared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-				exceptions = (
+			exceptions = (
 				2A0DF9533001EBD400AA3439 /* Exceptions for "Shared" folder in "Watch Widget" target */,
 				2A0DF9543001EBD400AA3439 /* Exceptions for "Shared" folder in "Widget" target */,
 			);
@@ -344,6 +356,19 @@
 			path = Special;
 			sourceTree = "<group>";
 		};
+		2AF3B0013000000000000001 /* TimetableTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TimetableTests;
+			sourceTree = "<group>";
+		};
+		2B0000053000000000000005 /* Messages */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				2B00000D300000000000000D /* Exceptions for "Messages" folder in "Messages" target */,
+			);
+			path = Messages;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -382,18 +407,24 @@
 				2AA6DF2C2FDFADAE00BBC70E /* Defaults in Frameworks */,
 			);
 		};
-/* End PBXFrameworksBuildPhase section */
-
-		2AF3B0043000000000000004 /* TimetableTests Frameworks */ = {
+		2AF3B0043000000000000004 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				2AE0586F300B591D00473DBD /* Defaults in Frameworks */,
+			);
+		};
+		2B0000063000000000000006 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
 			);
 		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		2A0237822F9C8EA000AB1E1F = {
 			isa = PBXGroup;
 			children = (
+				2B0000053000000000000005 /* Messages */,
 				2AD85A712FE8F239004EAB2B /* Special */,
 				2A5F92192FE66817007302CF /* App Intents */,
 				2A60F50B2FD953D1009F4CE8 /* Watch */,
@@ -402,6 +433,7 @@
 				2A324AAE2FF0E3A100E6A3D5 /* App Shared */,
 				2AAE62702FD839A7004B3FF4 /* Main */,
 				2A02378C2F9C8EA000AB1E1F /* Products */,
+				2AE05870300B591D00473DBD /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -413,8 +445,20 @@
 				2A2586A02FB5D6490030C8CD /* Watch Widget.appex */,
 				2AA6DF142FDFAC8F00BBC70E /* Widget.appex */,
 				2AF3B0073000000000000007 /* TimetableTests.xctest */,
+				2B0000023000000000000002 /* Messages.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		2AE05870300B591D00473DBD /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				2AF3B0013000000000000001 /* TimetableTests */,
+				2AF3B00E300000000000000E /* Shared/Platform.swift */,
+				2AF3B00F300000000000000F /* App Shared/Networking/AuthRequestDTOs.swift */,
+				2AF3B0133000000000000013 /* Shared/OnboardingState.swift */,
+			);
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -436,6 +480,7 @@
 			dependencies = (
 				2A098C8C2F9DB844002065BE /* PBXTargetDependency */,
 				2AA6DF232FDFAC9000BBC70E /* PBXTargetDependency */,
+				2B00000A300000000000000A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				2A02379F2F9C908300AB1E1F /* Shared */,
@@ -545,13 +590,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2AF3B00A300000000000000A /* Build configuration list for PBXNativeTarget "TimetableTests" */;
 			buildPhases = (
-				2AF3B0033000000000000003 /* TimetableTests Sources */,
-				2AF3B0043000000000000004 /* TimetableTests Frameworks */,
-				2AF3B0053000000000000005 /* TimetableTests Resources */,
+				2AF3B0033000000000000003 /* Sources */,
+				2AF3B0043000000000000004 /* Frameworks */,
+				2AF3B0053000000000000005 /* Resources */,
 			);
 			buildRules = (
-			);
-			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
 				2AF3B0013000000000000001 /* TimetableTests */,
@@ -564,13 +607,35 @@
 			productReference = 2AF3B0073000000000000007 /* TimetableTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		2B0000043000000000000004 /* Messages */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2B0000073000000000000007 /* Build configuration list for PBXNativeTarget "Messages" */;
+			buildPhases = (
+				2B0000083000000000000008 /* Sources */,
+				2B0000063000000000000006 /* Frameworks */,
+				2B0000093000000000000009 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				2B0000053000000000000005 /* Messages */,
+			);
+			name = Messages;
+			packageProductDependencies = (
+			);
+			productName = Messages;
+			productReference = 2B0000023000000000000002 /* Messages.appex */;
+			productType = "com.apple.product-type.app-extension.messages";
+		};
 /* End PBXNativeTarget section */
-
 
 /* Begin PBXProject section */
 		2A0237832F9C8EA000AB1E1F /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				2AF3B0023000000000000002 = {
+					CreatedOnToolsVersion = 27.0;
+				};
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2700;
 				LastUpgradeCheck = 2700;
@@ -578,7 +643,7 @@
 					2A02378A2F9C8EA000AB1E1F = {
 						CreatedOnToolsVersion = 26.5;
 					};
-				2A098C822F9DB842002065BE = {
+					2A098C822F9DB842002065BE = {
 						CreatedOnToolsVersion = 26.5;
 					};
 					2A25869F2FB5D6490030C8CD = {
@@ -587,9 +652,9 @@
 					2AA6DF132FDFAC8F00BBC70E = {
 						CreatedOnToolsVersion = 27.0;
 					};
-				};
-				2AF3B0023000000000000002 = {
-					CreatedOnToolsVersion = 27.0;
+					2B0000043000000000000004 = {
+						CreatedOnToolsVersion = 27.0;
+					};
 				};
 			};
 			buildConfigurationList = 2A0237862F9C8EA000AB1E1F /* Build configuration list for PBXProject "Timetable" */;
@@ -623,6 +688,7 @@
 				2AA6DF132FDFAC8F00BBC70E /* Widget */,
 				2A098C822F9DB842002065BE /* Watch */,
 				2AF3B0023000000000000002 /* TimetableTests */,
+				2B0000043000000000000004 /* Messages */,
 			);
 		};
 /* End PBXProject section */
@@ -648,7 +714,12 @@
 			files = (
 			);
 		};
-		2AF3B0053000000000000005 /* TimetableTests Resources */ = {
+		2AF3B0053000000000000005 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		2B0000093000000000000009 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
 			);
@@ -676,12 +747,17 @@
 			files = (
 			);
 		};
-		2AF3B0033000000000000003 /* TimetableTests Sources */ = {
+		2AF3B0033000000000000003 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
-				2AF3B0103000000000000010 /* Platform.swift in TimetableTests Sources */,
-				2AF3B0113000000000000011 /* AuthRequestDTOs.swift in TimetableTests Sources */,
-				2AF3B0123000000000000012 /* OnboardingState.swift in TimetableTests Sources */,
+				2AF3B0103000000000000010 /* Shared/Platform.swift in Sources */,
+				2AF3B0113000000000000011 /* App Shared/Networking/AuthRequestDTOs.swift in Sources */,
+				2AF3B0123000000000000012 /* Shared/OnboardingState.swift in Sources */,
+			);
+		};
+		2B0000083000000000000008 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
 			);
 		};
 /* End PBXSourcesBuildPhase section */
@@ -702,6 +778,11 @@
 			isa = PBXTargetDependency;
 			target = 2AA6DF132FDFAC8F00BBC70E /* Widget */;
 			targetProxy = 2AA6DF222FDFAC9000BBC70E /* PBXContainerItemProxy */;
+		};
+		2B00000A300000000000000A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2B0000043000000000000004 /* Messages */;
+			targetProxy = 2B0000033000000000000003 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -869,10 +950,10 @@
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = YES;
 				"INFOPLIST_KEY_UILaunchStoryboardName[sdk=iphoneos*]" = LaunchScreen;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				"INFOPLIST_KEY_UISupportedInterfaceOrientations~ipad" = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -939,10 +1020,10 @@
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = YES;
 				"INFOPLIST_KEY_UILaunchStoryboardName[sdk=iphoneos*]" = LaunchScreen;
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				"INFOPLIST_KEY_UISupportedInterfaceOrientations~ipad" = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1303,6 +1384,64 @@
 			};
 			name = Release;
 		};
+		2B00000B300000000000000B /* Debug configuration for PBXNativeTarget "Messages" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = Messages/Messages.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = P6PV2R9443;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Messages/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.omeriadon.Timetable.Messages;
+				PRODUCT_MODULE_NAME = TimetableMessages;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		2B00000C300000000000000C /* Release configuration for PBXNativeTarget "Messages" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = Messages/Messages.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = P6PV2R9443;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Messages/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 2.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.omeriadon.Timetable.Messages;
+				PRODUCT_MODULE_NAME = TimetableMessages;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1352,6 +1491,15 @@
 				2AF3B0093000000000000009 /* Debug configuration for PBXNativeTarget "TimetableTests" */,
 				2AF3B00B300000000000000B /* Release configuration for PBXNativeTarget "TimetableTests" */,
 			);
+			defaultConfigurationName = Release;
+		};
+		2B0000073000000000000007 /* Build configuration list for PBXNativeTarget "Messages" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2B00000B300000000000000B /* Debug configuration for PBXNativeTarget "Messages" */,
+				2B00000C300000000000000C /* Release configuration for PBXNativeTarget "Messages" */,
+			);
+			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
