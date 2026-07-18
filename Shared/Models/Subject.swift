@@ -52,7 +52,11 @@ nonisolated struct Subject: Hashable, Codable, Defaults.Serializable, Identifiab
 
 	@MainActor
 	func toSubjectEntity(identifier: String? = nil, timetable: IntentTimetableResolver.ResolvedTimetable) -> SubjectEntity {
-		SubjectEntity(id: identifier ?? id, name: id, symbol: symbol, colour: colour, slots: slots, personName: timetable.displayName, teacherName: teacher.displayName, classroomName: classroom.displayName)
+		var entity = SubjectEntity(id: identifier ?? id, name: id, symbol: symbol, colour: colour, slots: slots, personName: timetable.displayName, teacherName: teacher.displayName, classroomName: classroom.displayName)
+		#if !os(watchOS)
+			entity.contentURL = IntentTimetableResolver.subjectURL(for: timetable, subjectID: id)
+		#endif
+		return entity
 	}
 }
 

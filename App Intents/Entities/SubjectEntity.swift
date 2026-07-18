@@ -6,6 +6,7 @@
 //
 
 import AppIntents
+import Foundation
 
 #if !os(watchOS)
 	import CoreSpotlight
@@ -25,6 +26,7 @@ struct SubjectEntity: Identifiable, AppEntity, SyncableEntity {
 		#if !os(watchOS)
 			searchDescription = ""
 			searchKeywords = []
+			contentURL = nil
 		#endif
 	}
 
@@ -36,6 +38,7 @@ struct SubjectEntity: Identifiable, AppEntity, SyncableEntity {
 		#if !os(watchOS)
 			searchDescription = [personName, teacherName, classroomName].compactMap(\.self).joined(separator: " — ")
 			searchKeywords = [name, personName, teacherName, classroomName].compactMap(\.self)
+			contentURL = nil
 		#endif
 	}
 
@@ -59,6 +62,8 @@ struct SubjectEntity: Identifiable, AppEntity, SyncableEntity {
 		var searchDescription: String
 		@Property(identifier: "searchKeywords", title: "Search Keywords")
 		var searchKeywords: [String]
+		@Property(identifier: "contentURL", title: "Content URL", indexingKey: \CSSearchableItemAttributeSet.contentURL)
+		var contentURL: URL?
 	#endif
 
 	var displayRepresentation: DisplayRepresentation {

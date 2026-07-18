@@ -6,6 +6,7 @@
 //
 
 import AppIntents
+import Foundation
 
 #if !os(watchOS)
 	import CoreSpotlight
@@ -28,6 +29,8 @@ struct TimetableEntity: Identifiable, AppEntity, SyncableEntity {
 		var searchDescription: String
 		@Property(identifier: "searchKeywords", title: "Search Keywords")
 		var searchKeywords: [String]
+		@Property(identifier: "contentURL", title: "Content URL", indexingKey: \CSSearchableItemAttributeSet.contentURL)
+		var contentURL: URL?
 	#endif
 
 	init(id: String, subjects: [SubjectEntity], sender: String? = nil, receivedAt: Date? = nil) {
@@ -36,6 +39,7 @@ struct TimetableEntity: Identifiable, AppEntity, SyncableEntity {
 		#if !os(watchOS)
 			searchDescription = ""
 			searchKeywords = []
+			contentURL = nil
 		#endif
 		if let sender, let receivedAt {
 			sharedInfo = SharedInfo(receivedAt: receivedAt, sender: sender)
@@ -44,6 +48,12 @@ struct TimetableEntity: Identifiable, AppEntity, SyncableEntity {
 			let names = subjects.map(\.name)
 			searchDescription = "\(subjects.count) subjects" + (names.isEmpty ? "" : ": \(names.prefix(8).joined(separator: ", "))")
 			searchKeywords = [sender].compactMap(\.self) + names
+			let rawReceivedID = id.hasPrefix("timetable.received.") ? String(id.dropFirst("timetable.received.".count)) : nil
+			contentURL = if let rawReceivedID {
+				URL(string: "timetable://received/\(rawReceivedID)")
+			} else {
+				URL(string: "timetable://owner")
+			}
 		#endif
 	}
 
