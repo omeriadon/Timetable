@@ -10,7 +10,9 @@ struct PersonTimetableQuery: EntityStringQuery {
 
 	func entities(matching string: String) async -> [PersonTimetableEntity] {
 		await MainActor.run {
-			allEntities().filter { $0.displayName.localizedCaseInsensitiveContains(string) }
+			let text = string.trimmingCharacters(in: .whitespacesAndNewlines)
+			guard !text.isEmpty else { return allEntities() }
+			return allEntities().filter { $0.displayName.localizedCaseInsensitiveContains(text) }
 		}
 	}
 
@@ -24,10 +26,6 @@ struct PersonTimetableQuery: EntityStringQuery {
 
 	@MainActor
 	private func allEntities() -> [PersonTimetableEntity] {
-		let owner = PersonTimetableEntity(id: PersonTimetableEntity.ownerID, displayName: "You")
-		let received = Defaults[.receivedTimetables]
-			.filter { !$0.isDeleted }
-			.map { PersonTimetableEntity(id: $0.id, displayName: $0.sender) }
-		return [owner] + received
+		IntentTimetableResolver.all().map(\.person)
 	}
 }

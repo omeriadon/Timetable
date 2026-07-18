@@ -40,13 +40,22 @@ final class SpotlightIndexer {
 
 	private func performRebuild() async {
 		do {
+			let received = Defaults[.receivedTimetables].filter { !$0.isDeleted }
+			var timetables = received.toTimetableEntities()
+			if !Defaults[.timetable].isEmpty {
+				timetables.append(TimetableEntity(id: "timetable.owner", subjects: Defaults[.timetable].toSubjectEntities(prefix: "subject.owner")))
+			}
+			try Task.checkCancellation()
+			let uniqueTimetables = Dictionary(timetables.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first }).values.sorted { $0.id < $1.id }
+			let uniqueSubjects = Dictionary(uniqueTimetables.flatMap(\.subjects).map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first }).values.sorted { $0.id < $1.id }
+			try Task.checkCancellation()
 			try await removeAll()
-			var timetables = Defaults[.receivedTimetables]
-				.filter { !$0.isDeleted }
-				.toTimetableEntities()
-			timetables.append(TimetableEntity(id: "timetable.owner", subjects: Defaults[.timetable].toSubjectEntities(prefix: "subject.owner")))
-			try await timetableIndex.indexAppEntities(timetables)
-			try await subjectIndex.indexAppEntities(timetables.flatMap(\.subjects))
+			try Task.checkCancellation()
+			try await timetableIndex.indexAppEntities(Array(uniqueTimetables))
+			try await subjectIndex.indexAppEntities(Array(uniqueSubjects))
+			TimetableShortcuts.updateAppShortcutParameters()
+		} catch is CancellationError {
+			return
 		} catch {
 			PrintError("Spotlight indexing failed", category: .spotlight, error: error)
 		}
@@ -73,6 +82,10 @@ enum TimetableDeepLink: Equatable {
 			} else {
 				self = .timetable(id: id)
 			}
+			return
+		}
+		if first == "owner", parts.count >= 3, parts[1] == "subject" {
+			self = .subject(timetableID: nil, subjectID: String(parts[2]), slot: Self.slot(from: url))
 			return
 		}
 		self = .timetable(id: first == "owner" ? nil : first)

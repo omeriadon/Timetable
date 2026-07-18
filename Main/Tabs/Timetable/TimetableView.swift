@@ -187,7 +187,8 @@ struct TimetableView: View {
 					selectedSlot = nil
 				case let .subject(timetableID, subjectID, slot):
 					selectedTimetable = timetableID.flatMap { received in receivedTimetables.first { $0.id == received && !$0.isDeleted } }
-					selectedSlot = slot ?? selectedTimetable?.subjects.first(where: { $0.id == subjectID })?.slots.first
+					let subjects = selectedTimetable?.subjects ?? subjects
+					selectedSlot = slot ?? subjects.first(where: { $0.id == subjectID })?.slots.first
 			}
 		}
 	}

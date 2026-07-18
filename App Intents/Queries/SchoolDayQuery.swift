@@ -15,7 +15,7 @@ struct SchoolDayQuery: EnumerableEntityQuery {
 
 	func defaultResult() async -> SchoolDayEntity? {
 		let weekday = Calendar.current.component(.weekday, from: TimetableClock.now)
-		let index = min((weekday + 5) % 7, 4)
+		let index = (2 ... 6).contains(weekday) ? weekday - 2 : 0
 		return SchoolDayEntity(id: index, name: TimetableLayout.fullDayLabels[index])
 	}
 }

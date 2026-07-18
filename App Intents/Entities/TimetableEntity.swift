@@ -7,6 +7,10 @@
 
 import AppIntents
 
+#if !os(watchOS)
+	import CoreSpotlight
+#endif
+
 struct TimetableEntity: Identifiable, AppEntity, SyncableEntity {
 	static var defaultQuery = TimetableQuery()
 	static var typeDisplayRepresentation = TypeDisplayRepresentation(name: "Timetable")
@@ -19,12 +23,28 @@ struct TimetableEntity: Identifiable, AppEntity, SyncableEntity {
 	@Property(title: "Shared Info")
 	var sharedInfo: SharedInfo?
 
+	#if !os(watchOS)
+		@Property(identifier: "searchDescription", title: "Search Description", indexingKey: \CSSearchableItemAttributeSet.contentDescription)
+		var searchDescription: String
+		@Property(identifier: "searchKeywords", title: "Search Keywords")
+		var searchKeywords: [String]
+	#endif
+
 	init(id: String, subjects: [SubjectEntity], sender: String? = nil, receivedAt: Date? = nil) {
 		self.id = id
 		self.subjects = subjects
+		#if !os(watchOS)
+			searchDescription = ""
+			searchKeywords = []
+		#endif
 		if let sender, let receivedAt {
 			sharedInfo = SharedInfo(receivedAt: receivedAt, sender: sender)
 		}
+		#if !os(watchOS)
+			let names = subjects.map(\.name)
+			searchDescription = "\(subjects.count) subjects" + (names.isEmpty ? "" : ": \(names.prefix(8).joined(separator: ", "))")
+			searchKeywords = [sender].compactMap(\.self) + names
+		#endif
 	}
 
 	var displayRepresentation: DisplayRepresentation {

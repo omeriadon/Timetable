@@ -102,7 +102,7 @@ nonisolated struct ReceivedTimetable: Codable, Defaults.Serializable, Identifiab
 	@MainActor
 	func toTimetableEntity() -> TimetableEntity {
 		let entity = TimetableEntity(
-			id: id,
+			id: "timetable.received.\(id)",
 			subjects: subjects.toSubjectEntities(prefix: "subject.received.\(id)")
 		)
 		entity.sharedInfo = SharedInfo(receivedAt: receivedAt, sender: sender)

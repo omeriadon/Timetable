@@ -11,37 +11,31 @@ import Defaults
 struct TimetableQuery: EntityStringQuery {
 	func entities(for identifiers: [String]) async throws -> [TimetableEntity] {
 		await MainActor.run {
-			let receivedTimetables = Defaults[.receivedTimetables].filter { !$0.isDeleted }
-
-			var result = receivedTimetables.filter { t in
-				identifiers.contains(t.id) || identifiers.contains("timetable.received.\(t.id)") ||
-					identifiers.contains(t.sender) ||
-					t.subjects.contains { identifiers.contains($0.id) }
-			}.toTimetableEntities()
-			if identifiers.contains("timetable.owner") {
-				result.append(TimetableEntity(id: "timetable.owner", subjects: Defaults[.timetable].toSubjectEntities(prefix: "subject.owner")))
+			IntentTimetableResolver.all().compactMap { timetable in
+				let aliases = timetable.isOwner ? ["owner", "timetable.owner"] : [timetable.id, timetable.receivedID ?? ""]
+				guard identifiers.contains(where: { aliases.contains($0) }) else { return nil }
+				return TimetableEntity(id: timetable.id, subjects: timetable.subjects.toSubjectEntities(prefix: timetable.isOwner ? "subject.owner" : "subject.received.\(timetable.receivedID ?? timetable.id)"), sender: timetable.isOwner ? nil : timetable.displayName, receivedAt: timetable.isOwner ? nil : Date())
 			}
-			return result
 		}
 	}
 
 	func entities(matching string: String) async throws -> [TimetableEntity] {
 		await MainActor.run {
-			let receivedTimetables = Defaults[.receivedTimetables].filter { !$0.isDeleted }
-
-			return receivedTimetables.filter { t in
-				t.sender.localizedCaseInsensitiveContains(string) ||
-					t.subjects.contains { $0.id.localizedCaseInsensitiveContains(string)
-					}
+			let text = string.trimmingCharacters(in: .whitespacesAndNewlines)
+			guard !text.isEmpty else { return suggestedSync() }
+			return IntentTimetableResolver.all().filter { timetable in timetable.displayName.localizedCaseInsensitiveContains(text) || timetable.subjects.contains { $0.id.localizedCaseInsensitiveContains(text) || $0.teacher.displayName.localizedCaseInsensitiveContains(text) || $0.classroom.displayName.localizedCaseInsensitiveContains(text) } }.map { timetable in
+				TimetableEntity(id: timetable.id, subjects: timetable.subjects.toSubjectEntities(prefix: timetable.isOwner ? "subject.owner" : "subject.received.\(timetable.receivedID ?? timetable.id)"), sender: timetable.isOwner ? nil : timetable.displayName, receivedAt: timetable.isOwner ? nil : Date())
 			}
-			.toTimetableEntities()
 		}
 	}
 
 	func suggestedEntities() async throws -> [TimetableEntity] {
 		await MainActor.run {
-			let received = Defaults[.receivedTimetables].filter { !$0.isDeleted }.toTimetableEntities()
-			return [TimetableEntity(id: "timetable.owner", subjects: Defaults[.timetable].toSubjectEntities(prefix: "subject.owner"))] + received
+			suggestedSync()
 		}
+	}
+
+	@MainActor private func suggestedSync() -> [TimetableEntity] {
+		IntentTimetableResolver.all().map { timetable in TimetableEntity(id: timetable.id, subjects: timetable.subjects.toSubjectEntities(prefix: timetable.isOwner ? "subject.owner" : "subject.received.\(timetable.receivedID ?? timetable.id)"), sender: timetable.isOwner ? nil : timetable.displayName, receivedAt: timetable.isOwner ? nil : Date()) }
 	}
 }

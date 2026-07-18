@@ -49,6 +49,11 @@ nonisolated struct Subject: Hashable, Codable, Defaults.Serializable, Identifiab
 	func toSubjectEntity(identifier: String? = nil) -> SubjectEntity {
 		SubjectEntity(id: identifier ?? id, name: id, symbol: symbol, colour: colour, slots: slots)
 	}
+
+	@MainActor
+	func toSubjectEntity(identifier: String? = nil, timetable: IntentTimetableResolver.ResolvedTimetable) -> SubjectEntity {
+		SubjectEntity(id: identifier ?? id, name: id, symbol: symbol, colour: colour, slots: slots, personName: timetable.displayName, teacherName: teacher.displayName, classroomName: classroom.displayName)
+	}
 }
 
 nonisolated extension [Subject] {
