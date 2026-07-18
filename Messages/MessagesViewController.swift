@@ -46,19 +46,20 @@ final class MessagesViewController: MSMessagesAppViewController {
 			return
 		}
 		let title = suite.string(forKey: "userDisplayName").map { "\($0)'s Timetable" } ?? "Shared Timetable"
+		let previewTitle = String(title.prefix(80))
 		var components = URLComponents(string: "https://timetable.adonis.pt/sharedtimetable/\(id.uuidString)")!
 		components.queryItems = [
-			URLQueryItem(name: "title", value: String(title.prefix(80))),
+			URLQueryItem(name: "title", value: previewTitle),
 			URLQueryItem(name: "sharedAt", value: ISO8601DateFormatter().string(from: .now)),
 		]
 		let layout = MSMessageTemplateLayout()
-		layout.caption = title
+		layout.caption = previewTitle
 		layout.subcaption = "Tap to preview and save this timetable"
 		layout.image = UIImage(systemName: "calendar.day.timeline.left")?.withTintColor(.systemBlue, renderingMode: .alwaysOriginal)
 		let message = MSMessage(session: MSSession())
 		message.layout = layout
 		message.url = components.url
-		message.summaryText = title
+		message.summaryText = previewTitle
 		activeConversation?.insert(message) { [weak self] error in
 			DispatchQueue.main.async {
 				self?.showStatus(error == nil ? "Timetable added to the message." : "Unable to add timetable.", success: error == nil)
