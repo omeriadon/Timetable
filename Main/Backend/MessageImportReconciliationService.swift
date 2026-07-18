@@ -5,17 +5,22 @@ import Foundation
 enum MessageImportReconciliationService {
 	static func reconcile() async {
 		guard SessionStore.shared.isAuthenticated else { return }
-		let queued = Defaults[.pendingMessageTimetableIDs]
+		var queued = Defaults[.pendingMessageTimetableLocators]
+		if !Defaults[.pendingMessageTimetableIDs].isEmpty {
+			queued.append(contentsOf: Defaults[.pendingMessageTimetableIDs])
+			queued = Array(Set(queued))
+			Defaults[.pendingMessageTimetableLocators] = queued
+			Defaults[.pendingMessageTimetableIDs] = []
+		}
 		var remaining: [String] = []
 		for value in queued {
-			guard let id = UUID(uuidString: value) else { continue }
 			do {
-				try await ReceivedTimetableSyncService.shared.importTimetable(id: id)
+				try await ReceivedTimetableSyncService.shared.importTimetable(locator: value)
 			} catch {
 				remaining.append(value)
 			}
 		}
-		Defaults[.pendingMessageTimetableIDs] = remaining
+		Defaults[.pendingMessageTimetableLocators] = remaining
 		try? await ReceivedTimetableSyncService.shared.refreshAuthoritativeProjection()
 	}
 }

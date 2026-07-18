@@ -48,6 +48,7 @@ final class AccountBootstrapService {
 				} else {
 					try await self.ownerTimetableSync.downloadOwnerTimetable()
 				}
+				await TimetableShareAliasService.shared.fetchCurrentAlias()
 			}
 			async let settings: Void = self.runBootstrapStage("Account settings") {
 				// Notification preferences are device-local on non-authoritative clients.

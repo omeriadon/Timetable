@@ -130,8 +130,36 @@ nonisolated struct AuthoritativeReceivedTimetableDTO: Codable {
 }
 
 nonisolated struct ReceivedTimetableImportRequest: Codable {
-	let timetableID: UUID
+	let timetableID: UUID?
+	let timetableLocator: String?
+	init(timetableID: UUID) {
+		self.timetableID = timetableID; timetableLocator = nil
+	}
+
+	init(timetableLocator: String) {
+		timetableID = nil; self.timetableLocator = timetableLocator
+	}
 }
+
+nonisolated enum TimetableShareAliasAvailabilityReason: String, Codable, Sendable {
+	case empty, tooShort, tooLong, invalidCharacter, leadingSeparator, trailingSeparator, consecutiveSeparators, reserved, uuidShaped, taken
+}
+
+nonisolated struct TimetableShareAliasResponse: Codable, Sendable {
+	let alias: String?
+	let timetableID: UUID?
+	let url: String?
+}
+
+nonisolated struct TimetableShareAliasAvailabilityResponse: Codable, Sendable {
+	let normalizedAlias: String
+	let isValid: Bool
+	let isAvailable: Bool
+	let isOwnedByCurrentUser: Bool
+	let reason: TimetableShareAliasAvailabilityReason?
+}
+
+nonisolated struct TimetableShareAliasUpdateRequest: Codable, Sendable { let alias: String }
 
 nonisolated struct RegisterUserDeviceRequest: Codable {
 	let installationID: String

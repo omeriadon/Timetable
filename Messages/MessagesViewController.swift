@@ -34,10 +34,10 @@ final class MessagesViewController: MSMessagesAppViewController {
 	override func willBecomeActive(with conversation: MSConversation) {
 		super.willBecomeActive(with: conversation)
 		guard let message = conversation.selectedMessage,
-		      let id = Self.timetableID(from: message.url)
+		      let locator = Self.locator(from: message.url)
 		else { return }
 		let title = (message.layout as? MSMessageTemplateLayout)?.caption ?? "Shared Timetable"
-		confirmImport(id: id, title: title)
+		confirmImport(locator: locator, title: title)
 	}
 
 	@objc private func sendTimetable() {
@@ -47,7 +47,8 @@ final class MessagesViewController: MSMessagesAppViewController {
 		}
 		let title = suite.string(forKey: "userDisplayName").map { "\($0)'s Timetable" } ?? "Shared Timetable"
 		let previewTitle = String(title.prefix(80))
-		var components = URLComponents(string: "https://timetable.adonis.pt/sharedtimetable/\(id.uuidString)")!
+		let locator = suite.string(forKey: "ownerTimetableShareAlias").flatMap { $0.isEmpty ? nil : $0 } ?? id.uuidString
+		var components = URLComponents(string: "https://timetable.adonis.pt/sharedtimetable/\(locator)")!
 		components.queryItems = [
 			URLQueryItem(name: "title", value: previewTitle),
 			URLQueryItem(name: "sharedAt", value: ISO8601DateFormatter().string(from: .now)),
@@ -67,23 +68,23 @@ final class MessagesViewController: MSMessagesAppViewController {
 		}
 	}
 
-	private func confirmImport(id: UUID, title: String) {
+	private func confirmImport(locator: String, title: String) {
 		guard presentedViewController == nil else { return }
 		let alert = UIAlertController(title: "Save \(title)?", message: "This adds the timetable to your received timetables on every signed-in device.", preferredStyle: .alert)
 		alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
 		alert.addAction(UIAlertAction(title: "Save", style: .default) { [weak self] _ in
-			self?.importTimetable(id: id)
+			self?.importTimetable(locator: locator)
 		})
 		present(alert, animated: true)
 	}
 
-	private func importTimetable(id: UUID) {
+	private func importTimetable(locator: String) {
 		sendButton.isEnabled = false
 		Task {
-			let imported = await submitImport(id: id)
+			let imported = await submitImport(locator: locator)
 			await MainActor.run {
 				if !imported {
-					enqueue(id)
+					enqueue(locator)
 				}
 				showStatus(imported ? "Timetable saved." : "Timetable queued. Open the app to finish saving it.", success: true)
 				sendButton.isEnabled = true
@@ -91,13 +92,18 @@ final class MessagesViewController: MSMessagesAppViewController {
 		}
 	}
 
-	private func submitImport(id: UUID) async -> Bool {
+	private func submitImport(locator: String) async -> Bool {
 		guard let token = accessToken() else { return false }
 		var request = URLRequest(url: URL(string: "https://timetable.adonis.pt/v1/timetables/received/import")!)
 		request.httpMethod = "POST"
 		request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 		request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-		request.httpBody = try? JSONEncoder().encode(["timetableID": id.uuidString])
+		let body: [String: String] = if let id = UUID(uuidString: locator) {
+			["timetableID": id.uuidString]
+		} else {
+			["timetableLocator": locator]
+		}
+		request.httpBody = try? JSONEncoder().encode(body)
 		do {
 			let (_, response) = try await URLSession.shared.data(for: request)
 			return (response as? HTTPURLResponse).map { (200 ... 299).contains($0.statusCode) } ?? false
@@ -106,12 +112,12 @@ final class MessagesViewController: MSMessagesAppViewController {
 		}
 	}
 
-	private func enqueue(_ id: UUID) {
-		var pending = suite.stringArray(forKey: "pendingMessageTimetableIDs") ?? []
-		if !pending.contains(id.uuidString) {
-			pending.append(id.uuidString)
+	private func enqueue(_ locator: String) {
+		var pending = suite.stringArray(forKey: "pendingMessageTimetableLocators") ?? []
+		if !pending.contains(locator) {
+			pending.append(locator)
 		}
-		suite.set(pending, forKey: "pendingMessageTimetableIDs")
+		suite.set(pending, forKey: "pendingMessageTimetableLocators")
 	}
 
 	private func accessToken() -> String? {
@@ -139,11 +145,13 @@ final class MessagesViewController: MSMessagesAppViewController {
 		}
 	}
 
-	private static func timetableID(from url: URL?) -> UUID? {
+	private static func locator(from url: URL?) -> String? {
 		guard let url, url.host == "timetable.adonis.pt",
 		      url.pathComponents.count >= 3,
 		      url.pathComponents[1] == "sharedtimetable"
 		else { return nil }
-		return UUID(uuidString: url.pathComponents[2])
+		let locator = url.pathComponents[2]
+		guard locator.utf8.count <= 30 else { return nil }
+		return locator
 	}
 }

@@ -50,9 +50,11 @@ extension Defaults.Keys {
 	static let timetable = Key<[Subject]>("timetable", default: [], suite: sharedDefaults)
 	static let receivedTimetables = Key<[ReceivedTimetable]>("receivedTimetables", default: [], suite: sharedDefaults)
 	static let pendingMessageTimetableIDs = Key<[String]>("pendingMessageTimetableIDs", default: [], suite: sharedDefaults)
+	static let pendingMessageTimetableLocators = Key<[String]>("pendingMessageTimetableLocators", default: [], suite: sharedDefaults)
 	static let userDisplayName = Key<String>("userDisplayName", default: "My Timetable", suite: sharedDefaults)
 	static let ownerIsSearchable = Key<Bool>("ownerIsSearchable", default: true, suite: sharedDefaults)
 	static let ownerTimetableID = Key<String>("ownerTimetableID", default: "", suite: sharedDefaults)
+	static let ownerTimetableShareAlias = Key<String>("ownerTimetableShareAlias", default: "", suite: sharedDefaults)
 	static let timetableHighlightsCurrentDay = Key<Bool>("timetableHighlightsCurrentDay", default: true, suite: sharedDefaults)
 	static let hapticsEnabled = Key<Bool>("hapticsEnabled", default: true, suite: sharedDefaults)
 }

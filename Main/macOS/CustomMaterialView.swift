@@ -45,7 +45,7 @@ struct CustomMaterialView: NSViewRepresentable {
 
 	private func configure(_ view: Container, for scheme: ColorScheme) {
 		let isDark = scheme == .dark
-		view.effectView.material = .underWindowBackground
+		view.effectView.material = .hudWindow
 		view.effectView.blendingMode = .behindWindow
 		view.effectView.state = .active
 		view.effectView.appearance = NSAppearance(named: isDark ? .darkAqua : .aqua)

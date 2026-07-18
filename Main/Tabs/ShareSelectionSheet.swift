@@ -29,6 +29,12 @@ struct ShareSelectionSheet: View {
 	@State private var authoredTimetableService = AuthoredTimetableService.shared
 
 	let onSelect: (SelectedShareItem) -> Void
+	let onCustomize: () -> Void
+
+	init(onSelect: @escaping (SelectedShareItem) -> Void, onCustomize: @escaping () -> Void = {}) {
+		self.onSelect = onSelect
+		self.onCustomize = onCustomize
+	}
 
 	var body: some View {
 		NavigationStack {
@@ -47,6 +53,7 @@ struct ShareSelectionSheet: View {
 									.foregroundStyle(.secondary)
 							}
 						}
+						Button("Customize Link", systemImage: "link.badge.plus", action: onCustomize)
 					}
 				}
 

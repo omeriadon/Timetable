@@ -32,6 +32,8 @@ struct ContentView: View {
 		@State private var blurRadius: CGFloat = 3
 		@State private var showShareSelection = false
 		@State private var isShareSheetUpcoming = false
+		@State private var isAliasEditorUpcoming = false
+		@State private var showAliasEditor = false
 		@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	#endif
 
@@ -52,7 +54,10 @@ struct ContentView: View {
 				.animation(.smooth, value: isBlurred)
 				.ignoresSafeArea()
 				.sheet(isPresented: $showShareSelection, onDismiss: {
-					if !isShareSheetUpcoming {
+					if isAliasEditorUpcoming {
+						showAliasEditor = true
+						isAliasEditorUpcoming = false
+					} else if !isShareSheetUpcoming {
 						isBlurred = false
 					}
 					isShareSheetUpcoming = false
@@ -64,10 +69,16 @@ struct ContentView: View {
 							name: .shareTimetableItem,
 							object: selectedItem
 						)
+					}, onCustomize: {
+						isAliasEditorUpcoming = true
+						showShareSelection = false
 					})
 					.presentationDetents([.fraction(0.5)])
 					.presentationDragIndicator(.hidden)
 					.interactiveDismissDisabled(false)
+				}
+				.sheet(isPresented: $showAliasEditor) {
+					TimetableShareAliasSheet()
 				}
 			#else
 				TabView(selection: $selectedTab) {
@@ -276,12 +287,12 @@ extension Notification.Name {
 					}
 
 					do {
-						let id: UUID? = switch selectedItem {
-							case let .owner(id): id
-							case let .authored(id, _): id
-							case let .received(id, _): UUID(uuidString: id)
+						let url: URL? = switch selectedItem {
+							case let .owner(id): TimetableShareURL.ownerURL(id: id)
+							case let .authored(id, _): TimetableShareURL.url(locator: id.uuidString)
+							case let .received(id, _): TimetableShareURL.url(locator: id)
 						}
-						guard let id, let url = URL(string: "https://timetable.adonis.pt/sharedtimetable/\(id.uuidString)") else {
+						guard let url else {
 							throw URLError(.badURL)
 						}
 						presentShareSheet(with: url, from: targetVC)
