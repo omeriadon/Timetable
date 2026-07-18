@@ -34,7 +34,6 @@ struct ScheduledSubjectQuery: EntityQuery {
 @MainActor
 enum ScheduledSubjectEntityFactory {
 	static func make(timetable: IntentTimetableResolver.ResolvedTimetable, subject: Subject, day: Int, session: Int, start: Date, end: Date) -> ScheduledSubjectEntity {
-		let personID = timetable.isOwner ? PersonTimetableEntity.ownerID : timetable.receivedID ?? timetable.id
 		let subjectID = "subject.\(timetable.isOwner ? "owner" : "received.\(timetable.receivedID ?? timetable.id)").\(subject.id)"
 		return ScheduledSubjectEntity(id: "occurrence.\(timetable.id).\(subjectID).\(day).\(session)", subject: subject.toSubjectEntity(identifier: subjectID, timetable: timetable), person: timetable.person, day: SchoolDayEntity(id: day, name: TimetableLayout.fullDayLabels[day]), sessionNumber: session + 1, startDate: start, endDate: end, classroomName: subject.classroom.displayName, teacherName: subject.teacher.displayName)
 	}

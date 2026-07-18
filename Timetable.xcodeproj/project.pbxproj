@@ -13,7 +13,7 @@
 		2A1DB40E2F9DE9A300E5AE7C /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2A1DB40D2F9DE9A300E5AE7C /* Defaults */; };
 		2A1DB42D2F9ECEC300E5AE7C /* Watch Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2A2586A02FB5D6490030C8CD /* Watch Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2A324C072FF2980C00E6A3D5 /* ColorfulX in Frameworks */ = {isa = PBXBuildFile; productRef = 2A324C062FF2980C00E6A3D5 /* ColorfulX */; };
-		2A324C082FF2980C00E6A3D5 /* FocusOnAppear in Frameworks */ = {isa = PBXBuildFile; productRef = 2A324C092FF2980C00E6A3D5 /* FocusOnAppear */; platformFilter = ios; };
+		2A324C082FF2980C00E6A3D5 /* FocusOnAppear in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2A324C092FF2980C00E6A3D5 /* FocusOnAppear */; };
 		2A3EEF042FF39837005E0D87 /* Sticker in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2A3EEF032FF39837005E0D87 /* Sticker */; };
 		2A43AFA12FE7849E00BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFA02FE7849E00BBC8BD /* IrregularGradient */; };
 		2A43AFB12FE785E300BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFB02FE785E300BBC8BD /* IrregularGradient */; };
@@ -952,7 +952,6 @@
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = YES;
 				"INFOPLIST_KEY_UILaunchStoryboardName[sdk=iphoneos*]" = LaunchScreen;
-				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				"INFOPLIST_KEY_UISupportedInterfaceOrientations~ipad" = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -1022,7 +1021,6 @@
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = YES;
 				"INFOPLIST_KEY_UILaunchStoryboardName[sdk=iphoneos*]" = LaunchScreen;
-				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				"INFOPLIST_KEY_UISupportedInterfaceOrientations~ipad" = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -1536,7 +1534,10 @@
 		2A324C0A2FF2980C00E6A3D5 /* XCRemoteSwiftPackageReference "FocusOnAppear" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/naan/FocusOnAppear";
-			requirement = { kind = exactVersion; version = 1.2.0; };
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
 		};
 		2A3EEF022FF39837005E0D87 /* XCRemoteSwiftPackageReference "sticker" */ = {
 			isa = XCRemoteSwiftPackageReference;

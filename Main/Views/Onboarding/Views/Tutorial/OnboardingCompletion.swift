@@ -1,3 +1,10 @@
+//
+//  OnboardingCompletion.swift
+//  Timetable
+//
+//  Created by Adon Omeri on 3/7/2026.
+//
+
 import SwiftUI
 
 struct OnboardingCompletion: View {

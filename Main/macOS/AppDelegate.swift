@@ -24,6 +24,24 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 		}
 	}
 
+	func applicationWillFinishLaunching(_: Notification) {
+		NSWindow.allowsAutomaticWindowTabbing = false
+
+		if let mainMenu = NSApp.mainMenu {
+			let editMenuIndex = mainMenu.indexOfItem(withTitle: "View")
+
+			if editMenuIndex <= 0 {
+				mainMenu.removeItem(at: editMenuIndex)
+			}
+
+			let fileMenuIndex = mainMenu.indexOfItem(withTitle: "File")
+
+			if fileMenuIndex <= 0 {
+				mainMenu.removeItem(at: editMenuIndex)
+			}
+		}
+	}
+
 	func application(_: NSApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
 		Task { await NotificationRegistrationService.shared.receive(deviceToken: deviceToken) }
 	}

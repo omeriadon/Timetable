@@ -1,6 +1,8 @@
 import ColorfulX
 import Defaults
-import FocusOnAppear
+#if canImport(FocusOnAppear)
+	import FocusOnAppear
+#endif
 import SwiftUI
 
 struct TimetableShareAliasSheet: View {
@@ -24,13 +26,17 @@ struct TimetableShareAliasSheet: View {
 				Text("Create a short, memorable link for your timetable.").foregroundStyle(.secondary)
 				Text("timetable.adonis.pt/sharedtimetable/").font(.caption.monospaced()).foregroundStyle(.secondary)
 				ZStack(alignment: .leading) {
-					TextField("your-link", text: $rawInput)
+					TextField("your link", text: $rawInput)
+					#if !os(macOS)
 						.textInputAutocapitalization(.never)
-						.autocorrectionDisabled(true)
 						.keyboardType(.asciiCapable)
+					#endif
+						.autocorrectionDisabled(true)
 						.submitLabel(.done)
 						.focused($isFocused)
+					#if canImport(FocusOnAppear)
 						.focusOnAppear()
+					#endif
 						.foregroundStyle(.clear)
 						.tint(.mint)
 						.accessibilityLabel("Custom timetable link")

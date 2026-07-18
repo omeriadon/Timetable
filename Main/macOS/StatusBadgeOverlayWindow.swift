@@ -52,11 +52,13 @@ final class StatusBadgeOverlayWindowController {
 		refresh()
 	}
 
-	deinit {
+	isolated deinit {
 		observationTask?.cancel()
+
 		for token in notificationTokens {
 			NotificationCenter.default.removeObserver(token)
 		}
+
 		panel?.orderOut(nil)
 	}
 
