@@ -4,72 +4,79 @@
     "specular-location"
   ],
   "fill" : {
-    "linear-gradient" : [
-      "display-p3:0.33129,0.64778,1.00000,1.00000",
-      "display-p3:0.00000,0.32122,0.72634,1.00000"
-    ]
+    "automatic-gradient" : "display-p3:0.60392,0.47451,0.33725,1.00000"
   },
   "groups" : [
     {
-      "blur-material" : null,
       "layers" : [
         {
-          "blend-mode" : "normal",
-          "fill-specializations" : [
+          "hidden-specializations" : [
             {
-              "value" : {
-                "solid" : "extended-gray:1.00000,1.00000"
-              }
-            },
+              "idiom" : "square",
+              "value" : true
+            }
+          ],
+          "image-name" : "Timetable (1).svg",
+          "name" : "watchos",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -102.9921875,
+              -229
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
             {
               "appearance" : "dark",
               "value" : {
                 "linear-gradient" : [
-                  "display-p3:0.95000,0.95000,0.95000,1.00000",
-                  "extended-gray:1.00000,1.00000"
+                  "display-p3:0.95000,0.95000,0.95000,0.76000",
+                  "extended-gray:1.00000,0.84000"
                 ],
                 "orientation" : {
                   "start" : {
-                    "x" : 0.22468926458089625,
-                    "y" : 0.7304836958304741
+                    "x" : 0.5,
+                    "y" : 1
                   },
                   "stop" : {
-                    "x" : 1,
-                    "y" : 0.5000000000000006
+                    "x" : 0.5,
+                    "y" : 0
                   }
                 }
               }
             }
           ],
-          "image-name" : "Vector (1).svg",
-          "name" : "Cap",
+          "hidden-specializations" : [
+            {
+              "value" : true
+            },
+            {
+              "idiom" : "watchOS",
+              "value" : true
+            }
+          ],
+          "image-name" : "Timetable.svg",
+          "name" : "default",
           "position" : {
-            "scale" : 0.86,
+            "scale" : 1,
             "translation-in-points" : [
-              222.521852668076,
-              249.87471833667882
+              -121.9921875,
+              -231.3515625
             ]
           }
         }
       ],
-      "name" : "Cap",
+      "name" : "Timetable",
       "position-specializations" : [
-        {
-          "value" : {
-            "scale" : 1,
-            "translation-in-points" : [
-              20,
-              -7
-            ]
-          }
-        },
         {
           "idiom" : "watchOS",
           "value" : {
-            "scale" : 1,
+            "scale" : 0.94,
             "translation-in-points" : [
-              -16,
-              -43
+              0,
+              0
             ]
           }
         }
@@ -78,461 +85,179 @@
         "kind" : "neutral",
         "opacity" : 0.6
       },
-      "specular" : "outside",
+      "specular-specializations" : [
+        {
+          "value" : "outside"
+        },
+        {
+          "appearance" : "tinted",
+          "value" : "inside"
+        }
+      ],
       "translucency-specializations" : [
         {
           "appearance" : "dark",
           "value" : {
             "enabled" : true,
-            "value" : 0.46
+            "value" : 0.51
           }
         }
       ]
     },
     {
-      "blend-mode" : "normal",
-      "blur-material-specializations" : [
-        {
-          "value" : 0.04
-        },
-        {
-          "appearance" : "tinted",
-          "value" : 0.07
-        }
-      ],
       "layers" : [
         {
-          "fill-specializations" : [
+          "hidden-specializations" : [
             {
-              "value" : "none"
-            },
-            {
-              "appearance" : "dark",
-              "value" : "none"
+              "idiom" : "square",
+              "value" : true
             }
           ],
-          "image-name" : "Ellipse 2.svg",
-          "name" : "Badge",
+          "image-name" : "Frame 2 (4).svg",
+          "name" : "watchos",
           "position" : {
-            "scale" : 1,
+            "scale" : 0.94,
             "translation-in-points" : [
-              225.72231948057595,
-              251.67512931193926
-            ]
-          }
-        }
-      ],
-      "name" : "Badge",
-      "position-specializations" : [
-        {
-          "value" : {
-            "scale" : 1,
-            "translation-in-points" : [
-              20,
-              -7
+              0,
+              57
             ]
           }
         },
         {
-          "idiom" : "watchOS",
-          "value" : {
-            "scale" : 1,
-            "translation-in-points" : [
-              -16,
-              -43
-            ]
-          }
-        }
-      ],
-      "refractivity-specializations" : [
-        {
-          "value" : {
-            "depth" : 0.24722656250000014,
-            "enabled" : true,
-            "strength" : 0.4789453125
-          }
-        },
-        {
-          "idiom" : "watchOS",
-          "value" : {
-            "depth" : 0.2165625,
-            "enabled" : true,
-            "strength" : 0.1314453125
-          }
-        }
-      ],
-      "shadow" : {
-        "kind" : "neutral",
-        "opacity" : 4
-      },
-      "specular" : true,
-      "translucency" : {
-        "enabled" : true,
-        "value" : 0.25
-      }
-    },
-    {
-      "layers" : [
-        {
-          "fill-specializations" : [
+          "hidden-specializations" : [
             {
-              "value" : {
-                "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : {
-                "automatic-gradient" : "extended-gray:0.75000,1.00000"
-              }
-            }
-          ],
-          "image-name" : "Rectangle 12.svg",
-          "name" : "Rectangle 12",
-          "position" : {
-            "scale" : 1,
-            "translation-in-points" : [
-              129.0223194805759,
-              -305.02912287798347
-            ]
-          }
-        },
-        {
-          "fill-specializations" : [
-            {
-              "value" : {
-                "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : {
-                "automatic-gradient" : "extended-gray:0.75000,1.00000"
-              }
-            }
-          ],
-          "image-name" : "Rectangle 12.svg",
-          "name" : "Rectangle 12",
-          "position" : {
-            "scale" : 1,
-            "translation-in-points" : [
-              -59,
-              -305.02912287798347
-            ]
-          }
-        },
-        {
-          "fill-specializations" : [
-            {
-              "value" : {
-                "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : {
-                "automatic-gradient" : "extended-gray:0.75000,1.00000"
-              }
-            }
-          ],
-          "image-name" : "Rectangle 12.svg",
-          "name" : "Rectangle 12",
-          "position" : {
-            "scale" : 1,
-            "translation-in-points" : [
-              -250.77278442256784,
-              -305.02912287798347
-            ]
-          }
-        },
-        {
-          "fill-specializations" : [
-            {
-              "value" : {
-                "automatic-gradient" : "extended-srgb:0.00000,0.75294,0.90980,1.00000"
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : {
-                "automatic-gradient" : "extended-srgb:0.00000,0.78431,0.70196,1.00000"
-              }
-            }
-          ],
-          "image-name" : "Rectangle 3.svg",
-          "name" : "Date",
-          "position" : {
-            "scale" : 1,
-            "translation-in-points" : [
-              129.0223194805759,
-              23.47512931193927
-            ]
-          }
-        },
-        {
-          "fill-specializations" : [
-            {
-              "value" : {
-                "automatic-gradient" : "extended-srgb:0.20392,0.78039,0.34902,1.00000"
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : {
-                "automatic-gradient" : "extended-srgb:0.38039,0.33333,0.96078,1.00000"
-              }
-            }
-          ],
-          "image-name" : "Rectangle 3.svg",
-          "name" : "Date",
-          "position" : {
-            "scale" : 1,
-            "translation-in-points" : [
-              129.0223194805759,
-              175.45396203367244
-            ]
-          }
-        },
-        {
-          "fill-specializations" : [
-            {
-              "value" : {
-                "automatic-gradient" : "srgb:1.00000,0.25882,0.27059,1.00000"
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : {
-                "automatic-gradient" : "srgb:1.00000,0.25882,0.27059,1.00000"
-              }
-            }
-          ],
-          "image-name" : "Rectangle 3.svg",
-          "name" : "Date",
-          "position-specializations" : [
-            {
-              "value" : {
-                "scale" : 1,
-                "translation-in-points" : [
-                  -59,
-                  23.475129311939327
-                ]
-              }
+              "value" : false
             },
             {
               "idiom" : "watchOS",
-              "value" : {
-                "scale" : 1,
-                "translation-in-points" : [
-                  -59,
-                  23.475129311939327
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "fill-specializations" : [
-            {
-              "value" : {
-                "automatic-gradient" : "extended-srgb:0.79608,0.18824,0.87843,1.00000"
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : {
-                "automatic-gradient" : "extended-srgb:0.79608,0.18824,0.87843,1.00000"
-              }
+              "value" : true
             }
           ],
-          "image-name" : "Rectangle 3.svg",
-          "name" : "Date",
+          "image-name" : "Frame 2.svg",
+          "name" : "default",
           "position" : {
             "scale" : 1,
             "translation-in-points" : [
-              129.0223194805759,
-              -125.07682120743988
-            ]
-          }
-        },
-        {
-          "fill-specializations" : [
-            {
-              "value" : {
-                "automatic-gradient" : "extended-srgb:0.00000,0.78431,0.70196,1.00000"
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : {
-                "automatic-gradient" : "extended-srgb:1.00000,0.80000,0.00000,1.00000"
-              }
-            }
-          ],
-          "image-name" : "Rectangle 3.svg",
-          "name" : "Date",
-          "position" : {
-            "scale" : 1,
-            "translation-in-points" : [
-              -59,
-              -125.07682120743976
-            ]
-          }
-        },
-        {
-          "fill-specializations" : [
-            {
-              "value" : {
-                "automatic-gradient" : "extended-srgb:1.00000,0.55294,0.15686,1.00000"
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : {
-                "automatic-gradient" : "extended-srgb:0.20392,0.78039,0.34902,1.00000"
-              }
-            }
-          ],
-          "image-name" : "Rectangle 3.svg",
-          "name" : "Date",
-          "position" : {
-            "scale" : 1,
-            "translation-in-points" : [
-              -250.77278442256784,
-              -125.07682120743976
-            ]
-          }
-        },
-        {
-          "fill-specializations" : [
-            {
-              "value" : {
-                "automatic-gradient" : "extended-srgb:1.00000,0.80000,0.00000,1.00000"
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : {
-                "automatic-gradient" : "extended-gray:0.50000,1.00000"
-              }
-            }
-          ],
-          "image-name" : "Rectangle 3.svg",
-          "name" : "Date",
-          "position" : {
-            "scale" : 1,
-            "translation-in-points" : [
-              -59,
-              175.45396203367255
-            ]
-          }
-        },
-        {
-          "fill-specializations" : [
-            {
-              "value" : {
-                "automatic-gradient" : "extended-srgb:0.38039,0.33333,0.96078,1.00000"
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : {
-                "automatic-gradient" : "extended-srgb:1.00000,0.55294,0.15686,1.00000"
-              }
-            }
-          ],
-          "image-name" : "Rectangle 3.svg",
-          "name" : "Date",
-          "position" : {
-            "scale" : 1,
-            "translation-in-points" : [
-              -250.77278442256784,
-              175.45396203367255
-            ]
-          }
-        },
-        {
-          "fill-specializations" : [
-            {
-              "value" : {
-                "automatic-gradient" : "extended-gray:0.50000,1.00000"
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : {
-                "automatic-gradient" : "extended-srgb:0.00000,0.75294,0.90980,1.00000"
-              }
-            }
-          ],
-          "image-name" : "Rectangle 3.svg",
-          "name" : "Date",
-          "position" : {
-            "scale" : 1,
-            "translation-in-points" : [
-              -250.77278442256784,
-              23.475129311939384
-            ]
-          }
-        },
-        {
-          "fill-specializations" : [
-            {
-              "appearance" : "tinted",
-              "value" : {
-                "automatic-gradient" : "srgb:0.00000,0.53333,1.00000,0.69965"
-              }
-            }
-          ],
-          "image-name" : "Inset.svg",
-          "name" : "Inset",
-          "position" : {
-            "scale" : 1,
-            "translation-in-points" : [
-              -59,
-              23.475129311939327
-            ]
-          }
-        },
-        {
-          "fill-specializations" : [
-            {
-              "appearance" : "tinted",
-              "value" : {
-                "automatic-gradient" : "srgb:0.00000,0.53333,1.00000,0.32107"
-              }
-            }
-          ],
-          "image-name" : "Calendar.svg",
-          "name" : "Calendar",
-          "position" : {
-            "scale" : 1,
-            "translation-in-points" : [
-              -59,
-              -51
+              -0.21436480752777243,
+              49.078125
             ]
           }
         }
       ],
-      "lighting" : "individual",
-      "name" : "Calendar",
+      "name" : "Handwriting",
       "position-specializations" : [
-        {
-          "value" : {
-            "scale" : 1,
-            "translation-in-points" : [
-              23,
-              21
-            ]
-          }
-        },
         {
           "idiom" : "watchOS",
           "value" : {
+            "scale" : 0.94,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "refractivity" : {
+        "depth" : 0.5908984375,
+        "enabled" : true,
+        "strength" : -0.0468359375
+      },
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.6
+      },
+      "specular-specializations" : [
+        {
+          "value" : true
+        },
+        {
+          "appearance" : "tinted",
+          "value" : "inside"
+        }
+      ],
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.55
+      }
+    },
+    {
+      "blur-material-specializations" : [
+        {
+          "value" : 0.1
+        },
+        {
+          "appearance" : "tinted",
+          "value" : 0.2
+        }
+      ],
+      "layers" : [
+        {
+          "fill" : {
+            "solid" : "display-p3:0.60392,0.47451,0.33725,1.00000"
+          },
+          "image-name" : "Rectangle 1.svg",
+          "name" : "main"
+        }
+      ],
+      "name" : "Main",
+      "position-specializations" : [
+        {
+          "idiom" : "watchOS",
+          "value" : {
+            "scale" : 0.94,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "refractivity" : {
+        "depth" : 0.094140625,
+        "enabled" : true,
+        "strength" : 0.0496484375
+      },
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.6
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.58
+      }
+    },
+    {
+      "blur-material" : null,
+      "layers" : [
+        {
+          "glass" : false,
+          "hidden-specializations" : [
+            {
+              "idiom" : "watchOS",
+              "value" : true
+            }
+          ],
+          "image-name" : "Tuesday.png",
+          "name" : "Tuesday",
+          "opacity" : 0.47,
+          "position" : {
             "scale" : 1,
             "translation-in-points" : [
-              38,
-              36
+              -134,
+              -254
+            ]
+          }
+        }
+      ],
+      "name" : "Tuesday",
+      "position-specializations" : [
+        {
+          "idiom" : "watchOS",
+          "value" : {
+            "scale" : 0.94,
+            "translation-in-points" : [
+              0,
+              0
             ]
           }
         }
@@ -541,10 +266,144 @@
         "kind" : "neutral",
         "opacity" : 0.6
       },
-      "specular" : true,
       "translucency" : {
         "enabled" : true,
         "value" : 0.2
+      }
+    },
+    {
+      "hidden" : false,
+      "layers" : [
+        {
+          "fill" : "none",
+          "image-name" : "Rectangle 2.svg",
+          "name" : "second"
+        }
+      ],
+      "name" : "Second",
+      "position-specializations" : [
+        {
+          "idiom" : "watchOS",
+          "value" : {
+            "scale" : 0.94,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "refractivity" : {
+        "depth" : 0.1211328125,
+        "enabled" : true,
+        "strength" : 0.0983203125
+      },
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.6
+      },
+      "specular-specializations" : [
+        {
+          "appearance" : "tinted",
+          "value" : "inside"
+        }
+      ],
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.58
+      }
+    },
+    {
+      "hidden-specializations" : [
+        {
+          "value" : false
+        },
+        {
+          "idiom" : "watchOS",
+          "value" : true
+        }
+      ],
+      "layers" : [
+        {
+          "glass" : false,
+          "hidden" : false,
+          "image-name" : "Wednesday.png",
+          "name" : "Wednesday",
+          "opacity" : 0.4,
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -113,
+              -129
+            ]
+          }
+        }
+      ],
+      "name" : "Wednesday",
+      "position-specializations" : [
+        {
+          "idiom" : "watchOS",
+          "value" : {
+            "scale" : 0.94,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.6
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.2
+      }
+    },
+    {
+      "hidden" : false,
+      "layers" : [
+        {
+          "fill" : "none",
+          "image-name" : "Rectangle 3 2.svg",
+          "name" : "third"
+        }
+      ],
+      "name" : "Third",
+      "position-specializations" : [
+        {
+          "idiom" : "watchOS",
+          "value" : {
+            "scale" : 0.94,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "refractivity" : {
+        "depth" : 0.345546875,
+        "enabled" : true,
+        "strength" : 0.4146484375
+      },
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.6
+      },
+      "specular-specializations" : [
+        {
+          "value" : true
+        },
+        {
+          "appearance" : "tinted",
+          "value" : "inside"
+        }
+      ],
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.58
       }
     }
   ],
