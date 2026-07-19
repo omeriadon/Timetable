@@ -21,9 +21,11 @@
 - iOS, macOS, watchOS widgets
 - Search friend's timetables and add them to check them faster
 
+#### Get TestFlight: https://testflight.apple.com/join/DDUXPSq3
+
 <br>
 
-This project also has uses a server, the source code for which is at [omeriadon/pmstt](https://github.com/omeriadon/pmstt).
+This project also has a server, the source code for which is at [omeriadon/pmstt](https://github.com/omeriadon/pmstt).
 
 <br>
 
