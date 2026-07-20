@@ -2,13 +2,17 @@ import Defaults
 import SwiftUI
 
 struct NonAuthoritativeRootView: View {
-	@State private var expanded = WindowMode.none
+	@Binding var expanded: WindowMode
 
 	#if os(iOS)
 		@State private var watchSync = PhoneWatchSyncBridge.shared
 		@State private var syncStatus = SyncMode.normal
 	#endif
 	@State private var selectedTab = 0
+
+	init(expanded: Binding<WindowMode>) {
+		_expanded = expanded
+	}
 
 	var body: some View {
 		TabView(selection: $selectedTab) {

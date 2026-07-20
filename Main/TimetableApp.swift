@@ -71,7 +71,7 @@ struct TimetableApp: App {
 						ProgressView("Restoring Account…")
 						case .authenticated:
 						if Platform.current == .macOS {
-							NonAuthoritativeRootView()
+							NonAuthoritativeRootView(expanded: $expanded)
 						} else {
 							ContentView(expanded: $expanded)
 						}
@@ -81,10 +81,10 @@ struct TimetableApp: App {
 						switch sessionStore.state {
 							case .signedOut:
 								AccountAuthenticationView(allowsSignUp: false, allowsAppleSignIn: false)
-							case .restoring:
+						case .restoring:
 								ProgressView("Restoring Account…")
 							case .authenticated:
-								NonAuthoritativeRootView()
+								NonAuthoritativeRootView(expanded: $expanded)
 						}
 					} else {
 						ContentView(expanded: $expanded)
