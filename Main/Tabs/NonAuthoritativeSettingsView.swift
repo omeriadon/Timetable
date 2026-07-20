@@ -2,6 +2,12 @@ import Defaults
 import SwiftUI
 
 struct NonAuthoritativeSettingsView: View {
+	@Binding var expanded: WindowMode
+
+	init(expanded: Binding<WindowMode>) {
+		_expanded = expanded
+	}
+
 	var body: some View {
 		NavigationStack {
 			Form {
@@ -39,5 +45,9 @@ struct NonAuthoritativeSettingsView: View {
 			.formStyle(.grouped)
 			.appNavigationTitle("Settings", style: .main)
 		}
+		#if os(macOS)
+		.onAppear { expanded = .settings }
+		.onDisappear { expanded = .none }
+		#endif
 	}
 }

@@ -2,11 +2,11 @@ import Defaults
 import SwiftUI
 
 struct NonAuthoritativeRootView: View {
+	@State private var expanded = WindowMode.none
+
 	#if os(iOS)
 		@State private var watchSync = PhoneWatchSyncBridge.shared
 		@State private var syncStatus = SyncMode.normal
-	#else
-		@State private var expanded = WindowMode.none
 	#endif
 	@State private var selectedTab = 0
 
@@ -19,7 +19,9 @@ struct NonAuthoritativeRootView: View {
 					TimetableView(expanded: $expanded)
 				#endif
 			}
-			Tab("Settings", systemImage: "gear", value: 1) { NonAuthoritativeSettingsView() }
+			Tab("Settings", systemImage: "gear", value: 1) {
+				NonAuthoritativeSettingsView(expanded: $expanded)
+			}
 		}
 		#if os(iOS)
 		.frame(minWidth: 900, minHeight: 600)
