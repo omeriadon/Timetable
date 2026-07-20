@@ -105,7 +105,7 @@
         }
       ],
       "position" : {
-        "scale" : 0.98,
+        "scale" : 0.94,
         "translation-in-points" : [
           0,
           0
@@ -241,6 +241,13 @@
           "value" : {
             "enabled" : true,
             "value" : 0.48
+          }
+        },
+        {
+          "idiom" : "watchOS",
+          "value" : {
+            "enabled" : true,
+            "value" : 0.99
           }
         }
       ]
