@@ -50,6 +50,16 @@ final class AccountSettingsSyncService {
 		try await synchronizePendingSettings()
 	}
 
+	func updateNotificationSettings(_ settings: AccountSettings) async throws -> AccountSettings {
+		let updated: AccountSettings = try await networkManager.send(
+			.v1NotificationSettingsUpdate,
+			body: NotificationSettingsUpdateRequest(settings)
+		)
+		Defaults[.accountSettings] = updated
+		applyLocalSideEffects()
+		return updated
+	}
+
 	func flushPendingSettings() async throws {
 		try Platform.require(Platform.current.isAuthoritative)
 		if pendingMutation == nil {
@@ -65,7 +75,6 @@ final class AccountSettingsSyncService {
 	}
 
 	func downloadSettings() async throws {
-		try Platform.require(Platform.current.isAuthoritative)
 		let remoteSettings: AccountSettings = try await networkManager.send(.v1Settings)
 		Defaults[.accountSettings] = remoteSettings
 		Defaults[.lastServerSync] = Date.now
@@ -158,4 +167,5 @@ final class AccountSettingsSyncService {
 private extension Endpoint {
 	static let v1Settings = Endpoint("/v1/settings")
 	static let v1SettingsUpdate = Endpoint("/v1/settings", method: .put)
+	static let v1NotificationSettingsUpdate = Endpoint("/v1/settings/notifications", method: .put)
 }

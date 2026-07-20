@@ -25,6 +25,18 @@ nonisolated struct UpdateProfileRequest: Codable {
 	let email: String?
 }
 
+nonisolated struct NotificationSettingsUpdateRequest: Codable, Sendable {
+	let notificationsEnabled: Bool
+	let broadcastNotificationsEnabled: Bool
+	let notificationLeadTime: NotificationLeadTime
+
+	init(_ settings: AccountSettings) {
+		notificationsEnabled = settings.notificationsEnabled
+		broadcastNotificationsEnabled = settings.broadcastNotificationsEnabled
+		notificationLeadTime = settings.notificationLeadTime
+	}
+}
+
 nonisolated struct OwnerTimetableUpdateRequest: Codable {
 	let subjects: [Subject]
 	let expectedRevision: Int?

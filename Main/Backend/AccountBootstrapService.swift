@@ -51,10 +51,7 @@ final class AccountBootstrapService {
 				await TimetableShareAliasService.shared.fetchCurrentAlias()
 			}
 			async let settings: Void = self.runBootstrapStage("Account settings") {
-				// Notification preferences are device-local on non-authoritative clients.
-				if Platform.current.isAuthoritative {
-					try await self.settingsSync.downloadSettings()
-				}
+				try await self.settingsSync.downloadSettings()
 			}
 			async let received: Void = self.runBootstrapStage("Received timetables") {
 				try await self.receivedTimetableSync.downloadProjectionAndOverrides()
