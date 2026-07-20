@@ -2,7 +2,7 @@
 //   AccountAndSyncSettingsView.swift
 //   Main
 //
-//   Created by Codex on 29/6/2026.
+//   Created by Adon Omeri on 29/6/2026.
 //
 
 import Defaults
@@ -48,7 +48,7 @@ struct AccountAndSyncSettingsView: View {
 					#if os(iOS)
 					.pickerStyle(.wheel)
 					#else
-					.pickerStyle(.radioGroup)
+					.pickerStyle(.palette)
 					#endif
 					.disabled(!settings.notificationsEnabled)
 				}

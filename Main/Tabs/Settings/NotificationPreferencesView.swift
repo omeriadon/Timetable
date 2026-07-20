@@ -10,15 +10,24 @@ struct NotificationPreferencesView: View {
 		Form {
 			Section {
 				Toggle("Allow Class Notifications", isOn: localBinding(\.notificationsEnabled))
+
 				Picker("Send Notifications Early By...", selection: localBinding(\.notificationLeadTime)) {
 					ForEach(NotificationLeadTime.allCases, id: \.self) { leadTime in
 						Text("\(leadTime.minutes) \(leadTime.minutes == 1 ? "minute" : "minutes")").tag(leadTime)
 					}
 				}
+				#if os(macOS)
+				.pickerStyle(.radioGroup)
+				#endif
 				.disabled(!settings.notificationsEnabled)
 			}
-			Section { Toggle("Special Event Notifications", isOn: localBinding(\.broadcastNotificationsEnabled)) }
+
+			Section {
+				Toggle("Special Event Notifications", isOn: localBinding(\.broadcastNotificationsEnabled))
+			}
 		}
+		.formStyle(.grouped)
+		.scrollContentBackground(.hidden)
 		.appNavigationTitle("Notifications")
 	}
 

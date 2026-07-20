@@ -14,7 +14,7 @@ struct LiveActivityDebugView: View {
 	@State private var status = "Idle"
 
 	var body: some View {
-		VStack(spacing: 16) {
+		Form {
 			Text(status)
 
 			Button("Start Before School Activity") {

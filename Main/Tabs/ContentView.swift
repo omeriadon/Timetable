@@ -6,26 +6,35 @@
 //
 
 import SwiftUI
+
 #if os(iOS)
+	import UIKit
 	import WatchConnectivity
+#endif
+
+#if os(iOS)
+	private enum TabBarFont {
+		static let uiFont = UIFont.monospacedSystemFont(
+			ofSize: 11,
+			weight: .medium
+		)
+	}
 
 	enum SyncMode {
 		case normal, loading, success, error
 	}
-#endif
 
-enum MainTab: String, Hashable {
-	case timetable
-	case share
-	case settings
-	case search
-}
+	enum MainTab: String, Hashable {
+		case timetable
+		case share
+		case settings
+		case search
+	}
 
-struct ContentView: View {
-	@State private var networkManager = NetworkManager.shared
-	@Environment(\.statusBadgeManager) private var statusBadgeManager
+	struct ContentView: View {
+		@State private var networkManager = NetworkManager.shared
+		@Environment(\.statusBadgeManager) private var statusBadgeManager
 
-	#if os(iOS)
 		@State private var watchSync = PhoneWatchSyncBridge.shared
 		@State private var rootSyncStatus = SyncMode.normal
 		@State private var isBlurred = false
@@ -35,72 +44,58 @@ struct ContentView: View {
 		@State private var isAliasEditorUpcoming = false
 		@State private var showAliasEditor = false
 		@Environment(\.accessibilityReduceMotion) private var reduceMotion
-	#endif
 
-	@Binding var expanded: WindowMode
-	@State private var selectedTab: MainTab = .timetable
+		@Binding var expanded: WindowMode
+		@State private var selectedTab: MainTab = .timetable
 
-	var body: some View {
-		Group {
-			#if os(iOS)
-				ProminentActionTabView(
-					selectedTab: $selectedTab,
-					watchSync: $watchSync,
-					rootSyncStatus: $rootSyncStatus,
-					isBlurred: $isBlurred,
-					showShareSelection: $showShareSelection
-				)
-				.blur(radius: isBlurred ? blurRadius : 0)
-				.animation(.smooth, value: isBlurred)
-				.ignoresSafeArea()
-				.sheet(isPresented: $showShareSelection, onDismiss: {
-					if isAliasEditorUpcoming {
-						showAliasEditor = true
-						isAliasEditorUpcoming = false
-					} else if !isShareSheetUpcoming {
-						isBlurred = false
-					}
-					isShareSheetUpcoming = false
-				}) {
-					ShareSelectionSheet(onSelect: { selectedItem in
-						isShareSheetUpcoming = true
-						showShareSelection = false
-						NotificationCenter.default.post(
-							name: .shareTimetableItem,
-							object: selectedItem
-						)
-					}, onCustomize: {
-						isAliasEditorUpcoming = true
-						showShareSelection = false
-					})
-					.presentationDetents([.fraction(0.5)])
-					.presentationDragIndicator(.hidden)
-					.interactiveDismissDisabled(false)
+		var body: some View {
+			ProminentActionTabView(
+				selectedTab: $selectedTab,
+				watchSync: $watchSync,
+				rootSyncStatus: $rootSyncStatus,
+				isBlurred: $isBlurred,
+				showShareSelection: $showShareSelection
+			)
+			.blur(radius: isBlurred ? blurRadius : 0)
+			.animation(.smooth, value: isBlurred)
+			.ignoresSafeArea()
+			.sheet(isPresented: $showShareSelection, onDismiss: {
+				if isAliasEditorUpcoming {
+					showAliasEditor = true
+					isAliasEditorUpcoming = false
+				} else if !isShareSheetUpcoming {
+					isBlurred = false
 				}
-				.sheet(isPresented: $showAliasEditor) {
-					TimetableShareAliasSheet()
-				}
-			#else
-				TabView(selection: $selectedTab) {
-					Tab("Timetable", systemImage: "calendar", value: .timetable) {
-						TimetableView(expanded: $expanded)
-					}
-
-					Tab("Settings", systemImage: "gear", value: .settings) {
-						SettingsView(expanded: $expanded)
-					}
-				}
-				.onReceive(NotificationCenter.default.publisher(for: .openSettingsTab)) { _ in selectedTab = .settings }
-			#endif
-		}
-		.onReceive(NotificationCenter.default.publisher(for: .openTimetableTab)) { _ in
-			selectedTab = .timetable
-		}
-		.task {
-			networkManager.startMonitoring()
+				isShareSheetUpcoming = false
+			}) {
+				ShareSelectionSheet(onSelect: { selectedItem in
+					isShareSheetUpcoming = true
+					showShareSelection = false
+					NotificationCenter.default.post(
+						name: .shareTimetableItem,
+						object: selectedItem
+					)
+				}, onCustomize: {
+					isAliasEditorUpcoming = true
+					showShareSelection = false
+				})
+				.presentationDetents([.fraction(0.5)])
+				.presentationDragIndicator(.hidden)
+				.interactiveDismissDisabled(false)
+			}
+			.sheet(isPresented: $showAliasEditor) {
+				TimetableShareAliasSheet()
+			}
+			.onReceive(NotificationCenter.default.publisher(for: .openTimetableTab)) { _ in
+				selectedTab = .timetable
+			}
+			.task {
+				networkManager.startMonitoring()
+			}
 		}
 	}
-}
+
+#endif // os(iOS)
 
 extension Notification.Name {
 	static let openSettingsTab = Notification.Name("openSettingsTab")
@@ -127,6 +122,9 @@ extension Notification.Name {
 
 		func makeUIViewController(context: Context) -> UITabBarController {
 			let tabBarController = UITabBarController()
+
+			configureTabBarAppearance(tabBarController.tabBar)
+
 			tabBarController.delegate = context.coordinator
 			context.coordinator.tabBarController = tabBarController
 
@@ -156,6 +154,32 @@ extension Notification.Name {
 		func updateUIViewController(_: UITabBarController, context: Context) {
 			context.coordinator.parent = self
 			context.coordinator.selectTab(selectedTab)
+		}
+
+		@MainActor
+		private func configureTabBarAppearance(_ tabBar: UITabBar) {
+			let appearance = UITabBarAppearance()
+			appearance.configureWithDefaultBackground()
+
+			let attributes: [NSAttributedString.Key: Any] = [
+				.font: TabBarFont.uiFont,
+			]
+
+			let layouts = [
+				appearance.stackedLayoutAppearance,
+				appearance.inlineLayoutAppearance,
+				appearance.compactInlineLayoutAppearance,
+			]
+
+			for layout in layouts {
+				layout.normal.titleTextAttributes = attributes
+				layout.selected.titleTextAttributes = attributes
+				layout.disabled.titleTextAttributes = attributes
+				layout.focused.titleTextAttributes = attributes
+			}
+
+			tabBar.standardAppearance = appearance
+			tabBar.scrollEdgeAppearance = appearance
 		}
 
 		private func makeCustomShareImage() -> UIImage? {
@@ -203,7 +227,7 @@ extension Notification.Name {
 					if tab.identifier != tabBarController.selectedTab?.identifier {
 						UIView.transition(
 							with: tabBarController.view,
-							duration: 0.2,
+							duration: 0.1,
 							options: [.transitionCrossDissolve, .allowAnimatedContent],
 							animations: {}
 						)
@@ -343,8 +367,8 @@ extension Notification.Name {
 			}
 		}
 	}
-#endif // os(iOS)
 
-#Preview {
-	ContentView(expanded: .constant(.none))
-}
+	#Preview {
+		ContentView(expanded: .constant(.none))
+	}
+#endif // os(iOS)

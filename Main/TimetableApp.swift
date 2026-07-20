@@ -70,18 +70,14 @@ struct TimetableApp: App {
 						case .restoring:
 						ProgressView("Restoring Account…")
 						case .authenticated:
-						if Platform.current == .macOS {
-							NonAuthoritativeRootView(expanded: $expanded)
-						} else {
-							ContentView(expanded: $expanded)
-						}
+						NonAuthoritativeRootView(expanded: $expanded)
 					}
 				#else
 					if Platform.current == .iPadOS {
 						switch sessionStore.state {
 							case .signedOut:
 								AccountAuthenticationView(allowsSignUp: false, allowsAppleSignIn: false)
-						case .restoring:
+							case .restoring:
 								ProgressView("Restoring Account…")
 							case .authenticated:
 								NonAuthoritativeRootView(expanded: $expanded)
@@ -100,7 +96,7 @@ struct TimetableApp: App {
 				StatusBadgeOverlay()
 					.zIndex(9_999_999)
 			}
-			#endif
+			#endif // os(iOS)
 			.task {
 				NetworkManager.shared.configureFeedback { StatusBadgeManager.shared.present(networkError: $0) }
 				sessionStore.configureAccountBootstrap {
@@ -113,7 +109,7 @@ struct TimetableApp: App {
 							await LiveActivityRegistrationService.shared.startObserving()
 						}
 						PhoneWatchSyncBridge.shared.sendAuthenticatedStateIfPossible()
-					#endif
+					#endif // os(iOS)
 				} signingOut: {
 					#if os(iOS)
 						PhoneWatchSyncBridge.shared.sendSignedOutStateIfPossible()
@@ -159,8 +155,7 @@ struct TimetableApp: App {
 						.ignoresSafeArea()
 				}
 			#else
-				.preferredColorScheme(.dark)
-					.overlay {
+				.overlay {
 						if launchIllusionVisible {
 							LaunchIllusionView {
 								launchIllusionVisible = false
@@ -170,8 +165,10 @@ struct TimetableApp: App {
 						}
 					}
 			#endif
+					.preferredColorScheme(.dark)
 		}
 		.windowResizability(.contentSize)
+
 		#if os(macOS)
 			.commands {
 				CommandGroup(after: .appSettings) {
@@ -191,9 +188,9 @@ struct TimetableApp: App {
 					case .none:
 						NSSize(width: 700, height: 528)
 					case .comparison:
-						NSSize(width: 700, height: 727)
-					case .settings:
 						NSSize(width: 700, height: 750)
+					case .settings:
+						NSSize(width: 700, height: 650)
 				}
 			}
 

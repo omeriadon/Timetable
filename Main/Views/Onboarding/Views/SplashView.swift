@@ -14,16 +14,14 @@ struct SplashView: View {
 			Image("Icon")
 				.resizable()
 				.aspectRatio(contentMode: .fit)
-				.frame(width: 250)
+				.frame(width: 300)
 				.animation(.spring(duration: 0.5, bounce: 0.8, blendDuration: 0)) { view in
 					view
-
 						.stickerEffect()
 						.stickerCheckerIntensity(0)
-						.stickerNoiseScale(0)
 						.stickerCheckerScale(0)
-						.stickerNoiseIntensity(450)
 						.stickerColorIntensity(0)
+						.stickerBlend(0)
 						.stickerMotionEffect(.dragGesture(intensity: 0.6))
 				}
 

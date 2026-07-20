@@ -2,7 +2,7 @@
 //   ShareSelectionSheet.swift
 //   Main
 //
-//   Created by Codex on 02/07/2026.
+//   Created by Adon Omeri on 02/07/2026.
 //
 
 import Defaults

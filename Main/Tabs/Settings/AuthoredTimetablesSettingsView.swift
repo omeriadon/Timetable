@@ -1,3 +1,10 @@
+//
+//   AuthoredTimetablesSettingsView.swift
+//   Main
+//
+//   Created by Adon Omeri on 29/6/2026.
+//
+
 import SwiftUI
 
 struct AuthoredTimetablesSettingsView: View {

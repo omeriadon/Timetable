@@ -74,24 +74,53 @@ struct OnboardingView: View {
 				.multilineTextAlignment(.center)
 				.frame(maxWidth: .infinity)
 				.padding(.vertical, 8)
+				.contentTransition(.numericText())
+				.animation(.easeInOut, value: selectedID)
 		}
-		.safeAreaBar(edge: .bottom, alignment: .center, spacing: 0) {
-			VStack(spacing: 0) {
-				if let context = selectedContext {
-					Text(context.statusMessage ?? " ")
-						.contentTransition(.opacity)
-						.font(.footnote)
-						.multilineTextAlignment(.center)
-						.opacity(context.statusMessage == nil ? 0 : 1)
-						.frame(maxWidth: .infinity)
-						.frame(minHeight: 20)
-						.padding(.bottom, 20)
-						.padding(.top, 8)
-						.animation(.easeInOut, value: context.statusMessage)
+		.toolbar {
+			if #available(anyAppleOS 27, *) {
+				ToolbarItem(placement: .status) {
+					VStack(spacing: 0) {
+						if let context = selectedContext {
+							Text(context.statusMessage ?? " ")
+								.contentTransition(.opacity)
+								.font(.footnote)
+								.multilineTextAlignment(.center)
+								.opacity(context.statusMessage == nil ? 0 : 1)
+								.frame(maxWidth: .infinity)
+								.frame(minHeight: 20)
+								.padding(.bottom, 20)
+								.padding(.top, 8)
+								.animation(.easeInOut, value: context.statusMessage)
+						}
+						controls
+					}
 				}
-				controls
+//				.contentMarginsRemoved()
+				.sharedBackgroundVisibility(.hidden)
+
+			} else {
+				ToolbarItem(placement: .status) {
+					VStack(spacing: 0) {
+						if let context = selectedContext {
+							Text(context.statusMessage ?? " ")
+								.contentTransition(.opacity)
+								.font(.footnote)
+								.multilineTextAlignment(.center)
+								.opacity(context.statusMessage == nil ? 0 : 1)
+								.frame(maxWidth: .infinity)
+								.frame(minHeight: 20)
+								.padding(.bottom, 20)
+								.padding(.top, 8)
+								.animation(.easeInOut, value: context.statusMessage)
+						}
+						controls
+					}
+				}
+				.sharedBackgroundVisibility(.hidden)
 			}
 		}
+		.scrollEdgeEffectStyle(.soft, for: .all)
 		.task { await buildPages() }
 		.onChange(of: sessionStore.state) {
 			Task { await buildPages(preserving: selectedID) }

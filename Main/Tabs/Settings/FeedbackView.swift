@@ -9,31 +9,53 @@ struct FeedbackView: View {
 
 	var body: some View {
 		NavigationStack {
-			VStack(spacing: 0) {
+			Form {
+				Section {
+					Picker("Type", selection: $category) {
+						Label("Feedback", systemImage: "text.bubble")
+							.foregroundStyle(.white)
+							.tag("Feedback")
+
+						Label("Bug Report", systemImage: "ant")
+							.foregroundStyle(.white)
+							.tag("Bug Report")
+					}
+					#if os(macOS)
+					.pickerStyle(.radioGroup)
+					#endif
+				}
+
+				TextField(
+					text: $message,
+					prompt: Text("Describe the feedback or bug"),
+					axis: .vertical,
+					label: {
+						EmptyView()
+					}
+				)
+				.lineLimit(5 ... 12)
+				#if os(macOS)
+					.labelsHidden()
+					.frame(maxWidth: .infinity, alignment: .leading)
+					.padding(.horizontal, 4)
+					.padding(.bottom, 3)
+					.background {
+						RoundedRectangle(cornerRadius: 3)
+							.fill(Color(red: 0.13, green: 0.14, blue: 0.15))
+					}
+				#endif // os(macOS)
+			}
+			.formStyle(.grouped)
+			.scrollContentBackground(.hidden)
+			.safeAreaBar(edge: .top, alignment: .center, spacing: 20) {
 				Text("Report Feedback or Bug")
+					.padding(.horizontal, 5)
 					.font(.largeTitle)
+					.multilineTextAlignment(.leading)
 					.lineLimit(2)
 					.bold()
-					.padding(.bottom, 20)
-
-				Form {
-					Section {
-						Picker("Type", selection: $category) {
-							Label("Feedback", systemImage: "text.bubble")
-								.tag("Feedback")
-
-							Label("Bug Report", systemImage: "ant")
-								.tag("Bug Report")
-						}
-					}
-
-					TextField("Describe the feedback or bug", text: $message, axis: .vertical)
-						.lineLimit(5 ... 12)
-				}
 			}
-			#if os(macOS)
-			.padding(24)
-			#endif
+			.scrollEdgeEffectStyle(.soft, for: .all)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) { dismiss() }

@@ -14,13 +14,13 @@
 		2A1DB42D2F9ECEC300E5AE7C /* Watch Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2A2586A02FB5D6490030C8CD /* Watch Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2A324C072FF2980C00E6A3D5 /* ColorfulX in Frameworks */ = {isa = PBXBuildFile; productRef = 2A324C062FF2980C00E6A3D5 /* ColorfulX */; };
 		2A324C082FF2980C00E6A3D5 /* FocusOnAppear in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2A324C092FF2980C00E6A3D5 /* FocusOnAppear */; };
-		2A3EEF042FF39837005E0D87 /* Sticker in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2A3EEF032FF39837005E0D87 /* Sticker */; };
 		2A43AFA12FE7849E00BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFA02FE7849E00BBC8BD /* IrregularGradient */; };
 		2A43AFB12FE785E300BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFB02FE785E300BBC8BD /* IrregularGradient */; };
 		2A43AFB32FE785E700BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFB22FE785E700BBC8BD /* IrregularGradient */; };
 		2A5F91F12FE650FE007302CF /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A5F91F02FE650FE007302CF /* IrregularGradient */; };
 		2AA6DF242FDFAC9000BBC70E /* Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2AA6DF142FDFAC8F00BBC70E /* Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2AA6DF2C2FDFADAE00BBC70E /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AA6DF2B2FDFADAE00BBC70E /* Defaults */; };
+		2AB674D7300E387100A6815A /* Sticker in Frameworks */ = {isa = PBXBuildFile; productRef = 2AB674D6300E387100A6815A /* Sticker */; };
 		2ABBBA042FF4AD3A00878A9D /* PortalHeaders in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2ABBBA032FF4AD3A00878A9D /* PortalHeaders */; };
 		2ABBBA062FF4AD3A00878A9D /* PortalTransitions in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2ABBBA052FF4AD3A00878A9D /* PortalTransitions */; };
 		2AC5F7ED2FD8435700B813EA /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AC5F7EC2FD8435700B813EA /* Defaults */; };
@@ -171,7 +171,6 @@
 				Tabs/Settings/AuthoredTimetablesSettingsView.swift = (ios, );
 				Tabs/Settings/ReceivedTimetablesView.swift = (ios, );
 				Tabs/VariableBlur.swift = (ios, );
-				Views/Onboarding/OnboardingBackground.swift = (ios, );
 				Views/Onboarding/OnboardingPage.swift = (ios, );
 				Views/Onboarding/OnboardingPageContext.swift = (ios, );
 				Views/Onboarding/OnboardingView.swift = (ios, );
@@ -375,13 +374,13 @@
 		2A0237882F9C8EA000AB1E1F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				2AB674D7300E387100A6815A /* Sticker in Frameworks */,
 				2A324C072FF2980C00E6A3D5 /* ColorfulX in Frameworks */,
 				2A324C082FF2980C00E6A3D5 /* FocusOnAppear in Frameworks */,
 				2A43AFA12FE7849E00BBC8BD /* IrregularGradient in Frameworks */,
 				2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */,
 				2A02379B2F9C907000AB1E1F /* Defaults in Frameworks */,
 				2ADFCA8F2FF66F1A00B4301E /* WindowOverlay in Frameworks */,
-				2A3EEF042FF39837005E0D87 /* Sticker in Frameworks */,
 				2ABBBA042FF4AD3A00878A9D /* PortalHeaders in Frameworks */,
 				2ABBBA062FF4AD3A00878A9D /* PortalTransitions in Frameworks */,
 				2A0237AC2F9D9DE800AB1E1F /* SFSymbolsPicker in Frameworks */,
@@ -498,10 +497,10 @@
 				2A43AFA02FE7849E00BBC8BD /* IrregularGradient */,
 				2A324C062FF2980C00E6A3D5 /* ColorfulX */,
 				2A324C092FF2980C00E6A3D5 /* FocusOnAppear */,
-				2A3EEF032FF39837005E0D87 /* Sticker */,
 				2ABBBA032FF4AD3A00878A9D /* PortalHeaders */,
 				2ABBBA052FF4AD3A00878A9D /* PortalTransitions */,
 				2ADFCA8E2FF66F1A00B4301E /* WindowOverlay */,
+				2AB674D6300E387100A6815A /* Sticker */,
 			);
 			productName = Timetable;
 			productReference = 2A02378B2F9C8EA000AB1E1F /* Timetable.app */;
@@ -675,9 +674,9 @@
 				2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */,
 				2A324C052FF2980C00E6A3D5 /* XCRemoteSwiftPackageReference "ColorfulX" */,
 				2A324C0A2FF2980C00E6A3D5 /* XCRemoteSwiftPackageReference "FocusOnAppear" */,
-				2A3EEF022FF39837005E0D87 /* XCRemoteSwiftPackageReference "sticker" */,
 				2ABBBA022FF4AD3A00878A9D /* XCRemoteSwiftPackageReference "Portal" */,
 				2ADFCA8D2FF66F1A00B4301E /* XCLocalSwiftPackageReference "../../../Downloads/swiftui-window-overlay-main" */,
+				2AB674D5300E387100A6815A /* XCLocalSwiftPackageReference "../../../Downloads/Sticker-main" */,
 			);
 			preferredProjectObjectVersion = 110;
 			productRefGroup = 2A02378C2F9C8EA000AB1E1F /* Products */;
@@ -1508,6 +1507,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "../../../Downloads/SFSymbolsPickerForSwiftUI-main";
 		};
+		2AB674D5300E387100A6815A /* XCLocalSwiftPackageReference "../../../Downloads/Sticker-main" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../../Downloads/Sticker-main";
+		};
 		2ADFCA8D2FF66F1A00B4301E /* XCLocalSwiftPackageReference "../../../Downloads/swiftui-window-overlay-main" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "../../../Downloads/swiftui-window-overlay-main";
@@ -1537,14 +1540,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.2.0;
-			};
-		};
-		2A3EEF022FF39837005E0D87 /* XCRemoteSwiftPackageReference "sticker" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/bpisano/sticker";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.4.0;
 			};
 		};
 		2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */ = {
@@ -1599,11 +1594,6 @@
 			package = 2A324C0A2FF2980C00E6A3D5 /* XCRemoteSwiftPackageReference "FocusOnAppear" */;
 			productName = FocusOnAppear;
 		};
-		2A3EEF032FF39837005E0D87 /* Sticker */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2A3EEF022FF39837005E0D87 /* XCRemoteSwiftPackageReference "sticker" */;
-			productName = Sticker;
-		};
 		2A43AFA02FE7849E00BBC8BD /* IrregularGradient */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */;
@@ -1628,6 +1618,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = Defaults;
+		};
+		2AB674D6300E387100A6815A /* Sticker */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Sticker;
 		};
 		2ABBBA032FF4AD3A00878A9D /* PortalHeaders */ = {
 			isa = XCSwiftPackageProductDependency;

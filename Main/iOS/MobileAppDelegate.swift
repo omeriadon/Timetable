@@ -2,7 +2,7 @@
 //   MobileAppDelegate.swift
 //   Main
 //
-//   Created by Codex on 29/6/2026.
+//   Created by Adon Omeri on 29/6/2026.
 //
 
 #if os(iOS)

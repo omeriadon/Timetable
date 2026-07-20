@@ -1,5 +1,5 @@
 {
-  "originHash" : "29d5b5795468ab0b72546b932c7d3b74a8beab99a9eebfb8f847babb7f9e4f25",
+  "originHash" : "30d40d232358382120a1cdaf333a7e3b541ce3f9c73f57d79b8246c3ef830ff6",
   "pins" : [
     {
       "identity" : "chronicle",
@@ -106,15 +106,6 @@
       "location" : "https://github.com/Lakr233/SpringInterpolation.git",
       "state" : {
         "revision" : "cdb556516daa9b43c16aae9436dd39e19ff930fd",
-        "version" : "1.4.0"
-      }
-    },
-    {
-      "identity" : "sticker",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/bpisano/sticker",
-      "state" : {
-        "revision" : "301b9e0fb802c01edb2ed25695b3ba62e9c61da3",
         "version" : "1.4.0"
       }
     },

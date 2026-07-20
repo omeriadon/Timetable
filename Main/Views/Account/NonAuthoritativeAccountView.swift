@@ -14,9 +14,16 @@ struct NonAuthoritativeAccountView: View {
 				}
 			}
 			Section {
-				Button("Sign Out", role: .destructive) { Task { await sessionStore.signOut() } }
+				Button("Sign Out", systemImage: "door.left.hand.open", role: .destructive) {
+					Task {
+						await sessionStore.signOut()
+					}
+				}
+				.foregroundStyle(.red)
 			}
 		}
+		.formStyle(.grouped)
+		.scrollContentBackground(.hidden)
 		.appNavigationTitle("Account")
 	}
 }
