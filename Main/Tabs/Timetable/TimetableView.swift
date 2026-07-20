@@ -102,17 +102,18 @@ struct TimetableView: View {
 							}
 
 							let leftView = VStack(alignment: .leading) {
-								Text("You")
-									.textCase(.uppercase)
+								Text("YOU")
 									.foregroundStyle(.secondary)
 								Label(subject.id, systemImage: subject.symbol)
 							}
 
 							item(left: leftView, right: rightView, colour: subject.colour.swiftUIColor, top: true)
 								.padding(.horizontal, 10)
+								.padding(.top, 5)
 								.id(subject.id)
 								.transition(.blurReplace)
 								.animation(.spring(.bouncy), value: subject.id)
+								.foregroundStyle(.white)
 						}
 
 						Spacer()
