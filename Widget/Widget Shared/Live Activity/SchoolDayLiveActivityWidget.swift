@@ -44,7 +44,7 @@ struct SchoolDayLiveActivityWidget: Widget {
 							ProgressView(timerInterval: startDate ... endDate, countsDown: false) {
 								EmptyView()
 							} currentValueLabel: {
-								Text(timerInterval: startDate ... endDate, countsDown: true)
+								Text(.currentDate, format: .timer(countingDownIn: startDate..<endDate))
 									.monospaced()
 							}
 							.progressViewStyle(.circular)
@@ -116,7 +116,7 @@ struct SchoolDayLiveActivityWidget: Widget {
 					ProgressView(timerInterval: startDate ... endDate, countsDown: false) {
 						EmptyView()
 					} currentValueLabel: {
-						Text(timerInterval: startDate ... endDate, countsDown: true)
+						Text(.currentDate, format: .timer(countingDownIn: startDate..<endDate))
 							.font(.system(size: 12, design: .monospaced))
 							.fontDesign(.monospaced)
 							.monospacedDigit()
@@ -183,7 +183,7 @@ private struct SchoolDayLiveActivityView: View {
 			   let endDate = context.state.endDate,
 			   startDate < endDate
 			{
-				Text(timerInterval: startDate ... endDate, countsDown: true, showsHours: false)
+				Text(.currentDate, format: .timer(countingDownIn: startDate..<endDate, showsHours: false))
 					.font(.system(size: 25, weight: .regular, design: .monospaced))
 					.fontDesign(.monospaced)
 					.monospacedDigit()
@@ -232,7 +232,7 @@ private struct SchoolDayLiveActivityView: View {
 					.progressViewStyle(.linear)
 
 				HStack(alignment: .lastTextBaseline) {
-					Text(timerInterval: startDate ... endDate, countsDown: true)
+					Text(.currentDate, format: .timer(countingDownIn: startDate..<endDate))
 						.foregroundStyle(.white)
 						.font(.system(size: 20, design: .monospaced))
 						.fontDesign(.monospaced)
