@@ -27,9 +27,6 @@
 		2ADFCA8F2FF66F1A00B4301E /* WindowOverlay in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2ADFCA8E2FF66F1A00B4301E /* WindowOverlay */; };
 		2AE0586F300B591D00473DBD /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2A02379A2F9C907000AB1E1F /* Defaults */; };
 		2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */ = {isa = PBXBuildFile; platformFilters = (macos, ); productRef = 2AE0F13A2FE03989002B5D9D /* MaterialView */; };
-		2AF3B0103000000000000010 /* Shared/Platform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF3B00E300000000000000E /* Shared/Platform.swift */; };
-		2AF3B0113000000000000011 /* App Shared/Networking/AuthRequestDTOs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF3B00F300000000000000F /* App Shared/Networking/AuthRequestDTOs.swift */; };
-		2AF3B0123000000000000012 /* Shared/OnboardingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF3B0133000000000000013 /* Shared/OnboardingState.swift */; };
 		2B0000013000000000000001 /* Timetable Messages.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2B0000023000000000000002 /* Timetable Messages.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -117,9 +114,6 @@
 		2A2586A02FB5D6490030C8CD /* Watch Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Watch Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2AA6DF142FDFAC8F00BBC70E /* Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Widget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2AF3B0073000000000000007 /* TimetableTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TimetableTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		2AF3B00E300000000000000E /* Shared/Platform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/Platform.swift; sourceTree = SOURCE_ROOT; };
-		2AF3B00F300000000000000F /* App Shared/Networking/AuthRequestDTOs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "App Shared/Networking/AuthRequestDTOs.swift"; sourceTree = SOURCE_ROOT; };
-		2AF3B0133000000000000013 /* Shared/OnboardingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/OnboardingState.swift; sourceTree = SOURCE_ROOT; };
 		2B0000023000000000000002 /* Timetable Messages.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Timetable Messages.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -355,11 +349,6 @@
 			path = Special;
 			sourceTree = "<group>";
 		};
-		2AF3B0013000000000000001 /* TimetableTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = TimetableTests;
-			sourceTree = "<group>";
-		};
 		2B0000053000000000000005 /* Messages */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -433,7 +422,6 @@
 				2A324AAE2FF0E3A100E6A3D5 /* App Shared */,
 				2AAE62702FD839A7004B3FF4 /* Main */,
 				2A02378C2F9C8EA000AB1E1F /* Products */,
-				2AE05870300B591D00473DBD /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -448,17 +436,6 @@
 				2B0000023000000000000002 /* Timetable Messages.appex */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		2AE05870300B591D00473DBD /* Recovered References */ = {
-			isa = PBXGroup;
-			children = (
-				2AF3B0013000000000000001 /* TimetableTests */,
-				2AF3B00E300000000000000E /* Shared/Platform.swift */,
-				2AF3B00F300000000000000F /* App Shared/Networking/AuthRequestDTOs.swift */,
-				2AF3B0133000000000000013 /* Shared/OnboardingState.swift */,
-			);
-			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -596,9 +573,6 @@
 				2AF3B0053000000000000005 /* Resources */,
 			);
 			buildRules = (
-			);
-			fileSystemSynchronizedGroups = (
-				2AF3B0013000000000000001 /* TimetableTests */,
 			);
 			name = TimetableTests;
 			packageProductDependencies = (
@@ -750,9 +724,6 @@
 		2AF3B0033000000000000003 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
-				2AF3B0103000000000000010 /* Shared/Platform.swift in Sources */,
-				2AF3B0113000000000000011 /* App Shared/Networking/AuthRequestDTOs.swift in Sources */,
-				2AF3B0123000000000000012 /* Shared/OnboardingState.swift in Sources */,
 			);
 		};
 		2B0000083000000000000008 /* Sources */ = {
