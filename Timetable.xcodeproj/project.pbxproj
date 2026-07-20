@@ -173,16 +173,11 @@
 				Views/Onboarding/Views/CalendarPermission.swift = (ios, );
 				Views/Onboarding/Views/Notifications.swift = (ios, );
 				Views/Onboarding/Views/SplashView.swift = (ios, );
-				Views/Onboarding/Views/Tutorial/FriendsTutorial.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/GeneratedSFSymbolShapes.swift = (ios, );
-				Views/Onboarding/Views/Tutorial/NotifTutorial.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/OnboardingAccount.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/OnboardingCompletion.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/OnboardingOverview.swift = (ios, );
-				Views/Onboarding/Views/Tutorial/SearchTutorial.swift = (ios, );
-				Views/Onboarding/Views/Tutorial/ShareTutorial.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/TimetableTypesTutorial.swift = (ios, );
-				Views/Onboarding/Views/Tutorial/WidgetTutorial.swift = (ios, );
 				"Views/Subject Editor/main sheet.swift" = (ios, );
 				iOS/LiveActivityDebugView.swift = (ios, );
 				macOS/AppDelegate.swift = (macos, );

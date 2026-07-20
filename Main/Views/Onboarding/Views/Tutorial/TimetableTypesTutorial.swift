@@ -37,21 +37,19 @@ struct TimetableTypesTutorial: View {
 	@Environment(\.onboardingPageContext) private var context
 
 	var body: some View {
-		VStack(spacing: 30) {
-			Text("There are a few types of timetable:")
-				.font(.title2)
-
+		VStack(spacing: 20) {
 			VStack(alignment: .leading, spacing: 8) {
 				ForEach(items) { item in
 					HStack(alignment: .top, spacing: 8) {
 						Text("•")
 
 						Text("\(Text(item.title).bold().foregroundStyle(item.colour)): \(item.description)")
+							.lineLimit(5)
 					}
 				}
 			}
 
-			GlassEffectContainer(spacing: 130) {
+			GlassEffectContainer(spacing: 145) {
 				TimelineView(.animation(minimumInterval: 1.0 / 60.0)) { timeline in
 					GeometryReader { proxy in
 						let time = timeline.date.timeIntervalSinceReferenceDate

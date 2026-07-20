@@ -40,7 +40,5 @@ struct WatchSignInView: View {
 			.disabled(provisioningService.isRequesting == true)
 		}
 		.ignoresSafeArea(.all, edges: .vertical)
-		.padding(.bottom, 1)
-		.padding(.top, 5)
 	}
 }

@@ -77,50 +77,49 @@ struct OnboardingView: View {
 				.contentTransition(.numericText())
 				.animation(.easeInOut, value: selectedID)
 		}
-		.toolbar {
-			if #available(anyAppleOS 27, *) {
-				ToolbarItem(placement: .status) {
-					VStack(spacing: 0) {
-						if let context = selectedContext {
-							Text(context.statusMessage ?? " ")
-								.contentTransition(.opacity)
-								.font(.footnote)
-								.multilineTextAlignment(.center)
-								.opacity(context.statusMessage == nil ? 0 : 1)
-								.frame(maxWidth: .infinity)
-								.frame(minHeight: 20)
-								.padding(.bottom, 20)
-								.padding(.top, 8)
-								.animation(.easeInOut, value: context.statusMessage)
-						}
-						controls
-					}
+		.safeAreaInset(edge: .bottom, alignment: .center, spacing: 0) {
+			VStack {
+				if let context = selectedContext {
+					Text(context.statusMessage ?? " ")
+						.contentTransition(.numericText())
+						.font(.footnote)
+						.multilineTextAlignment(.center)
+						.opacity(context.statusMessage == nil ? 0 : 1)
+						.frame(maxWidth: .infinity)
+						.frame(minHeight: 20)
+						.padding(.bottom, 20)
+						.padding(.top, 8)
+						.animation(.easeInOut, value: context.statusMessage)
 				}
-//				.contentMarginsRemoved()
-				.sharedBackgroundVisibility(.hidden)
+			}
+		}
+		.toolbar {
+			ToolbarItem(placement: .bottomBar) {
+				left
+			}
 
+			ToolbarSpacer(.flexible, placement: .bottomBar)
+
+			if #available(anyAppleOS 27, *) {
+				ToolbarItem(placement: .bottomBar) {
+					middle
+				}
+				.contentMarginsRemoved()
+				.sharedBackgroundVisibility(.hidden)
 			} else {
-				ToolbarItem(placement: .status) {
-					VStack(spacing: 0) {
-						if let context = selectedContext {
-							Text(context.statusMessage ?? " ")
-								.contentTransition(.opacity)
-								.font(.footnote)
-								.multilineTextAlignment(.center)
-								.opacity(context.statusMessage == nil ? 0 : 1)
-								.frame(maxWidth: .infinity)
-								.frame(minHeight: 20)
-								.padding(.bottom, 20)
-								.padding(.top, 8)
-								.animation(.easeInOut, value: context.statusMessage)
-						}
-						controls
-					}
+				ToolbarItem(placement: .bottomBar) {
+					middle
 				}
 				.sharedBackgroundVisibility(.hidden)
 			}
+
+			ToolbarSpacer(.flexible, placement: .bottomBar)
+
+			ToolbarItem(placement: .bottomBar) {
+				right
+			}
 		}
-		.scrollEdgeEffectStyle(.soft, for: .all)
+		.scrollEdgeEffectStyle(.soft, for: .top)
 		.task { await buildPages() }
 		.onChange(of: sessionStore.state) {
 			Task { await buildPages(preserving: selectedID) }
@@ -145,62 +144,58 @@ struct OnboardingView: View {
 		}
 	}
 
-	private var controls: some View {
-		HStack(spacing: 0) {
-			Button {
-				move(by: -1)
-			} label: {
-				HStack {
-					Image(systemName: "chevron.left")
+	var left: some View {
+		Button {
+			move(by: -1)
+		} label: {
+			Image(systemName: "chevron.left")
 
-					Text("Back")
-				}
-			}
-			.buttonSizing(.fitted)
-			.font(.headline)
-			.buttonStyle(.glassProminent)
-			.controlSize(.extraLarge)
-			.disabled(isBackDisabled)
-			.animation(.easeInOut, value: selectedIndex)
-
-			Spacer(minLength: 1)
-
-			VStack(spacing: 5) {
-				Text("\(min(selectedIndex + 1, pages.count)) of \(pages.count)")
-					.contentTransition(.numericText())
-				ProgressView(value: pages.isEmpty ? 0 : Double(selectedIndex + 1), total: Double(max(pages.count, 1)))
-					.progressViewStyle(.linear)
-					.frame(width: 90)
-			}
-			.animation(.easeInOut, value: selectedIndex)
-
-			Spacer(minLength: 1)
-
-			Button {
-				if selectedIndex == pages.count - 1 {
-					hasCompletedOnboarding = true
-					hasSeenOnboardingBefore = true
-					onboardingPageID = ""
-				} else {
-					move(by: 1)
-				}
-			} label: {
-				HStack {
-					Text(selectedIndex == pages.count - 1 ? "Finish" : "Next")
-
-					if !(selectedIndex == pages.count - 1) {
-						Image(systemName: "chevron.right")
-					}
-				}
-				.animation(.easeInOut, value: selectedIndex)
-			}
-			.buttonSizing(.fitted)
-			.font(.headline)
-			.buttonStyle(.glassProminent)
-			.controlSize(.extraLarge)
-			.disabled(isNextDisabled)
+				.foregroundStyle(.white)
 		}
-		.padding(.horizontal, 30)
+		.buttonSizing(.fitted)
+		.font(.headline)
+		.buttonStyle(.glassProminent)
+		.controlSize(.extraLarge)
+		.disabled(isBackDisabled)
+		.animation(.easeInOut, value: selectedIndex)
+	}
+
+	var middle: some View {
+		VStack(spacing: 5) {
+			Text("\(min(selectedIndex + 1, pages.count)) of \(pages.count)")
+				.contentTransition(.numericText())
+			ProgressView(value: pages.isEmpty ? 0 : Double(selectedIndex + 1), total: Double(max(pages.count, 1)))
+				.progressViewStyle(.linear)
+				.frame(width: 90)
+		}
+		.animation(.easeInOut, value: selectedIndex)
+	}
+
+	var right: some View {
+		Button {
+			if selectedIndex == pages.count - 1 {
+				hasCompletedOnboarding = true
+				hasSeenOnboardingBefore = true
+				onboardingPageID = ""
+			} else {
+				move(by: 1)
+			}
+		} label: {
+			ZStack {
+				if !(selectedIndex == pages.count - 1) {
+					Image(systemName: "chevron.right")
+				} else {
+					Text("Finish")
+				}
+			}
+			.foregroundStyle(.white)
+			.animation(.easeInOut, value: selectedIndex)
+		}
+		.buttonSizing(.fitted)
+		.font(.headline)
+		.buttonStyle(.glassProminent)
+		.controlSize(.extraLarge)
+		.disabled(isNextDisabled)
 	}
 
 	private var selectedIndex: Int {
@@ -299,21 +294,6 @@ struct OnboardingView: View {
 			},
 			OnboardingPage(id: "finished", title: "Ready to Begin") {
 				OnboardingOverview()
-			},
-			OnboardingPage(id: "widget", title: "Widgets") {
-				WidgetTutorial()
-			},
-			OnboardingPage(id: "notif", title: "Notifications") {
-				NotifTutorial()
-			},
-			OnboardingPage(id: "share", title: "Share Timetables") {
-				ShareTutorial()
-			},
-			OnboardingPage(id: "search", title: "Search Timetables") {
-				SearchTutorial()
-			},
-			OnboardingPage(id: "friends", title: "Friends' Timetables") {
-				FriendsTutorial()
 			},
 			OnboardingPage(id: "timetableTypes", title: "Timetable Types") {
 				TimetableTypesTutorial()
