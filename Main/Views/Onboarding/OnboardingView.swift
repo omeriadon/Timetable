@@ -69,7 +69,7 @@ struct OnboardingView: View {
 			}
 		}
 		.safeAreaBar(edge: .top, alignment: .center, spacing: 0) {
-			Text(pages.first(where: { $0.id == selectedID })?.title ?? "")
+			Text(pages.first(where: { $0.id == selectedID })?.title ?? "   ")
 				.font(.title.bold())
 				.multilineTextAlignment(.center)
 				.frame(maxWidth: .infinity)
@@ -77,22 +77,21 @@ struct OnboardingView: View {
 				.contentTransition(.numericText())
 				.animation(.easeInOut, value: selectedID)
 		}
-		.safeAreaInset(edge: .bottom, alignment: .center, spacing: 0) {
-			VStack {
-				if let context = selectedContext {
-					Text(context.statusMessage ?? " ")
-						.contentTransition(.numericText())
-						.font(.footnote)
-						.multilineTextAlignment(.center)
-						.opacity(context.statusMessage == nil ? 0 : 1)
-						.frame(maxWidth: .infinity)
-						.frame(minHeight: 20)
-						.padding(.bottom, 20)
-						.padding(.top, 8)
-						.animation(.easeInOut, value: context.statusMessage)
-				}
-			}
-		}
+//		.safeAreaInset(edge: .bottom, alignment: .center, spacing: 0) {
+//			VStack {
+//				if let context = selectedContext {
+//					Text(context.statusMessage ?? " ")
+//						.contentTransition(.numericText())
+//						.animation(.easeInOut, value: context.statusMessage)
+//						.font(.footnote)
+//						.multilineTextAlignment(.center)
+//						.frame(maxWidth: .infinity)
+//						.frame(minHeight: 20)
+//						.padding(.bottom, 20)
+//						.padding(.top, 8)
+//				}
+//			}
+//		}
 		.toolbar {
 			ToolbarItem(placement: .bottomBar) {
 				left
@@ -119,7 +118,7 @@ struct OnboardingView: View {
 				right
 			}
 		}
-		.scrollEdgeEffectStyle(.soft, for: .top)
+		.scrollEdgeEffectStyle(.hard, for: .all)
 		.task { await buildPages() }
 		.onChange(of: sessionStore.state) {
 			Task { await buildPages(preserving: selectedID) }
@@ -260,7 +259,7 @@ struct OnboardingView: View {
 		hasServerTimetable: Bool
 	) -> [OnboardingPage] {
 		[
-			OnboardingPage(id: "splash", title: "") {
+			OnboardingPage(id: "splash", title: "    ") {
 				SplashView()
 			},
 			OnboardingPage(id: "calendar", title: "Calendar Access", isVisible: {

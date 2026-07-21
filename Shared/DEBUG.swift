@@ -8,7 +8,7 @@
 import Foundation
 
 #if DEBUG
-	nonisolated let debugOffset: TimeInterval = -43393
+	nonisolated let debugOffset: TimeInterval = -0
 #else
 	nonisolated let debugOffset: TimeInterval = 0
 #endif
