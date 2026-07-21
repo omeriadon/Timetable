@@ -31,6 +31,7 @@ final class NotificationRegistrationService {
 
 	private let networkManager: NetworkManager
 	private var badgeID = UUID()
+	private var uploadTask: Task<Void, Never>?
 
 	private init(networkManager: NetworkManager) {
 		self.networkManager = networkManager
@@ -42,6 +43,7 @@ final class NotificationRegistrationService {
 	}
 
 	func requestRemoteRegistration() async {
+		Print("Requesting remote APNs registration", category: .network)
 		do {
 			let granted = try await requestNotificationPermission()
 			guard granted else {
@@ -79,6 +81,7 @@ final class NotificationRegistrationService {
 
 	func receive(deviceToken: Data) async {
 		let token = deviceToken.map { String(format: "%02x", $0) }.joined()
+		Print("Received APNs device token", category: .network)
 		if Defaults[.pendingAPNsToken] != token {
 			Defaults[.pendingAPNsToken] = token
 			Defaults[.hasRegisteredAPNsToken] = false
@@ -95,6 +98,20 @@ final class NotificationRegistrationService {
 	}
 
 	func uploadPendingToken() async {
+		Print("Synchronizing pending APNs token", category: .network)
+		if let uploadTask {
+			await uploadTask.value
+			return
+		}
+		let task = Task { @MainActor in
+			await performUploadPendingToken()
+		}
+		uploadTask = task
+		await task.value
+		uploadTask = nil
+	}
+
+	private func performUploadPendingToken() async {
 		guard SessionStore.shared.isAuthenticated else { return }
 		let token = Defaults[.pendingAPNsToken]
 		guard !token.isEmpty else {
@@ -103,35 +120,44 @@ final class NotificationRegistrationService {
 		}
 
 		registrationState = .registering
-		do {
-			let _: UserDeviceResponse = try await networkManager.send(
-				.v1CurrentDevice,
-				body: RegisterUserDeviceRequest(
-					installationID: ClientIdentityProvider.shared.identity().installationID,
-					platform: ClientIdentityProvider.shared.identity().platform.rawValue,
-					apnsToken: token,
-					isDebug: Self.isDebug
+		let identity = ClientIdentityProvider.shared.identity()
+		for attempt in 1 ... 3 {
+			do {
+				let _: UserDeviceResponse = try await networkManager.send(
+					.v1CurrentDevice,
+					body: RegisterUserDeviceRequest(
+						installationID: identity.installationID,
+						platform: identity.platform.rawValue,
+						apnsToken: token,
+						isDebug: Self.isDebug
+					)
 				)
-			)
-			Defaults[.hasRegisteredAPNsToken] = true
-			registrationState = .registered
+				Defaults[.hasRegisteredAPNsToken] = true
+				registrationState = .registered
+				Print("Device registered for APNs", category: .network)
+				return
+			} catch {
+				PrintError("APNs token upload attempt \(attempt) failed", category: .network, error: error)
+				if attempt < 3 {
+					try? await Task.sleep(for: .seconds(attempt))
+					continue
+				}
 
-			Print("Device registered")
-		} catch {
-			Defaults[.hasRegisteredAPNsToken] = false
-			registrationState = .failed(error.localizedDescription)
-			StatusBadgeManager.shared.addBadge(
-				id: badgeID,
-				title: "Device registration failed",
-				secondaryText: error.localizedDescription,
-				priority: 5,
-				view: .error
-			)
-			PrintError("APNs token upload failed", category: .network, error: error)
+				Defaults[.hasRegisteredAPNsToken] = false
+				registrationState = .failed(error.localizedDescription)
+				StatusBadgeManager.shared.addBadge(
+					id: badgeID,
+					title: "Device registration failed",
+					secondaryText: error.localizedDescription,
+					priority: 5,
+					view: .error
+				)
+			}
 		}
 	}
 
 	func removeServerRegistration() async {
+		Print("Removing server APNs registration", category: .network)
 		if SessionStore.shared.isAuthenticated {
 			do {
 				let identity = ClientIdentityProvider.shared.identity()
@@ -151,6 +177,7 @@ final class NotificationRegistrationService {
 	}
 
 	func registrationFailed(_ error: (any Error)? = nil) {
+		PrintError("APNs registration failed", category: .network, error: error)
 		let message = error?.localizedDescription ?? "Apple Push Notification registration failed."
 		registrationState = .failed(message)
 		StatusBadgeManager.shared.addBadge(
