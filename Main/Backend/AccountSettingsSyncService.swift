@@ -33,11 +33,6 @@ final class AccountSettingsSyncService {
 	}
 
 	func updateSettings(_ settings: AccountSettings) async throws {
-		guard Platform.current.isAuthoritative else {
-			Defaults[.accountSettings] = settings
-			applyLocalSideEffects()
-			return
-		}
 		let previousSettings = Defaults[.accountSettings]
 		syncGeneration += 1
 		pendingMutation = PendingMutation(
@@ -61,7 +56,6 @@ final class AccountSettingsSyncService {
 	}
 
 	func flushPendingSettings() async throws {
-		try Platform.require(Platform.current.isAuthoritative)
 		if pendingMutation == nil {
 			syncGeneration += 1
 			let settings = Defaults[.accountSettings]

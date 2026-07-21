@@ -21,7 +21,7 @@ struct TimetableView: View {
 	#endif
 
 	@Default(.timetable) var subjects
-	@Default(.timetableHighlightsCurrentDay) private var highlightsCurrentDay
+	@Default(.accountSettings) private var accountSettings
 
 	@Default(.receivedTimetables) private var receivedTimetables
 
@@ -224,7 +224,7 @@ struct TimetableView: View {
 				}
 			}
 			.background {
-				if highlightsCurrentDay, currentDayIndex == day {
+				if accountSettings.highlightsCurrentDay, currentDayIndex == day {
 					RoundedRectangle(cornerRadius: 8)
 						.stroke(.white, lineWidth: 2)
 						.padding(-2)

@@ -6,6 +6,10 @@ struct NonAuthoritativeSettingsView: View {
 	@Environment(\.statusBadgeManager) private var statusBadgeManager
 	@State private var sessionStore = SessionStore.shared
 	@State private var networkManager = NetworkManager.shared
+	@State private var settings = Defaults[.accountSettings]
+	@State private var committedSettings = Defaults[.accountSettings]
+	@State private var settingsSync = AccountSettingsSyncService.shared
+	@State private var saveGeneration = 0
 	@State private var showFeedbackSheet = false
 
 	@Binding var expanded: WindowMode
@@ -32,10 +36,7 @@ struct NonAuthoritativeSettingsView: View {
 						Label("Notifications", systemImage: "bell")
 					}
 
-					Toggle("Highlight Current Day in timetables", isOn: Binding(
-						get: { Defaults[.timetableHighlightsCurrentDay] },
-						set: { Defaults[.timetableHighlightsCurrentDay] = $0 }
-					))
+					Toggle("Highlight Current Day in timetables", isOn: highlightsBinding)
 				}
 
 				Section {
@@ -150,5 +151,30 @@ struct NonAuthoritativeSettingsView: View {
 
 	private func showSignInRequired() {
 		statusBadgeManager.signInRequired()
+	}
+
+	private var highlightsBinding: Binding<Bool> {
+		Binding(
+			get: { settings.highlightsCurrentDay },
+			set: { value in
+				saveGeneration += 1
+				let generation = saveGeneration
+				let previous = committedSettings
+				settings.highlightsCurrentDay = value
+				let proposed = settings
+				Task {
+					do {
+						try await settingsSync.updateSettings(proposed)
+						guard generation == saveGeneration else { return }
+						committedSettings = proposed
+						statusBadgeManager.addBadge(id: UUID(), title: "Preferences saved", priority: 3, view: .success)
+					} catch {
+						guard generation == saveGeneration else { return }
+						settings = previous
+						statusBadgeManager.addBadge(id: UUID(), title: "Unable to save preferences", secondaryText: error.localizedDescription, priority: 4, view: .error)
+					}
+				}
+			}
+		)
 	}
 }

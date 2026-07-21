@@ -15,7 +15,7 @@ struct ContentView: View {
 	@State private var showSyncErrorIcon = false
 
 	@Default(.timetable) var subjects
-	@Default(.timetableHighlightsCurrentDay) private var highlightsCurrentDay
+	@Default(.accountSettings) private var accountSettings
 
 	var body: some View {
 		let subjectLookup = TimetableLayout.subjectLookup(for: subjects)
@@ -77,7 +77,7 @@ struct ContentView: View {
 						}
 					}
 					.background {
-						if highlightsCurrentDay, currentDayIndex == day {
+						if accountSettings.highlightsCurrentDay, currentDayIndex == day {
 							RoundedRectangle(cornerRadius: 5)
 								.fill(.white.opacity(0.1))
 								.strokeBorder(.white, lineWidth: 1, antialiased: true)

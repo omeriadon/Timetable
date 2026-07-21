@@ -57,10 +57,17 @@ final class WatchAccountBootstrapService {
 		}
 		try await task.value
 	}
+
+	func updateSettings(_ settings: AccountSettings) async throws {
+		let updated: AccountSettings = try await networkManager.send(.v1SettingsUpdate, body: settings)
+		Defaults[.accountSettings] = updated
+		WidgetCenter.shared.reloadAllTimelines()
+	}
 }
 
 private extension Endpoint {
 	static let v1OwnerTimetable = Endpoint("/v1/timetables/owner")
 	static let v1Settings = Endpoint("/v1/settings")
+	static let v1SettingsUpdate = Endpoint("/v1/settings", method: .put)
 	static let v1ReceivedTimetables = Endpoint("/v1/timetables/received/authoritative", queryItems: [URLQueryItem(name: "limit", value: "50")])
 }

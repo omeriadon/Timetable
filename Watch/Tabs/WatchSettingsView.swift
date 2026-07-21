@@ -4,14 +4,21 @@ import WidgetKit
 
 struct WatchSettingsView: View {
 	@Default(.accountProfile) private var profile
+	@State private var settings = Defaults[.accountSettings]
+	@State private var committedSettings = Defaults[.accountSettings]
 	@Environment(\.statusBadgeManager) private var badges
 
 	@State private var bootstrapService = WatchAccountBootstrapService.shared
 	@State private var signOutConfirm = false
+	@State private var saveGeneration = 0
 
 	var body: some View {
 		NavigationStack {
 			List {
+				Section("Preferences") {
+					Toggle("Highlight Current Day in timetables", isOn: highlightsBinding)
+				}
+
 				Section("Account") {
 					if let profile {
 						LabeledContent("Name", value: profile.displayName)
@@ -119,6 +126,31 @@ struct WatchSettingsView: View {
 		} catch {
 			badges.present(error: error, title: "Unable to Sync")
 		}
+	}
+
+	private var highlightsBinding: Binding<Bool> {
+		Binding(
+			get: { settings.highlightsCurrentDay },
+			set: { value in
+				saveGeneration += 1
+				let generation = saveGeneration
+				let previous = committedSettings
+				settings.highlightsCurrentDay = value
+				let proposed = settings
+				Task {
+					do {
+						try await bootstrapService.updateSettings(proposed)
+						guard generation == saveGeneration else { return }
+						committedSettings = proposed
+						badges.addBadge(id: UUID(), title: "Preferences saved", priority: 3, view: .success)
+					} catch {
+						guard generation == saveGeneration else { return }
+						settings = previous
+						badges.addBadge(id: UUID(), title: "Unable to save preferences", secondaryText: error.localizedDescription, priority: 4, view: .error)
+					}
+				}
+			}
+		)
 	}
 
 	private func reloadWidgets() {

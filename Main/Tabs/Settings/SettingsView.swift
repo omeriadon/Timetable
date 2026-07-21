@@ -23,6 +23,10 @@ import WidgetKit
 		@Environment(\.statusBadgeManager) private var statusBadgeManager
 		@State private var sessionStore = SessionStore.shared
 		@State private var networkManager = NetworkManager.shared
+		@State private var settings = Defaults[.accountSettings]
+		@State private var committedSettings = Defaults[.accountSettings]
+		@State private var settingsSync = AccountSettingsSyncService.shared
+		@State private var settingsSaveGeneration = 0
 
 		let watchSync: PhoneWatchSyncBridge
 
@@ -73,7 +77,7 @@ import WidgetKit
 			}
 
 			Section("Preferences") {
-				Toggle("Highlight Current Day in timetables", isOn: $highlightsCurrentDay)
+				Toggle("Highlight Current Day in timetables", isOn: highlightsCurrentDayBinding)
 				if sessionStore.isAuthenticated {
 					NavigationLink { AccountAndSyncSettingsView() } label: { Label("Live Updates", systemImage: "switch.2") }
 				} else {
@@ -252,8 +256,32 @@ import WidgetKit
 			}
 		}
 
-		@Default(.timetableHighlightsCurrentDay) private var highlightsCurrentDay
 		@Default(.hapticsEnabled) private var hapticsEnabled
+
+		private var highlightsCurrentDayBinding: Binding<Bool> {
+			Binding(
+				get: { settings.highlightsCurrentDay },
+				set: { value in
+					settingsSaveGeneration += 1
+					let generation = settingsSaveGeneration
+					let previous = committedSettings
+					settings.highlightsCurrentDay = value
+					let proposed = settings
+					Task {
+						do {
+							try await settingsSync.updateSettings(proposed)
+							guard generation == settingsSaveGeneration else { return }
+							committedSettings = proposed
+							statusBadgeManager.addBadge(id: UUID(), title: "Preferences saved", priority: 3, view: .success)
+						} catch {
+							guard generation == settingsSaveGeneration else { return }
+							settings = previous
+							statusBadgeManager.addBadge(id: UUID(), title: "Unable to save preferences", secondaryText: error.localizedDescription, priority: 4, view: .error)
+						}
+					}
+				}
+			)
+		}
 
 		private var hapticsBinding: Binding<Bool> {
 			Binding(get: { hapticsEnabled }, set: { hapticsEnabled = $0 })

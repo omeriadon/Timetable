@@ -1,4 +1,3 @@
-import Defaults
 import SwiftUI
 
 struct NonAuthoritativeRootView: View {
@@ -30,11 +29,5 @@ struct NonAuthoritativeRootView: View {
 		#if os(iOS)
 		.frame(minWidth: 900, minHeight: 600)
 		#endif
-	}
-}
-
-private enum DefaultsBinding {
-	static var timetableHighlightsCurrentDay: Binding<Bool> {
-		Binding(get: { Defaults[.timetableHighlightsCurrentDay] }, set: { Defaults[.timetableHighlightsCurrentDay] = $0 })
 	}
 }
