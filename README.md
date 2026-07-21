@@ -1,4 +1,9 @@
-<img width="300" height="300" alt="Timetable-iOS-Dark-1024@1x" src="https://github.com/user-attachments/assets/f3178fde-8466-49d6-9a0c-e66d5540be49" />
+<picture>
+<img width="300" height="300" alt="Timetable-iOS-Dark-1024@1x" src="https://github.com/user-attachments/assets/295ed7a0-2fec-46b9-bfcd-0bde11f9db13" />
+<img width="250" height="250" alt="Timetable-watchOS-Default-1088@1x" src="https://github.com/user-attachments/assets/f904cf9c-355e-4dfc-ad2a-34cf82960648" />
+</picture>
+
+
 
 # Timetable for PMS
 
