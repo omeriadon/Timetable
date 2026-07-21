@@ -36,14 +36,14 @@ import SwiftUI
 					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
 			}
 			.padding(2)
-			.background(fill, in: RoundedRectangle(cornerRadius: isBreak ? 2 : 6))
+//			.background(fill, in: RoundedRectangle(cornerRadius: isBreak ? 2 : 6))
+			.background(
+				isBreak ? .clear : fill.opacity(0.72),
+				in: RoundedRectangle(cornerRadius: isBreak ? 2 : 6)
+			)
 			.glassEffect(
 				!isBreak ? .clear.tint(fill).interactive()
 					: .identity,
-				in: RoundedRectangle(cornerRadius: isBreak ? 2 : 6)
-			)
-			.background(
-				isBreak ? .clear : fill.opacity(0.72),
 				in: RoundedRectangle(cornerRadius: isBreak ? 2 : 6)
 			)
 		}

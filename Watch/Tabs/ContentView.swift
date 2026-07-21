@@ -65,20 +65,23 @@ struct ContentView: View {
 	}
 
 	func mainContent(subjectLookup: [Slot: Subject]) -> some View {
-		HStack(spacing: 2) {
-			ForEach(0 ..< 5) { day in
-				VStack(spacing: 2) {
-					Text(TimetableLayout.shortDayLabels[day])
-						.font(.footnote.scaled(by: 0.8))
-						.frame(height: 15)
-					ForEach(0 ..< 8) { session in
-						sessionCell(day, session, subjectLookup: subjectLookup)
+		GlassEffectContainer(spacing: 2) {
+			HStack(spacing: 2) {
+				ForEach(0 ..< 5) { day in
+					VStack(spacing: 2) {
+						Text(TimetableLayout.shortDayLabels[day])
+							.font(.footnote.scaled(by: 0.8))
+							.frame(height: 15)
+						ForEach(0 ..< 8) { session in
+							sessionCell(day, session, subjectLookup: subjectLookup)
+						}
 					}
-				}
-				.background {
-					if highlightsCurrentDay, currentDayIndex == day {
-						Color.white
-							.padding(-1)
+					.background {
+						if highlightsCurrentDay, currentDayIndex == day {
+							RoundedRectangle(cornerRadius: 5)
+								.fill(.white.opacity(0.1))
+								.strokeBorder(.white, lineWidth: 1, antialiased: true)
+						}
 					}
 				}
 			}

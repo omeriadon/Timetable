@@ -59,7 +59,7 @@ struct FriendsTimetablesView: View {
 				symbol = "house.fill"
 				color = .secondary
 				if let next = SchoolStateEngine.nextSubjectOnFollowingSchoolDay(after: now, subjects: receivedTimetable.subjects) {
-					nextText = "Next: \(next.subject.id)"
+					nextText = "First period: \(next.subject.id)"
 				}
 
 			case .noTimetable:
@@ -75,6 +75,7 @@ struct FriendsTimetablesView: View {
 					.bold()
 					.lineLimit(2)
 					.minimumScaleFactor(0.8)
+					.multilineTextAlignment(.center)
 
 				Spacer()
 

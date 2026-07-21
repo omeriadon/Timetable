@@ -41,7 +41,7 @@
               "value" : {
                 "scale" : 1.22,
                 "translation-in-points" : [
-                  162,
+                  262,
                   0
                 ]
               }
@@ -87,7 +87,7 @@
               "value" : {
                 "scale" : 1,
                 "translation-in-points" : [
-                  1.0636734693880499,
+                  1.1,
                   0
                 ]
               }
@@ -97,7 +97,7 @@
               "value" : {
                 "scale" : 1.22,
                 "translation-in-points" : [
-                  162,
+                  262,
                   -7.590000000000032
                 ]
               }
@@ -188,7 +188,7 @@
               "value" : {
                 "scale" : 1.88,
                 "translation-in-points" : [
-                  211.43999999999977,
+                  311.4,
                   112.80000000000007
                 ]
               }
@@ -260,7 +260,7 @@
               "value" : {
                 "scale" : 1.36,
                 "translation-in-points" : [
-                  198,
+                  298,
                   0
                 ]
               }
