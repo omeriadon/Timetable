@@ -164,7 +164,8 @@ final class StatusBadgeManager {
 	func present(error: any Error, title: String) {
 		guard !error.isCancellation else { return }
 		if let networkError = error as? NetworkError {
-			present(networkError: networkError, title: title); return
+			present(networkError: networkError, title: title)
+			return
 		}
 		addBadge(id: UUID(), title: title, secondaryText: error.localizedDescription, priority: 4, view: .error)
 	}

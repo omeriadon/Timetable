@@ -145,11 +145,13 @@ nonisolated struct ReceivedTimetableImportRequest: Codable {
 	let timetableID: UUID?
 	let timetableLocator: String?
 	init(timetableID: UUID) {
-		self.timetableID = timetableID; timetableLocator = nil
+		self.timetableID = timetableID
+		timetableLocator = nil
 	}
 
 	init(timetableLocator: String) {
-		timetableID = nil; self.timetableLocator = timetableLocator
+		timetableID = nil
+		self.timetableLocator = timetableLocator
 	}
 }
 

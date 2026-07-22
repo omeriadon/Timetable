@@ -68,13 +68,23 @@ final class TimetableShareAliasService {
 			currentAlias = response.alias ?? ""
 			Defaults[.ownerTimetableShareAlias] = currentAlias
 			return true
-		} catch { errorMessage = error.isCancellation ? nil : "That link could not be saved."; return false }
+		} catch {
+			errorMessage = error.isCancellation ? nil : "That link could not be saved."
+			return false
+		}
 	}
 
 	func remove() async -> Bool {
 		guard Platform.current.allowsOwnerMutation else { return false }
-		do { try await networkManager.send(.v1OwnerShareAliasDelete, context: .userInitiated); currentAlias = ""; Defaults[.ownerTimetableShareAlias] = ""; return true }
-		catch { errorMessage = "That link could not be removed."; return false }
+		do {
+			try await networkManager.send(.v1OwnerShareAliasDelete, context: .userInitiated)
+			currentAlias = ""
+			Defaults[.ownerTimetableShareAlias] = ""
+			return true
+		} catch {
+			errorMessage = "That link could not be removed."
+			return false
+		}
 	}
 }
 

@@ -38,7 +38,6 @@ import SwiftUI
 		@State private var watchSync = PhoneWatchSyncBridge.shared
 		@State private var rootSyncStatus = SyncMode.normal
 		@State private var isBlurred = false
-		@State private var blurRadius: CGFloat = 3
 		@State private var showShareSelection = false
 		@State private var isShareSheetUpcoming = false
 		@State private var isAliasEditorUpcoming = false
@@ -56,7 +55,6 @@ import SwiftUI
 				isBlurred: $isBlurred,
 				showShareSelection: $showShareSelection
 			)
-			.blur(radius: isBlurred ? blurRadius : 0)
 			.animation(.smooth, value: isBlurred)
 			.ignoresSafeArea()
 			.sheet(isPresented: $showShareSelection, onDismiss: {

@@ -98,7 +98,10 @@ struct NonAuthoritativeSettingsView: View {
 					}
 
 					Button {
-						guard sessionStore.isAuthenticated else { showSignInRequired(); return }
+						guard sessionStore.isAuthenticated else {
+							showSignInRequired()
+							return
+						}
 						WidgetCenter.shared.reloadAllTimelines()
 						statusBadgeManager.addBadge(id: UUID(), title: "Widgets reloaded", priority: 3, view: .success)
 					} label: {
@@ -109,7 +112,10 @@ struct NonAuthoritativeSettingsView: View {
 
 				Section("Support") {
 					Button {
-						guard sessionStore.isAuthenticated else { showSignInRequired(); return }
+						guard sessionStore.isAuthenticated else {
+							showSignInRequired()
+							return
+						}
 						showFeedbackSheet = true
 					} label: {
 						Label("Report Feedback or Bug", systemImage: "exclamationmark.bubble")

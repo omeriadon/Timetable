@@ -74,7 +74,10 @@ enum TimetableDeepLink: Equatable {
 	init?(url: URL) {
 		guard url.scheme == "timetable" else { return nil }
 		let parts = ([url.host].compactMap(\.self) + url.pathComponents.dropFirst().filter { $0 != "/" })
-		guard let first = parts.first else { self = .timetable(id: nil); return }
+		guard let first = parts.first else {
+			self = .timetable(id: nil)
+			return
+		}
 		if first == "received", parts.count >= 2 {
 			let id = String(parts[1])
 			if parts.count >= 4, parts[2] == "subject" {

@@ -12,19 +12,42 @@ struct TimetableShareAliasSheet: View {
 	@State private var service = TimetableShareAliasService.shared
 	@State private var rawInput = ""
 	@State private var editRevision = 0
-	@State private var colors = [Color.clear, .clear, .clear, .clear, .clear, .mint]
+	@State private var colors = [Color.clear, .clear, .mint, .clear, .clear, .clear, .mint]
 
 	var body: some View {
 		ZStack {
-			ColorfulView(color: $colors, speed: .constant(reduceMotion ? 0 : 0.25), bias: .constant(0.00001), noise: .constant(64), transitionSpeed: .constant(10), frameLimit: .constant(60), renderScale: .constant(1))
-				.opacity(0.8)
-				.allowsHitTesting(false)
-				.ignoresSafeArea()
+			ColorfulView(
+				color: $colors,
+				speed: .constant(reduceMotion ? 0 : 0.25),
+				bias: .constant(0.00001),
+				noise: .constant(100),
+				transitionSpeed: .constant(10),
+				frameLimit: .constant(60),
+				renderScale: .constant(1)
+			)
+			.opacity(0.8)
+			.allowsHitTesting(false)
+			.ignoresSafeArea()
+
 			VStack(alignment: .leading, spacing: 18) {
-				HStack { Spacer(); Button("Close", role: .cancel) { dismiss() }.frame(minWidth: 44, minHeight: 44) }
-				Text("Choose your link").font(.largeTitle.bold())
-				Text("Create a short, memorable link for your timetable.").foregroundStyle(.secondary)
-				Text("timetable.adonis.pt/sharedtimetable/").font(.caption.monospaced()).foregroundStyle(.secondary)
+				HStack {
+					Spacer()
+					Button("Close", role: .cancel) {
+						dismiss()
+					}
+					.frame(minWidth: 44, minHeight: 44)
+				}
+
+				Text("Choose your link")
+					.font(.largeTitle.bold())
+
+				Text("Create a short, memorable link for your timetable.")
+					.foregroundStyle(.secondary)
+
+				Text("timetable.adonis.pt/sharedtimetable/")
+					.font(.caption.monospaced())
+					.foregroundStyle(.secondary)
+
 				ZStack(alignment: .leading) {
 					TextField("your link", text: $rawInput)
 					#if !os(macOS)
@@ -40,6 +63,7 @@ struct TimetableShareAliasSheet: View {
 						.foregroundStyle(.clear)
 						.tint(.mint)
 						.accessibilityLabel("Custom timetable link")
+
 					Text(rawInput.isEmpty ? "your-link" : rawInput)
 						.foregroundStyle(service.validation == nil ? Color.primary : Color.red)
 						.font(.title3.monospaced())
@@ -48,27 +72,40 @@ struct TimetableShareAliasSheet: View {
 				.padding(14)
 				.background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16))
 				.onTapGesture { isFocused = true }
+
 				Text(statusText)
 					.font(.callout)
 					.foregroundStyle(service.availability?.isAvailable == true ? .mint : .red)
 					.frame(minHeight: 24, alignment: .leading)
+
 				HStack {
-					Text("\(rawInput.count)/30").font(.caption.monospaced()).contentTransition(.numericText(value: Double(rawInput.count)))
+					Text("\(rawInput.count)/30")
+						.font(.caption.monospaced())
+						.contentTransition(.numericText(value: Double(rawInput.count)))
+						.animation(.easeInOut(duration: 0.2), value: rawInput.count)
+
 					Spacer()
-					Button("Save") { Task {
-						if await service.save() {
-							dismiss()
+
+					Button("Save") {
+						Task {
+							if await service.save() {
+								dismiss()
+							}
 						}
-					} }
-					.buttonStyle(.borderedProminent)
+					}
+					.buttonStyle(.glassProminent)
 					.disabled(service.validation != nil || service.availability?.isAvailable != true || service.isSaving)
 				}
+
 				if !service.currentAlias.isEmpty {
-					Button("Remove Custom Link", role: .destructive) { Task {
-						if await service.remove() {
-							dismiss()
+					Button("Remove Custom Link", role: .destructive) {
+						Task {
+							if await service.remove() {
+								dismiss()
+							}
 						}
-					} }
+					}
+					.buttonStyle(.glass)
 				}
 				Spacer()
 			}
@@ -82,7 +119,10 @@ struct TimetableShareAliasSheet: View {
 			service.updateCandidate(rawInput)
 			isFocused = true
 		}
-		.onChange(of: rawInput) { _, value in editRevision += 1; service.updateCandidate(value) }
+		.onChange(of: rawInput) { _, value in
+			editRevision += 1
+			service.updateCandidate(value)
+		}
 	}
 
 	private var statusText: String {
