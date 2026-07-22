@@ -225,8 +225,9 @@ struct TimetableView: View {
 			}
 			.overlay {
 				if accountSettings.highlightsCurrentDay, currentDayIndex == day {
-					RoundedRectangle(cornerRadius: 12)
-						.stroke(.white, lineWidth: 2)
+					RoundedRectangle(cornerRadius: 12, style: .continuous)
+						.strokeBorder(.white, lineWidth: 2)
+						.offset(y: -3)
 				}
 			}
 		}
