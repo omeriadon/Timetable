@@ -298,7 +298,7 @@ extension Notification.Name {
 					}
 
 					do {
-					let url = selectedItem.shareURL
+						let url = selectedItem.shareURL
 						guard let url else {
 							throw URLError(.badURL)
 						}
