@@ -223,11 +223,10 @@ struct TimetableView: View {
 						}
 				}
 			}
-			.background {
+			.overlay {
 				if accountSettings.highlightsCurrentDay, currentDayIndex == day {
-					RoundedRectangle(cornerRadius: 8)
+					RoundedRectangle(cornerRadius: 12)
 						.stroke(.white, lineWidth: 2)
-						.padding(-2)
 				}
 			}
 		}

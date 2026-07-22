@@ -15,113 +15,112 @@ struct TimetableShareAliasSheet: View {
 	@State private var colors = [Color.clear, .clear, .mint, .clear, .clear, .clear, .mint]
 
 	var body: some View {
-		ZStack {
-			ColorfulView(
-				color: $colors,
-				speed: .constant(reduceMotion ? 0 : 0.25),
-				bias: .constant(0.00001),
-				noise: .constant(100),
-				transitionSpeed: .constant(10),
-				frameLimit: .constant(60),
-				renderScale: .constant(1)
-			)
-			.opacity(0.8)
-			.allowsHitTesting(false)
-			.ignoresSafeArea()
+		NavigationStack {
+			ZStack {
+				ColorfulView(
+					color: $colors,
+					speed: .constant(reduceMotion ? 0 : 0.25),
+					bias: .constant(0.00001),
+					noise: .constant(100),
+					transitionSpeed: .constant(10),
+					frameLimit: .constant(60),
+					renderScale: .constant(1)
+				)
+				.opacity(0.8)
+				.allowsHitTesting(false)
+				.ignoresSafeArea()
 
-			VStack(alignment: .leading, spacing: 18) {
-				HStack {
+				VStack(alignment: .leading, spacing: 18) {
+					Text("Choose your link")
+						.font(.largeTitle.bold())
+
+					Text("Create a short, memorable link for your timetable.")
+						.padding(.bottom, 15)
+
+					Text("timetable.adonis.pt/sharedtimetable/\(rawInput)")
+						.font(.caption.monospaced())
+						.contentTransition(.numericText())
+						.animation(.easeInOut(duration: 0.2), value: rawInput)
+
+					ZStack(alignment: .leading) {
+						TextField("your link", text: $rawInput)
+						#if !os(macOS)
+							.textInputAutocapitalization(.never)
+							.keyboardType(.asciiCapable)
+						#endif
+							.autocorrectionDisabled(true)
+							.submitLabel(.done)
+							.focused($isFocused)
+						#if canImport(FocusOnAppear)
+							.focusOnAppear()
+						#endif
+							.tint(.mint)
+							.accessibilityLabel("Custom timetable link")
+					}
+					.padding(14)
+					.background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+					.onTapGesture { isFocused = true }
+
+					Text(statusText)
+						.font(.callout)
+						.contentTransition(.numericText())
+						.foregroundStyle(service.availability?.isAvailable == true ? .mint : .red)
+						.padding(8)
+						.glassEffect(.clear.interactive(), in: Capsule())
+						.animation(.easeInOut(duration: 0.2), value: statusText)
+
+					HStack {
+						Text("\(rawInput.count)/30")
+							.font(.caption.monospaced())
+							.contentTransition(.numericText(value: Double(rawInput.count)))
+							.animation(.easeInOut(duration: 0.2), value: rawInput.count)
+
+						Spacer()
+
+						Button("Save") {
+							Task {
+								if await service.save() {
+									dismiss()
+								}
+							}
+						}
+						.buttonStyle(.glassProminent)
+						.disabled(service.validation != nil || service.availability?.isAvailable != true || service.isSaving)
+					}
+
+					if !service.currentAlias.isEmpty {
+						Button("Remove Custom Link", role: .destructive) {
+							Task {
+								if await service.remove() {
+									dismiss()
+								}
+							}
+						}
+						.buttonStyle(.glass)
+					}
 					Spacer()
-					Button("Close", role: .cancel) {
+				}
+				.padding(24)
+			}
+			.toolbar {
+				ToolbarItem(placement: .topBarTrailing) {
+					Button(role: .cancel) {
 						dismiss()
 					}
-					.frame(minWidth: 44, minHeight: 44)
 				}
-
-				Text("Choose your link")
-					.font(.largeTitle.bold())
-
-				Text("Create a short, memorable link for your timetable.")
-					.foregroundStyle(.secondary)
-
-				Text("timetable.adonis.pt/sharedtimetable/")
-					.font(.caption.monospaced())
-					.foregroundStyle(.secondary)
-
-				ZStack(alignment: .leading) {
-					TextField("your link", text: $rawInput)
-					#if !os(macOS)
-						.textInputAutocapitalization(.never)
-						.keyboardType(.asciiCapable)
-					#endif
-						.autocorrectionDisabled(true)
-						.submitLabel(.done)
-						.focused($isFocused)
-					#if canImport(FocusOnAppear)
-						.focusOnAppear()
-					#endif
-						.foregroundStyle(.clear)
-						.tint(.mint)
-						.accessibilityLabel("Custom timetable link")
-
-					Text(rawInput.isEmpty ? "your-link" : rawInput)
-						.foregroundStyle(service.validation == nil ? Color.primary : Color.red)
-						.font(.title3.monospaced())
-						.contentTransition(.numericText(value: Double(editRevision)))
-				}
-				.padding(14)
-				.background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16))
-				.onTapGesture { isFocused = true }
-
-				Text(statusText)
-					.font(.callout)
-					.foregroundStyle(service.availability?.isAvailable == true ? .mint : .red)
-					.frame(minHeight: 24, alignment: .leading)
-
-				HStack {
-					Text("\(rawInput.count)/30")
-						.font(.caption.monospaced())
-						.contentTransition(.numericText(value: Double(rawInput.count)))
-						.animation(.easeInOut(duration: 0.2), value: rawInput.count)
-
-					Spacer()
-
-					Button("Save") {
-						Task {
-							if await service.save() {
-								dismiss()
-							}
-						}
-					}
-					.buttonStyle(.glassProminent)
-					.disabled(service.validation != nil || service.availability?.isAvailable != true || service.isSaving)
-				}
-
-				if !service.currentAlias.isEmpty {
-					Button("Remove Custom Link", role: .destructive) {
-						Task {
-							if await service.remove() {
-								dismiss()
-							}
-						}
-					}
-					.buttonStyle(.glass)
-				}
-				Spacer()
 			}
-			.padding(24)
-		}
-		.interactiveDismissDisabled(true)
-		.scrollDismissesKeyboard(.never)
-		.task {
-			await service.fetchCurrentAlias()
-			rawInput = service.currentAlias
-			service.updateCandidate(rawInput)
-			isFocused = true
-		}
-		.onChange(of: rawInput) { _, value in
-			editRevision += 1
-			service.updateCandidate(value)
+			.interactiveDismissDisabled(true)
+			.scrollDismissesKeyboard(.never)
+			.task {
+				await service.fetchCurrentAlias()
+				rawInput = service.currentAlias
+				service.updateCandidate(rawInput)
+				isFocused = true
+			}
+			.onChange(of: rawInput) { _, value in
+				editRevision += 1
+				service.updateCandidate(value)
+			}
 		}
 	}
 

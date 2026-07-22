@@ -68,6 +68,8 @@ struct OnboardingView: View {
 				}
 			}
 		}
+		.scrollEdgeEffect(maximumOpacity: 0.3)
+		.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.85)
 		.safeAreaBar(edge: .top, alignment: .center, spacing: 0) {
 			Text(pages.first(where: { $0.id == selectedID })?.title ?? "   ")
 				.font(.title.bold())
@@ -77,48 +79,34 @@ struct OnboardingView: View {
 				.contentTransition(.numericText())
 				.animation(.easeInOut, value: selectedID)
 		}
-//		.safeAreaInset(edge: .bottom, alignment: .center, spacing: 0) {
-//			VStack {
-//				if let context = selectedContext {
-//					Text(context.statusMessage ?? " ")
-//						.contentTransition(.numericText())
-//						.animation(.easeInOut, value: context.statusMessage)
-//						.font(.footnote)
-//						.multilineTextAlignment(.center)
-//						.frame(maxWidth: .infinity)
-//						.frame(minHeight: 20)
-//						.padding(.bottom, 20)
-//						.padding(.top, 8)
-//				}
-//			}
-//		}
-		.toolbar {
-			ToolbarItem(placement: .bottomBar) {
-				left
-			}
-
-			ToolbarSpacer(.flexible, placement: .bottomBar)
-
-			if #available(anyAppleOS 27, *) {
-				ToolbarItem(placement: .bottomBar) {
-					middle
+		.overlay(alignment: .bottom) {
+			VStack {
+				VStack {
+					if let context = selectedContext {
+						Text(context.statusMessage ?? "")
+							.contentTransition(.numericText())
+							.animation(.easeInOut, value: context.statusMessage)
+							.font(.footnote)
+							.multilineTextAlignment(.center)
+							.frame(maxWidth: .infinity)
+							.frame(minHeight: 20)
+					}
 				}
-				.contentMarginsRemoved()
-				.sharedBackgroundVisibility(.hidden)
-			} else {
-				ToolbarItem(placement: .bottomBar) {
+				HStack(spacing: 0) {
+					left
+
+					Spacer()
+
 					middle
+
+					Spacer()
+
+					right
 				}
-				.sharedBackgroundVisibility(.hidden)
 			}
-
-			ToolbarSpacer(.flexible, placement: .bottomBar)
-
-			ToolbarItem(placement: .bottomBar) {
-				right
-			}
+			.ignoresSafeArea()
+			.padding(5)
 		}
-		.scrollEdgeEffectStyle(.hard, for: .all)
 		.task { await buildPages() }
 		.onChange(of: sessionStore.state) {
 			Task { await buildPages(preserving: selectedID) }
@@ -152,6 +140,7 @@ struct OnboardingView: View {
 				.foregroundStyle(.white)
 		}
 		.buttonSizing(.fitted)
+		.buttonBorderShape(.circle)
 		.font(.headline)
 		.buttonStyle(.glassProminent)
 		.controlSize(.extraLarge)
@@ -180,18 +169,14 @@ struct OnboardingView: View {
 				move(by: 1)
 			}
 		} label: {
-			ZStack {
-				if !(selectedIndex == pages.count - 1) {
-					Image(systemName: "chevron.right")
-				} else {
-					Text("Finish")
-				}
-			}
-			.foregroundStyle(.white)
-			.animation(.easeInOut, value: selectedIndex)
+			Image(systemName: !(selectedIndex == pages.count - 1) ? "chevron.right" : "checkmark")
+				.contentTransition(.symbolEffect(.replace.upUp.wholeSymbol, options: .nonRepeating))
+				.foregroundStyle(.white)
+				.animation(.easeInOut, value: selectedIndex)
 		}
 		.buttonSizing(.fitted)
 		.font(.headline)
+		.buttonBorderShape(.circle)
 		.buttonStyle(.glassProminent)
 		.controlSize(.extraLarge)
 		.disabled(isNextDisabled)

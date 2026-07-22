@@ -75,11 +75,11 @@ struct TimetableApp: App {
 				#else
 					switch sessionStore.state {
 						case .signedOut:
-							if hasCompletedOnboarding {
-								IOSSignInGateView()
-							} else {
-								Color.clear
-							}
+						if hasCompletedOnboarding {
+							IOSSignInGateView()
+						} else {
+							Color.clear
+						}
 						case .restoring:
 						ProgressView("Restoring Account…")
 						case .authenticated:
