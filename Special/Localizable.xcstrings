@@ -3145,7 +3145,7 @@
         }
       }
     },
-    "timetable.adonis.pt/sharedtimetable/%@" : {
+    "timetable.adonis.pt/share/%@" : {
 
     },
     "Timetable's \"currency\" is Wallet passes. You can find all of your owned, authored, received, and shared timetables in Wallet. Timetable automatically finds them and syncs them into your app." : {
