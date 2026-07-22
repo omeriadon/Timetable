@@ -197,7 +197,21 @@ struct TimetableApp: App {
 
 	@MainActor
 	private func handleIncomingURL(_ url: URL) {
-		if let locator = TimetableShareURL.locator(from: url) ?? TimetableShareURL.locator(fromFallbackURL: url) {
+		if url.scheme == "https", url.host == TimetableShareURL.host {
+			if let locator = TimetableShareURL.locator(from: url) {
+				queueSharedTimetable(locator)
+			} else {
+				StatusBadgeManager.shared.addBadge(
+					id: UUID(),
+					title: "Invalid timetable link",
+					secondaryText: "This link does not identify a timetable.",
+					priority: 4,
+					view: .error
+				)
+			}
+			return
+		}
+		if let locator = TimetableShareURL.locator(fromFallbackURL: url) {
 			queueSharedTimetable(locator)
 			return
 		}
