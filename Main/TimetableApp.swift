@@ -73,17 +73,21 @@ struct TimetableApp: App {
 						NonAuthoritativeRootView(expanded: $expanded)
 					}
 				#else
-					if Platform.current == .iPadOS {
-						switch sessionStore.state {
-							case .signedOut:
-								AccountAuthenticationView(allowsSignUp: false, allowsAppleSignIn: false)
-							case .restoring:
-								ProgressView("Restoring Account…")
-							case .authenticated:
-								NonAuthoritativeRootView(expanded: $expanded)
+					switch sessionStore.state {
+						case .signedOut:
+							if hasCompletedOnboarding {
+								IOSSignInGateView()
+							} else {
+								Color.clear
+							}
+						case .restoring:
+						ProgressView("Restoring Account…")
+						case .authenticated:
+						if Platform.current == .iPadOS {
+							NonAuthoritativeRootView(expanded: $expanded)
+						} else {
+							ContentView(expanded: $expanded)
 						}
-					} else {
-						ContentView(expanded: $expanded)
 					}
 				#endif
 			}
@@ -132,7 +136,10 @@ struct TimetableApp: App {
 				#endif
 			}
 			#if os(iOS)
-			.fullScreenCover(isPresented: .constant(Platform.current == .iOS && !hasCompletedOnboarding)) {
+			.fullScreenCover(isPresented: .constant(
+				Platform.current == .iOS
+					&& !hasCompletedOnboarding
+			)) {
 				OnboardingView()
 					.interactiveDismissDisabled()
 			}
@@ -230,6 +237,25 @@ struct TimetableApp: App {
 					VStack(spacing: 20) {
 						Text("Sign In Required").font(.title2.bold())
 						Text("Sign in to view your timetable on this Mac.").foregroundStyle(.secondary)
+
+						AccountAuthenticationView()
+					}
+					.frame(width: 520, height: 580, alignment: .center)
+					.padding(30)
+					.interactiveDismissDisabled()
+				}
+		}
+	}
+#endif
+
+#if os(iOS)
+	private struct IOSSignInGateView: View {
+		var body: some View {
+			Color.clear
+				.sheet(isPresented: .constant(true)) {
+					VStack(spacing: 20) {
+						Text("Sign In Required").font(.title2.bold())
+						Text("Sign in to use Timetable.").foregroundStyle(.secondary)
 
 						AccountAuthenticationView(allowsSignUp: false, allowsAppleSignIn: false)
 					}
