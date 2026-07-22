@@ -221,6 +221,20 @@ struct TimetableApp: App {
 
 	@MainActor
 	private func queueSharedTimetable(_ locator: String) {
+		if isOwnerShareLink(locator) {
+			NotificationCenter.default.post(
+				name: .openTimetableDestination,
+				object: TimetableDeepLink.timetable(id: nil)
+			)
+			StatusBadgeManager.shared.addBadge(
+				id: UUID(),
+				title: "Opened your timetable",
+				priority: 3,
+				view: .success
+			)
+			return
+		}
+
 		pendingSharedTimetableLocator = locator
 		var locators = Defaults[.pendingMessageTimetableLocators]
 		if !locators.contains(locator) {
@@ -249,9 +263,42 @@ struct TimetableApp: App {
 				name: .openTimetableDestination,
 				object: TimetableDeepLink.timetable(id: timetable.id)
 			)
+			StatusBadgeManager.shared.addBadge(
+				id: UUID(),
+				title: "Opened shared timetable",
+				priority: 3,
+				view: .success
+			)
+		} catch let error as NetworkError {
+			guard case let .server(statusCode, _) = error, statusCode == 404 else { return }
+			clearQueuedSharedTimetable(locator)
+			StatusBadgeManager.shared.addBadge(
+				id: UUID(),
+				title: "Invalid timetable link",
+				secondaryText: "This timetable is unavailable.",
+				priority: 4,
+				view: .error
+			)
 		} catch {
 			// Keep the locator queued for the next authenticated foreground pass.
 		}
+	}
+
+	@MainActor
+	private func isOwnerShareLink(_ locator: String) -> Bool {
+		if UUID(uuidString: Defaults[.ownerTimetableID])?.uuidString.caseInsensitiveCompare(locator) == .orderedSame {
+			return true
+		}
+		let alias = Defaults[.ownerTimetableShareAlias]
+		return !alias.isEmpty && TimetableShareAliasValidator.canonicalize(alias) == TimetableShareAliasValidator.canonicalize(locator)
+	}
+
+	@MainActor
+	private func clearQueuedSharedTimetable(_ locator: String) {
+		var locators = Defaults[.pendingMessageTimetableLocators]
+		locators.removeAll { $0 == locator }
+		Defaults[.pendingMessageTimetableLocators] = locators
+		pendingSharedTimetableLocator = nil
 	}
 
 	#if os(macOS)
