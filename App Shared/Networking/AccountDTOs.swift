@@ -155,6 +155,19 @@ nonisolated struct ReceivedTimetableImportRequest: Codable {
 	}
 }
 
+nonisolated struct ReceivedTimetableImportResponse: Codable {
+	let importID: UUID
+	let id: UUID
+	let title: String
+	let authorAccountID: UUID
+	let authorDisplayName: String
+	let sourceKind: SourceKind
+	let revision: Int
+	let updatedAt: Date?
+	let importedAt: Date
+	let availability: ReceivedTimetableAvailability
+}
+
 nonisolated enum TimetableShareAliasAvailabilityReason: String, Codable, Sendable {
 	case empty, tooShort, tooLong, invalidCharacter, leadingSeparator, trailingSeparator, consecutiveSeparators, reserved, uuidShaped, taken
 }

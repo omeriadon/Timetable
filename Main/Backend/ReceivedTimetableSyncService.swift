@@ -54,13 +54,16 @@ final class ReceivedTimetableSyncService {
 	@discardableResult
 	func importTimetable(locator: String) async throws -> ReceivedTimetable {
 		try Platform.require(Platform.current.allowsReceivedTimetableMutation)
-		let response: AuthoritativeReceivedTimetableDTO = try await networkManager.send(
+		let response: ReceivedTimetableImportResponse = try await networkManager.send(
 			.v1ReceivedImport,
 			body: UUID(uuidString: locator).map { ReceivedTimetableImportRequest(timetableID: $0) } ?? ReceivedTimetableImportRequest(timetableLocator: locator),
 			context: .userInitiated
 		)
 		try await refreshAuthoritativeProjection()
-		return response.receivedTimetable
+		guard let timetable = Defaults[.receivedTimetables].first(where: { $0.id == response.id.uuidString }) else {
+			throw NetworkError.invalidResponse
+		}
+		return timetable
 	}
 
 	func deleteReceivedTimetable(serialNumber: String) async throws {
