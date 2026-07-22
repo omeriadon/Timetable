@@ -79,7 +79,7 @@ struct OnboardingView: View {
 				.contentTransition(.numericText())
 				.animation(.easeInOut, value: selectedID)
 		}
-		.overlay(alignment: .bottom) {
+		.safeAreaBar(edge: .bottom, alignment: .center, spacing: 0) {
 			VStack {
 				VStack {
 					if let context = selectedContext {
@@ -104,8 +104,9 @@ struct OnboardingView: View {
 					right
 				}
 			}
-			.ignoresSafeArea()
-			.padding(5)
+			.padding(.horizontal, 20)
+			.padding(.bottom, -12)
+			.padding(.top, 5)
 		}
 		.task { await buildPages() }
 		.onChange(of: sessionStore.state) {
@@ -136,8 +137,9 @@ struct OnboardingView: View {
 			move(by: -1)
 		} label: {
 			Image(systemName: "chevron.left")
-
 				.foregroundStyle(.white)
+				.frame(width: 56, height: 56)
+				.contentShape(.circle)
 		}
 		.buttonSizing(.fitted)
 		.buttonBorderShape(.circle)
@@ -172,6 +174,8 @@ struct OnboardingView: View {
 			Image(systemName: !(selectedIndex == pages.count - 1) ? "chevron.right" : "checkmark")
 				.contentTransition(.symbolEffect(.replace.upUp.wholeSymbol, options: .nonRepeating))
 				.foregroundStyle(.white)
+				.frame(width: 56, height: 56)
+				.contentShape(.circle)
 				.animation(.easeInOut, value: selectedIndex)
 		}
 		.buttonSizing(.fitted)
