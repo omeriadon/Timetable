@@ -8,6 +8,14 @@
 import Defaults
 import SwiftUI
 
+#if os(iOS)
+	import UIKit
+#endif
+
+#if os(macOS)
+	import AppKit
+#endif
+
 enum SelectedShareItem: Identifiable, Hashable {
 	case owner(id: UUID)
 	case authored(id: UUID, name: String)
@@ -27,20 +35,31 @@ struct ShareSelectionSheet: View {
 	@Default(.ownerIsSearchable) var ownerIsSearchable
 	@Default(.receivedTimetables) var receivedTimetables
 	@State private var authoredTimetableService = AuthoredTimetableService.shared
+	@State private var showAliasEditor = false
+	@Environment(\.statusBadgeManager) private var statusBadgeManager
 
 	let onSelect: (SelectedShareItem) -> Void
-	let onCustomize: () -> Void
-
-	init(onSelect: @escaping (SelectedShareItem) -> Void, onCustomize: @escaping () -> Void = {}) {
-		self.onSelect = onSelect
-		self.onCustomize = onCustomize
-	}
 
 	var body: some View {
 		NavigationStack {
 			List {
 				if ownerIsSearchable, let ownerID = UUID(uuidString: Defaults[.ownerTimetableID]) {
 					Section("Your Timetable") {
+						if let url = SelectedShareItem.owner(id: ownerID).shareURL {
+							Button {
+								copy(url)
+							} label: {
+								HStack {
+									Text(url.path)
+										.font(.body.monospaced())
+										.foregroundStyle(.primary)
+									Spacer()
+									Image(systemName: "doc.on.doc")
+										.foregroundStyle(.secondary)
+								}
+							}
+							.accessibilityLabel("Copy timetable link")
+						}
 						Button {
 							dismiss()
 							onSelect(.owner(id: ownerID))
@@ -53,7 +72,9 @@ struct ShareSelectionSheet: View {
 									.foregroundStyle(.secondary)
 							}
 						}
-						Button("Customize Link", systemImage: "link.badge.plus", action: onCustomize)
+						Button("Customize Link", systemImage: "link.badge.plus") {
+							showAliasEditor = true
+						}
 					}
 				}
 
@@ -106,6 +127,29 @@ struct ShareSelectionSheet: View {
 					}
 				}
 			}
+			.sheet(isPresented: $showAliasEditor) {
+				TimetableShareAliasSheet()
+			}
+		}
+	}
+
+	private func copy(_ url: URL) {
+		#if os(iOS)
+			UIPasteboard.general.url = url
+		#elseif os(macOS)
+			NSPasteboard.general.clearContents()
+			NSPasteboard.general.setString(url.absoluteString, forType: .string)
+		#endif
+		statusBadgeManager.addBadge(id: UUID(), title: "Link copied", priority: 3, view: .success)
+	}
+}
+
+extension SelectedShareItem {
+	var shareURL: URL? {
+		switch self {
+			case let .owner(id): TimetableShareURL.ownerURL(id: id)
+			case let .authored(id, _): TimetableShareURL.url(locator: id.uuidString)
+			case let .received(id, _): TimetableShareURL.url(locator: id)
 		}
 	}
 }

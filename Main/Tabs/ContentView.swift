@@ -40,8 +40,6 @@ import SwiftUI
 		@State private var isBlurred = false
 		@State private var showShareSelection = false
 		@State private var isShareSheetUpcoming = false
-		@State private var isAliasEditorUpcoming = false
-		@State private var showAliasEditor = false
 		@Environment(\.accessibilityReduceMotion) private var reduceMotion
 
 		@Binding var expanded: WindowMode
@@ -58,10 +56,7 @@ import SwiftUI
 			.animation(.smooth, value: isBlurred)
 			.ignoresSafeArea()
 			.sheet(isPresented: $showShareSelection, onDismiss: {
-				if isAliasEditorUpcoming {
-					showAliasEditor = true
-					isAliasEditorUpcoming = false
-				} else if !isShareSheetUpcoming {
+				if !isShareSheetUpcoming {
 					isBlurred = false
 				}
 				isShareSheetUpcoming = false
@@ -73,16 +68,10 @@ import SwiftUI
 						name: .shareTimetableItem,
 						object: selectedItem
 					)
-				}, onCustomize: {
-					isAliasEditorUpcoming = true
-					showShareSelection = false
 				})
 				.presentationDetents([.fraction(0.5)])
 				.presentationDragIndicator(.hidden)
 				.interactiveDismissDisabled(false)
-			}
-			.sheet(isPresented: $showAliasEditor) {
-				TimetableShareAliasSheet()
 			}
 			.onReceive(NotificationCenter.default.publisher(for: .openTimetableTab)) { _ in
 				selectedTab = .timetable
@@ -309,11 +298,7 @@ extension Notification.Name {
 					}
 
 					do {
-						let url: URL? = switch selectedItem {
-							case let .owner(id): TimetableShareURL.ownerURL(id: id)
-							case let .authored(id, _): TimetableShareURL.url(locator: id.uuidString)
-							case let .received(id, _): TimetableShareURL.url(locator: id)
-						}
+					let url = selectedItem.shareURL
 						guard let url else {
 							throw URLError(.badURL)
 						}
