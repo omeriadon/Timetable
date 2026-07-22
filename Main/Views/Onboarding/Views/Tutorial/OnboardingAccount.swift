@@ -16,19 +16,19 @@ struct OnboardingAccountView: View {
 			Group {
 				if sessionStore.isAuthenticated {
 					VStack(spacing: 20) {
-						Image(systemName: "checkmark.circle.fill")
+						Image(systemName: "checkmark")
 							.font(.system(size: 88, weight: .medium))
-							.foregroundStyle(.green)
+							.foregroundStyle(.white)
 							.symbolRenderingMode(.hierarchical)
 
 						Text("Account Ready")
 							.font(.title.bold())
 
-						Text("Your account is connected. Continue to import and sync your timetable.")
+						Text("Your account is connected.")
 							.font(.title3)
 							.multilineTextAlignment(.center)
-							.foregroundStyle(.secondary)
 					}
+					.padding(.top, 100)
 					.frame(maxWidth: .infinity, minHeight: 360)
 				} else {
 					VStack(spacing: 30) {
@@ -45,7 +45,7 @@ struct OnboardingAccountView: View {
 			.animation(.snappy, value: sessionStore.isAuthenticated)
 		}
 		.onAppear { updateContext() }
-		.onChange(of: sessionStore.state) { _, _ in updateContext() }
+		.onChange(of: sessionStore.state) { updateContext() }
 	}
 
 	private func updateContext() {

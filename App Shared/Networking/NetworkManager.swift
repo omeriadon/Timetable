@@ -284,6 +284,7 @@ final class NetworkManager {
 
 		if body != nil {
 			request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+			request.httpBody = body
 		}
 
 		if endpoint.requiresAuthentication, let accessToken = accessTokenProvider?() {
@@ -314,18 +315,11 @@ final class NetworkManager {
 			requestID = request.value(forHTTPHeaderField: "X-Request-ID") ?? requestID
 
 			Print(
-				"Sending \(endpoint.method.rawValue) \(endpoint.path) [request_id=\(requestID)] [body_bytes=\(body?.count ?? 0)] [transport=\(body == nil ? "data" : "upload")]",
+				"Sending \(endpoint.method.rawValue) \(endpoint.path) [request_id=\(requestID)] [body_bytes=\(body?.count ?? 0)] [transport=data]",
 				category: .network
 			)
 
-			let data: Data
-			let response: URLResponse
-
-			if let body {
-				(data, response) = try await session.upload(for: request, from: body)
-			} else {
-				(data, response) = try await session.data(for: request)
-			}
+			let (data, response) = try await session.data(for: request)
 
 			isOnline = true
 			offlineRequestAttempted = false

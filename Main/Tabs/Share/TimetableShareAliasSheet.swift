@@ -37,7 +37,7 @@ struct TimetableShareAliasSheet: View {
 					Text("Create a short, memorable link for your timetable.")
 						.padding(.bottom, 15)
 
-					Text("timetable.adonis.pt/sharedtimetable/\(rawInput)")
+					Text("timetable.adonis.pt/share/\(rawInput)")
 						.font(.caption.monospaced())
 						.contentTransition(.numericText())
 						.animation(.easeInOut(duration: 0.2), value: rawInput)
@@ -66,8 +66,8 @@ struct TimetableShareAliasSheet: View {
 						.contentTransition(.numericText())
 						.foregroundStyle(service.availability?.isAvailable == true ? .mint : .red)
 						.padding(8)
-						.glassEffect(.clear.interactive(), in: Capsule())
-						.animation(.easeInOut(duration: 0.2), value: statusText)
+						.glassEffect(.regular.interactive(), in: Capsule())
+						.animation(.easeInOut(duration: 0.1), value: statusText)
 
 					HStack {
 						Text("\(rawInput.count)/30")
@@ -84,6 +84,7 @@ struct TimetableShareAliasSheet: View {
 								}
 							}
 						}
+						.controlSize(.large)
 						.buttonStyle(.glassProminent)
 						.disabled(service.validation != nil || service.availability?.isAvailable != true || service.isSaving)
 					}

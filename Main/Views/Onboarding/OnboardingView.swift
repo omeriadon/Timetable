@@ -68,7 +68,7 @@ struct OnboardingView: View {
 				}
 			}
 		}
-		.scrollEdgeEffect(maximumOpacity: 0.3)
+		.scrollEdgeEffect()
 		.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.85)
 		.safeAreaBar(edge: .top, alignment: .center, spacing: 0) {
 			Text(pages.first(where: { $0.id == selectedID })?.title ?? " ")
@@ -142,7 +142,7 @@ struct OnboardingView: View {
 		}
 		.buttonSizing(.fitted)
 		.buttonBorderShape(.circle)
-		.font(.headline)
+		.font(.title)
 		.buttonStyle(.glassProminent)
 		.controlSize(.extraLarge)
 		.disabled(isBackDisabled)
@@ -177,7 +177,7 @@ struct OnboardingView: View {
 				.animation(.easeInOut, value: selectedIndex)
 		}
 		.buttonSizing(.fitted)
-		.font(.headline)
+		.font(.title)
 		.buttonBorderShape(.circle)
 		.buttonStyle(.glassProminent)
 		.controlSize(.extraLarge)

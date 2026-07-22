@@ -48,7 +48,7 @@ final class MessagesViewController: MSMessagesAppViewController {
 		let title = suite.string(forKey: "userDisplayName").map { "\($0)'s Timetable" } ?? "Shared Timetable"
 		let previewTitle = String(title.prefix(80))
 		let locator = suite.string(forKey: "ownerTimetableShareAlias").flatMap { $0.isEmpty ? nil : $0 } ?? id.uuidString
-		var components = URLComponents(string: "https://timetable.adonis.pt/sharedtimetable/\(locator)")!
+		var components = URLComponents(string: "https://timetable.adonis.pt/share/\(locator)")!
 		components.queryItems = [
 			URLQueryItem(name: "title", value: previewTitle),
 			URLQueryItem(name: "sharedAt", value: ISO8601DateFormatter().string(from: .now)),
@@ -148,7 +148,7 @@ final class MessagesViewController: MSMessagesAppViewController {
 	private static func locator(from url: URL?) -> String? {
 		guard let url, url.host == "timetable.adonis.pt",
 		      url.pathComponents.count >= 3,
-		      url.pathComponents[1] == "sharedtimetable"
+		      url.pathComponents[1] == "share"
 		else { return nil }
 		let locator = url.pathComponents[2]
 		guard locator.utf8.count <= 30 else { return nil }

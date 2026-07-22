@@ -48,7 +48,7 @@ extension Defaults.Keys {
 
 	static let hasCompletedAccountBootstrap = Key<Bool>("hasCompletedAccountBootstrap", default: false, suite: sharedDefaults)
 	static let hasCompletedOnboarding = Key<Bool>("hasCompletedOnboarding", default: false, suite: sharedDefaults)
-	static let hasSeenOnboardingBefore = Key<Bool>("hasSeenOnboardingBefore_v2", default: false, suite: sharedDefaults)
+	static let hasSeenOnboardingBefore = Key<Bool>("hasSeenOnboardingBefore_v3", default: false, suite: sharedDefaults)
 	static let onboardingPageID = Key<String>("onboardingPageID_v2", default: "", suite: sharedDefaults)
 	static let hasRegisteredAPNsToken = Key<Bool>("hasRegisteredAPNsToken", default: false, suite: sharedDefaults)
 	static let pendingAPNsToken = Key<String>("pendingAPNsToken", default: "", suite: sharedDefaults)

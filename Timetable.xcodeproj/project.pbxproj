@@ -179,6 +179,7 @@
 				Views/Onboarding/Views/Tutorial/OnboardingOverview.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/TimetableTypesTutorial.swift = (ios, );
 				"Views/Subject Editor/main sheet.swift" = (ios, );
+				iOS/LaunchIllusionView.swift = (ios, );
 				iOS/LiveActivityDebugView.swift = (ios, );
 				macOS/AppDelegate.swift = (macos, );
 				macOS/CustomMaterialView.swift = (macos, );

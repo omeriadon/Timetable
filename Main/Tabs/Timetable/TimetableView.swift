@@ -209,6 +209,7 @@ struct TimetableView: View {
 		ForEach(0 ..< 5) { day in
 			VStack(spacing: 4) {
 				Text(TimetableLayout.shortDayLabels[day])
+					.padding(.top, 3)
 				ForEach(0 ..< 8) { session in
 					SessionCellView(day, session, subjectLookup, selectedSlot)
 						.contentShape(Rectangle())
@@ -226,8 +227,8 @@ struct TimetableView: View {
 			.overlay {
 				if accountSettings.highlightsCurrentDay, currentDayIndex == day {
 					RoundedRectangle(cornerRadius: 12, style: .continuous)
+						.fill(.white.opacity(0.1))
 						.strokeBorder(.white, lineWidth: 2)
-						.offset(y: -3)
 				}
 			}
 		}

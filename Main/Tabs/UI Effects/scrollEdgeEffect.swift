@@ -12,7 +12,7 @@ extension View {
 		direction: BlackGradientDirection = .darkTopClearBottom,
 		offset: CGFloat = 0.9,
 		maxBlurRadius: CGFloat = 2,
-		maximumOpacity: CGFloat = 0.3
+		maximumOpacity: CGFloat = 0.4
 	) -> some View {
 		scrollEdgeEffectStyle(.soft, for: .all)
 			.overlay {

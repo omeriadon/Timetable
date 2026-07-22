@@ -48,7 +48,7 @@ struct ReceivedTimetablesView: View {
 	@ViewBuilder
 	private func actions(for timetable: ReceivedTimetable) -> some View {
 		if let id = UUID(uuidString: timetable.id),
-		   let url = URL(string: "https://timetable.adonis.pt/sharedtimetable/\(id.uuidString)")
+		   let url = URL(string: "https://timetable.adonis.pt/share/\(id.uuidString)")
 		{
 			Button("Share Link", systemImage: "square.and.arrow.up") {
 				shareURL = ShareableTimetableURL(url: url)
