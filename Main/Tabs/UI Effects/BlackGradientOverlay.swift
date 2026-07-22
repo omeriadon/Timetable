@@ -29,7 +29,13 @@ struct BlackGradientOverlay: View {
 	}
 
 	private var gradientStops: [Gradient.Stop] {
-		let offset = 1 - min(max(offset, 0), 1)
+		let logicalOffset = min(max(offset, 0), 1)
+		let offset = switch direction {
+			case .clearTopDarkBottom:
+				logicalOffset
+			case .darkTopClearBottom:
+				1 - logicalOffset
+		}
 
 		if direction.isDarkAtStart {
 			return [
