@@ -13,14 +13,36 @@ struct OnboardingAccountView: View {
 
 	var body: some View {
 		ScrollView {
-			VStack(spacing: 30) {
-				Text("Create or sign in to an account before importing your timetable. This enables server syncing, sharing, search, and notifications.")
-					.font(.title2)
-					.multilineTextAlignment(.leading)
+			Group {
+				if sessionStore.isAuthenticated {
+					VStack(spacing: 20) {
+						Image(systemName: "checkmark.circle.fill")
+							.font(.system(size: 88, weight: .medium))
+							.foregroundStyle(.green)
+							.symbolRenderingMode(.hierarchical)
 
-				AccountAuthenticationView()
+						Text("Account Ready")
+							.font(.title.bold())
+
+						Text("Your account is connected. Continue to import and sync your timetable.")
+							.font(.title3)
+							.multilineTextAlignment(.center)
+							.foregroundStyle(.secondary)
+					}
+					.frame(maxWidth: .infinity, minHeight: 360)
+				} else {
+					VStack(spacing: 30) {
+						Text("Create or sign in to an account before importing your timetable. This enables server syncing, sharing, search, and notifications.")
+							.font(.title2)
+							.multilineTextAlignment(.leading)
+
+						AccountAuthenticationView()
+					}
+				}
 			}
 			.padding(.vertical, 8)
+			.transition(.blurReplace)
+			.animation(.snappy, value: sessionStore.isAuthenticated)
 		}
 		.onAppear { updateContext() }
 		.onChange(of: sessionStore.state) { _, _ in updateContext() }
