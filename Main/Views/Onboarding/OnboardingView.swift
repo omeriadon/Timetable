@@ -71,7 +71,7 @@ struct OnboardingView: View {
 		.scrollEdgeEffect(maximumOpacity: 0.3)
 		.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.85)
 		.safeAreaBar(edge: .top, alignment: .center, spacing: 0) {
-			Text(pages.first(where: { $0.id == selectedID })?.title ?? "   ")
+			Text(pages.first(where: { $0.id == selectedID })?.title ?? " ")
 				.font(.title.bold())
 				.multilineTextAlignment(.center)
 				.frame(maxWidth: .infinity)
@@ -138,7 +138,6 @@ struct OnboardingView: View {
 		} label: {
 			Image(systemName: "chevron.left")
 				.foregroundStyle(.white)
-				.frame(width: 56, height: 56)
 				.contentShape(.circle)
 		}
 		.buttonSizing(.fitted)
@@ -174,7 +173,6 @@ struct OnboardingView: View {
 			Image(systemName: !(selectedIndex == pages.count - 1) ? "chevron.right" : "checkmark")
 				.contentTransition(.symbolEffect(.replace.upUp.wholeSymbol, options: .nonRepeating))
 				.foregroundStyle(.white)
-				.frame(width: 56, height: 56)
 				.contentShape(.circle)
 				.animation(.easeInOut, value: selectedIndex)
 		}
