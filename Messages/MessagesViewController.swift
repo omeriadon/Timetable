@@ -148,10 +148,10 @@ final class MessagesViewController: MSMessagesAppViewController {
 	private static func locator(from url: URL?) -> String? {
 		guard let url, url.host == "timetable.adonis.pt",
 		      url.pathComponents.count >= 3,
-		      url.pathComponents[1] == "share"
+		      ["share", "sharedtimetable"].contains(url.pathComponents[1])
 		else { return nil }
 		let locator = url.pathComponents[2]
-		guard locator.utf8.count <= 30 else { return nil }
+		guard locator.utf8.count <= TimetableShareURL.maximumLocatorLength else { return nil }
 		return locator
 	}
 }

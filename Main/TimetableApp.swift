@@ -42,6 +42,7 @@ struct TimetableApp: App {
 
 	@State private var sessionStore = SessionStore.shared
 	@State private var statusBadgeManager = StatusBadgeManager.shared
+	@State private var pendingSharedTimetableLocator: String?
 
 	#if os(macOS)
 		@NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
@@ -92,8 +93,11 @@ struct TimetableApp: App {
 				#endif
 			}
 			.onOpenURL { url in
-				guard let destination = TimetableDeepLink(url: url) else { return }
-				NotificationCenter.default.post(name: .openTimetableDestination, object: destination)
+				handleIncomingURL(url)
+			}
+			.onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { activity in
+				guard let url = activity.webpageURL else { return }
+				handleIncomingURL(url)
 			}
 			#if os(iOS)
 			.windowOverlay(isPresented: true, disableSafeArea: false) {
@@ -124,6 +128,8 @@ struct TimetableApp: App {
 				_ = ClientIdentityProvider.shared.identity()
 				await indexEntities()
 				await sessionStore.restore()
+				await openSharedTimetableIfPossible()
+				await MessageImportReconciliationService.reconcile()
 
 				await NotificationRegistrationService.shared.requestRemoteRegistration()
 
@@ -146,7 +152,10 @@ struct TimetableApp: App {
 			#endif // os(iOS)
 			.onChange(of: scenePhase) { _, phase in
 				guard phase == .active else { return }
-				Task { await MessageImportReconciliationService.reconcile() }
+				Task {
+					await openSharedTimetableIfPossible()
+					await MessageImportReconciliationService.reconcile()
+				}
 			}
 			.monospaced()
 			.environment(\.statusBadgeManager, statusBadgeManager)
@@ -184,6 +193,51 @@ struct TimetableApp: App {
 				}
 			}
 		#endif
+	}
+
+	@MainActor
+	private func handleIncomingURL(_ url: URL) {
+		if let locator = TimetableShareURL.locator(from: url) ?? TimetableShareURL.locator(fromFallbackURL: url) {
+			queueSharedTimetable(locator)
+			return
+		}
+		guard let destination = TimetableDeepLink(url: url) else { return }
+		NotificationCenter.default.post(name: .openTimetableDestination, object: destination)
+	}
+
+	@MainActor
+	private func queueSharedTimetable(_ locator: String) {
+		pendingSharedTimetableLocator = locator
+		var locators = Defaults[.pendingMessageTimetableLocators]
+		if !locators.contains(locator) {
+			locators.append(locator)
+			Defaults[.pendingMessageTimetableLocators] = locators
+		}
+
+		Task {
+			await openSharedTimetableIfPossible()
+		}
+	}
+
+	@MainActor
+	private func openSharedTimetableIfPossible() async {
+		guard SessionStore.shared.isAuthenticated,
+		      let locator = pendingSharedTimetableLocator
+		else { return }
+
+		do {
+			let timetable = try await ReceivedTimetableSyncService.shared.importTimetable(locator: locator)
+			var locators = Defaults[.pendingMessageTimetableLocators]
+			locators.removeAll { $0 == locator }
+			Defaults[.pendingMessageTimetableLocators] = locators
+			pendingSharedTimetableLocator = nil
+			NotificationCenter.default.post(
+				name: .openTimetableDestination,
+				object: TimetableDeepLink.timetable(id: timetable.id)
+			)
+		} catch {
+			// Keep the locator queued for the next authenticated foreground pass.
+		}
 	}
 
 	#if os(macOS)

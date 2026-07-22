@@ -4,6 +4,7 @@ import Foundation
 enum TimetableShareURL {
 	static let host = "timetable.adonis.pt"
 	static let pathPrefix = "/share/"
+	static let maximumLocatorLength = 36
 
 	static func ownerURL(id: UUID, alias: String = Defaults[.ownerTimetableShareAlias]) -> URL? {
 		if !alias.isEmpty, TimetableShareAliasValidator.validate(alias) == nil {
@@ -23,8 +24,18 @@ enum TimetableShareURL {
 	static func locator(from url: URL) -> String? {
 		guard url.scheme == "https", url.host == host else { return nil }
 		let components = url.pathComponents
-		guard components.count == 3, components[1] == "share", components[2].utf8.count <= TimetableShareAliasValidator.maximumLength else { return nil }
+		guard components.count == 3,
+		      ["share", "sharedtimetable"].contains(components[1]),
+		      components[2].utf8.count <= maximumLocatorLength
+		else { return nil }
 		return components[2]
+	}
+
+	static func locator(fromFallbackURL url: URL) -> String? {
+		guard url.scheme == "timetable", url.host == "share" else { return nil }
+		let components = url.pathComponents
+		guard components.count == 2, components[1].utf8.count <= maximumLocatorLength else { return nil }
+		return components[1]
 	}
 }
 
