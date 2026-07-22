@@ -3,6 +3,7 @@ import Security
 import UIKit
 
 final class MessagesViewController: MSMessagesAppViewController {
+	private static let maximumShareLocatorLength = 36
 	private let sendButton = UIButton(type: .system)
 	private let statusLabel = UILabel()
 	private let suite = UserDefaults(suiteName: "group.omeriadon.timetable") ?? .standard
@@ -151,7 +152,7 @@ final class MessagesViewController: MSMessagesAppViewController {
 		      ["share", "sharedtimetable"].contains(url.pathComponents[1])
 		else { return nil }
 		let locator = url.pathComponents[2]
-		guard locator.utf8.count <= TimetableShareURL.maximumLocatorLength else { return nil }
+		guard locator.utf8.count <= Self.maximumShareLocatorLength else { return nil }
 		return locator
 	}
 }
