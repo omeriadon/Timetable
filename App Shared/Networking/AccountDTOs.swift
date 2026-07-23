@@ -29,12 +29,12 @@ nonisolated struct UpdateProfileRequest: Codable {
 nonisolated struct NotificationSettingsUpdateRequest: Codable, Sendable {
 	let notificationsEnabled: Bool
 	let broadcastNotificationsEnabled: Bool
-	let notificationLeadTime: NotificationLeadTime
+	let notificationLeadTimes: Set<NotificationLeadTime>
 
 	init(_ settings: AccountSettings) {
 		notificationsEnabled = settings.notificationsEnabled
 		broadcastNotificationsEnabled = settings.broadcastNotificationsEnabled
-		notificationLeadTime = settings.notificationLeadTime
+		notificationLeadTimes = settings.notificationLeadTimes
 	}
 }
 

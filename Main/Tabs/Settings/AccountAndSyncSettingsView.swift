@@ -35,24 +35,9 @@ struct AccountAndSyncSettingsView: View {
 					Text("Send notifications for each class throughout the day.")
 				}
 
-				VStack {
-					#if os(iOS)
-						Text("Send Notifications Early By...")
-					#endif
-					Picker("Send Notifications Early By...", selection: leadTimeBinding) {
-						ForEach(NotificationLeadTime.allCases, id: \.self) { leadTime in
-							Text("\(leadTime.minutes) \(leadTime.minutes == 1 ? "minute " : "minutes")")
-								.tag(leadTime)
-						}
-					}
-					#if os(iOS)
-					.pickerStyle(.wheel)
-					#else
-					.pickerStyle(.palette)
-					#endif
+				NotificationLeadTimesEditor(selection: leadTimesBinding)
 					.disabled(!settings.notificationsEnabled)
-				}
-				.opacity(settings.notificationsEnabled ? 1 : 0.3)
+					.opacity(settings.notificationsEnabled ? 1 : 0.3)
 
 				#if os(iOS)
 					Button {
@@ -131,14 +116,14 @@ struct AccountAndSyncSettingsView: View {
 		)
 	}
 
-	private var leadTimeBinding: Binding<NotificationLeadTime> {
+	private var leadTimesBinding: Binding<Set<NotificationLeadTime>> {
 		Binding(
-			get: { settings.notificationLeadTime },
+			get: { settings.notificationLeadTimes },
 			set: { value in
 				saveGeneration += 1
 				let generation = saveGeneration
 				let previous = committedSettings
-				settings.notificationLeadTime = value
+				settings.notificationLeadTimes = value
 				let proposed = settings
 				Task { await save(proposed, previous: previous, generation: generation) }
 			}
@@ -156,5 +141,78 @@ struct AccountAndSyncSettingsView: View {
 			settings = previous
 			badges.addBadge(id: UUID(), title: "Unable to save preferences", secondaryText: error.localizedDescription, priority: 4, view: .error)
 		}
+	}
+}
+
+struct NotificationLeadTimesEditor: View {
+	@Binding var selection: Set<NotificationLeadTime>
+
+	var body: some View {
+		#if os(macOS)
+			VStack(alignment: .leading) {
+				Text("Send Notifications Early By")
+				ForEach(NotificationLeadTime.allCases, id: \.self) { leadTime in
+					Toggle(leadTime.label, isOn: containsBinding(leadTime))
+						.toggleStyle(.checkbox)
+				}
+			}
+		#else
+			NavigationLink {
+				NotificationLeadTimesSelectionView(selection: $selection)
+			} label: {
+				LabeledContent("Send Notifications Early By", value: summary)
+			}
+		#endif
+	}
+
+	private var summary: String {
+		selection.isEmpty ? "None" : selection.sorted { $0.minutes < $1.minutes }.map(\.label).joined(separator: ", ")
+	}
+
+	private func containsBinding(_ leadTime: NotificationLeadTime) -> Binding<Bool> {
+		Binding(
+			get: { selection.contains(leadTime) },
+			set: { isSelected in
+				if isSelected {
+					selection.insert(leadTime)
+				} else {
+					selection.remove(leadTime)
+				}
+			}
+		)
+	}
+}
+
+#if os(iOS)
+	private struct NotificationLeadTimesSelectionView: View {
+		@Binding var selection: Set<NotificationLeadTime>
+
+		var body: some View {
+			List(NotificationLeadTime.allCases, id: \.self) { leadTime in
+				Button {
+					if selection.contains(leadTime) {
+						selection.remove(leadTime)
+					} else {
+						selection.insert(leadTime)
+					}
+				} label: {
+					HStack {
+						Text(leadTime.label)
+						Spacer()
+						if selection.contains(leadTime) {
+							Image(systemName: "checkmark")
+						}
+					}
+				}
+				.buttonStyle(.plain)
+			}
+			.appNavigationTitle("Notify Me")
+		}
+	}
+#endif
+
+private extension NotificationLeadTime {
+	var label: String {
+		"\(minutes) \(minutes == 1 ? "minute" : "minutes") early"
 	}
 }

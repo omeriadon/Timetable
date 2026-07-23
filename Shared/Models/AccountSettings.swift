@@ -26,22 +26,22 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 	var highlightsCurrentDay: Bool
 	var notificationsEnabled: Bool
 	var broadcastNotificationsEnabled: Bool
-	var notificationLeadTime: NotificationLeadTime
+	var notificationLeadTimes: Set<NotificationLeadTime>
 
 	static let `default` = AccountSettings(
 		liveActivitiesEnabled: true,
 		highlightsCurrentDay: true,
 		notificationsEnabled: true,
 		broadcastNotificationsEnabled: true,
-		notificationLeadTime: .zero
+		notificationLeadTimes: [.zero]
 	)
 
-	init(liveActivitiesEnabled: Bool, highlightsCurrentDay: Bool = true, notificationsEnabled: Bool, broadcastNotificationsEnabled: Bool, notificationLeadTime: NotificationLeadTime) {
+	init(liveActivitiesEnabled: Bool, highlightsCurrentDay: Bool = true, notificationsEnabled: Bool, broadcastNotificationsEnabled: Bool, notificationLeadTimes: Set<NotificationLeadTime>) {
 		self.liveActivitiesEnabled = liveActivitiesEnabled
 		self.highlightsCurrentDay = highlightsCurrentDay
 		self.notificationsEnabled = notificationsEnabled
 		self.broadcastNotificationsEnabled = broadcastNotificationsEnabled
-		self.notificationLeadTime = notificationLeadTime
+		self.notificationLeadTimes = notificationLeadTimes
 	}
 
 	init(from decoder: any Decoder) throws {
@@ -50,6 +50,12 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 		highlightsCurrentDay = try container.decodeIfPresent(Bool.self, forKey: .highlightsCurrentDay) ?? Self.default.highlightsCurrentDay
 		notificationsEnabled = try container.decodeIfPresent(Bool.self, forKey: .notificationsEnabled) ?? Self.default.notificationsEnabled
 		broadcastNotificationsEnabled = try container.decodeIfPresent(Bool.self, forKey: .broadcastNotificationsEnabled) ?? Self.default.broadcastNotificationsEnabled
-		notificationLeadTime = try container.decodeIfPresent(NotificationLeadTime.self, forKey: .notificationLeadTime) ?? .zero
+		if let leadTimes = try container.decodeIfPresent(Set<NotificationLeadTime>.self, forKey: .notificationLeadTimes) {
+			notificationLeadTimes = leadTimes
+		} else if let legacyLeadTime = try container.decodeIfPresent(NotificationLeadTime.self, forKey: .notificationLeadTime) {
+			notificationLeadTimes = [legacyLeadTime]
+		} else {
+			notificationLeadTimes = Self.default.notificationLeadTimes
+		}
 	}
 }

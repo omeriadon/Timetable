@@ -11,15 +11,8 @@ struct NotificationPreferencesView: View {
 			Section {
 				Toggle("Allow Class Notifications", isOn: localBinding(\.notificationsEnabled))
 
-				Picker("Send Notifications Early By...", selection: localBinding(\.notificationLeadTime)) {
-					ForEach(NotificationLeadTime.allCases, id: \.self) { leadTime in
-						Text("\(leadTime.minutes) \(leadTime.minutes == 1 ? "minute" : "minutes")").tag(leadTime)
-					}
-				}
-				#if os(macOS)
-				.pickerStyle(.radioGroup)
-				#endif
-				.disabled(!settings.notificationsEnabled)
+				NotificationLeadTimesEditor(selection: localBinding(\.notificationLeadTimes))
+					.disabled(!settings.notificationsEnabled)
 			}
 
 			Section {
