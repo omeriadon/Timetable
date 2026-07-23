@@ -28,6 +28,10 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 	var broadcastNotificationsEnabled: Bool
 	var notificationLeadTimes: Set<NotificationLeadTime>
 
+	private enum LegacyCodingKeys: String, CodingKey {
+		case notificationLeadTime
+	}
+
 	static let `default` = AccountSettings(
 		liveActivitiesEnabled: true,
 		highlightsCurrentDay: true,
@@ -46,13 +50,14 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 
 	init(from decoder: any Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
+		let legacyContainer = try decoder.container(keyedBy: LegacyCodingKeys.self)
 		liveActivitiesEnabled = try container.decodeIfPresent(Bool.self, forKey: .liveActivitiesEnabled) ?? Self.default.liveActivitiesEnabled
 		highlightsCurrentDay = try container.decodeIfPresent(Bool.self, forKey: .highlightsCurrentDay) ?? Self.default.highlightsCurrentDay
 		notificationsEnabled = try container.decodeIfPresent(Bool.self, forKey: .notificationsEnabled) ?? Self.default.notificationsEnabled
 		broadcastNotificationsEnabled = try container.decodeIfPresent(Bool.self, forKey: .broadcastNotificationsEnabled) ?? Self.default.broadcastNotificationsEnabled
 		if let leadTimes = try container.decodeIfPresent(Set<NotificationLeadTime>.self, forKey: .notificationLeadTimes) {
 			notificationLeadTimes = leadTimes
-		} else if let legacyLeadTime = try container.decodeIfPresent(NotificationLeadTime.self, forKey: .notificationLeadTime) {
+		} else if let legacyLeadTime = try legacyContainer.decodeIfPresent(NotificationLeadTime.self, forKey: .notificationLeadTime) {
 			notificationLeadTimes = [legacyLeadTime]
 		} else {
 			notificationLeadTimes = Self.default.notificationLeadTimes
