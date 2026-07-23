@@ -36,7 +36,7 @@
 					await reconcileAuthorization()
 				}
 			}
-			await reconcileAuthorization()
+			await reconcileAuthorization(requestStartIfNeeded: true)
 		}
 
 		func reconcileAuthorization(requestStartIfNeeded: Bool = false) async {
