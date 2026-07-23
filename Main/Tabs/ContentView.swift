@@ -227,12 +227,12 @@ extension Notification.Name {
 					return false
 				}
 
-				let currentTab = tabBarController.selectedTab
+				let previousTab = tabBarController.selectedTab
 
 				parent.showShareSelection = true
 
-				DispatchQueue.main.async {
-					tabBarController.selectedTab = currentTab
+				DispatchQueue.main.async { [weak tabBarController] in
+					tabBarController?.selectedTab = previousTab
 				}
 
 				return false
