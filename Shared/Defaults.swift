@@ -29,6 +29,7 @@ enum SharedDefaultsStore {
 
 	static func removeAll() {
 		let defaults = UserDefaults(suiteName: suiteName)
+		let hasCompletedOnboarding = defaults?.bool(forKey: "hasCompletedOnboarding") ?? false
 		let installationKeys = ["installationID", "installationID.iOS", "installationID.iPadOS", "installationID.macOS", "installationID.watchOS"]
 		let installationValues = installationKeys.reduce(into: [String: String]()) { values, key in
 			if let value = defaults?.string(forKey: key), !value.isEmpty {
@@ -36,6 +37,9 @@ enum SharedDefaultsStore {
 			}
 		}
 		defaults?.removePersistentDomain(forName: suiteName)
+		if hasCompletedOnboarding {
+			defaults?.set(true, forKey: "hasCompletedOnboarding")
+		}
 		for (key, value) in installationValues {
 			defaults?.set(value, forKey: key)
 		}
