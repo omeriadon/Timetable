@@ -56,11 +56,15 @@ struct OnboardingView: View {
 					}
 					.scrollIndicators(.hidden)
 					.scrollDisabled(true)
-					.onChange(of: selectedID) { oldID, newID in
+					.onChange(of: selectedID, initial: true) { oldID, newID in
 						if !newID.isEmpty {
 							onboardingPageID = newID
 						}
-						guard !oldID.isEmpty, oldID != newID else { return }
+						guard !newID.isEmpty else { return }
+						guard !oldID.isEmpty, oldID != newID else {
+							proxy.scrollTo(newID, anchor: .center)
+							return
+						}
 						withAnimation(reduceMotion ? .none : .smooth(duration: 0.65)) {
 							proxy.scrollTo(newID, anchor: .center)
 						}
