@@ -47,31 +47,41 @@ struct ShareSelectionSheet: View {
 					Section("Your Timetable") {
 						if let url = SelectedShareItem.owner(id: ownerID).shareURL {
 							Button {
+								dismiss()
+								onSelect(.owner(id: ownerID))
+							} label: {
+								VStack {
+									HStack {
+										VStack {
+											Text(verbatim: Defaults[.accountProfile].map { "\($0.displayName)'s Timetable" } ?? "Your Timetable")
+
+											Text(url.path.trimmingPrefix("/share"))
+												.font(.caption)
+										}
+										.foregroundStyle(.white)
+
+										Spacer()
+										Image(systemName: "person.crop.circle")
+											.foregroundStyle(.accent)
+									}
+								}
+							}
+
+							Button {
 								copy(url)
 							} label: {
 								HStack {
-									Text(url.path)
+									Text(url.path.trimmingPrefix("/share"))
 										.font(.body.monospaced())
 										.foregroundStyle(.white)
 									Spacer()
 									Image(systemName: "doc.on.doc")
-										.foregroundStyle(.blue)
+										.foregroundStyle(.accent)
 								}
 							}
 							.accessibilityLabel("Copy timetable link")
 						}
-						Button {
-							dismiss()
-							onSelect(.owner(id: ownerID))
-						} label: {
-							HStack {
-								Text(verbatim: Defaults[.accountProfile].map { "\($0.displayName)'s Timetable" } ?? "Your Timetable")
-									.foregroundStyle(.white)
-								Spacer()
-								Image(systemName: "person.crop.circle")
-									.foregroundStyle(.blue)
-							}
-						}
+
 						Button("Customize Link", systemImage: "link.badge.plus") {
 							showAliasEditor = true
 						}
@@ -91,7 +101,7 @@ struct ShareSelectionSheet: View {
 										.foregroundStyle(.white)
 									Spacer()
 									Image(systemName: "calendar")
-										.foregroundStyle(.blue)
+										.foregroundStyle(.accent)
 								}
 							}
 						}
@@ -108,10 +118,10 @@ struct ShareSelectionSheet: View {
 							} label: {
 								HStack {
 									Text(timetable.sender)
-										.foregroundStyle(.primary)
+										.foregroundStyle(.white)
 									Spacer()
 									Image(systemName: "square.and.arrow.down")
-										.foregroundStyle(.secondary)
+										.foregroundStyle(.accent)
 								}
 							}
 						}

@@ -19,6 +19,7 @@ import WidgetKit
 	struct SettingsView: View {
 		@Default(.timetable) var subjects
 		@Default(.receivedTimetables) private var receivedTimetables
+		@Default(.lastServerSync) var lastServerSync
 
 		@Environment(\.statusBadgeManager) private var statusBadgeManager
 		@State private var sessionStore = SessionStore.shared
@@ -252,6 +253,15 @@ import WidgetKit
 					FeedbackView()
 						.presentationDetents([.fraction(0.7)])
 						.navigationTransition(.zoom(sourceID: "346361347", in: ns))
+				}
+
+				HStack {
+					Text("Last Servery Sync")
+
+					Spacer()
+
+					Text(lastServerSync?.formatted(date: .numeric, time: .shortened) ?? "Never")
+						.foregroundStyle(.secondary)
 				}
 
 				HStack {
