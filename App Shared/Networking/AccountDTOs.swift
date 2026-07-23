@@ -212,6 +212,7 @@ nonisolated struct LiveActivityUpdateTokenRequest: Codable {
 
 nonisolated struct ReconcileLiveActivityRequest: Codable {
 	let installationID: String
+	let activeActivityKeys: [String]
 }
 
 nonisolated struct ReconcileLiveActivityResponse: Codable {

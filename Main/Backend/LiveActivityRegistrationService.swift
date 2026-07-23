@@ -183,7 +183,10 @@
 			do {
 				let response: ReconcileLiveActivityResponse = try await networkManager.send(
 					.v1LiveActivityReconcile,
-					body: ReconcileLiveActivityRequest(installationID: ClientIdentityProvider.shared.identity().installationID)
+					body: ReconcileLiveActivityRequest(
+						installationID: ClientIdentityProvider.shared.identity().installationID,
+						activeActivityKeys: Activity<SchoolDayActivityAttributes>.activities.map(\.attributes.activityKey)
+					)
 				)
 				Print(
 					response.started ? "Requested current Live Activity" : "Current Live Activity not required",
