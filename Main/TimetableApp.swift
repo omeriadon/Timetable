@@ -74,22 +74,35 @@ struct TimetableApp: App {
 						NonAuthoritativeRootView(expanded: $expanded)
 					}
 				#else
-					switch sessionStore.state {
-						case .signedOut:
-						if hasCompletedOnboarding {
-							IOSSignInGateView()
-						} else {
-							Color.clear
-						}
-						case .restoring:
-						ProgressView("Restoring Account…")
-						case .authenticated:
-						if Platform.current == .iPadOS {
-							NonAuthoritativeRootView(expanded: $expanded)
-						} else {
-							ContentView(expanded: $expanded)
+					ZStack {
+						switch sessionStore.state {
+							case .signedOut:
+								ZStack {
+									if hasCompletedOnboarding {
+										IOSSignInGateView()
+											.transition(.blurReplace)
+									} else {
+										Color.clear
+											.transition(.blurReplace)
+									}
+								}
+								.animation(.easeInOut, value: hasCompletedOnboarding)
+
+							case .restoring:
+								ProgressView("Restoring Account…")
+									.transition(.blurReplace)
+
+							case .authenticated:
+								if Platform.current == .iPadOS {
+									NonAuthoritativeRootView(expanded: $expanded)
+										.transition(.blurReplace)
+								} else {
+									ContentView(expanded: $expanded)
+										.transition(.blurReplace)
+								}
 						}
 					}
+					.animation(.easeInOut, value: sessionStore.state)
 				#endif
 			}
 			.onOpenURL { url in
@@ -361,20 +374,29 @@ struct TimetableApp: App {
 				}
 		}
 	}
-#endif
+#endif // os(macOS)
 
 #if os(iOS)
 	private struct IOSSignInGateView: View {
 		var body: some View {
-			ZStack {
-				OnboardingBackground(currentPageID: "splash")
+			NavigationStack {
+				ZStack {
+					OnboardingBackground(currentPageID: "splash")
 
-				ScrollView {
-					AccountAuthenticationView()
+					ScrollView {
+						AccountAuthenticationView()
+					}
+					.scrollBounceBehavior(.basedOnSize)
+					.scrollEdgeEffectStyle(.none, for: .vertical)
 				}
-				.scrollBounceBehavior(.basedOnSize)
-				.scrollEdgeEffectStyle(.none, for: .vertical)
+				.scrollEdgeEffect(offset: 0.8)
+				.safeAreaBar(edge: .top, alignment: .center, spacing: 10) {
+					Text("Sign in or sign up to use Timetable")
+						.font(.title)
+						.bold()
+						.lineLimit(3)
+				}
 			}
 		}
 	}
-#endif
+#endif // os(iOS)

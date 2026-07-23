@@ -24,7 +24,9 @@ struct AccountAuthenticationView: View {
 			if allowsSignUp {
 				Picker("Account action", selection: $model.mode) {
 					ForEach(AccountAuthenticationMode.allCases) { mode in
-						Text(mode.rawValue).tag(mode)
+						Text(mode.rawValue)
+							.fontDesign(.monospaced)
+							.tag(mode)
 					}
 				}
 				.pickerStyle(.segmented)
