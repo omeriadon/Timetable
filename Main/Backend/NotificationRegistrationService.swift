@@ -189,11 +189,6 @@ final class NotificationRegistrationService {
 		)
 	}
 
-	func sendTestNotification() async throws -> Int {
-		let response: TestNotificationResponse = try await networkManager.send(.v1TestNotification, body: EmptyRequest())
-		return response.deliveredDeviceCount
-	}
-
 	private static var isDebug: Bool {
 		#if DEBUG
 			true
@@ -207,6 +202,5 @@ private nonisolated struct EmptyRequest: Codable {}
 
 private extension Endpoint {
 	static let v1CurrentDevice = Endpoint("/v1/devices/current", method: .put)
-	static let v1TestNotification = Endpoint("/v1/notifications/test", method: .post)
 	static let v1CurrentDeviceDelete = Endpoint("/v1/devices/current", method: .delete)
 }

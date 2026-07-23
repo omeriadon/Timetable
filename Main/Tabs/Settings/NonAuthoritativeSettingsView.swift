@@ -173,7 +173,6 @@ struct NonAuthoritativeSettingsView: View {
 						try await settingsSync.updateSettings(proposed)
 						guard generation == saveGeneration else { return }
 						committedSettings = proposed
-						statusBadgeManager.addBadge(id: UUID(), title: "Preferences saved", priority: 3, view: .success)
 					} catch {
 						guard generation == saveGeneration else { return }
 						settings = previous

@@ -38,46 +38,6 @@ struct AccountAndSyncSettingsView: View {
 				NotificationLeadTimesEditor(selection: leadTimesBinding)
 					.disabled(!settings.notificationsEnabled)
 					.opacity(settings.notificationsEnabled ? 1 : 0.3)
-
-				#if os(iOS)
-					Button {
-						Task {
-							do {
-								let count = try await notificationRegistration.sendTestNotification()
-								testResult = count == 1 ? "Sent to 1 device." : "Sent to \(count) devices."
-							} catch {
-								testResult = error.localizedDescription
-							}
-						}
-					} label: {
-						VStack(alignment: .leading) {
-							Label("Send Test Notification", systemImage: "bell.badge")
-							switch notificationRegistration.registrationState {
-								case let .failed(message):
-									Text(message).foregroundStyle(.red.secondary)
-								case .registering:
-									Text("Registering this device…").foregroundStyle(.secondary)
-								case .idle, .tokenReceived:
-									Text("Sign in and wait for device registration to finish.").foregroundStyle(.secondary)
-								case .registered:
-									EmptyView()
-							}
-						}
-						.font(.callout)
-					}
-					.disabled(!settings.notificationsEnabled || notificationRegistration.registrationState != .registered)
-					.onChange(of: testResult) {
-						if let testResult {
-							if testResult == "Sent to 0 devices." {
-								badges.addBadge(id: UUID(), title: testResult, priority: 4, view: .error)
-							} else if testResult.contains("devices") || testResult == "Sent to 1 device." {
-								badges.addBadge(id: UUID(), title: testResult, priority: 4, view: .success)
-							} else {
-								badges.addBadge(id: UUID(), title: testResult, priority: 4, view: .error)
-							}
-						}
-					}
-				#endif // os(iOS)
 			}
 
 			Section {
@@ -135,7 +95,6 @@ struct AccountAndSyncSettingsView: View {
 			try await settingsSync.updateSettings(proposed)
 			guard generation == saveGeneration else { return }
 			committedSettings = proposed
-			badges.addBadge(id: UUID(), title: "Preferences saved", priority: 3, view: .success)
 		} catch {
 			guard generation == saveGeneration else { return }
 			settings = previous
@@ -160,13 +119,24 @@ struct NotificationLeadTimesEditor: View {
 			NavigationLink {
 				NotificationLeadTimesSelectionView(selection: $selection)
 			} label: {
-				LabeledContent("Send Notifications Early By", value: summary)
+				LabeledContent("Send Notifications Early By") {
+					VStack(alignment: .leading) {
+						ForEach(summary, id: \.count) { i in
+							Text(i)
+						}
+					}
+					.foregroundStyle(.secondary)
+				}
 			}
 		#endif
 	}
 
-	private var summary: String {
-		selection.isEmpty ? "None" : selection.sorted { $0.minutes < $1.minutes }.map(\.label).joined(separator: ", ")
+	private var summary: [String] {
+		selection.isEmpty
+			? ["None"]
+			: selection
+			.sorted { $0.minutes < $1.minutes }
+			.map(\.label)
 	}
 
 	private func containsBinding(_ leadTime: NotificationLeadTime) -> Binding<Bool> {

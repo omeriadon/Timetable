@@ -33,7 +33,6 @@ struct NotificationPreferencesView: View {
 			Task { @MainActor in
 				do {
 					settings = try await settingsSync.updateNotificationSettings(updated)
-					badges.addBadge(id: UUID(), title: "Preferences saved", priority: 3, view: .success)
 				} catch {
 					settings = previous
 					badges.addBadge(id: UUID(), title: "Unable to save preferences", secondaryText: error.localizedDescription, priority: 4, view: .error)

@@ -142,7 +142,6 @@ struct WatchSettingsView: View {
 						try await bootstrapService.updateSettings(proposed)
 						guard generation == saveGeneration else { return }
 						committedSettings = proposed
-						badges.addBadge(id: UUID(), title: "Preferences saved", priority: 3, view: .success)
 					} catch {
 						guard generation == saveGeneration else { return }
 						settings = previous

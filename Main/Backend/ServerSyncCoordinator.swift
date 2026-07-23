@@ -114,12 +114,6 @@ final class ServerSyncCoordinator {
 			do {
 				_ = try await SessionStore.shared.updateProfile(displayName: displayName)
 
-				StatusBadgeManager.shared.addBadge(
-					id: UUID(),
-					title: "Preferences saved",
-					priority: 3,
-					view: .success
-				)
 			} catch {
 				Self.showSyncFailure(error, title: "Profile sync failed")
 			}

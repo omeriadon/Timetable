@@ -286,7 +286,6 @@ import WidgetKit
 							try await settingsSync.updateSettings(proposed)
 							guard generation == settingsSaveGeneration else { return }
 							committedSettings = proposed
-							statusBadgeManager.addBadge(id: UUID(), title: "Preferences saved", priority: 3, view: .success)
 						} catch {
 							guard generation == settingsSaveGeneration else { return }
 							settings = previous
