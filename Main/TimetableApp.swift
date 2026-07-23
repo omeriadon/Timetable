@@ -366,18 +366,15 @@ struct TimetableApp: App {
 #if os(iOS)
 	private struct IOSSignInGateView: View {
 		var body: some View {
-			Color.clear
-				.sheet(isPresented: .constant(true)) {
-					VStack(spacing: 20) {
-						Text("Sign In Required").font(.title2.bold())
-						Text("Sign in to use Timetable.").foregroundStyle(.secondary)
+			ZStack {
+				OnboardingBackground(currentPageID: "splash")
 
-						AccountAuthenticationView(allowsSignUp: false, allowsAppleSignIn: false)
-					}
-					.frame(width: 520, height: 580, alignment: .center)
-					.padding(30)
-					.interactiveDismissDisabled()
+				ScrollView {
+					AccountAuthenticationView()
 				}
+				.scrollBounceBehavior(.basedOnSize)
+				.scrollEdgeEffectStyle(.none, for: .vertical)
+			}
 		}
 	}
 #endif
