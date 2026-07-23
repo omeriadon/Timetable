@@ -1,18 +1,19 @@
 import Foundation
+import Defaults
 import Observation
 
 @MainActor
 @Observable
 final class AuthoredTimetableService {
 	static let shared = AuthoredTimetableService()
-	private(set) var timetables: [TimetableDetailResponse] = []
+	private(set) var timetables = Defaults[.authoredTimetables]
 	private let network = NetworkManager.shared
 
 	func refresh() async throws {
 		do {
-			timetables = try await network.send(Endpoint("/v1/timetables/authored"))
+			apply(try await network.send(Endpoint("/v1/timetables/authored")))
 		} catch let error as NetworkError where error.suppressesStatusBadge {
-			timetables = []
+			return
 		}
 	}
 
@@ -21,7 +22,11 @@ final class AuthoredTimetableService {
 		let value: TimetableDetailResponse = try await network.send(Endpoint("/v1/timetables/authored/\(id.uuidString)", method: .put), body: AuthoredTimetableUpdateRequest(title: title, subjects: subjects, isSearchable: isSearchable))
 		if let index = timetables.firstIndex(where: { $0.id == id }) {
 			timetables[index] = value
+		} else {
+			timetables.append(value)
 		}
+		timetables.sort { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+		Defaults[.authoredTimetables] = timetables
 	}
 
 	@discardableResult
@@ -33,6 +38,7 @@ final class AuthoredTimetableService {
 		)
 		timetables.append(value)
 		timetables.sort { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+		Defaults[.authoredTimetables] = timetables
 		return value
 	}
 
@@ -40,5 +46,13 @@ final class AuthoredTimetableService {
 		try Platform.require(Platform.current.allowsAuthoredTimetableMutation)
 		try await network.send(Endpoint("/v1/timetables/authored/\(id.uuidString)", method: .delete))
 		timetables.removeAll { $0.id == id }
+		Defaults[.authoredTimetables] = timetables
+	}
+
+	private func apply(_ timetables: [TimetableDetailResponse]) {
+		self.timetables = timetables.sorted {
+			$0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending
+		}
+		Defaults[.authoredTimetables] = self.timetables
 	}
 }

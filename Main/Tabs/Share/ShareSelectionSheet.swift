@@ -34,7 +34,7 @@ struct ShareSelectionSheet: View {
 	@Environment(\.dismiss) private var dismiss
 	@Default(.ownerIsSearchable) var ownerIsSearchable
 	@Default(.receivedTimetables) var receivedTimetables
-	@State private var authoredTimetableService = AuthoredTimetableService.shared
+	@Default(.authoredTimetables) var authoredTimetables
 	@State private var showAliasEditor = false
 	@Environment(\.statusBadgeManager) private var statusBadgeManager
 
@@ -88,7 +88,7 @@ struct ShareSelectionSheet: View {
 					}
 				}
 
-				let authored = authoredTimetableService.timetables.filter(\.isSearchable)
+				let authored = authoredTimetables.filter(\.isSearchable)
 				if !authored.isEmpty {
 					Section("Authored Timetables") {
 						ForEach(authored) { timetable in

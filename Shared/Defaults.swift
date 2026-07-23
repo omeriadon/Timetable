@@ -59,6 +59,7 @@ extension Defaults.Keys {
 	static let receivedNameOverrides = Key<[String: String]>("receivedNameOverrides", default: [:], suite: sharedDefaults)
 	static let timetable = Key<[Subject]>("timetable", default: [], suite: sharedDefaults)
 	static let receivedTimetables = Key<[ReceivedTimetable]>("receivedTimetables", default: [], suite: sharedDefaults)
+	static let authoredTimetables = Key<[TimetableDetailResponse]>("authoredTimetables", default: [], suite: sharedDefaults)
 	static let pendingMessageTimetableIDs = Key<[String]>("pendingMessageTimetableIDs", default: [], suite: sharedDefaults)
 	static let pendingMessageTimetableLocators = Key<[String]>("pendingMessageTimetableLocators", default: [], suite: sharedDefaults)
 	static let userDisplayName = Key<String>("userDisplayName", default: "My Timetable", suite: sharedDefaults)
