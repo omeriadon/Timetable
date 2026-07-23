@@ -35,7 +35,7 @@ enum SessionStoreError: LocalizedError {
 final class SessionStore {
 	static let shared = SessionStore(networkManager: .shared)
 
-	private(set) var state: AuthenticationState = .restoring
+	private(set) var state: AuthenticationState
 
 	var isAuthenticated: Bool {
 		if case .authenticated = state {
@@ -57,18 +57,25 @@ final class SessionStore {
 
 	private init(networkManager: NetworkManager) {
 		self.networkManager = networkManager
+		if let profile = Defaults[.accountProfile] {
+			state = .authenticated(profile)
+		} else {
+			state = .restoring
+		}
 		configureNetworkAuthentication()
 	}
 
 	func restore() async {
 		Print("Restoring session state", category: .account)
-		state = .restoring
 		configureNetworkAuthentication()
 
 		guard let profile = Defaults[.accountProfile] else {
 			clearSessionState()
 			return
 		}
+
+		// Keep the cached account visible while the server verifies its session.
+		state = .authenticated(profile)
 
 		if let accessToken, !accessToken.isEmpty {
 			state = .authenticated(profile)
@@ -81,13 +88,9 @@ final class SessionStore {
 		}
 
 		guard refreshToken != nil else {
-			#if os(watchOS)
-				// The Watch keeps the last known signed-in surface until the server
-				// proves that the session was revoked or the account was deleted.
-				state = .authenticated(profile)
-			#else
-				clearSessionState()
-			#endif
+			// Keep the last known signed-in surface until the server proves that
+			// the session was revoked or the account was deleted.
+			state = .authenticated(profile)
 			return
 		}
 
@@ -105,8 +108,12 @@ final class SessionStore {
 				error: error
 			)
 		} catch {
-			PrintError("Silent restore failed", category: .account, error: error)
-			clearSessionState()
+			state = .authenticated(profile)
+			PrintError(
+				"Using cached authenticated session after silent restore failure for \(profile.id)",
+				category: .account,
+				error: error
+			)
 		}
 	}
 
