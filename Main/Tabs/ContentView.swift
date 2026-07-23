@@ -229,7 +229,6 @@ extension Notification.Name {
 
 				let currentTab = tabBarController.selectedTab
 
-				parent.isBlurred = true
 				parent.showShareSelection = true
 
 				DispatchQueue.main.async {
@@ -308,7 +307,6 @@ extension Notification.Name {
 						return
 					} catch {
 						PrintError("Background share error: \(error)")
-						parent.isBlurred = false
 						StatusBadgeManager.shared.addBadge(
 							id: UUID(),
 							title: "Unable to share timetable.",

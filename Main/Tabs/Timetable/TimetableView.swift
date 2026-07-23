@@ -229,6 +229,7 @@ struct TimetableView: View {
 					RoundedRectangle(cornerRadius: 12, style: .continuous)
 						.fill(.white.opacity(0.1))
 						.strokeBorder(.white, lineWidth: 2)
+						.allowsHitTesting(false)
 				}
 			}
 		}

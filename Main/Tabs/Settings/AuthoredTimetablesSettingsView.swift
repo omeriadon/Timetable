@@ -85,7 +85,7 @@ private struct AuthoredTimetableCreateView: View {
 		NavigationStack {
 			Text("New Authored Timetable")
 				.bold()
-				.padding(.leading, 4)
+				.padding(.horizontal, 10)
 				.font(.largeTitle)
 				.lineLimit(3)
 				.frame(maxWidth: .infinity, alignment: .leading)

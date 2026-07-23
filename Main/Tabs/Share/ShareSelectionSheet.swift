@@ -52,10 +52,10 @@ struct ShareSelectionSheet: View {
 								HStack {
 									Text(url.path)
 										.font(.body.monospaced())
-										.foregroundStyle(.primary)
+										.foregroundStyle(.white)
 									Spacer()
 									Image(systemName: "doc.on.doc")
-										.foregroundStyle(.secondary)
+										.foregroundStyle(.blue)
 								}
 							}
 							.accessibilityLabel("Copy timetable link")
@@ -66,10 +66,10 @@ struct ShareSelectionSheet: View {
 						} label: {
 							HStack {
 								Text(verbatim: Defaults[.accountProfile].map { "\($0.displayName)'s Timetable" } ?? "Your Timetable")
-									.foregroundStyle(.primary)
+									.foregroundStyle(.white)
 								Spacer()
 								Image(systemName: "person.crop.circle")
-									.foregroundStyle(.secondary)
+									.foregroundStyle(.blue)
 							}
 						}
 						Button("Customize Link", systemImage: "link.badge.plus") {
@@ -88,10 +88,10 @@ struct ShareSelectionSheet: View {
 							} label: {
 								HStack {
 									Text(timetable.title)
-										.foregroundStyle(.primary)
+										.foregroundStyle(.white)
 									Spacer()
 									Image(systemName: "calendar")
-										.foregroundStyle(.secondary)
+										.foregroundStyle(.blue)
 								}
 							}
 						}
