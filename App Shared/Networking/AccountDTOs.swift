@@ -5,6 +5,7 @@
 //   Created by Adon Omeri on 28/6/2026.
 //
 
+import Defaults
 import Foundation
 
 nonisolated struct TokenResponse: Codable {
@@ -73,21 +74,6 @@ nonisolated struct TimetableSearchResult: Codable, Identifiable, Hashable {
 	let authorDisplayName: String
 	let sourceKind: SourceKind
 	let confidence: Double
-}
-
-nonisolated struct TimetableDetailResponse: Codable, Identifiable, Hashable {
-	let id: UUID
-	let title: String
-	let authorAccountID: UUID
-	let authorDisplayName: String
-	let sourceKind: SourceKind
-	let subjects: [Subject]
-	let subjectCount: Int
-	let weeklyLessonCount: Int
-	let updatedAt: Date?
-	let savedByCount: Int
-	let isSearchable: Bool
-	let canEdit: Bool
 }
 
 nonisolated struct AuthoredTimetableUpdateRequest: Codable {

@@ -255,12 +255,10 @@ import WidgetKit
 						.navigationTransition(.zoom(sourceID: "346361347", in: ns))
 				}
 
-				HStack {
-					Text("Last Servery Sync")
+				VStack(alignment: .leading) {
+					Text("Last Server Sync")
 
-					Spacer()
-
-					Text(lastServerSync?.formatted(date: .numeric, time: .shortened) ?? "Never")
+					Text(lastServerSync?.formatted(date: .complete, time: .complete) ?? "Never")
 						.foregroundStyle(.secondary)
 				}
 

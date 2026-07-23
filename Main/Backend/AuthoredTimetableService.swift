@@ -1,17 +1,17 @@
-import Foundation
 import Defaults
+import Foundation
 import Observation
 
 @MainActor
 @Observable
 final class AuthoredTimetableService {
 	static let shared = AuthoredTimetableService()
-	private(set) var timetables = Defaults[.authoredTimetables]
+	var timetables = Defaults[.authoredTimetables]
 	private let network = NetworkManager.shared
 
 	func refresh() async throws {
 		do {
-			apply(try await network.send(Endpoint("/v1/timetables/authored")))
+			try await apply(network.send(Endpoint("/v1/timetables/authored")))
 		} catch let error as NetworkError where error.suppressesStatusBadge {
 			return
 		}

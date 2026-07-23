@@ -52,34 +52,22 @@ struct ShareSelectionSheet: View {
 							} label: {
 								VStack {
 									HStack {
-										VStack {
+										VStack(alignment: .leading) {
 											Text(verbatim: Defaults[.accountProfile].map { "\($0.displayName)'s Timetable" } ?? "Your Timetable")
 
 											Text(url.path.trimmingPrefix("/share"))
-												.font(.caption)
+												.font(.callout)
+												.foregroundStyle(.secondary)
 										}
 										.foregroundStyle(.white)
 
 										Spacer()
+
 										Image(systemName: "person.crop.circle")
 											.foregroundStyle(.accent)
 									}
 								}
 							}
-
-							Button {
-								copy(url)
-							} label: {
-								HStack {
-									Text(url.path.trimmingPrefix("/share"))
-										.font(.body.monospaced())
-										.foregroundStyle(.white)
-									Spacer()
-									Image(systemName: "doc.on.doc")
-										.foregroundStyle(.accent)
-								}
-							}
-							.accessibilityLabel("Copy timetable link")
 						}
 
 						Button("Customize Link", systemImage: "link.badge.plus") {
