@@ -44,7 +44,7 @@ struct SchoolDayLiveActivityWidget: Widget {
 							ProgressView(timerInterval: startDate ... endDate, countsDown: false) {
 								EmptyView()
 							} currentValueLabel: {
-								Text(.currentDate, format: .timer(countingDownIn: startDate ..< endDate))
+								Text(timerInterval: startDate ... endDate, countsDown: true, showsHours: false)
 									.monospaced()
 							}
 							.progressViewStyle(.circular)
@@ -116,7 +116,7 @@ struct SchoolDayLiveActivityWidget: Widget {
 					ProgressView(timerInterval: startDate ... endDate, countsDown: false) {
 						EmptyView()
 					} currentValueLabel: {
-						Text(.currentDate, format: .timer(countingDownIn: startDate ..< endDate))
+						Text(timerInterval: startDate ... endDate, countsDown: true, showsHours: false)
 							.font(.system(size: 12, design: .monospaced))
 							.fontDesign(.monospaced)
 							.monospacedDigit()
@@ -183,7 +183,7 @@ private struct SchoolDayLiveActivityView: View {
 			   let endDate = context.state.endDate,
 			   startDate < endDate
 			{
-				Text(.currentDate, format: .timer(countingDownIn: startDate ..< endDate, showsHours: false))
+				Text(timerInterval: startDate ... endDate, countsDown: true, showsHours: false)
 					.font(.system(size: 25, weight: .regular, design: .monospaced))
 					.fontDesign(.monospaced)
 					.monospacedDigit()
@@ -232,20 +232,24 @@ private struct SchoolDayLiveActivityView: View {
 					.progressViewStyle(.linear)
 
 				HStack(alignment: .lastTextBaseline) {
-					Text(.currentDate, format: .timer(countingDownIn: startDate ..< endDate))
+					Text(timerInterval: startDate ... endDate, countsDown: true, showsHours: false)
 						.foregroundStyle(.white)
 						.font(.system(size: 20, design: .monospaced))
 						.fontDesign(.monospaced)
 						.monospacedDigit()
-
-					Spacer(minLength: 8)
+						.fixedSize(horizontal: true, vertical: false)
 
 					if let nextText = context.state.nextText {
+						Spacer()
+							.frame(width: 40)
+
 						Text(nextText == "Last Period" ? "Last Period" : "Next: \(nextText)")
-							.font(.system(size: 18, design: .monospaced))
+							.font(.system(size: 16, design: .monospaced))
 							.fontDesign(.monospaced)
 							.lineLimit(1)
-							.foregroundStyle(.white)
+							.truncationMode(.tail)
+							.frame(maxWidth: .infinity, alignment: .trailing)
+							.foregroundStyle(.secondary)
 					}
 				}
 
