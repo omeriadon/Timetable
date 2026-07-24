@@ -5,14 +5,12 @@
   ],
   "fill-specializations" : [
     {
-      "value" : {
-        "solid" : "display-p3:0.32941,0.25882,0.18431,1.00000"
-      }
+      "value" : "system-dark"
     },
     {
       "appearance" : "dark",
       "value" : {
-        "automatic-gradient" : "extended-gray:0.00000,1.00000"
+        "solid" : "extended-gray:0.00000,1.00000"
       }
     }
   ],
@@ -321,7 +319,7 @@
       ],
       "hidden-specializations" : [
         {
-          "value" : true
+          "value" : false
         },
         {
           "idiom" : "watchOS",

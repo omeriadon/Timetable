@@ -1353,23 +1353,25 @@
 			};
 			name = Release;
 		};
-		2B00000B300000000000000B /* Debug configuration for PBXNativeTarget "Messages" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				APPLICATION_EXTENSION_API_ONLY = YES;
-				CODE_SIGN_ENTITLEMENTS = Messages/Messages.entitlements;
+			2B00000B300000000000000B /* Debug configuration for PBXNativeTarget "Messages" */ = {
+				isa = XCBuildConfiguration;
+				buildSettings = {
+					APPLICATION_EXTENSION_API_ONLY = YES;
+					ASSETCATALOG_COMPILER_APPICON_NAME = "Messages Icon";
+					CODE_SIGN_ENTITLEMENTS = Messages/Messages.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = P6PV2R9443;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Messages/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Timetable Messages";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.0.1;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.omeriadon.Timetable.Messages;
 				PRODUCT_MODULE_NAME = TimetableMessages;
 				PRODUCT_NAME = "Timetable Messages";
@@ -1382,23 +1384,25 @@
 			};
 			name = Debug;
 		};
-		2B00000C300000000000000C /* Release configuration for PBXNativeTarget "Messages" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				APPLICATION_EXTENSION_API_ONLY = YES;
-				CODE_SIGN_ENTITLEMENTS = Messages/Messages.entitlements;
+			2B00000C300000000000000C /* Release configuration for PBXNativeTarget "Messages" */ = {
+				isa = XCBuildConfiguration;
+				buildSettings = {
+					APPLICATION_EXTENSION_API_ONLY = YES;
+					ASSETCATALOG_COMPILER_APPICON_NAME = "Messages Icon";
+					CODE_SIGN_ENTITLEMENTS = Messages/Messages.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = P6PV2R9443;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Messages/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Timetable Messages";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.0.1;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.omeriadon.Timetable.Messages;
 				PRODUCT_MODULE_NAME = TimetableMessages;
 				PRODUCT_NAME = "Timetable Messages";
