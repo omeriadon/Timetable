@@ -144,11 +144,9 @@ struct SearchLandingView: View {
 	var body: some View {
 		VStack(spacing: 25) {
 			ZStack {
-				RoundedRectangle(cornerRadius: 32, style: .continuous)
-					.fill(.blue.gradient)
-				Image(systemName: "calendar.day.timeline.left")
-					.font(.system(size: 72, weight: .medium))
-					.foregroundStyle(.white)
+				Image("Timetable")
+					.resizable()
+					.aspectRatio(contentMode: .fit)
 			}
 			.aspectRatio(1.35, contentMode: .fit)
 			.padding(.horizontal, 80)
@@ -157,13 +155,13 @@ struct SearchLandingView: View {
 					.scaleEffect(isInteracting ? 1.05 : 0.95)
 					.stickerEffect()
 					.stickerPattern(.diamond)
-					.stickerNoiseScale(450)
-					.stickerNoiseIntensity(1)
-					.stickerColorIntensity(1)
+					.stickerNoiseScale(0)
+					.stickerNoiseIntensity(0)
+					.stickerColorIntensity(0)
+					.stickerBlend(0)
 					.stickerMotionEffect(.dragGesture(intensity: 0.8))
-					.modifier(AccelerometerStickerMotionEffect.accelerometer(intensity: 1.2, maxRotation: .degrees(30)))
 			}
-			.shadow(color: .blue.mix(with: .white, by: 0.5).opacity(0.35), radius: 17, x: 0, y: 0)
+			.shadow(color: .brown.mix(with: .white, by: 0.5).opacity(0.6), radius: 17, x: 0, y: 0)
 			.simultaneousGesture(
 				DragGesture(minimumDistance: 0)
 					.onChanged { _ in

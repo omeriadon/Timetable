@@ -174,6 +174,7 @@ struct NotificationLeadTimesEditor: View {
 						}
 					}
 				}
+				.contentShape(Rectangle())
 				.buttonSizing(.flexible)
 				.buttonStyle(.plain)
 			}
