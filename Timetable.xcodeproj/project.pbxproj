@@ -164,7 +164,10 @@
 				Tabs/Search/TimetableSearchView.swift = (ios, );
 				Tabs/Settings/AuthoredTimetablesSettingsView.swift = (ios, );
 				Tabs/Settings/ReceivedTimetablesView.swift = (ios, );
+				Tabs/Share/TimetableShareAliasSheet.swift = (ios, );
 				"Tabs/UI Effects/VariableBlur.swift" = (ios, );
+				"Tabs/UI Effects/scrollEdgeEffect.swift" = (ios, );
+				Views/Account/CapsuleInputRow.swift = (ios, );
 				Views/Onboarding/OnboardingPage.swift = (ios, );
 				Views/Onboarding/OnboardingPageContext.swift = (ios, );
 				Views/Onboarding/OnboardingView.swift = (ios, );
