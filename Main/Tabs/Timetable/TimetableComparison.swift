@@ -18,9 +18,7 @@ struct TimetableComparison: View {
 
 	var body: some View {
 		VStack(spacing: 14) {
-			let friends = receivedTimetables.filter { !$0.isDeleted && $0.sourceKind != .accountOwner }
-
-//			let authoredFriends =
+			let friends = receivedTimetables.filter { !$0.isDeleted }
 
 			if friends.isEmpty {
 				#if os(iOS)
