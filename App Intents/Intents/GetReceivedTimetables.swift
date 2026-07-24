@@ -82,7 +82,7 @@ struct GetReceivedTimetablesIntentView: View {
 		}
 		.background {
 			ContainerRelativeShape()
-				.fill(Color.accent.gradient)
+				.fill(Color.accentColor.gradient)
 		}
 		.padding(.horizontal)
 		.monospaced()

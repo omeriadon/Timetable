@@ -172,7 +172,7 @@ extension Notification.Name {
 		private func makeCustomShareImage() -> UIImage? {
 			let config = UIImage.SymbolConfiguration(pointSize: 18, weight: .bold, scale: .large)
 			guard let symbolImage = UIImage(systemName: "paperplane", withConfiguration: config)?
-				.withTintColor(.systemBlue, renderingMode: .alwaysTemplate)
+				.withTintColor(.systemBrown, renderingMode: .alwaysTemplate)
 			else {
 				return nil
 			}

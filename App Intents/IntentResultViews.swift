@@ -17,7 +17,7 @@ struct IntentSummaryView: View {
 		}
 		.frame(maxWidth: .infinity)
 		.padding()
-		.background(ContainerRelativeShape().fill(.accent.gradient))
+		.background(ContainerRelativeShape().fill(Color.accentColor.gradient))
 		.clipShape(ContainerRelativeShape())
 		.monospaced()
 	}
@@ -37,7 +37,7 @@ struct IntentListView: View {
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.padding()
-		.background(ContainerRelativeShape().fill(.accent.gradient))
+		.background(ContainerRelativeShape().fill(Color.accentColor.gradient))
 		.clipShape(ContainerRelativeShape())
 		.monospaced()
 	}

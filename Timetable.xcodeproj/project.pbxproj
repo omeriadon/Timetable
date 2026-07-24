@@ -8,16 +8,18 @@
 
 /* Begin PBXBuildFile section */
 		2A02379B2F9C907000AB1E1F /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2A02379A2F9C907000AB1E1F /* Defaults */; };
-		2A0237AC2F9D9DE800AB1E1F /* SFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2A0237AB2F9D9DE800AB1E1F /* SFSymbolsPicker */; };
 		2A098C8D2F9DB844002065BE /* Watch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 2A098C832F9DB842002065BE /* Watch.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2A1DB40E2F9DE9A300E5AE7C /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2A1DB40D2F9DE9A300E5AE7C /* Defaults */; };
 		2A1DB42D2F9ECEC300E5AE7C /* Watch Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2A2586A02FB5D6490030C8CD /* Watch Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2A324C072FF2980C00E6A3D5 /* ColorfulX in Frameworks */ = {isa = PBXBuildFile; productRef = 2A324C062FF2980C00E6A3D5 /* ColorfulX */; };
 		2A324C082FF2980C00E6A3D5 /* FocusOnAppear in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2A324C092FF2980C00E6A3D5 /* FocusOnAppear */; };
-		2A43AFA12FE7849E00BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFA02FE7849E00BBC8BD /* IrregularGradient */; };
 		2A43AFB12FE785E300BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFB02FE785E300BBC8BD /* IrregularGradient */; };
 		2A43AFB32FE785E700BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFB22FE785E700BBC8BD /* IrregularGradient */; };
 		2A5F91F12FE650FE007302CF /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A5F91F02FE650FE007302CF /* IrregularGradient */; };
+		2A79F3B030138FAB003CA797 /* Sticker in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2A79F3AF30138FAB003CA797 /* Sticker */; };
+		2A79F3B330138FD2003CA797 /* SFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2A79F3B230138FD2003CA797 /* SFSymbolsPicker */; };
+		2A79F3B630138FFC003CA797 /* WindowOverlay in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2A79F3B530138FFC003CA797 /* WindowOverlay */; };
+		2A79F3B93013924E003CA797 /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A79F3B83013924E003CA797 /* IrregularGradient */; };
 		2AA6DF242FDFAC9000BBC70E /* Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2AA6DF142FDFAC8F00BBC70E /* Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2AA6DF2C2FDFADAE00BBC70E /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AA6DF2B2FDFADAE00BBC70E /* Defaults */; };
 		2AB674D7300E387100A6815A /* Sticker in Frameworks */ = {isa = PBXBuildFile; productRef = 2AB674D6300E387100A6815A /* Sticker */; };
@@ -179,7 +181,6 @@
 				Views/Onboarding/Views/Tutorial/GeneratedSFSymbolShapes.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/OnboardingAccount.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/OnboardingCompletion.swift = (ios, );
-				Views/Onboarding/Views/Tutorial/OnboardingOverview.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/TimetableTypesTutorial.swift = (ios, );
 				"Views/Subject Editor/main sheet.swift" = (ios, );
 				iOS/LaunchIllusionView.swift = (ios, );
@@ -362,16 +363,18 @@
 		2A0237882F9C8EA000AB1E1F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				2A79F3B93013924E003CA797 /* IrregularGradient in Frameworks */,
+				2A79F3B030138FAB003CA797 /* Sticker in Frameworks */,
 				2AB674D7300E387100A6815A /* Sticker in Frameworks */,
 				2A324C072FF2980C00E6A3D5 /* ColorfulX in Frameworks */,
 				2A324C082FF2980C00E6A3D5 /* FocusOnAppear in Frameworks */,
-				2A43AFA12FE7849E00BBC8BD /* IrregularGradient in Frameworks */,
 				2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */,
 				2A02379B2F9C907000AB1E1F /* Defaults in Frameworks */,
+				2A79F3B630138FFC003CA797 /* WindowOverlay in Frameworks */,
 				2ADFCA8F2FF66F1A00B4301E /* WindowOverlay in Frameworks */,
 				2ABBBA042FF4AD3A00878A9D /* PortalHeaders in Frameworks */,
+				2A79F3B330138FD2003CA797 /* SFSymbolsPicker in Frameworks */,
 				2ABBBA062FF4AD3A00878A9D /* PortalTransitions in Frameworks */,
-				2A0237AC2F9D9DE800AB1E1F /* SFSymbolsPicker in Frameworks */,
 			);
 		};
 		2A098C802F9DB842002065BE /* Frameworks */ = {
@@ -420,6 +423,7 @@
 				2A02379F2F9C908300AB1E1F /* Shared */,
 				2A324AAE2FF0E3A100E6A3D5 /* App Shared */,
 				2AAE62702FD839A7004B3FF4 /* Main */,
+				2A79F3B73013924E003CA797 /* Frameworks */,
 				2A02378C2F9C8EA000AB1E1F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -435,6 +439,13 @@
 				2B0000023000000000000002 /* Timetable Messages.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		2A79F3B73013924E003CA797 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -468,15 +479,17 @@
 			name = Timetable;
 			packageProductDependencies = (
 				2A02379A2F9C907000AB1E1F /* Defaults */,
-				2A0237AB2F9D9DE800AB1E1F /* SFSymbolsPicker */,
 				2AE0F13A2FE03989002B5D9D /* MaterialView */,
-				2A43AFA02FE7849E00BBC8BD /* IrregularGradient */,
 				2A324C062FF2980C00E6A3D5 /* ColorfulX */,
 				2A324C092FF2980C00E6A3D5 /* FocusOnAppear */,
 				2ABBBA032FF4AD3A00878A9D /* PortalHeaders */,
 				2ABBBA052FF4AD3A00878A9D /* PortalTransitions */,
 				2ADFCA8E2FF66F1A00B4301E /* WindowOverlay */,
 				2AB674D6300E387100A6815A /* Sticker */,
+				2A79F3AF30138FAB003CA797 /* Sticker */,
+				2A79F3B230138FD2003CA797 /* SFSymbolsPicker */,
+				2A79F3B530138FFC003CA797 /* WindowOverlay */,
+				2A79F3B83013924E003CA797 /* IrregularGradient */,
 			);
 			productName = Timetable;
 			productReference = 2A02378B2F9C8EA000AB1E1F /* Timetable.app */;
@@ -642,14 +655,14 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */,
-				2A0237AA2F9D9DE800AB1E1F /* XCLocalSwiftPackageReference "../../../Downloads/SFSymbolsPickerForSwiftUI-main" */,
 				2AE0F1392FE03989002B5D9D /* XCRemoteSwiftPackageReference "MaterialView" */,
 				2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */,
 				2A324C052FF2980C00E6A3D5 /* XCRemoteSwiftPackageReference "ColorfulX" */,
 				2A324C0A2FF2980C00E6A3D5 /* XCRemoteSwiftPackageReference "FocusOnAppear" */,
 				2ABBBA022FF4AD3A00878A9D /* XCRemoteSwiftPackageReference "Portal" */,
-				2ADFCA8D2FF66F1A00B4301E /* XCLocalSwiftPackageReference "../../../Downloads/swiftui-window-overlay-main" */,
-				2AB674D5300E387100A6815A /* XCLocalSwiftPackageReference "../../../Downloads/Sticker-main" */,
+				2A79F3AE30138FAB003CA797 /* XCLocalSwiftPackageReference "../Sticker-main" */,
+				2A79F3B130138FD2003CA797 /* XCLocalSwiftPackageReference "../SFSymbolsPickerForSwiftUI-main" */,
+				2A79F3B430138FFC003CA797 /* XCLocalSwiftPackageReference "../swiftui-window-overlay-main" */,
 			);
 			preferredProjectObjectVersion = 110;
 			productRefGroup = 2A02378C2F9C8EA000AB1E1F /* Products */;
@@ -1479,17 +1492,17 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		2A0237AA2F9D9DE800AB1E1F /* XCLocalSwiftPackageReference "../../../Downloads/SFSymbolsPickerForSwiftUI-main" */ = {
+		2A79F3AE30138FAB003CA797 /* XCLocalSwiftPackageReference "../Sticker-main" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = "../../../Downloads/SFSymbolsPickerForSwiftUI-main";
+			relativePath = "../Sticker-main";
 		};
-		2AB674D5300E387100A6815A /* XCLocalSwiftPackageReference "../../../Downloads/Sticker-main" */ = {
+		2A79F3B130138FD2003CA797 /* XCLocalSwiftPackageReference "../SFSymbolsPickerForSwiftUI-main" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = "../../../Downloads/Sticker-main";
+			relativePath = "../SFSymbolsPickerForSwiftUI-main";
 		};
-		2ADFCA8D2FF66F1A00B4301E /* XCLocalSwiftPackageReference "../../../Downloads/swiftui-window-overlay-main" */ = {
+		2A79F3B430138FFC003CA797 /* XCLocalSwiftPackageReference "../swiftui-window-overlay-main" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = "../../../Downloads/swiftui-window-overlay-main";
+			relativePath = "../swiftui-window-overlay-main";
 		};
 /* End XCLocalSwiftPackageReference section */
 
@@ -1550,11 +1563,6 @@
 			package = 2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = Defaults;
 		};
-		2A0237AB2F9D9DE800AB1E1F /* SFSymbolsPicker */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2A0237AA2F9D9DE800AB1E1F /* XCLocalSwiftPackageReference "../../../Downloads/SFSymbolsPickerForSwiftUI-main" */;
-			productName = SFSymbolsPicker;
-		};
 		2A1DB40D2F9DE9A300E5AE7C /* Defaults */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */;
@@ -1570,11 +1578,6 @@
 			package = 2A324C0A2FF2980C00E6A3D5 /* XCRemoteSwiftPackageReference "FocusOnAppear" */;
 			productName = FocusOnAppear;
 		};
-		2A43AFA02FE7849E00BBC8BD /* IrregularGradient */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */;
-			productName = IrregularGradient;
-		};
 		2A43AFB02FE785E300BBC8BD /* IrregularGradient */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */;
@@ -1586,6 +1589,23 @@
 			productName = IrregularGradient;
 		};
 		2A5F91F02FE650FE007302CF /* IrregularGradient */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */;
+			productName = IrregularGradient;
+		};
+		2A79F3AF30138FAB003CA797 /* Sticker */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Sticker;
+		};
+		2A79F3B230138FD2003CA797 /* SFSymbolsPicker */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SFSymbolsPicker;
+		};
+		2A79F3B530138FFC003CA797 /* WindowOverlay */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WindowOverlay;
+		};
+		2A79F3B83013924E003CA797 /* IrregularGradient */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */;
 			productName = IrregularGradient;

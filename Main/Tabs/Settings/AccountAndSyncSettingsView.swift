@@ -171,17 +171,19 @@ struct NotificationLeadTimesEditor: View {
 						Spacer()
 						if selection.contains(leadTime) {
 							Image(systemName: "checkmark")
+								.foregroundStyle(.accent)
 						}
 					}
+					.frame(maxWidth: .infinity, alignment: .leading)
+					.contentShape(Rectangle())
 				}
-				.contentShape(Rectangle())
 				.buttonSizing(.flexible)
 				.buttonStyle(.plain)
 			}
 			.appNavigationTitle("Notify Me")
 		}
 	}
-#endif
+#endif // os(iOS)
 
 private extension NotificationLeadTime {
 	var label: String {

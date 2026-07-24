@@ -282,9 +282,6 @@ struct OnboardingView: View {
 			OnboardingPage(id: "apns", title: "Register This Device") {
 				OnboardingAPNsRegistrationView()
 			},
-			OnboardingPage(id: "finished", title: "Ready to Begin") {
-				OnboardingOverview()
-			},
 			OnboardingPage(id: "timetableTypes", title: "Timetable Types") {
 				TimetableTypesTutorial()
 			},

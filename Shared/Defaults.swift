@@ -10,12 +10,14 @@ import Foundation
 
 private let sharedDefaults = UserDefaults(suiteName: "group.omeriadon.timetable") ?? UserDefaults.standard
 
-enum SharedDefaultsStore {
+let onboardingVersion: Int = 3
+
+enum SharedDefaultsStoreSharedDefaultsStore {
 	static let suiteName = "group.omeriadon.timetable"
 
 	static func removeAll() {
 		let defaults = UserDefaults(suiteName: suiteName)
-		let hasCompletedOnboarding = defaults?.bool(forKey: "hasCompletedOnboarding") ?? false
+		let hasCompletedOnboarding = defaults?.bool(forKey: "hasCompletedOnboarding_v\(onboardingVersion)") ?? false
 		let installationKeys = ["installationID", "installationID.iOS", "installationID.iPadOS", "installationID.macOS", "installationID.watchOS"]
 		let installationValues = installationKeys.reduce(into: [String: String]()) { values, key in
 			if let value = defaults?.string(forKey: key), !value.isEmpty {
@@ -24,7 +26,7 @@ enum SharedDefaultsStore {
 		}
 		defaults?.removePersistentDomain(forName: suiteName)
 		if hasCompletedOnboarding {
-			defaults?.set(true, forKey: "hasCompletedOnboarding")
+			defaults?.set(true, forKey: "hasCompletedOnboarding_v\(onboardingVersion)")
 		}
 		for (key, value) in installationValues {
 			defaults?.set(value, forKey: key)
@@ -37,9 +39,11 @@ extension Defaults.Keys {
 	static let accountSettings = Key<AccountSettings>("accountSettings", default: .default, suite: sharedDefaults)
 
 	static let hasCompletedAccountBootstrap = Key<Bool>("hasCompletedAccountBootstrap", default: false, suite: sharedDefaults)
-	static let hasCompletedOnboarding = Key<Bool>("hasCompletedOnboarding", default: false, suite: sharedDefaults)
-	static let hasSeenOnboardingBefore = Key<Bool>("hasSeenOnboardingBefore_v3", default: false, suite: sharedDefaults)
-	static let onboardingPageID = Key<String>("onboardingPageID_v2", default: "", suite: sharedDefaults)
+
+	// these two need version updating
+	static let hasCompletedOnboarding = Key<Bool>("hasCompletedOnboarding_v\(onboardingVersion)", default: false, suite: sharedDefaults)
+	static let onboardingPageID = Key<String>("onboardingPageID_v\(onboardingVersion)", default: "", suite: sharedDefaults)
+
 	static let hasRegisteredAPNsToken = Key<Bool>("hasRegisteredAPNsToken", default: false, suite: sharedDefaults)
 	static let pendingAPNsToken = Key<String>("pendingAPNsToken", default: "", suite: sharedDefaults)
 
