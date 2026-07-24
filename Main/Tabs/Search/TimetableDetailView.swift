@@ -57,27 +57,7 @@ struct TimetableDetailView: View {
 				.scrollEdgeEffectStyle(.soft, for: .top)
 			}
 			.animation(.easeIn(duration: 0.1), value: detail == nil)
-			.safeAreaBar(edge: .bottom, alignment: .center, spacing: 0) {
-				ZStack {
-					if imported {
-						Label("Saved", systemImage: "checkmark.circle.fill")
-							.foregroundStyle(.green)
-							.transition(.blurReplace)
-					} else if isWorking {
-						ProgressView()
-							.transition(.blurReplace)
-					} else {
-						Button("Save Timetable", systemImage: "square.and.arrow.down", action: importTimetable)
-							.buttonStyle(.glassProminent)
-							.controlSize(.large)
-							.buttonSizing(.flexible)
-							.transition(.blurReplace)
-					}
-				}
-				.frame(height: 50)
-				.animation(.easeInOut, value: "\(imported)\(isWorking)")
-				.padding(.horizontal, 20)
-			}
+			.scrollEdgeEffect(direction: .clearTopDarkBottom)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button("Close", systemImage: "xmark", action: dismiss.callAsFunction)
@@ -91,6 +71,41 @@ struct TimetableDetailView: View {
 						} message: {
 							Text("This reports the author account to Timetable moderation.")
 						}
+				}
+
+				ToolbarItem(placement: .bottomBar) {
+					Button {
+						if !imported, !isWorking {
+							importTimetable()
+						}
+					} label: {
+						ZStack {
+							if imported {
+								HStack {
+									Image(systemName: "checkmark.circle.fill")
+									Text("Saved")
+								}
+								.foregroundStyle(.white)
+								.transition(.blurReplace)
+							} else if isWorking {
+								ProgressView()
+									.transition(.blurReplace)
+							} else {
+								HStack {
+									Image(systemName: "square.and.arrow.down")
+									Text("Save Timetable")
+								}
+								.foregroundStyle(.white)
+								.transition(.blurReplace)
+							}
+						}
+					}
+					.buttonStyle(.glassProminent)
+					.tint(imported ? .green : .accentColor)
+					.controlSize(.large)
+					.buttonSizing(.flexible)
+					.frame(height: 50)
+					.animation(.easeInOut, value: "\(imported)\(isWorking)")
 				}
 			}
 			.task { await load() }
