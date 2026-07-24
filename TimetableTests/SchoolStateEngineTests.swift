@@ -15,8 +15,8 @@ final class SchoolStateEngineTests: XCTestCase {
 			slots: [Slot(2, 6)]
 		)
 
-		let duringPeriodFive = SchoolStateEngine.calculate(
-			at: try date(2026, 7, 22, 14, 0),
+		let duringPeriodFive = try SchoolStateEngine.calculate(
+			at: date(2026, 7, 22, 14, 0),
 			subjects: [periodFive],
 			calendar: calendar
 		)
@@ -25,8 +25,8 @@ final class SchoolStateEngineTests: XCTestCase {
 		}
 		XCTAssertEqual(lesson.next, .endOfDay)
 
-		let afterPeriodFive = SchoolStateEngine.calculate(
-			at: try date(2026, 7, 22, 14, 32),
+		let afterPeriodFive = try SchoolStateEngine.calculate(
+			at: date(2026, 7, 22, 14, 32),
 			subjects: [periodFive],
 			calendar: calendar
 		)
@@ -42,8 +42,8 @@ final class SchoolStateEngineTests: XCTestCase {
 		)
 
 		XCTAssertEqual(
-			SchoolStateEngine.calculate(
-				at: try date(2026, 7, 24, 14, 32),
+			try SchoolStateEngine.calculate(
+				at: date(2026, 7, 24, 14, 32),
 				subjects: [periodFive],
 				calendar: calendar
 			),
@@ -59,8 +59,8 @@ final class SchoolStateEngineTests: XCTestCase {
 			slots: [Slot(0, 7)]
 		)
 
-		let state = SchoolStateEngine.calculate(
-			at: try date(2026, 7, 20, 14, 40),
+		let state = try SchoolStateEngine.calculate(
+			at: date(2026, 7, 20, 14, 40),
 			subjects: [periodSix],
 			calendar: calendar
 		)

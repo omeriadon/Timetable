@@ -39,6 +39,8 @@ struct WatchSignInView: View {
 			.buttonStyle(.glassProminent)
 			.disabled(provisioningService.isRequesting == true)
 		}
+		.padding(.top, 50)
+		.padding(.bottom, 10)
 		.ignoresSafeArea(.all, edges: .vertical)
 	}
 }

@@ -22,9 +22,10 @@ struct WatchTimetablesTabView: View {
 			if !subjects.isEmpty {
 				Tab("Current Subject", systemImage: "timer") {
 					CurrentSubjectView(now: now)
-						.containerBackground(for: .tabView) {
+						.background {
 							WatchSchoolProgressBackground(state: ownerState, now: now)
 								.animation(.smooth, value: ownerState)
+								.ignoresSafeArea()
 						}
 				}
 			}
@@ -32,12 +33,13 @@ struct WatchTimetablesTabView: View {
 			ForEach(receivedTimetables) { receivedTimetable in
 				Tab(receivedTimetable.sender, systemImage: "person") {
 					FriendsTimetablesView(receivedTimetable: receivedTimetable)
-						.containerBackground(for: .tabView) {
+						.background {
 							WatchSchoolProgressBackground(
 								state: schoolState(for: receivedTimetable),
 								now: now
 							)
 							.animation(.smooth, value: schoolState(for: receivedTimetable))
+							.ignoresSafeArea()
 						}
 				}
 			}
