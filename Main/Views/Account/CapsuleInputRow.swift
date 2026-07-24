@@ -28,8 +28,8 @@ struct CapsuleInputRow: View {
 				} else {
 					TextField(title, text: $text)
 						.autocorrectionDisabled()
-						.keyboardType(title == "Email" ? .emailAddress : .default)
 					#if !os(macOS)
+						.keyboardType(title == "Email" ? .emailAddress : .default)
 						.textInputAutocapitalization(.never)
 					#endif
 				}
