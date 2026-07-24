@@ -8,6 +8,7 @@
 import Defaults
 import Foundation
 import Observation
+import WidgetKit
 
 @MainActor
 @Observable
@@ -212,9 +213,7 @@ final class OwnerTimetableSyncService {
 			)
 		)
 
-		Defaults[.ownerIsSearchable] = response.isSearchable
-		cacheID(response.id)
-		Defaults[.lastServerSync] = Date.now
+		cache(response)
 
 		Print("Uploaded owner timetable revision \(response.revision)", category: .network)
 
@@ -227,11 +226,7 @@ final class OwnerTimetableSyncService {
 
 		let response: OwnerTimetableResponse = try await networkManager.send(.v1OwnerTimetable)
 
-		Defaults[.timetable] = response.subjects
-		cacheID(response.id)
-		Task { await SpotlightIndexer.shared.indexOwnerTimetable() }
-		Defaults[.ownerIsSearchable] = response.isSearchable
-		Defaults[.lastServerSync] = Date.now
+		cache(response)
 
 		Print(
 			"Downloaded owner timetable revision \(response.revision)",
@@ -245,18 +240,11 @@ final class OwnerTimetableSyncService {
 		cacheID(response.id)
 
 		let localTimetable = Defaults[.timetable]
-		let lastServerSync = Defaults[.lastServerSync]
 
-		let serverIsNewer = response.updatedAt.map { updatedAt in
-			guard let lastServerSync else { return true }
-			return updatedAt > lastServerSync
-		} ?? false
-
-		if localTimetable.isEmpty || (serverIsNewer && !response.subjects.isEmpty) {
-			Defaults[.timetable] = response.subjects
-			Task { await SpotlightIndexer.shared.indexOwnerTimetable() }
-			Defaults[.ownerIsSearchable] = response.isSearchable
-			Defaults[.lastServerSync] = Date.now
+		// Once the server has timetable content it is authoritative for every
+		// device. A non-empty local timetable only seeds a freshly empty server.
+		if localTimetable.isEmpty || !response.subjects.isEmpty {
+			cache(response)
 			return
 		}
 
@@ -269,11 +257,18 @@ final class OwnerTimetableSyncService {
 			)
 		)
 
-		Defaults[.ownerIsSearchable] = updated.isSearchable
-		cacheID(updated.id)
-		Defaults[.lastServerSync] = Date.now
+		cache(updated)
 
 		Print("Reconciled owner timetable revision \(updated.revision)", category: .network)
+	}
+
+	private func cache(_ response: OwnerTimetableResponse) {
+		Defaults[.timetable] = response.subjects
+		Defaults[.ownerIsSearchable] = response.isSearchable
+		cacheID(response.id)
+		Defaults[.lastServerSync] = Date.now
+		Task { await SpotlightIndexer.shared.indexOwnerTimetable() }
+		WidgetCenter.shared.reloadAllTimelines()
 	}
 }
 

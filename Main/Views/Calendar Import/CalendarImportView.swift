@@ -165,8 +165,7 @@ struct CalendarImportView: View {
 			let updatedSubjects = translatedSubjects
 				.sorted { $0.id.localizedCaseInsensitiveCompare($1.id) == .orderedAscending }
 				.filter { !$0.slots.isEmpty }
-			subjects = updatedSubjects
-			ServerSyncCoordinator.shared.ownerTimetableChanged(subjects: updatedSubjects)
+			subjects = try await ServerSyncCoordinator.shared.saveOwnerTimetable(updatedSubjects)
 
 			await moveForward(to: .done)
 			Print("[iOS] Calendar Import: Success!")
