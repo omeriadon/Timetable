@@ -222,7 +222,6 @@ import WidgetKit
 
 					Button("reset onboarding") {
 						Defaults[.hasCompletedOnboarding] = false
-						Defaults[.hasSeenOnboardingBefore] = false
 						Defaults[.onboardingPageID] = ""
 					}
 				}

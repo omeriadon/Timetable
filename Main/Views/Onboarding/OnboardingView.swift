@@ -12,7 +12,6 @@ import UserNotifications
 
 struct OnboardingView: View {
 	@Default(.hasCompletedOnboarding) private var hasCompletedOnboarding
-	@Default(.hasSeenOnboardingBefore) private var hasSeenOnboardingBefore
 	@Default(.onboardingPageID) private var onboardingPageID
 	@Default(.hasCompletedAccountBootstrap) private var hasCompletedAccountBootstrap
 	@Default(.timetable) private var subjects
@@ -168,7 +167,6 @@ struct OnboardingView: View {
 		Button {
 			if selectedIndex == pages.count - 1 {
 				hasCompletedOnboarding = true
-				hasSeenOnboardingBefore = true
 				onboardingPageID = ""
 			} else {
 				move(by: 1)

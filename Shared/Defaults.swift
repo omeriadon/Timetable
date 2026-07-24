@@ -12,7 +12,7 @@ private let sharedDefaults = UserDefaults(suiteName: "group.omeriadon.timetable"
 
 let onboardingVersion: Int = 3
 
-enum SharedDefaultsStoreSharedDefaultsStore {
+enum SharedDefaultsStore {
 	static let suiteName = "group.omeriadon.timetable"
 
 	static func removeAll() {

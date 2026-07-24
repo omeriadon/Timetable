@@ -92,7 +92,6 @@ struct NonAuthoritativeSettingsView: View {
 
 						Button("reset onboarding") {
 							Defaults[.hasCompletedOnboarding] = false
-							Defaults[.hasSeenOnboardingBefore] = false
 							Defaults[.onboardingPageID] = ""
 						}
 					}
