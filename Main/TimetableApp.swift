@@ -392,7 +392,7 @@ struct TimetableApp: App {
 				}
 				.scrollEdgeEffect(offset: 0.8)
 				.safeAreaBar(edge: .top, alignment: .center, spacing: 10) {
-					Text("Sign in or sign up to use Timetable")
+					Text("Sign in to use Timetable")
 						.font(.title)
 						.bold()
 						.lineLimit(3)
