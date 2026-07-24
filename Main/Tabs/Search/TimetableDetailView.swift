@@ -57,7 +57,7 @@ struct TimetableDetailView: View {
 				.scrollEdgeEffectStyle(.soft, for: .top)
 			}
 			.animation(.easeIn(duration: 0.1), value: detail == nil)
-			.safeAreaBar(edge: .bottom, alignment: .center, spacing: 10) {
+			.safeAreaBar(edge: .bottom, alignment: .center, spacing: 0) {
 				ZStack {
 					if imported {
 						Label("Saved", systemImage: "checkmark.circle.fill")
@@ -76,7 +76,7 @@ struct TimetableDetailView: View {
 				}
 				.frame(height: 50)
 				.animation(.easeInOut, value: "\(imported)\(isWorking)")
-				.padding([.bottom, .horizontal], 20)
+				.padding(.horizontal, 20)
 			}
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {

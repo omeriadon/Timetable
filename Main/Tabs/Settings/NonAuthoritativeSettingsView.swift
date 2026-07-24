@@ -89,11 +89,6 @@ struct NonAuthoritativeSettingsView: View {
 								statusBadgeManager.updateBadge(id: id, title: "Prepared timetable", view: .success)
 							}
 						}
-
-						Button("reset onboarding") {
-							Defaults[.hasCompletedOnboarding] = false
-							Defaults[.onboardingPageID] = ""
-						}
 					}
 
 					Button {

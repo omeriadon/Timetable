@@ -16,51 +16,56 @@ struct AuthoredTimetablesSettingsView: View {
 	@Namespace var ns
 
 	var body: some View {
-		Text("Authored Timetables")
-			.bold()
-			.padding(.leading, 4)
-			.font(.largeTitle)
-			.lineLimit(3)
-			.frame(maxWidth: .infinity, alignment: .leading)
-
-		List(service.timetables) { timetable in
-			NavigationLink {
-				AuthoredTimetableEditorView(timetable: timetable)
-			} label: {
-				VStack(alignment: .leading) { Text(timetable.title)
-					Text(timetable.isSearchable ? "Searchable" : "Hidden")
-						.font(.caption)
+		NavigationStack {
+			Text("Authored Timetables")
+			List(service.timetables) { timetable in
+				NavigationLink {
+					AuthoredTimetableEditorView(timetable: timetable)
+				} label: {
+					VStack(alignment: .leading) { Text(timetable.title)
+						Text(timetable.isSearchable ? "Searchable" : "Hidden")
+							.font(.caption)
+							.foregroundStyle(.secondary)
+					}
+				}
+			}
+			.toolbar {
+				ToolbarItem(placement: .largeTitle) {
+					Text("Authored Timetables")
+						.bold()
+						.font(.largeTitle)
+						.lineLimit(3)
+						.frame(maxWidth: .infinity, alignment: .leading)
+				}
+			}
+			.toolbar {
+				ToolbarItem(placement: .topBarTrailing) {
+					Button("Create Timetable", systemImage: "plus") { showCreate = true }
+						.buttonStyle(.glassProminent)
+				}
+				.matchedTransitionSource(id: "1", in: ns)
+			}
+			.sheet(isPresented: $showCreate) {
+				AuthoredTimetableCreateView()
+					.presentationDetents([.medium])
+					.navigationTransition(
+						.zoom(sourceID: "1", in: ns)
+					)
+			}
+			.overlay {
+				if !networkManager.isOnline {
+					ContentUnavailableView("Offline", systemImage: "wifi.slash", description: Text("Authored timetables are unavailable until a connection is restored."))
+				} else if service.timetables.isEmpty {
+					ContentUnavailableView("No Authored Timetables", systemImage: "person.2.crop.square.stack")
+						.fontWeight(.regular)
 						.foregroundStyle(.secondary)
 				}
 			}
-		}
-		.toolbar {
-			ToolbarItem(placement: .topBarTrailing) {
-				Button("Create Timetable", systemImage: "plus") { showCreate = true }
-					.buttonStyle(.glassProminent)
-			}
-			.matchedTransitionSource(id: "1", in: ns)
-		}
-		.sheet(isPresented: $showCreate) {
-			AuthoredTimetableCreateView()
-				.presentationDetents([.medium])
-				.navigationTransition(
-					.zoom(sourceID: "1", in: ns)
-				)
-		}
-		.overlay {
-			if !networkManager.isOnline {
-				ContentUnavailableView("Offline", systemImage: "wifi.slash", description: Text("Authored timetables are unavailable until a connection is restored."))
-			} else if service.timetables.isEmpty {
-				ContentUnavailableView("No Authored Timetables", systemImage: "person.2.crop.square.stack")
-					.fontWeight(.regular)
-					.foregroundStyle(.secondary)
-			}
-		}
-		.refreshable { await refresh() }
-		.task {
-			if networkManager.isOnline {
-				await refresh()
+			.refreshable { await refresh() }
+			.task {
+				if networkManager.isOnline {
+					await refresh()
+				}
 			}
 		}
 	}
