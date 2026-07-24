@@ -121,7 +121,7 @@ struct NotificationLeadTimesEditor: View {
 			} label: {
 				LabeledContent("Send Notifications Early By") {
 					VStack(alignment: .leading) {
-						ForEach(summary, id: \.count) { i in
+						ForEach(summary, id: \.self) { i in
 							Text(i)
 						}
 					}
