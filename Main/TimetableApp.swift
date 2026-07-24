@@ -11,6 +11,7 @@
 	import Sticker
 	import WindowOverlay
 #endif
+import ColorfulX
 import Defaults
 import Foundation
 import SwiftUI
@@ -357,18 +358,39 @@ struct TimetableApp: App {
 
 #if os(macOS)
 	private struct MacSignInGateView: View {
+		@State private var colors = ColorfulPreset.aurora
+		@State private var speed = 1.2
+		@State private var colorTransitionSpeed = 10.0
+
 		var body: some View {
 			Color.clear
 				.sheet(isPresented: .constant(true)) {
 					VStack(spacing: 20) {
-						Text("Sign In Required").font(.title2.bold())
-						Text("Sign in to view your timetable on this Mac.").foregroundStyle(.secondary)
+						Image("Icon")
+							.resizable()
+							.frame(width: 150, height: 150)
+							.shadow(color: .black, radius: 15)
 
-						AccountAuthenticationView()
+						Text("Sign In Required").font(.title2.bold())
+						Text("Sign in to view your timetable on this Mac.")
+
+						AccountAuthenticationView(allowsSignUp: false)
 					}
-					.frame(width: 520, height: 580, alignment: .center)
 					.padding(30)
 					.interactiveDismissDisabled()
+					.presentationBackground {
+						ColorfulView(
+							color: $colors,
+							speed: $speed,
+							bias: .constant(0.00001),
+							noise: .constant(200),
+							transitionSpeed: $colorTransitionSpeed,
+							frameLimit: .constant(60),
+							renderScale: .constant(1)
+						)
+						.opacity(0.8)
+					}
+					.presentationSizing(.fitted)
 				}
 		}
 	}
