@@ -59,6 +59,7 @@ import WidgetKit
 					} else {
 						List { list }
 							.listStyle(.sidebar)
+							.scrollEdgeEffect(offset: 0.95, maxBlurRadius: 1, maximumOpacity: 0.2)
 					}
 				}
 				.scrollEdgeEffectStyle(.soft, for: .top)
@@ -78,12 +79,14 @@ import WidgetKit
 			}
 
 			Section("Preferences") {
-				Toggle("Highlight Current Day in timetables", isOn: highlightsCurrentDayBinding)
 				if sessionStore.isAuthenticated {
 					NavigationLink { AccountAndSyncSettingsView() } label: { Label("Live Updates", systemImage: "switch.2") }
 				} else {
 					Button { showSignInRequired() } label: { Label("Live Updates", systemImage: "switch.2") }
 				}
+
+				Toggle("Highlight Current Day in timetables", isOn: highlightsCurrentDayBinding)
+
 				Toggle("Haptic Feedback", isOn: hapticsBinding)
 			}
 

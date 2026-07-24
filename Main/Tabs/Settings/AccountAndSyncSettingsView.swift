@@ -37,7 +37,7 @@ struct AccountAndSyncSettingsView: View {
 
 				NotificationLeadTimesEditor(selection: leadTimesBinding)
 					.disabled(!settings.notificationsEnabled)
-					.opacity(settings.notificationsEnabled ? 1 : 0.3)
+					.opacity(settings.notificationsEnabled ? 1 : 0.5)
 			}
 
 			Section {
