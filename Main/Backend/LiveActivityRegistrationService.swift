@@ -24,6 +24,7 @@
 
 		func startObserving() async {
 			guard Platform.current == .iOS else { return }
+			await endExpiredActivities()
 			guard authorizationTask == nil else {
 				await reconcileAuthorization()
 				return
@@ -231,6 +232,29 @@
 
 		private func endActiveActivities() async {
 			for activity in Activity<SchoolDayActivityAttributes>.activities {
+				await activity.end(nil, dismissalPolicy: .immediate)
+			}
+		}
+
+		private func endExpiredActivities(now: Date = .now) async {
+			var calendar = Calendar(identifier: .gregorian)
+			calendar.timeZone = TimeZone(identifier: "Australia/Perth") ?? .current
+			let components = calendar.dateComponents([.year, .month, .day, .weekday, .hour, .minute], from: now)
+			let today = String(
+				format: "%04d-%02d-%02d",
+				components.year ?? 0,
+				components.month ?? 0,
+				components.day ?? 0
+			)
+			let dayIndex = (components.weekday ?? 1) - 2
+			let dismissal = (0 ..< 5).contains(dayIndex)
+				? SchoolStateEngine.schoolEnd(for: dayIndex).minutesSinceMidnight
+				: 0
+			let currentMinute = (components.hour ?? 0) * 60 + (components.minute ?? 0)
+
+			for activity in Activity<SchoolDayActivityAttributes>.activities
+				where activity.attributes.schoolDate != today || currentMinute >= dismissal
+			{
 				await activity.end(nil, dismissalPolicy: .immediate)
 			}
 		}

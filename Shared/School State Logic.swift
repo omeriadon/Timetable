@@ -158,6 +158,14 @@ nonisolated enum SchoolStateEngine {
 	static let schoolStart = TimeOfDay(8, 50)
 	static let schoolEnd = TimeOfDay(15, 30)
 
+	static func activePeriods(for dayIndex: Int) -> [SchoolPeriod] {
+		periods.filter { TimetableLayout.canUse(period: $0.number, on: dayIndex) }
+	}
+
+	static func schoolEnd(for dayIndex: Int) -> TimeOfDay {
+		activePeriods(for: dayIndex).last?.end ?? schoolEnd
+	}
+
 	@MainActor
 	static func currentOwnerState() -> SchoolState {
 		calculate(at: TimetableClock.now, subjects: Defaults[.timetable])
@@ -206,8 +214,9 @@ nonisolated enum SchoolStateEngine {
 
 		let lookup = TimetableLayout.subjectLookup(for: subjects)
 		let minute = calendar.component(.hour, from: date) * 60 + calendar.component(.minute, from: date)
+		let dayEnd = schoolEnd(for: dayIndex)
 
-		guard minute < schoolEnd.minutesSinceMidnight else { return .afterSchool }
+		guard minute < dayEnd.minutesSinceMidnight else { return .afterSchool }
 
 		if minute < schoolStart.minutesSinceMidnight {
 			guard let first = periods.first,
@@ -256,9 +265,9 @@ nonisolated enum SchoolStateEngine {
 		subjects: [Subject],
 		calendar: Calendar = .current
 	) -> [Date] {
-		guard !subjects.isEmpty, schoolDayIndex(for: date, calendar: calendar) != nil else { return [] }
+		guard !subjects.isEmpty, let dayIndex = schoolDayIndex(for: date, calendar: calendar) else { return [] }
 
-		return periods.flatMap { period -> [Date] in
+		return activePeriods(for: dayIndex).flatMap { period -> [Date] in
 			guard let interval = interval(for: period, on: date, calendar: calendar) else { return [] }
 			return [interval.start, interval.end]
 		}.sorted()
@@ -382,6 +391,7 @@ nonisolated enum SchoolStateEngine {
 		lookup: [Slot: Subject]
 	) -> SchoolStateDestination {
 		guard periods.indices.contains(index) else { return .endOfDay }
+		guard TimetableLayout.canUse(period: periods[index].number, on: dayIndex) else { return .endOfDay }
 		if let subject = subject(for: periods[index], dayIndex: dayIndex, lookup: lookup) {
 			return .subject(subject)
 		}

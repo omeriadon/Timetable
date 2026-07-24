@@ -64,6 +64,7 @@ struct Provider: TimelineProvider {
 		var entries: [TimetableEntry] = []
 
 		guard
+			let dayIndex = schoolDayIndex(for: schoolDay, calendar: calendar),
 			let schoolStart = calendar.date(
 				bySettingHour: SchoolStateEngine.schoolStart.hour,
 				minute: SchoolStateEngine.schoolStart.minute,
@@ -71,8 +72,8 @@ struct Provider: TimelineProvider {
 				of: schoolDay
 			),
 			let schoolEnd = calendar.date(
-				bySettingHour: SchoolStateEngine.schoolEnd.hour,
-				minute: SchoolStateEngine.schoolEnd.minute,
+				bySettingHour: SchoolStateEngine.schoolEnd(for: dayIndex).hour,
+				minute: SchoolStateEngine.schoolEnd(for: dayIndex).minute,
 				second: 0,
 				of: schoolDay
 			),
@@ -94,7 +95,7 @@ struct Provider: TimelineProvider {
 			makeEntry(date: preSchool, subjects: subjects, receivedTimetables: receivedTimetables, calendar: calendar)
 		)
 
-		for period in SchoolStateEngine.periods {
+		for period in SchoolStateEngine.activePeriods(for: dayIndex) {
 			if let start = calendar.date(
 				bySettingHour: period.start.hour,
 				minute: period.start.minute,
@@ -247,6 +248,7 @@ private func relevance(
 	}
 
 	guard
+		let dayIndex = schoolDayIndex(for: date, calendar: calendar),
 		let schoolStart = calendar.date(
 			bySettingHour: SchoolStateEngine.schoolStart.hour,
 			minute: SchoolStateEngine.schoolStart.minute,
@@ -254,8 +256,8 @@ private func relevance(
 			of: date
 		),
 		let schoolEnd = calendar.date(
-			bySettingHour: SchoolStateEngine.schoolEnd.hour,
-			minute: SchoolStateEngine.schoolEnd.minute,
+			bySettingHour: SchoolStateEngine.schoolEnd(for: dayIndex).hour,
+			minute: SchoolStateEngine.schoolEnd(for: dayIndex).minute,
 			second: 0,
 			of: date
 		),
@@ -276,4 +278,10 @@ private func relevance(
 	}
 
 	return TimelineEntryRelevance(score: 0, duration: 0)
+}
+
+private func schoolDayIndex(for date: Date, calendar: Calendar) -> Int? {
+	let weekday = calendar.component(.weekday, from: date)
+	guard (2 ... 6).contains(weekday) else { return nil }
+	return weekday - 2
 }
