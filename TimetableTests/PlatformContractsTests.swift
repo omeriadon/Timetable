@@ -7,6 +7,9 @@ final class PlatformContractsTests: XCTestCase {
 		XCTAssertFalse(Platform.macOS.isAuthoritative)
 		XCTAssertFalse(Platform.watchOS.isAuthoritative)
 		XCTAssertTrue(Platform.iPadOS.allowsNotificationSettings)
+		XCTAssertTrue(Platform.iPadOS.allowsAppleAuthentication)
+		XCTAssertTrue(Platform.macOS.allowsAppleAuthentication)
+		XCTAssertFalse(Platform.watchOS.allowsAppleAuthentication)
 		XCTAssertFalse(Platform.macOS.allowsOwnerMutation)
 	}
 

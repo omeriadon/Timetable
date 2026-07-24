@@ -50,8 +50,6 @@ struct TimetableApp: App {
 	#endif
 
 	init() {
-		SharedDefaultsStore.resetPreReleaseStateIfNeeded()
-
 		#if os(macOS)
 			UserDefaults.standard.set(false, forKey: "NSFullScreenMenuItemEverywhere")
 		#endif
@@ -378,13 +376,16 @@ struct TimetableApp: App {
 
 #if os(iOS)
 	private struct IOSSignInGateView: View {
+		@Default(.hasCompletedOnboarding) private var hasCompletedOnboarding
+		@Default(.onboardingPageID) private var onboardingPageID
+
 		var body: some View {
 			NavigationStack {
 				ZStack {
 					OnboardingBackground(currentPageID: "splash")
 
 					ScrollView {
-						AccountAuthenticationView()
+						AccountAuthenticationView(allowsSignUp: false)
 					}
 					.scrollBounceBehavior(.basedOnSize)
 					.scrollEdgeEffectStyle(.none, for: .vertical)
@@ -395,6 +396,16 @@ struct TimetableApp: App {
 						.font(.title)
 						.bold()
 						.lineLimit(3)
+				}
+				.safeAreaBar(edge: .bottom) {
+					Button("Create an Account") {
+						onboardingPageID = ""
+						hasCompletedOnboarding = false
+					}
+					.buttonStyle(.glassProminent)
+					.controlSize(.large)
+					.buttonSizing(.flexible)
+					.padding(.horizontal, 20)
 				}
 			}
 		}

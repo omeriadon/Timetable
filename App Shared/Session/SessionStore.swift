@@ -150,7 +150,7 @@ final class SessionStore {
 	}
 
 	func signInWithApple(_ authorization: ASAuthorization, context: NetworkRequestContext = .background) async throws {
-		guard Platform.current.allowsAccountCreation else { throw SessionStoreError.platformActionUnavailable }
+		guard Platform.current.allowsAppleAuthentication else { throw SessionStoreError.platformActionUnavailable }
 		guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential else {
 			throw SessionStoreError.invalidIdentityToken
 		}

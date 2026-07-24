@@ -21,6 +21,10 @@ enum Platform: String, Codable, Sendable, CaseIterable {
 		self == .iOS
 	}
 
+	var allowsAppleAuthentication: Bool {
+		self == .iOS || self == .iPadOS || self == .macOS
+	}
+
 	var allowsOwnerMutation: Bool {
 		self == .iOS
 	}

@@ -36,7 +36,7 @@ struct OnboardingAccountView: View {
 							.font(.title2)
 							.multilineTextAlignment(.leading)
 
-						AccountAuthenticationView()
+						AccountAuthenticationView(allowsSignUp: true)
 					}
 				}
 			}

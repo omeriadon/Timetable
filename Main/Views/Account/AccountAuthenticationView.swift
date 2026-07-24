@@ -14,7 +14,7 @@ struct AccountAuthenticationView: View {
 	let allowsSignUp: Bool
 	let allowsAppleSignIn: Bool
 
-	init(allowsSignUp: Bool = true, allowsAppleSignIn: Bool = true) {
+	init(allowsSignUp: Bool = false, allowsAppleSignIn: Bool = true) {
 		self.allowsSignUp = allowsSignUp
 		self.allowsAppleSignIn = allowsAppleSignIn
 	}
