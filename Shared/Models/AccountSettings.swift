@@ -15,6 +15,7 @@ nonisolated enum NotificationLeadTime: Int, Codable, CaseIterable, Defaults.Seri
 	case three = 3
 	case four = 4
 	case five = 5
+	case ten = 10
 
 	var minutes: Int {
 		rawValue
