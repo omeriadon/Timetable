@@ -34,5 +34,5 @@ struct TimetableShortcuts: AppShortcutsProvider {
 		AppShortcut(intent: OpenTimetableDestinationIntent(), phrases: ["Open my timetable in \(.applicationName)"], shortTitle: "Open Timetable", systemImageName: "arrow.up.forward.app")
 	}
 
-	static var shortcutTileColor: ShortcutTileColor = .blue
+	static var shortcutTileColor: ShortcutTileColor = .grayBrown
 }

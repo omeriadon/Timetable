@@ -69,10 +69,13 @@ struct TimetableDetailView: View {
 					} else {
 						Button("Save Timetable", systemImage: "square.and.arrow.down", action: importTimetable)
 							.buttonStyle(.glassProminent)
+							.controlSize(.large)
+							.buttonSizing(.flexible)
+							.transition(.blurReplace)
 					}
 				}
 				.frame(height: 50)
-				.animation(.easeInOut, value: imported)
+				.animation(.easeInOut, value: "\(imported)\(isWorking)")
 				.padding([.bottom, .horizontal], 20)
 			}
 			.toolbar {

@@ -27,7 +27,15 @@ struct TimetablePreviewGrid: View {
 								.overlay { Image(systemName: subject.symbol).font(.caption).foregroundStyle(.white) }
 								.frame(minWidth: 42, minHeight: 44)
 						} else {
-							RoundedRectangle(cornerRadius: 8).fill(.secondary.opacity(0.08)).frame(minWidth: 42, minHeight: 44)
+							if !(session == 8 && day == 3), !(session == 8 && day == 5) {
+								RoundedRectangle(cornerRadius: 8)
+									.fill(.secondary.opacity(0.08))
+									.frame(minWidth: 42, minHeight: 44)
+							} else {
+								RoundedRectangle(cornerRadius: 8)
+									.fill(.secondary.opacity(0))
+									.frame(minWidth: 42, minHeight: 44)
+							}
 						}
 					}
 				}
