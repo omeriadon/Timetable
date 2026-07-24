@@ -174,6 +174,7 @@ struct NotificationLeadTimesEditor: View {
 						}
 					}
 				}
+				.buttonSizing(.flexible)
 				.buttonStyle(.plain)
 			}
 			.appNavigationTitle("Notify Me")
