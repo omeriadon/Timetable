@@ -191,6 +191,7 @@ struct BreakToPeriodNotificationLeadTimesEditor: View {
 struct EventNotificationSchedulesEditor: View {
 	@Binding var selection: Set<EventNotificationSchedule>
 	@State private var isAdding = false
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 
 	var body: some View {
 		ForEach(selection.sorted { lhs, rhs in
@@ -208,13 +209,19 @@ struct EventNotificationSchedulesEditor: View {
 					.textCase(.lowercase)
 					.foregroundStyle(.secondary)
 				Spacer()
-				Button("Remove", systemImage: "minus.circle", role: .destructive) { selection.remove(schedule) }
-					.foregroundStyle(.red)
-					.labelStyle(.iconOnly)
+				Button("Remove", systemImage: "minus.circle", role: .destructive) {
+					withAnimation(reduceMotion ? nil : .snappy) {
+						selection.remove(schedule)
+					}
+				}
+				.foregroundStyle(.red)
+				.labelStyle(.iconOnly)
 			}
+			.transition(.move(edge: .top).combined(with: .opacity))
 		}
 		Button("Add Event Notification", systemImage: "plus") { isAdding = true }
 			.sheet(isPresented: $isAdding) { EventNotificationScheduleSheet(selection: $selection) }
+			.animation(reduceMotion ? nil : .snappy, value: selection)
 	}
 }
 
@@ -223,6 +230,7 @@ private struct EventNotificationScheduleSheet: View {
 	@Binding var selection: Set<EventNotificationSchedule>
 	@State private var timeMinutes = 8 * 60
 	@State private var dayOffset = 0
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 
 	var body: some View {
 		NavigationStack {
@@ -257,7 +265,9 @@ private struct EventNotificationScheduleSheet: View {
 				ToolbarItem(placement: .cancellationAction) { Button(role: .cancel) { dismiss() } }
 				ToolbarItem(placement: .confirmationAction) {
 					Button("Add", systemImage: "plus", role: .confirm) {
-						selection.insert(EventNotificationSchedule(hour: timeMinutes / 60, minute: timeMinutes % 60, dayOffset: dayOffset))
+						withAnimation(reduceMotion ? nil : .snappy) {
+							selection.insert(EventNotificationSchedule(hour: timeMinutes / 60, minute: timeMinutes % 60, dayOffset: dayOffset))
+						}
 						dismiss()
 					}
 					.buttonStyle(.glassProminent)
