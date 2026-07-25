@@ -350,23 +350,6 @@
         }
       }
     },
-    "Calendar" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Calendrier"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Calendario"
-          }
-        }
-      }
-    },
     "Cancel" : {
       "localizations" : {
         "fr" : {
@@ -1110,23 +1093,6 @@
         }
       }
     },
-    "Import from Calendar" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importer depuis le calendrier"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Importa da Calendario"
-          }
-        }
-      }
-    },
     "Import from Calendar Again" : {
 
     },
@@ -1207,23 +1173,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Attività Live"
-          }
-        }
-      }
-    },
-    "Live Activity Debug" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Débogage des activités en direct"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Debug attività live"
           }
         }
       }
