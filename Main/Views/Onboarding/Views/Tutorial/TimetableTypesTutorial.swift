@@ -28,7 +28,7 @@ private let items = [
 	),
 	TimetableTypeItem(
 		title: "Received Timetables",
-		description: "A timetable that you receive from your friends, or one you imported from Search. Just because you receive a timetable from your friend doesn't mean you can share it with others, it might have privacy settings applied.",
+		description: "A timetable that you receive from your friends, or one you imported from Search.",
 		colour: .green
 	),
 ]
