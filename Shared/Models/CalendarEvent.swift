@@ -17,7 +17,7 @@ nonisolated struct CalendarEventsProjection: Codable, Defaults.Serializable, Has
 
 	static let empty = CalendarEventsProjection(globalEvents: [], privateEvents: [], canManageGlobalEvents: false)
 
-	var allEvents: [CalendarEvent] {
+	nonisolated var allEvents: [CalendarEvent] {
 		(globalEvents + privateEvents).sorted { lhs, rhs in
 			lhs.date < rhs.date
 		}
@@ -47,7 +47,7 @@ nonisolated struct EventNotificationSchedule: Codable, Defaults.Serializable, Ha
 }
 
 extension SchoolCalendarDate: Comparable {
-	static func < (lhs: Self, rhs: Self) -> Bool {
+	nonisolated static func < (lhs: Self, rhs: Self) -> Bool {
 		if lhs.year != rhs.year {
 			return lhs.year < rhs.year
 		}
@@ -57,18 +57,18 @@ extension SchoolCalendarDate: Comparable {
 		return lhs.day < rhs.day
 	}
 
-	init(_ date: Date, calendar: Calendar = SchoolCalendarProjection.perthCalendar) {
+	nonisolated init(_ date: Date, calendar: Calendar = SchoolCalendarProjection.perthCalendar) {
 		let components = calendar.dateComponents([.year, .month, .day], from: date)
 		year = components.year ?? 0
 		month = components.month ?? 0
 		day = components.day ?? 0
 	}
 
-	func startOfDay(calendar: Calendar = SchoolCalendarProjection.perthCalendar) -> Date? {
+	nonisolated func startOfDay(calendar: Calendar = SchoolCalendarProjection.perthCalendar) -> Date? {
 		calendar.date(from: components)
 	}
 
-	var displayLabel: String {
+	nonisolated var displayLabel: String {
 		guard let date = startOfDay() else { return "" }
 		return date.formatted(.dateTime.weekday(.wide).day().month(.wide).year())
 	}

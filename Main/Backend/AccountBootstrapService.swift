@@ -16,7 +16,8 @@ final class AccountBootstrapService {
 		ownerTimetableSync: .shared,
 		settingsSync: .shared,
 		receivedTimetableSync: .shared,
-		schoolCalendarSync: .shared
+		schoolCalendarSync: .shared,
+		calendarEventsSync: .shared
 	)
 
 	private(set) var isBootstrapping = false
@@ -33,7 +34,7 @@ final class AccountBootstrapService {
 		settingsSync: AccountSettingsSyncService,
 		receivedTimetableSync: ReceivedTimetableSyncService,
 		schoolCalendarSync: SchoolCalendarSyncService,
-		calendarEventsSync: CalendarEventsSyncService = .shared
+		calendarEventsSync: CalendarEventsSyncService
 	) {
 		self.ownerTimetableSync = ownerTimetableSync
 		self.settingsSync = settingsSync

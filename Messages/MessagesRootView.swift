@@ -47,8 +47,6 @@ struct MessagesRootView: View {
 				) {
 					Button("Cancel", role: .cancel, action: model.dismissImport)
 					Button("Save", action: model.importTimetable)
-				} message: {
-					Text("This adds the timetable to your received timetables on every signed-in device.")
 				}
 			} else {
 				ContentUnavailableView("Timetable is not shareable", systemImage: "calendar.badge.lock", description: Text("Go to settings and enable searching this timetable."))

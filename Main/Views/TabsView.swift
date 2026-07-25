@@ -16,8 +16,8 @@ import SwiftUI
 			let view = TabsView()
 			view.tintColor = .brown
 			view.items = items
-			view.selectedTagIndex = selection
 			view.onSelectionChange = { selection = $0 }
+			view.selectInitialTagIndex(selection)
 			return view
 		}
 
@@ -35,8 +35,8 @@ import SwiftUI
 		func makeNSView(context _: Context) -> TabsView {
 			let view = TabsView()
 			view.items = items
-			view.selectedTagIndex = selection
 			view.onSelectionChange = { selection = $0 }
+			view.selectInitialTagIndex(selection)
 			return view
 		}
 
@@ -84,6 +84,15 @@ class TabsView: PlatformView {
 
 	var selectedTagIndex: Int = 0 {
 		didSet { updateSelection(for: selectedTagIndex) }
+	}
+
+	func selectInitialTagIndex(_ index: Int) {
+		selectedTagIndex = bottomButtons.indices.contains(index) ? index : 0
+		setNeedsLayout()
+		DispatchQueue.main.async { [weak self] in
+			guard let self else { return }
+			updateSelection(for: selectedTagIndex)
+		}
 	}
 
 	#if os(iOS)

@@ -36,7 +36,6 @@ struct TodayTimetableView: View {
 				.padding()
 			}
 		}
-		.appNavigationTitle("Today", style: .main)
 	}
 
 	private func todayEvents(at date: Date) -> [CalendarEvent] {
