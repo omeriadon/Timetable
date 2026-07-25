@@ -36,46 +36,53 @@ struct SubjectMetadataEditorView: View {
 								building.displayName
 							}
 
-							HStack(spacing: 10) {
-								Text(secondaryText)
+							HStack(spacing: 5) {
+								Image(systemName: "door.left.hand.open")
 									.foregroundStyle(.secondary)
 
-								Text(number.description)
-									.font(.headline)
-									.bold()
-							}
-						case let .unknown(rawLocation):
-							Text("Classroom: \(rawLocation)")
+								Text("Classroom")
+									.foregroundStyle(.secondary)
+
+								Spacer()
+
+								HStack(spacing: 10) {
+									Text(secondaryText)
+										.foregroundStyle(.secondary)
+
+									Text(number.description)
+										.font(.headline)
+										.bold()
+								}
 								.font(.headline)
+								.lineLimit(1)
+							}
+							.padding(.horizontal, 12)
+							.padding(.vertical, 10)
+							.frame(maxWidth: .infinity, alignment: .leading)
+							.glassEffect(.clear, in: RoundedRectangle(cornerRadius: 20))
+
+						case let .unknown(rawLocation):
+							HStack(spacing: 5) {
+								Image(systemName: "door.left.hand.open")
+									.foregroundStyle(.secondary)
+
+								Text("Classroom")
+									.foregroundStyle(.secondary)
+
+								Spacer()
+
+								Text(rawLocation)
+									.font(.headline)
+									.lineLimit(1)
+							}
+							.padding(.horizontal, 12)
+							.padding(.vertical, 10)
+							.frame(maxWidth: .infinity, alignment: .leading)
+							.glassEffect(.clear, in: RoundedRectangle(cornerRadius: 20))
 					}
 				}
 			}
 			.buttonStyle(.plain)
-
-			Button {} label: {
-				HStack(spacing: 0) {
-					Text(subject.name.isEmpty ? "Subject Name" : subject.name)
-						.font(.title)
-						.padding(10)
-						.padding(.leading, 8)
-						.contentTransition(.numericText())
-						.lineLimit(1)
-
-					Spacer(minLength: 0)
-				}
-				.frame(maxWidth: .infinity, alignment: .leading)
-				.contentShape(Capsule())
-			}
-			.buttonStyle(.plain)
-			.background {
-				Capsule()
-					.fill(subject.color.opacity(0.22))
-					.animation(.snappy(duration: 0.25), value: subject.color)
-			}
-			.glassEffect(
-				.clear.tint(subject.color).interactive(),
-				in: Capsule()
-			)
 
 			Button {
 				draftValue = subject.teacher
@@ -121,28 +128,24 @@ struct SubjectMetadataEditorView: View {
 		placeholder: String,
 		systemImage: String
 	) -> some View {
-		HStack(spacing: 12) {
+		HStack(spacing: 5) {
 			Image(systemName: systemImage)
 				.foregroundStyle(.secondary)
-				.frame(width: 24)
 
-			VStack(alignment: .leading, spacing: 2) {
-				Text(title)
-					.font(.caption)
-					.foregroundStyle(.secondary)
+			Text(title)
+				.foregroundStyle(.secondary)
 
-				Text(value.isEmpty ? placeholder : value)
-					.font(.headline)
-					.foregroundStyle(value.isEmpty ? .secondary : .primary)
-					.lineLimit(1)
-			}
+			Spacer()
 
-			Spacer(minLength: 0)
+			Text(value.isEmpty ? placeholder : value)
+				.font(.headline)
+				.foregroundStyle(value.isEmpty ? .secondary : .primary)
+				.lineLimit(1)
 		}
 		.padding(.horizontal, 12)
 		.padding(.vertical, 10)
 		.frame(maxWidth: .infinity, alignment: .leading)
-		.background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
+		.glassEffect(.clear, in: RoundedRectangle(cornerRadius: 20))
 	}
 }
 

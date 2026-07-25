@@ -17,7 +17,6 @@ struct CreatedTimetablesSettingsView: View {
 
 	var body: some View {
 		NavigationStack {
-			Text("Created Timetables")
 			List(service.timetables) { timetable in
 				NavigationLink {
 					CreatedTimetableEditorView(timetable: timetable)
@@ -29,6 +28,7 @@ struct CreatedTimetablesSettingsView: View {
 					}
 				}
 			}
+			.navigationBarTitleDisplayMode(.large)
 			.toolbar {
 				ToolbarItem(placement: .largeTitle) {
 					Text("Created Timetables")
@@ -88,19 +88,21 @@ private struct CreatedTimetableCreateView: View {
 
 	var body: some View {
 		NavigationStack {
-			Text("New Created Timetable")
-				.bold()
-				.padding(.horizontal, 10)
-				.font(.largeTitle)
-				.lineLimit(3)
-				.frame(maxWidth: .infinity, alignment: .leading)
-
 			Form {
 				TextField("Title", text: $title)
 				Toggle("Searchable", isOn: $isSearchable)
 				Button("Edit Subjects", systemImage: "pencil") { showSubjectEditor = true }
 			}
+			.navigationBarTitleDisplayMode(.large)
 			.toolbar {
+				ToolbarItem(placement: .largeTitle) {
+					Text("New Created Timetable")
+						.bold()
+						.font(.title)
+						.lineLimit(3)
+						.frame(maxWidth: .infinity, alignment: .leading)
+				}
+
 				ToolbarItem(placement: .cancellationAction) {
 					Button("Cancel", systemImage: "xmark", role: .cancel) {
 						dismiss()

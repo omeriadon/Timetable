@@ -17,7 +17,7 @@ struct SubjectContextPopover: View {
 
 			VStack(spacing: 10) {
 				infoRow(
-					title: "Room",
+					title: "Clasroom",
 					value: classroomText,
 					systemImage: "door.left.hand.open"
 				)
