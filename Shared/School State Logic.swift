@@ -38,7 +38,7 @@ nonisolated struct SchoolCalendarDateRange: Codable, Hashable, Sendable {
 }
 
 /// The server-owned definition of dates on which the timetable is active.
-nonisolated struct SchoolCalendarProjection: Codable, Hashable, Sendable {
+nonisolated struct SchoolCalendarProjection: Defaults.Serializable, Codable, Hashable, Sendable {
 	let termRanges: [SchoolCalendarDateRange]
 	let skippedDates: Set<SchoolCalendarDate>
 
