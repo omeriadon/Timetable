@@ -240,9 +240,9 @@ struct TimetableApp: App {
 			)
 			StatusBadgeManager.shared.addBadge(
 				id: UUID(),
-				title: "Opened your timetable",
+				title: "Imported your own timetable",
 				priority: 3,
-				view: .success
+				view: .info
 			)
 			return
 		}
