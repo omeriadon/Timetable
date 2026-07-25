@@ -13,10 +13,17 @@ struct NotificationPreferencesView: View {
 
 				NotificationLeadTimesEditor(selection: localBinding(\.notificationLeadTimes))
 					.disabled(!settings.notificationsEnabled)
+
+				BreakToPeriodNotificationLeadTimesEditor(selection: localBinding(\.breakToPeriodNotificationLeadTimes))
+					.disabled(!settings.notificationsEnabled)
 			}
 
 			Section {
 				Toggle("Special Event Notifications", isOn: localBinding(\.broadcastNotificationsEnabled))
+			}
+
+			Section("Event Notifications") {
+				EventNotificationSchedulesEditor(selection: localBinding(\.eventNotificationSchedules))
 			}
 		}
 		.formStyle(.grouped)

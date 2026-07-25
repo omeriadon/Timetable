@@ -35,15 +35,36 @@ nonisolated struct SchoolCalendarResponse: Codable, Sendable {
 	}
 }
 
+nonisolated struct CalendarEventsResponse: Codable, Sendable {
+	let globalEvents: [CalendarEvent]
+	let privateEvents: [CalendarEvent]
+	let canManageGlobalEvents: Bool
+
+	var projection: CalendarEventsProjection {
+		CalendarEventsProjection(globalEvents: globalEvents, privateEvents: privateEvents, canManageGlobalEvents: canManageGlobalEvents)
+	}
+}
+
+nonisolated struct CreateCalendarEventRequest: Codable, Sendable {
+	let title: String
+	let notes: String?
+	let symbol: String
+	let date: SchoolCalendarDate
+}
+
 nonisolated struct NotificationSettingsUpdateRequest: Codable, Sendable {
 	let notificationsEnabled: Bool
 	let broadcastNotificationsEnabled: Bool
 	let notificationLeadTimes: Set<NotificationLeadTime>
+	let breakToPeriodNotificationLeadTimes: Set<NotificationLeadTime>
+	let eventNotificationSchedules: Set<EventNotificationSchedule>
 
 	init(_ settings: AccountSettings) {
 		notificationsEnabled = settings.notificationsEnabled
 		broadcastNotificationsEnabled = settings.broadcastNotificationsEnabled
 		notificationLeadTimes = settings.notificationLeadTimes
+		breakToPeriodNotificationLeadTimes = settings.breakToPeriodNotificationLeadTimes
+		eventNotificationSchedules = settings.eventNotificationSchedules
 	}
 }
 

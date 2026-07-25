@@ -169,53 +169,20 @@ class TabsView: PlatformView {
 
 	private func makeGlassView(tint: PlatformColor) -> PlatformView {
 		#if os(iOS)
-			if #available(iOS 26.0, *) {
-				let effect = UIGlassEffect(style: .regular)
-				effect.isInteractive = true
-				effect.tintColor = tint
-				let view = UIVisualEffectView(effect: effect)
-				view.layer.cornerCurve = .continuous
-				return view
-			} else {
-				let view = UIVisualEffectView(effect: UIBlurEffect(style: .systemThinMaterial))
-				view.layer.cornerCurve = .continuous
-				let tintOverlay = UIView()
-				tintOverlay.backgroundColor = tint.withAlphaComponent(0.28)
-				tintOverlay.translatesAutoresizingMaskIntoConstraints = false
-				view.contentView.addSubview(tintOverlay)
-				NSLayoutConstraint.activate([
-					tintOverlay.topAnchor.constraint(equalTo: view.contentView.topAnchor),
-					tintOverlay.leadingAnchor.constraint(equalTo: view.contentView.leadingAnchor),
-					tintOverlay.trailingAnchor.constraint(equalTo: view.contentView.trailingAnchor),
-					tintOverlay.bottomAnchor.constraint(equalTo: view.contentView.bottomAnchor),
-				])
-				return view
-			}
+
+			let effect = UIGlassEffect(style: .regular)
+			effect.isInteractive = true
+			effect.tintColor = tint
+			let view = UIVisualEffectView(effect: effect)
+			view.layer.cornerCurve = .continuous
+			return view
+
 		#else
-			if #available(macOS 26.0, *) {
-				let view = NSGlassEffectView()
-				view.tintColor = tint
-				return view
-			} else {
-				let view = NSVisualEffectView()
-				view.material = .hudWindow
-				view.blendingMode = .withinWindow
-				view.state = .active
-				view.wantsLayer = true
-				view.layer?.cornerCurve = .continuous
-				let tintOverlay = NSView()
-				tintOverlay.wantsLayer = true
-				tintOverlay.layer?.backgroundColor = tint.withAlphaComponent(0.28).cgColor
-				tintOverlay.translatesAutoresizingMaskIntoConstraints = false
-				view.addSubview(tintOverlay)
-				NSLayoutConstraint.activate([
-					tintOverlay.topAnchor.constraint(equalTo: view.topAnchor),
-					tintOverlay.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-					tintOverlay.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-					tintOverlay.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-				])
-				return view
-			}
+
+			let view = NSGlassEffectView()
+			view.tintColor = tint
+			return view
+
 		#endif
 	}
 
@@ -223,11 +190,8 @@ class TabsView: PlatformView {
 		#if os(iOS)
 			view.layer.cornerRadius = radius
 		#else
-			if #available(macOS 26.0, *), let glass = view as? NSGlassEffectView {
-				glass.cornerRadius = radius
-			} else {
-				view.layer?.cornerRadius = radius
-			}
+			glass.cornerRadius = radius
+
 		#endif
 	}
 

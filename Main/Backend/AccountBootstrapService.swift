@@ -25,18 +25,21 @@ final class AccountBootstrapService {
 	private let settingsSync: AccountSettingsSyncService
 	private let receivedTimetableSync: ReceivedTimetableSyncService
 	private let schoolCalendarSync: SchoolCalendarSyncService
+	private let calendarEventsSync: CalendarEventsSyncService
 	private var bootstrapTask: Task<Void, any Error>?
 
 	private init(
 		ownerTimetableSync: OwnerTimetableSyncService,
 		settingsSync: AccountSettingsSyncService,
 		receivedTimetableSync: ReceivedTimetableSyncService,
-		schoolCalendarSync: SchoolCalendarSyncService
+		schoolCalendarSync: SchoolCalendarSyncService,
+		calendarEventsSync: CalendarEventsSyncService = .shared
 	) {
 		self.ownerTimetableSync = ownerTimetableSync
 		self.settingsSync = settingsSync
 		self.receivedTimetableSync = receivedTimetableSync
 		self.schoolCalendarSync = schoolCalendarSync
+		self.calendarEventsSync = calendarEventsSync
 	}
 
 	func bootstrap() async throws {
@@ -66,7 +69,10 @@ final class AccountBootstrapService {
 			async let schoolCalendar: Void = self.runBootstrapStage("School calendar") {
 				try await self.schoolCalendarSync.downloadCalendar()
 			}
-			_ = await (timetable, settings, received, created, schoolCalendar)
+			async let calendarEvents: Void = self.runBootstrapStage("Calendar events") {
+				try await self.calendarEventsSync.downloadEvents()
+			}
+			_ = await (timetable, settings, received, created, schoolCalendar, calendarEvents)
 		}
 		bootstrapTask = task
 		isBootstrapping = true

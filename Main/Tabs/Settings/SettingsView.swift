@@ -81,9 +81,9 @@ import WidgetKit
 
 			Section("Preferences") {
 				if sessionStore.isAuthenticated {
-					NavigationLink { AccountAndSyncSettingsView() } label: { Label("Live Updates", systemImage: "switch.2") }
+					NavigationLink { AccountAndSyncSettingsView() } label: { Label("Updates", systemImage: "switch.2") }
 				} else {
-					Button { showSignInRequired() } label: { Label("Live Updates", systemImage: "switch.2") }
+					Button { showSignInRequired() } label: { Label("Updates", systemImage: "switch.2") }
 				}
 
 				Toggle("Highlight Current Day in timetables", isOn: highlightsCurrentDayBinding)

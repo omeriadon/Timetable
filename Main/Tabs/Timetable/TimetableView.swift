@@ -23,6 +23,7 @@ struct TimetableView: View {
 	@Default(.timetable) var subjects
 	@Default(.accountSettings) private var accountSettings
 	@Default(.schoolCalendar) private var schoolCalendar
+	@Default(.calendarEvents) private var calendarEvents
 
 	@Default(.receivedTimetables) private var receivedTimetables
 
@@ -81,15 +82,19 @@ struct TimetableView: View {
 						.containerRelativeFrame(.horizontal)
 						.id(0)
 
-					Text("monkey")
-						.containerRelativeFrame(.horizontal)
-						.id(1)
+					TodayTimetableView(
+						subjects: selectedTimetable?.subjects ?? subjects,
+						schoolCalendar: schoolCalendar,
+						events: calendarEvents.allEvents
+					)
+					.containerRelativeFrame(.horizontal)
+					.id(1)
 
-					Text("baboon")
+					CalendarEventsView(projection: calendarEvents)
 						.containerRelativeFrame(.horizontal)
 						.id(2)
 
-					Text("gorilla")
+					SchoolDatesView(schoolCalendar: schoolCalendar)
 						.containerRelativeFrame(.horizontal)
 						.id(3)
 				}
