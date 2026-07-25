@@ -86,13 +86,13 @@ struct TimetableView: View {
 			.scrollTargetBehavior(.paging)
 			.scrollIndicators(.hidden)
 			.scrollPosition(id: $scrollPosition)
-			.scrollEdgeEffect(offset: 0.8)
+			.scrollEdgeEffect(offset: 0.85)
 			.safeAreaBar(edge: .top, alignment: .center, spacing: 0) {
 				TabsPicker(
 					items: [
 						("Today", "calendar.day.timeline.left"),
 						("Week", "7.calendar"),
-						("Dates", "calendar.badge.clock"),
+						("Upcoming", "list.star"),
 					],
 					selection: $currentTab
 				)
@@ -217,8 +217,7 @@ struct TimetableView: View {
 							.padding([.top, .horizontal], 10)
 						#endif
 					}
-					.scrollEdgeEffectStyle(.soft, for: .bottom)
-					.scrollEdgeEffectStyle(.none, for: .top)
+					.scrollEdgeEffectStyle(.hard, for: .top)
 			}
 			.padding(.trailing, 2)
 			.dynamicTypeSize(.medium)

@@ -33,7 +33,6 @@ struct TodayTimetableView: View {
 						TodayCountdown(subjects: subjects, schoolCalendar: schoolCalendar, now: now)
 					}
 				}
-				.padding()
 			}
 		}
 	}
@@ -52,14 +51,15 @@ private struct TodayCountdown: View {
 	var body: some View {
 		if let next = SchoolStateEngine.nextScheduledSubject(after: now, subjects: subjects, schoolCalendar: schoolCalendar) {
 			VStack(spacing: 20) {
-				VStack {
-					Image(systemName: "face.dashed")
-						.font(.largeTitle)
-						.foregroundStyle(.accent)
+				Image(systemName: "face.dashed")
+					.font(.largeTitle.scaled(by: 1.3))
+					.foregroundStyle(.accent)
+					.bold()
 
-					Text("Nothing Scheduled Today")
-						.font(.title)
-				}
+				Text("Nothing Scheduled Today")
+					.font(.title2)
+					.multilineTextAlignment(.center)
+					.bold()
 
 				Text("Next class: \(next.subject.id)")
 

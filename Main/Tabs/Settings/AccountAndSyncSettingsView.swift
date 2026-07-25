@@ -145,7 +145,7 @@ struct BreakToPeriodNotificationLeadTimesEditor: View {
 	var body: some View {
 		#if os(macOS)
 			VStack(alignment: .leading) {
-				Text("Before Class From a Break")
+				Text("Before Class or From a Break")
 				Text("Applies before first period and after recess or lunch.")
 					.font(.footnote)
 					.foregroundStyle(.secondary)
@@ -157,12 +157,12 @@ struct BreakToPeriodNotificationLeadTimesEditor: View {
 		#else
 			NavigationLink {
 				NotificationLeadTimesSelectionView(
-					title: "Before Class From a Break",
+					title: "Notify Me",
 					description: "Applies before first period and after recess or lunch.",
 					selection: $selection
 				)
 			} label: {
-				LabeledContent("Before Class From a Break") {
+				LabeledContent("Before Class or From a Break") {
 					Text(summary)
 						.foregroundStyle(.secondary)
 				}
@@ -227,13 +227,6 @@ private struct EventNotificationScheduleSheet: View {
 	var body: some View {
 		NavigationStack {
 			Form {
-				Picker("Time", selection: $timeMinutes) {
-					ForEach(Array(stride(from: 5 * 60, through: 22 * 60, by: 15)), id: \.self) { minutes in
-						Text(timeLabel(minutes)).tag(minutes)
-					}
-				}
-				.pickerStyle(.wheel)
-				.frame(height: 160)
 				Picker("Send notification", selection: $dayOffset) {
 					Text("On the day")
 						.foregroundStyle(.accent)
@@ -251,6 +244,13 @@ private struct EventNotificationScheduleSheet: View {
 						.foregroundStyle(.accent)
 						.tag(7)
 				}
+
+				Picker("Time", selection: $timeMinutes) {
+					ForEach(Array(stride(from: 5 * 60, through: 22 * 60, by: 15)), id: \.self) { minutes in
+						Text(timeLabel(minutes)).tag(minutes)
+					}
+				}
+				.pickerStyle(.wheel)
 			}
 			.appNavigationTitle("Event Notification")
 			.toolbar {
@@ -334,6 +334,9 @@ struct NotificationLeadTimesEditor: View {
 		}
 
 		var body: some View {
+			if let description {
+				Text(description)
+			}
 			List(NotificationLeadTime.allCases, id: \.self) { leadTime in
 				Button {
 					if selection.contains(leadTime) {

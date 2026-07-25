@@ -248,7 +248,7 @@ class TabsView: PlatformView {
 			button.configuration = .plain()
 			button.configuration?.title = item.title
 			button.configuration?.image = UIImage(systemName: item.icon)
-			button.configuration?.imagePadding = 6
+			button.configuration?.imagePadding = 10
 			button.configuration?.imagePlacement = .leading
 			button.configuration?.cornerStyle = .capsule
 			button.configuration?.baseForegroundColor = foregroundColor
@@ -354,7 +354,7 @@ class TabsView: PlatformView {
 
 	private func animateSelection(to index: Int) {
 		#if os(iOS)
-			UIView.animate(springDuration: 0.3, bounce: 0.3) {
+			UIView.animate(springDuration: 0.3, bounce: 0.4) {
 				self.selectedTagIndex = index
 			}
 		#else

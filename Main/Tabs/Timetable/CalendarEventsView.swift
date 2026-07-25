@@ -67,6 +67,9 @@ struct DatesView: View {
 			ForEach(filtered) { event in
 				Button { editorTarget = .edit(event) } label: { HStack(alignment: .center) {
 					Image(systemName: event.symbol)
+						.font(.largeTitle.scaled(by: 1.2))
+						.padding(.trailing, 5)
+						.foregroundStyle(.accent)
 
 					VStack(alignment: .leading, spacing: 4) {
 						Text(event.title)
@@ -181,7 +184,11 @@ private struct CalendarEventEditor: View {
 		}
 		.safeAreaBar(edge: .bottom) {
 			if let event = target.event, !event.isGlobal || canManageGlobalEvents {
-				Button("Delete Event", systemImage: "trash", role: .destructive) { deleteEvent(event) }
+				Button("Delete Event", systemImage: "trash", role: .destructive) {
+					deleteEvent(event)
+				}
+				.buttonStyle(.glassProminent)
+				.tint(.red)
 			}
 		}
 		.sheet(isPresented: $showsSymbolPicker) { CalendarEventSymbolPicker(symbol: $symbol) }
