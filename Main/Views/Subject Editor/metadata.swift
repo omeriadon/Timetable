@@ -59,7 +59,7 @@ struct SubjectMetadataEditorView: View {
 							.padding(.horizontal, 12)
 							.padding(.vertical, 10)
 							.frame(maxWidth: .infinity, alignment: .leading)
-							.glassEffect(.clear, in: RoundedRectangle(cornerRadius: 20))
+							.glassEffect(.clear.interactive(), in: Capsule())
 
 						case let .unknown(rawLocation):
 							HStack(spacing: 5) {
@@ -71,14 +71,14 @@ struct SubjectMetadataEditorView: View {
 
 								Spacer()
 
-								Text(rawLocation)
+								Text(rawLocation.isEmpty ? "No classroom" : rawLocation)
 									.font(.headline)
 									.lineLimit(1)
 							}
 							.padding(.horizontal, 12)
 							.padding(.vertical, 10)
 							.frame(maxWidth: .infinity, alignment: .leading)
-							.glassEffect(.clear, in: RoundedRectangle(cornerRadius: 20))
+							.glassEffect(.clear.interactive(), in: Capsule())
 					}
 				}
 			}
@@ -99,8 +99,13 @@ struct SubjectMetadataEditorView: View {
 		}
 		.alert("Edit \(editingTarget?.title ?? "Metadata")", item: $editingTarget) { target in
 			TextField(target.placeholder, text: $draftValue)
+				.onSubmit {
+					if editingTarget == .classroom {
+						draftValue = "Attending Staff : \(draftValue)"
+					}
+				}
 
-			Button("Save") {
+			Button("Save", role: .confirm) {
 				commit(target)
 			}
 
@@ -145,7 +150,7 @@ struct SubjectMetadataEditorView: View {
 		.padding(.horizontal, 12)
 		.padding(.vertical, 10)
 		.frame(maxWidth: .infinity, alignment: .leading)
-		.glassEffect(.clear, in: RoundedRectangle(cornerRadius: 20))
+		.glassEffect(.clear.interactive(), in: Capsule())
 	}
 }
 
@@ -167,17 +172,17 @@ private enum MetadataEditTarget: Identifiable {
 	var placeholder: String {
 		switch self {
 			case .classroom: "MU12"
-			case .teacher: "Attending Staff : JSMITH"
+			case .teacher: "JSMITH"
 		}
 	}
 
 	var helpText: String {
 		switch self {
 			case .classroom:
-				"Use the raw room code."
+				"MU12"
 
 			case .teacher:
-				"Use the raw teacher note."
+				"Enter in capitals using first initial and last name."
 		}
 	}
 }

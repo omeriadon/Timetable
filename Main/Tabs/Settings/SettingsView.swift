@@ -110,12 +110,15 @@ import WidgetKit
 						}
 					}
 				}
-				.confirmationDialog("Import timetable from Calendar again?", isPresented: $showImportConfirmation) {
+				.confirmationDialog(Text("Import timetable from Calendar again?"), isPresented: $showImportConfirmation, titleVisibility: .visible, actions: {
 					Button("Yes", role: .confirm) {
 						showCalendarImportSheet = true
 					}
 					Button("No", role: .cancel) {}
-				}
+
+				}, message: {
+					Text("This will delete your current timetable and reimport. Anyone you shared this timetable with will be able to access the new one.")
+				})
 				.sheet(isPresented: $showCalendarImportSheet) {
 					CalendarImportView()
 						.presentationDetents([.fraction(1 / 3)])
