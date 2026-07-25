@@ -26,7 +26,7 @@ struct SchoolDatesView: View {
 			Section("No School") {
 				let skippedDates = schoolCalendar.skippedDates.filter { window.contains($0) }.sorted()
 				if skippedDates.isEmpty {
-					Text("No no-school days in the next three months.")
+					Text("No no-school days upcoming.")
 						.foregroundStyle(.secondary)
 				} else {
 					ForEach(skippedDates, id: \.self) { date in
@@ -35,7 +35,6 @@ struct SchoolDatesView: View {
 				}
 			}
 		}
-		.appNavigationTitle("Dates", style: .main)
 	}
 
 	private var dateWindow: ClosedRange<SchoolCalendarDate> {

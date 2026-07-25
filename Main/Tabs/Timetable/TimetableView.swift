@@ -63,19 +63,6 @@ struct TimetableView: View {
 
 	var body: some View {
 		NavigationStack {
-			TabsPicker(
-				items: [
-					("Week", "7.calendar"),
-					("Today", "calendar.day.timeline.left"),
-					("Events", "calendar.day"),
-					("Dates", "flag"),
-				],
-				selection: $currentTab
-			)
-			.padding(.horizontal, 10)
-			.frame(height: 36)
-			.padding(.bottom, 5)
-
 			ScrollView(.horizontal) {
 				HStack(spacing: 0) {
 					mainView
@@ -103,6 +90,21 @@ struct TimetableView: View {
 			.scrollTargetBehavior(.paging)
 			.scrollIndicators(.hidden)
 			.scrollPosition(id: $scrollPosition)
+			.scrollEdgeEffect(offset: 0.8)
+			.safeAreaBar(edge: .top, alignment: .center, spacing: 0) {
+				TabsPicker(
+					items: [
+						("Week", "7.calendar"),
+						("Today", "calendar.day.timeline.left"),
+						("Events", "calendar.day"),
+						("Dates", "flag"),
+					],
+					selection: $currentTab
+				)
+				.padding(.horizontal, 10)
+				.frame(height: 36)
+				.padding(.bottom, 5)
+			}
 			.onChange(of: currentTab) { _, newValue in
 				withAnimation {
 					scrollPosition = newValue

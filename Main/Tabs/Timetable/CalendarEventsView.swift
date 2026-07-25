@@ -30,7 +30,6 @@ struct CalendarEventsView: View {
 				}
 			}
 		}
-		.appNavigationTitle("Events", style: .main)
 		.sheet(item: $editorScope) { scope in
 			CalendarEventEditor(scope: scope) { request in
 				try await eventService.createEvent(request, globally: scope == .globalEvent)
