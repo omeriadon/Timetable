@@ -97,9 +97,21 @@ struct DatesView: View {
 private enum CalendarEventEditorTarget: Identifiable {
 	case create(CalendarEventScope)
 	case edit(CalendarEvent)
-	var id: String { switch self { case let .create(scope): "create-\(scope.id)"; case let .edit(event): event.id.uuidString } }
-	var scope: CalendarEventScope { switch self { case let .create(scope): scope; case let .edit(event): event.isGlobal ? .globalEvent : .privateEvent } }
-	var event: CalendarEvent? { if case let .edit(event) = self { event } else { nil } }
+	var id: String {
+		switch self { case let .create(scope): "create-\(scope.id)"; case let .edit(event): event.id.uuidString }
+	}
+
+	var scope: CalendarEventScope {
+		switch self { case let .create(scope): scope; case let .edit(event): event.isGlobal ? .globalEvent : .privateEvent }
+	}
+
+	var event: CalendarEvent? {
+		if case let .edit(event) = self {
+			event
+		} else {
+			nil
+		}
+	}
 }
 
 private enum CalendarEventScope: String, Identifiable {
@@ -212,3 +224,4 @@ private extension SchoolCalendarDateRange {
 		guard let startDate = start.startOfDay(), let endDate = end.startOfDay() else { return "" }
 		return "\(startDate.formatted(.dateTime.day().month(.abbreviated))) – \(endDate.formatted(.dateTime.day().month(.abbreviated).year()))"
 	}
+}
