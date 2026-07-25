@@ -68,7 +68,7 @@ struct DatesView: View {
 				Button { editorTarget = .edit(event) } label: { HStack(alignment: .center) {
 					Image(systemName: event.symbol)
 						.font(.largeTitle.scaled(by: 1.2))
-						.padding(.trailing, 5)
+						.padding(.trailing, 10)
 						.foregroundStyle(.accent)
 
 					VStack(alignment: .leading, spacing: 4) {

@@ -33,6 +33,7 @@ struct TodayTimetableView: View {
 						TodayCountdown(subjects: subjects, schoolCalendar: schoolCalendar, now: now)
 					}
 				}
+				.frame(maxWidth: .infinity, alignment: .leading)
 			}
 		}
 	}
