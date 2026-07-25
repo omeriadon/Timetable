@@ -30,8 +30,6 @@ enum OnboardingBackgroundStyle: Equatable {
 				.colorful(.winter, opacity: 0.8, speed: 0.6)
 			case "account":
 				.colorful(.summer, opacity: 0.8, speed: 0.6)
-			case "apns":
-				.colorful(.sunset, opacity: 0.8, speed: 0.6)
 			case "finished":
 				.custom([.black, .black, .black, .black, .black, .black, .blue], opacity: 1, speed: 0.8)
 			case "actualFinished":
