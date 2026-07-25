@@ -1,5 +1,5 @@
 //
-//   AuthoredTimetablesSettingsView.swift
+//   CreatedTimetablesSettingsView.swift
 //   Main
 //
 //   Created by Adon Omeri on 29/6/2026.

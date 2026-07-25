@@ -40,6 +40,7 @@ import WidgetKit
 		@State private var visibilitySaveGeneration = 0
 		@State private var showEditReceivedTimetablesSheet = false
 		@State private var showFeedbackSheet = false
+		@State private var showImportConfirmation = false
 
 		@Namespace private var ns
 
@@ -91,8 +92,36 @@ import WidgetKit
 			}
 
 			Section("Your Timetable") {
-				Toggle("Searchable", isOn: ownerVisibilityBinding)
-					.disabled(!networkManager.isOnline)
+				Button {
+					showImportConfirmation = true
+				} label: {
+					HStack(alignment: .center) {
+						Image(systemName: "calendar")
+							.foregroundStyle(.tint)
+							.imageScale(.large)
+							.padding(.trailing, 10)
+
+						VStack(alignment: .leading) {
+							Text("Import from Calendar Again")
+								.foregroundStyle(.accent)
+							Text("Subscribe to Compass Schedule in Calendar")
+								.foregroundStyle(.secondary)
+								.font(.callout)
+						}
+					}
+				}
+				.confirmationDialog("Import timetable from Calendar again?", isPresented: $showImportConfirmation) {
+					Button("Yes", role: .confirm) {
+						showCalendarImportSheet = true
+					}
+					Button("No", role: .cancel) {}
+				}
+				.sheet(isPresented: $showCalendarImportSheet) {
+					CalendarImportView()
+						.presentationDetents([.fraction(1 / 3)])
+						.presentationDragIndicator(.hidden)
+				}
+
 				Button {
 					showEditTimetableSheet = true
 				} label: {
@@ -119,6 +148,9 @@ import WidgetKit
 					.interactiveDismissDisabled()
 					.navigationTransition(.zoom(sourceID: "sheetMorph", in: ns))
 				}
+
+				Toggle("Searchable", isOn: ownerVisibilityBinding)
+					.disabled(!networkManager.isOnline)
 			}
 
 			Section("Created Timetables") {
@@ -126,32 +158,6 @@ import WidgetKit
 					NavigationLink { CreatedTimetablesSettingsView() } label: { Label("Manage Created Timetables", systemImage: "person.2.crop.square.stack") }
 				} else {
 					Button { showSignInRequired() } label: { Label("Manage Created Timetables", systemImage: "person.2.crop.square.stack") }
-				}
-			}
-
-			Section("Calendar") {
-				Button {
-					showCalendarImportSheet = true
-				} label: {
-					HStack(alignment: .center) {
-						Image(systemName: "calendar")
-							.foregroundStyle(.tint)
-							.imageScale(.large)
-							.padding(.trailing, 10)
-
-						VStack(alignment: .leading) {
-							Text("Import from Calendar")
-								.foregroundStyle(.accent)
-							Text("Subscribe to Compass Schedule in Calendar")
-								.foregroundStyle(.secondary)
-								.font(.callout)
-						}
-					}
-				}
-				.sheet(isPresented: $showCalendarImportSheet) {
-					CalendarImportView()
-						.presentationDetents([.fraction(1 / 3)])
-						.presentationDragIndicator(.hidden)
 				}
 			}
 
