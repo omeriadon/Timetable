@@ -34,14 +34,17 @@ final class WatchAccountBootstrapService {
 			async let timetable: OwnerTimetableResponse = networkManager.send(.v1OwnerTimetable)
 			async let settings: AccountSettings = networkManager.send(.v1Settings)
 			async let received: [AuthoritativeReceivedTimetableDTO] = networkManager.send(.v1ReceivedTimetables)
-			let (ownerTimetable, remoteSettings, receivedTimetables) = try await (
+			async let schoolCalendar: SchoolCalendarResponse = networkManager.send(.v1SchoolCalendar)
+			let (ownerTimetable, remoteSettings, receivedTimetables, remoteSchoolCalendar) = try await (
 				timetable,
 				settings,
-				received
+				received,
+				schoolCalendar
 			)
 
 			Defaults[.timetable] = ownerTimetable.subjects
 			Defaults[.accountSettings] = remoteSettings
+			Defaults[.schoolCalendar] = remoteSchoolCalendar.projection
 			Defaults[.receivedTimetables] = receivedTimetables
 				.filter { $0.availability == .available }
 				.map(\.receivedTimetable)
@@ -68,6 +71,7 @@ final class WatchAccountBootstrapService {
 private extension Endpoint {
 	static let v1OwnerTimetable = Endpoint("/v1/timetables/owner")
 	static let v1Settings = Endpoint("/v1/settings")
+	static let v1SchoolCalendar = Endpoint("/v1/settings/calendar")
 	static let v1SettingsUpdate = Endpoint("/v1/settings", method: .put)
 	static let v1ReceivedTimetables = Endpoint("/v1/timetables/received/authoritative", queryItems: [URLQueryItem(name: "limit", value: "50")])
 }

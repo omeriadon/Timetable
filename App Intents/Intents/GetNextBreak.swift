@@ -9,7 +9,12 @@ struct GetNextBreakIntent: SnippetIntent {
 
 	@MainActor
 	func perform() async -> some IntentResult & ProvidesDialog & ReturnsValue<String?> & ShowsSnippetView {
-		guard let next = SchoolStateEngine.nextBreak(after: TimetableClock.now, subjects: Defaults[.timetable]) else {
+		guard let next = SchoolStateEngine.nextBreak(
+			after: TimetableClock.now,
+			subjects: Defaults[.timetable],
+			calendar: SchoolCalendarProjection.perthCalendar,
+			schoolCalendar: Defaults[.schoolCalendar]
+		) else {
 			return .result(value: nil, dialog: "You have no more breaks today.", view: IntentSummaryView(title: "No More Breaks", detail: "There are no scheduled breaks left today."))
 		}
 

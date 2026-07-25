@@ -26,6 +26,15 @@ nonisolated struct UpdateProfileRequest: Codable {
 	let email: String?
 }
 
+nonisolated struct SchoolCalendarResponse: Codable, Sendable {
+	let termRanges: [SchoolCalendarDateRange]
+	let skippedDates: Set<SchoolCalendarDate>
+
+	var projection: SchoolCalendarProjection {
+		SchoolCalendarProjection(termRanges: termRanges, skippedDates: skippedDates)
+	}
+}
+
 nonisolated struct NotificationSettingsUpdateRequest: Codable, Sendable {
 	let notificationsEnabled: Bool
 	let broadcastNotificationsEnabled: Bool

@@ -22,6 +22,65 @@ nonisolated struct TimeOfDay: Codable, Hashable {
 	}
 }
 
+nonisolated struct SchoolCalendarDate: Codable, Hashable, Sendable {
+	let year: Int
+	let month: Int
+	let day: Int
+
+	var components: DateComponents {
+		DateComponents(year: year, month: month, day: day)
+	}
+}
+
+nonisolated struct SchoolCalendarDateRange: Codable, Hashable, Sendable {
+	let start: SchoolCalendarDate
+	let end: SchoolCalendarDate
+}
+
+/// The server-owned definition of dates on which the timetable is active.
+nonisolated struct SchoolCalendarProjection: Codable, Hashable, Sendable {
+	let termRanges: [SchoolCalendarDateRange]
+	let skippedDates: Set<SchoolCalendarDate>
+
+	static let empty = SchoolCalendarProjection(termRanges: [], skippedDates: [])
+
+	static var perthCalendar: Calendar {
+		var calendar = Calendar(identifier: .gregorian)
+		calendar.timeZone = TimeZone(identifier: "Australia/Perth") ?? .current
+		return calendar
+	}
+
+	func isSchoolDay(_ date: Date, calendar: Calendar = Self.perthCalendar) -> Bool {
+		let day = calendar.dateComponents([.year, .month, .day, .weekday], from: date)
+		guard let weekday = day.weekday,
+		      (2 ... 6).contains(weekday),
+		      let schoolDate = calendar.date(from: day)
+		else {
+			return false
+		}
+
+		let dateKey = SchoolCalendarDate(year: day.year ?? 0, month: day.month ?? 0, day: day.day ?? 0)
+		guard !skippedDates.contains(dateKey) else { return false }
+
+		return termRanges.contains { range in
+			guard let start = calendar.date(from: range.start.components),
+			      let end = calendar.date(from: range.end.components)
+			else {
+				return false
+			}
+			return schoolDate >= start && schoolDate <= end
+		}
+	}
+
+	func dayIndex(for date: Date, calendar: Calendar = Self.perthCalendar) -> Int? {
+		let weekday = calendar.component(.weekday, from: date)
+		guard (2 ... 6).contains(weekday) else {
+			return nil
+		}
+		return weekday - 2
+	}
+}
+
 nonisolated struct SchoolPeriod: Codable, Hashable {
 	let number: Int
 	let start: TimeOfDay
@@ -168,7 +227,7 @@ nonisolated enum SchoolStateEngine {
 
 	@MainActor
 	static func currentOwnerState() -> SchoolState {
-		calculate(at: TimetableClock.now, subjects: Defaults[.timetable])
+		calculate(at: TimetableClock.now, subjects: Defaults[.timetable], schoolCalendar: Defaults[.schoolCalendar])
 	}
 
 	@MainActor
@@ -179,7 +238,7 @@ nonisolated enum SchoolStateEngine {
 				ReceivedSchoolState(
 					id: $0.id,
 					displayName: $0.sender,
-					state: calculate(at: TimetableClock.now, subjects: $0.subjects)
+					state: calculate(at: TimetableClock.now, subjects: $0.subjects, schoolCalendar: Defaults[.schoolCalendar])
 				)
 			}
 	}
@@ -192,7 +251,7 @@ nonisolated enum SchoolStateEngine {
 			return .noTimetable
 		}
 
-		return calculate(at: TimetableClock.now, subjects: timetable.subjects)
+		return calculate(at: TimetableClock.now, subjects: timetable.subjects, schoolCalendar: Defaults[.schoolCalendar])
 	}
 
 	@MainActor
@@ -201,16 +260,19 @@ nonisolated enum SchoolStateEngine {
 			return []
 		}
 
-		return timelineTransitions(on: TimetableClock.now, subjects: timetable.subjects)
+		return timelineTransitions(on: TimetableClock.now, subjects: timetable.subjects, schoolCalendar: Defaults[.schoolCalendar])
 	}
 
 	static func calculate(
 		at date: Date,
 		subjects: [Subject],
-		calendar: Calendar = .current
+		calendar: Calendar = SchoolCalendarProjection.perthCalendar,
+		schoolCalendar: SchoolCalendarProjection = .empty
 	) -> SchoolState {
 		guard !subjects.isEmpty else { return .noTimetable }
-		guard let dayIndex = schoolDayIndex(for: date, calendar: calendar) else { return .weekend }
+		guard schoolCalendar.isSchoolDay(date, calendar: calendar),
+		      let dayIndex = schoolCalendar.dayIndex(for: date, calendar: calendar)
+		else { return .weekend }
 
 		let lookup = TimetableLayout.subjectLookup(for: subjects)
 		let minute = calendar.component(.hour, from: date) * 60 + calendar.component(.minute, from: date)
@@ -263,9 +325,13 @@ nonisolated enum SchoolStateEngine {
 	static func timelineTransitions(
 		on date: Date,
 		subjects: [Subject],
-		calendar: Calendar = .current
+		calendar: Calendar = SchoolCalendarProjection.perthCalendar,
+		schoolCalendar: SchoolCalendarProjection = .empty
 	) -> [Date] {
-		guard !subjects.isEmpty, let dayIndex = schoolDayIndex(for: date, calendar: calendar) else { return [] }
+		guard !subjects.isEmpty,
+		      schoolCalendar.isSchoolDay(date, calendar: calendar),
+		      let dayIndex = schoolCalendar.dayIndex(for: date, calendar: calendar)
+		else { return [] }
 
 		return activePeriods(for: dayIndex).flatMap { period -> [Date] in
 			guard let interval = interval(for: period, on: date, calendar: calendar) else { return [] }
@@ -276,9 +342,13 @@ nonisolated enum SchoolStateEngine {
 	static func nextBreak(
 		after date: Date,
 		subjects: [Subject],
-		calendar: Calendar = .current
+		calendar: Calendar = SchoolCalendarProjection.perthCalendar,
+		schoolCalendar: SchoolCalendarProjection = .empty
 	) -> (type: BreakType, interval: SchoolInterval)? {
-		guard !subjects.isEmpty, schoolDayIndex(for: date, calendar: calendar) != nil else { return nil }
+		guard !subjects.isEmpty,
+		      schoolCalendar.isSchoolDay(date, calendar: calendar),
+		      schoolCalendar.dayIndex(for: date, calendar: calendar) != nil
+		else { return nil }
 
 		let breaks: [(BreakType, Int, Int)] = [(.recess, 1, 2), (.lunch, 3, 4)]
 		for (type, previousIndex, nextIndex) in breaks {
@@ -300,9 +370,13 @@ nonisolated enum SchoolStateEngine {
 	static func nextSubject(
 		after date: Date,
 		subjects: [Subject],
-		calendar: Calendar = .current
+		calendar: Calendar = SchoolCalendarProjection.perthCalendar,
+		schoolCalendar: SchoolCalendarProjection = .empty
 	) -> ScheduledSubject? {
-		guard let dayIndex = schoolDayIndex(for: date, calendar: calendar), !subjects.isEmpty else { return nil }
+		guard schoolCalendar.isSchoolDay(date, calendar: calendar),
+		      let dayIndex = schoolCalendar.dayIndex(for: date, calendar: calendar),
+		      !subjects.isEmpty
+		else { return nil }
 		let lookup = TimetableLayout.subjectLookup(for: subjects)
 
 		for period in periods {
@@ -321,16 +395,23 @@ nonisolated enum SchoolStateEngine {
 		return nil
 	}
 
-	static func nextSubjectOnFollowingSchoolDay(
+	static func nextScheduledSubject(
 		after date: Date,
 		subjects: [Subject],
-		calendar: Calendar = .current
+		calendar: Calendar = SchoolCalendarProjection.perthCalendar,
+		schoolCalendar: SchoolCalendarProjection = .empty
 	) -> ScheduledSubject? {
 		guard !subjects.isEmpty else { return nil }
-		var candidate = date
-		for _ in 0 ..< 7 {
-			candidate = calendar.date(byAdding: .day, value: 1, to: candidate) ?? candidate
-			if let next = nextSubject(after: calendar.startOfDay(for: candidate), subjects: subjects, calendar: calendar) {
+		if let next = nextSubject(after: date, subjects: subjects, calendar: calendar, schoolCalendar: schoolCalendar) {
+			return next
+		}
+
+		var candidate = calendar.startOfDay(for: date)
+		for _ in 0 ..< 370 {
+			guard let followingDay = calendar.date(byAdding: .day, value: 1, to: candidate) else { return nil }
+			candidate = followingDay
+			guard schoolCalendar.isSchoolDay(candidate, calendar: calendar) else { continue }
+			if let next = nextSubject(after: candidate, subjects: subjects, calendar: calendar, schoolCalendar: schoolCalendar) {
 				return next
 			}
 		}
@@ -341,12 +422,6 @@ nonisolated enum SchoolStateEngine {
 		guard (0 ..< 5).contains(dayIndex) else { return [] }
 		let lookup = TimetableLayout.subjectLookup(for: subjects)
 		return periods.compactMap { subject(for: $0, dayIndex: dayIndex, lookup: lookup) }
-	}
-
-	private static func schoolDayIndex(for date: Date, calendar: Calendar) -> Int? {
-		let weekday = calendar.component(.weekday, from: date)
-		let index = (weekday + 5) % 7
-		return index < 5 ? index : nil
 	}
 
 	private static func interval(

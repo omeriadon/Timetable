@@ -1,6 +1,10 @@
 import XCTest
 
 final class SchoolStateEngineTests: XCTestCase {
+	private let schoolCalendar = SchoolCalendarProjection(
+		termRanges: [.init(start: .init(year: 2026, month: 1, day: 1), end: .init(year: 2026, month: 12, day: 31))],
+		skippedDates: []
+	)
 	private var calendar: Calendar {
 		var calendar = Calendar(identifier: .gregorian)
 		calendar.timeZone = TimeZone(identifier: "Australia/Perth")!
@@ -18,7 +22,8 @@ final class SchoolStateEngineTests: XCTestCase {
 		let duringPeriodFive = try SchoolStateEngine.calculate(
 			at: date(2026, 7, 22, 14, 0),
 			subjects: [periodFive],
-			calendar: calendar
+			calendar: calendar,
+			schoolCalendar: schoolCalendar
 		)
 		guard case let .lesson(lesson) = duringPeriodFive else {
 			return XCTFail("Expected period five to be a lesson.")
@@ -28,7 +33,8 @@ final class SchoolStateEngineTests: XCTestCase {
 		let afterPeriodFive = try SchoolStateEngine.calculate(
 			at: date(2026, 7, 22, 14, 32),
 			subjects: [periodFive],
-			calendar: calendar
+			calendar: calendar,
+			schoolCalendar: schoolCalendar
 		)
 		XCTAssertEqual(afterPeriodFive, .afterSchool)
 	}
@@ -45,7 +51,8 @@ final class SchoolStateEngineTests: XCTestCase {
 			try SchoolStateEngine.calculate(
 				at: date(2026, 7, 24, 14, 32),
 				subjects: [periodFive],
-				calendar: calendar
+				calendar: calendar,
+				schoolCalendar: schoolCalendar
 			),
 			.afterSchool
 		)
@@ -62,7 +69,8 @@ final class SchoolStateEngineTests: XCTestCase {
 		let state = try SchoolStateEngine.calculate(
 			at: date(2026, 7, 20, 14, 40),
 			subjects: [periodSix],
-			calendar: calendar
+			calendar: calendar,
+			schoolCalendar: schoolCalendar
 		)
 		guard case let .lesson(lesson) = state else {
 			return XCTFail("Expected period six to remain active on Monday.")

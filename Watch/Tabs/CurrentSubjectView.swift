@@ -11,13 +11,19 @@ import SwiftUI
 
 struct CurrentSubjectView: View {
 	@Default(.timetable) private var subjects
+	@Default(.schoolCalendar) private var schoolCalendar
 
 	let now: Date
 
 	private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
 	var body: some View {
-		let state = SchoolStateEngine.calculate(at: now, subjects: subjects)
+		let state = SchoolStateEngine.calculate(
+			at: now,
+			subjects: subjects,
+			calendar: SchoolCalendarProjection.perthCalendar,
+			schoolCalendar: schoolCalendar
+		)
 
 		Group {
 			switch state {
@@ -67,18 +73,22 @@ struct CurrentSubjectView: View {
 					)
 
 				case .afterSchool, .weekend:
-					VStack(alignment: .center) {
-						Label("School's Out", systemImage: "house.fill")
-							.font(.title3)
-							.padding(.bottom)
-
-						if let next = SchoolStateEngine.nextSubjectOnFollowingSchoolDay(after: now, subjects: subjects) {
-							Text("Next: \(next.subject.id)")
-								.foregroundStyle(.secondary)
-						} else {
-							Text("No more subjects")
-								.foregroundStyle(.secondary)
-						}
+					if let next = SchoolStateEngine.nextScheduledSubject(
+						after: now,
+						subjects: subjects,
+						calendar: SchoolCalendarProjection.perthCalendar,
+						schoolCalendar: schoolCalendar
+					) {
+						createProgressView(
+							title: "School's Out",
+							symbol: "house.fill",
+							color: .secondary,
+							nextText: "Next: \(next.subject.id)",
+							start: now,
+							end: next.interval.start
+						)
+					} else {
+						ContentUnavailableView("School's Out", systemImage: "house.fill")
 					}
 
 				case .noTimetable:
@@ -98,15 +108,6 @@ struct CurrentSubjectView: View {
 		GeometryReader { geo in
 			if let nextText, let end {
 				// 2. Calculate remaining time using the synchronized parent 'now'
-				let remaining = max(0, end.timeIntervalSince(now))
-				let hours = Int(remaining) / 3600
-				let minutes = (Int(remaining) % 3600) / 60
-				let seconds = Int(remaining) % 60
-
-				let timeString = hours > 0
-					? String(format: "%d:%02d:%02d", hours, minutes, seconds)
-					: String(format: "%02d:%02d", minutes, seconds)
-
 				VStack(alignment: .center) {
 					Spacer()
 					Spacer()
@@ -128,9 +129,7 @@ struct CurrentSubjectView: View {
 
 					Spacer()
 
-					Text(timeString)
-						.contentTransition(.numericText(countsDown: true))
-						.animation(.easeInOut(duration: 0.5), value: timeString)
+					Text(timerInterval: now ... end, countsDown: true, showsHours: true)
 						.font(.title2)
 						.lineLimit(1)
 						.bold()
@@ -187,7 +186,7 @@ struct CurrentSubjectView: View {
 					Spacer()
 
 					let targetDate = end ?? now
-					Text(timerInterval: now ... targetDate, countsDown: true)
+					Text(timerInterval: now ... targetDate, countsDown: true, showsHours: true)
 						.contentTransition(.numericText(countsDown: true))
 						.animation(.easeInOut(duration: 0.5), value: now)
 						.font(.title2)

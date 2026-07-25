@@ -5,12 +5,13 @@ import SwiftUI
 struct WatchTimetablesTabView: View {
 	@Default(.timetable) private var subjects
 	@Default(.receivedTimetables) private var receivedTimetables
+	@Default(.schoolCalendar) private var schoolCalendar
 	@State private var now = TimetableClock.now
 
 	private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
 	private var ownerState: SchoolState {
-		SchoolStateEngine.calculate(at: now, subjects: subjects)
+		SchoolStateEngine.calculate(at: now, subjects: subjects, calendar: SchoolCalendarProjection.perthCalendar, schoolCalendar: schoolCalendar)
 	}
 
 	var body: some View {
@@ -50,6 +51,6 @@ struct WatchTimetablesTabView: View {
 	}
 
 	private func schoolState(for timetable: ReceivedTimetable) -> SchoolState {
-		SchoolStateEngine.calculate(at: now, subjects: timetable.subjects)
+		SchoolStateEngine.calculate(at: now, subjects: timetable.subjects, calendar: SchoolCalendarProjection.perthCalendar, schoolCalendar: schoolCalendar)
 	}
 }

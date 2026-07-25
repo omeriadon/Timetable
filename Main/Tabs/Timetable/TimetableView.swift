@@ -22,6 +22,7 @@ struct TimetableView: View {
 
 	@Default(.timetable) var subjects
 	@Default(.accountSettings) private var accountSettings
+	@Default(.schoolCalendar) private var schoolCalendar
 
 	@Default(.receivedTimetables) private var receivedTimetables
 
@@ -204,7 +205,9 @@ struct TimetableView: View {
 	private func findCurrentSubject(in timetable: [Subject]) -> Subject? {
 		guard case let .lesson(lesson) = SchoolStateEngine.calculate(
 			at: TimetableClock.now,
-			subjects: timetable
+			subjects: timetable,
+			calendar: SchoolCalendarProjection.perthCalendar,
+			schoolCalendar: schoolCalendar
 		) else {
 			return nil
 		}

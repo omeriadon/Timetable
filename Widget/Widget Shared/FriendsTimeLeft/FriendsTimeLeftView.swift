@@ -84,7 +84,7 @@ struct FriendsTimeLeftView: View {
 	let schedules: [ScheduleItem]
 
 	var body: some View {
-		let owner = entry.ownerSchedule ?? ScheduleItem(name: "You", currentState: .noTimetable, backgroundColour: .black)
+		let owner = entry.ownerSchedule ?? ScheduleItem(name: "You", currentState: .noTimetable, nextScheduledSubject: nil, backgroundColour: .black)
 
 		return VStack(alignment: .leading, spacing: 0) {
 			FriendsCurrentRow(schedule: owner, now: TimetableClock.adjusted(entry.date))
@@ -134,25 +134,24 @@ private struct FriendsCurrentRow: View {
 
 	@ViewBuilder
 	private var currentTimer: some View {
+		if let target = countdownTarget {
+			Text(timerInterval: now ... target, countsDown: true, showsHours: true)
+				.font(.system(size: 18, weight: .regular, design: .monospaced))
+				.monospacedDigit()
+		} else {
+			Text("—")
+				.font(.system(size: 18, design: .monospaced))
+		}
+	}
+
+	private var countdownTarget: Date? {
 		switch schedule.currentState {
-			case let .lesson(lesson):
-				Text(timerInterval: now ... lesson.interval.end, countsDown: true, showsHours: false)
-					.font(.system(size: 18, weight: .regular, design: .monospaced))
-					.monospacedDigit()
-			case let .freePeriod(period):
-				Text(timerInterval: now ... period.interval.end, countsDown: true, showsHours: false)
-					.font(.system(size: 18, weight: .regular, design: .monospaced))
-					.monospacedDigit()
-			case let .recess(state), let .lunch(state):
-				Text(timerInterval: now ... state.interval.end, countsDown: true, showsHours: false)
-					.font(.system(size: 18, weight: .regular, design: .monospaced))
-					.monospacedDigit()
-			case .afterSchool, .weekend, .noTimetable:
-				Text("—")
-					.font(.system(size: 18, design: .monospaced))
-			case let .beforeSchool(next):
-				Text(timerInterval: now ... next.interval.start, countsDown: true)
-					.font(.system(size: 18, design: .monospaced))
+			case let .beforeSchool(next): next.interval.start
+			case let .lesson(lesson): lesson.interval.end
+			case let .freePeriod(period): period.interval.end
+			case let .recess(state), let .lunch(state): state.interval.end
+			case .afterSchool, .weekend: schedule.nextScheduledSubject?.interval.start
+			case .noTimetable: nil
 		}
 	}
 
@@ -186,7 +185,12 @@ private struct FriendsCurrentRow: View {
 			case let .lesson(lesson): lesson.next.title
 			case let .freePeriod(period): period.next.title
 			case let .recess(state), let .lunch(state): state.next.title
-			case .afterSchool, .weekend: "No more classes"
+			case .afterSchool, .weekend:
+				if let next = schedule.nextScheduledSubject {
+					"Next: \(next.subject.id.capitalized)"
+				} else {
+					"No more classes"
+				}
 			case .noTimetable: "Sync a timetable"
 		}
 	}

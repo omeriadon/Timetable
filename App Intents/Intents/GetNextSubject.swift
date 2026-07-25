@@ -9,7 +9,12 @@ struct GetNextSubjectIntent: SnippetIntent {
 
 	@MainActor
 	func perform() async -> some IntentResult & ProvidesDialog & ReturnsValue<SubjectEntity?> & ShowsSnippetView {
-		guard let scheduled = SchoolStateEngine.nextSubject(after: TimetableClock.now, subjects: Defaults[.timetable]) else {
+		guard let scheduled = SchoolStateEngine.nextScheduledSubject(
+			after: TimetableClock.now,
+			subjects: Defaults[.timetable],
+			calendar: SchoolCalendarProjection.perthCalendar,
+			schoolCalendar: Defaults[.schoolCalendar]
+		) else {
 			return .result(value: nil, dialog: "You have no more subjects today.", view: IntentSummaryView(title: "No More Subjects", detail: "There are no scheduled subjects left today."))
 		}
 

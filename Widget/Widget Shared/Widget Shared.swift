@@ -15,13 +15,14 @@ import WidgetKit
 struct Provider: TimelineProvider {
 	func placeholder(in _: Context) -> TimetableEntry {
 		let date = placeholderSchoolDate()
+		let schoolCalendar = Defaults[.schoolCalendar]
 		return TimetableEntry(
 			date: date,
 			subjects: debugTimetable,
-			ownerSchedule: scheduleItem(name: "You", subjects: debugTimetable, at: date),
+			ownerSchedule: scheduleItem(name: "You", subjects: debugTimetable, at: date, schoolCalendar: schoolCalendar),
 			friendSchedules: [
-				scheduleItem(name: "Alex", subjects: debugTimetable, at: date),
-				scheduleItem(name: "Sam", subjects: debugTimetable, at: date),
+				scheduleItem(name: "Alex", subjects: debugTimetable, at: date, schoolCalendar: schoolCalendar),
+				scheduleItem(name: "Sam", subjects: debugTimetable, at: date, schoolCalendar: schoolCalendar),
 			],
 			isPlaceholder: true,
 			relevance: nil
@@ -31,12 +32,13 @@ struct Provider: TimelineProvider {
 	func getSnapshot(in _: Context, completion: @escaping (TimetableEntry) -> Void) {
 		let subjects = Defaults[.timetable]
 		let receivedTimetables = Defaults[.receivedTimetables]
+		let schoolCalendar = Defaults[.schoolCalendar]
 		completion(
 			TimetableEntry(
 				date: .now,
 				subjects: subjects,
-				ownerSchedule: scheduleItem(name: "You", subjects: subjects, at: .now),
-				friendSchedules: friendSchedules(for: receivedTimetables, at: .now),
+				ownerSchedule: scheduleItem(name: "You", subjects: subjects, at: .now, schoolCalendar: schoolCalendar),
+				friendSchedules: friendSchedules(for: receivedTimetables, at: .now, schoolCalendar: schoolCalendar),
 				isPlaceholder: false,
 				relevance: nil
 			)
@@ -46,25 +48,29 @@ struct Provider: TimelineProvider {
 	func getTimeline(in _: Context, completion: @escaping (Timeline<TimetableEntry>) -> Void) {
 		let subjects = Defaults[.timetable]
 		let receivedTimetables = Defaults[.receivedTimetables]
+		let schoolCalendar = Defaults[.schoolCalendar]
 
-		let calendar = Calendar.current
+		let calendar = SchoolCalendarProjection.perthCalendar
+		let now = TimetableClock.now
 
-		guard let schoolDay = nextSchoolDay(from: TimetableClock.now, calendar: calendar) else {
+		guard let schoolDay = nextSchoolDay(from: now, calendar: calendar, schoolCalendar: schoolCalendar) else {
 			completion(
 				Timeline(
 					entries: [
-						makeEntry(date: .now, subjects: subjects, receivedTimetables: receivedTimetables, calendar: calendar),
+						makeEntry(date: now, subjects: subjects, receivedTimetables: receivedTimetables, calendar: calendar, schoolCalendar: schoolCalendar),
 					],
-					policy: .after(Date().addingTimeInterval(60 * 60))
+					policy: .after(now.addingTimeInterval(60 * 60))
 				)
 			)
 			return
 		}
 
-		var entries: [TimetableEntry] = []
+		var entries: [TimetableEntry] = [
+			makeEntry(date: now, subjects: subjects, receivedTimetables: receivedTimetables, calendar: calendar, schoolCalendar: schoolCalendar),
+		]
 
 		guard
-			let dayIndex = schoolDayIndex(for: schoolDay, calendar: calendar),
+			let dayIndex = schoolCalendar.dayIndex(for: schoolDay, calendar: calendar),
 			let schoolStart = calendar.date(
 				bySettingHour: SchoolStateEngine.schoolStart.hour,
 				minute: SchoolStateEngine.schoolStart.minute,
@@ -92,7 +98,7 @@ struct Provider: TimelineProvider {
 		}
 
 		entries.append(
-			makeEntry(date: preSchool, subjects: subjects, receivedTimetables: receivedTimetables, calendar: calendar)
+			makeEntry(date: preSchool, subjects: subjects, receivedTimetables: receivedTimetables, calendar: calendar, schoolCalendar: schoolCalendar)
 		)
 
 		for period in SchoolStateEngine.activePeriods(for: dayIndex) {
@@ -103,7 +109,7 @@ struct Provider: TimelineProvider {
 				of: schoolDay
 			) {
 				entries.append(
-					makeEntry(date: start, subjects: subjects, receivedTimetables: receivedTimetables, calendar: calendar)
+					makeEntry(date: start, subjects: subjects, receivedTimetables: receivedTimetables, calendar: calendar, schoolCalendar: schoolCalendar)
 				)
 			}
 
@@ -114,13 +120,13 @@ struct Provider: TimelineProvider {
 				of: schoolDay
 			) {
 				entries.append(
-					makeEntry(date: end, subjects: subjects, receivedTimetables: receivedTimetables, calendar: calendar)
+					makeEntry(date: end, subjects: subjects, receivedTimetables: receivedTimetables, calendar: calendar, schoolCalendar: schoolCalendar)
 				)
 			}
 		}
 
 		entries.append(
-			makeEntry(date: refreshAfterSchool, subjects: subjects, receivedTimetables: receivedTimetables, calendar: calendar)
+			makeEntry(date: refreshAfterSchool, subjects: subjects, receivedTimetables: receivedTimetables, calendar: calendar, schoolCalendar: schoolCalendar)
 		)
 
 		completion(
@@ -142,6 +148,7 @@ nonisolated struct ScheduleItem: Identifiable {
 	let name: String
 
 	let currentState: SchoolState
+	let nextScheduledSubject: ScheduledSubject?
 	let backgroundColour: Color
 }
 
@@ -162,13 +169,14 @@ private func makeEntry(
 	date: Date,
 	subjects: [Subject],
 	receivedTimetables: [ReceivedTimetable],
-	calendar: Calendar
+	calendar: Calendar,
+	schoolCalendar: SchoolCalendarProjection
 ) -> TimetableEntry {
 	TimetableEntry(
 		date: date,
 		subjects: subjects,
-		ownerSchedule: scheduleItem(name: "You", subjects: subjects, at: date),
-		friendSchedules: friendSchedules(for: receivedTimetables, at: date),
+		ownerSchedule: scheduleItem(name: "You", subjects: subjects, at: date, schoolCalendar: schoolCalendar),
+		friendSchedules: friendSchedules(for: receivedTimetables, at: date, schoolCalendar: schoolCalendar),
 		isPlaceholder: false,
 		relevance: relevance(for: date, calendar: calendar)
 	)
@@ -185,15 +193,24 @@ private func placeholderSchoolDate(calendar: Calendar = .current) -> Date {
 
 private func friendSchedules(
 	for receivedTimetables: [ReceivedTimetable],
-	at date: Date
+	at date: Date,
+	schoolCalendar: SchoolCalendarProjection
 ) -> [ScheduleItem] {
 	receivedTimetables.map { timetable in
-		scheduleItem(name: timetable.sender, subjects: timetable.subjects, at: date)
+		scheduleItem(name: timetable.sender, subjects: timetable.subjects, at: date, schoolCalendar: schoolCalendar)
 	}
 }
 
-private func scheduleItem(name: String, subjects: [Subject], at date: Date) -> ScheduleItem {
-	let state = SchoolStateEngine.calculate(at: TimetableClock.adjusted(date), subjects: subjects)
+private func scheduleItem(name: String, subjects: [Subject], at date: Date, schoolCalendar: SchoolCalendarProjection) -> ScheduleItem {
+	let calendar = SchoolCalendarProjection.perthCalendar
+	let adjustedDate = TimetableClock.adjusted(date)
+	let state = SchoolStateEngine.calculate(at: adjustedDate, subjects: subjects, calendar: calendar, schoolCalendar: schoolCalendar)
+	let nextScheduledSubject = SchoolStateEngine.nextScheduledSubject(
+		after: adjustedDate,
+		subjects: subjects,
+		calendar: calendar,
+		schoolCalendar: schoolCalendar
+	)
 
 	let backgroundColour: Color = switch state {
 		case let .beforeSchool(next): next.subject.colour.swiftUIColor
@@ -203,21 +220,24 @@ private func scheduleItem(name: String, subjects: [Subject], at date: Date) -> S
 		case .afterSchool, .weekend, .noTimetable: .black
 	}
 
-	return ScheduleItem(name: name, currentState: state, backgroundColour: backgroundColour)
+	return ScheduleItem(name: name, currentState: state, nextScheduledSubject: nextScheduledSubject, backgroundColour: backgroundColour)
 }
 
 // MARK: - nextSchoolDay
 
 private func nextSchoolDay(
 	from date: Date,
-	calendar: Calendar
+	calendar: Calendar,
+	schoolCalendar: SchoolCalendarProjection
 ) -> Date? {
 	var day = calendar.startOfDay(for: date)
 
-	for _ in 0 ..< 7 {
-		let weekday = calendar.component(.weekday, from: day)
-
-		if (2 ... 6).contains(weekday) {
+	for _ in 0 ..< 370 {
+		if schoolCalendar.isSchoolDay(day, calendar: calendar),
+		   let dayIndex = schoolCalendar.dayIndex(for: day, calendar: calendar),
+		   let schoolEnd = calendar.date(bySettingHour: SchoolStateEngine.schoolEnd(for: dayIndex).hour, minute: SchoolStateEngine.schoolEnd(for: dayIndex).minute, second: 0, of: day),
+		   date < schoolEnd
+		{
 			return day
 		}
 
@@ -241,14 +261,14 @@ private func relevance(
 	for date: Date,
 	calendar: Calendar
 ) -> TimelineEntryRelevance? {
-	let weekday = calendar.component(.weekday, from: date)
+	let schoolCalendar = Defaults[.schoolCalendar]
 
-	guard (2 ... 6).contains(weekday) else {
+	guard schoolCalendar.isSchoolDay(date, calendar: calendar) else {
 		return TimelineEntryRelevance(score: 0, duration: 0)
 	}
 
 	guard
-		let dayIndex = schoolDayIndex(for: date, calendar: calendar),
+		let dayIndex = schoolCalendar.dayIndex(for: date, calendar: calendar),
 		let schoolStart = calendar.date(
 			bySettingHour: SchoolStateEngine.schoolStart.hour,
 			minute: SchoolStateEngine.schoolStart.minute,
@@ -278,10 +298,4 @@ private func relevance(
 	}
 
 	return TimelineEntryRelevance(score: 0, duration: 0)
-}
-
-private func schoolDayIndex(for date: Date, calendar: Calendar) -> Int? {
-	let weekday = calendar.component(.weekday, from: date)
-	guard (2 ... 6).contains(weekday) else { return nil }
-	return weekday - 2
 }

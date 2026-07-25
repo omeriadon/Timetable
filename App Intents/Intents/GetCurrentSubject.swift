@@ -24,9 +24,15 @@ struct GetCurrentSubjectIntent: SnippetIntent {
 	@MainActor
 	func perform() async -> some IntentResult & ProvidesDialog & ShowsSnippetView {
 		let subjects = Defaults[.timetable]
+		let schoolCalendar = Defaults[.schoolCalendar]
 
 		let adjustedNow = TimetableClock.now
-		let state = SchoolStateEngine.calculate(at: adjustedNow, subjects: subjects)
+		let state = SchoolStateEngine.calculate(
+			at: adjustedNow,
+			subjects: subjects,
+			calendar: SchoolCalendarProjection.perthCalendar,
+			schoolCalendar: schoolCalendar
+		)
 
 		let text: String = switch state {
 			case .beforeSchool:
@@ -45,7 +51,7 @@ struct GetCurrentSubjectIntent: SnippetIntent {
 				"No Timetable"
 		}
 
-		return .result(dialog: IntentDialog(stringLiteral: text), view: GetCurrentSubjectIntentView(state: state, now: adjustedNow, subjects: subjects))
+		return .result(dialog: IntentDialog(stringLiteral: text), view: GetCurrentSubjectIntentView(state: state, now: adjustedNow, subjects: subjects, schoolCalendar: schoolCalendar))
 	}
 }
 
@@ -54,6 +60,7 @@ struct GetCurrentSubjectIntentView: View {
 
 	let now: Date
 	let subjects: [Subject]
+	let schoolCalendar: SchoolCalendarProjection
 
 	var body: some View {
 		ZStack {
@@ -107,7 +114,12 @@ struct GetCurrentSubjectIntentView: View {
 							.font(.title)
 							.padding(.bottom)
 
-						if let next = SchoolStateEngine.nextSubjectOnFollowingSchoolDay(after: now, subjects: subjects) {
+						if let next = SchoolStateEngine.nextScheduledSubject(
+							after: now,
+							subjects: subjects,
+							calendar: SchoolCalendarProjection.perthCalendar,
+							schoolCalendar: schoolCalendar
+						) {
 							Text("Next: \(next.subject.id)")
 								.foregroundStyle(.secondary)
 						} else {
