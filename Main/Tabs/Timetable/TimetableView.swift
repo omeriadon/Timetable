@@ -30,6 +30,9 @@ struct TimetableView: View {
 	@State private var showTimetableComparison = false
 	@State private var selectedSlot: Slot? = nil
 
+	@State private var currentTab: Int = 0
+	@State private var scrollPosition: Int?
+
 	#if os(iOS)
 		init(
 			watchSync: Binding<PhoneWatchSyncBridge>,
@@ -58,9 +61,60 @@ struct TimetableView: View {
 	#endif
 
 	var body: some View {
+		NavigationStack {
+			TabsPicker(
+				items: [
+					("Week", "7.calendar"),
+					("Today", "calendar.day.timeline.left"),
+					("Events", "calendar.day"),
+					("Dates", "flag"),
+				],
+				selection: $currentTab
+			)
+			.padding(.horizontal, 10)
+			.frame(height: 36)
+			.padding(.bottom, 5)
+
+			ScrollView(.horizontal) {
+				HStack(spacing: 0) {
+					mainView
+						.containerRelativeFrame(.horizontal)
+						.id(0)
+
+					Text("monkey")
+						.containerRelativeFrame(.horizontal)
+						.id(1)
+
+					Text("baboon")
+						.containerRelativeFrame(.horizontal)
+						.id(2)
+
+					Text("gorilla")
+						.containerRelativeFrame(.horizontal)
+						.id(3)
+				}
+				.scrollTargetLayout()
+			}
+			.scrollTargetBehavior(.paging)
+			.scrollIndicators(.hidden)
+			.scrollPosition(id: $scrollPosition)
+			.onChange(of: currentTab) { _, newValue in
+				withAnimation {
+					scrollPosition = newValue
+				}
+			}
+			.onChange(of: scrollPosition) { _, newValue in
+				if let newValue {
+					currentTab = newValue
+				}
+			}
+		}
+	}
+
+	private var mainView: some View {
 		let subjectLookup = TimetableLayout.subjectLookup(for: selectedTimetable?.subjects ?? subjects)
 
-		NavigationStack {
+		return NavigationStack {
 			VStack {
 				ScrollView {
 					let subject: Subject? = if let selectedSlot, let subject = subjectLookup[selectedSlot] {
@@ -164,6 +218,23 @@ struct TimetableView: View {
 					.scrollEdgeEffectStyle(.soft, for: .bottom)
 					.scrollEdgeEffectStyle(.none, for: .top)
 			}
+			.padding(.trailing, 2)
+			.dynamicTypeSize(.medium)
+			.onReceive(NotificationCenter.default.publisher(for: .openTimetableTab)) { _ in
+				selectedSlot = nil
+			}
+			.onReceive(NotificationCenter.default.publisher(for: .openTimetableDestination)) { notification in
+				guard let destination = notification.object as? TimetableDeepLink else { return }
+				switch destination {
+					case let .timetable(id):
+						selectedTimetable = id.flatMap { received in receivedTimetables.first { $0.id == received && !$0.isDeleted } }
+						selectedSlot = nil
+					case let .subject(timetableID, subjectID, slot):
+						selectedTimetable = timetableID.flatMap { received in receivedTimetables.first { $0.id == received && !$0.isDeleted } }
+						let subjects = selectedTimetable?.subjects ?? subjects
+						selectedSlot = slot ?? subjects.first(where: { $0.id == subjectID })?.slots.first
+				}
+			}
 			#if os(iOS)
 			.onAppear {
 				watchSync.activateIfNeeded()
@@ -182,23 +253,6 @@ struct TimetableView: View {
 						}
 					}
 			#endif
-		}
-		.padding(.trailing, 2)
-		.dynamicTypeSize(.medium)
-		.onReceive(NotificationCenter.default.publisher(for: .openTimetableTab)) { _ in
-			selectedSlot = nil
-		}
-		.onReceive(NotificationCenter.default.publisher(for: .openTimetableDestination)) { notification in
-			guard let destination = notification.object as? TimetableDeepLink else { return }
-			switch destination {
-				case let .timetable(id):
-					selectedTimetable = id.flatMap { received in receivedTimetables.first { $0.id == received && !$0.isDeleted } }
-					selectedSlot = nil
-				case let .subject(timetableID, subjectID, slot):
-					selectedTimetable = timetableID.flatMap { received in receivedTimetables.first { $0.id == received && !$0.isDeleted } }
-					let subjects = selectedTimetable?.subjects ?? subjects
-					selectedSlot = slot ?? subjects.first(where: { $0.id == subjectID })?.slots.first
-			}
 		}
 	}
 
