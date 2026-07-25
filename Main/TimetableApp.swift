@@ -77,7 +77,7 @@ struct TimetableApp: App {
 						switch sessionStore.state {
 							case .signedOut:
 								ZStack {
-									if hasCompletedOnboarding {
+									if Platform.current == .iPadOS || hasCompletedOnboarding {
 										IOSSignInGateView()
 											.transition(.blurReplace)
 									} else {
@@ -155,7 +155,8 @@ struct TimetableApp: App {
 			}
 			#if os(iOS)
 			.fullScreenCover(isPresented: .constant(
-				!hasCompletedOnboarding
+				Platform.current == .iOS
+					&& !hasCompletedOnboarding
 			)) {
 				OnboardingView()
 					.interactiveDismissDisabled()
@@ -419,14 +420,16 @@ struct TimetableApp: App {
 						.lineLimit(3)
 				}
 				.safeAreaBar(edge: .bottom) {
-					Button("Create an Account") {
-						onboardingPageID = ""
-						hasCompletedOnboarding = false
+					if Platform.current.allowsAccountCreation {
+						Button("Create an Account") {
+							onboardingPageID = ""
+							hasCompletedOnboarding = false
+						}
+						.buttonStyle(.glassProminent)
+						.controlSize(.large)
+						.buttonSizing(.flexible)
+						.padding(.horizontal, 20)
 					}
-					.buttonStyle(.glassProminent)
-					.controlSize(.large)
-					.buttonSizing(.flexible)
-					.padding(.horizontal, 20)
 				}
 			}
 		}
