@@ -51,17 +51,27 @@ private struct TodayCountdown: View {
 
 	var body: some View {
 		if let next = SchoolStateEngine.nextScheduledSubject(after: now, subjects: subjects, schoolCalendar: schoolCalendar) {
-			ContentUnavailableView {
+			VStack(spacing: 20) {
 				Label("Nothing Scheduled Today", systemImage: "calendar")
-			} description: {
-				VStack(spacing: 8) {
-					Text("Next class: \(next.subject.id)")
-					Text(timerInterval: now ... next.interval.start, countsDown: true, showsHours: true)
-						.font(.title3.monospacedDigit())
-				}
+					.font(.title)
+					.tint(.accent)
+
+				Text("Next class: \(next.subject.id)")
+
+				Text(timerInterval: now ... next.interval.start, countsDown: true, showsHours: true)
+					.font(.title3)
+					.contentTransition(.numericText())
+					.animation(.easeInOut, value: now)
+					.foregroundStyle(.white)
+					.padding()
+					.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 15))
 			}
+
+			.padding(.top, 40)
+
 		} else {
 			ContentUnavailableView("Nothing Scheduled", systemImage: "calendar")
+				.padding(.top, 40)
 		}
 	}
 }

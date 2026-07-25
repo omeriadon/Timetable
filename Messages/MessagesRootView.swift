@@ -34,20 +34,6 @@ struct MessagesRootView: View {
 				.frame(maxWidth: .infinity, maxHeight: .infinity)
 				.background(.background)
 				.animation(.easeInOut(duration: 0.2), value: model.status)
-				.alert(
-					"Save \(model.importPrompt?.title ?? "Shared Timetable")?",
-					isPresented: Binding(
-						get: { model.importPrompt != nil },
-						set: { isPresented in
-							if !isPresented {
-								model.dismissImport()
-							}
-						}
-					)
-				) {
-					Button("Cancel", role: .cancel, action: model.dismissImport)
-					Button("Save", action: model.importTimetable)
-				}
 			} else {
 				ContentUnavailableView("Timetable is not shareable", systemImage: "calendar.badge.lock", description: Text("Go to settings and enable searching this timetable."))
 					.foregroundStyle(.red)

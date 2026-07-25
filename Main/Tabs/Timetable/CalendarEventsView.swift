@@ -35,6 +35,7 @@ struct CalendarEventsView: View {
 			CalendarEventEditor(scope: scope) { request in
 				try await eventService.createEvent(request, globally: scope == .globalEvent)
 			}
+			.presentationDetents([.fraction(0.5)])
 		}
 	}
 
@@ -113,9 +114,18 @@ private struct CalendarEventEditor: View {
 			}
 			.appNavigationTitle(scope.title)
 			.toolbar {
-				ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.disabled(isSaving) }
+				ToolbarItem(placement: .cancellationAction) {
+					Button(role: .cancel) {
+						dismiss()
+					}
+					.disabled(isSaving)
+				}
 				ToolbarItem(placement: .confirmationAction) {
-					Button("Add") { submit() }.disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSaving)
+					Button("Add", systemImage: "plus", role: .confirm) {
+						submit()
+					}
+					.buttonStyle(.glassProminent)
+					.disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSaving)
 				}
 			}
 		}
