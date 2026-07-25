@@ -1914,6 +1914,7 @@
       }
     },
     "Registering this installation with Apple Push Notification service." : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -2972,6 +2973,7 @@
       }
     },
     "This device is ready for push services." : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {

@@ -159,6 +159,21 @@
 			);
 			target = 2AA6DF132FDFAC8F00BBC70E /* Widget */;
 		};
+		2A454119301486A700C21756 /* Exceptions for "Widget" folder in "Timetable iPad" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Widget Shared/FriendsTimeLeft/FriendsTimeLeftView.swift",
+				"Widget Shared/FriendsTimeLeft/FriendsTimeLeftWidget.swift",
+				"Widget Shared/Live Activity/SchoolDayActivityAttributes.swift",
+				"Widget Shared/Live Activity/SchoolDayLiveActivityWidget.swift",
+				"Widget Shared/Live Activity/StaticIrregularGradient.swift",
+				"Widget Shared/SharedWidgetBundle.swift",
+				"Widget Shared/WeeklySchedule/WeeklyScheduleView.swift",
+				"Widget Shared/WeeklySchedule/WeeklyScheduleWidget.swift",
+				"Widget Shared/Widget Shared.swift",
+			);
+			target = 2B2000013000000000000001 /* Timetable iPad */;
+		};
 		2AA9C7BD2FEE72DC00AD87A8 /* Exceptions for "Widget" folder in "Timetable" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -403,6 +418,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				2AA9C7BD2FEE72DC00AD87A8 /* Exceptions for "Widget" folder in "Timetable" target */,
+				2A454119301486A700C21756 /* Exceptions for "Widget" folder in "Timetable iPad" target */,
 				2AD85A6F2FE8F219004EAB2B /* Exceptions for "Widget" folder in "Watch Widget" target */,
 				2AD85A702FE8F219004EAB2B /* Exceptions for "Widget" folder in "Widget" target */,
 				2AA9C7C22FEE7C5400AD87A8 /* Exceptions for "Widget" folder in "Watch" target */,
