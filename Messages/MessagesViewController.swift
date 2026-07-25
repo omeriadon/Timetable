@@ -46,25 +46,11 @@ final class MessagesViewController: MSMessagesAppViewController {
 			showStatus("Open Timetable and finish syncing before sharing.", success: false)
 			return
 		}
-		let title = suite.string(forKey: "userDisplayName").map { "\($0)'s Timetable" } ?? "Shared Timetable"
-		let previewTitle = String(title.prefix(80))
 		let locator = suite.string(forKey: "ownerTimetableShareAlias").flatMap { $0.isEmpty ? nil : $0 } ?? id.uuidString
-		var components = URLComponents(string: "https://timetable.adonis.pt/share/\(locator)")!
-		components.queryItems = [
-			URLQueryItem(name: "title", value: previewTitle),
-			URLQueryItem(name: "sharedAt", value: ISO8601DateFormatter().string(from: .now)),
-		]
-		let layout = MSMessageTemplateLayout()
-		layout.caption = previewTitle
-		layout.subcaption = "Tap to preview and save this timetable"
-		layout.image = UIImage(systemName: "calendar.day.timeline.left")?.withTintColor(.systemBlue, renderingMode: .alwaysOriginal)
-		let message = MSMessage(session: MSSession())
-		message.layout = layout
-		message.url = components.url
-		message.summaryText = previewTitle
-		activeConversation?.insert(message) { [weak self] error in
+		let url = URL(string: "https://timetable.adonis.pt/share/\(locator)")!
+		activeConversation?.insertText(url.absoluteString) { [weak self] error in
 			DispatchQueue.main.async {
-				self?.showStatus(error == nil ? "Timetable added to the message." : "Unable to add timetable.", success: error == nil)
+				self?.showStatus(error == nil ? "Link added to the message." : "Unable to add link.", success: error == nil)
 			}
 		}
 	}
