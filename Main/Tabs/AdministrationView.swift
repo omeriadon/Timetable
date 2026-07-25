@@ -59,10 +59,12 @@ struct AdministrationView: View {
 
 	private func save(_ request: AdministrationCalendarEntryRequest, existingID: UUID?) async throws {
 		entries = try await service.save(request, id: existingID)
+		try await SchoolCalendarSyncService.shared.downloadCalendar()
 	}
 
 	private func delete(_ id: UUID) async throws {
 		entries = try await service.delete(id: id)
+		try await SchoolCalendarSyncService.shared.downloadCalendar()
 	}
 }
 
