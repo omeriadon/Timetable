@@ -116,7 +116,7 @@ extension Notification.Name {
 			context.coordinator.tabBarController = tabBarController
 
 			tabBarController.tabs = [
-				UITab(title: "Timetable", image: UIImage(systemName: "calendar"), identifier: "timetable") { _ in
+				UITab(title: "Timetable", image: UIImage(systemName: "calendar.day.timeline.left"), identifier: "timetable") { _ in
 					UIHostingController(rootView: TimetableView(watchSync: $watchSync, syncStatus: $rootSyncStatus))
 				},
 				UITab(title: "Share", image: makeCustomShareImage(), identifier: prominentTabIdentifier) { _ in

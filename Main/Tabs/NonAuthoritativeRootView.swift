@@ -15,7 +15,7 @@ struct NonAuthoritativeRootView: View {
 
 	var body: some View {
 		TabView(selection: $selectedTab) {
-			Tab("Timetable", systemImage: "calendar", value: 0) {
+			Tab("Timetable", systemImage: "calendar.day.timeline.left", value: 0) {
 				#if os(iOS)
 					TimetableView(watchSync: $watchSync, syncStatus: $syncStatus)
 				#else
