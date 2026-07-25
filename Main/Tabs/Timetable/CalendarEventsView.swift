@@ -36,12 +36,6 @@ struct DatesView: View {
 				eventRows(events.privateEvents)
 				Button("Add Personal Event", systemImage: "plus") { editorTarget = .create(.privateEvent) }
 			}
-
-			if events.canManageGlobalEvents {
-				Section("School Administration") {
-					Button("Add School Event", systemImage: "plus") { editorTarget = .create(.globalEvent) }
-				}
-			}
 		}
 		.sheet(item: $editorTarget) { target in
 			CalendarEventEditor(target: target, canManageGlobalEvents: events.canManageGlobalEvents) { request, event in

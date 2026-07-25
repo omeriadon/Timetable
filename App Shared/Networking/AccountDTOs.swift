@@ -52,6 +52,11 @@ nonisolated struct CreateCalendarEventRequest: Codable, Sendable {
 	let date: SchoolCalendarDate
 }
 
+nonisolated struct AdministrationDashboardResponse: Codable, Sendable { let isAdmin: Bool }
+nonisolated struct AdministrationUserResponse: Codable, Identifiable, Sendable { let id: UUID; let displayName: String; let email: String?; let createdAt: Date? }
+nonisolated struct AdministrationCalendarEntry: Codable, Identifiable, Sendable { let id: UUID; let kind: String; let label: String; let startDate: SchoolCalendarDate; let endDate: SchoolCalendarDate? }
+nonisolated struct AdministrationCalendarEntryRequest: Codable, Sendable { let kind: String; let label: String; let startDate: SchoolCalendarDate; let endDate: SchoolCalendarDate? }
+
 nonisolated struct NotificationSettingsUpdateRequest: Codable, Sendable {
 	let notificationsEnabled: Bool
 	let broadcastNotificationsEnabled: Bool

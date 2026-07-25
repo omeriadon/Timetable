@@ -12,8 +12,13 @@ struct TodayTimetableView: View {
 				VStack(alignment: .leading, spacing: 16) {
 					Text(now.formatted(.dateTime.weekday(.wide).day().month(.wide)))
 						.font(.title2.bold())
+
 					if !todayEvents(at: now).isEmpty {
-						Section("Events") {
+						VStack(alignment: .center) {
+							Text("Events")
+								.bold()
+								.frame(alignment: .leading)
+
 							ForEach(todayEvents(at: now)) { event in
 								Label {
 									VStack(alignment: .leading) {
@@ -22,18 +27,33 @@ struct TodayTimetableView: View {
 											Text(notes).font(.footnote).foregroundStyle(.secondary)
 										}
 									}
-								} icon: { Image(systemName: event.symbol) }
-									.padding(.vertical, 4)
+								} icon: {
+									Image(systemName: event.symbol)
+										.foregroundStyle(.accent)
+								}
+								.padding(.vertical, 4)
 							}
 						}
+						.padding(10)
+						.background {
+							Image("paper")
+								.clipShape(RoundedRectangle(cornerRadius: 10))
+						}
+						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
+						GroupBox {} label: {
+							Text("Events")
+								.bold()
+						}
 					}
+
 					if let dayIndex = schoolCalendar.dayIndex(for: now), schoolCalendar.isSchoolDay(now), !subjects.isEmpty {
 						TodaySchoolTimeline(subjects: subjects, dayIndex: dayIndex, now: now)
 					} else if todayEvents(at: now).isEmpty {
 						TodayCountdown(subjects: subjects, schoolCalendar: schoolCalendar, now: now)
 					}
 				}
-				.frame(maxWidth: .infinity, alignment: .leading)
+				.padding()
+				.frame(maxWidth: .infinity, alignment: .center)
 			}
 		}
 	}

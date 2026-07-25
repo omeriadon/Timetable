@@ -29,6 +29,7 @@ import SwiftUI
 		case share
 		case settings
 		case search
+		case administration
 	}
 
 	struct ContentView: View {
@@ -128,6 +129,7 @@ extension Notification.Name {
 				UITab(title: "Search", image: UIImage(systemName: "magnifyingglass"), identifier: "search") { _ in
 					UIHostingController(rootView: TimetableSearchView())
 				},
+				UITab(title: "Administration", image: UIImage(systemName: "shield"), identifier: "administration") { _ in UIHostingController(rootView: AdministrationView()) },
 			]
 
 			tabBarController.selectedTab = tabBarController.tabs.first
@@ -242,6 +244,7 @@ extension Notification.Name {
 				parent.selectedTab = switch tabBarController.selectedTab?.identifier {
 					case "settings": .settings
 					case "search": .search
+					case "administration": .administration
 					default: .timetable
 				}
 			}
@@ -253,6 +256,7 @@ extension Notification.Name {
 					case .share: parent.prominentTabIdentifier
 					case .settings: "settings"
 					case .search: "search"
+					case .administration: "administration"
 				}
 				guard let target = tabBarController.tabs.first(where: { $0.identifier == identifier }) else { return }
 				if tabBarController.selectedTab?.identifier != target.identifier {
