@@ -5,6 +5,7 @@
 //   Created by Adon Omeri on 13/5/2026.
 //
 
+import Defaults
 import SwiftUI
 
 #if os(iOS)
@@ -101,6 +102,7 @@ extension Notification.Name {
 		@Binding var rootSyncStatus: SyncMode
 		@Binding var isBlurred: Bool
 		@Binding var showShareSelection: Bool
+		@Default(.calendarEvents) private var calendarEvents
 
 		let prominentTabIdentifier = "prominent-share-action"
 
@@ -116,7 +118,7 @@ extension Notification.Name {
 			tabBarController.delegate = context.coordinator
 			context.coordinator.tabBarController = tabBarController
 
-			tabBarController.tabs = [
+			var tabs = [
 				UITab(title: "Timetable", image: UIImage(systemName: "calendar.day.timeline.left"), identifier: "timetable") { _ in
 					UIHostingController(rootView: TimetableView(watchSync: $watchSync, syncStatus: $rootSyncStatus))
 				},
@@ -129,8 +131,13 @@ extension Notification.Name {
 				UITab(title: "Search", image: UIImage(systemName: "magnifyingglass"), identifier: "search") { _ in
 					UIHostingController(rootView: TimetableSearchView())
 				},
-				UITab(title: "Administration", image: UIImage(systemName: "shield"), identifier: "administration") { _ in UIHostingController(rootView: AdministrationView()) },
 			]
+			if calendarEvents.canManageGlobalEvents {
+				tabs.append(UITab(title: "Administration", image: UIImage(systemName: "shield"), identifier: "administration") { _ in
+					UIHostingController(rootView: AdministrationView())
+				})
+			}
+			tabBarController.tabs = tabs
 
 			tabBarController.selectedTab = tabBarController.tabs.first
 			if #available(iOS 27.0, *) {
@@ -140,8 +147,19 @@ extension Notification.Name {
 			return tabBarController
 		}
 
-		func updateUIViewController(_: UITabBarController, context: Context) {
+		func updateUIViewController(_ tabBarController: UITabBarController, context: Context) {
 			context.coordinator.parent = self
+			let hasAdministrationTab = tabBarController.tabs.contains { $0.identifier == "administration" }
+			if calendarEvents.canManageGlobalEvents != hasAdministrationTab {
+				if calendarEvents.canManageGlobalEvents {
+					tabBarController.tabs.append(UITab(title: "Administration", image: UIImage(systemName: "shield"), identifier: "administration") { _ in
+						UIHostingController(rootView: AdministrationView())
+					})
+				} else {
+					tabBarController.tabs.removeAll { $0.identifier == "administration" }
+					if selectedTab == .administration { selectedTab = .timetable }
+				}
+			}
 			context.coordinator.selectTab(selectedTab)
 		}
 
