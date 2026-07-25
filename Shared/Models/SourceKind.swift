@@ -9,5 +9,5 @@ import Defaults
 
 nonisolated enum SourceKind: String, Codable, Defaults.Serializable, Hashable {
 	case accountOwner
-	case authoredForThirdParty
+	case createdForThirdParty
 }

@@ -29,7 +29,7 @@ enum Platform: String, Codable, Sendable, CaseIterable {
 		self == .iOS
 	}
 
-	var allowsAuthoredTimetableMutation: Bool {
+	var allowsCreatedTimetableMutation: Bool {
 		self == .iOS
 	}
 

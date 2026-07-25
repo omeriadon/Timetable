@@ -121,11 +121,11 @@ import WidgetKit
 				}
 			}
 
-			Section("Authored Timetables") {
+			Section("Created Timetables") {
 				if sessionStore.isAuthenticated {
-					NavigationLink { AuthoredTimetablesSettingsView() } label: { Label("Manage Authored Timetables", systemImage: "person.2.crop.square.stack") }
+					NavigationLink { CreatedTimetablesSettingsView() } label: { Label("Manage Created Timetables", systemImage: "person.2.crop.square.stack") }
 				} else {
-					Button { showSignInRequired() } label: { Label("Manage Authored Timetables", systemImage: "person.2.crop.square.stack") }
+					Button { showSignInRequired() } label: { Label("Manage Created Timetables", systemImage: "person.2.crop.square.stack") }
 				}
 			}
 

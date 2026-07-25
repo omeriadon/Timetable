@@ -18,13 +18,13 @@ import SwiftUI
 
 enum SelectedShareItem: Identifiable, Hashable {
 	case owner(id: UUID)
-	case authored(id: UUID, name: String)
+	case created(id: UUID, name: String)
 	case received(id: String, name: String)
 
 	var id: String {
 		switch self {
 			case let .owner(id): "owner-\(id.uuidString)"
-			case let .authored(id, _): "authored-\(id.uuidString)"
+			case let .created(id, _): "created-\(id.uuidString)"
 			case let .received(id, _): "received-\(id)"
 		}
 	}
@@ -34,7 +34,7 @@ struct ShareSelectionSheet: View {
 	@Environment(\.dismiss) private var dismiss
 	@Default(.ownerIsSearchable) var ownerIsSearchable
 	@Default(.receivedTimetables) var receivedTimetables
-	@Default(.authoredTimetables) var authoredTimetables
+	@Default(.createdTimetables) var createdTimetables
 	@State private var showAliasEditor = false
 	@Environment(\.statusBadgeManager) private var statusBadgeManager
 
@@ -76,13 +76,13 @@ struct ShareSelectionSheet: View {
 					}
 				}
 
-				let authored = authoredTimetables.filter(\.isSearchable)
-				if !authored.isEmpty {
-					Section("Authored Timetables") {
-						ForEach(authored) { timetable in
+				let created = createdTimetables.filter(\.isSearchable)
+				if !created.isEmpty {
+					Section("Created Timetables") {
+						ForEach(created) { timetable in
 							Button {
 								dismiss()
-								onSelect(.authored(id: timetable.id, name: timetable.title))
+								onSelect(.created(id: timetable.id, name: timetable.title))
 							} label: {
 								HStack {
 									Text(timetable.title)
@@ -146,7 +146,7 @@ extension SelectedShareItem {
 	var shareURL: URL? {
 		switch self {
 			case let .owner(id): TimetableShareURL.ownerURL(id: id)
-			case let .authored(id, _): TimetableShareURL.url(locator: id.uuidString)
+			case let .created(id, _): TimetableShareURL.url(locator: id.uuidString)
 			case let .received(id, _): TimetableShareURL.url(locator: id)
 		}
 	}

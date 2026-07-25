@@ -56,10 +56,10 @@ final class AccountBootstrapService {
 			async let received: Void = self.runBootstrapStage("Received timetables") {
 				try await self.receivedTimetableSync.downloadProjectionAndOverrides()
 			}
-			async let authored: Void = self.runBootstrapStage("Authored timetables") {
-				try await AuthoredTimetableService.shared.refresh()
+			async let created: Void = self.runBootstrapStage("Created timetables") {
+				try await CreatedTimetableService.shared.refresh()
 			}
-			_ = await (timetable, settings, received, authored)
+			_ = await (timetable, settings, received, created)
 		}
 		bootstrapTask = task
 		isBootstrapping = true

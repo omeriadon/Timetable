@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct AuthoredTimetablesSettingsView: View {
-	@State private var service = AuthoredTimetableService.shared
+struct CreatedTimetablesSettingsView: View {
+	@State private var service = CreatedTimetableService.shared
 	@Environment(\.statusBadgeManager) private var badges
 	@State private var showCreate = false
 	@State private var networkManager = NetworkManager.shared
@@ -17,10 +17,10 @@ struct AuthoredTimetablesSettingsView: View {
 
 	var body: some View {
 		NavigationStack {
-			Text("Authored Timetables")
+			Text("Created Timetables")
 			List(service.timetables) { timetable in
 				NavigationLink {
-					AuthoredTimetableEditorView(timetable: timetable)
+					CreatedTimetableEditorView(timetable: timetable)
 				} label: {
 					VStack(alignment: .leading) { Text(timetable.title)
 						Text(timetable.isSearchable ? "Searchable" : "Hidden")
@@ -31,7 +31,7 @@ struct AuthoredTimetablesSettingsView: View {
 			}
 			.toolbar {
 				ToolbarItem(placement: .largeTitle) {
-					Text("Authored Timetables")
+					Text("Created Timetables")
 						.bold()
 						.font(.largeTitle)
 						.lineLimit(3)
@@ -46,7 +46,7 @@ struct AuthoredTimetablesSettingsView: View {
 				.matchedTransitionSource(id: "1", in: ns)
 			}
 			.sheet(isPresented: $showCreate) {
-				AuthoredTimetableCreateView()
+				CreatedTimetableCreateView()
 					.presentationDetents([.medium])
 					.navigationTransition(
 						.zoom(sourceID: "1", in: ns)
@@ -54,9 +54,9 @@ struct AuthoredTimetablesSettingsView: View {
 			}
 			.overlay {
 				if !networkManager.isOnline {
-					ContentUnavailableView("Offline", systemImage: "wifi.slash", description: Text("Authored timetables are unavailable until a connection is restored."))
+					ContentUnavailableView("Offline", systemImage: "wifi.slash", description: Text("Created timetables are unavailable until a connection is restored."))
 				} else if service.timetables.isEmpty {
-					ContentUnavailableView("No Authored Timetables", systemImage: "person.2.crop.square.stack")
+					ContentUnavailableView("No Created Timetables", systemImage: "person.2.crop.square.stack")
 						.fontWeight(.regular)
 						.foregroundStyle(.secondary)
 				}
@@ -73,11 +73,11 @@ struct AuthoredTimetablesSettingsView: View {
 	private func refresh() async {
 		do { try await service.refresh() }
 		catch let error as NetworkError where error.suppressesStatusBadge {}
-		catch { badges.addBadge(id: UUID(), title: "Unable to load authored timetables", secondaryText: error.localizedDescription, priority: 4, view: .error) }
+		catch { badges.addBadge(id: UUID(), title: "Unable to load created timetables", secondaryText: error.localizedDescription, priority: 4, view: .error) }
 	}
 }
 
-private struct AuthoredTimetableCreateView: View {
+private struct CreatedTimetableCreateView: View {
 	@State private var title = ""
 	@State private var subjects: [Subject] = []
 	@State private var isSearchable = true
@@ -88,7 +88,7 @@ private struct AuthoredTimetableCreateView: View {
 
 	var body: some View {
 		NavigationStack {
-			Text("New Authored Timetable")
+			Text("New Created Timetable")
 				.bold()
 				.padding(.horizontal, 10)
 				.font(.largeTitle)
@@ -131,8 +131,8 @@ private struct AuthoredTimetableCreateView: View {
 		isSaving = true
 		defer { isSaving = false }
 		do {
-			try await AuthoredTimetableService.shared.create(title: title, subjects: subjects, isSearchable: isSearchable)
-			badges.addBadge(id: UUID(), title: "Authored timetable created", priority: 3, view: .success)
+			try await CreatedTimetableService.shared.create(title: title, subjects: subjects, isSearchable: isSearchable)
+			badges.addBadge(id: UUID(), title: "Created timetable created", priority: 3, view: .success)
 			dismiss()
 		} catch {
 			badges.addBadge(id: UUID(), title: "Unable to create timetable", secondaryText: error.localizedDescription, priority: 4, view: .error)
@@ -140,7 +140,7 @@ private struct AuthoredTimetableCreateView: View {
 	}
 }
 
-private struct AuthoredTimetableEditorView: View {
+private struct CreatedTimetableEditorView: View {
 	let timetable: TimetableDetailResponse
 	@State private var title: String
 	@State private var subjects: [Subject]
@@ -216,8 +216,8 @@ private struct AuthoredTimetableEditorView: View {
 
 	private func save() async {
 		do {
-			try await AuthoredTimetableService.shared.update(id: timetable.id, title: title, subjects: subjects, isSearchable: isSearchable)
-			badges.addBadge(id: UUID(), title: "Authored timetable saved", priority: 3, view: .success)
+			try await CreatedTimetableService.shared.update(id: timetable.id, title: title, subjects: subjects, isSearchable: isSearchable)
+			badges.addBadge(id: UUID(), title: "Created timetable saved", priority: 3, view: .success)
 		} catch {
 			badges.addBadge(
 				id: UUID(),
@@ -231,7 +231,7 @@ private struct AuthoredTimetableEditorView: View {
 
 	private func delete() async {
 		do {
-			try await AuthoredTimetableService.shared.delete(id: timetable.id)
+			try await CreatedTimetableService.shared.delete(id: timetable.id)
 			badges.addBadge(id: UUID(), title: "Timetable deleted", priority: 3, view: .success)
 			dismiss()
 		} catch {

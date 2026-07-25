@@ -76,7 +76,7 @@ nonisolated struct TimetableSearchResult: Codable, Identifiable, Hashable {
 	let confidence: Double
 }
 
-nonisolated struct AuthoredTimetableUpdateRequest: Codable {
+nonisolated struct CreatedTimetableUpdateRequest: Codable {
 	let title: String
 	let subjects: [Subject]
 	let isSearchable: Bool

@@ -33,7 +33,7 @@ struct TimetableDetailView: View {
 							TimetablePreviewGrid(subjects: detail.subjects)
 
 							if detail.sourceKind != .accountOwner {
-								Label("This timetable is an authored timetable, which means this user has created this timetable for someone else. The contents of this timetable are not verified.", systemImage: "exclamationmark.triangle")
+								Label("This timetable is an created timetable, which means this user has created this timetable for someone else. The contents of this timetable are not verified.", systemImage: "exclamationmark.triangle")
 									.foregroundStyle(.secondary)
 									.font(.callout)
 							}

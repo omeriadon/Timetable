@@ -22,7 +22,7 @@ private let items = [
 		colour: .blue
 	),
 	TimetableTypeItem(
-		title: "Authored Timetables",
+		title: "Created Timetables",
 		description: "A user can create a timetable for someone else, for example if they don’t have the app.",
 		colour: .yellow
 	),
