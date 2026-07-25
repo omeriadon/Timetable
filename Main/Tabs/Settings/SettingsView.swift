@@ -327,7 +327,6 @@ import WidgetKit
 				guard generation == visibilitySaveGeneration else { return }
 				ownerIsSearchable = committed
 				committedOwnerIsSearchable = committed
-				statusBadgeManager.addBadge(id: UUID(), title: "Visibility updated", priority: 3, view: .success)
 			} catch {
 				guard generation == visibilitySaveGeneration else { return }
 				ownerIsSearchable = previous

@@ -6,7 +6,7 @@ import Security
 @MainActor
 @Observable
 final class MessagesViewModel {
-	private static let maximumShareLocatorLength = 36
+	private static let maximumShareLocatorLength = 100
 	private let suite = UserDefaults(suiteName: "group.omeriadon.timetable") ?? .standard
 	private var conversation: MSConversation?
 	private var statusTask: Task<Void, Never>?
@@ -25,16 +25,33 @@ final class MessagesViewModel {
 	}
 
 	func sendTimetable() {
-		guard let value = suite.string(forKey: "ownerTimetableID"), let id = UUID(uuidString: value) else {
-			showStatus("Open Timetable and finish syncing before sharing.", isSuccess: false)
+		guard let value = suite.string(forKey: "ownerTimetableID"),
+		      let id = UUID(uuidString: value)
+		else {
+			showStatus(
+				"Open Timetable and finish syncing before sharing.",
+				isSuccess: false
+			)
 			return
 		}
 
-		let locator = suite.string(forKey: "ownerTimetableShareAlias").flatMap { $0.isEmpty ? nil : $0 } ?? id.uuidString
+		let locator =
+			suite.string(forKey: "ownerTimetableShareAlias")
+				.flatMap { $0.isEmpty ? nil : $0 }
+				?? id.uuidString
+
 		let url = URL(string: "https://timetable.adonis.pt/share/\(locator)")!
+
 		conversation?.insertText(url.absoluteString) { [weak self] error in
+			guard let self else { return }
+
 			Task { @MainActor in
-				self?.showStatus(error == nil ? "Link added to the message." : "Unable to add link.", isSuccess: error == nil)
+				self.showStatus(
+					error == nil
+						? "Link added to the message."
+						: "Unable to add link.",
+					isSuccess: error == nil
+				)
 			}
 		}
 	}
@@ -107,7 +124,7 @@ final class MessagesViewModel {
 		statusTask?.cancel()
 		status = Status(text: text, isSuccess: isSuccess)
 		statusTask = Task { [weak self] in
-			try? await Task.sleep(for: .seconds(2))
+			try? await Task.sleep(for: .seconds(5))
 			guard !Task.isCancelled else { return }
 			self?.status = nil
 		}
