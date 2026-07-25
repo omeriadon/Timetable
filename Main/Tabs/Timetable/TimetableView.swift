@@ -84,10 +84,12 @@ struct TimetableView: View {
 												Text(secondaryText)
 													.textCase(.uppercase)
 													.foregroundStyle(.secondary)
+													.contentTransition(.numericText())
 
 												Text(number.description)
 													.font(.headline)
 													.bold()
+													.contentTransition(.numericText())
 											}
 
 										case let .unknown(rawLocation):
@@ -96,15 +98,19 @@ struct TimetableView: View {
 
 								} icon: {
 									Image(systemName: "door.left.hand.open")
+										.contentTransition(.numericText())
 								}
 
 								Label(subject.teacher.displayName, systemImage: "person.fill")
+									.contentTransition(.numericText())
 							}
 
 							let leftView = VStack(alignment: .leading) {
 								Text("YOU")
 									.foregroundStyle(.secondary)
+									.contentTransition(.numericText())
 								Label(subject.id, systemImage: subject.symbol)
+									.contentTransition(.numericText())
 							}
 
 							item(left: leftView, right: rightView, colour: subject.colour.swiftUIColor, top: true)
