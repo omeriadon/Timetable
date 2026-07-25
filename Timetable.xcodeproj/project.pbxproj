@@ -460,6 +460,7 @@
 				2A098C8E2F9DB844002065BE /* Embed Watch Content */,
 				2AAE2F502FA1A00500E050A2 /* Embed Foundation Extensions */,
 				2A5F92042FE665C0007302CF /* Embed ExtensionKit Extensions */,
+				2B1000013000000000000001 /* Remove Watch Content from iPad Simulator */,
 			);
 			buildRules = (
 			);
@@ -711,6 +712,29 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		2B1000013000000000000001 /* Remove Watch Content from iPad Simulator */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Remove Watch Content from iPad Simulator";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "case \"$TARGET_DEVICE_PLATFORM_NAME:$TARGET_DEVICE_MODEL\" in\n    iphonesimulator:iPad*)\n        /bin/rm -rf \"$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH/Watch\"\n        ;;\nesac\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		2A0237872F9C8EA000AB1E1F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -925,6 +949,7 @@
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Timetable;
 				INFOPLIST_KEY_CFBundleURLTypes = "<array><dict><key>CFBundleTypeRole</key><string>Editor</string><key>CFBundleURLName</key><string>com.omeriadon.Timetable</string><key>CFBundleURLSchemes</key><array><string>timetable</string></array></dict></array>";
@@ -994,6 +1019,7 @@
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Timetable;
 				INFOPLIST_KEY_CFBundleURLTypes = "<array><dict><key>CFBundleTypeRole</key><string>Editor</string><key>CFBundleURLName</key><string>com.omeriadon.Timetable</string><key>CFBundleURLSchemes</key><array><string>timetable</string></array></dict></array>";
