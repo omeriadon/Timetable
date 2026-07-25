@@ -155,8 +155,7 @@ struct TimetableApp: App {
 			}
 			#if os(iOS)
 			.fullScreenCover(isPresented: .constant(
-				Platform.current == .iOS
-					&& !hasCompletedOnboarding
+				!hasCompletedOnboarding
 			)) {
 				OnboardingView()
 					.interactiveDismissDisabled()
