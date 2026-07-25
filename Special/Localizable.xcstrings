@@ -878,6 +878,9 @@
         }
       }
     },
+    "Don't have an account? Sign in / sign up on iPhone then come back here." : {
+
+    },
     "Done" : {
       "localizations" : {
         "fr" : {
@@ -2580,6 +2583,7 @@
 
     },
     "Sign in to view your timetable on this Mac." : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {

@@ -110,10 +110,10 @@ struct TimetableView: View {
 							item(left: leftView, right: rightView, colour: subject.colour.swiftUIColor, top: true)
 								.padding(.horizontal, 10)
 								.padding(.top, 5)
-								.id(subject.id)
-								.transition(.blurReplace)
+								.transition(.opacity)
 								.animation(.spring(.bouncy), value: subject.id)
 								.foregroundStyle(.white)
+								.padding(.horizontal, Device.isIPad ? 10 : 0)
 						}
 
 						Spacer()
@@ -124,6 +124,7 @@ struct TimetableView: View {
 							.blur(radius: selectedSlot == nil ? 20 : 0)
 							.allowsHitTesting(selectedSlot != nil)
 							.animation(.snappy(duration: 0.3), value: selectedSlot)
+							.padding(.horizontal, Device.isIPad ? 10 : 0)
 					}
 				}
 				.scrollIndicators(.visible)

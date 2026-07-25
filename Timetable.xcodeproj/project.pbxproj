@@ -72,6 +72,9 @@
 				2A098C8D2F9DB844002065BE /* Watch.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
+			platformFilters = (
+				ios,
+			);
 		};
 		2A1DB42C2F9ECEC300E5AE7C /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;

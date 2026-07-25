@@ -154,7 +154,7 @@ final class NetworkManager {
 	private(set) var offlineRequestAttempted = false
 	var presentedAlert: NetworkAlert?
 
-	private let baseURL: URL = .init(string: "https://timetable.adonis.pt")!
+	private let baseURL: URL = .init(string: "https://timetable.adonis.pt/api")!
 	private let decoder: JSONDecoder
 	private let encoder: JSONEncoder
 	private let monitor: NWPathMonitor

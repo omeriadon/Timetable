@@ -39,15 +39,6 @@ struct NonAuthoritativeSettingsView: View {
 					Toggle("Highlight Current Day in timetables", isOn: highlightsBinding)
 				}
 
-				Section {
-					Button("Sign Out", systemImage: "door.left.hand.open", role: .destructive) {
-						Task {
-							await SessionStore.shared.signOut()
-						}
-					}
-					.foregroundStyle(.red)
-				}
-
 				Section("Developer") {
 					if _isDebugAssertConfiguration() || Defaults[.userDisplayName].contains("Adon") {
 						#if os(iOS)
