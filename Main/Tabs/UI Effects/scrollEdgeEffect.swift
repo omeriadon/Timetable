@@ -36,7 +36,7 @@ extension View {
 						maximumOpacity: maximumOpacity
 					)
 				}
-				.ignoresSafeArea()
+				.ignoresSafeArea(.container)
 				.allowsHitTesting(false)
 			}
 	}

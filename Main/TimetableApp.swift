@@ -419,7 +419,9 @@ struct TimetableApp: App {
 							.font(.title)
 							.bold()
 							.lineLimit(3)
-						Text("Don't have an account? Sign in / sign up on iPhone then come back here.")
+						if Device.isIPad {
+							Text("Don't have an account? Sign in / sign up on iPhone then come back here.")
+						}
 					}
 				}
 				.safeAreaBar(edge: .bottom) {

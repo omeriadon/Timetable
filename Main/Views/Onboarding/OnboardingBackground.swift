@@ -33,7 +33,12 @@ enum OnboardingBackgroundStyle: Equatable {
 			case "finished":
 				.custom([.black, .black, .black, .black, .black, .black, .blue], opacity: 1, speed: 0.8)
 			case "actualFinished":
-				.colorful(.neon, opacity: 1, speed: 0.8)
+				.custom([
+					Color(red: 0.82, green: 0.70, blue: 0.55),
+					Color(red: 0.60, green: 0.46, blue: 0.33),
+					Color(red: 0.40, green: 0.28, blue: 0.19),
+					Color(red: 0.18, green: 0.12, blue: 0.08),
+				], opacity: 1, speed: 1)
 			default:
 				.black
 		}
