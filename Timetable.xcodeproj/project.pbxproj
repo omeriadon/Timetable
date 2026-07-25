@@ -30,6 +30,20 @@
 		2AE0586F300B591D00473DBD /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2A02379A2F9C907000AB1E1F /* Defaults */; };
 		2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */ = {isa = PBXBuildFile; platformFilters = (macos, ); productRef = 2AE0F13A2FE03989002B5D9D /* MaterialView */; };
 		2B0000013000000000000001 /* Timetable Messages.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2B0000023000000000000002 /* Timetable Messages.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2B2000103000000000000010 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2A02379A2F9C907000AB1E1F /* Defaults */; };
+		2B2000113000000000000011 /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A79F3B83013924E003CA797 /* IrregularGradient */; };
+		2B2000123000000000000012 /* Sticker in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2A79F3AF30138FAB003CA797 /* Sticker */; };
+		2B2000133000000000000013 /* Sticker in Frameworks */ = {isa = PBXBuildFile; productRef = 2AB674D6300E387100A6815A /* Sticker */; };
+		2B2000143000000000000014 /* ColorfulX in Frameworks */ = {isa = PBXBuildFile; productRef = 2A324C062FF2980C00E6A3D5 /* ColorfulX */; };
+		2B2000153000000000000015 /* FocusOnAppear in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2A324C092FF2980C00E6A3D5 /* FocusOnAppear */; };
+		2B2000163000000000000016 /* MaterialView in Frameworks */ = {isa = PBXBuildFile; platformFilters = (macos, ); productRef = 2AE0F13A2FE03989002B5D9D /* MaterialView */; };
+		2B2000173000000000000017 /* WindowOverlay in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2A79F3B530138FFC003CA797 /* WindowOverlay */; };
+		2B2000183000000000000018 /* WindowOverlay in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2ADFCA8E2FF66F1A00B4301E /* WindowOverlay */; };
+		2B2000193000000000000019 /* PortalHeaders in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2ABBBA032FF4AD3A00878A9D /* PortalHeaders */; };
+		2B20001A300000000000001A /* SFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2A79F3B230138FD2003CA797 /* SFSymbolsPicker */; };
+		2B20001B300000000000001B /* PortalTransitions in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2ABBBA052FF4AD3A00878A9D /* PortalTransitions */; };
+		2B20001C300000000000001C /* Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2AA6DF142FDFAC8F00BBC70E /* Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2B20001D300000000000001D /* Timetable Messages.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2B0000023000000000000002 /* Timetable Messages.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -108,6 +122,16 @@
 			);
 			name = "Embed Foundation Extensions";
 		};
+		2B2000063000000000000006 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "";
+			dstSubfolder = PlugIns;
+			files = (
+				2B20001C300000000000001C /* Widget.appex in Embed Foundation Extensions */,
+				2B20001D300000000000001D /* Timetable Messages.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -117,6 +141,7 @@
 		2AA6DF142FDFAC8F00BBC70E /* Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Widget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2AF3B0073000000000000007 /* TimetableTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TimetableTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B0000023000000000000002 /* Timetable Messages.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Timetable Messages.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2B2000023000000000000002 /* Timetable iPad.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Timetable iPad.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -286,6 +311,53 @@
 			);
 			target = 2B0000043000000000000004 /* Messages */;
 		};
+		2B20000C300000000000000C /* Exceptions for "Main" folder in "Timetable iPad" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			platformFiltersByRelativePath = {
+				Backend/LiveActivityRegistrationService.swift = (ios, );
+				Backend/PhoneWatchSyncBridge.swift = (ios, );
+				Tabs/Search/TimetableDetailView.swift = (ios, );
+				Tabs/Search/TimetableIdentityView.swift = (ios, );
+				Tabs/Search/TimetablePortalIdentityView.swift = (ios, );
+				Tabs/Search/TimetableSearchView.swift = (ios, );
+				Tabs/Settings/AuthoredTimetablesSettingsView.swift = (ios, );
+				Tabs/Settings/ReceivedTimetablesView.swift = (ios, );
+				Tabs/Share/ShareSelectionSheet.swift = (ios, );
+				Tabs/Share/TimetableShareAliasSheet.swift = (ios, );
+				"Tabs/UI Effects/VariableBlur.swift" = (ios, );
+				"Tabs/UI Effects/scrollEdgeEffect.swift" = (ios, );
+				Views/Onboarding/OnboardingPage.swift = (ios, );
+				Views/Onboarding/OnboardingPageContext.swift = (ios, );
+				Views/Onboarding/OnboardingView.swift = (ios, );
+				Views/Onboarding/Views/CalendarImport.swift = (ios, );
+				Views/Onboarding/Views/CalendarPermission.swift = (ios, );
+				Views/Onboarding/Views/Notifications.swift = (ios, );
+				Views/Onboarding/Views/SplashView.swift = (ios, );
+				Views/Onboarding/Views/Tutorial/GeneratedSFSymbolShapes.swift = (ios, );
+				Views/Onboarding/Views/Tutorial/OnboardingAccount.swift = (ios, );
+				Views/Onboarding/Views/Tutorial/OnboardingCompletion.swift = (ios, );
+				Views/Onboarding/Views/Tutorial/TimetableTypesTutorial.swift = (ios, );
+				"Views/Subject Editor/main sheet.swift" = (ios, );
+				iOS/LaunchIllusionView.swift = (ios, );
+				iOS/LiveActivityDebugView.swift = (ios, );
+				macOS/AppDelegate.swift = (macos, );
+				macOS/CustomMaterialView.swift = (macos, );
+				macOS/StatusBadgeOverlayWindow.swift = (macos, );
+			};
+			target = 2B2000013000000000000001 /* Timetable iPad */;
+		};
+		2B20000D300000000000000D /* Exceptions for "Special" folder in "Timetable iPad" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info/Message.plist,
+				"Info/Watch Widget.plist",
+				Info/Widget.plist,
+			);
+			platformFiltersByRelativePath = {
+				"/Localized: LaunchScreen.storyboard" = (ios, );
+			};
+			target = 2B2000013000000000000001 /* Timetable iPad */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -322,6 +394,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				2AC5F7EA2FD842F000B813EA /* Exceptions for "Main" folder in "Timetable" target */,
+				2B20000C300000000000000C /* Exceptions for "Main" folder in "Timetable iPad" target */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -341,6 +414,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				2AD85A872FE8F23A004EAB2B /* Exceptions for "Special" folder in "Timetable" target */,
+				2B20000D300000000000000D /* Exceptions for "Special" folder in "Timetable iPad" target */,
 				2AD85A882FE8F23A004EAB2B /* Exceptions for "Special" folder in "Watch Widget" target */,
 				2AD85A892FE8F23A004EAB2B /* Exceptions for "Special" folder in "Widget" target */,
 				2AD85A8B2FE8F23A004EAB2B /* Exceptions for "Special" folder in "Watch" target */,
@@ -408,6 +482,23 @@
 			files = (
 			);
 		};
+		2B2000043000000000000004 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				2B2000113000000000000011 /* IrregularGradient in Frameworks */,
+				2B2000123000000000000012 /* Sticker in Frameworks */,
+				2B2000133000000000000013 /* Sticker in Frameworks */,
+				2B2000143000000000000014 /* ColorfulX in Frameworks */,
+				2B2000153000000000000015 /* FocusOnAppear in Frameworks */,
+				2B2000163000000000000016 /* MaterialView in Frameworks */,
+				2B2000103000000000000010 /* Defaults in Frameworks */,
+				2B2000173000000000000017 /* WindowOverlay in Frameworks */,
+				2B2000183000000000000018 /* WindowOverlay in Frameworks */,
+				2B2000193000000000000019 /* PortalHeaders in Frameworks */,
+				2B20001A300000000000001A /* SFSymbolsPicker in Frameworks */,
+				2B20001B300000000000001B /* PortalTransitions in Frameworks */,
+			);
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -436,6 +527,7 @@
 				2AA6DF142FDFAC8F00BBC70E /* Widget.appex */,
 				2AF3B0073000000000000007 /* TimetableTests.xctest */,
 				2B0000023000000000000002 /* Timetable Messages.appex */,
+				2B2000023000000000000002 /* Timetable iPad.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -460,7 +552,6 @@
 				2A098C8E2F9DB844002065BE /* Embed Watch Content */,
 				2AAE2F502FA1A00500E050A2 /* Embed Foundation Extensions */,
 				2A5F92042FE665C0007302CF /* Embed ExtensionKit Extensions */,
-				2B1000013000000000000001 /* Remove Watch Content from iPad Simulator */,
 			);
 			buildRules = (
 			);
@@ -612,6 +703,47 @@
 			productReference = 2B0000023000000000000002 /* Timetable Messages.appex */;
 			productType = "com.apple.product-type.app-extension.messages";
 		};
+		2B2000013000000000000001 /* Timetable iPad */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2B2000073000000000000007 /* Build configuration list for PBXNativeTarget "Timetable iPad" */;
+			buildPhases = (
+				2B2000033000000000000003 /* Sources */,
+				2B2000043000000000000004 /* Frameworks */,
+				2B2000053000000000000005 /* Resources */,
+				2B2000063000000000000006 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2B20000A300000000000000A /* PBXTargetDependency */,
+				2B20000B300000000000000B /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				2A02379F2F9C908300AB1E1F /* Shared */,
+				2A324AAE2FF0E3A100E6A3D5 /* App Shared */,
+				2A5F92192FE66817007302CF /* App Intents */,
+				2AAE62702FD839A7004B3FF4 /* Main */,
+				2AD85A712FE8F239004EAB2B /* Special */,
+			);
+			name = "Timetable iPad";
+			packageProductDependencies = (
+				2A02379A2F9C907000AB1E1F /* Defaults */,
+				2AE0F13A2FE03989002B5D9D /* MaterialView */,
+				2A324C062FF2980C00E6A3D5 /* ColorfulX */,
+				2A324C092FF2980C00E6A3D5 /* FocusOnAppear */,
+				2ABBBA032FF4AD3A00878A9D /* PortalHeaders */,
+				2ABBBA052FF4AD3A00878A9D /* PortalTransitions */,
+				2ADFCA8E2FF66F1A00B4301E /* WindowOverlay */,
+				2AB674D6300E387100A6815A /* Sticker */,
+				2A79F3AF30138FAB003CA797 /* Sticker */,
+				2A79F3B230138FD2003CA797 /* SFSymbolsPicker */,
+				2A79F3B530138FFC003CA797 /* WindowOverlay */,
+				2A79F3B83013924E003CA797 /* IrregularGradient */,
+			);
+			productName = "Timetable iPad";
+			productReference = 2B2000023000000000000002 /* Timetable iPad.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -638,6 +770,9 @@
 						CreatedOnToolsVersion = 27.0;
 					};
 					2B0000043000000000000004 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					2B2000013000000000000001 = {
 						CreatedOnToolsVersion = 27.0;
 					};
 				};
@@ -670,6 +805,7 @@
 			projectRoot = "";
 			targets = (
 				2A02378A2F9C8EA000AB1E1F /* Timetable */,
+				2B2000013000000000000001 /* Timetable iPad */,
 				2A25869F2FB5D6490030C8CD /* Watch Widget */,
 				2AA6DF132FDFAC8F00BBC70E /* Widget */,
 				2A098C822F9DB842002065BE /* Watch */,
@@ -710,30 +846,12 @@
 			files = (
 			);
 		};
-/* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		2B1000013000000000000001 /* Remove Watch Content from iPad Simulator */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
+		2B2000053000000000000005 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
 			files = (
 			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Remove Watch Content from iPad Simulator";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "case \"$TARGET_DEVICE_PLATFORM_NAME:$TARGET_DEVICE_MODEL\" in\n    iphonesimulator:iPad*)\n        /bin/rm -rf \"$TARGET_BUILD_DIR/$CONTENTS_FOLDER_PATH/Watch\"\n        ;;\nesac\n";
-			showEnvVarsInLog = 0;
 		};
-/* End PBXShellScriptBuildPhase section */
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		2A0237872F9C8EA000AB1E1F /* Sources */ = {
@@ -766,6 +884,11 @@
 			files = (
 			);
 		};
+		2B2000033000000000000003 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -786,6 +909,17 @@
 			targetProxy = 2AA6DF222FDFAC9000BBC70E /* PBXContainerItemProxy */;
 		};
 		2B00000A300000000000000A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilter = ios;
+			target = 2B0000043000000000000004 /* Messages */;
+			targetProxy = 2B0000033000000000000003 /* PBXContainerItemProxy */;
+		};
+		2B20000A300000000000000A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2AA6DF132FDFAC8F00BBC70E /* Widget */;
+			targetProxy = 2AA6DF222FDFAC9000BBC70E /* PBXContainerItemProxy */;
+		};
+		2B20000B300000000000000B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			platformFilter = ios;
 			target = 2B0000043000000000000004 /* Messages */;
@@ -949,7 +1083,6 @@
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Timetable;
 				INFOPLIST_KEY_CFBundleURLTypes = "<array><dict><key>CFBundleTypeRole</key><string>Editor</string><key>CFBundleURLName</key><string>com.omeriadon.Timetable</string><key>CFBundleURLSchemes</key><array><string>timetable</string></array></dict></array>";
@@ -988,7 +1121,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Debug;
@@ -1019,7 +1152,6 @@
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
-				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Timetable;
 				INFOPLIST_KEY_CFBundleURLTypes = "<array><dict><key>CFBundleTypeRole</key><string>Editor</string><key>CFBundleURLName</key><string>com.omeriadon.Timetable</string><key>CFBundleURLSchemes</key><array><string>timetable</string></array></dict></array>";
@@ -1058,7 +1190,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Release;
@@ -1455,6 +1587,142 @@
 			};
 			name = Release;
 		};
+		2B2000083000000000000008 /* Debug configuration for PBXNativeTarget "Timetable iPad" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = TimetableDebug;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				AUTOMATION_APPLE_EVENTS = NO;
+				CODE_SIGN_ENTITLEMENTS = Special/Entitlements/Timetable.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 4;
+				DEVELOPMENT_TEAM = P6PV2R9443;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = NO;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = YES;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Timetable;
+				INFOPLIST_KEY_CFBundleURLTypes = "<array><dict><key>CFBundleTypeRole</key><string>Editor</string><key>CFBundleURLName</key><string>com.omeriadon.Timetable</string><key>CFBundleURLSchemes</key><array><string>timetable</string></array></dict></array>";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Timetable needs to read your calendar to pull Compass Events from your schedule.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = YES;
+				"INFOPLIST_KEY_UILaunchStoryboardName[sdk=iphoneos*]" = LaunchScreen;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				"INFOPLIST_KEY_UISupportedInterfaceOrientations~ipad" = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.omeriadon.Timetable;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
+				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
+				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
+				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
+				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
+				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
+				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Debug;
+		};
+		2B2000093000000000000009 /* Release configuration for PBXNativeTarget "Timetable iPad" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = Timetable;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				AUTOMATION_APPLE_EVENTS = NO;
+				CODE_SIGN_ENTITLEMENTS = Special/Entitlements/Timetable.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 4;
+				DEVELOPMENT_TEAM = P6PV2R9443;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = NO;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = NO;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = YES;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Timetable;
+				INFOPLIST_KEY_CFBundleURLTypes = "<array><dict><key>CFBundleTypeRole</key><string>Editor</string><key>CFBundleURLName</key><string>com.omeriadon.Timetable</string><key>CFBundleURLSchemes</key><array><string>timetable</string></array></dict></array>";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Timetable needs to read your calendar to pull Compass Events from your schedule.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = YES;
+				"INFOPLIST_KEY_UILaunchStoryboardName[sdk=iphoneos*]" = LaunchScreen;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				"INFOPLIST_KEY_UISupportedInterfaceOrientations~ipad" = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.omeriadon.Timetable;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
+				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
+				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
+				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
+				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
+				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
+				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1511,6 +1779,14 @@
 			buildConfigurations = (
 				2B00000B300000000000000B /* Debug configuration for PBXNativeTarget "Messages" */,
 				2B00000C300000000000000C /* Release configuration for PBXNativeTarget "Messages" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		2B2000073000000000000007 /* Build configuration list for PBXNativeTarget "Timetable iPad" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2B2000083000000000000008 /* Debug configuration for PBXNativeTarget "Timetable iPad" */,
+				2B2000093000000000000009 /* Release configuration for PBXNativeTarget "Timetable iPad" */,
 			);
 			defaultConfigurationName = Release;
 		};
