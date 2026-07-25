@@ -241,7 +241,7 @@ enum CalendarImportStep: Equatable {
 			case .finalising:
 				"Finalising..."
 			case .done:
-				"Calendar Imported"
+				""
 			case let .error(t):
 				"Error: \(t)"
 		}

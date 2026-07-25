@@ -44,8 +44,13 @@ struct CalendarImportView: View {
 						Text("Importing timetable...")
 							.transition(.blurReplace)
 					case .success:
-						Text("Import complete")
-							.transition(.blurReplace)
+						VStack {
+							Text("Import complete")
+							Text("You can change subjects, teachers and classrooms in settings if they have issues.")
+								.font(.body)
+						}
+						.padding(.bottom, 20)
+						.transition(.blurReplace)
 					case .error:
 						Text("Import failed")
 							.transition(.blurReplace)
@@ -94,7 +99,7 @@ struct CalendarImportView: View {
 		.ignoresSafeArea()
 		.padding([.horizontal], 32)
 		.monospaced()
-		.presentationDetents(dismissesWhenFinished ? [.medium] : [.large])
+		.presentationDetents(dismissesWhenFinished ? [.fraction(0.4)] : [.large])
 		.interactiveDismissDisabled()
 		.presentationDragIndicator(.hidden)
 	}

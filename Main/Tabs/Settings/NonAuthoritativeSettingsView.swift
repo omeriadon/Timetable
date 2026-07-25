@@ -41,12 +41,6 @@ struct NonAuthoritativeSettingsView: View {
 
 				Section("Developer") {
 					if _isDebugAssertConfiguration() || Defaults[.userDisplayName].contains("Adon") {
-						#if os(iOS)
-							NavigationLink("Live Activity Debug") {
-								LiveActivityDebugView()
-							}
-						#endif
-
 						Button("Test progress badge", systemImage: "progress.indicator") {
 							addDebugStatusBadge(title: "Syncing account", secondaryText: "Working", view: .progressView)
 						}

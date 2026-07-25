@@ -191,10 +191,6 @@ import WidgetKit
 			}
 			Section("Developer") {
 				if _isDebugAssertConfiguration() || Defaults[.userDisplayName].contains("Adon") {
-					NavigationLink("Live Activity Debug") {
-						LiveActivityDebugView()
-					}
-
 					Button("Test progress badge", systemImage: "progress.indicator") {
 						addDebugStatusBadge(title: "Syncing account", secondaryText: "Working", view: .progressView)
 					}
