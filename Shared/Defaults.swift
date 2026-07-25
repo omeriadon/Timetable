@@ -10,7 +10,7 @@ import Foundation
 
 private let sharedDefaults = UserDefaults(suiteName: "group.omeriadon.timetable") ?? UserDefaults.standard
 
-let onboardingVersion: Int = 3
+let onboardingVersion: Int = 4
 
 enum SharedDefaultsStore {
 	static let suiteName = "group.omeriadon.timetable"
