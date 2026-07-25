@@ -371,8 +371,8 @@ struct TimetableApp: App {
 							.frame(width: 150, height: 150)
 							.shadow(color: .black, radius: 15)
 
-						Text("Sign In Required").font(.title2.bold())
-						Text("Sign in to view your timetable on this Mac.")
+						Text("Sign in to use Timetable").font(.title2.bold())
+						Text("Don't have an account? Sign in / sign up on iPhone then come back here.")
 
 						AccountAuthenticationView(allowsSignUp: false)
 					}
@@ -414,10 +414,13 @@ struct TimetableApp: App {
 				}
 				.scrollEdgeEffect(offset: 0.8)
 				.safeAreaBar(edge: .top, alignment: .center, spacing: 10) {
-					Text("Sign in to use Timetable")
-						.font(.title)
-						.bold()
-						.lineLimit(3)
+					VStack {
+						Text("Sign in to use Timetable")
+							.font(.title)
+							.bold()
+							.lineLimit(3)
+						Text("Don't have an account? Sign in / sign up on iPhone then come back here.")
+					}
 				}
 				.safeAreaBar(edge: .bottom) {
 					if Platform.current.allowsAccountCreation {

@@ -174,6 +174,7 @@ private struct StatusBadgeContent: View {
 						.animation(contentAnimation, value: secondaryText)
 				}
 			}
+			.foregroundStyle(.white)
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.padding(.leading, textLeadingPadding)
 
@@ -252,7 +253,9 @@ private struct StatusBadgeContent: View {
 		} else {
 			switch badge.view {
 				case .progressView:
-					ProgressView().controlSize(progressControlSize)
+					ProgressView()
+						.controlSize(progressControlSize)
+						.preferredColorScheme(.dark)
 				case .success:
 					statusSymbol("checkmark.circle.fill", color: .green, isTerminal: true)
 				case .error:
@@ -339,6 +342,7 @@ private struct StatusBadgeGauge: View {
 			if containsProgress {
 				ProgressView()
 					.controlSize(combinedProgressControlSize)
+					.preferredColorScheme(.dark)
 			}
 		}
 	}
