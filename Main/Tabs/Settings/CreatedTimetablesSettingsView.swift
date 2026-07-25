@@ -163,7 +163,9 @@ private struct CreatedTimetableEditorView: View {
 		Form {
 			Section("Details") {
 				TextField("Title", text: $title)
+					.onSubmit { save() }
 				Toggle("Searchable", isOn: $isSearchable)
+					.onChange(of: isSearchable) { save() }
 			}
 			Section("Timetable") {
 				TimetablePreviewGrid(subjects: subjects)
@@ -173,21 +175,29 @@ private struct CreatedTimetableEditorView: View {
 				}
 			}
 			Section {
-				Button(
-					"Delete Timetable",
-					systemImage: "trash",
-					role: .destructive
-				) {
+				Button(role: .destructive) {
 					confirmDelete = true
+				} label: {
+					Label("Delete Timetable", systemImage: "trash")
+						.foregroundStyle(.red)
+				}
+				.confirmationDialog(
+					"Delete this timetable?",
+					isPresented: $confirmDelete
+				) {
+					Button("Delete Timetable", role: .destructive) {
+						Task {
+							await delete()
+						}
+					}
+				} message: {
+					Text(
+						"This removes the timetable from the server and revokes installed passes."
+					)
 				}
 			}
 		}
 		.appNavigationTitle(title)
-		.toolbar {
-			ToolbarItem(
-				placement: .confirmationAction
-			) { Button("Save") { Task { await save() } } }
-		}
 		.sheet(
 			isPresented: $showEditor
 		) {
@@ -196,38 +206,23 @@ private struct CreatedTimetableEditorView: View {
 				.presentationDragIndicator(.hidden)
 				.interactiveDismissDisabled()
 		}
-		.confirmationDialog(
-			"Delete this timetable?",
-			isPresented: $confirmDelete
-		) {
-			Button("Delete Timetable", role: .destructive) {
-				Task {
-					await delete()
-				}
-			}
-			Button(
-				"Cancel",
-				role: .cancel
-			) {}
-		} message: {
-			Text(
-				"This removes the timetable from the server and revokes installed passes."
-			)
-		}
+		.onChange(of: subjects) { save() }
 	}
 
-	private func save() async {
-		do {
-			try await CreatedTimetableService.shared.update(id: timetable.id, title: title, subjects: subjects, isSearchable: isSearchable)
-			badges.addBadge(id: UUID(), title: "Created timetable saved", priority: 3, view: .success)
-		} catch {
-			badges.addBadge(
-				id: UUID(),
-				title: "Unable to save timetable",
-				secondaryText: error.localizedDescription,
-				priority: 4,
-				view: .error
-			)
+	private func save() {
+		Task {
+			do {
+				try await CreatedTimetableService.shared.update(id: timetable.id, title: title, subjects: subjects, isSearchable: isSearchable)
+
+			} catch {
+				badges.addBadge(
+					id: UUID(),
+					title: "Unable to save timetable",
+					secondaryText: error.localizedDescription,
+					priority: 4,
+					view: .error
+				)
+			}
 		}
 	}
 

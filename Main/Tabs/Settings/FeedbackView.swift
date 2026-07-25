@@ -45,23 +45,24 @@ struct FeedbackView: View {
 					}
 				#endif // os(macOS)
 			}
+			.navigationBarTitleDisplayMode(.large)
 			.formStyle(.grouped)
 			.scrollContentBackground(.hidden)
-			.safeAreaBar(edge: .top, alignment: .center, spacing: 20) {
-				Text("Report Feedback or Bug")
-					.padding(.horizontal, 5)
-					.font(.largeTitle)
-					.multilineTextAlignment(.leading)
-					.lineLimit(2)
-					.bold()
-			}
 			.scrollEdgeEffectStyle(.soft, for: .all)
 			.toolbar {
+				ToolbarItem(placement: .largeTitle) {
+					Text("Report Feedback or Bug")
+						.font(.title)
+						.multilineTextAlignment(.leading)
+						.bold()
+				}
+
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) { dismiss() }
 				}
 				ToolbarItem(placement: .confirmationAction) {
 					Button("Send", systemImage: "checkmark", role: .confirm) { submit() }
+						.buttonStyle(.glassProminent)
 						.disabled(message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSubmitting)
 				}
 			}
