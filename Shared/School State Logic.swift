@@ -33,14 +33,20 @@ nonisolated struct SchoolCalendarDate: Codable, Hashable, Sendable {
 }
 
 nonisolated struct SchoolCalendarDateRange: Codable, Hashable, Sendable {
+	let label: String
 	let start: SchoolCalendarDate
 	let end: SchoolCalendarDate
+}
+
+nonisolated struct SchoolCalendarNamedDate: Codable, Hashable, Sendable {
+	let date: SchoolCalendarDate
+	let label: String
 }
 
 /// The server-owned definition of dates on which the timetable is active.
 nonisolated struct SchoolCalendarProjection: Defaults.Serializable, Codable, Hashable, Sendable {
 	let termRanges: [SchoolCalendarDateRange]
-	let skippedDates: Set<SchoolCalendarDate>
+	let skippedDates: [SchoolCalendarNamedDate]
 
 	static let empty = SchoolCalendarProjection(termRanges: [], skippedDates: [])
 
@@ -60,7 +66,7 @@ nonisolated struct SchoolCalendarProjection: Defaults.Serializable, Codable, Has
 		}
 
 		let dateKey = SchoolCalendarDate(year: day.year ?? 0, month: day.month ?? 0, day: day.day ?? 0)
-		guard !skippedDates.contains(dateKey) else { return false }
+		guard !skippedDates.contains(where: { $0.date == dateKey }) else { return false }
 
 		return termRanges.contains { range in
 			guard let start = calendar.date(from: range.start.components),

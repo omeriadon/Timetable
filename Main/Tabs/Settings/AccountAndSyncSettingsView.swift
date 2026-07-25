@@ -205,9 +205,11 @@ struct EventNotificationSchedulesEditor: View {
 			HStack {
 				Text(schedule.timeLabel)
 				Text(schedule.offsetLabel)
+					.textCase(.lowercase)
 					.foregroundStyle(.secondary)
 				Spacer()
 				Button("Remove", systemImage: "minus.circle", role: .destructive) { selection.remove(schedule) }
+					.foregroundStyle(.red)
 					.labelStyle(.iconOnly)
 			}
 		}
@@ -219,42 +221,53 @@ struct EventNotificationSchedulesEditor: View {
 private struct EventNotificationScheduleSheet: View {
 	@Environment(\.dismiss) private var dismiss
 	@Binding var selection: Set<EventNotificationSchedule>
-	@State private var hour = 8
-	@State private var minute = 0
+	@State private var timeMinutes = 8 * 60
 	@State private var dayOffset = 0
 
 	var body: some View {
 		NavigationStack {
 			Form {
-				Picker("Time", selection: $hour) {
-					ForEach(0 ..< 24, id: \.self) { hour in Text(hourLabel(hour)).tag(hour) }
+				Picker("Time", selection: $timeMinutes) {
+					ForEach(Array(stride(from: 5 * 60, through: 22 * 60, by: 15)), id: \.self) { minutes in
+						Text(timeLabel(minutes)).tag(minutes)
+					}
 				}
-				Picker("Minutes", selection: $minute) {
-					ForEach([0, 15, 30, 45], id: \.self) { minute in Text(String(format: ":%02d", minute)).tag(minute) }
-				}
-				Picker("Event day", selection: $dayOffset) {
-					Text("On the day").tag(0)
-					Text("1 day before").tag(1)
-					Text("2 days before").tag(2)
-					Text("3 days before").tag(3)
-					Text("1 week before").tag(7)
+				.pickerStyle(.wheel)
+				.frame(height: 160)
+				Picker("Send notification", selection: $dayOffset) {
+					Text("On the day")
+						.foregroundStyle(.accent)
+						.tag(0)
+					Text("1 day before")
+						.foregroundStyle(.accent)
+						.tag(1)
+					Text("2 days before")
+						.foregroundStyle(.accent)
+						.tag(2)
+					Text("3 days before")
+						.foregroundStyle(.accent)
+						.tag(3)
+					Text("1 week before")
+						.foregroundStyle(.accent)
+						.tag(7)
 				}
 			}
 			.appNavigationTitle("Event Notification")
 			.toolbar {
-				ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+				ToolbarItem(placement: .cancellationAction) { Button(role: .cancel) { dismiss() } }
 				ToolbarItem(placement: .confirmationAction) {
-					Button("Add") {
-						selection.insert(EventNotificationSchedule(hour: hour, minute: minute, dayOffset: dayOffset))
+					Button("Add", systemImage: "plus", role: .confirm) {
+						selection.insert(EventNotificationSchedule(hour: timeMinutes / 60, minute: timeMinutes % 60, dayOffset: dayOffset))
 						dismiss()
 					}
+					.buttonStyle(.glassProminent)
 				}
 			}
 		}
 	}
 
-	private func hourLabel(_ hour: Int) -> String {
-		DateFormatter.localizedString(from: Calendar.current.date(from: DateComponents(hour: hour)) ?? .now, dateStyle: .none, timeStyle: .short)
+	private func timeLabel(_ minutes: Int) -> String {
+		DateFormatter.localizedString(from: Calendar.current.date(from: DateComponents(hour: minutes / 60, minute: minutes % 60)) ?? .now, dateStyle: .none, timeStyle: .short)
 	}
 }
 

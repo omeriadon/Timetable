@@ -9,9 +9,9 @@ struct SchoolDatesView: View {
 		let window = dateWindow
 		List {
 			Section("Term Dates") {
-				ForEach(Array(schoolCalendar.termRanges.enumerated()), id: \.offset) { index, range in
+				ForEach(Array(schoolCalendar.termRanges.enumerated()), id: \.offset) { _, range in
 					if range.intersects(window, calendar: calendar) {
-						LabeledContent("Term \(index + 1)") {
+						LabeledContent(range.label) {
 							Text(range.displayLabel(calendar: calendar))
 								.multilineTextAlignment(.trailing)
 								.foregroundStyle(.secondary)
@@ -24,13 +24,13 @@ struct SchoolDatesView: View {
 			}
 
 			Section("No School") {
-				let skippedDates = schoolCalendar.skippedDates.filter { window.contains($0) }.sorted()
+				let skippedDates = schoolCalendar.skippedDates.filter { window.contains($0.date) }.sorted { $0.date < $1.date }
 				if skippedDates.isEmpty {
 					Text("No no-school days upcoming.")
 						.foregroundStyle(.secondary)
 				} else {
 					ForEach(skippedDates, id: \.self) { date in
-						Label(date.displayLabel, systemImage: "moon.zzz")
+						Label(date.label, systemImage: "moon.zzz")
 					}
 				}
 			}

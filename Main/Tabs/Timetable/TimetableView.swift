@@ -65,25 +65,21 @@ struct TimetableView: View {
 		NavigationStack {
 			ScrollView(.horizontal) {
 				HStack(spacing: 0) {
-					mainView
-						.containerRelativeFrame(.horizontal)
-						.id(0)
-
 					TodayTimetableView(
 						subjects: selectedTimetable?.subjects ?? subjects,
 						schoolCalendar: schoolCalendar,
 						events: calendarEvents.allEvents
 					)
 					.containerRelativeFrame(.horizontal)
-					.id(1)
+					.id(0)
 
-					CalendarEventsView(projection: calendarEvents)
+					mainView
+						.containerRelativeFrame(.horizontal)
+						.id(1)
+
+					DatesView(schoolCalendar: schoolCalendar, events: calendarEvents)
 						.containerRelativeFrame(.horizontal)
 						.id(2)
-
-					SchoolDatesView(schoolCalendar: schoolCalendar)
-						.containerRelativeFrame(.horizontal)
-						.id(3)
 				}
 				.scrollTargetLayout()
 			}
@@ -94,10 +90,9 @@ struct TimetableView: View {
 			.safeAreaBar(edge: .top, alignment: .center, spacing: 0) {
 				TabsPicker(
 					items: [
-						("Week", "7.calendar"),
 						("Today", "calendar.day.timeline.left"),
-						("Events", "calendar.day"),
-						("Dates", "flag"),
+						("Week", "7.calendar"),
+						("Dates", "calendar.badge.clock"),
 					],
 					selection: $currentTab
 				)

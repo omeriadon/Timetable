@@ -28,7 +28,7 @@ nonisolated struct UpdateProfileRequest: Codable {
 
 nonisolated struct SchoolCalendarResponse: Codable, Sendable {
 	let termRanges: [SchoolCalendarDateRange]
-	let skippedDates: Set<SchoolCalendarDate>
+	let skippedDates: [SchoolCalendarNamedDate]
 
 	var projection: SchoolCalendarProjection {
 		SchoolCalendarProjection(termRanges: termRanges, skippedDates: skippedDates)

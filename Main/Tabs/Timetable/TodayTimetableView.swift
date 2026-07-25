@@ -6,7 +6,7 @@ struct TodayTimetableView: View {
 	let events: [CalendarEvent]
 
 	var body: some View {
-		TimelineView(.periodic(from: .now, by: 30)) { context in
+		TimelineView(.periodic(from: .now, by: 1)) { context in
 			let now = TimetableClock.adjusted(context.date)
 			ScrollView {
 				VStack(alignment: .leading, spacing: 16) {
@@ -63,10 +63,10 @@ private struct TodayCountdown: View {
 
 				Text("Next class: \(next.subject.id)")
 
-				Text(timerInterval: now ... next.interval.start)
+				Text(countdownText(until: next.interval.start))
 					.font(.title3)
 					.contentTransition(.numericText())
-					.animation(.easeInOut, value: now)
+					.animation(.linear(duration: 0.2), value: countdownText(until: next.interval.start))
 			}
 
 			.padding(.top, 40)
@@ -75,6 +75,11 @@ private struct TodayCountdown: View {
 			ContentUnavailableView("Nothing Scheduled", systemImage: "calendar")
 				.padding(.top, 40)
 		}
+	}
+
+	private func countdownText(until target: Date) -> String {
+		let seconds = max(0, Int(target.timeIntervalSince(now)))
+		return String(format: "%02d:%02d:%02d", seconds / 3600, seconds / 60 % 60, seconds % 60)
 	}
 }
 

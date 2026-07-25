@@ -2,7 +2,7 @@ import XCTest
 
 final class SchoolStateEngineTests: XCTestCase {
 	private let schoolCalendar = SchoolCalendarProjection(
-		termRanges: [.init(start: .init(year: 2026, month: 1, day: 1), end: .init(year: 2026, month: 12, day: 31))],
+		termRanges: [.init(label: "Test term", start: .init(year: 2026, month: 1, day: 1), end: .init(year: 2026, month: 12, day: 31))],
 		skippedDates: []
 	)
 	private var calendar: Calendar {

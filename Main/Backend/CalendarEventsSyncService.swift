@@ -33,6 +33,15 @@ final class CalendarEventsSyncService {
 		)
 		Defaults[.calendarEvents] = response.projection
 	}
+
+	func updateEvent(id: UUID, request: CreateCalendarEventRequest, globally: Bool) async throws {
+		let response: CalendarEventsResponse = try await networkManager.send(
+			Endpoint("/v1/events/\(globally ? "global" : "private")/\(id.uuidString)", method: .put),
+			body: request,
+			context: .userInitiated
+		)
+		Defaults[.calendarEvents] = response.projection
+	}
 }
 
 private extension Endpoint {
