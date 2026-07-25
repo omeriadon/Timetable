@@ -282,6 +282,19 @@ final class SessionStore {
 			throw SessionStoreError.credentialPersistenceFailed
 		}
 		let profile = persist(response.user)
+
+		// The watch's authenticated root contains nested TabViews whose page
+		// structure is driven by the bootstrap Defaults. Mount it only after
+		// those values have been written, rather than changing its pages while
+		// it is being inserted into the view graph.
+		if Platform.current == .watchOS, bootstrap, let accountBootstrapHandler {
+			try await accountBootstrapHandler()
+			state = .authenticated(profile)
+			await authenticatedHandler?()
+			Print("Authenticated session for \(profile.id)", category: .account)
+			return
+		}
+
 		state = .authenticated(profile)
 		await authenticatedHandler?()
 		if bootstrap, let accountBootstrapHandler {
