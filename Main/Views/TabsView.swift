@@ -55,6 +55,7 @@ import SwiftUI
 	typealias PlatformStackView = UIStackView
 	typealias PlatformColor = UIColor
 	typealias PlatformFont = UIFont
+	typealias PlatformPanGestureRecognizer = UIPanGestureRecognizer
 #else
 	import AppKit
 
@@ -62,6 +63,7 @@ import SwiftUI
 	typealias PlatformStackView = NSStackView
 	typealias PlatformColor = NSColor
 	typealias PlatformFont = NSFont
+	typealias PlatformPanGestureRecognizer = NSPanGestureRecognizer
 #endif
 
 class TabsView: PlatformView {
@@ -69,8 +71,10 @@ class TabsView: PlatformView {
 	private var topStackView: PlatformStackView!
 	private var backgroundView: PlatformView!
 	private var tagMaskView: PlatformView!
-
 	private var bottomButtons: [PlatformView] = []
+
+	private var isDragging = false
+	private var dragStartX: CGFloat = 0
 
 	var onSelectionChange: ((Int) -> Void)?
 
@@ -87,22 +91,17 @@ class TabsView: PlatformView {
 			super.init(frame: frame)
 			commonInit()
 		}
-
-		@available(*, unavailable)
-		required init?(coder _: NSCoder) {
-			fatalError("init(coder:) has not been implemented")
-		}
 	#else
 		override init(frame frameRect: NSRect) {
 			super.init(frame: frameRect)
 			commonInit()
 		}
-
-		@available(*, unavailable)
-		required init?(coder _: NSCoder) {
-			fatalError("init(coder:) has not been implemented")
-		}
 	#endif
+
+	@available(*, unavailable)
+	required init?(coder _: NSCoder) {
+		fatalError("init(coder:) has not been implemented")
+	}
 
 	private func commonInit() {
 		#if os(macOS)
@@ -112,11 +111,18 @@ class TabsView: PlatformView {
 		setupTopStackView()
 		setupBackgroundView()
 		setupTagMaskView()
+		setupPanGesture()
 	}
+
+	// MARK: - Stack setup
 
 	private func setupBottomStackView() {
 		bottomStackView = PlatformStackView()
-		bottomStackView.orientation_axis = .horizontal
+		#if os(iOS)
+			bottomStackView.axis = .horizontal
+		#else
+			bottomStackView.orientation = .horizontal
+		#endif
 		bottomStackView.distribution = .fillEqually
 		bottomStackView.translatesAutoresizingMaskIntoConstraints = false
 		addSubview(bottomStackView)
@@ -130,11 +136,13 @@ class TabsView: PlatformView {
 
 	private func setupTopStackView() {
 		topStackView = PlatformStackView()
-		topStackView.orientation_axis = .horizontal
-		topStackView.distribution = .fillEqually
 		#if os(iOS)
+			topStackView.axis = .horizontal
 			topStackView.isUserInteractionEnabled = false
+		#else
+			topStackView.orientation = .horizontal
 		#endif
+		topStackView.distribution = .fillEqually
 		topStackView.translatesAutoresizingMaskIntoConstraints = false
 		addSubview(topStackView)
 		NSLayoutConstraint.activate([
@@ -143,27 +151,83 @@ class TabsView: PlatformView {
 			topStackView.trailingAnchor.constraint(equalTo: trailingAnchor),
 			topStackView.bottomAnchor.constraint(equalTo: bottomAnchor),
 		])
-		#if os(macOS)
-			// NSStackView has no isUserInteractionEnabled; disable hit testing
-			// by overriding hitTest on a subclassed view is not available here
-			// without a further subclass, so top stack view's buttons are given
-			// isEnabled = false instead — see button(with:) below.
-		#endif
 	}
 
+	// MARK: - Glass background
+
 	private func setupBackgroundView() {
-		backgroundView = PlatformView()
+		backgroundView = makeGlassView(tint: .brown)
 		#if os(iOS)
 			backgroundView.clipsToBounds = true
-			backgroundView.backgroundColor = .tintColor
-			backgroundView.layer.cornerCurve = .continuous
 			insertSubview(backgroundView, aboveSubview: bottomStackView)
 		#else
 			backgroundView.wantsLayer = true
 			backgroundView.layer?.masksToBounds = true
-			backgroundView.layer?.backgroundColor = PlatformColor.controlAccentColor.cgColor
-			backgroundView.layer?.cornerCurve = .continuous
 			addSubview(backgroundView, positioned: .above, relativeTo: bottomStackView)
+		#endif
+	}
+
+	private func makeGlassView(tint: PlatformColor) -> PlatformView {
+		#if os(iOS)
+			if #available(iOS 26.0, *) {
+				let effect = UIGlassEffect(style: .regular)
+				effect.isInteractive = true
+				effect.tintColor = tint
+				let view = UIVisualEffectView(effect: effect)
+				view.layer.cornerCurve = .continuous
+				return view
+			} else {
+				let view = UIVisualEffectView(effect: UIBlurEffect(style: .systemThinMaterial))
+				view.layer.cornerCurve = .continuous
+				let tintOverlay = UIView()
+				tintOverlay.backgroundColor = tint.withAlphaComponent(0.28)
+				tintOverlay.translatesAutoresizingMaskIntoConstraints = false
+				view.contentView.addSubview(tintOverlay)
+				NSLayoutConstraint.activate([
+					tintOverlay.topAnchor.constraint(equalTo: view.contentView.topAnchor),
+					tintOverlay.leadingAnchor.constraint(equalTo: view.contentView.leadingAnchor),
+					tintOverlay.trailingAnchor.constraint(equalTo: view.contentView.trailingAnchor),
+					tintOverlay.bottomAnchor.constraint(equalTo: view.contentView.bottomAnchor),
+				])
+				return view
+			}
+		#else
+			if #available(macOS 26.0, *) {
+				let view = NSGlassEffectView()
+				view.tintColor = tint
+				return view
+			} else {
+				let view = NSVisualEffectView()
+				view.material = .hudWindow
+				view.blendingMode = .withinWindow
+				view.state = .active
+				view.wantsLayer = true
+				view.layer?.cornerCurve = .continuous
+				let tintOverlay = NSView()
+				tintOverlay.wantsLayer = true
+				tintOverlay.layer?.backgroundColor = tint.withAlphaComponent(0.28).cgColor
+				tintOverlay.translatesAutoresizingMaskIntoConstraints = false
+				view.addSubview(tintOverlay)
+				NSLayoutConstraint.activate([
+					tintOverlay.topAnchor.constraint(equalTo: view.topAnchor),
+					tintOverlay.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+					tintOverlay.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+					tintOverlay.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+				])
+				return view
+			}
+		#endif
+	}
+
+	private func setCornerRadius(_ radius: CGFloat, on view: PlatformView) {
+		#if os(iOS)
+			view.layer.cornerRadius = radius
+		#else
+			if #available(macOS 26.0, *), let glass = view as? NSGlassEffectView {
+				glass.cornerRadius = radius
+			} else {
+				view.layer?.cornerRadius = radius
+			}
 		#endif
 	}
 
@@ -182,6 +246,8 @@ class TabsView: PlatformView {
 			topStackView.layer?.mask = tagMaskView.layer
 		#endif
 	}
+
+	// MARK: - Buttons
 
 	private func updateButtons(with items: [(title: String, icon: String)]) {
 		bottomStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
@@ -231,8 +297,6 @@ class TabsView: PlatformView {
 			button.bezelStyle = .inline
 			button.isBordered = false
 			button.tag = tag
-			button.font = NSFont.monospacedSystemFont(ofSize: 13, weight: .semibold)
-			button.contentTintColor = foregroundColor
 			button.attributedTitle = NSAttributedString(
 				string: item.title,
 				attributes: [
@@ -247,13 +311,82 @@ class TabsView: PlatformView {
 
 	@objc private func tagButtonTapped(_ sender: PlatformView) {
 		guard let index = bottomButtons.firstIndex(of: sender) else { return }
+		animateSelection(to: index)
+	}
+
+	// MARK: - Pan gesture
+
+	private func setupPanGesture() {
+		let pan = PlatformPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
+		backgroundView.addGestureRecognizer(pan)
+	}
+
+	@objc private func handlePan(_ gesture: PlatformPanGestureRecognizer) {
+		guard !bottomButtons.isEmpty else { return }
+		let translationX = gesture.translation(in: self).x
+
+		switch gesture.state {
+			case .began:
+				isDragging = true
+				dragStartX = backgroundView.frame.origin.x
+
+			case .changed:
+				guard isDragging else { return }
+				let width = backgroundView.frame.width
+				let minX = bottomButtons.first!.frame.origin.x
+				let maxX = bottomButtons.last!.frame.origin.x
+				let proposedX = dragStartX + translationX
+				let clampedX = min(max(proposedX, minX), maxX)
+				moveIndicator(toX: clampedX, width: width)
+
+			case .ended, .cancelled, .failed:
+				guard isDragging else { return }
+				isDragging = false
+				let centerX = backgroundView.frame.midX
+				let nearestIndex = nearestButtonIndex(toX: centerX)
+				animateSelection(to: nearestIndex)
+
+			default:
+				break
+		}
+	}
+
+	private func moveIndicator(toX x: CGFloat, width: CGFloat) {
+		let frame = CGRect(x: x, y: backgroundView.frame.origin.y, width: width, height: backgroundView.frame.height)
 		#if os(iOS)
-			UIView.animate(springDuration: 0.25, bounce: 0.25) {
+			backgroundView.frame = frame
+			tagMaskView.frame = frame
+		#else
+			CATransaction.begin()
+			CATransaction.setDisableActions(true)
+			backgroundView.frame = frame
+			tagMaskView.frame = frame
+			topStackView.layer?.mask?.frame = frame
+			CATransaction.commit()
+		#endif
+	}
+
+	private func nearestButtonIndex(toX x: CGFloat) -> Int {
+		var closest = 0
+		var closestDistance = CGFloat.greatestFiniteMagnitude
+		for (index, button) in bottomButtons.enumerated() {
+			let distance = abs(button.frame.midX - x)
+			if distance < closestDistance {
+				closestDistance = distance
+				closest = index
+			}
+		}
+		return closest
+	}
+
+	private func animateSelection(to index: Int) {
+		#if os(iOS)
+			UIView.animate(springDuration: 0.3, bounce: 0.3) {
 				self.selectedTagIndex = index
 			}
 		#else
 			NSAnimationContext.runAnimationGroup { context in
-				context.duration = 0.25
+				context.duration = 0.3
 				context.allowsImplicitAnimation = true
 				self.selectedTagIndex = index
 			}
@@ -261,20 +394,16 @@ class TabsView: PlatformView {
 		onSelectionChange?(index)
 	}
 
+	// MARK: - Selection layout
+
 	private func updateSelection(for selectedTagIndex: Int) {
 		guard bottomButtons.indices.contains(selectedTagIndex) else { return }
-		let button = bottomButtons[selectedTagIndex]
-		let frame = button.frame
-		#if os(iOS)
-			backgroundView.layer.cornerRadius = frame.height / 2
-			backgroundView.frame = frame
-			tagMaskView.layer.cornerRadius = frame.height / 2
-			tagMaskView.frame = frame
-		#else
-			backgroundView.layer?.cornerRadius = frame.height / 2
-			backgroundView.frame = frame
-			tagMaskView.layer?.cornerRadius = frame.height / 2
-			tagMaskView.frame = frame
+		let frame = bottomButtons[selectedTagIndex].frame
+		setCornerRadius(frame.height / 2, on: backgroundView)
+		backgroundView.frame = frame
+		setCornerRadius(frame.height / 2, on: tagMaskView)
+		tagMaskView.frame = frame
+		#if os(macOS)
 			topStackView.layer?.mask?.frame = frame
 		#endif
 	}
@@ -282,6 +411,7 @@ class TabsView: PlatformView {
 	#if os(iOS)
 		override func layoutSubviews() {
 			super.layoutSubviews()
+			guard !isDragging else { return }
 			UIView.performWithoutAnimation { [unowned self] in
 				updateSelection(for: selectedTagIndex)
 			}
@@ -289,6 +419,7 @@ class TabsView: PlatformView {
 	#else
 		override func layout() {
 			super.layout()
+			guard !isDragging else { return }
 			updateSelection(for: selectedTagIndex)
 		}
 	#endif
@@ -304,28 +435,6 @@ class TabsView: PlatformView {
 	extension NSColor {
 		static var labelColorCompat: NSColor {
 			.labelColor
-		}
-	}
-
-	extension NSStackView {
-		var orientation_axis: NSUserInterfaceLayoutOrientation {
-			get { orientation }
-			set { orientation = newValue }
-		}
-	}
-
-	extension NSView {
-		func addSubview(_ view: NSView, positioned: NSWindow.OrderingMode, relativeTo otherView: NSView?) {
-			addSubview(view, positioned: positioned, relativeTo: otherView)
-		}
-	}
-#endif
-
-#if os(iOS)
-	extension UIStackView {
-		var orientation_axis: NSLayoutConstraint.Axis {
-			get { axis }
-			set { axis = newValue }
 		}
 	}
 #endif
