@@ -243,10 +243,10 @@ private struct TodaySchoolTimeline: View {
 		let duration = CGFloat(period.end.minutesSinceMidnight - period.start.minutesSinceMidnight) * minuteHeight
 		let cardHeight = max(44, duration - 8)
 		HStack(alignment: .center) {
-			HStack(alignment: .lastTextBaseline, spacing: 10) {
+			HStack(alignment: .center, spacing: 10) {
 				Text("\(period.number)")
 					.font(.caption.monospacedDigit())
-					.frame(width: 22)
+					.frame(width: 15)
 
 				Text(subject?.id ?? "Free Period")
 					.lineLimit(2)
@@ -260,7 +260,7 @@ private struct TodaySchoolTimeline: View {
 				Image(systemName: subject.symbol)
 					.resizable()
 					.aspectRatio(contentMode: .fit)
-					.frame(height: cardHeight - 40)
+					.frame(width: cardHeight - 40, height: cardHeight - 40)
 					.padding(.trailing, 10)
 					.foregroundStyle(subject.colour.swiftUIColor)
 			}
