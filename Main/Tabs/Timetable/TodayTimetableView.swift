@@ -126,7 +126,7 @@ private struct TodaySchoolTimeline: View {
 		VStack(alignment: .leading, spacing: 8) {
 			Text("Classes").font(.headline)
 			GeometryReader { geometry in
-				GlassEffectContainer(spacing: 8) {
+				GlassEffectContainer(spacing: 10) {
 					ZStack(alignment: .topLeading) {
 						ForEach(periods, id: \.number) { period in
 							periodRow(period)
@@ -146,7 +146,6 @@ private struct TodaySchoolTimeline: View {
 			}
 			.frame(height: height)
 		}
-		.padding(.bottom, 5)
 		.padding(10)
 		.background {
 			GeometryReader { proxy in
@@ -168,9 +167,7 @@ private struct TodaySchoolTimeline: View {
 		HStack(alignment: .top, spacing: 10) {
 			Text("\(period.number)").font(.caption.monospacedDigit()).foregroundStyle(.secondary).frame(width: 22)
 
-
-				Text(subject?.id ?? "Free Period").font(.headline)
-
+			Text(subject?.id ?? "Free Period").font(.headline)
 
 			Spacer()
 
