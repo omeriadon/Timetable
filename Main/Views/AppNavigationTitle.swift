@@ -5,6 +5,7 @@ private struct AppNavigationTitleModifier: ViewModifier {
 
 	let title: String
 	let style: AppNavigationTitleStyle
+	let usesAccentColor: Bool
 
 	func body(content: Content) -> some View {
 		#if os(iOS)
@@ -17,6 +18,7 @@ private struct AppNavigationTitleModifier: ViewModifier {
 							.font(style == .main ? .largeTitle : .title2)
 							.bold()
 							.monospaced()
+							.foregroundStyle(usesAccentColor ? .accent : .primary)
 					}
 				}
 				.scrollEdgeEffectStyle(.soft, for: .top)
@@ -51,7 +53,7 @@ enum AppNavigationTitleStyle {
 }
 
 extension View {
-	func appNavigationTitle(_ title: String, style: AppNavigationTitleStyle = .subview) -> some View {
-		modifier(AppNavigationTitleModifier(title: title, style: style))
+	func appNavigationTitle(_ title: String, style: AppNavigationTitleStyle = .subview, accent: Bool = false) -> some View {
+		modifier(AppNavigationTitleModifier(title: title, style: style, usesAccentColor: accent))
 	}
 }

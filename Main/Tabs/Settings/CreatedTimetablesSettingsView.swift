@@ -197,7 +197,7 @@ private struct CreatedTimetableEditorView: View {
 				}
 			}
 		}
-		.appNavigationTitle(title)
+		.appNavigationTitle(title, accent: true)
 		.sheet(
 			isPresented: $showEditor
 		) {

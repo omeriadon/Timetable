@@ -78,6 +78,7 @@ struct TimetableSearchView: View {
 							.monospaced()
 							.font(.largeTitle)
 							.bold()
+							.foregroundStyle(.accent)
 					}
 				}
 				.overlay {

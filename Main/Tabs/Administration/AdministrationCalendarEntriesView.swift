@@ -41,7 +41,7 @@ struct AdministrationCalendarEntriesView: View {
 			.listRowInsets(.init(top: 2, leading: 20, bottom: 2, trailing: 20))
 		}
 		.listRowSpacing(8)
-		.appNavigationTitle(navigationTitle)
+		.appNavigationTitle(navigationTitle, accent: true)
 		.task {
 			await load()
 		}

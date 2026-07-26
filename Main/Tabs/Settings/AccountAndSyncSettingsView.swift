@@ -67,7 +67,7 @@ struct AccountAndSyncSettingsView: View {
 			.scrollContentBackground(.hidden)
 			.frame(maxWidth: 560)
 		#endif
-			.appNavigationTitle("Updates")
+			.appNavigationTitle("Updates", accent: true)
 	}
 
 	private func preferenceBinding(_ keyPath: WritableKeyPath<AccountSettings, Bool>) -> Binding<Bool> {
@@ -260,7 +260,7 @@ private struct EventNotificationScheduleSheet: View {
 				}
 				.pickerStyle(.wheel)
 			}
-			.appNavigationTitle("Event Notification")
+			.appNavigationTitle("Event Notification", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) { Button(role: .cancel) { dismiss() } }
 				ToolbarItem(placement: .confirmationAction) {
@@ -375,7 +375,7 @@ struct NotificationLeadTimesEditor: View {
 				.buttonSizing(.flexible)
 				.buttonStyle(.plain)
 			}
-			.appNavigationTitle(title)
+			.appNavigationTitle(title, accent: true)
 		}
 	}
 #endif // os(iOS)

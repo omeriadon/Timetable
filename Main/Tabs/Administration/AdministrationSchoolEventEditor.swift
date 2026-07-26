@@ -40,7 +40,7 @@ struct AdministrationSchoolEventEditor: View {
 					Label("Symbol", systemImage: symbol)
 				}
 			}
-			.appNavigationTitle(target.event == nil ? "School Event" : "Edit School Event")
+			.appNavigationTitle(target.event == nil ? "School Event" : "Edit School Event", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {

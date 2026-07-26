@@ -46,7 +46,7 @@ struct AdministrationUserEditor: View {
 					}
 				}
 			}
-			.appNavigationTitle(target.user == nil ? "New User" : "User")
+			.appNavigationTitle(target.user == nil ? "New User" : "User", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {

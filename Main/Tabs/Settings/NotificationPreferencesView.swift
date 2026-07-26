@@ -28,7 +28,7 @@ struct NotificationPreferencesView: View {
 		}
 		.formStyle(.grouped)
 		.scrollContentBackground(.hidden)
-		.appNavigationTitle("Notifications")
+		.appNavigationTitle("Notifications", accent: true)
 	}
 
 	private func localBinding<Value>(_ keyPath: WritableKeyPath<AccountSettings, Value>) -> Binding<Value> {

@@ -122,7 +122,7 @@ struct NonAuthoritativeSettingsView: View {
 			}
 			.scrollContentBackground(.hidden)
 			.formStyle(.grouped)
-			.appNavigationTitle("Settings", style: .main)
+			.appNavigationTitle("Settings", style: .main, accent: true)
 		}
 		#if os(macOS)
 		.onAppear { expanded = .settings }

@@ -29,7 +29,7 @@ struct AdministrationUsersView: View {
 			.matchedTransitionSource(id: user.id, in: userEditorNamespace)
 		}
 		.searchable(text: $searchText, prompt: "Search users")
-		.appNavigationTitle("Users")
+		.appNavigationTitle("Users", accent: true)
 		.toolbar {
 			ToolbarItem(placement: .confirmationAction) {
 				Button("Add User", systemImage: "plus", role: .confirm) {

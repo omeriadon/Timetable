@@ -66,7 +66,7 @@ import WidgetKit
 				}
 				.scrollEdgeEffectStyle(.soft, for: .top)
 				.scrollContentBackground(.hidden)
-				.appNavigationTitle("Settings", style: .main)
+				.appNavigationTitle("Settings", style: .main, accent: true)
 			}
 		}
 

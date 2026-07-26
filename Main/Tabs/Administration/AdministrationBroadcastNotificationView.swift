@@ -13,7 +13,7 @@ struct AdministrationBroadcastNotificationView: View {
 			TextField("Message", text: $notifBody, axis: .vertical)
 				.lineLimit(4 ... 8)
 		}
-		.appNavigationTitle("Broadcast Notification")
+		.appNavigationTitle("Broadcast Notification", accent: true)
 		.toolbar {
 			ToolbarItem(placement: .confirmationAction) {
 				Button("Send", systemImage: "paperplane.fill", role: .confirm) {

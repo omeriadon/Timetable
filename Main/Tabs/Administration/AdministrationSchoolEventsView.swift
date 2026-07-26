@@ -41,7 +41,7 @@ struct AdministrationSchoolEventsView: View {
 			}
 		}
 		.listRowSpacing(8)
-		.appNavigationTitle("School Events")
+		.appNavigationTitle("School Events", accent: true)
 		.sheet(item: $editorTarget) { target in
 			AdministrationSchoolEventEditor(
 				target: target,
