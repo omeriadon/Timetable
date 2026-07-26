@@ -55,7 +55,7 @@ struct TodayTimetableView: View {
 
 					if let dayIndex = schoolCalendar.dayIndex(for: now), schoolCalendar.isSchoolDay(now), !subjects.isEmpty {
 						TodaySchoolTimeline(subjects: subjects, dayIndex: dayIndex, now: now)
-					} else if schoolEvents.isEmpty && personalEvents.isEmpty && noSchoolDay == nil {
+					} else if schoolEvents.isEmpty, personalEvents.isEmpty, noSchoolDay == nil {
 						TodayCountdown(subjects: subjects, schoolCalendar: schoolCalendar, now: now)
 					}
 				}
@@ -181,7 +181,9 @@ private struct TodaySchoolTimeline: View {
 	private let outerCornerRadius: CGFloat = 20
 	private let periodCornerRadius: CGFloat = 13
 	private let timelineHorizontalPadding: CGFloat = 3
-	private var periodHorizontalInset: CGFloat { outerCornerRadius - periodCornerRadius }
+	private var periodHorizontalInset: CGFloat {
+		outerCornerRadius - periodCornerRadius
+	}
 
 	var body: some View {
 		let periods = SchoolStateEngine.activePeriods(for: dayIndex)
@@ -255,11 +257,11 @@ private struct TodaySchoolTimeline: View {
 
 	private var currentTimeMarker: some View {
 		Color.clear
-		.frame(maxWidth: .infinity, alignment: .leading)
-		.frame(height: 15)
-		.glassEffect(.regular.tint(.red), in: CurrentTimeMarkerShape())
-		.padding(.horizontal, -1)
-		.accessibilityLabel("Current time")
+			.frame(maxWidth: .infinity, alignment: .leading)
+			.frame(height: 15)
+			.glassEffect(.regular.tint(.red), in: CurrentTimeMarkerShape())
+			.padding(.horizontal, -1)
+			.accessibilityLabel("Current time")
 	}
 
 	private func periodRowWidth(for availableWidth: CGFloat) -> CGFloat {

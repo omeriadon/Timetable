@@ -59,10 +59,12 @@ nonisolated struct AdministrationUserCreateRequest: Codable, Sendable {
 	let email: String
 	let password: String
 }
+
 nonisolated struct AdministrationUserUpdateRequest: Codable, Sendable { let displayName: String; let email: String; let password: String? }
 nonisolated struct AdministrationUserDetailResponse: Codable, Sendable {
 	let rawData: String
 }
+
 nonisolated struct AdministrationCalendarEntry: Codable, Identifiable, Sendable { let id: UUID; let kind: String; let label: String; let startDate: SchoolCalendarDate; let endDate: SchoolCalendarDate? }
 nonisolated struct AdministrationCalendarEntryRequest: Codable, Sendable { let kind: String; let label: String; let startDate: SchoolCalendarDate; let endDate: SchoolCalendarDate? }
 nonisolated struct BroadcastNotificationRequest: Codable, Sendable {

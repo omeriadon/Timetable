@@ -81,7 +81,7 @@ struct AdministrationUserEditor: View {
 				return
 			}
 
-			rawData = (try? await service.userDetail(id: user.id).rawData) ?? "Unable to load raw account data."
+			rawData = await (try? service.userDetail(id: user.id).rawData) ?? "Unable to load raw account data."
 		}
 	}
 
