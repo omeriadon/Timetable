@@ -12,16 +12,21 @@ struct AdministrationSchoolEventsView: View {
 				Button {
 					editorTarget = .edit(event)
 				} label: {
-					LabeledContent {
-						Text(event.date.displayLabel)
-							.foregroundStyle(.secondary)
-					} label: {
-						Label(event.title, systemImage: event.symbol)
+					Label {
+						VStack(alignment: .leading, spacing: 4) {
+							Text(event.title)
+								.foregroundStyle(.primary)
+							Text(event.date.displayLabel)
+								.font(.footnote)
+								.foregroundStyle(.secondary)
+						}
+					} icon: {
+						Image(systemName: event.symbol)
 					}
+					.padding(.vertical, 6)
 				}
 				.buttonStyle(.plain)
-				.frame(maxWidth: .infinity, minHeight: 44, maxHeight: 44, alignment: .leading)
-				.listRowInsets(.init(top: 0, leading: 20, bottom: 0, trailing: 20))
+				.listRowInsets(.init(top: 2, leading: 20, bottom: 2, trailing: 20))
 				.swipeActions {
 					Button("Delete", systemImage: "trash", role: .destructive) {
 						Task {
@@ -35,6 +40,7 @@ struct AdministrationSchoolEventsView: View {
 				editorTarget = .create
 			}
 		}
+		.listRowSpacing(8)
 		.appNavigationTitle("School Events")
 		.sheet(item: $editorTarget) { target in
 			AdministrationSchoolEventEditor(

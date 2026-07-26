@@ -13,14 +13,21 @@ struct AdministrationCalendarEntriesView: View {
 				Button {
 					editor = entry
 				} label: {
-					LabeledContent(entry.label) {
-						Text(entry.startDate.displayLabel)
-							.foregroundStyle(.secondary)
+					Label {
+						VStack(alignment: .leading, spacing: 4) {
+							Text(entry.label)
+								.foregroundStyle(.primary)
+							Text(dateLabel(for: entry))
+								.font(.footnote)
+								.foregroundStyle(.secondary)
+						}
+					} icon: {
+						Image(systemName: kind == "term" ? "calendar" : "calendar.badge.exclamationmark")
 					}
+					.padding(.vertical, 6)
 				}
 				.buttonStyle(.plain)
-				.frame(maxWidth: .infinity, minHeight: 44, maxHeight: 44, alignment: .leading)
-				.listRowInsets(.init(top: 0, leading: 20, bottom: 0, trailing: 20))
+				.listRowInsets(.init(top: 2, leading: 20, bottom: 2, trailing: 20))
 				.swipeActions {
 					Button("Delete", systemImage: "trash", role: .destructive) {
 						delete(entry.id)
@@ -31,9 +38,9 @@ struct AdministrationCalendarEntriesView: View {
 			Button(addButtonTitle, systemImage: "plus") {
 				editor = newEntry()
 			}
-			.listRowInsets(.init(top: 0, leading: 20, bottom: 0, trailing: 20))
+			.listRowInsets(.init(top: 2, leading: 20, bottom: 2, trailing: 20))
 		}
-		.listRowSpacing(0)
+		.listRowSpacing(8)
 		.appNavigationTitle(navigationTitle)
 		.task {
 			await load()
@@ -88,5 +95,23 @@ struct AdministrationCalendarEntriesView: View {
 
 	private var addButtonTitle: String {
 		kind == "term" ? "Add Term Date" : "Add No-School Day"
+	}
+
+	private func dateLabel(for entry: AdministrationCalendarEntry) -> String {
+		let start = shortDate(for: entry.startDate)
+
+		guard kind == "term", let endDate = entry.endDate else {
+			return start
+		}
+
+		return "\(start) – \(shortDate(for: endDate))"
+	}
+
+	private func shortDate(for calendarDate: SchoolCalendarDate) -> String {
+		guard let date = calendarDate.startOfDay() else {
+			return calendarDate.displayLabel
+		}
+
+		return date.formatted(.dateTime.day().month(.abbreviated).year())
 	}
 }
