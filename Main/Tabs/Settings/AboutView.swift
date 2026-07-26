@@ -1,0 +1,95 @@
+//
+//  AboutView.swift
+//  Timetable
+//
+//  Created by Adon Omeri on 26/7/2026.
+//
+
+import ColorfulX
+import SwiftUI
+
+struct AboutView: View {
+	@State private var colors = [
+		Color.brown,
+		Color.clear,
+		Color.clear,
+	]
+	@State private var speed = 0.6
+	@State private var colorTransitionSpeed = 10.0
+
+	var body: some View {
+		ScrollView {
+			VStack {
+				Image("Icon")
+					.resizable()
+					.aspectRatio(contentMode: .fit)
+					.frame(width: 200)
+
+				Text("Timetable")
+					.font(.largeTitle)
+					.bold()
+					.fontWidth(.expanded)
+					.padding(.bottom, 20)
+
+				VStack(alignment: .leading, spacing: 8) {
+					Text("Development")
+						.foregroundStyle(.secondary)
+						.textCase(.uppercase)
+						.padding(.horizontal)
+
+					VStack(spacing: 0) {
+						LabeledContent("Adon Omeri", value: "Software Engineer")
+							.padding()
+
+						Divider()
+							.padding(.horizontal)
+
+						LabeledContent(
+							"Bob Han-Busi",
+							value: "Human Interface Design"
+						)
+						.padding()
+
+						Divider()
+							.padding(.horizontal)
+
+						LabeledContent(
+							"Joshua Gilgallon",
+							value: "Infrastructure & Hosting"
+						)
+						.padding()
+					}
+					.background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 30))
+					.environment(\.colorScheme, .dark)
+
+					Text("© \(Calendar.current.component(.year, from: .now).description), JDCQ. All rights reserved.")
+						.foregroundStyle(.secondary)
+						.padding()
+						.frame(maxWidth: .infinity, alignment: .leading)
+						.frame(height: 50)
+						.background(
+							Capsule()
+								.fill(.ultraThinMaterial)
+								.environment(\.colorScheme, .dark)
+						)
+				}
+			}
+			.padding(.horizontal)
+		}
+		.scrollContentBackground(.hidden)
+		.preferredColorScheme(.dark)
+		.scrollEdgeEffect()
+		.background {
+			ColorfulView(
+				color: $colors,
+				speed: $speed,
+				bias: .constant(0.00001),
+				noise: .constant(64),
+				transitionSpeed: $colorTransitionSpeed,
+				frameLimit: .constant(60),
+				renderScale: .constant(1)
+			)
+			.ignoresSafeArea()
+		}
+	}
+}

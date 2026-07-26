@@ -5,6 +5,7 @@
 //   Created by Adon Omeri on 13/5/2026.
 //
 
+import ColorfulX
 import Defaults
 import SwiftUI
 import WidgetKit
@@ -42,6 +43,16 @@ import WidgetKit
 		@State private var showEditReceivedTimetablesSheet = false
 		@State private var showFeedbackSheet = false
 		@State private var showImportConfirmation = false
+
+		@State private var colors = [
+			Color.brown,
+			Color(uiColor: .secondarySystemGroupedBackground),
+			Color(uiColor: .secondarySystemGroupedBackground),
+			Color(uiColor: .secondarySystemGroupedBackground),
+			Color(uiColor: .secondarySystemGroupedBackground),
+		]
+		@State private var speed = 0.6
+		@State private var colorTransitionSpeed = 10.0
 
 		@Namespace private var ns
 
@@ -263,6 +274,23 @@ import WidgetKit
 						.presentationDetents([.fraction(0.7)])
 						.navigationTransition(.zoom(sourceID: "346361347", in: ns))
 				}
+
+				NavigationLink {
+					AboutView()
+				} label: {
+					Label("About Timetable", systemImage: "info.circle")
+				}
+				.listRowBackground(
+					ColorfulView(
+						color: $colors,
+						speed: $speed,
+						bias: .constant(0.00001),
+						noise: .constant(64),
+						transitionSpeed: $colorTransitionSpeed,
+						frameLimit: .constant(60),
+						renderScale: .constant(1)
+					)
+				)
 
 				VStack(alignment: .leading) {
 					Text("Last Server Sync")
