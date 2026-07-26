@@ -426,9 +426,11 @@ struct TimetableApp: App {
 				}
 				.safeAreaBar(edge: .bottom) {
 					if Platform.current.allowsAccountCreation {
-						Button("Create an Account") {
-							onboardingPageID = ""
+						Button {
+							onboardingPageID = "account"
 							hasCompletedOnboarding = false
+						} label: {
+							Label("Create an Account", systemImage: "person.badge.plus")
 						}
 						.buttonStyle(.glassProminent)
 						.controlSize(.large)
