@@ -191,7 +191,7 @@ import WidgetKit
 				}
 			}
 			Section("Developer") {
-				if _isDebugAssertConfiguration() || Defaults[.userDisplayName].contains("Adon") {
+				if _isDebugAssertConfiguration() || Defaults[.userDisplayName].contains("Adon") || Defaults[.calendarEvents].canManageGlobalEvents {
 					LabeledContent("Debug Offset") {
 						TextField("Seconds", value: $debugOffset, format: .number)
 							.multilineTextAlignment(.trailing)

@@ -111,9 +111,15 @@ struct FriendsTimetablesView: View {
 				Spacer()
 
 				if let countdownEnd {
-					Text(timerInterval: now ... countdownEnd, countsDown: true, showsHours: true)
-						.font(.title3.monospacedDigit())
+					Text(timerInterval: now ... countdownEnd)
+						.contentTransition(.numericText())
+						.animation(.easeInOut, value: now)
+						.font(.title3)
+						.lineLimit(1)
 						.bold()
+						.padding(.horizontal, 13)
+						.padding(.vertical, 8)
+						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
 				}
 
 				Spacer()

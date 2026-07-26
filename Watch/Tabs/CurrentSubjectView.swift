@@ -129,7 +129,9 @@ struct CurrentSubjectView: View {
 
 					Spacer()
 
-					Text(timerInterval: now ... end, countsDown: true, showsHours: true)
+					Text(timerInterval: now ... end)
+						.contentTransition(.numericText())
+						.animation(.easeInOut, value: now)
 						.font(.title2)
 						.lineLimit(1)
 						.bold()
