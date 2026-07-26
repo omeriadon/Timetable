@@ -16,6 +16,10 @@ final class AdministrationService {
 		try await networkManager.send(.v1AdministrationUsers)
 	}
 
+	func updateUser(id: UUID, request: AdministrationUserUpdateRequest) async throws -> AdministrationUserResponse {
+		try await networkManager.send(Endpoint("/v1/administration/users/\(id.uuidString)", method: .put), body: request, context: .userInitiated)
+	}
+
 	func calendar() async throws -> [AdministrationCalendarEntry] {
 		try await networkManager.send(.v1AdministrationCalendar)
 	}
