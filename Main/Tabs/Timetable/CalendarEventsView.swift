@@ -16,21 +16,17 @@ struct DatesView: View {
 
 	var body: some View {
 		List {
-			Section("Term Dates") {
-				ForEach(Array(schoolCalendar.termRanges.enumerated()), id: \.offset) { _, range in
-					if range.intersects(dateWindow) {
-						LabeledContent(range.label) { Text(range.displayLabel).foregroundStyle(.secondary) }
-					}
+			Section {
+				NavigationLink {
+					TermDatesList(ranges: upcomingTermRanges)
+				} label: {
+					Label("Term Dates", systemImage: "calendar")
 				}
-			}
-			Section("No School") {
-				if upcomingNoSchoolDates.isEmpty {
-					Text("There are no no-school days upcoming.")
-						.foregroundStyle(.secondary)
-				} else {
-					ForEach(upcomingNoSchoolDates, id: \.self) { date in
-						LabeledContent(date.label) { Text(date.date.displayLabel).foregroundStyle(.secondary) }
-					}
+
+				NavigationLink {
+					NoSchoolDatesList(dates: upcomingNoSchoolDates)
+				} label: {
+					Label("No School", systemImage: "calendar.badge.exclamationmark")
 				}
 			}
 			Section("School Events") {
@@ -99,6 +95,52 @@ struct DatesView: View {
 		schoolCalendar.skippedDates
 			.filter { dateWindow.contains($0.date) }
 			.sorted { $0.date < $1.date }
+	}
+
+	private var upcomingTermRanges: [SchoolCalendarDateRange] {
+		schoolCalendar.termRanges.filter { $0.intersects(dateWindow) }
+	}
+}
+
+private struct TermDatesList: View {
+	let ranges: [SchoolCalendarDateRange]
+
+	var body: some View {
+		List {
+			if ranges.isEmpty {
+				Text("There are no term dates upcoming.")
+					.foregroundStyle(.secondary)
+			} else {
+				ForEach(Array(ranges.enumerated()), id: \.offset) { _, range in
+					LabeledContent(range.label) {
+						Text(range.displayLabel)
+							.foregroundStyle(.secondary)
+					}
+				}
+			}
+		}
+		.appNavigationTitle("Term Dates")
+	}
+}
+
+private struct NoSchoolDatesList: View {
+	let dates: [SchoolCalendarNamedDate]
+
+	var body: some View {
+		List {
+			if dates.isEmpty {
+				Text("There are no no-school days upcoming.")
+					.foregroundStyle(.secondary)
+			} else {
+				ForEach(dates, id: \.self) { date in
+					LabeledContent(date.label) {
+						Text(date.date.displayLabel)
+							.foregroundStyle(.secondary)
+					}
+				}
+			}
+		}
+		.appNavigationTitle("No School")
 	}
 }
 
