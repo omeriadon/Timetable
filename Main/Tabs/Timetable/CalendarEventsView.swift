@@ -8,8 +8,7 @@ import SwiftUI
 struct DatesView: View {
 	@Default(.schoolCalendar) private var schoolCalendar
 	@Default(.calendarEvents) private var events
-	@State private var editorTarget: CalendarEventEditorTarget?
-	@State private var noSchoolDayTarget: NoSchoolDayDetailTarget?
+	@State private var presentationTarget: PlannerPresentationTarget?
 	@State private var eventService = CalendarEventsSyncService.shared
 	@Environment(\.statusBadgeManager) private var badges
 	@Namespace private var eventEditorNamespace
@@ -43,7 +42,7 @@ struct DatesView: View {
 
 		.safeAreaBar(edge: .bottom, spacing: 10) {
 			Button("Add Personal Event", systemImage: "plus") {
-				editorTarget = .create(.privateEvent)
+				presentationTarget = .createEvent(.privateEvent)
 			}
 			.controlSize(.extraLarge)
 			.labelStyle(.iconOnly)
@@ -51,29 +50,64 @@ struct DatesView: View {
 			.buttonBorderShape(.circle)
 			.buttonStyle(.glassProminent)
 			.matchedTransitionSource(
-				id: CalendarEventEditorTarget.create(.privateEvent).transitionID,
+				id: PlannerPresentationTarget.createEvent(.privateEvent).transitionID,
 				in: eventEditorNamespace
 			)
 			.padding(.bottom, 10)
 		}
-		.sheet(item: $editorTarget) { target in
-			CalendarEventEditor(target: target, canManageGlobalEvents: events.canManageGlobalEvents) { request, event in
-				if let event {
-					try await eventService.updateEvent(id: event.id, request: request, globally: event.isGlobal)
-				} else {
-					try await eventService.createEvent(request, globally: target.scope == .globalEvent)
-				}
-			} delete: { event in
-				try await eventService.deleteEvent(id: event.id, globally: event.isGlobal)
-			}
-			.presentationDetents([.fraction(0.6)])
-			.navigationTransition(.zoom(sourceID: target.transitionID, in: eventEditorNamespace))
+		.sheet(item: $presentationTarget) { target in
+			plannerPresentation(for: target)
 		}
-		.sheet(item: $noSchoolDayTarget) { target in
-			NoSchoolDayDetailView(target: target)
+	}
+
+	@ViewBuilder
+	private func plannerPresentation(for target: PlannerPresentationTarget) -> some View {
+		switch target {
+		case let .createEvent(scope):
+			calendarEventEditor(
+				target: .create(scope),
+				transitionID: target.transitionID
+			)
+		case let .calendarEvent(event, _):
+			calendarEventEditor(
+				target: .edit(event),
+				transitionID: target.transitionID
+			)
+		case let .noSchoolDay(detail):
+			NoSchoolDayDetailView(target: detail)
 				.presentationDetents([.fraction(0.5)])
 				.navigationTransition(.zoom(sourceID: target.transitionID, in: eventEditorNamespace))
 		}
+	}
+
+	private func calendarEventEditor(
+		target: CalendarEventEditorTarget,
+		transitionID: String
+	) -> some View {
+		CalendarEventEditor(
+			target: target,
+			canManageGlobalEvents: events.canManageGlobalEvents
+		) { request, event in
+			if let event {
+				try await eventService.updateEvent(
+					id: event.id,
+					request: request,
+					globally: event.isGlobal
+				)
+			} else {
+				try await eventService.createEvent(
+					request,
+					globally: target.scope == .globalEvent
+				)
+			}
+		} delete: { event in
+			try await eventService.deleteEvent(
+				id: event.id,
+				globally: event.isGlobal
+			)
+		}
+		.presentationDetents([.fraction(0.6)])
+		.navigationTransition(.zoom(sourceID: transitionID, in: eventEditorNamespace))
 	}
 
 	private var termDates: some View {
@@ -92,26 +126,17 @@ struct DatesView: View {
 
 	@ViewBuilder
 	private func timelineEntry(_ entry: PlannerTimelineEntry) -> some View {
-		switch entry.kind {
-		case let .event(event):
-			let target = CalendarEventEditorTarget.edit(event)
+		if let target = PlannerPresentationTarget(entry: entry) {
 			Button {
-				editorTarget = target
+				presentationTarget = target
 			} label: {
 				timelineEntryContent(entry)
-					.matchedTransitionSource(id: target.transitionID, in: eventEditorNamespace)
 			}
 			.buttonStyle(.plain)
-		case .noSchoolDay:
-			let target = NoSchoolDayDetailTarget(entry: entry)
-			Button {
-				noSchoolDayTarget = target
-			} label: {
-				timelineEntryContent(entry)
-					.matchedTransitionSource(id: target.transitionID, in: eventEditorNamespace)
-			}
-			.buttonStyle(.plain)
-		case .termDate:
+			.frame(maxWidth: .infinity)
+			.contentShape(RoundedRectangle(cornerRadius: 20))
+			.matchedTransitionSource(id: target.transitionID, in: eventEditorNamespace)
+		} else {
 			timelineEntryContent(entry)
 		}
 	}
@@ -150,7 +175,6 @@ struct DatesView: View {
 		.padding([.vertical, .leading])
 		.padding(.trailing, 14)
 		.foregroundStyle(entry.foregroundColor)
-		.contentShape(RoundedRectangle(cornerRadius: 20))
 		.background {
 			GeometryReader { proxy in
 				Image(entry.backgroundImageName)
@@ -161,7 +185,7 @@ struct DatesView: View {
 			}
 			.clipShape(RoundedRectangle(cornerRadius: 20))
 		}
-		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 20))
+		.glassEffect(.clear, in: RoundedRectangle(cornerRadius: 20))
 	}
 
 	private var dateWindow: ClosedRange<SchoolCalendarDate> {
@@ -277,22 +301,41 @@ private struct PlannerTimelineEntry: Identifiable {
 	}
 }
 
-private enum CalendarEventEditorTarget: Identifiable {
-	case create(CalendarEventScope)
-	case edit(CalendarEvent)
+private enum PlannerPresentationTarget: Identifiable {
+	case createEvent(CalendarEventScope)
+	case calendarEvent(CalendarEvent, entryID: String)
+	case noSchoolDay(NoSchoolDayDetailTarget)
+
+	init?(entry: PlannerTimelineEntry) {
+		switch entry.kind {
+		case let .event(event):
+			self = .calendarEvent(event, entryID: entry.id)
+		case .noSchoolDay:
+			self = .noSchoolDay(NoSchoolDayDetailTarget(entry: entry))
+		case .termDate:
+			return nil
+		}
+	}
+
 	var id: String {
 		switch self {
-		case let .create(scope):
-			return "create-\(scope.id)"
-		case let .edit(event):
-			let scope = event.isGlobal ? "global" : "personal"
-			return "edit-\(scope)-\(event.date.year)-\(event.date.month)-\(event.date.day)-\(event.id.uuidString)"
+		case let .createEvent(scope):
+			return "create-event-\(scope.id)"
+		case let .calendarEvent(_, entryID):
+			return "calendar-event-\(entryID)"
+		case let .noSchoolDay(detail):
+			return "no-school-day-\(detail.id)"
 		}
 	}
 
 	var transitionID: String {
-		"calendar-event-editor-\(id)"
+		"planner-presentation-\(id)"
 	}
+}
+
+private enum CalendarEventEditorTarget {
+	case create(CalendarEventScope)
+	case edit(CalendarEvent)
 
 	var scope: CalendarEventScope {
 		switch self {
@@ -321,10 +364,6 @@ private struct NoSchoolDayDetailTarget: Identifiable {
 		id = entry.id
 		title = entry.title
 		date = entry.date
-	}
-
-	var transitionID: String {
-		"no-school-day-\(id)"
 	}
 }
 
