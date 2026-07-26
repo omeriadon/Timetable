@@ -84,6 +84,8 @@ private struct AdministrationSchoolEventsView: View {
 					}
 				}
 				.buttonStyle(.plain)
+				.frame(maxWidth: .infinity, minHeight: 44, maxHeight: 44, alignment: .leading)
+				.listRowInsets(.init(top: 0, leading: 20, bottom: 0, trailing: 20))
 				.swipeActions {
 					Button("Delete", systemImage: "trash", role: .destructive) {
 						Task {
@@ -284,6 +286,8 @@ private struct AdministrationCalendarView: View {
 					}
 				}
 				.buttonStyle(.plain)
+				.frame(maxWidth: .infinity, minHeight: 44, maxHeight: 44, alignment: .leading)
+				.listRowInsets(.init(top: 0, leading: 20, bottom: 0, trailing: 20))
 				.swipeActions {
 					Button("Delete", systemImage: "trash", role: .destructive) {
 						delete(entry.id)
@@ -294,11 +298,14 @@ private struct AdministrationCalendarView: View {
 			Button("Add Term Date", systemImage: "plus") {
 				editor = newEntry(kind: "term")
 			}
+			.listRowInsets(.init(top: 0, leading: 20, bottom: 0, trailing: 20))
 
 			Button("Add No-School Day", systemImage: "plus") {
 				editor = newEntry(kind: "noSchool")
 			}
+			.listRowInsets(.init(top: 0, leading: 20, bottom: 0, trailing: 20))
 		}
+		.listRowSpacing(0)
 		.appNavigationTitle("School Calendar")
 		.task {
 			await load()
@@ -483,13 +490,13 @@ private struct AdministrationBroadcastNotificationView: View {
 	@State private var service = AdministrationService.shared
 	@State private var title = ""
 	@State private var subtitle = ""
-	@State private var body = ""
+	@State private var notifBody = ""
 
 	var body: some View {
 		Form {
 			TextField("Title", text: $title)
 			TextField("Subtitle", text: $subtitle)
-			TextField("Message", text: $body, axis: .vertical)
+			TextField("Message", text: $notifBody, axis: .vertical)
 				.lineLimit(4 ... 8)
 		}
 		.appNavigationTitle("Broadcast Notification")
@@ -501,7 +508,7 @@ private struct AdministrationBroadcastNotificationView: View {
 				.disabled(
 					title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
 						|| subtitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-						|| body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+						|| notifBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
 				)
 				.buttonStyle(.glassProminent)
 			}
@@ -512,7 +519,7 @@ private struct AdministrationBroadcastNotificationView: View {
 		let request = BroadcastNotificationRequest(
 			title: title,
 			subtitle: subtitle,
-			body: body
+			body: notifBody
 		)
 
 		Task {
