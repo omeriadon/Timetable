@@ -143,10 +143,10 @@ struct CalendarImportView: View {
 			Print("[iOS] Calendar Import: Searching for Compass calendar...")
 			await moveForward(to: .findingCalendar)
 
-			guard let calendar = eventStore.calendars(for: .event).first(where: { $0.title.contains("Compass") }) else {
+			guard let calendar = eventStore.calendars(for: .event).first(where: {
+				$0.title.range(of: "Compass", options: .caseInsensitive) != nil
+			}) else {
 				errorAndExit("Compass calendar not found")
-				dismiss()
-				calendarImportStatus = .loading
 				return
 			}
 
