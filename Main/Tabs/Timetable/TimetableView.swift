@@ -35,6 +35,8 @@ struct TimetableView: View {
 
 	@State private var currentTab: Int = 0
 	@State private var scrollPosition: Int?
+	@State private var presentedWeekSubject: WeekSubjectDetail?
+	@Namespace private var weekSubjectNamespace
 
 	#if os(iOS)
 		init(
@@ -111,6 +113,25 @@ struct TimetableView: View {
 			.onChange(of: scrollPosition) { _, newValue in
 				if let newValue {
 					currentTab = newValue
+				}
+			}
+			.sheet(item: $presentedWeekSubject) { detail in
+				if detail.canEdit {
+					SubjectEditorSheet(
+						subjects: $subjects,
+						initialRequest: .allSubjectes(focus: detail.subject.id),
+						onSave: { proposedSubjects in
+							try await ServerSyncCoordinator.shared.saveOwnerTimetable(proposedSubjects)
+						}
+					)
+					.navigationTransition(.zoom(sourceID: detail.sourceID, in: weekSubjectNamespace))
+				} else {
+					SubjectContextPopover(
+						owner: detail.owner,
+						subject: detail.subject
+					)
+					.presentationDetents([.fraction(0.5)])
+					.navigationTransition(.zoom(sourceID: detail.sourceID, in: weekSubjectNamespace))
 				}
 			}
 		}
@@ -300,14 +321,27 @@ struct TimetableView: View {
 					SessionCellView(day, session, subjectLookup, selectedSlot)
 						.contentShape(Rectangle())
 						.onTapGesture {
-							withAnimation(.snappy(duration: 0.3)) {
-								if selectedSlot == Slot(day, session) {
-									selectedSlot = nil
-								} else if subjectLookup[Slot(day, session)] != nil {
-									selectedSlot = Slot(day, session)
-								}
+							let slot = Slot(day, session)
+
+							guard let subject = subjectLookup[slot] else {
+								return
 							}
+
+							withAnimation(.snappy(duration: 0.3)) {
+								selectedSlot = slot
+							}
+
+							presentedWeekSubject = WeekSubjectDetail(
+								subject: subject,
+								owner: selectedTimetable?.sender ?? "You",
+								canEdit: selectedTimetable == nil,
+								sourceID: "week-subject-\(day)-\(session)"
+							)
 						}
+						.matchedTransitionSource(
+							id: "week-subject-\(day)-\(session)",
+							in: weekSubjectNamespace
+						)
 				}
 			}
 			.overlay {
@@ -350,5 +384,16 @@ struct TimetableView: View {
 		else { return nil }
 
 		return EditableSlot(day: day, period: period)
+	}
+}
+
+private struct WeekSubjectDetail: Identifiable {
+	let subject: Subject
+	let owner: String
+	let canEdit: Bool
+	let sourceID: String
+
+	var id: String {
+		sourceID
 	}
 }
