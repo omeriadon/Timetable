@@ -98,7 +98,7 @@ struct TodayTimetableView: View {
 private enum TodayCardLayout {
 	static let outerCornerRadius: CGFloat = 20
 	static let innerCornerRadius: CGFloat = 13
-	static let contentInset = outerCornerRadius - innerCornerRadius
+	static let contentInset: CGFloat = 14
 }
 
 private struct TodayNoSchoolDayCard: View {
@@ -187,9 +187,7 @@ private struct TodaySchoolTimeline: View {
 	private let outerCornerRadius = TodayCardLayout.outerCornerRadius
 	private let periodCornerRadius = TodayCardLayout.innerCornerRadius
 	private let timelineHorizontalPadding: CGFloat = 3
-	private var periodHorizontalInset: CGFloat {
-		outerCornerRadius - periodCornerRadius
-	}
+	private let periodHorizontalInset = TodayCardLayout.contentInset
 
 	var body: some View {
 		let periods = SchoolStateEngine.activePeriods(for: dayIndex)
