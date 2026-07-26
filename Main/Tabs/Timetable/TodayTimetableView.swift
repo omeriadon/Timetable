@@ -80,24 +80,24 @@ struct TodayTimetableView: View {
 	@ViewBuilder private func eventSection(_ title: String, events: [CalendarEvent], showsDate: Bool = false) -> some View {
 		Text(title)
 			.fontWeight(.semibold)
-			.foregroundStyle(.secondary)
+			.foregroundStyle(title == "Upcoming Events" ? .tertiary : .secondary)
 			.padding(.top, 4)
 
 		ForEach(events) { event in
 			Label {
 				VStack(alignment: .leading) {
 					Text(event.title)
+						.foregroundStyle(.secondary)
+
 					if showsDate {
 						Text(event.date.displayLabel)
 							.font(.footnote)
-							.foregroundStyle(.secondary)
-					}
-					if let notes = event.notes, !notes.isEmpty {
-						Text(notes).font(.footnote).foregroundStyle(.secondary)
+							.foregroundStyle(.tertiary)
 					}
 				}
 			} icon: {
 				Image(systemName: event.symbol)
+					.foregroundStyle(.secondary)
 			}
 			.padding(.vertical, 4)
 			.font(.title3)
@@ -108,12 +108,13 @@ struct TodayTimetableView: View {
 					Image("paperWhite")
 						.resizable()
 						.scaledToFill()
+						.opacity(title == "Upcoming Events" ? 0.9 : 1)
 						.frame(width: proxy.size.width, height: proxy.size.height)
 						.clipped()
 				}
 				.clipShape(RoundedRectangle(cornerRadius: TodayCardLayout.innerCornerRadius))
 			}
-			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: TodayCardLayout.innerCornerRadius))
+			.glassEffect(title == "Upcoming Events" ? .identity : .clear.interactive(), in: RoundedRectangle(cornerRadius: TodayCardLayout.innerCornerRadius))
 		}
 	}
 
@@ -231,42 +232,41 @@ private struct TodaySchoolTimeline: View {
 	private let timelineHorizontalPadding: CGFloat = 3
 	private let periodHorizontalInset = TodayCardLayout.contentInset
 
+	/// Pulled these out of `body` into computed properties so both `body`
+	/// and `periodsLayer` can reference them without re-deriving anything
+	/// or capturing local `let`s across a view boundary.
+	private var periods: [SchoolPeriod] {
+		SchoolStateEngine.activePeriods(for: dayIndex)
+	}
+
+	private var dayEnd: TimeOfDay {
+		SchoolStateEngine.schoolEnd(for: dayIndex)
+	}
+
+	private var totalMinutes: Int {
+		dayEnd.minutesSinceMidnight - SchoolStateEngine.schoolStart.minutesSinceMidnight
+	}
+
+	private var height: CGFloat {
+		CGFloat(totalMinutes) * minuteHeight
+	}
+
 	var body: some View {
-		let periods = SchoolStateEngine.activePeriods(for: dayIndex)
-		let dayEnd = SchoolStateEngine.schoolEnd(for: dayIndex)
-		let totalMinutes = dayEnd.minutesSinceMidnight - SchoolStateEngine.schoolStart.minutesSinceMidnight
-		let height = CGFloat(totalMinutes) * minuteHeight
 		VStack(alignment: .leading, spacing: 8) {
 			Text("Classes")
 				.font(.title)
 				.bold()
 				.padding(.horizontal, periodHorizontalInset - timelineHorizontalPadding)
-			GeometryReader { geometry in
-				GlassEffectContainer(spacing: 10) {
-					ZStack(alignment: .topLeading) {
-						ForEach(periods, id: \.number) { period in
-							periodRow(period)
-								.frame(width: periodRowWidth(for: geometry.size.width))
-								.offset(
-									x: periodHorizontalInset - timelineHorizontalPadding,
-									y: offset(for: period.start)
-								)
-						}
-					}
-					.frame(width: geometry.size.width, height: height, alignment: .topLeading)
-				}
-				.overlay(alignment: .topLeading) {
-					if let firstPeriod = periods.first,
-					   currentMinute >= markerDisplayStart,
-					   currentMinute <= dayEnd.minutesSinceMidnight
-					{
-						currentTimeMarker
-							.offset(y: markerOffset(for: firstPeriod))
-					}
-				}
-				.frame(width: geometry.size.width, height: height, alignment: .topLeading)
-			}
-			.frame(height: height)
+
+			// A bare GeometryReader always greedily expands to fill all
+			// available space before any downstream .frame() applies —
+			// that's what was making this section balloon. Fixing the
+			// size first with Color.clear, then handing the
+			// GeometryReader that resolved size via .overlay, keeps it
+			// pinned to `height` instead of expanding.
+			Color.clear
+				.frame(height: height)
+				.overlay(alignment: .topLeading) { periodsLayer }
 		}
 		.foregroundStyle(.black)
 		.padding(.top, 10)
@@ -283,6 +283,34 @@ private struct TodaySchoolTimeline: View {
 			.clipShape(RoundedRectangle(cornerRadius: outerCornerRadius))
 		}
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: outerCornerRadius))
+	}
+
+	private var periodsLayer: some View {
+		GeometryReader { geometry in
+			GlassEffectContainer(spacing: 10) {
+				ZStack(alignment: .topLeading) {
+					ForEach(periods, id: \.number) { period in
+						periodRow(period)
+							.frame(width: periodRowWidth(for: geometry.size.width))
+							.offset(
+								x: periodHorizontalInset - timelineHorizontalPadding,
+								y: offset(for: period.start)
+							)
+					}
+				}
+				.frame(width: geometry.size.width, height: height, alignment: .topLeading)
+			}
+			.overlay(alignment: .topLeading) {
+				if let firstPeriod = periods.first,
+				   currentMinute >= markerDisplayStart,
+				   currentMinute <= dayEnd.minutesSinceMidnight
+				{
+					currentTimeMarker
+						.offset(y: markerOffset(for: firstPeriod))
+				}
+			}
+			.frame(width: geometry.size.width, height: height, alignment: .topLeading)
+		}
 	}
 
 	@ViewBuilder private func periodRow(_ period: SchoolPeriod) -> some View {

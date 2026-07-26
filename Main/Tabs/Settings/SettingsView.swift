@@ -84,24 +84,15 @@ import WidgetKit
 
 		@ContentBuilder
 		private var list: some View {
-			Section("You") {
+			Section {
 				NavigationLink {
 					AccountView()
 				} label: {
 					Label(userDisplayName, systemImage: "person.crop.circle")
 				}
-				if sessionStore.isAuthenticated {
-					NavigationLink { AccountAndSyncSettingsView() } label: { Label("Updates & Notifications", systemImage: "switch.2") }
-				} else {
-					Button { showSignInRequired() } label: { Label("Updates", systemImage: "switch.2") }
-				}
-
-				Toggle("Highlight Current Day in timetables", systemImage: "inset.filled.lefthalf.righthalf.rectangle", isOn: highlightsCurrentDayBinding)
-
-				Toggle("Haptic Feedback", systemImage: "iphone.radiowaves.left.and.right", isOn: hapticsBinding)
 			}
 
-			Section("Your Timetable") {
+			Section("My Timetable") {
 				Button {
 					showImportConfirmation = true
 				} label: {
@@ -127,7 +118,7 @@ import WidgetKit
 					Button("No", role: .cancel) {}
 
 				}, message: {
-					Text("This will delete your current timetable and reimport. Anyone you shared this timetable with will be able to access the new one.")
+					Text("This will delete your current timetable and reimport. Anyone you shared this timetable with will be able to access the updated one.")
 				})
 				.sheet(isPresented: $showCalendarImportSheet) {
 					CalendarImportView()
@@ -139,7 +130,7 @@ import WidgetKit
 					showEditTimetableSheet = true
 				} label: {
 					Label {
-						Text("Edit Timetable")
+						Text("Edit")
 					} icon: {
 						Image(systemName: "pencil")
 							.foregroundStyle(.tint)
@@ -164,6 +155,18 @@ import WidgetKit
 
 				Toggle("Searchable", systemImage: "magnifyingglass", isOn: ownerVisibilityBinding)
 					.disabled(!networkManager.isOnline)
+			}
+
+			Section("Preferences") {
+				if sessionStore.isAuthenticated {
+					NavigationLink { AccountAndSyncSettingsView() } label: { Label("Updates & Notifications", systemImage: "switch.2") }
+				} else {
+					Button { showSignInRequired() } label: { Label("Updates", systemImage: "switch.2") }
+				}
+
+				Toggle("Highlight Current Day in timetables", systemImage: "inset.filled.lefthalf.righthalf.rectangle", isOn: highlightsCurrentDayBinding)
+
+				Toggle("Haptic Feedback", systemImage: "iphone.radiowaves.left.and.right", isOn: hapticsBinding)
 			}
 
 			Section("Created Timetables") {

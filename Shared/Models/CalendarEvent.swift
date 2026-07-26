@@ -70,6 +70,6 @@ extension SchoolCalendarDate: Comparable {
 
 	nonisolated var displayLabel: String {
 		guard let date = startOfDay() else { return "" }
-		return date.formatted(.dateTime.weekday(.wide).day().month(.wide).year())
+		return date.formatted(.dateTime.weekday(.wide).day().month(.wide))
 	}
 }

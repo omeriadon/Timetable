@@ -34,6 +34,17 @@ struct DatesView: View {
 						Section {
 							timelineEntry(entry)
 						}
+						.foregroundStyle(.black)
+						.background {
+							GeometryReader { proxy in
+								Image("paperWhite")
+									.resizable()
+									.scaledToFill()
+									.frame(width: proxy.size.width, height: proxy.size.height)
+									.clipped()
+							}
+							.clipShape(RoundedRectangle(cornerRadius: 20))
+						}
 					}
 				}
 
@@ -41,13 +52,18 @@ struct DatesView: View {
 			}
 			.padding()
 		}
-		.safeAreaBar(edge: .bottom) {
-			Button("Add Personal Event", systemImage: "plus", role: .confirm) {
+
+		.safeAreaBar(edge: .bottom, spacing: 10) {
+			Button("Add Personal Event", systemImage: "plus") {
 				editorTarget = .create(.privateEvent)
 			}
+			.controlSize(.extraLarge)
+			.labelStyle(.iconOnly)
+			.font(.title)
+			.buttonBorderShape(.circle)
 			.buttonStyle(.glassProminent)
-			.frame(maxWidth: .infinity)
 			.matchedTransitionSource(id: "calendar-event-editor", in: eventEditorNamespace)
+			.padding(.bottom, 10)
 		}
 		.sheet(item: $editorTarget) { target in
 			CalendarEventEditor(target: target, canManageGlobalEvents: events.canManageGlobalEvents) { request, event in
@@ -93,29 +109,21 @@ struct DatesView: View {
 	}
 
 	private func timelineEntryContent(_ entry: PlannerTimelineEntry) -> some View {
-		HStack(alignment: .top, spacing: 14) {
-			VStack(spacing: 2) {
-				Text(entry.date.startOfDay()?.formatted(.dateTime.day()) ?? "")
-					.font(.title2.bold())
-
-				Text(entry.date.startOfDay()?.formatted(.dateTime.month(.abbreviated)) ?? "")
-					.font(.caption.weight(.semibold))
-			}
-			.frame(width: 42)
-			.foregroundStyle(entry.tint)
-
+		HStack(alignment: .center, spacing: 14) {
 			Image(systemName: entry.symbol)
-				.font(.title2)
-				.frame(width: 32)
+				.font(.title)
+				.frame(width: 42)
 				.foregroundStyle(entry.tint)
 
 			VStack(alignment: .leading, spacing: 4) {
 				Text(entry.title)
 					.font(.headline)
 
-				Text(entry.kind.title)
-					.font(.footnote)
-					.foregroundStyle(.secondary)
+				if !entry.kind.title.isEmpty {
+					Text(entry.kind.title)
+						.font(.footnote)
+						.foregroundStyle(.secondary)
+				}
 
 				if let notes = entry.notes, !notes.isEmpty {
 					Text(notes)
@@ -124,9 +132,30 @@ struct DatesView: View {
 				}
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
+
+			VStack(spacing: 2) {
+				Text(entry.date.startOfDay()?.formatted(.dateTime.day()) ?? "")
+					.font(.title2.bold())
+
+				Text(entry.date.startOfDay()?.formatted(.dateTime.month(.abbreviated)) ?? "")
+					.font(.caption.weight(.semibold))
+			}
+			.frame(width: 42)
+			.foregroundStyle(Color.accentColor)
 		}
-		.padding()
-		.background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20))
+		.padding([.vertical, .leading])
+		.padding(.trailing, 14)
+		.foregroundStyle(.black)
+		.background {
+			GeometryReader { proxy in
+				Image("paperWhite")
+					.resizable()
+					.scaledToFill()
+					.frame(width: proxy.size.width, height: proxy.size.height)
+					.clipped()
+			}
+			.clipShape(RoundedRectangle(cornerRadius: 20))
+		}
 	}
 
 	private var dateWindow: ClosedRange<SchoolCalendarDate> {
@@ -162,12 +191,12 @@ private struct PlannerTimelineEntry: Identifiable {
 
 		var title: String {
 			switch self {
-			case .noSchoolDay:
-				"Pupil Free Day"
-			case .termDate:
-				"Term Date"
-			case let .event(event):
-					event.isGlobal ? "School Event" : "Your Event"
+				case .noSchoolDay:
+					"Pupil Free Day"
+				case .termDate:
+					""
+				case .event:
+					""
 			}
 		}
 	}
