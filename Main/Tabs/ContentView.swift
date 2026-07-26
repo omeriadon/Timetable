@@ -133,7 +133,7 @@ extension Notification.Name {
 				},
 			]
 			if calendarEvents.canManageGlobalEvents {
-				tabs.append(UITab(title: "Administration", image: UIImage(systemName: "shield"), identifier: "administration") { _ in
+				tabs.append(UITab(title: "Admin", image: UIImage(systemName: "shield"), identifier: "administration") { _ in
 					UIHostingController(rootView: AdministrationView())
 				})
 			}
@@ -152,12 +152,14 @@ extension Notification.Name {
 			let hasAdministrationTab = tabBarController.tabs.contains { $0.identifier == "administration" }
 			if calendarEvents.canManageGlobalEvents != hasAdministrationTab {
 				if calendarEvents.canManageGlobalEvents {
-					tabBarController.tabs.append(UITab(title: "Administration", image: UIImage(systemName: "shield"), identifier: "administration") { _ in
+					tabBarController.tabs.append(UITab(title: "Admin", image: UIImage(systemName: "shield"), identifier: "administration") { _ in
 						UIHostingController(rootView: AdministrationView())
 					})
 				} else {
 					tabBarController.tabs.removeAll { $0.identifier == "administration" }
-					if selectedTab == .administration { selectedTab = .timetable }
+					if selectedTab == .administration {
+						selectedTab = .timetable
+					}
 				}
 			}
 			context.coordinator.selectTab(selectedTab)

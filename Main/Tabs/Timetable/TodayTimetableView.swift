@@ -17,7 +17,7 @@ struct TodayTimetableView: View {
 						VStack(alignment: .center) {
 							Text("Events")
 								.bold()
-								.frame(alignment: .leading)
+								.frame(maxWidth: .infinity, alignment: .leading)
 
 							ForEach(todayEvents(at: now)) { event in
 								Label {
@@ -34,16 +34,19 @@ struct TodayTimetableView: View {
 								.padding(.vertical, 4)
 							}
 						}
+						.frame(maxWidth: .infinity)
 						.padding(10)
 						.background {
-							Image("paper")
-								.clipShape(RoundedRectangle(cornerRadius: 10))
+							GeometryReader { proxy in
+								Image("paper")
+									.resizable()
+									.scaledToFill()
+									.frame(width: proxy.size.width, height: proxy.size.height)
+									.clipped()
+							}
+							.clipShape(RoundedRectangle(cornerRadius: 20))
 						}
-						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
-						GroupBox {} label: {
-							Text("Events")
-								.bold()
-						}
+						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 20))
 					}
 
 					if let dayIndex = schoolCalendar.dayIndex(for: now), schoolCalendar.isSchoolDay(now), !subjects.isEmpty {

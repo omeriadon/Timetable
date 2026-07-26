@@ -65,7 +65,7 @@ extension Defaults.Keys {
 	static let hapticsEnabled = Key<Bool>("hapticsEnabled", default: true, suite: sharedDefaults)
 
 	#if DEBUG
-		nonisolated static let debugOffset = Key<TimeInterval>("debugOffset", default: 87_896, suite: sharedDefaults)
+		nonisolated static let debugOffset = Key<TimeInterval>("debugOffset", default: 87896, suite: sharedDefaults)
 	#else
 		nonisolated static let debugOffset = Key<TimeInterval>("debugOffset", default: 0, suite: sharedDefaults)
 	#endif

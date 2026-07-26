@@ -132,10 +132,10 @@ private enum AdministrationSchoolEventEditorTarget: Identifiable {
 
 	var id: String {
 		switch self {
-		case .create:
-			return "create"
-		case let .edit(event):
-			return event.id.uuidString
+			case .create:
+				"create"
+			case let .edit(event):
+				event.id.uuidString
 		}
 	}
 
@@ -282,7 +282,7 @@ private struct AdministrationCalendarView: View {
 							entry.kind == "term" ? "Term" : "No School",
 							systemImage: entry.kind == "term" ? "calendar" : "xmark.circle"
 						)
-							.foregroundStyle(.secondary)
+						.foregroundStyle(.secondary)
 					}
 				}
 				.buttonStyle(.plain)
@@ -320,7 +320,7 @@ private struct AdministrationCalendarView: View {
 	}
 
 	private func load() async {
-		entries = (try? await service.calendar()) ?? []
+		entries = await (try? service.calendar()) ?? []
 	}
 
 	private func save(
@@ -382,7 +382,7 @@ private struct AdministrationUsersView: View {
 		.searchable(text: $searchText, prompt: "Search users")
 		.appNavigationTitle("Users")
 		.task {
-			users = (try? await service.users()) ?? []
+			users = await (try? service.users()) ?? []
 		}
 		.sheet(item: $editor) { user in
 			AdministrationUserEditor(user: user) { updatedUser in
