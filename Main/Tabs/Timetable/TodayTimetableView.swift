@@ -21,6 +21,7 @@ struct TodayTimetableView: View {
 						.lineLimit(1)
 						.font(.system(size: 200))
 						.minimumScaleFactor(0.1)
+						.foregroundStyle(.white)
 
 					if let noSchoolDay {
 						TodayNoSchoolDayCard(noSchoolDay: noSchoolDay)
@@ -42,6 +43,7 @@ struct TodayTimetableView: View {
 						}
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.padding(.vertical, 10)
+						.padding(.bottom, 5)
 						.padding(.horizontal, TodayCardLayout.contentInset)
 						.background {
 							GeometryReader { proxy in
@@ -51,9 +53,9 @@ struct TodayTimetableView: View {
 									.frame(width: proxy.size.width, height: proxy.size.height)
 									.clipped()
 							}
-							.clipShape(RoundedRectangle(cornerRadius: 20))
+							.clipShape(RoundedRectangle(cornerRadius: TodayCardLayout.outerCornerRadius))
 						}
-						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 20))
+						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: TodayCardLayout.outerCornerRadius))
 					}
 
 					if let dayIndex = schoolCalendar.dayIndex(for: now), schoolCalendar.isSchoolDay(now), !subjects.isEmpty {
@@ -62,8 +64,9 @@ struct TodayTimetableView: View {
 						TodayCountdown(subjects: subjects, schoolCalendar: schoolCalendar, now: now)
 					}
 				}
+				.foregroundStyle(.black)
 				.padding(.vertical)
-				.padding(.horizontal, 5)
+				.padding(.horizontal, 10)
 				.frame(maxWidth: .infinity, alignment: .center)
 			}
 		}
@@ -88,6 +91,19 @@ struct TodayTimetableView: View {
 			}
 			.padding(.vertical, 4)
 			.font(.title3)
+			.padding(5)
+			.frame(maxWidth: .infinity, alignment: .leading)
+			.background {
+				GeometryReader { proxy in
+					Image("paperWhite")
+						.resizable()
+						.scaledToFill()
+						.frame(width: proxy.size.width, height: proxy.size.height)
+						.clipped()
+				}
+				.clipShape(RoundedRectangle(cornerRadius: TodayCardLayout.innerCornerRadius))
+			}
+			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: TodayCardLayout.innerCornerRadius))
 		}
 	}
 
@@ -100,7 +116,7 @@ struct TodayTimetableView: View {
 }
 
 private enum TodayCardLayout {
-	static let outerCornerRadius: CGFloat = 20
+	static let outerCornerRadius: CGFloat = 25
 	static let innerCornerRadius: CGFloat = 13
 	static let contentInset: CGFloat = 14
 }
@@ -225,6 +241,7 @@ private struct TodaySchoolTimeline: View {
 			}
 			.frame(height: height)
 		}
+		.foregroundStyle(.black)
 		.padding(.top, 10)
 		.padding(.bottom, 8)
 		.padding(.horizontal, timelineHorizontalPadding)
@@ -268,7 +285,6 @@ private struct TodaySchoolTimeline: View {
 					.foregroundStyle(subject.colour.swiftUIColor)
 			}
 		}
-		.foregroundStyle(.black)
 		.padding(10)
 		.frame(height: cardHeight, alignment: .top)
 		.background {
