@@ -183,17 +183,17 @@ private enum AdministrationJSONFormatter {
 
 	private static func expandEmbeddedJSON(in object: Any) -> Any {
 		switch object {
-		case let dictionary as [String: Any]:
-			dictionary.mapValues(expandEmbeddedJSON(in:))
+			case let dictionary as [String: Any]:
+				dictionary.mapValues(expandEmbeddedJSON(in:))
 
-		case let array as [Any]:
-			array.map(expandEmbeddedJSON(in:))
+			case let array as [Any]:
+				array.map(expandEmbeddedJSON(in:))
 
-		case let string as String:
-			expandJSON(from: string) ?? string
+			case let string as String:
+				expandJSON(from: string) ?? string
 
-		default:
-			object
+			default:
+				object
 		}
 	}
 

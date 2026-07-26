@@ -48,7 +48,7 @@ struct AdministrationUsersView: View {
 				didSave: save,
 				didDelete: delete
 			)
-			.presentationDetents([.fraction(0.6)])
+			.presentationDetents([.fraction(0.6), .large])
 			.navigationTransition(.zoom(sourceID: target.id, in: userEditorNamespace))
 		}
 	}
