@@ -8,50 +8,37 @@ struct TodayTimetableView: View {
 	var body: some View {
 		TimelineView(.periodic(from: .now, by: 1)) { context in
 			let now = TimetableClock.adjusted(context.date)
+			let schoolEvents = todayEvents(at: now, globally: true)
+			let personalEvents = todayEvents(at: now, globally: false)
+			let noSchoolDay = noSchoolDay(at: now)
+			let hasSchoolToday = schoolCalendar.isSchoolDay(now)
+				&& schoolCalendar.dayIndex(for: now) != nil
+				&& !subjects.isEmpty
+			let isEmpty = !hasSchoolToday
+				&& noSchoolDay == nil
+				&& schoolEvents.isEmpty
+				&& personalEvents.isEmpty
+
 			ScrollView {
 				VStack(alignment: .leading, spacing: 16) {
 					Text(now.formatted(.dateTime.weekday(.wide).day().month(.wide)))
 						.font(.title2.bold())
 
-					if !todayEvents(at: now).isEmpty {
-						VStack(alignment: .center) {
-							Text("Events")
-								.bold()
-								.frame(maxWidth: .infinity, alignment: .leading)
-
-							ForEach(todayEvents(at: now)) { event in
-								Label {
-									VStack(alignment: .leading) {
-										Text(event.title)
-										if let notes = event.notes, !notes.isEmpty {
-											Text(notes).font(.footnote).foregroundStyle(.secondary)
-										}
-									}
-								} icon: {
-									Image(systemName: event.symbol)
-										.foregroundStyle(.accent)
-								}
-								.padding(.vertical, 4)
-							}
-						}
-						.frame(maxWidth: .infinity)
-						.padding(10)
-						.background {
-							GeometryReader { proxy in
-								Image("paper")
-									.resizable()
-									.scaledToFill()
-									.frame(width: proxy.size.width, height: proxy.size.height)
-									.clipped()
-							}
-							.clipShape(RoundedRectangle(cornerRadius: 20))
-						}
-						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 20))
+					if let noSchoolDay {
+						TodayNoSchoolDay(name: noSchoolDay.label)
 					}
 
-					if let dayIndex = schoolCalendar.dayIndex(for: now), schoolCalendar.isSchoolDay(now), !subjects.isEmpty {
+					if !schoolEvents.isEmpty {
+						TodayEventsSection(title: "School Events", events: schoolEvents)
+					}
+
+					if !personalEvents.isEmpty {
+						TodayEventsSection(title: "Your Events", events: personalEvents)
+					}
+
+					if let dayIndex = schoolCalendar.dayIndex(for: now), hasSchoolToday {
 						TodaySchoolTimeline(subjects: subjects, dayIndex: dayIndex, now: now)
-					} else if todayEvents(at: now).isEmpty {
+					} else if isEmpty {
 						TodayCountdown(subjects: subjects, schoolCalendar: schoolCalendar, now: now)
 					}
 				}
@@ -61,10 +48,82 @@ struct TodayTimetableView: View {
 		}
 	}
 
-	private func todayEvents(at date: Date) -> [CalendarEvent] {
+	private func todayEvents(at date: Date, globally: Bool) -> [CalendarEvent] {
 		let today = SchoolCalendarDate(date)
-		return events.filter { $0.date == today }.sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
+		return events
+			.filter { $0.date == today && $0.isGlobal == globally }
+			.sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
 	}
+
+	private func noSchoolDay(at date: Date) -> SchoolCalendarNamedDate? {
+		let today = SchoolCalendarDate(date)
+		return schoolCalendar.skippedDates.first { $0.date == today }
+	}
+}
+
+private struct TodayNoSchoolDay: View {
+	let name: String
+
+	var body: some View {
+		Label {
+			VStack(alignment: .leading) {
+				Text("No School")
+					.bold()
+				Text(name)
+					.foregroundStyle(.secondary)
+			}
+		} icon: {
+			Image(systemName: "xmark.circle")
+				.foregroundStyle(.red)
+		}
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.padding()
+		.background(.quaternary, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+	}
+}
+
+private struct TodayEventsSection: View {
+	let title: String
+	let events: [CalendarEvent]
+
+	var body: some View {
+		VStack(alignment: .center) {
+			Text(title)
+				.bold()
+				.frame(maxWidth: .infinity, alignment: .leading)
+
+			ForEach(events) { event in
+				Label {
+					VStack(alignment: .leading) {
+						Text(event.title)
+
+						if let notes = event.notes, !notes.isEmpty {
+							Text(notes)
+								.font(.footnote)
+								.foregroundStyle(.secondary)
+						}
+					}
+				} icon: {
+					Image(systemName: event.symbol)
+						.foregroundStyle(.accent)
+				}
+				.padding(.vertical, 4)
+			}
+		}
+		.frame(maxWidth: .infinity)
+		.padding(10)
+		.background {
+			GeometryReader { proxy in
+				Image("paper")
+					.resizable()
+					.scaledToFill()
+					.frame(width: proxy.size.width, height: proxy.size.height)
+					.clipped()
+			}
+			.clipShape(RoundedRectangle(cornerRadius: 20))
+		}
+		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 20))
+}
 }
 
 private struct TodayCountdown: View {
