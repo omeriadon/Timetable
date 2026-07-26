@@ -20,6 +20,10 @@ final class AdministrationService {
 		try await networkManager.send(Endpoint("/v1/administration/users/\(id.uuidString)", method: .put), body: request, context: .userInitiated)
 	}
 
+	func broadcastNotification(_ request: BroadcastNotificationRequest) async throws -> BroadcastNotificationResponse {
+		try await networkManager.send(.v1AdministrationBroadcastNotification, body: request, context: .userInitiated)
+	}
+
 	func calendar() async throws -> [AdministrationCalendarEntry] {
 		try await networkManager.send(.v1AdministrationCalendar)
 	}
@@ -33,4 +37,10 @@ final class AdministrationService {
 	}
 }
 
-private extension Endpoint { static let v1Administration = Endpoint("/v1/administration"); static let v1AdministrationUsers = Endpoint("/v1/administration/users"); static let v1AdministrationCalendar = Endpoint("/v1/administration/calendar"); static let v1AdministrationCalendarCreate = Endpoint("/v1/administration/calendar", method: .post) }
+private extension Endpoint {
+	static let v1Administration = Endpoint("/v1/administration")
+	static let v1AdministrationUsers = Endpoint("/v1/administration/users")
+	static let v1AdministrationCalendar = Endpoint("/v1/administration/calendar")
+	static let v1AdministrationCalendarCreate = Endpoint("/v1/administration/calendar", method: .post)
+	static let v1AdministrationBroadcastNotification = Endpoint("/v1/administration/broadcast-notification", method: .post)
+}

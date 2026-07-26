@@ -57,6 +57,18 @@ nonisolated struct AdministrationUserResponse: Codable, Identifiable, Sendable {
 nonisolated struct AdministrationUserUpdateRequest: Codable, Sendable { let displayName: String; let email: String; let password: String? }
 nonisolated struct AdministrationCalendarEntry: Codable, Identifiable, Sendable { let id: UUID; let kind: String; let label: String; let startDate: SchoolCalendarDate; let endDate: SchoolCalendarDate? }
 nonisolated struct AdministrationCalendarEntryRequest: Codable, Sendable { let kind: String; let label: String; let startDate: SchoolCalendarDate; let endDate: SchoolCalendarDate? }
+nonisolated struct BroadcastNotificationRequest: Codable, Sendable {
+	let title: String
+	let subtitle: String
+	let body: String
+}
+
+nonisolated struct BroadcastNotificationResponse: Codable, Sendable {
+	let eligibleDeviceCount: Int
+	let deliveredDeviceCount: Int
+	let invalidatedDeviceCount: Int
+	let failedDeviceCount: Int
+}
 
 nonisolated struct NotificationSettingsUpdateRequest: Codable, Sendable {
 	let notificationsEnabled: Bool

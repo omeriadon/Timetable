@@ -1,6 +1,10 @@
 import Defaults
 import SwiftUI
 
+#if os(iOS)
+	import SFSymbolsPicker
+#endif
+
 struct AdministrationView: View {
 	@State private var service = AdministrationService.shared
 	@State private var isAdmin = false
@@ -27,6 +31,12 @@ struct AdministrationView: View {
 								AdministrationUsersView()
 							} label: {
 								Label("Users", systemImage: "person.2")
+							}
+
+							NavigationLink {
+								AdministrationBroadcastNotificationView()
+							} label: {
+								Label("Broadcast Notification", systemImage: "megaphone")
 							}
 						}
 					}
@@ -58,75 +68,199 @@ struct AdministrationView: View {
 private struct AdministrationSchoolEventsView: View {
 	@Default(.calendarEvents) private var events
 	@State private var service = CalendarEventsSyncService.shared
-	@State private var title = ""
-	@State private var date = TimetableClock.now
-	@State private var showCreate = false
+	@State private var editorTarget: AdministrationSchoolEventEditorTarget?
 
 	var body: some View {
 		List {
 			ForEach(events.globalEvents) { event in
-				LabeledContent(event.title) {
-					Text(event.date.displayLabel)
-						.foregroundStyle(.secondary)
+				Button {
+					editorTarget = .edit(event)
+				} label: {
+					LabeledContent {
+						Text(event.date.displayLabel)
+							.foregroundStyle(.secondary)
+					} label: {
+						Label(event.title, systemImage: event.symbol)
+					}
 				}
+				.buttonStyle(.plain)
 				.swipeActions {
 					Button("Delete", systemImage: "trash", role: .destructive) {
-						delete(event)
+						Task {
+							try? await delete(event)
+						}
 					}
 				}
 			}
 
 			Button("Add School Event", systemImage: "plus") {
-				showCreate = true
+				editorTarget = .create
 			}
 		}
 		.appNavigationTitle("School Events")
-		.sheet(isPresented: $showCreate) {
-			NavigationStack {
-				Form {
-					TextField("Title", text: $title)
-					DatePicker("Date", selection: $date, displayedComponents: .date)
-				}
-				.appNavigationTitle("School Event")
-				.toolbar {
-					ToolbarItem(placement: .cancellationAction) {
-						Button(role: .cancel) {
-							showCreate = false
-						}
-					}
+		.sheet(item: $editorTarget) { target in
+			AdministrationSchoolEventEditor(
+				target: target,
+				save: save,
+				delete: delete
+			)
+			.presentationDetents([.fraction(0.6)])
+		}
+	}
 
-					ToolbarItem(placement: .confirmationAction) {
-						Button("Add", systemImage: "plus", role: .confirm) {
-							createEvent()
-						}
-						.disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-						.buttonStyle(.glassProminent)
-					}
+	private func save(
+		_ request: CreateCalendarEventRequest,
+		existingEvent: CalendarEvent?
+	) async throws {
+		if let existingEvent {
+			try await service.updateEvent(id: existingEvent.id, request: request, globally: true)
+		} else {
+			try await service.createEvent(request, globally: true)
+		}
+	}
+
+	private func delete(_ event: CalendarEvent) async throws {
+		try await service.deleteEvent(id: event.id, globally: true)
+	}
+}
+
+private enum AdministrationSchoolEventEditorTarget: Identifiable {
+	case create
+	case edit(CalendarEvent)
+
+	var id: String {
+		switch self {
+		case .create:
+			return "create"
+		case let .edit(event):
+			return event.id.uuidString
+		}
+	}
+
+	var event: CalendarEvent? {
+		if case let .edit(event) = self {
+			return event
+		}
+
+		return nil
+	}
+}
+
+private struct AdministrationSchoolEventEditor: View {
+	let target: AdministrationSchoolEventEditorTarget
+	let save: (CreateCalendarEventRequest, CalendarEvent?) async throws -> Void
+	let delete: (CalendarEvent) async throws -> Void
+
+	@Environment(\.dismiss) private var dismiss
+	@State private var title: String
+	@State private var notes: String
+	@State private var symbol: String
+	@State private var date: Date
+	@State private var showsSymbolPicker = false
+
+	init(
+		target: AdministrationSchoolEventEditorTarget,
+		save: @escaping (CreateCalendarEventRequest, CalendarEvent?) async throws -> Void,
+		delete: @escaping (CalendarEvent) async throws -> Void
+	) {
+		self.target = target
+		self.save = save
+		self.delete = delete
+		_title = State(initialValue: target.event?.title ?? "")
+		_notes = State(initialValue: target.event?.notes ?? "")
+		_symbol = State(initialValue: target.event?.symbol ?? "calendar")
+		_date = State(initialValue: target.event?.date.startOfDay() ?? TimetableClock.now)
+	}
+
+	var body: some View {
+		NavigationStack {
+			Form {
+				TextField("Title", text: $title)
+				TextField("Notes", text: $notes, axis: .vertical)
+					.lineLimit(3 ... 6)
+				DatePicker("Date", selection: $date, displayedComponents: .date)
+
+				Button {
+					showsSymbolPicker = true
+				} label: {
+					Label("Symbol", systemImage: symbol)
 				}
 			}
-			.presentationDetents([.fraction(0.5)])
+			.appNavigationTitle(target.event == nil ? "School Event" : "Edit School Event")
+			.toolbar {
+				ToolbarItem(placement: .cancellationAction) {
+					Button(role: .cancel) {
+						dismiss()
+					}
+				}
+
+				ToolbarItem(placement: .confirmationAction) {
+					Button(target.event == nil ? "Add" : "Save", systemImage: target.event == nil ? "plus" : "checkmark", role: .confirm) {
+						saveEvent()
+					}
+					.disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+					.buttonStyle(.glassProminent)
+				}
+			}
+			.safeAreaBar(edge: .bottom) {
+				if let event = target.event {
+					Button("Delete Event", systemImage: "trash", role: .destructive) {
+						deleteEvent(event)
+					}
+					.buttonStyle(.glassProminent)
+					.tint(.red)
+				}
+			}
+		}
+		.sheet(isPresented: $showsSymbolPicker) {
+			AdministrationEventSymbolPicker(symbol: $symbol)
 		}
 	}
 
-	private func createEvent() {
+	private func saveEvent() {
+		let request = CreateCalendarEventRequest(
+			title: title,
+			notes: notes.isEmpty ? nil : notes,
+			symbol: symbol,
+			date: SchoolCalendarDate(date)
+		)
+
 		Task {
-			try? await service.createEvent(
-				CreateCalendarEventRequest(
-					title: title,
-					notes: nil,
-					symbol: "calendar",
-					date: SchoolCalendarDate(date)
-				),
-				globally: true
+			try? await save(request, target.event)
+			dismiss()
+		}
+	}
+
+	private func deleteEvent(_ event: CalendarEvent) {
+		Task {
+			try? await delete(event)
+			dismiss()
+		}
+	}
+}
+
+private struct AdministrationEventSymbolPicker: View {
+	@Binding var symbol: String
+
+	#if os(iOS)
+		@Environment(\.dismiss) private var dismiss
+	#endif
+
+	var body: some View {
+		#if os(iOS)
+			SymbolsPicker(
+				selection: $symbol,
+				title: "",
+				searchLabel: "Search symbols...",
+				autoDismiss: true
 			)
-			showCreate = false
-		}
-	}
-
-	private func delete(_ event: CalendarEvent) {
-		Task {
-			try? await service.deleteEvent(id: event.id, globally: true)
-		}
+		#else
+			Form {
+				TextField("SF Symbol Name", text: $symbol)
+				Label("Preview", systemImage: symbol)
+			}
+			.padding()
+		#endif
 	}
 }
 
@@ -142,7 +276,10 @@ private struct AdministrationCalendarView: View {
 					editor = entry
 				} label: {
 					LabeledContent(entry.label) {
-						Text(entry.kind == "term" ? "Term" : "No School")
+						Label(
+							entry.kind == "term" ? "Term" : "No School",
+							systemImage: entry.kind == "term" ? "calendar" : "xmark.circle"
+						)
 							.foregroundStyle(.secondary)
 					}
 				}
@@ -213,22 +350,25 @@ private struct AdministrationUsersView: View {
 	@State private var service = AdministrationService.shared
 	@State private var users: [AdministrationUserResponse] = []
 	@State private var searchText = ""
+	@State private var editor: AdministrationUserResponse?
 
 	var body: some View {
 		List(filteredUsers) { user in
-			NavigationLink {
-				AdministrationUserEditor(user: user) { updatedUser in
-					update(updatedUser)
-				}
+			Button {
+				editor = user
 			} label: {
-				VStack(alignment: .leading) {
-					Text(user.displayName)
+				Label {
+					VStack(alignment: .leading) {
+						Text(user.displayName)
 
-					if let email = user.email {
-						Text(email)
-							.font(.footnote)
-							.foregroundStyle(.secondary)
+						if let email = user.email {
+							Text(email)
+								.font(.footnote)
+								.foregroundStyle(.secondary)
+						}
 					}
+				} icon: {
+					Image(systemName: "person")
 				}
 			}
 		}
@@ -236,6 +376,11 @@ private struct AdministrationUsersView: View {
 		.appNavigationTitle("Users")
 		.task {
 			users = (try? await service.users()) ?? []
+		}
+		.sheet(item: $editor) { user in
+			AdministrationUserEditor(user: user) { updatedUser in
+				update(updatedUser)
+			}
 		}
 	}
 
@@ -280,35 +425,37 @@ private struct AdministrationUserEditor: View {
 	}
 
 	var body: some View {
-		Form {
-			TextField("Name", text: $displayName)
-			TextField("Email", text: $email)
-				.textInputAutocapitalization(.never)
-				.keyboardType(.emailAddress)
+		NavigationStack {
+			Form {
+				TextField("Name", text: $displayName)
+				TextField("Email", text: $email)
+					.textInputAutocapitalization(.never)
+					.keyboardType(.emailAddress)
 
-			Section {
-				SecureField("New Password", text: $password)
-			} footer: {
-				Text("Leave blank to keep the current password.")
-			}
-		}
-		.appNavigationTitle("User")
-		.toolbar {
-			ToolbarItem(placement: .cancellationAction) {
-				Button(role: .cancel) {
-					dismiss()
+				Section {
+					SecureField("New Password", text: $password)
+				} footer: {
+					Text("Leave blank to keep the current password.")
 				}
 			}
-
-			ToolbarItem(placement: .confirmationAction) {
-				Button("Save", systemImage: "checkmark", role: .confirm) {
-					save()
+			.appNavigationTitle("User")
+			.toolbar {
+				ToolbarItem(placement: .cancellationAction) {
+					Button(role: .cancel) {
+						dismiss()
+					}
 				}
-				.disabled(
-					displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-						|| email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-				)
-				.buttonStyle(.glassProminent)
+
+				ToolbarItem(placement: .confirmationAction) {
+					Button("Save", systemImage: "checkmark", role: .confirm) {
+						save()
+					}
+					.disabled(
+						displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+							|| email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+					)
+					.buttonStyle(.glassProminent)
+				}
 			}
 		}
 		.presentationDetents([.fraction(0.6)])
@@ -328,6 +475,48 @@ private struct AdministrationUserEditor: View {
 
 			didSave(updatedUser)
 			dismiss()
+		}
+	}
+}
+
+private struct AdministrationBroadcastNotificationView: View {
+	@State private var service = AdministrationService.shared
+	@State private var title = ""
+	@State private var subtitle = ""
+	@State private var body = ""
+
+	var body: some View {
+		Form {
+			TextField("Title", text: $title)
+			TextField("Subtitle", text: $subtitle)
+			TextField("Message", text: $body, axis: .vertical)
+				.lineLimit(4 ... 8)
+		}
+		.appNavigationTitle("Broadcast Notification")
+		.toolbar {
+			ToolbarItem(placement: .confirmationAction) {
+				Button("Send", systemImage: "paperplane.fill", role: .confirm) {
+					send()
+				}
+				.disabled(
+					title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+						|| subtitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+						|| body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+				)
+				.buttonStyle(.glassProminent)
+			}
+		}
+	}
+
+	private func send() {
+		let request = BroadcastNotificationRequest(
+			title: title,
+			subtitle: subtitle,
+			body: body
+		)
+
+		Task {
+			try? await service.broadcastNotification(request)
 		}
 	}
 }
@@ -385,6 +574,8 @@ private struct AdministrationCalendarEditor: View {
 					Button("Delete", systemImage: "trash", role: .destructive) {
 						deleteEntry()
 					}
+					.buttonStyle(.glassProminent)
+					.tint(.red)
 				}
 			}
 		}
