@@ -71,12 +71,7 @@ struct DatesView: View {
 
 			ForEach(Array(schoolCalendar.termRanges.enumerated()), id: \.offset) { _, range in
 				if range.intersects(dateWindow) {
-					LabeledContent(range.label) {
-						Text(range.displayLabel)
-							.foregroundStyle(.secondary)
-					}
-					.padding()
-					.background(.thinMaterial, in: RoundedRectangle(cornerRadius: 18))
+					timelineEntryContent(PlannerTimelineEntry(termRange: range))
 				}
 			}
 		}
@@ -162,13 +157,16 @@ struct DatesView: View {
 private struct PlannerTimelineEntry: Identifiable {
 	enum Kind {
 		case noSchoolDay
+		case termDate
 		case event(CalendarEvent)
 
 		var title: String {
 			switch self {
-				case .noSchoolDay:
-					"Pupil Free Day"
-				case let .event(event):
+			case .noSchoolDay:
+				"Pupil Free Day"
+			case .termDate:
+				"Term Date"
+			case let .event(event):
 					event.isGlobal ? "School Event" : "Your Event"
 			}
 		}
@@ -190,6 +188,25 @@ private struct PlannerTimelineEntry: Identifiable {
 		symbol = "figure.wave"
 		tint = .blue
 		kind = .noSchoolDay
+	}
+
+	init(termRange: SchoolCalendarDateRange) {
+		let termNumber = termRange.label
+			.split(whereSeparator: { !$0.isNumber })
+			.first
+			.map(String.init)
+
+		id = "term-\(termRange.start.year)-\(termRange.start.month)-\(termRange.start.day)-\(termRange.end.year)-\(termRange.end.month)-\(termRange.end.day)"
+		title = termRange.label
+		notes = termRange.displayLabel
+		date = termRange.start
+		symbol = if let termNumber {
+			"\(termNumber).calendar"
+		} else {
+			"calendar"
+		}
+		tint = .orange
+		kind = .termDate
 	}
 
 	init(event: CalendarEvent) {
