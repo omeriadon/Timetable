@@ -126,18 +126,17 @@ private struct TodaySchoolTimeline: View {
 		VStack(alignment: .leading, spacing: 8) {
 			Text("Classes").font(.headline)
 			GeometryReader { geometry in
-				ZStack(alignment: .topLeading) {
-					GlassEffectContainer(spacing: 0) {
-						ZStack(alignment: .topLeading) {
-							ForEach(periods, id: \.number) { period in
-								periodRow(period)
-									.offset(y: offset(for: period.start))
-							}
-							.padding(.horizontal, 4)
+				GlassEffectContainer(spacing: 8) {
+					ZStack(alignment: .topLeading) {
+						ForEach(periods, id: \.number) { period in
+							periodRow(period)
+								.offset(y: offset(for: period.start))
 						}
-						.frame(width: geometry.size.width, height: height, alignment: .topLeading)
+						.padding(.horizontal, 4)
 					}
-
+					.frame(width: geometry.size.width, height: height, alignment: .topLeading)
+				}
+				.overlay(alignment: .topLeading) {
 					if currentMinute >= SchoolStateEngine.schoolStart.minutesSinceMidnight, currentMinute <= dayEnd.minutesSinceMidnight {
 						currentTimeMarker
 							.offset(y: CGFloat(currentMinute - SchoolStateEngine.schoolStart.minutesSinceMidnight) * minuteHeight - 4)
