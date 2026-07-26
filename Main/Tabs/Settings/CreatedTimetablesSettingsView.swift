@@ -35,6 +35,7 @@ struct CreatedTimetablesSettingsView: View {
 						.bold()
 						.font(.largeTitle)
 						.lineLimit(3)
+						.foregroundStyle(.accent)
 						.frame(maxWidth: .infinity, alignment: .leading)
 				}
 			}

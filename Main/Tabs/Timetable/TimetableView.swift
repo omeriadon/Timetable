@@ -94,7 +94,7 @@ struct TimetableView: View {
 					items: [
 						("Today", "calendar.day.timeline.left"),
 						("Week", "7.calendar"),
-						("Upcoming", "list.star"),
+						("Planner", "pencil.and.list.clipboard"),
 					],
 					selection: $currentTab
 				)

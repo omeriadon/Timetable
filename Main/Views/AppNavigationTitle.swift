@@ -53,7 +53,7 @@ enum AppNavigationTitleStyle {
 }
 
 extension View {
-	func appNavigationTitle(_ title: String, style: AppNavigationTitleStyle = .subview, accent: Bool = false) -> some View {
+	func appNavigationTitle(_ title: String, style: AppNavigationTitleStyle = .subview, accent: Bool = true) -> some View {
 		modifier(AppNavigationTitleModifier(title: title, style: style, usesAccentColor: accent))
 	}
 }
