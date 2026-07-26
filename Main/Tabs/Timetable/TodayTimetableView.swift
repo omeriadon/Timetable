@@ -17,10 +17,9 @@ struct TodayTimetableView: View {
 						.font(.title2.bold())
 
 					if !todayEvents(at: now).isEmpty {
-						VStack(alignment: .center) {
-							Text("Events")
+						VStack(alignment: .leading) {
+							Text("Events Today")
 								.bold()
-								.frame(maxWidth: .infinity, alignment: .leading)
 
 							ForEach(todayEvents(at: now)) { event in
 								Label {
@@ -32,12 +31,12 @@ struct TodayTimetableView: View {
 									}
 								} icon: {
 									Image(systemName: event.symbol)
-										.foregroundStyle(.accent)
 								}
 								.padding(.vertical, 4)
+								.font(.title3)
 							}
 						}
-						.frame(maxWidth: .infinity)
+						.frame(maxWidth: .infinity, alignment: .leading)
 						.padding(10)
 						.background {
 							GeometryReader { proxy in
@@ -58,7 +57,8 @@ struct TodayTimetableView: View {
 						TodayCountdown(subjects: subjects, schoolCalendar: schoolCalendar, now: now)
 					}
 				}
-				.padding()
+				.padding(.vertical)
+				.padding(.horizontal, 5)
 				.frame(maxWidth: .infinity, alignment: .center)
 			}
 		}
@@ -126,21 +126,42 @@ private struct TodaySchoolTimeline: View {
 		VStack(alignment: .leading, spacing: 8) {
 			Text("Classes").font(.headline)
 			GeometryReader { geometry in
-				ZStack(alignment: .topLeading) {
-					ForEach(periods, id: \.number) { period in periodRow(period).offset(y: offset(for: period.start)) }
-					if currentMinute >= SchoolStateEngine.schoolStart.minutesSinceMidnight, currentMinute <= dayEnd.minutesSinceMidnight {
-						HStack(spacing: 0) {
-							Circle().fill(.red).frame(width: 8, height: 8)
-							Rectangle().fill(.red).frame(height: 2)
+				GlassEffectContainer(spacing: 0) {
+					ZStack(alignment: .topLeading) {
+						ForEach(periods, id: \.number) { period in
+							periodRow(period)
+								.offset(y: offset(for: period.start))
 						}
-						.offset(y: CGFloat(currentMinute - SchoolStateEngine.schoolStart.minutesSinceMidnight) * minuteHeight - 4)
-						.accessibilityLabel("Current time")
+						.padding(.horizontal, 4)
+
+						if currentMinute >= SchoolStateEngine.schoolStart.minutesSinceMidnight, currentMinute <= dayEnd.minutesSinceMidnight {
+							HStack(spacing: 0) {
+								Circle().fill(.red).frame(width: 15, height: 15)
+								Capsule().fill(.red).frame(height: 5)
+							}
+							.padding(.horizontal, -3)
+							.offset(y: CGFloat(currentMinute - SchoolStateEngine.schoolStart.minutesSinceMidnight) * minuteHeight - 4)
+							.accessibilityLabel("Current time")
+						}
 					}
+					.frame(width: geometry.size.width, height: height, alignment: .topLeading)
 				}
-				.frame(width: geometry.size.width, height: height, alignment: .topLeading)
 			}
 			.frame(height: height)
 		}
+		.padding(.bottom, 5)
+		.padding(10)
+		.background {
+			GeometryReader { proxy in
+				Image("paper")
+					.resizable()
+					.scaledToFill()
+					.frame(width: proxy.size.width, height: proxy.size.height)
+					.clipped()
+			}
+			.clipShape(RoundedRectangle(cornerRadius: 20))
+		}
+		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 20))
 	}
 
 	@ViewBuilder private func periodRow(_ period: SchoolPeriod) -> some View {
@@ -148,18 +169,24 @@ private struct TodaySchoolTimeline: View {
 		let duration = CGFloat(period.end.minutesSinceMidnight - period.start.minutesSinceMidnight) * minuteHeight
 		HStack(alignment: .top, spacing: 10) {
 			Text("\(period.number)").font(.caption.monospacedDigit()).foregroundStyle(.secondary).frame(width: 22)
+
 			VStack(alignment: .leading, spacing: 4) {
 				Text(subject?.id ?? "Free Period").font(.headline)
 				Text("\(timeLabel(period.start)) – \(timeLabel(period.end))").font(.caption).foregroundStyle(.secondary)
 			}
+
 			Spacer()
+
 			if let subject {
-				Image(systemName: subject.symbol).foregroundStyle(subject.colour.swiftUIColor)
+				Image(systemName: subject.symbol)
+					.foregroundStyle(subject.colour.swiftUIColor)
+					.font(.title)
 			}
 		}
 		.padding(10)
 		.frame(height: duration, alignment: .top)
-		.background(.quaternary, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+		.glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+		.padding(.vertical, 2)
 	}
 
 	private var currentMinute: Int {
