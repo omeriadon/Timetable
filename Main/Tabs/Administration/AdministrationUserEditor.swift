@@ -10,7 +10,8 @@ struct AdministrationUserEditor: View {
 	@State private var displayName: String
 	@State private var email: String
 	@State private var password = ""
-	@State private var rawData = ""
+	@State private var detailSections: [AdministrationUserDetailSection] = []
+	@State private var showsDeleteConfirmation = false
 
 	init(
 		target: AdministrationUserEditorTarget,
@@ -39,10 +40,21 @@ struct AdministrationUserEditor: View {
 				}
 
 				if target.user != nil {
-					Section("Raw Account Data") {
-						Text(rawData.isEmpty ? "Loading..." : rawData)
-							.font(.system(.caption, design: .monospaced))
-							.textSelection(.enabled)
+					Section("Account Data") {
+						if detailSections.isEmpty {
+							Text("Loading...")
+						} else {
+							ForEach(detailSections) { section in
+								VStack(alignment: .leading, spacing: 6) {
+									Text(section.title)
+										.font(.headline)
+									Text(section.content)
+										.font(.system(.caption, design: .monospaced))
+										.textSelection(.enabled)
+								}
+								.padding(.vertical, 4)
+							}
+						}
 					}
 				}
 			}
@@ -67,21 +79,32 @@ struct AdministrationUserEditor: View {
 				}
 			}
 			.safeAreaBar(edge: .bottom) {
-				if let user = target.user {
+				if target.user != nil {
 					Button("Delete Account", systemImage: "trash", role: .destructive) {
-						delete(user)
+						showsDeleteConfirmation = true
 					}
 					.buttonStyle(.glassProminent)
 					.tint(.red)
 				}
 			}
 		}
+		.confirmationDialog("Delete Account?", isPresented: $showsDeleteConfirmation, titleVisibility: .visible) {
+			if let user = target.user {
+				Button("Delete Account", systemImage: "trash", role: .destructive) {
+					delete(user)
+				}
+			}
+		} message: {
+			Text("This permanently deletes the account and its associated records.")
+		}
 		.task {
 			guard let user = target.user else {
 				return
 			}
 
-			rawData = await (try? service.userDetail(id: user.id).rawData) ?? "Unable to load raw account data."
+			detailSections = await (try? service.userDetail(id: user.id).sections) ?? [
+				AdministrationUserDetailSection(title: "Account Data", content: "Unable to load account data.")
+			]
 		}
 	}
 
