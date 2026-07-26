@@ -113,7 +113,6 @@ struct DatesView: View {
 			Image(systemName: entry.symbol)
 				.font(.title)
 				.frame(width: 42)
-				.foregroundStyle(entry.tint)
 
 			VStack(alignment: .leading, spacing: 4) {
 				Text(entry.title)
@@ -122,13 +121,11 @@ struct DatesView: View {
 				if !entry.kind.title.isEmpty {
 					Text(entry.kind.title)
 						.font(.footnote)
-						.foregroundStyle(.secondary)
 				}
 
 				if let notes = entry.notes, !notes.isEmpty {
 					Text(notes)
 						.font(.footnote)
-						.foregroundStyle(.secondary)
 				}
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
@@ -141,21 +138,11 @@ struct DatesView: View {
 					.font(.caption.weight(.semibold))
 			}
 			.frame(width: 42)
-			.foregroundStyle(Color.accentColor)
 		}
 		.padding([.vertical, .leading])
 		.padding(.trailing, 14)
-		.foregroundStyle(.black)
-		.background {
-			GeometryReader { proxy in
-				Image("paperWhite")
-					.resizable()
-					.scaledToFill()
-					.frame(width: proxy.size.width, height: proxy.size.height)
-					.clipped()
-			}
-			.clipShape(RoundedRectangle(cornerRadius: 20))
-		}
+		.foregroundStyle(entry.foregroundColor)
+		.background(entry.backgroundColor, in: RoundedRectangle(cornerRadius: 20))
 	}
 
 	private var dateWindow: ClosedRange<SchoolCalendarDate> {
@@ -206,8 +193,23 @@ private struct PlannerTimelineEntry: Identifiable {
 	let notes: String?
 	let date: SchoolCalendarDate
 	let symbol: String
-	let tint: Color
 	let kind: Kind
+
+	var backgroundColor: Color {
+		isPersonalEvent ? .white : .brown
+	}
+
+	var foregroundColor: Color {
+		isPersonalEvent ? .black : .white
+	}
+
+	private var isPersonalEvent: Bool {
+		if case let .event(event) = kind {
+			return !event.isGlobal
+		}
+
+		return false
+	}
 
 	nonisolated init(noSchoolDay: SchoolCalendarNamedDate) {
 		id = "no-school-\(noSchoolDay.date.year)-\(noSchoolDay.date.month)-\(noSchoolDay.date.day)"
@@ -215,7 +217,6 @@ private struct PlannerTimelineEntry: Identifiable {
 		notes = nil
 		date = noSchoolDay.date
 		symbol = "figure.wave"
-		tint = .blue
 		kind = .noSchoolDay
 	}
 
@@ -234,7 +235,6 @@ private struct PlannerTimelineEntry: Identifiable {
 		} else {
 			"calendar"
 		}
-		tint = .orange
 		kind = .termDate
 	}
 
@@ -244,7 +244,6 @@ private struct PlannerTimelineEntry: Identifiable {
 		notes = event.notes
 		date = event.date
 		symbol = event.symbol
-		tint = event.isGlobal ? .yellow : .purple
 		kind = .event(event)
 	}
 }
