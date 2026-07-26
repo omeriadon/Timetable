@@ -153,11 +153,26 @@ struct DatesView: View {
 		let noSchoolEntries = schoolCalendar.skippedDates
 			.filter { dateWindow.contains($0.date) }
 			.map(PlannerTimelineEntry.init(noSchoolDay:))
-		let eventEntries = (events.globalEvents + events.privateEvents)
-			.filter { dateWindow.contains($0.date) }
-			.map(PlannerTimelineEntry.init(event:))
+		let globalEventEntries = events.globalEvents
+			.enumerated()
+			.compactMap { offset, event in
+				guard dateWindow.contains(event.date) else {
+					return nil
+				}
 
-		return (noSchoolEntries + eventEntries)
+				return PlannerTimelineEntry(event: event, occurrence: offset)
+			}
+		let privateEventEntries = events.privateEvents
+			.enumerated()
+			.compactMap { offset, event in
+				guard dateWindow.contains(event.date) else {
+					return nil
+				}
+
+				return PlannerTimelineEntry(event: event, occurrence: offset)
+			}
+
+		return (noSchoolEntries + globalEventEntries + privateEventEntries)
 			.sorted {
 				if $0.date == $1.date {
 					return $0.title.localizedStandardCompare($1.title) == .orderedAscending
@@ -236,8 +251,9 @@ private struct PlannerTimelineEntry: Identifiable {
 		kind = .termDate
 	}
 
-	nonisolated init(event: CalendarEvent) {
-		id = event.id.uuidString
+	nonisolated init(event: CalendarEvent, occurrence: Int) {
+		let scope = event.isGlobal ? "global" : "personal"
+		id = "event-\(scope)-\(event.date.year)-\(event.date.month)-\(event.date.day)-\(event.id.uuidString)-\(occurrence)"
 		title = event.title
 		notes = event.notes
 		date = event.date
@@ -250,7 +266,13 @@ private enum CalendarEventEditorTarget: Identifiable {
 	case create(CalendarEventScope)
 	case edit(CalendarEvent)
 	var id: String {
-		switch self { case let .create(scope): "create-\(scope.id)"; case let .edit(event): event.id.uuidString }
+		switch self {
+		case let .create(scope):
+			return "create-\(scope.id)"
+		case let .edit(event):
+			let scope = event.isGlobal ? "global" : "personal"
+			return "edit-\(scope)-\(event.date.year)-\(event.date.month)-\(event.date.day)-\(event.id.uuidString)"
+		}
 	}
 
 	var scope: CalendarEventScope {
