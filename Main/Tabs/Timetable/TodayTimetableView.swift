@@ -21,7 +21,6 @@ struct TodayTimetableView: View {
 
 					if let noSchoolDay {
 						TodayNoSchoolDayCard(noSchoolDay: noSchoolDay)
-							.padding(.horizontal, 10)
 					}
 
 					if !schoolEvents.isEmpty || !personalEvents.isEmpty {
@@ -38,7 +37,8 @@ struct TodayTimetableView: View {
 							}
 						}
 						.frame(maxWidth: .infinity, alignment: .leading)
-						.padding(10)
+						.padding(.vertical, 10)
+						.padding(.horizontal, TodayCardLayout.contentInset)
 						.background {
 							GeometryReader { proxy in
 								Image("paper")
@@ -50,7 +50,6 @@ struct TodayTimetableView: View {
 							.clipShape(RoundedRectangle(cornerRadius: 20))
 						}
 						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 20))
-						.padding(.horizontal, 10)
 					}
 
 					if let dayIndex = schoolCalendar.dayIndex(for: now), schoolCalendar.isSchoolDay(now), !subjects.isEmpty {
@@ -96,6 +95,12 @@ struct TodayTimetableView: View {
 	}
 }
 
+private enum TodayCardLayout {
+	static let outerCornerRadius: CGFloat = 20
+	static let innerCornerRadius: CGFloat = 13
+	static let contentInset = outerCornerRadius - innerCornerRadius
+}
+
 private struct TodayNoSchoolDayCard: View {
 	let noSchoolDay: SchoolCalendarNamedDate
 
@@ -118,7 +123,8 @@ private struct TodayNoSchoolDayCard: View {
 			.font(.title3)
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)
-		.padding(10)
+		.padding(.vertical, 10)
+		.padding(.horizontal, TodayCardLayout.contentInset)
 		.background {
 			GeometryReader { proxy in
 				Image("paperWhite")
@@ -178,8 +184,8 @@ private struct TodaySchoolTimeline: View {
 	let dayIndex: Int
 	let now: Date
 	private let minuteHeight: CGFloat = 1.35
-	private let outerCornerRadius: CGFloat = 20
-	private let periodCornerRadius: CGFloat = 13
+	private let outerCornerRadius = TodayCardLayout.outerCornerRadius
+	private let periodCornerRadius = TodayCardLayout.innerCornerRadius
 	private let timelineHorizontalPadding: CGFloat = 3
 	private var periodHorizontalInset: CGFloat {
 		outerCornerRadius - periodCornerRadius
