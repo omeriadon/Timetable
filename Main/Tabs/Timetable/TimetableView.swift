@@ -30,6 +30,8 @@ struct TimetableView: View {
 	@State private var selectedTimetable: ReceivedTimetable?
 	@State private var showTimetableComparison = false
 	@State private var selectedSlot: Slot? = nil
+	@State private var schoolCalendarSync = SchoolCalendarSyncService.shared
+	@State private var calendarEventsSync = CalendarEventsSyncService.shared
 
 	@State private var currentTab: Int = 0
 	@State private var scrollPosition: Int?
@@ -104,12 +106,21 @@ struct TimetableView: View {
 				withAnimation {
 					scrollPosition = newValue
 				}
+				refreshCalendarData()
 			}
 			.onChange(of: scrollPosition) { _, newValue in
 				if let newValue {
 					currentTab = newValue
 				}
 			}
+		}
+	}
+
+	private func refreshCalendarData() {
+		Task {
+			async let schoolCalendarRefresh: Void = schoolCalendarSync.downloadCalendar()
+			async let calendarEventsRefresh: Void = calendarEventsSync.downloadEvents()
+			_ = try? await (schoolCalendarRefresh, calendarEventsRefresh)
 		}
 	}
 
