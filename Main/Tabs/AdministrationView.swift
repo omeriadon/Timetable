@@ -22,9 +22,15 @@ struct AdministrationView: View {
 							}
 
 							NavigationLink {
-								AdministrationCalendarView()
+								AdministrationCalendarEntriesView(kind: "term")
 							} label: {
-								Label("School Calendar", systemImage: "calendar.badge.clock")
+								Label("Term Dates", systemImage: "calendar")
+							}
+
+							NavigationLink {
+								AdministrationCalendarEntriesView(kind: "noSchool")
+							} label: {
+								Label("No-School Days", systemImage: "calendar.badge.exclamationmark")
 							}
 
 							NavigationLink {
@@ -263,25 +269,6 @@ private struct AdministrationEventSymbolPicker: View {
 			}
 			.padding()
 		#endif
-	}
-}
-
-private struct AdministrationCalendarView: View {
-	var body: some View {
-		List {
-			NavigationLink {
-				AdministrationCalendarEntriesView(kind: "term")
-			} label: {
-				Label("Term Dates", systemImage: "calendar")
-			}
-
-			NavigationLink {
-				AdministrationCalendarEntriesView(kind: "noSchool")
-			} label: {
-				Label("No-School Days", systemImage: "calendar.badge.exclamationmark")
-			}
-		}
-		.appNavigationTitle("School Calendar")
 	}
 }
 

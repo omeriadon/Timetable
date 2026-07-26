@@ -58,7 +58,7 @@ struct DatesView: View {
 
 	@ViewBuilder
 	private func eventRows(_ events: [CalendarEvent]) -> some View {
-		let filtered = events.filter { dateWindow.contains($0.date) }.sorted { $0.date < $1.date }
+		let filtered = events.filter { eventDateWindow.contains($0.date) }.sorted { $0.date < $1.date }
 		if filtered.isEmpty {
 			Text("No events in the next three months.")
 				.foregroundStyle(.secondary)
@@ -93,6 +93,12 @@ struct DatesView: View {
 		let start = SchoolCalendarDate(TimetableClock.now, calendar: calendar)
 		let end = SchoolCalendarDate(calendar.date(byAdding: .month, value: 3, to: TimetableClock.now) ?? TimetableClock.now, calendar: calendar)
 		return start ... end
+	}
+
+	private var eventDateWindow: ClosedRange<SchoolCalendarDate> {
+		let startDate = calendar.date(byAdding: .day, value: -1, to: TimetableClock.now) ?? TimetableClock.now
+		let endDate = calendar.date(byAdding: .month, value: 3, to: TimetableClock.now) ?? TimetableClock.now
+		return SchoolCalendarDate(startDate, calendar: calendar) ... SchoolCalendarDate(endDate, calendar: calendar)
 	}
 
 	private var upcomingNoSchoolDates: [SchoolCalendarNamedDate] {
