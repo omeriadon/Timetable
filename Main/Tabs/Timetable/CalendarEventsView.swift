@@ -155,21 +155,15 @@ struct DatesView: View {
 			.map(PlannerTimelineEntry.init(noSchoolDay:))
 		let globalEventEntries = events.globalEvents
 			.enumerated()
-			.compactMap { offset, event in
-				guard dateWindow.contains(event.date) else {
-					return nil
-				}
-
-				return PlannerTimelineEntry(event: event, occurrence: offset)
+			.filter { dateWindow.contains($0.element.date) }
+			.map { entry in
+				PlannerTimelineEntry(event: entry.element, occurrence: entry.offset)
 			}
 		let privateEventEntries = events.privateEvents
 			.enumerated()
-			.compactMap { offset, event in
-				guard dateWindow.contains(event.date) else {
-					return nil
-				}
-
-				return PlannerTimelineEntry(event: event, occurrence: offset)
+			.filter { dateWindow.contains($0.element.date) }
+			.map { entry in
+				PlannerTimelineEntry(event: entry.element, occurrence: entry.offset)
 			}
 
 		return (noSchoolEntries + globalEventEntries + privateEventEntries)
