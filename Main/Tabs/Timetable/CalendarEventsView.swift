@@ -142,7 +142,17 @@ struct DatesView: View {
 		.padding([.vertical, .leading])
 		.padding(.trailing, 14)
 		.foregroundStyle(entry.foregroundColor)
-		.background(entry.backgroundColor, in: RoundedRectangle(cornerRadius: 20))
+		.background {
+			GeometryReader { proxy in
+				Image(entry.backgroundImageName)
+					.resizable()
+					.scaledToFill()
+					.frame(width: proxy.size.width, height: proxy.size.height)
+					.clipped()
+			}
+			.clipShape(RoundedRectangle(cornerRadius: 20))
+		}
+		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 20))
 	}
 
 	private var dateWindow: ClosedRange<SchoolCalendarDate> {
@@ -195,8 +205,8 @@ private struct PlannerTimelineEntry: Identifiable {
 	let symbol: String
 	let kind: Kind
 
-	var backgroundColor: Color {
-		isPersonalEvent ? .white : .brown
+	var backgroundImageName: String {
+		isPersonalEvent ? "paperWhite" : "paper"
 	}
 
 	var foregroundColor: Color {
