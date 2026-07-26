@@ -126,26 +126,24 @@ private struct TodaySchoolTimeline: View {
 		VStack(alignment: .leading, spacing: 8) {
 			Text("Classes").font(.headline)
 			GeometryReader { geometry in
-				GlassEffectContainer(spacing: 0) {
-					ZStack(alignment: .topLeading) {
-						ForEach(periods, id: \.number) { period in
-							periodRow(period)
-								.offset(y: offset(for: period.start))
-						}
-						.padding(.horizontal, 4)
-
-						if currentMinute >= SchoolStateEngine.schoolStart.minutesSinceMidnight, currentMinute <= dayEnd.minutesSinceMidnight {
-							HStack(spacing: 0) {
-								Circle().fill(.red).frame(width: 15, height: 15)
-								Capsule().fill(.red).frame(height: 5)
+				ZStack(alignment: .topLeading) {
+					GlassEffectContainer(spacing: 0) {
+						ZStack(alignment: .topLeading) {
+							ForEach(periods, id: \.number) { period in
+								periodRow(period)
+									.offset(y: offset(for: period.start))
 							}
-							.padding(.horizontal, -3)
-							.offset(y: CGFloat(currentMinute - SchoolStateEngine.schoolStart.minutesSinceMidnight) * minuteHeight - 4)
-							.accessibilityLabel("Current time")
+							.padding(.horizontal, 4)
 						}
+						.frame(width: geometry.size.width, height: height, alignment: .topLeading)
 					}
-					.frame(width: geometry.size.width, height: height, alignment: .topLeading)
+
+					if currentMinute >= SchoolStateEngine.schoolStart.minutesSinceMidnight, currentMinute <= dayEnd.minutesSinceMidnight {
+						currentTimeMarker
+							.offset(y: CGFloat(currentMinute - SchoolStateEngine.schoolStart.minutesSinceMidnight) * minuteHeight - 4)
+					}
 				}
+				.frame(width: geometry.size.width, height: height, alignment: .topLeading)
 			}
 			.frame(height: height)
 		}
@@ -167,13 +165,13 @@ private struct TodaySchoolTimeline: View {
 	@ViewBuilder private func periodRow(_ period: SchoolPeriod) -> some View {
 		let subject = subject(for: period)
 		let duration = CGFloat(period.end.minutesSinceMidnight - period.start.minutesSinceMidnight) * minuteHeight
+		let cardHeight = max(44, duration - 8)
 		HStack(alignment: .top, spacing: 10) {
 			Text("\(period.number)").font(.caption.monospacedDigit()).foregroundStyle(.secondary).frame(width: 22)
 
-			VStack(alignment: .leading, spacing: 4) {
+
 				Text(subject?.id ?? "Free Period").font(.headline)
-				Text("\(timeLabel(period.start)) – \(timeLabel(period.end))").font(.caption).foregroundStyle(.secondary)
-			}
+
 
 			Spacer()
 
@@ -184,9 +182,22 @@ private struct TodaySchoolTimeline: View {
 			}
 		}
 		.padding(10)
-		.frame(height: duration, alignment: .top)
+		.frame(height: cardHeight, alignment: .top)
 		.glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-		.padding(.vertical, 2)
+	}
+
+	private var currentTimeMarker: some View {
+		HStack(spacing: 0) {
+			Circle()
+				.fill(.red)
+				.frame(width: 15, height: 15)
+			Capsule()
+				.fill(.red)
+				.frame(height: 5)
+		}
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.padding(.horizontal, -3)
+		.accessibilityLabel("Current time")
 	}
 
 	private var currentMinute: Int {
