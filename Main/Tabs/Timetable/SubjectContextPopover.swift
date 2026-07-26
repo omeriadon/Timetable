@@ -38,18 +38,18 @@ struct SubjectContextPopover: View {
 	private var header: some View {
 		HStack(spacing: 12) {
 			Image(systemName: subject.symbol)
-				.font(.largeTitle)
+				.font(.title)
 				.bold()
 				.padding(.trailing, 3)
 
 			VStack(alignment: .leading, spacing: 3) {
 				Text(owner)
-					.font(.title3)
+					.font(.headline)
 					.foregroundStyle(.secondary)
 					.lineLimit(1)
 
 				Text(subject.id)
-					.font(.title2)
+					.font(.title3)
 					.lineLimit(1)
 					.bold()
 			}
@@ -62,7 +62,7 @@ struct SubjectContextPopover: View {
 	private func infoRow(title: String, value: some View, systemImage: String) -> some View {
 		HStack(spacing: 12) {
 			Image(systemName: systemImage)
-				.font(.title)
+				.font(.title2)
 				.padding(.leading, 7)
 				.frame(width: 25)
 				.bold()
@@ -72,7 +72,7 @@ struct SubjectContextPopover: View {
 					.foregroundStyle(.secondary)
 
 				value
-					.font(.title3)
+					.font(.headline)
 					.foregroundStyle(.primary)
 					.lineLimit(2)
 					.bold()
