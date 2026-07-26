@@ -31,20 +31,7 @@ struct DatesView: View {
 					.padding(.vertical, 36)
 				} else {
 					ForEach(timelineEntries) { entry in
-						Section {
-							timelineEntry(entry)
-						}
-						.foregroundStyle(.black)
-						.background {
-							GeometryReader { proxy in
-								Image("paperWhite")
-									.resizable()
-									.scaledToFill()
-									.frame(width: proxy.size.width, height: proxy.size.height)
-									.clipped()
-							}
-							.clipShape(RoundedRectangle(cornerRadius: 20))
-						}
+						timelineEntry(entry)
 					}
 				}
 
@@ -142,6 +129,7 @@ struct DatesView: View {
 		.padding([.vertical, .leading])
 		.padding(.trailing, 14)
 		.foregroundStyle(entry.foregroundColor)
+		.contentShape(RoundedRectangle(cornerRadius: 20))
 		.background {
 			GeometryReader { proxy in
 				Image(entry.backgroundImageName)
