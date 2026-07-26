@@ -180,7 +180,7 @@ private struct PlannerTimelineEntry: Identifiable {
 	let tint: Color
 	let kind: Kind
 
-	init(noSchoolDay: SchoolCalendarNamedDate) {
+	nonisolated init(noSchoolDay: SchoolCalendarNamedDate) {
 		id = "no-school-\(noSchoolDay.date.year)-\(noSchoolDay.date.month)-\(noSchoolDay.date.day)"
 		title = noSchoolDay.label
 		notes = nil
@@ -209,7 +209,7 @@ private struct PlannerTimelineEntry: Identifiable {
 		kind = .termDate
 	}
 
-	init(event: CalendarEvent) {
+	nonisolated init(event: CalendarEvent) {
 		id = event.id.uuidString
 		title = event.title
 		notes = event.notes
