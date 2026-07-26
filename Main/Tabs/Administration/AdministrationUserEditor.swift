@@ -1,23 +1,27 @@
 import SwiftUI
 
 struct AdministrationUserEditor: View {
-	let user: AdministrationUserResponse
+	let target: AdministrationUserEditorTarget
 	let didSave: (AdministrationUserResponse) -> Void
+	let didDelete: (AdministrationUserResponse) -> Void
 
 	@Environment(\.dismiss) private var dismiss
 	@State private var service = AdministrationService.shared
 	@State private var displayName: String
 	@State private var email: String
 	@State private var password = ""
+	@State private var rawData = ""
 
 	init(
-		user: AdministrationUserResponse,
-		didSave: @escaping (AdministrationUserResponse) -> Void
+		target: AdministrationUserEditorTarget,
+		didSave: @escaping (AdministrationUserResponse) -> Void,
+		didDelete: @escaping (AdministrationUserResponse) -> Void
 	) {
-		self.user = user
+		self.target = target
 		self.didSave = didSave
-		_displayName = State(initialValue: user.displayName)
-		_email = State(initialValue: user.email ?? "")
+		self.didDelete = didDelete
+		_displayName = State(initialValue: target.user?.displayName ?? "")
+		_email = State(initialValue: target.user?.email ?? "")
 	}
 
 	var body: some View {
@@ -29,12 +33,20 @@ struct AdministrationUserEditor: View {
 					.keyboardType(.emailAddress)
 
 				Section {
-					SecureField("New Password", text: $password)
+					SecureField(target.user == nil ? "Password" : "New Password", text: $password)
 				} footer: {
-					Text("Leave blank to keep the current password.")
+					Text(target.user == nil ? "Passwords must contain at least eight characters." : "Leave blank to keep the current password.")
+				}
+
+				if target.user != nil {
+					Section("Raw Account Data") {
+						Text(rawData.isEmpty ? "Loading..." : rawData)
+							.font(.system(.caption, design: .monospaced))
+							.textSelection(.enabled)
+					}
 				}
 			}
-			.appNavigationTitle("User")
+			.appNavigationTitle(target.user == nil ? "New User" : "User")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {
@@ -43,33 +55,73 @@ struct AdministrationUserEditor: View {
 				}
 
 				ToolbarItem(placement: .confirmationAction) {
-					Button("Save", systemImage: "checkmark", role: .confirm) {
+					Button(target.user == nil ? "Create" : "Save", systemImage: target.user == nil ? "plus" : "checkmark", role: .confirm) {
 						save()
 					}
 					.disabled(
 						displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
 							|| email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+							|| (target.user == nil && password.count < 8)
 					)
 					.buttonStyle(.glassProminent)
 				}
 			}
+			.safeAreaBar(edge: .bottom) {
+				if let user = target.user {
+					Button("Delete Account", systemImage: "trash", role: .destructive) {
+						delete(user)
+					}
+					.buttonStyle(.glassProminent)
+					.tint(.red)
+				}
+			}
 		}
-		.presentationDetents([.fraction(0.6)])
+		.task {
+			guard let user = target.user else {
+				return
+			}
+
+			rawData = (try? await service.userDetail(id: user.id).rawData) ?? "Unable to load raw account data."
+		}
 	}
 
 	private func save() {
 		Task {
-			let request = AdministrationUserUpdateRequest(
-				displayName: displayName,
-				email: email,
-				password: password.isEmpty ? nil : password
-			)
+			let savedUser: AdministrationUserResponse?
+			if let user = target.user {
+				let request = AdministrationUserUpdateRequest(
+					displayName: displayName,
+					email: email,
+					password: password.isEmpty ? nil : password
+				)
+				savedUser = try? await service.updateUser(id: user.id, request: request)
+			} else {
+				let request = AdministrationUserCreateRequest(
+					displayName: displayName,
+					email: email,
+					password: password
+				)
+				savedUser = try? await service.createUser(request: request)
+			}
 
-			guard let updatedUser = try? await service.updateUser(id: user.id, request: request) else {
+			guard let savedUser else {
 				return
 			}
 
-			didSave(updatedUser)
+			didSave(savedUser)
+			dismiss()
+		}
+	}
+
+	private func delete(_ user: AdministrationUserResponse) {
+		Task {
+			do {
+				try await service.deleteUser(id: user.id)
+			} catch {
+				return
+			}
+
+			didDelete(user)
 			dismiss()
 		}
 	}

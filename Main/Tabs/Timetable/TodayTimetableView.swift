@@ -21,6 +21,7 @@ struct TodayTimetableView: View {
 
 					if let noSchoolDay {
 						TodayNoSchoolDayCard(noSchoolDay: noSchoolDay)
+							.padding(.horizontal, 10)
 					}
 
 					if !schoolEvents.isEmpty || !personalEvents.isEmpty {
@@ -49,6 +50,7 @@ struct TodayTimetableView: View {
 							.clipShape(RoundedRectangle(cornerRadius: 20))
 						}
 						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 20))
+						.padding(.horizontal, 10)
 					}
 
 					if let dayIndex = schoolCalendar.dayIndex(for: now), schoolCalendar.isSchoolDay(now), !subjects.isEmpty {
@@ -195,9 +197,12 @@ private struct TodaySchoolTimeline: View {
 					ZStack(alignment: .topLeading) {
 						ForEach(periods, id: \.number) { period in
 							periodRow(period)
-								.offset(y: offset(for: period.start))
+								.frame(width: periodRowWidth(for: geometry.size.width))
+								.offset(
+									x: periodHorizontalInset - timelineHorizontalPadding,
+									y: offset(for: period.start)
+								)
 						}
-						.padding(.horizontal, periodHorizontalInset - timelineHorizontalPadding)
 					}
 					.frame(width: geometry.size.width, height: height, alignment: .topLeading)
 				}
@@ -249,18 +254,16 @@ private struct TodaySchoolTimeline: View {
 	}
 
 	private var currentTimeMarker: some View {
-		HStack(spacing: -7) {
-			Color.clear
-				.frame(width: 15, height: 15)
-				.glassEffect(.regular.tint(.red), in: Circle())
-			Color.clear
-				.frame(maxWidth: .infinity)
-				.frame(height: 5)
-				.glassEffect(.regular.tint(.red), in: Capsule())
-		}
+		Color.clear
 		.frame(maxWidth: .infinity, alignment: .leading)
-		.padding(.horizontal, -3)
+		.frame(height: 15)
+		.glassEffect(.regular.tint(.red), in: CurrentTimeMarkerShape())
+		.padding(.horizontal, -1)
 		.accessibilityLabel("Current time")
+	}
+
+	private func periodRowWidth(for availableWidth: CGFloat) -> CGFloat {
+		availableWidth - 2 * (periodHorizontalInset - timelineHorizontalPadding)
 	}
 
 	private var currentMinute: Int {
@@ -279,5 +282,25 @@ private struct TodaySchoolTimeline: View {
 
 	private func timeLabel(_ time: TimeOfDay) -> String {
 		String(format: "%d:%02d", time.hour, time.minute)
+	}
+}
+
+private struct CurrentTimeMarkerShape: Shape {
+	func path(in rect: CGRect) -> Path {
+		let circleDiameter = min(15, rect.height)
+		let circleY = rect.midY - circleDiameter / 2
+		let lineHeight: CGFloat = 5
+		let lineStart = circleDiameter / 2
+		let lineRect = CGRect(
+			x: lineStart,
+			y: rect.midY - lineHeight / 2,
+			width: max(0, rect.width - lineStart),
+			height: lineHeight
+		)
+
+		var path = Path()
+		path.addEllipse(in: CGRect(x: 0, y: circleY, width: circleDiameter, height: circleDiameter))
+		path.addRoundedRect(in: lineRect, cornerSize: CGSize(width: lineHeight / 2, height: lineHeight / 2))
+		return path
 	}
 }

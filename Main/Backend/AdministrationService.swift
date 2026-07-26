@@ -20,6 +20,18 @@ final class AdministrationService {
 		try await networkManager.send(Endpoint("/v1/administration/users/\(id.uuidString)", method: .put), body: request, context: .userInitiated)
 	}
 
+	func createUser(request: AdministrationUserCreateRequest) async throws -> AdministrationUserResponse {
+		try await networkManager.send(.v1AdministrationUsersCreate, body: request, context: .userInitiated)
+	}
+
+	func deleteUser(id: UUID) async throws {
+		try await networkManager.send(Endpoint("/v1/administration/users/\(id.uuidString)", method: .delete), context: .userInitiated)
+	}
+
+	func userDetail(id: UUID) async throws -> AdministrationUserDetailResponse {
+		try await networkManager.send(Endpoint("/v1/administration/users/\(id.uuidString)"), context: .userInitiated)
+	}
+
 	func broadcastNotification(_ request: BroadcastNotificationRequest) async throws -> BroadcastNotificationResponse {
 		try await networkManager.send(.v1AdministrationBroadcastNotification, body: request, context: .userInitiated)
 	}
@@ -40,6 +52,7 @@ final class AdministrationService {
 private extension Endpoint {
 	static let v1Administration = Endpoint("/v1/administration")
 	static let v1AdministrationUsers = Endpoint("/v1/administration/users")
+	static let v1AdministrationUsersCreate = Endpoint("/v1/administration/users", method: .post)
 	static let v1AdministrationCalendar = Endpoint("/v1/administration/calendar")
 	static let v1AdministrationCalendarCreate = Endpoint("/v1/administration/calendar", method: .post)
 	static let v1AdministrationBroadcastNotification = Endpoint("/v1/administration/broadcast-notification", method: .post)
