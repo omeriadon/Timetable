@@ -36,6 +36,7 @@ struct DatesView: View {
 				}
 
 				termDates
+					.zIndex(0)
 			}
 			.padding()
 		}
@@ -134,8 +135,9 @@ struct DatesView: View {
 			}
 			.buttonStyle(.plain)
 			.frame(maxWidth: .infinity)
-			.contentShape(RoundedRectangle(cornerRadius: 20))
 			.matchedTransitionSource(id: target.transitionID, in: eventEditorNamespace)
+			.contentShape(RoundedRectangle(cornerRadius: 20))
+			.zIndex(1)
 		} else {
 			timelineEntryContent(entry)
 		}
@@ -185,7 +187,7 @@ struct DatesView: View {
 			}
 			.clipShape(RoundedRectangle(cornerRadius: 20))
 		}
-		.glassEffect(.clear, in: RoundedRectangle(cornerRadius: 20))
+		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 20))
 	}
 
 	private var dateWindow: ClosedRange<SchoolCalendarDate> {
