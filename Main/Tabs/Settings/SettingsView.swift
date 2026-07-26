@@ -28,6 +28,7 @@ import WidgetKit
 		@State private var committedSettings = Defaults[.accountSettings]
 		@State private var settingsSync = AccountSettingsSyncService.shared
 		@State private var settingsSaveGeneration = 0
+		@Default(.debugOffset) private var debugOffset
 
 		let watchSync: PhoneWatchSyncBridge
 
@@ -191,6 +192,12 @@ import WidgetKit
 			}
 			Section("Developer") {
 				if _isDebugAssertConfiguration() || Defaults[.userDisplayName].contains("Adon") {
+					LabeledContent("Debug Offset") {
+						TextField("Seconds", value: $debugOffset, format: .number)
+							.multilineTextAlignment(.trailing)
+							.keyboardType(.numbersAndPunctuation)
+					}
+
 					Button("Test progress badge", systemImage: "progress.indicator") {
 						addDebugStatusBadge(title: "Syncing account", secondaryText: "Working", view: .progressView)
 					}

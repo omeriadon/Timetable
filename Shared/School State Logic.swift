@@ -202,11 +202,11 @@ nonisolated enum SchoolState: Hashable {
 
 nonisolated enum TimetableClock {
 	static var now: Date {
-		Date().addingTimeInterval(debugOffset)
+		Date().addingTimeInterval(Defaults[.debugOffset])
 	}
 
 	static func adjusted(_ date: Date) -> Date {
-		date.addingTimeInterval(debugOffset)
+		date.addingTimeInterval(Defaults[.debugOffset])
 	}
 }
 

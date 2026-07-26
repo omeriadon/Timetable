@@ -7,12 +7,6 @@
 
 import Foundation
 
-#if DEBUG
-	nonisolated let debugOffset: TimeInterval = -0
-#else
-	nonisolated let debugOffset: TimeInterval = 0
-#endif
-
 let debugTimetable: [Subject] = [
 	Subject(id: "Maths", symbol: "apple", colour: .init(red: 1, green: 0, blue: 1, alpha: 1), slots: [
 		Slot(1, 2),

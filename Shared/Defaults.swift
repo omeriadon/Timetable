@@ -63,4 +63,10 @@ extension Defaults.Keys {
 	static let ownerTimetableID = Key<String>("ownerTimetableID", default: "", suite: sharedDefaults)
 	static let ownerTimetableShareAlias = Key<String>("ownerTimetableShareAlias", default: "", suite: sharedDefaults)
 	static let hapticsEnabled = Key<Bool>("hapticsEnabled", default: true, suite: sharedDefaults)
+
+	#if DEBUG
+		static let debugOffset = Key<TimeInterval>("debugOffset", default: 87_896, suite: sharedDefaults)
+	#else
+		static let debugOffset = Key<TimeInterval>("debugOffset", default: 0, suite: sharedDefaults)
+	#endif
 }

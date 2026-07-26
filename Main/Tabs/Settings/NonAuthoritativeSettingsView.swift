@@ -11,6 +11,7 @@ struct NonAuthoritativeSettingsView: View {
 	@State private var settingsSync = AccountSettingsSyncService.shared
 	@State private var saveGeneration = 0
 	@State private var showFeedbackSheet = false
+	@Default(.debugOffset) private var debugOffset
 
 	@Binding var expanded: WindowMode
 
@@ -41,6 +42,11 @@ struct NonAuthoritativeSettingsView: View {
 
 				Section("Developer") {
 					if _isDebugAssertConfiguration() || Defaults[.userDisplayName].contains("Adon") {
+						LabeledContent("Debug Offset") {
+							TextField("Seconds", value: $debugOffset, format: .number)
+								.multilineTextAlignment(.trailing)
+						}
+
 						Button("Test progress badge", systemImage: "progress.indicator") {
 							addDebugStatusBadge(title: "Syncing account", secondaryText: "Working", view: .progressView)
 						}
