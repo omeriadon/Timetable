@@ -211,7 +211,7 @@ struct EventNotificationSchedulesEditor: View {
 				Spacer()
 				Button("Remove", systemImage: "minus.circle", role: .destructive) {
 					withAnimation(reduceMotion ? nil : .snappy) {
-						selection.remove(schedule)
+						_ = selection.remove(schedule)
 					}
 				}
 				.foregroundStyle(.red)
@@ -266,7 +266,13 @@ private struct EventNotificationScheduleSheet: View {
 				ToolbarItem(placement: .confirmationAction) {
 					Button("Add", systemImage: "plus", role: .confirm) {
 						withAnimation(reduceMotion ? nil : .snappy) {
-							selection.insert(EventNotificationSchedule(hour: timeMinutes / 60, minute: timeMinutes % 60, dayOffset: dayOffset))
+							_ = selection.insert(
+								EventNotificationSchedule(
+									hour: timeMinutes / 60,
+									minute: timeMinutes % 60,
+									dayOffset: dayOffset
+								)
+							)
 						}
 						dismiss()
 					}
