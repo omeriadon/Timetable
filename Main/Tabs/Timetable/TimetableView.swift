@@ -71,12 +71,12 @@ struct TimetableView: View {
 						subjects: selectedTimetable?.subjects ?? subjects
 					)
 					.containerRelativeFrame(.horizontal)
-					.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.5)
+					.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.7)
 					.id(0)
 
 					mainView
 						.containerRelativeFrame(.horizontal)
-						.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.5)
+						.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.7)
 						.id(1)
 
 					DatesView()

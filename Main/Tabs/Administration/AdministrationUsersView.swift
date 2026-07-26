@@ -32,11 +32,14 @@ struct AdministrationUsersView: View {
 		.appNavigationTitle("Users", accent: true)
 		.toolbar {
 			ToolbarItem(placement: .confirmationAction) {
-				Button("Add User", systemImage: "plus", role: .confirm) {
+				Button(role: .confirm) {
 					editor = .create
+				} label: {
+					Label("Add User", systemImage: "plus")
+						.foregroundStyle(.white)
 				}
-				.buttonStyle(.glassProminent)
 				.matchedTransitionSource(id: AdministrationUserEditorTarget.create.id, in: userEditorNamespace)
+				.buttonStyle(.glassProminent)
 			}
 		}
 		.task {
@@ -48,7 +51,7 @@ struct AdministrationUsersView: View {
 				didSave: save,
 				didDelete: delete
 			)
-			.presentationDetents([.fraction(0.6)])
+			.presentationDetents([.fraction(0.6), .large])
 			.navigationTransition(.zoom(sourceID: target.id, in: userEditorNamespace))
 		}
 	}
