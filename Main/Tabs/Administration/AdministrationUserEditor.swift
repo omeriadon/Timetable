@@ -10,7 +10,7 @@ struct AdministrationUserEditor: View {
 	@State private var displayName: String
 	@State private var email: String
 	@State private var password = ""
-	@State private var detailSections: [AdministrationUserDetailSection] = []
+	@State private var rawData = ""
 	@State private var showsDeleteConfirmation = false
 
 	init(
@@ -41,19 +41,10 @@ struct AdministrationUserEditor: View {
 
 				if target.user != nil {
 					Section("Account Data") {
-						if detailSections.isEmpty {
+						if rawData.isEmpty {
 							Text("Loading...")
 						} else {
-							ForEach(detailSections) { section in
-								VStack(alignment: .leading, spacing: 6) {
-									Text(section.title)
-										.font(.headline)
-									Text(section.content)
-										.font(.system(.caption, design: .monospaced))
-										.textSelection(.enabled)
-								}
-								.padding(.vertical, 4)
-							}
+							AdministrationJSONRenderer(json: rawData)
 						}
 					}
 				}
@@ -102,9 +93,7 @@ struct AdministrationUserEditor: View {
 				return
 			}
 
-			detailSections = await (try? service.userDetail(id: user.id).sections) ?? [
-				AdministrationUserDetailSection(title: "Account Data", content: "Unable to load account data.")
-			]
+			rawData = await (try? service.userDetail(id: user.id).rawData) ?? "Unable to load account data."
 		}
 	}
 
@@ -146,6 +135,19 @@ struct AdministrationUserEditor: View {
 
 			didDelete(user)
 			dismiss()
+		}
+	}
+}
+
+private struct AdministrationJSONRenderer: View {
+	let json: String
+
+	var body: some View {
+		ScrollView(.horizontal) {
+			Text(json)
+				.font(.system(.caption, design: .monospaced))
+				.textSelection(.enabled)
+				.frame(maxWidth: .infinity, alignment: .leading)
 		}
 	}
 }
