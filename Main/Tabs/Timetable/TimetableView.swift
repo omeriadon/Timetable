@@ -229,8 +229,12 @@ struct TimetableView: View {
 						#endif
 							.background {
 								ZStack {
-									Color.black.opacity(0.3)
-									BlurView(blurRadius: 5)
+									Color.black.opacity(0.5)
+									#if os(iOS)
+										BlurView(blurRadius: 10)
+									#else
+										Color.clear
+									#endif
 								}
 							}
 					}
