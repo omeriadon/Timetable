@@ -11,6 +11,7 @@ struct DatesView: View {
 	@State private var presentationTarget: PlannerPresentationTarget?
 	@State private var eventService = CalendarEventsSyncService.shared
 	@Environment(\.statusBadgeManager) private var badges
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	@Namespace private var eventEditorNamespace
 
 	private let calendar = SchoolCalendarProjection.perthCalendar
@@ -31,7 +32,7 @@ struct DatesView: View {
 					.padding(.vertical, 36)
 				} else {
 					ForEach(timelineEntries) { entry in
-						timelineEntry(entry)
+						animatedScrollCard(timelineEntry(entry))
 					}
 				}
 
@@ -118,7 +119,9 @@ struct DatesView: View {
 
 			ForEach(Array(schoolCalendar.termRanges.enumerated()), id: \.offset) { _, range in
 				if range.intersects(dateWindow) {
-					timelineEntryContent(PlannerTimelineEntry(termRange: range))
+					animatedScrollCard(
+						timelineEntryContent(PlannerTimelineEntry(termRange: range))
+					)
 				}
 			}
 		}
@@ -141,6 +144,17 @@ struct DatesView: View {
 		} else {
 			timelineEntryContent(entry)
 		}
+	}
+
+	private func animatedScrollCard<Content: View>(_ content: Content) -> some View {
+		let shouldReduceMotion = reduceMotion
+
+		return content
+			.scrollTransition(.animated(.snappy(duration: 0.3))) { card, phase in
+				card
+					.opacity(shouldReduceMotion || phase.isIdentity ? 1 : 0.65)
+					.scaleEffect(shouldReduceMotion || phase.isIdentity ? 1 : 0.96)
+			}
 	}
 
 	private func timelineEntryContent(_ entry: PlannerTimelineEntry) -> some View {
