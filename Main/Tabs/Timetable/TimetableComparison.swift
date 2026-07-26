@@ -103,6 +103,7 @@ func item(
 		Spacer()
 
 		right
+			.contentTransition(.numericText())
 			.frame(height: top ? 40 : 20)
 			.padding(.trailing, 5)
 	}

@@ -53,7 +53,6 @@ struct SubjectContextPopover: View {
 					.lineLimit(1)
 					.bold()
 			}
-
 			Spacer()
 		}
 		.padding(.bottom, 3)
