@@ -161,9 +161,9 @@ private struct TodayCountdown: View {
 					.multilineTextAlignment(.center)
 					.bold()
 
-				Text("Next class: \(next.subject.id)")
+				Text("Next: \(next.subject.id)")
 			}
-
+			.frame(maxWidth: .infinity, alignment: .center)
 			.padding(.top, 40)
 
 		} else {
