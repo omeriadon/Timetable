@@ -168,6 +168,7 @@
 				Tabs/Settings/ReceivedTimetablesView.swift = (ios, );
 				Tabs/Share/ShareSelectionSheet.swift = (ios, );
 				Tabs/Share/TimetableShareAliasSheet.swift = (ios, );
+				"Tabs/UI Effects/BlurView.swift" = (ios, );
 				"Tabs/UI Effects/VariableBlur.swift" = (ios, );
 				"Tabs/UI Effects/scrollEdgeEffect.swift" = (ios, );
 				Views/Onboarding/OnboardingPage.swift = (ios, );

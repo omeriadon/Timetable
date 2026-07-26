@@ -227,8 +227,14 @@ struct TimetableView: View {
 						#if os(macOS)
 							.padding([.top, .horizontal], 10)
 						#endif
+							.background {
+								ZStack {
+									Color.black.opacity(0.3)
+									BlurView(blurRadius: 5)
+								}
+							}
 					}
-					.scrollEdgeEffectStyle(.hard, for: .top)
+					.scrollEdgeEffectStyle(.soft, for: .top)
 			}
 			.padding(.trailing, 2)
 			.dynamicTypeSize(.medium)
