@@ -162,7 +162,7 @@ extension Notification.Name {
 					}
 				}
 			}
-			context.coordinator.selectTab(selectedTab)
+			context.coordinator.selectTabIfRequested(selectedTab)
 		}
 
 		@MainActor
@@ -212,6 +212,7 @@ extension Notification.Name {
 		final class Coordinator: NSObject, UITabBarControllerDelegate, UIAdaptivePresentationControllerDelegate {
 			var parent: ProminentActionTabView
 			weak var tabBarController: UITabBarController?
+			private var requestedTab: MainTab?
 
 			init(_ parent: ProminentActionTabView) {
 				self.parent = parent
@@ -261,15 +262,23 @@ extension Notification.Name {
 			}
 
 			func tabBarController(_ tabBarController: UITabBarController, didSelect _: UIViewController) {
-				parent.selectedTab = switch tabBarController.selectedTab?.identifier {
+				let selectedTab: MainTab = switch tabBarController.selectedTab?.identifier {
 					case "settings": .settings
 					case "search": .search
 					case "administration": .administration
 					default: .timetable
 				}
+				requestedTab = selectedTab
+				parent.selectedTab = selectedTab
 			}
 
-			func selectTab(_ tab: MainTab) {
+			func selectTabIfRequested(_ tab: MainTab) {
+				guard requestedTab != tab else {
+					return
+				}
+
+				requestedTab = tab
+
 				guard let tabBarController else { return }
 				let identifier = switch tab {
 					case .timetable: "timetable"
