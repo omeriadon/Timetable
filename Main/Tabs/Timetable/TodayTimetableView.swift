@@ -242,22 +242,43 @@ private struct TodaySchoolTimeline: View {
 		let subject = subject(for: period)
 		let duration = CGFloat(period.end.minutesSinceMidnight - period.start.minutesSinceMidnight) * minuteHeight
 		let cardHeight = max(44, duration - 8)
-		HStack(alignment: .top, spacing: 10) {
-			Text("\(period.number)").font(.caption.monospacedDigit()).foregroundStyle(.secondary).frame(width: 22)
+		HStack(alignment: .center) {
+			HStack(alignment: .lastTextBaseline, spacing: 10) {
+				Text("\(period.number)")
+					.font(.caption.monospacedDigit())
+					.frame(width: 22)
 
-			Text(subject?.id ?? "Free Period").font(.headline)
+				Text(subject?.id ?? "Free Period")
+					.lineLimit(2)
+					.font(.title2)
+			}
+			.frame(maxHeight: .infinity, alignment: .topLeading)
 
 			Spacer()
 
 			if let subject {
 				Image(systemName: subject.symbol)
+					.resizable()
+					.aspectRatio(contentMode: .fit)
+					.frame(height: cardHeight - 40)
+					.padding(.trailing, 10)
 					.foregroundStyle(subject.colour.swiftUIColor)
-					.font(.title)
 			}
 		}
+		.foregroundStyle(.black)
 		.padding(10)
 		.frame(height: cardHeight, alignment: .top)
-		.glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: periodCornerRadius, style: .continuous))
+		.background {
+			GeometryReader { proxy in
+				Image("paperWhite")
+					.resizable()
+					.scaledToFill()
+					.frame(width: proxy.size.width, height: proxy.size.height)
+					.clipped()
+			}
+			.clipShape(RoundedRectangle(cornerRadius: periodCornerRadius, style: .continuous))
+		}
+		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: periodCornerRadius, style: .continuous))
 	}
 
 	private var currentTimeMarker: some View {
