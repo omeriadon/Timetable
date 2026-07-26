@@ -106,7 +106,6 @@ struct DatesView: View {
 			.filter { dateWindow.contains($0.date) }
 			.sorted { $0.date < $1.date }
 	}
-
 }
 
 private enum CalendarEventEditorTarget: Identifiable {

@@ -320,7 +320,7 @@ private struct AdministrationCalendarEntriesView: View {
 	}
 
 	private func load() async {
-		entries = (try? await service.calendar())?.filter { $0.kind == kind } ?? []
+		entries = await (try? service.calendar())?.filter { $0.kind == kind } ?? []
 	}
 
 	private func save(
