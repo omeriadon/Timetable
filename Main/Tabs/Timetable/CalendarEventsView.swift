@@ -29,7 +29,10 @@ struct DatesView: View {
 						.foregroundStyle(.secondary)
 				} else {
 					ForEach(upcomingNoSchoolDates, id: \.self) { date in
-						LabeledContent(date.label) { Text(date.date.displayLabel).foregroundStyle(.secondary) }
+						NoSchoolDateCard(date: date)
+							.listRowInsets(.init(top: 4, leading: 10, bottom: 4, trailing: 10))
+							.listRowBackground(Color.clear)
+							.listRowSeparator(.hidden)
 					}
 				}
 			}
@@ -105,6 +108,43 @@ struct DatesView: View {
 		schoolCalendar.skippedDates
 			.filter { dateWindow.contains($0.date) }
 			.sorted { $0.date < $1.date }
+	}
+}
+
+private struct NoSchoolDateCard: View {
+	let date: SchoolCalendarNamedDate
+
+	var body: some View {
+		VStack(alignment: .leading) {
+			Text("No School")
+				.bold()
+
+			Label {
+				VStack(alignment: .leading) {
+					Text(date.label)
+					Text(date.date.displayLabel)
+						.font(.footnote)
+						.foregroundStyle(.secondary)
+				}
+			} icon: {
+				Image(systemName: "xmark.circle")
+			}
+			.padding(.vertical, 4)
+			.font(.title3)
+		}
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.padding(10)
+		.background {
+			GeometryReader { proxy in
+				Image("paper")
+					.resizable()
+					.scaledToFill()
+					.frame(width: proxy.size.width, height: proxy.size.height)
+					.clipped()
+			}
+			.clipShape(RoundedRectangle(cornerRadius: 20))
+		}
+		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 20))
 	}
 }
 
