@@ -143,11 +143,77 @@ private struct AdministrationJSONRenderer: View {
 	let json: String
 
 	var body: some View {
-		ScrollView(.horizontal) {
-			Text(json)
+		ScrollView([.horizontal, .vertical]) {
+			Text(AdministrationJSONFormatter.format(json))
 				.font(.system(.caption, design: .monospaced))
 				.textSelection(.enabled)
-				.frame(maxWidth: .infinity, alignment: .leading)
+				.fixedSize(horizontal: true, vertical: true)
+				.frame(maxWidth: .infinity, alignment: .topLeading)
 		}
+		.frame(height: 320)
+	}
+}
+
+private enum AdministrationJSONFormatter {
+	static func format(_ json: String) -> String {
+		guard
+			let data = json.data(using: .utf8),
+			let object = try? JSONSerialization.jsonObject(with: data)
+		else {
+			return json
+		}
+
+		guard JSONSerialization.isValidJSONObject(object) else {
+			return json
+		}
+
+		let expandedObject = expandEmbeddedJSON(in: object)
+		guard
+			let formattedData = try? JSONSerialization.data(
+				withJSONObject: expandedObject,
+				options: [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
+			),
+			let formattedJSON = String(data: formattedData, encoding: .utf8)
+		else {
+			return json
+		}
+
+		return formattedJSON
+	}
+
+	private static func expandEmbeddedJSON(in object: Any) -> Any {
+		switch object {
+		case let dictionary as [String: Any]:
+			dictionary.mapValues(expandEmbeddedJSON(in:))
+
+		case let array as [Any]:
+			array.map(expandEmbeddedJSON(in:))
+
+		case let string as String:
+			expandJSON(from: string) ?? string
+
+		default:
+			object
+		}
+	}
+
+	private static func expandJSON(from string: String) -> Any? {
+		if let object = jsonObject(from: Data(string.utf8)) {
+			return expandEmbeddedJSON(in: object)
+		}
+
+		guard let data = Data(base64Encoded: string), let object = jsonObject(from: data) else {
+			return nil
+		}
+
+		return expandEmbeddedJSON(in: object)
+	}
+
+	private static func jsonObject(from data: Data) -> Any? {
+		guard let object = try? JSONSerialization.jsonObject(with: data), JSONSerialization.isValidJSONObject(object) else {
+			return nil
+		}
+
+		return object
 	}
 }
