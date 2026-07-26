@@ -88,7 +88,7 @@ struct TimetableView: View {
 			.scrollTargetBehavior(.paging)
 			.scrollIndicators(.hidden)
 			.scrollPosition(id: $scrollPosition)
-			.scrollEdgeEffect(offset: 0.9, maxBlurRadius: 4, maximumOpacity: 0.5)
+			.scrollEdgeEffect(offset: 0.9, maxBlurRadius: 4, maximumOpacity: 0.7)
 			.safeAreaBar(edge: .top, alignment: .center, spacing: 0) {
 				TabsPicker(
 					items: [

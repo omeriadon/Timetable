@@ -31,30 +31,34 @@ struct BlackGradientOverlay: View {
 	private var gradientStops: [Gradient.Stop] {
 		let logicalOffset = min(max(offset, 0), 1)
 		let offset = switch direction {
-			case .clearTopDarkBottom:
-				logicalOffset
-			case .darkTopClearBottom:
-				1 - logicalOffset
+			case .clearTopDarkBottom: logicalOffset
+			case .darkTopClearBottom: 1 - logicalOffset
 		}
+
+		let roomBefore = offset
+		let roomAfter = 1 - offset
+
+		let beforeScale = min(1, roomBefore / 0.16)
+		let afterScale = min(1, roomAfter / 0.18)
 
 		if direction.isDarkAtStart {
 			return [
 				.init(color: .black.opacity(maximumOpacity), location: 0),
-				.init(color: .black.opacity(maximumOpacity * 0.98), location: max(0, offset - 0.16)),
-				.init(color: .black.opacity(maximumOpacity * 0.90), location: max(0, offset - 0.08)),
+				.init(color: .black.opacity(maximumOpacity * 0.98), location: offset - 0.16 * beforeScale),
+				.init(color: .black.opacity(maximumOpacity * 0.90), location: offset - 0.08 * beforeScale),
 				.init(color: .black.opacity(maximumOpacity * 0.55), location: offset),
-				.init(color: .black.opacity(maximumOpacity * 0.18), location: min(1, offset + 0.08)),
-				.init(color: .clear, location: min(1, offset + 0.18)),
+				.init(color: .black.opacity(maximumOpacity * 0.18), location: offset + 0.08 * afterScale),
+				.init(color: .clear, location: offset + 0.18 * afterScale),
 				.init(color: .clear, location: 1),
 			]
 		} else {
 			return [
 				.init(color: .clear, location: 0),
-				.init(color: .clear, location: max(0, offset - 0.18)),
-				.init(color: .black.opacity(maximumOpacity * 0.18), location: max(0, offset - 0.08)),
+				.init(color: .clear, location: offset - 0.18 * beforeScale),
+				.init(color: .black.opacity(maximumOpacity * 0.18), location: offset - 0.08 * beforeScale),
 				.init(color: .black.opacity(maximumOpacity * 0.55), location: offset),
-				.init(color: .black.opacity(maximumOpacity * 0.90), location: min(1, offset + 0.08)),
-				.init(color: .black.opacity(maximumOpacity * 0.98), location: min(1, offset + 0.16)),
+				.init(color: .black.opacity(maximumOpacity * 0.90), location: offset + 0.08 * afterScale),
+				.init(color: .black.opacity(maximumOpacity * 0.98), location: offset + 0.16 * afterScale),
 				.init(color: .black.opacity(maximumOpacity), location: 1),
 			]
 		}
