@@ -150,7 +150,6 @@ private struct AdministrationJSONRenderer: View {
 				.fixedSize(horizontal: true, vertical: true)
 				.frame(maxWidth: .infinity, alignment: .topLeading)
 		}
-		.frame(height: 320)
 	}
 }
 
