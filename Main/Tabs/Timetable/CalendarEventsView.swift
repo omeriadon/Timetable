@@ -166,17 +166,36 @@ private struct CalendarEventEditor: View {
 		_date = State(initialValue: event?.date.startOfDay() ?? TimetableClock.now)
 	}
 
+	private var isReadOnlyGlobalEvent: Bool {
+		target.event?.isGlobal == true && !canManageGlobalEvents
+	}
+
+	private var navigationTitle: String {
+		guard !isReadOnlyGlobalEvent else {
+			return ""
+		}
+
+		return target.event == nil ? target.scope.title : "Edit Event"
+	}
+
 	var body: some View {
 		NavigationStack {
 			Form {
-				TextField("Title", text: $title)
-				TextField("Notes", text: $notes, axis: .vertical)
-					.lineLimit(3 ... 6)
-				DatePicker("Date", selection: $date, displayedComponents: .date)
-				Button { showsSymbolPicker = true } label: { Label("Symbol", systemImage: symbol) }
+				if isReadOnlyGlobalEvent {
+					readOnlyEventRows
+				} else {
+					TextField("Title", text: $title)
+					TextField("Notes", text: $notes, axis: .vertical)
+						.lineLimit(3 ... 6)
+					DatePicker("Date", selection: $date, displayedComponents: .date)
+					Button {
+						showsSymbolPicker = true
+					} label: {
+						Label("Symbol", systemImage: symbol)
+					}
+				}
 			}
-			.disabled(target.event?.isGlobal == true && !canManageGlobalEvents)
-			.appNavigationTitle(target.event == nil ? target.scope.title : "Edit Event")
+			.appNavigationTitle(navigationTitle)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {
@@ -184,12 +203,14 @@ private struct CalendarEventEditor: View {
 					}
 					.disabled(isSaving)
 				}
-				ToolbarItem(placement: .confirmationAction) {
-					Button(target.event == nil ? "Add" : "Save", systemImage: target.event == nil ? "plus" : "checkmark", role: .confirm) {
-						submit()
+				if !isReadOnlyGlobalEvent {
+					ToolbarItem(placement: .confirmationAction) {
+						Button(target.event == nil ? "Add" : "Save", systemImage: target.event == nil ? "plus" : "checkmark", role: .confirm) {
+							submit()
+						}
+						.buttonStyle(.glassProminent)
+						.disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSaving)
 					}
-					.buttonStyle(.glassProminent)
-					.disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSaving)
 				}
 			}
 		}
@@ -203,6 +224,28 @@ private struct CalendarEventEditor: View {
 			}
 		}
 		.sheet(isPresented: $showsSymbolPicker) { CalendarEventSymbolPicker(symbol: $symbol) }
+	}
+
+	@ViewBuilder
+	private var readOnlyEventRows: some View {
+		HStack(spacing: 12) {
+			Text(title)
+				.font(.title3)
+				.foregroundStyle(.primary)
+
+			Spacer()
+
+			Image(systemName: symbol)
+				.font(.title3)
+				.foregroundStyle(.accent)
+				.padding(.trailing, 4)
+		}
+
+		if !notes.isEmpty {
+			LabeledContent("Notes", value: notes)
+		}
+
+		LabeledContent("Date", value: date.displayLabel)
 	}
 
 	private func submit() {
