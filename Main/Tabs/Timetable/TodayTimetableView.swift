@@ -11,12 +11,17 @@ struct TodayTimetableView: View {
 			let now = TimetableClock.adjusted(context.date)
 			let schoolEvents = todayEvents(in: calendarEvents.globalEvents, at: now)
 			let personalEvents = todayEvents(in: calendarEvents.privateEvents, at: now)
+			let noSchoolDay = schoolCalendar.skippedDates.first { $0.date == SchoolCalendarDate(now) }
 			ScrollView {
 				VStack(alignment: .leading, spacing: 16) {
 					Text(now.formatted(.dateTime.weekday(.wide).day().month(.wide).hour(.defaultDigits(amPM: .wide)).minute(.defaultDigits).second(.defaultDigits)))
 						.contentTransition(.numericText())
 						.animation(.easeInOut, value: now)
 						.font(.title2.bold())
+
+					if let noSchoolDay {
+						TodayNoSchoolDayCard(noSchoolDay: noSchoolDay)
+					}
 
 					if !schoolEvents.isEmpty || !personalEvents.isEmpty {
 						VStack(alignment: .leading) {
@@ -48,7 +53,7 @@ struct TodayTimetableView: View {
 
 					if let dayIndex = schoolCalendar.dayIndex(for: now), schoolCalendar.isSchoolDay(now), !subjects.isEmpty {
 						TodaySchoolTimeline(subjects: subjects, dayIndex: dayIndex, now: now)
-					} else if schoolEvents.isEmpty && personalEvents.isEmpty {
+					} else if schoolEvents.isEmpty && personalEvents.isEmpty && noSchoolDay == nil {
 						TodayCountdown(subjects: subjects, schoolCalendar: schoolCalendar, now: now)
 					}
 				}
@@ -86,6 +91,43 @@ struct TodayTimetableView: View {
 		return events
 			.filter { $0.date == today }
 			.sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
+	}
+}
+
+private struct TodayNoSchoolDayCard: View {
+	let noSchoolDay: SchoolCalendarNamedDate
+
+	var body: some View {
+		VStack(alignment: .leading) {
+			Text("No School Today")
+				.bold()
+
+			Label {
+				VStack(alignment: .leading) {
+					Text(noSchoolDay.label)
+					Text(noSchoolDay.date.displayLabel)
+						.font(.footnote)
+						.foregroundStyle(.secondary)
+				}
+			} icon: {
+				Image(systemName: "xmark.circle")
+			}
+			.padding(.vertical, 4)
+			.font(.title3)
+		}
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.padding(10)
+		.background {
+			GeometryReader { proxy in
+				Image("paperWhite")
+					.resizable()
+					.scaledToFill()
+					.frame(width: proxy.size.width, height: proxy.size.height)
+					.clipped()
+			}
+			.clipShape(RoundedRectangle(cornerRadius: 20))
+		}
+		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 20))
 	}
 }
 
