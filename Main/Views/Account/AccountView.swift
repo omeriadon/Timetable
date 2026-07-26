@@ -71,11 +71,11 @@ struct AccountView: View {
 		}
 
 		Section {
-			Button("Sign Out", role: .destructive, action: signOut)
-				.foregroundStyle(.red)
+			Button("Sign Out", systemImage: "door.right.hand.open", role: .destructive, action: signOut)
 			#if os(iOS)
-				Button("Delete Account", role: .destructive) { showDeleteConfirmation = true }
+				Button("Delete Account", systemImage: "trash", role: .destructive) { showDeleteConfirmation = true }
 					.disabled(isDeleting)
+					.foregroundStyle(.red)
 			#endif
 		}
 	}

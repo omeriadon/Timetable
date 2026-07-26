@@ -21,6 +21,7 @@ import WidgetKit
 		@Default(.timetable) var subjects
 		@Default(.receivedTimetables) private var receivedTimetables
 		@Default(.lastServerSync) var lastServerSync
+		@Default(.userDisplayName) var userDisplayName
 
 		@Environment(\.statusBadgeManager) private var statusBadgeManager
 		@State private var sessionStore = SessionStore.shared
@@ -83,24 +84,21 @@ import WidgetKit
 
 		@ContentBuilder
 		private var list: some View {
-			Section("Account") {
+			Section("You") {
 				NavigationLink {
 					AccountView()
 				} label: {
-					Label("Account", systemImage: "person.crop.circle")
+					Label(userDisplayName, systemImage: "person.crop.circle")
 				}
-			}
-
-			Section("Preferences") {
 				if sessionStore.isAuthenticated {
-					NavigationLink { AccountAndSyncSettingsView() } label: { Label("Updates", systemImage: "switch.2") }
+					NavigationLink { AccountAndSyncSettingsView() } label: { Label("Updates & Notifications", systemImage: "switch.2") }
 				} else {
 					Button { showSignInRequired() } label: { Label("Updates", systemImage: "switch.2") }
 				}
 
-				Toggle("Highlight Current Day in timetables", isOn: highlightsCurrentDayBinding)
+				Toggle("Highlight Current Day in timetables", systemImage: "inset.filled.lefthalf.righthalf.rectangle", isOn: highlightsCurrentDayBinding)
 
-				Toggle("Haptic Feedback", isOn: hapticsBinding)
+				Toggle("Haptic Feedback", systemImage: "iphone.radiowaves.left.and.right", isOn: hapticsBinding)
 			}
 
 			Section("Your Timetable") {
@@ -114,9 +112,9 @@ import WidgetKit
 							.padding(.trailing, 10)
 
 						VStack(alignment: .leading) {
-							Text("Import from Calendar Again")
+							Text("Re-import from Calendar")
 								.foregroundStyle(.accent)
-							Text("Subscribe to Compass Schedule in Calendar")
+							Text("Subscribe to Compass Schedule in Calendar first.")
 								.foregroundStyle(.secondary)
 								.font(.callout)
 						}
@@ -164,7 +162,7 @@ import WidgetKit
 					.navigationTransition(.zoom(sourceID: "sheetMorph", in: ns))
 				}
 
-				Toggle("Searchable", isOn: ownerVisibilityBinding)
+				Toggle("Searchable", systemImage: "magnifyingglass", isOn: ownerVisibilityBinding)
 					.disabled(!networkManager.isOnline)
 			}
 
@@ -292,17 +290,21 @@ import WidgetKit
 					)
 				)
 
-				VStack(alignment: .leading) {
+				Label {
 					Text("Last Server Sync")
 
 					Text(lastServerSync?.formatted(date: .complete, time: .complete) ?? "Never")
 						.foregroundStyle(.secondary)
+				} icon: {
+					Image(systemName: "checkmark.icloud")
 				}
 
-				HStack {
+				Label {
 					Text("\(Bundle.main.appVersion)")
 					Text("(\(Bundle.main.buildNumber))")
 						.foregroundStyle(.secondary)
+				} icon: {
+					Image(systemName: "hammer")
 				}
 			}
 		}

@@ -135,7 +135,6 @@ private struct CreatedTimetableCreateView: View {
 		defer { isSaving = false }
 		do {
 			try await CreatedTimetableService.shared.create(title: title, subjects: subjects, isSearchable: isSearchable)
-			badges.addBadge(id: UUID(), title: "Created timetable created", priority: 3, view: .success)
 			dismiss()
 		} catch {
 			badges.addBadge(id: UUID(), title: "Unable to create timetable", secondaryText: error.localizedDescription, priority: 4, view: .error)

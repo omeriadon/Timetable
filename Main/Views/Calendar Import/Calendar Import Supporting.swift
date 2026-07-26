@@ -404,6 +404,9 @@ func translateSymbol(_ original: String) -> String {
 		case lower.contains("AEEST"):
 			return "building.columns"
 
+		case lower.contains("AEPAL"):
+			return "laurel.leading"
+
 		case lower.contains("AECSC"):
 			return "laptopcomputer"
 
@@ -459,6 +462,9 @@ func translateTitle(_ original: String) -> String {
 
 		case lower.contains("AEMAM"):
 			return "Methods"
+
+		case lower.contains("AEPAL"):
+			return "Politics & Law"
 
 		case lower.contains("AEPHY"):
 			return "Physics"

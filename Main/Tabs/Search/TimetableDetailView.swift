@@ -132,7 +132,6 @@ struct TimetableDetailView: View {
 			do {
 				_ = try await ReceivedTimetableSyncService.shared.importTimetable(id: result.id)
 				imported = true
-				badges.addBadge(id: UUID(), title: "Timetable saved", priority: 3, view: .success)
 			} catch {
 				show(error, title: "Unable to save timetable")
 			}
