@@ -25,7 +25,7 @@ struct DatesView: View {
 			}
 			Section("No School") {
 				if upcomingNoSchoolDates.isEmpty {
-					Text("There are no no-school days upcoming.")
+					Text("There are no pupil free days upcoming.")
 						.foregroundStyle(.secondary)
 				} else {
 					ForEach(upcomingNoSchoolDates, id: \.self) { date in

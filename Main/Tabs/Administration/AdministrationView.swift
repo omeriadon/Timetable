@@ -25,7 +25,7 @@ struct AdministrationView: View {
 							NavigationLink {
 								AdministrationCalendarEntriesView(kind: "noSchool")
 							} label: {
-								Label("No-School Days", systemImage: "calendar.badge.exclamationmark")
+								Label("Pupil Free Days", systemImage: "calendar.badge.exclamationmark")
 							}
 
 							NavigationLink {

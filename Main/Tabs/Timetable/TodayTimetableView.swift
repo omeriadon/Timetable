@@ -17,7 +17,8 @@ struct TodayTimetableView: View {
 					Text(now.formatted(.dateTime.weekday(.wide).day().month(.wide).hour(.defaultDigits(amPM: .wide)).minute(.defaultDigits).second(.defaultDigits)))
 						.contentTransition(.numericText())
 						.animation(.easeInOut, value: now)
-						.font(.title2.bold())
+						.font(.system(size: 200))
+						.minimumScaleFactor(0.1
 
 					if let noSchoolDay {
 						TodayNoSchoolDayCard(noSchoolDay: noSchoolDay)
@@ -158,11 +159,6 @@ private struct TodayCountdown: View {
 					.bold()
 
 				Text("Next class: \(next.subject.id)")
-
-				Text(countdownText(until: next.interval.start))
-					.font(.title3)
-					.contentTransition(.numericText())
-					.animation(.linear(duration: 0.2), value: countdownText(until: next.interval.start))
 			}
 
 			.padding(.top, 40)

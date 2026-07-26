@@ -90,11 +90,11 @@ struct AdministrationCalendarEntriesView: View {
 	}
 
 	private var navigationTitle: String {
-		kind == "term" ? "Term Dates" : "No-School Days"
+		kind == "term" ? "Term Dates" : "Pupil Free Days"
 	}
 
 	private var addButtonTitle: String {
-		kind == "term" ? "Add Term Date" : "Add No-School Day"
+		kind == "term" ? "Add Term Date" : "Add Pupil Free Day"
 	}
 
 	private func dateLabel(for entry: AdministrationCalendarEntry) -> String {
