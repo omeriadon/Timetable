@@ -64,7 +64,11 @@ final class TimetableShareAliasService {
 		isSaving = true
 		defer { isSaving = false }
 		do {
-			let response: TimetableShareAliasResponse = try await networkManager.send(.v1OwnerShareAlias, body: TimetableShareAliasUpdateRequest(alias: candidate), context: .userInitiated)
+			let response: TimetableShareAliasResponse = try await networkManager.send(
+				.v1OwnerShareAliasUpdate,
+				body: TimetableShareAliasUpdateRequest(alias: candidate),
+				context: .userInitiated
+			)
 			currentAlias = response.alias ?? ""
 			Defaults[.ownerTimetableShareAlias] = currentAlias
 			return true
@@ -89,7 +93,8 @@ final class TimetableShareAliasService {
 }
 
 private extension Endpoint {
-	static let v1OwnerShareAlias = Endpoint("/v1/timetables/owner/share-alias", method: .put)
+	static let v1OwnerShareAlias = Endpoint("/v1/timetables/owner/share-alias")
+	static let v1OwnerShareAliasUpdate = Endpoint("/v1/timetables/owner/share-alias", method: .put)
 	static let v1OwnerShareAliasDelete = Endpoint("/v1/timetables/owner/share-alias", method: .delete)
 	static func v1OwnerShareAliasAvailability(_ alias: String) -> Endpoint {
 		Endpoint("/v1/timetables/owner/share-alias/availability", queryItems: [URLQueryItem(name: "alias", value: alias)])

@@ -33,9 +33,11 @@ enum SelectedShareItem: Identifiable, Hashable {
 struct ShareSelectionSheet: View {
 	@Environment(\.dismiss) private var dismiss
 	@Default(.ownerIsSearchable) var ownerIsSearchable
+	@Default(.ownerTimetableShareAlias) private var ownerTimetableShareAlias
 	@Default(.receivedTimetables) var receivedTimetables
 	@Default(.createdTimetables) var createdTimetables
 	@State private var showAliasEditor = false
+	@State private var aliasService = TimetableShareAliasService.shared
 	@Environment(\.statusBadgeManager) private var statusBadgeManager
 
 	let onSelect: (SelectedShareItem) -> Void
@@ -45,7 +47,7 @@ struct ShareSelectionSheet: View {
 			List {
 				if ownerIsSearchable, let ownerID = UUID(uuidString: Defaults[.ownerTimetableID]) {
 					Section("Your Timetable") {
-						if let url = SelectedShareItem.owner(id: ownerID).shareURL {
+						if let url = TimetableShareURL.ownerURL(id: ownerID, alias: ownerTimetableShareAlias) {
 							Button {
 								dismiss()
 								onSelect(.owner(id: ownerID))
@@ -127,6 +129,9 @@ struct ShareSelectionSheet: View {
 			}
 			.sheet(isPresented: $showAliasEditor) {
 				TimetableShareAliasSheet()
+			}
+			.task {
+				await aliasService.fetchCurrentAlias()
 			}
 		}
 	}
