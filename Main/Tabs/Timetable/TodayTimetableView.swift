@@ -213,9 +213,12 @@ private struct TodaySchoolTimeline: View {
 					.frame(width: geometry.size.width, height: height, alignment: .topLeading)
 				}
 				.overlay(alignment: .topLeading) {
-					if currentMinute >= SchoolStateEngine.schoolStart.minutesSinceMidnight, currentMinute <= dayEnd.minutesSinceMidnight {
+					if let firstPeriod = periods.first,
+					   currentMinute >= markerDisplayStart,
+					   currentMinute <= dayEnd.minutesSinceMidnight
+					{
 						currentTimeMarker
-							.offset(y: CGFloat(currentMinute - SchoolStateEngine.schoolStart.minutesSinceMidnight) * minuteHeight - 4)
+							.offset(y: markerOffset(for: firstPeriod))
 					}
 				}
 				.frame(width: geometry.size.width, height: height, alignment: .topLeading)
@@ -297,6 +300,18 @@ private struct TodaySchoolTimeline: View {
 	private var currentMinute: Int {
 		let calendar = SchoolCalendarProjection.perthCalendar
 		return calendar.component(.hour, from: now) * 60 + calendar.component(.minute, from: now)
+	}
+
+	private var markerDisplayStart: Int {
+		TimeOfDay(8, 0).minutesSinceMidnight
+	}
+
+	private func markerOffset(for firstPeriod: SchoolPeriod) -> CGFloat {
+		guard currentMinute < firstPeriod.start.minutesSinceMidnight else {
+			return CGFloat(currentMinute - SchoolStateEngine.schoolStart.minutesSinceMidnight) * minuteHeight - 4
+		}
+
+		return -15
 	}
 
 	private func offset(for time: TimeOfDay) -> CGFloat {
