@@ -81,6 +81,7 @@ struct TimetableView: View {
 
 					DatesView()
 						.containerRelativeFrame(.horizontal)
+						.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.95, maxBlurRadius: 1, maximumOpacity: 0.7)
 						.id(2)
 				}
 				.scrollTargetLayout()

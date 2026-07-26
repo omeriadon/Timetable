@@ -64,20 +64,20 @@ struct DatesView: View {
 	@ViewBuilder
 	private func plannerPresentation(for target: PlannerPresentationTarget) -> some View {
 		switch target {
-		case let .createEvent(scope):
-			calendarEventEditor(
-				target: .create(scope),
-				transitionID: target.transitionID
-			)
-		case let .calendarEvent(event, _):
-			calendarEventEditor(
-				target: .edit(event),
-				transitionID: target.transitionID
-			)
-		case let .noSchoolDay(detail):
-			NoSchoolDayDetailView(target: detail)
-				.presentationDetents([.fraction(0.5)])
-				.navigationTransition(.zoom(sourceID: target.transitionID, in: eventEditorNamespace))
+			case let .createEvent(scope):
+				calendarEventEditor(
+					target: .create(scope),
+					transitionID: target.transitionID
+				)
+			case let .calendarEvent(event, _):
+				calendarEventEditor(
+					target: .edit(event),
+					transitionID: target.transitionID
+				)
+			case let .noSchoolDay(detail):
+				NoSchoolDayDetailView(target: detail)
+					.presentationDetents([.fraction(0.5)])
+					.navigationTransition(.zoom(sourceID: target.transitionID, in: eventEditorNamespace))
 		}
 	}
 
@@ -310,23 +310,23 @@ private enum PlannerPresentationTarget: Identifiable {
 
 	init?(entry: PlannerTimelineEntry) {
 		switch entry.kind {
-		case let .event(event):
-			self = .calendarEvent(event, entryID: entry.id)
-		case .noSchoolDay:
-			self = .noSchoolDay(NoSchoolDayDetailTarget(entry: entry))
-		case .termDate:
-			return nil
+			case let .event(event):
+				self = .calendarEvent(event, entryID: entry.id)
+			case .noSchoolDay:
+				self = .noSchoolDay(NoSchoolDayDetailTarget(entry: entry))
+			case .termDate:
+				return nil
 		}
 	}
 
 	var id: String {
 		switch self {
-		case let .createEvent(scope):
-			return "create-event-\(scope.id)"
-		case let .calendarEvent(_, entryID):
-			return "calendar-event-\(entryID)"
-		case let .noSchoolDay(detail):
-			return "no-school-day-\(detail.id)"
+			case let .createEvent(scope):
+				"create-event-\(scope.id)"
+			case let .calendarEvent(_, entryID):
+				"calendar-event-\(entryID)"
+			case let .noSchoolDay(detail):
+				"no-school-day-\(detail.id)"
 		}
 	}
 
@@ -341,10 +341,10 @@ private enum CalendarEventEditorTarget {
 
 	var scope: CalendarEventScope {
 		switch self {
-		case let .create(scope):
-			return scope
-		case let .edit(event):
-			return event.isGlobal ? .globalEvent : .privateEvent
+			case let .create(scope):
+				scope
+			case let .edit(event):
+				event.isGlobal ? .globalEvent : .privateEvent
 		}
 	}
 

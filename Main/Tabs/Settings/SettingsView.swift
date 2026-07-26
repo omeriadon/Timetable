@@ -204,10 +204,12 @@ import WidgetKit
 			}
 			Section("Developer") {
 				if _isDebugAssertConfiguration() || Defaults[.userDisplayName].contains("Adon") || Defaults[.calendarEvents].canManageGlobalEvents {
-					LabeledContent("Debug Offset") {
+					LabeledContent {
 						TextField("Seconds", value: $debugOffset, format: .number)
 							.multilineTextAlignment(.trailing)
 							.keyboardType(.numbersAndPunctuation)
+					} label: {
+						Label("Debug Offset", systemImage: "clock.arrow.trianglehead.counterclockwise.rotate.90")
 					}
 
 					Button("Test progress badge", systemImage: "progress.indicator") {
@@ -303,9 +305,11 @@ import WidgetKit
 				}
 
 				Label {
-					Text("\(Bundle.main.appVersion)")
-					Text("(\(Bundle.main.buildNumber))")
-						.foregroundStyle(.secondary)
+					HStack {
+						Text("\(Bundle.main.appVersion)")
+						Text("(\(Bundle.main.buildNumber))")
+							.foregroundStyle(.secondary)
+					}
 				} icon: {
 					Image(systemName: "hammer")
 				}
