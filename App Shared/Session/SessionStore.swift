@@ -54,6 +54,7 @@ final class SessionStore {
 	private var accountBootstrapHandler: (() async throws -> Void)?
 	private var authenticatedHandler: (() async -> Void)?
 	private var signingOutHandler: (() async -> Void)?
+	private var sessionGeneration = 0
 
 	private init(networkManager: NetworkManager) {
 		self.networkManager = networkManager
@@ -68,6 +69,7 @@ final class SessionStore {
 	func restore() async {
 		Print("Restoring session state", category: .account)
 		configureNetworkAuthentication()
+		let restoringGeneration = sessionGeneration
 
 		guard let profile = Defaults[.accountProfile] else {
 			clearSessionState()
@@ -99,8 +101,16 @@ final class SessionStore {
 		} catch let NetworkError.server(statusCode, response)
 			where statusCode == 401 || response.code == .sessionExpired
 		{
+			guard sessionGeneration == restoringGeneration else {
+				return
+			}
+
 			clearSessionState()
 		} catch let error as NetworkError {
+			guard sessionGeneration == restoringGeneration else {
+				return
+			}
+
 			state = .authenticated(profile)
 			PrintError(
 				"Using cached authenticated session after refresh failure for \(profile.id)",
@@ -108,6 +118,10 @@ final class SessionStore {
 				error: error
 			)
 		} catch {
+			guard sessionGeneration == restoringGeneration else {
+				return
+			}
+
 			state = .authenticated(profile)
 			PrintError(
 				"Using cached authenticated session after silent restore failure for \(profile.id)",
@@ -185,6 +199,7 @@ final class SessionStore {
 		guard let refreshToken else {
 			throw SessionStoreError.missingRefreshToken
 		}
+		let refreshingGeneration = sessionGeneration
 
 		Print("Refreshing session silently", category: .account)
 		do {
@@ -196,7 +211,10 @@ final class SessionStore {
 		} catch let NetworkError.server(statusCode, response)
 			where statusCode == 401 || response.code == .sessionExpired
 		{
-			clearSessionState()
+			if sessionGeneration == refreshingGeneration, self.refreshToken == refreshToken {
+				clearSessionState()
+			}
+
 			throw NetworkError.server(statusCode: statusCode, response: response)
 		}
 	}
@@ -282,6 +300,7 @@ final class SessionStore {
 			throw SessionStoreError.credentialPersistenceFailed
 		}
 		let profile = persist(response.user)
+		sessionGeneration += 1
 
 		// The watch's authenticated root contains nested TabViews whose page
 		// structure is driven by the bootstrap Defaults. Mount it only after
@@ -316,6 +335,7 @@ final class SessionStore {
 	}
 
 	private func clearSessionState() {
+		sessionGeneration += 1
 		KeychainManager.delete(forKey: accessTokenKey)
 		KeychainManager.delete(forKey: refreshTokenKey)
 		SharedDefaultsStore.removeAll()
