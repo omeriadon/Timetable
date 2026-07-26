@@ -56,13 +56,6 @@ struct TimetableComparison: View {
 								.tint(.white)
 							}
 							.buttonStyle(.plain)
-							.popover(item: $presentedSubject) { presented in
-								SubjectContextPopover(
-									owner: presented.owner,
-									subject: presented.subject
-								)
-								.presentationCompactAdaptation(.popover)
-							}
 						} else {
 							item(
 								left: Text(timetable.sender),
@@ -77,6 +70,13 @@ struct TimetableComparison: View {
 			Spacer()
 		}
 		.padding()
+		.popover(item: $presentedSubject) { presented in
+			SubjectContextPopover(
+				owner: presented.owner,
+				subject: presented.subject
+			)
+			.presentationCompactAdaptation(.popover)
+		}
 	}
 
 	private func getSubjectAtSlot(day: Int, session: Int, in timetable: [Subject]) -> Subject? {
