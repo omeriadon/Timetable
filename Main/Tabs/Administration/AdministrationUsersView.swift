@@ -5,7 +5,6 @@ struct AdministrationUsersView: View {
 	@State private var users: [AdministrationUserResponse] = []
 	@State private var searchText = ""
 	@State private var editor: AdministrationUserEditorTarget?
-	@Namespace private var userEditorNamespace
 
 	var body: some View {
 		List(filteredUsers) { user in
@@ -32,11 +31,13 @@ struct AdministrationUsersView: View {
 		.appNavigationTitle("Users", accent: true)
 		.toolbar {
 			ToolbarItem(placement: .confirmationAction) {
-				Button("Add User", systemImage: "plus", role: .confirm) {
+				Button(role: .confirm) {
 					editor = .create
+				} label: {
+					Label("Add User", systemImage: "plus")
+						.foregroundStyle(.white)
 				}
 				.buttonStyle(.glassProminent)
-				.matchedTransitionSource(id: AdministrationUserEditorTarget.create.id, in: userEditorNamespace)
 			}
 		}
 		.task {
@@ -49,7 +50,6 @@ struct AdministrationUsersView: View {
 				didDelete: delete
 			)
 			.presentationDetents([.large])
-			.navigationTransition(.zoom(sourceID: target.id, in: userEditorNamespace))
 		}
 	}
 

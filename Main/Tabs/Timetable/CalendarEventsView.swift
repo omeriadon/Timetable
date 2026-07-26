@@ -245,7 +245,7 @@ private struct CalendarEventEditor: View {
 			LabeledContent("Notes", value: notes)
 		}
 
-		LabeledContent("Date", value: date.displayLabel)
+		LabeledContent("Date", value: date.formatted(date: .long, time: .omitted))
 	}
 
 	private func submit() {

@@ -18,7 +18,7 @@ struct TodayTimetableView: View {
 						.contentTransition(.numericText())
 						.animation(.easeInOut, value: now)
 						.font(.system(size: 200))
-						.minimumScaleFactor(0.1
+						.minimumScaleFactor(0.1)
 
 					if let noSchoolDay {
 						TodayNoSchoolDayCard(noSchoolDay: noSchoolDay)
@@ -27,6 +27,7 @@ struct TodayTimetableView: View {
 					if !schoolEvents.isEmpty || !personalEvents.isEmpty {
 						VStack(alignment: .leading) {
 							Text("Events Today")
+								.font(.headline)
 								.bold()
 
 							if !schoolEvents.isEmpty {
@@ -193,6 +194,7 @@ private struct TodaySchoolTimeline: View {
 		VStack(alignment: .leading, spacing: 8) {
 			Text("Classes")
 				.font(.headline)
+				.bold()
 				.padding(.horizontal, periodHorizontalInset - timelineHorizontalPadding)
 			GeometryReader { geometry in
 				GlassEffectContainer(spacing: 10) {
@@ -218,7 +220,8 @@ private struct TodaySchoolTimeline: View {
 			}
 			.frame(height: height)
 		}
-		.padding(.vertical, 10)
+		.padding(.top, 10)
+		.padding(.bottom, 8)
 		.padding(.horizontal, timelineHorizontalPadding)
 		.background {
 			GeometryReader { proxy in
