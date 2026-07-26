@@ -9,6 +9,7 @@ struct DatesView: View {
 	@Default(.schoolCalendar) private var schoolCalendar
 	@Default(.calendarEvents) private var events
 	@State private var editorTarget: CalendarEventEditorTarget?
+	@State private var noSchoolDayTarget: NoSchoolDayDetailTarget?
 	@State private var eventService = CalendarEventsSyncService.shared
 	@Environment(\.statusBadgeManager) private var badges
 	@Namespace private var eventEditorNamespace
@@ -49,7 +50,10 @@ struct DatesView: View {
 			.font(.title)
 			.buttonBorderShape(.circle)
 			.buttonStyle(.glassProminent)
-			.matchedTransitionSource(id: "calendar-event-editor", in: eventEditorNamespace)
+			.matchedTransitionSource(
+				id: CalendarEventEditorTarget.create(.privateEvent).transitionID,
+				in: eventEditorNamespace
+			)
 			.padding(.bottom, 10)
 		}
 		.sheet(item: $editorTarget) { target in
@@ -63,7 +67,12 @@ struct DatesView: View {
 				try await eventService.deleteEvent(id: event.id, globally: event.isGlobal)
 			}
 			.presentationDetents([.fraction(0.6)])
-			.navigationTransition(.zoom(sourceID: "calendar-event-editor", in: eventEditorNamespace))
+			.navigationTransition(.zoom(sourceID: target.transitionID, in: eventEditorNamespace))
+		}
+		.sheet(item: $noSchoolDayTarget) { target in
+			NoSchoolDayDetailView(target: target)
+				.presentationDetents([.fraction(0.5)])
+				.navigationTransition(.zoom(sourceID: target.transitionID, in: eventEditorNamespace))
 		}
 	}
 
@@ -83,14 +92,26 @@ struct DatesView: View {
 
 	@ViewBuilder
 	private func timelineEntry(_ entry: PlannerTimelineEntry) -> some View {
-		if case let .event(event) = entry.kind {
+		switch entry.kind {
+		case let .event(event):
+			let target = CalendarEventEditorTarget.edit(event)
 			Button {
-				editorTarget = .edit(event)
+				editorTarget = target
 			} label: {
 				timelineEntryContent(entry)
+					.matchedTransitionSource(id: target.transitionID, in: eventEditorNamespace)
 			}
 			.buttonStyle(.plain)
-		} else {
+		case .noSchoolDay:
+			let target = NoSchoolDayDetailTarget(entry: entry)
+			Button {
+				noSchoolDayTarget = target
+			} label: {
+				timelineEntryContent(entry)
+					.matchedTransitionSource(id: target.transitionID, in: eventEditorNamespace)
+			}
+			.buttonStyle(.plain)
+		case .termDate:
 			timelineEntryContent(entry)
 		}
 	}
@@ -269,8 +290,17 @@ private enum CalendarEventEditorTarget: Identifiable {
 		}
 	}
 
+	var transitionID: String {
+		"calendar-event-editor-\(id)"
+	}
+
 	var scope: CalendarEventScope {
-		switch self { case let .create(scope): scope; case let .edit(event): event.isGlobal ? .globalEvent : .privateEvent }
+		switch self {
+		case let .create(scope):
+			return scope
+		case let .edit(event):
+			return event.isGlobal ? .globalEvent : .privateEvent
+		}
 	}
 
 	var event: CalendarEvent? {
@@ -278,6 +308,47 @@ private enum CalendarEventEditorTarget: Identifiable {
 			event
 		} else {
 			nil
+		}
+	}
+}
+
+private struct NoSchoolDayDetailTarget: Identifiable {
+	let id: String
+	let title: String
+	let date: SchoolCalendarDate
+
+	init(entry: PlannerTimelineEntry) {
+		id = entry.id
+		title = entry.title
+		date = entry.date
+	}
+
+	var transitionID: String {
+		"no-school-day-\(id)"
+	}
+}
+
+private struct NoSchoolDayDetailView: View {
+	let target: NoSchoolDayDetailTarget
+	@Environment(\.dismiss) private var dismiss
+
+	var body: some View {
+		NavigationStack {
+			Form {
+				LabeledContent("Name", value: target.title)
+				LabeledContent(
+					"Date",
+					value: target.date.startOfDay()?.formatted(date: .long, time: .omitted) ?? ""
+				)
+			}
+			.appNavigationTitle("Pupil Free Day")
+			.toolbar {
+				ToolbarItem(placement: .cancellationAction) {
+					Button(role: .cancel) {
+						dismiss()
+					}
+				}
+			}
 		}
 	}
 }
