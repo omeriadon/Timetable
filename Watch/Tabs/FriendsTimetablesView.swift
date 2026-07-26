@@ -76,7 +76,7 @@ struct FriendsTimetablesView: View {
 					calendar: SchoolCalendarProjection.perthCalendar,
 					schoolCalendar: schoolCalendar
 				) {
-					nextText = "First period: \(next.subject.id)"
+					nextText = "Next: \(next.subject.id)"
 					countdownEnd = next.interval.start
 				}
 

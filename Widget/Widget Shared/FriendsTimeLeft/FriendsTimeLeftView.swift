@@ -181,7 +181,7 @@ private struct FriendsCurrentRow: View {
 
 	private var nextText: String {
 		switch schedule.currentState {
-			case let .beforeSchool(next): "First Period: \(next.subject.id.capitalized)"
+			case let .beforeSchool(next): "Next: \(next.subject.id.capitalized)"
 			case let .lesson(lesson): lesson.next.title
 			case let .freePeriod(period): period.next.title
 			case let .recess(state), let .lunch(state): state.next.title

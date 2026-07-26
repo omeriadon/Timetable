@@ -163,15 +163,19 @@ struct BreakToPeriodNotificationLeadTimesEditor: View {
 				)
 			} label: {
 				LabeledContent("Before Class or From a Break") {
-					Text(summary)
-						.foregroundStyle(.secondary)
+					VStack(alignment: .leading) {
+						ForEach(summary, id: \.self) { i in
+							Text(i)
+						}
+					}
+					.foregroundStyle(.secondary)
 				}
 			}
 		#endif
 	}
 
-	private var summary: String {
-		selection.isEmpty ? "None" : selection.sorted { $0.minutes < $1.minutes }.map(\.label).joined(separator: ", ")
+	private var summary: [String] {
+		selection.isEmpty ? [] : selection.sorted { $0.minutes < $1.minutes }.map(\.label)
 	}
 
 	private func containsBinding(_ leadTime: NotificationLeadTime) -> Binding<Bool> {
@@ -350,9 +354,6 @@ struct NotificationLeadTimesEditor: View {
 		}
 
 		var body: some View {
-			if let description {
-				Text(description)
-			}
 			List(NotificationLeadTime.allCases, id: \.self) { leadTime in
 				Button {
 					if selection.contains(leadTime) {
@@ -374,6 +375,11 @@ struct NotificationLeadTimesEditor: View {
 				}
 				.buttonSizing(.flexible)
 				.buttonStyle(.plain)
+			}
+			.safeAreaBar(edge: .top, alignment: .center, spacing: 5) {
+				if let description {
+					Text(description)
+				}
 			}
 			.appNavigationTitle(title, accent: true)
 		}

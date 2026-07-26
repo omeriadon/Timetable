@@ -53,7 +53,7 @@ nonisolated struct CreateCalendarEventRequest: Codable, Sendable {
 }
 
 nonisolated struct AdministrationDashboardResponse: Codable, Sendable { let isAdmin: Bool }
-nonisolated struct AdministrationUserResponse: Codable, Identifiable, Sendable { let id: UUID; let displayName: String; let email: String?; let createdAt: Date? }
+nonisolated struct AdministrationUserResponse: Codable, Identifiable, Sendable, Equatable { let id: UUID; let displayName: String; let email: String?; let createdAt: Date? }
 nonisolated struct AdministrationUserCreateRequest: Codable, Sendable {
 	let displayName: String
 	let email: String

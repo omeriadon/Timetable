@@ -17,6 +17,8 @@ struct TodayTimetableView: View {
 					Text(now.formatted(.dateTime.weekday(.wide).day().month(.wide).hour(.defaultDigits(amPM: .wide)).minute(.defaultDigits).second(.defaultDigits)))
 						.contentTransition(.numericText())
 						.animation(.easeInOut, value: now)
+						.padding(.horizontal, 10)
+						.lineLimit(1)
 						.font(.system(size: 200))
 						.minimumScaleFactor(0.1)
 
@@ -27,7 +29,7 @@ struct TodayTimetableView: View {
 					if !schoolEvents.isEmpty || !personalEvents.isEmpty {
 						VStack(alignment: .leading) {
 							Text("Events Today")
-								.font(.headline)
+								.font(.title)
 								.bold()
 
 							if !schoolEvents.isEmpty {
@@ -69,7 +71,7 @@ struct TodayTimetableView: View {
 
 	@ViewBuilder private func eventSection(_ title: String, events: [CalendarEvent]) -> some View {
 		Text(title)
-			.font(.footnote.weight(.semibold))
+			.fontWeight(.semibold)
 			.foregroundStyle(.secondary)
 			.padding(.top, 4)
 
@@ -193,7 +195,7 @@ private struct TodaySchoolTimeline: View {
 		let height = CGFloat(totalMinutes) * minuteHeight
 		VStack(alignment: .leading, spacing: 8) {
 			Text("Classes")
-				.font(.headline)
+				.font(.title)
 				.bold()
 				.padding(.horizontal, periodHorizontalInset - timelineHorizontalPadding)
 			GeometryReader { geometry in

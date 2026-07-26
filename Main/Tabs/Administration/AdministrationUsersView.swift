@@ -48,7 +48,7 @@ struct AdministrationUsersView: View {
 				didSave: save,
 				didDelete: delete
 			)
-			.presentationDetents([.large])
+			.presentationDetents(editor == .create ? [.fraction(0.6)] : [.large])
 		}
 	}
 
@@ -85,7 +85,7 @@ struct AdministrationUsersView: View {
 	}
 }
 
-enum AdministrationUserEditorTarget: Identifiable {
+enum AdministrationUserEditorTarget: Identifiable, Equatable {
 	case create
 	case edit(AdministrationUserResponse)
 
