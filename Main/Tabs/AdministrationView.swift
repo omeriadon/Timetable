@@ -267,6 +267,27 @@ private struct AdministrationEventSymbolPicker: View {
 }
 
 private struct AdministrationCalendarView: View {
+	var body: some View {
+		List {
+			NavigationLink {
+				AdministrationCalendarEntriesView(kind: "term")
+			} label: {
+				Label("Term Dates", systemImage: "calendar")
+			}
+
+			NavigationLink {
+				AdministrationCalendarEntriesView(kind: "noSchool")
+			} label: {
+				Label("No-School Days", systemImage: "calendar.badge.exclamationmark")
+			}
+		}
+		.appNavigationTitle("School Calendar")
+	}
+}
+
+private struct AdministrationCalendarEntriesView: View {
+	let kind: String
+
 	@State private var service = AdministrationService.shared
 	@State private var entries: [AdministrationCalendarEntry] = []
 	@State private var editor: AdministrationCalendarEntry?
@@ -278,11 +299,8 @@ private struct AdministrationCalendarView: View {
 					editor = entry
 				} label: {
 					LabeledContent(entry.label) {
-						Label(
-							entry.kind == "term" ? "Term" : "No School",
-							systemImage: entry.kind == "term" ? "calendar" : "xmark.circle"
-						)
-						.foregroundStyle(.secondary)
+						Text(entry.startDate.displayLabel)
+							.foregroundStyle(.secondary)
 					}
 				}
 				.buttonStyle(.plain)
@@ -295,18 +313,13 @@ private struct AdministrationCalendarView: View {
 				}
 			}
 
-			Button("Add Term Date", systemImage: "plus") {
-				editor = newEntry(kind: "term")
-			}
-			.listRowInsets(.init(top: 0, leading: 20, bottom: 0, trailing: 20))
-
-			Button("Add No-School Day", systemImage: "plus") {
-				editor = newEntry(kind: "noSchool")
+			Button(addButtonTitle, systemImage: "plus") {
+				editor = newEntry()
 			}
 			.listRowInsets(.init(top: 0, leading: 20, bottom: 0, trailing: 20))
 		}
 		.listRowSpacing(0)
-		.appNavigationTitle("School Calendar")
+		.appNavigationTitle(navigationTitle)
 		.task {
 			await load()
 		}
@@ -320,14 +333,15 @@ private struct AdministrationCalendarView: View {
 	}
 
 	private func load() async {
-		entries = await (try? service.calendar()) ?? []
+		entries = (try? await service.calendar())?.filter { $0.kind == kind } ?? []
 	}
 
 	private func save(
 		_ request: AdministrationCalendarEntryRequest,
 		existingID: UUID?
 	) async throws {
-		entries = try await service.save(request, id: existingID)
+		let allEntries = try await service.save(request, id: existingID)
+		entries = allEntries.filter { $0.kind == kind }
 		try await SchoolCalendarSyncService.shared.downloadCalendar()
 	}
 
@@ -338,11 +352,12 @@ private struct AdministrationCalendarView: View {
 	}
 
 	private func deleteFromEditor(_ id: UUID) async throws {
-		entries = try await service.delete(id: id)
+		let allEntries = try await service.delete(id: id)
+		entries = allEntries.filter { $0.kind == kind }
 		try await SchoolCalendarSyncService.shared.downloadCalendar()
 	}
 
-	private func newEntry(kind: String) -> AdministrationCalendarEntry {
+	private func newEntry() -> AdministrationCalendarEntry {
 		AdministrationCalendarEntry(
 			id: UUID(),
 			kind: kind,
@@ -350,6 +365,14 @@ private struct AdministrationCalendarView: View {
 			startDate: SchoolCalendarDate(TimetableClock.now),
 			endDate: kind == "term" ? SchoolCalendarDate(TimetableClock.now) : nil
 		)
+	}
+
+	private var navigationTitle: String {
+		kind == "term" ? "Term Dates" : "No-School Days"
+	}
+
+	private var addButtonTitle: String {
+		kind == "term" ? "Add Term Date" : "Add No-School Day"
 	}
 }
 

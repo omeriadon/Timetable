@@ -79,7 +79,7 @@ struct TimetableView: View {
 						.containerRelativeFrame(.horizontal)
 						.id(1)
 
-					DatesView(schoolCalendar: schoolCalendar, events: calendarEvents)
+					DatesView()
 						.containerRelativeFrame(.horizontal)
 						.id(2)
 				}
