@@ -1,9 +1,10 @@
+import Defaults
 import SwiftUI
 
 struct TodayTimetableView: View {
 	let subjects: [Subject]
-	let schoolCalendar: SchoolCalendarProjection
-	let events: [CalendarEvent]
+	@Default(.schoolCalendar) private var schoolCalendar
+	@Default(.calendarEvents) private var calendarEvents
 
 	var body: some View {
 		TimelineView(.periodic(from: .now, by: 1)) { context in
@@ -65,7 +66,9 @@ struct TodayTimetableView: View {
 
 	private func todayEvents(at date: Date) -> [CalendarEvent] {
 		let today = SchoolCalendarDate(date)
-		return events.filter { $0.date == today }.sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
+		return calendarEvents.allEvents
+			.filter { $0.date == today }
+			.sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
 	}
 }
 

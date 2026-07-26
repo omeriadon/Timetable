@@ -68,9 +68,7 @@ struct TimetableView: View {
 			ScrollView(.horizontal) {
 				HStack(spacing: 0) {
 					TodayTimetableView(
-						subjects: selectedTimetable?.subjects ?? subjects,
-						schoolCalendar: schoolCalendar,
-						events: calendarEvents.allEvents
+						subjects: selectedTimetable?.subjects ?? subjects
 					)
 					.containerRelativeFrame(.horizontal)
 					.id(0)
