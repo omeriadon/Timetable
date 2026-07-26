@@ -24,8 +24,13 @@ struct DatesView: View {
 				}
 			}
 			Section("No School") {
-				ForEach(schoolCalendar.skippedDates.filter { dateWindow.contains($0.date) }.sorted { $0.date < $1.date }, id: \.self) { date in
-					LabeledContent(date.label) { Text(date.date.displayLabel).foregroundStyle(.secondary) }
+				if upcomingNoSchoolDates.isEmpty {
+					Text("There are no no-school days upcoming.")
+						.foregroundStyle(.secondary)
+				} else {
+					ForEach(upcomingNoSchoolDates, id: \.self) { date in
+						LabeledContent(date.label) { Text(date.date.displayLabel).foregroundStyle(.secondary) }
+					}
 				}
 			}
 			Section("School Events") {
@@ -88,6 +93,12 @@ struct DatesView: View {
 		let start = SchoolCalendarDate(TimetableClock.now, calendar: calendar)
 		let end = SchoolCalendarDate(calendar.date(byAdding: .month, value: 3, to: TimetableClock.now) ?? TimetableClock.now, calendar: calendar)
 		return start ... end
+	}
+
+	private var upcomingNoSchoolDates: [SchoolCalendarNamedDate] {
+		schoolCalendar.skippedDates
+			.filter { dateWindow.contains($0.date) }
+			.sorted { $0.date < $1.date }
 	}
 }
 
