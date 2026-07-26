@@ -25,7 +25,6 @@ struct AdministrationUsersView: View {
 					Image(systemName: "person")
 				}
 			}
-			.matchedTransitionSource(id: user.id, in: userEditorNamespace)
 		}
 		.searchable(text: $searchText, prompt: "Search users")
 		.appNavigationTitle("Users", accent: true)
