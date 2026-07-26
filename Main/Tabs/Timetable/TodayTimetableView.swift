@@ -11,6 +11,7 @@ struct TodayTimetableView: View {
 			let now = TimetableClock.adjusted(context.date)
 			let schoolEvents = todayEvents(in: calendarEvents.globalEvents, at: now)
 			let personalEvents = todayEvents(in: calendarEvents.privateEvents, at: now)
+			let upcomingEvents = upcomingEvents(at: now)
 			let noSchoolDay = schoolCalendar.skippedDates.first { $0.date == SchoolCalendarDate(now) }
 			ScrollView {
 				VStack(alignment: .leading, spacing: 16) {
@@ -27,7 +28,7 @@ struct TodayTimetableView: View {
 						TodayNoSchoolDayCard(noSchoolDay: noSchoolDay)
 					}
 
-					if !schoolEvents.isEmpty || !personalEvents.isEmpty {
+					if !schoolEvents.isEmpty || !personalEvents.isEmpty || !upcomingEvents.isEmpty {
 						VStack(alignment: .leading) {
 							Text("Events Today")
 								.font(.title)
@@ -39,6 +40,10 @@ struct TodayTimetableView: View {
 
 							if !personalEvents.isEmpty {
 								eventSection("Your Events", events: personalEvents)
+							}
+
+							if !upcomingEvents.isEmpty {
+								eventSection("Upcoming Events", events: upcomingEvents, showsDate: true)
 							}
 						}
 						.frame(maxWidth: .infinity, alignment: .leading)
@@ -60,7 +65,7 @@ struct TodayTimetableView: View {
 
 					if let dayIndex = schoolCalendar.dayIndex(for: now), schoolCalendar.isSchoolDay(now), !subjects.isEmpty {
 						TodaySchoolTimeline(subjects: subjects, dayIndex: dayIndex, now: now)
-					} else if schoolEvents.isEmpty, personalEvents.isEmpty, noSchoolDay == nil {
+					} else if schoolEvents.isEmpty, personalEvents.isEmpty, upcomingEvents.isEmpty, noSchoolDay == nil {
 						TodayCountdown(subjects: subjects, schoolCalendar: schoolCalendar, now: now)
 					}
 				}
@@ -72,7 +77,7 @@ struct TodayTimetableView: View {
 		}
 	}
 
-	@ViewBuilder private func eventSection(_ title: String, events: [CalendarEvent]) -> some View {
+	@ViewBuilder private func eventSection(_ title: String, events: [CalendarEvent], showsDate: Bool = false) -> some View {
 		Text(title)
 			.fontWeight(.semibold)
 			.foregroundStyle(.secondary)
@@ -82,6 +87,11 @@ struct TodayTimetableView: View {
 			Label {
 				VStack(alignment: .leading) {
 					Text(event.title)
+					if showsDate {
+						Text(event.date.displayLabel)
+							.font(.footnote)
+							.foregroundStyle(.secondary)
+					}
 					if let notes = event.notes, !notes.isEmpty {
 						Text(notes).font(.footnote).foregroundStyle(.secondary)
 					}
@@ -112,6 +122,23 @@ struct TodayTimetableView: View {
 		return events
 			.filter { $0.date == today }
 			.sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
+	}
+
+	private func upcomingEvents(at date: Date) -> [CalendarEvent] {
+		let calendar = SchoolCalendarProjection.perthCalendar
+		let tomorrow = calendar.date(byAdding: .day, value: 1, to: date) ?? date
+		let nextWeek = calendar.date(byAdding: .day, value: 7, to: date) ?? date
+		let dateWindow = SchoolCalendarDate(tomorrow, calendar: calendar) ... SchoolCalendarDate(nextWeek, calendar: calendar)
+
+		return (calendarEvents.globalEvents + calendarEvents.privateEvents)
+			.filter { dateWindow.contains($0.date) }
+			.sorted {
+				if $0.date == $1.date {
+					return $0.title.localizedStandardCompare($1.title) == .orderedAscending
+				}
+
+				return $0.date < $1.date
+			}
 	}
 }
 

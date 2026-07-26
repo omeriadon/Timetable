@@ -11,36 +11,43 @@ struct DatesView: View {
 	@State private var editorTarget: CalendarEventEditorTarget?
 	@State private var eventService = CalendarEventsSyncService.shared
 	@Environment(\.statusBadgeManager) private var badges
+	@Namespace private var eventEditorNamespace
 
 	private let calendar = SchoolCalendarProjection.perthCalendar
 
 	var body: some View {
-		List {
-			Section("Term Dates") {
-				ForEach(Array(schoolCalendar.termRanges.enumerated()), id: \.offset) { _, range in
-					if range.intersects(dateWindow) {
-						LabeledContent(range.label) { Text(range.displayLabel).foregroundStyle(.secondary) }
-					}
-				}
-			}
-			Section("Pupil Free Days") {
-				if upcomingNoSchoolDates.isEmpty {
-					Text("There are no upcoming pupil free days.")
-						.foregroundStyle(.secondary)
-				} else {
-					ForEach(upcomingNoSchoolDates, id: \.self) { date in
-						LabeledContent(date.label) { Text(date.date.displayLabel).foregroundStyle(.secondary) }
-					}
-				}
-			}
-			Section("School Events") {
-				eventRows(events.globalEvents)
-			}
+		ScrollView {
+			LazyVStack(alignment: .leading, spacing: 16) {
+				Text("Upcoming")
+					.font(.title.bold())
 
-			Section("Your Events") {
-				eventRows(events.privateEvents)
-				Button("Add Personal Event", systemImage: "plus") { editorTarget = .create(.privateEvent) }
+				if timelineEntries.isEmpty {
+					ContentUnavailableView(
+						"No Upcoming Events",
+						systemImage: "calendar",
+						description: Text("Add a personal event or wait for the school calendar to update.")
+					)
+					.frame(maxWidth: .infinity)
+					.padding(.vertical, 36)
+				} else {
+					ForEach(timelineEntries) { entry in
+						Section {
+							timelineEntry(entry)
+						}
+					}
+				}
+
+				termDates
 			}
+			.padding()
+		}
+		.safeAreaBar(edge: .bottom) {
+			Button("Add Personal Event", systemImage: "plus", role: .confirm) {
+				editorTarget = .create(.privateEvent)
+			}
+			.buttonStyle(.glassProminent)
+			.frame(maxWidth: .infinity)
+			.matchedTransitionSource(id: "calendar-event-editor", in: eventEditorNamespace)
 		}
 		.sheet(item: $editorTarget) { target in
 			CalendarEventEditor(target: target, canManageGlobalEvents: events.canManageGlobalEvents) { request, event in
@@ -53,40 +60,78 @@ struct DatesView: View {
 				try await eventService.deleteEvent(id: event.id, globally: event.isGlobal)
 			}
 			.presentationDetents([.fraction(0.6)])
+			.navigationTransition(.zoom(sourceID: "calendar-event-editor", in: eventEditorNamespace))
 		}
 	}
 
-	@ViewBuilder
-	private func eventRows(_ events: [CalendarEvent]) -> some View {
-		let filtered = events.filter { eventDateWindow.contains($0.date) }.sorted { $0.date < $1.date }
-		if filtered.isEmpty {
-			Text("No events in the next three months.")
-				.foregroundStyle(.secondary)
-		} else {
-			ForEach(filtered) { event in
-				Button { editorTarget = .edit(event) } label: { HStack(alignment: .center) {
-					Image(systemName: event.symbol)
-						.font(.largeTitle.scaled(by: 1.2))
-						.padding(.trailing, 10)
-						.foregroundStyle(.accent)
+	private var termDates: some View {
+		VStack(alignment: .leading, spacing: 12) {
+			Text("Term Dates")
+				.font(.title2.bold())
 
-					VStack(alignment: .leading, spacing: 4) {
-						Text(event.title)
-
-						Text(event.date.displayLabel)
-							.font(.footnote)
+			ForEach(Array(schoolCalendar.termRanges.enumerated()), id: \.offset) { _, range in
+				if range.intersects(dateWindow) {
+					LabeledContent(range.label) {
+						Text(range.displayLabel)
 							.foregroundStyle(.secondary)
-
-						if let notes = event.notes, !notes.isEmpty {
-							Text(notes)
-								.font(.footnote)
-								.foregroundStyle(.secondary)
-						}
 					}
-				} }
-				.buttonStyle(.plain)
+					.padding()
+					.background(.thinMaterial, in: RoundedRectangle(cornerRadius: 18))
+				}
 			}
 		}
+		.padding(.top, 20)
+	}
+
+	@ViewBuilder
+	private func timelineEntry(_ entry: PlannerTimelineEntry) -> some View {
+		if case let .event(event) = entry.kind {
+			Button {
+				editorTarget = .edit(event)
+			} label: {
+				timelineEntryContent(entry)
+			}
+			.buttonStyle(.plain)
+		} else {
+			timelineEntryContent(entry)
+		}
+	}
+
+	private func timelineEntryContent(_ entry: PlannerTimelineEntry) -> some View {
+		HStack(alignment: .top, spacing: 14) {
+			VStack(spacing: 2) {
+				Text(entry.date.startOfDay()?.formatted(.dateTime.day()) ?? "")
+					.font(.title2.bold())
+
+				Text(entry.date.startOfDay()?.formatted(.dateTime.month(.abbreviated)) ?? "")
+					.font(.caption.weight(.semibold))
+			}
+			.frame(width: 42)
+			.foregroundStyle(entry.tint)
+
+			Image(systemName: entry.symbol)
+				.font(.title2)
+				.frame(width: 32)
+				.foregroundStyle(entry.tint)
+
+			VStack(alignment: .leading, spacing: 4) {
+				Text(entry.title)
+					.font(.headline)
+
+				Text(entry.kind.title)
+					.font(.footnote)
+					.foregroundStyle(.secondary)
+
+				if let notes = entry.notes, !notes.isEmpty {
+					Text(notes)
+						.font(.footnote)
+						.foregroundStyle(.secondary)
+				}
+			}
+			.frame(maxWidth: .infinity, alignment: .leading)
+		}
+		.padding()
+		.background(.thinMaterial, in: RoundedRectangle(cornerRadius: 20))
 	}
 
 	private var dateWindow: ClosedRange<SchoolCalendarDate> {
@@ -95,16 +140,66 @@ struct DatesView: View {
 		return start ... end
 	}
 
-	private var eventDateWindow: ClosedRange<SchoolCalendarDate> {
-		let startDate = calendar.date(byAdding: .day, value: -1, to: TimetableClock.now) ?? TimetableClock.now
-		let endDate = calendar.date(byAdding: .month, value: 3, to: TimetableClock.now) ?? TimetableClock.now
-		return SchoolCalendarDate(startDate, calendar: calendar) ... SchoolCalendarDate(endDate, calendar: calendar)
+	private var timelineEntries: [PlannerTimelineEntry] {
+		let noSchoolEntries = schoolCalendar.skippedDates
+			.filter { dateWindow.contains($0.date) }
+			.map(PlannerTimelineEntry.init(noSchoolDay:))
+		let eventEntries = (events.globalEvents + events.privateEvents)
+			.filter { dateWindow.contains($0.date) }
+			.map(PlannerTimelineEntry.init(event:))
+
+		return (noSchoolEntries + eventEntries)
+			.sorted {
+				if $0.date == $1.date {
+					return $0.title.localizedStandardCompare($1.title) == .orderedAscending
+				}
+
+				return $0.date < $1.date
+			}
+	}
+}
+
+private struct PlannerTimelineEntry: Identifiable {
+	enum Kind {
+		case noSchoolDay
+		case event(CalendarEvent)
+
+		var title: String {
+			switch self {
+				case .noSchoolDay:
+					"Pupil Free Day"
+				case let .event(event):
+					event.isGlobal ? "School Event" : "Your Event"
+			}
+		}
 	}
 
-	private var upcomingNoSchoolDates: [SchoolCalendarNamedDate] {
-		schoolCalendar.skippedDates
-			.filter { dateWindow.contains($0.date) }
-			.sorted { $0.date < $1.date }
+	let id: String
+	let title: String
+	let notes: String?
+	let date: SchoolCalendarDate
+	let symbol: String
+	let tint: Color
+	let kind: Kind
+
+	init(noSchoolDay: SchoolCalendarNamedDate) {
+		id = "no-school-\(noSchoolDay.date.year)-\(noSchoolDay.date.month)-\(noSchoolDay.date.day)"
+		title = noSchoolDay.label
+		notes = nil
+		date = noSchoolDay.date
+		symbol = "figure.wave"
+		tint = .blue
+		kind = .noSchoolDay
+	}
+
+	init(event: CalendarEvent) {
+		id = event.id.uuidString
+		title = event.title
+		notes = event.notes
+		date = event.date
+		symbol = event.symbol
+		tint = event.isGlobal ? .yellow : .purple
+		kind = .event(event)
 	}
 }
 
