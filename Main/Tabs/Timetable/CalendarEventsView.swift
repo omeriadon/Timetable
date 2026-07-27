@@ -146,7 +146,7 @@ struct DatesView: View {
 		}
 	}
 
-	private func animatedScrollCard<Content: View>(_ content: Content) -> some View {
+	private func animatedScrollCard(_ content: some View) -> some View {
 		let shouldReduceMotion = reduceMotion
 
 		return content

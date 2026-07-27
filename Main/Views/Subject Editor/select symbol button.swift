@@ -17,14 +17,14 @@ struct SymbolSelectionRowView: View {
 			selectSymbol(subject.id)
 		} label: {
 			HStack {
-				Image(systemName: subject.symbol)
-					.font(.title2)
-					.frame(height: 15)
+				Text("Symbol")
+					.padding(.leading, 4)
 
 				Spacer()
 
-				Text("Select Symbol")
-					.padding(.trailing, 4)
+				Image(systemName: subject.symbol)
+					.font(.title2)
+					.frame(height: 15)
 			}
 			.padding(10)
 			.foregroundStyle(.white)
