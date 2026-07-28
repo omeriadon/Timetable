@@ -99,7 +99,7 @@ extension Notification.Name {
 				},
 			]
 			if calendarEvents.canManageGlobalEvents {
-				tabs.append(UITab(title: "Admin", image: UIImage(systemName: "shield"), identifier: "administration") { _ in
+				tabs.append(UITab(title: "Admin", image: UIImage(systemName: "calendar.badge.lock"), identifier: "administration") { _ in
 					UIHostingController(rootView: AdministrationView())
 				})
 			}

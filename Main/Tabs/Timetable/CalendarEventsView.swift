@@ -43,19 +43,23 @@ struct DatesView: View {
 		}
 
 		.safeAreaBar(edge: .bottom, spacing: 10) {
-			Button("Add Personal Event", systemImage: "plus") {
+			Button {
 				presentationTarget = .createEvent(.privateEvent)
+			} label: {
+				Label("Add Personal Event", systemImage: "plus")
+					.font(.largeTitle)
+					.bold()
+					.padding(5)
 			}
 			.controlSize(.extraLarge)
 			.labelStyle(.iconOnly)
-			.font(.title)
 			.buttonBorderShape(.circle)
 			.buttonStyle(.glassProminent)
 			.matchedTransitionSource(
 				id: PlannerPresentationTarget.createEvent(.privateEvent).transitionID,
 				in: eventEditorNamespace
 			)
-			.padding(.bottom, 10)
+			.padding(.bottom, 15)
 		}
 		.sheet(item: $presentationTarget) { target in
 			plannerPresentation(for: target)

@@ -29,39 +29,53 @@ struct BlackGradientOverlay: View {
 	}
 
 	private var gradientStops: [Gradient.Stop] {
-		let logicalOffset = min(max(offset, 0), 1)
-		let offset = switch direction {
-			case .clearTopDarkBottom: logicalOffset
-			case .darkTopClearBottom: 1 - logicalOffset
+		let offset = min(max(offset, 0), 1)
+
+		let beforeTransition: CGFloat = 0.05
+		let afterTransition: CGFloat = 0.18
+
+		let beforeScale = min(1, offset / beforeTransition)
+		let afterScale = min(1, (1 - offset) / afterTransition)
+
+		let clearToDarkStops: [Gradient.Stop] = [
+			.init(
+				color: .clear,
+				location: 0
+			),
+			.init(
+				color: .clear,
+				location: offset - beforeTransition * beforeScale
+			),
+			.init(
+				color: .black.opacity(maximumOpacity * 0.04),
+				location: offset
+			),
+			.init(
+				color: .black.opacity(maximumOpacity * 0.45),
+				location: offset + 0.10 * afterScale
+			),
+			.init(
+				color: .black.opacity(maximumOpacity * 0.98),
+				location: offset + afterTransition * afterScale
+			),
+			.init(
+				color: .black.opacity(maximumOpacity),
+				location: 1
+			),
+		]
+
+		if !direction.isDarkAtStart {
+			return clearToDarkStops
 		}
 
-		let roomBefore = offset
-		let roomAfter = 1 - offset
-
-		let beforeScale = min(1, roomBefore / 0.16)
-		let afterScale = min(1, roomAfter / 0.18)
-
-		if direction.isDarkAtStart {
-			return [
-				.init(color: .black.opacity(maximumOpacity), location: 0),
-				.init(color: .black.opacity(maximumOpacity * 0.98), location: offset - 0.16 * beforeScale),
-				.init(color: .black.opacity(maximumOpacity * 0.90), location: offset - 0.08 * beforeScale),
-				.init(color: .black.opacity(maximumOpacity * 0.55), location: offset),
-				.init(color: .black.opacity(maximumOpacity * 0.18), location: offset + 0.08 * afterScale),
-				.init(color: .clear, location: offset + 0.18 * afterScale),
-				.init(color: .clear, location: 1),
-			]
-		} else {
-			return [
-				.init(color: .clear, location: 0),
-				.init(color: .clear, location: offset - 0.18 * beforeScale),
-				.init(color: .black.opacity(maximumOpacity * 0.18), location: offset - 0.08 * beforeScale),
-				.init(color: .black.opacity(maximumOpacity * 0.55), location: offset),
-				.init(color: .black.opacity(maximumOpacity * 0.90), location: offset + 0.08 * afterScale),
-				.init(color: .black.opacity(maximumOpacity * 0.98), location: offset + 0.16 * afterScale),
-				.init(color: .black.opacity(maximumOpacity), location: 1),
-			]
-		}
+		return clearToDarkStops
+			.reversed()
+			.map {
+				Gradient.Stop(
+					color: $0.color,
+					location: 1 - $0.location
+				)
+			}
 	}
 }
 
