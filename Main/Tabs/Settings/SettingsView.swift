@@ -12,14 +12,8 @@ import WidgetKit
 
 #if os(iOS)
 
-	struct RenameTimetable: Identifiable {
-		let id: String
-		let timetable: ReceivedTimetable
-	}
-
 	struct SettingsView: View {
 		@Default(.timetable) var subjects
-		@Default(.receivedTimetables) private var receivedTimetables
 		@Default(.lastServerSync) var lastServerSync
 		@Default(.userDisplayName) var userDisplayName
 
@@ -41,7 +35,6 @@ import WidgetKit
 		@State private var ownerIsSearchable = Defaults[.ownerIsSearchable]
 		@State private var committedOwnerIsSearchable = Defaults[.ownerIsSearchable]
 		@State private var visibilitySaveGeneration = 0
-		@State private var showEditReceivedTimetablesSheet = false
 		@State private var showFeedbackSheet = false
 		@State private var showImportConfirmation = false
 
@@ -177,31 +170,6 @@ import WidgetKit
 				}
 			}
 
-			if receivedTimetables.contains(where: { !$0.isDeleted }) {
-				Section("Imported Timetables") {
-					Button {
-						if sessionStore.isAuthenticated {
-							showEditReceivedTimetablesSheet = true
-						} else {
-							showSignInRequired()
-						}
-					} label: {
-						Label("Edit Received Timetables...", systemImage: "calendar")
-					}
-					.matchedTransitionSource(id: "unique_transition_id", in: ns)
-					.sheet(isPresented: $showEditReceivedTimetablesSheet) {
-						ReceivedTimetablesView()
-							.presentationDetents([.fraction(0.8)])
-							.presentationDragIndicator(.hidden)
-							.navigationTransition(
-								.zoom(sourceID: "unique_transition_id", in: ns)
-							)
-					}
-					.onChange(of: receivedTimetables) { _, newValue in
-						if newValue.isEmpty {}
-					}
-				}
-			}
 			Section("Developer") {
 				if _isDebugAssertConfiguration() || Defaults[.userDisplayName].contains("Adon") || Defaults[.calendarEvents].canManageGlobalEvents {
 					LabeledContent {

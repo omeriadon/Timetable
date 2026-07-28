@@ -9,7 +9,7 @@ import Defaults
 import SwiftUI
 
 struct TimetableComparison: View {
-	@Default(.receivedTimetables) private var receivedTimetables
+	@Default(.friends) private var friends
 
 	let selectedSlot: Slot?
 	let subject: Subject?
@@ -18,8 +18,6 @@ struct TimetableComparison: View {
 
 	var body: some View {
 		VStack(spacing: 14) {
-			let friends = receivedTimetables.filter { !$0.isDeleted }
-
 			if friends.isEmpty {
 				#if os(iOS)
 					ContentUnavailableView {
@@ -31,37 +29,39 @@ struct TimetableComparison: View {
 						.font(.callout)
 						.foregroundStyle(.secondary)
 					} description: {
-						Text("Import a friend's timetable to compare it with yours here.")
+						Text("Add a friend to compare their timetable with yours here.")
 							.font(.caption)
 					}
 					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
 				#endif // os(iOS)
 			} else {
-				ForEach(friends) { timetable in
-					ZStack {
-						if let slot = selectedSlot,
-						   let theirSubject = getSubjectAtSlot(day: slot.day, session: slot.session, in: timetable.subjects)
-						{
-							Button {
-								presentedSubject = PresentedSubject(
-									owner: timetable.sender,
-									subject: theirSubject
-								)
-							} label: {
+				ForEach(friends) { friend in
+					if let timetable = friend.timetable {
+						ZStack {
+							if let slot = selectedSlot,
+							   let theirSubject = getSubjectAtSlot(day: slot.day, session: slot.session, in: timetable.subjects)
+							{
+								Button {
+									presentedSubject = PresentedSubject(
+										owner: friend.friend.displayName,
+										subject: theirSubject
+									)
+								} label: {
+									item(
+										left: Text(friend.friend.displayName),
+										right: Label(theirSubject.id, systemImage: theirSubject.symbol),
+										colour: theirSubject.colour.swiftUIColor
+									)
+									.tint(.white)
+								}
+								.buttonStyle(.plain)
+							} else {
 								item(
-									left: Text(timetable.sender),
-									right: Label(theirSubject.id, systemImage: theirSubject.symbol),
-									colour: theirSubject.colour.swiftUIColor
+									left: Text(friend.friend.displayName),
+									right: Label("Free period", systemImage: "square.dotted"),
+									colour: .gray
 								)
-								.tint(.white)
 							}
-							.buttonStyle(.plain)
-						} else {
-							item(
-								left: Text(timetable.sender),
-								right: Label("Free period", systemImage: "square.dotted"),
-								colour: .gray
-							)
 						}
 					}
 				}

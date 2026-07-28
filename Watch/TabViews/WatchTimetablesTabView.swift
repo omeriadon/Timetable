@@ -4,7 +4,7 @@ import SwiftUI
 
 struct WatchTimetablesTabView: View {
 	@Default(.timetable) private var subjects
-	@Default(.receivedTimetables) private var receivedTimetables
+	@Default(.friends) private var friends
 	@Default(.schoolCalendar) private var schoolCalendar
 	@State private var now = TimetableClock.now
 
@@ -31,17 +31,19 @@ struct WatchTimetablesTabView: View {
 				}
 			}
 
-			ForEach(receivedTimetables) { receivedTimetable in
-				Tab(receivedTimetable.sender, systemImage: "person") {
-					FriendsTimetablesView(receivedTimetable: receivedTimetable)
-						.background {
-							WatchSchoolProgressBackground(
-								state: schoolState(for: receivedTimetable),
-								now: now
-							)
-							.animation(.smooth, value: schoolState(for: receivedTimetable))
-							.ignoresSafeArea()
-						}
+			ForEach(friends) { friend in
+				if let timetable = friend.timetable {
+					Tab(friend.friend.displayName, systemImage: "person") {
+						FriendsTimetablesView(friend: friend, timetable: timetable)
+							.background {
+								WatchSchoolProgressBackground(
+									state: schoolState(for: timetable),
+									now: now
+								)
+								.animation(.smooth, value: schoolState(for: timetable))
+								.ignoresSafeArea()
+							}
+					}
 				}
 			}
 		}
@@ -50,7 +52,7 @@ struct WatchTimetablesTabView: View {
 		.onReceive(timer) { now = TimetableClock.adjusted($0) }
 	}
 
-	private func schoolState(for timetable: ReceivedTimetable) -> SchoolState {
+	private func schoolState(for timetable: FriendTimetable) -> SchoolState {
 		SchoolStateEngine.calculate(at: now, subjects: timetable.subjects, calendar: SchoolCalendarProjection.perthCalendar, schoolCalendar: schoolCalendar)
 	}
 }

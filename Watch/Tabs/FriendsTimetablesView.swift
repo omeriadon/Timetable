@@ -10,7 +10,8 @@ import Defaults
 import SwiftUI
 
 struct FriendsTimetablesView: View {
-	let receivedTimetable: ReceivedTimetable
+	let friend: FriendSummary
+	let timetable: FriendTimetable
 	@Default(.schoolCalendar) private var schoolCalendar
 
 	@State private var now = TimetableClock.now
@@ -19,7 +20,7 @@ struct FriendsTimetablesView: View {
 	var body: some View {
 		let state = SchoolStateEngine.calculate(
 			at: now,
-			subjects: receivedTimetable.subjects,
+			subjects: timetable.subjects,
 			calendar: SchoolCalendarProjection.perthCalendar,
 			schoolCalendar: schoolCalendar
 		)
@@ -72,7 +73,7 @@ struct FriendsTimetablesView: View {
 				color = .secondary
 				if let next = SchoolStateEngine.nextScheduledSubject(
 					after: now,
-					subjects: receivedTimetable.subjects,
+					subjects: timetable.subjects,
 					calendar: SchoolCalendarProjection.perthCalendar,
 					schoolCalendar: schoolCalendar
 				) {
@@ -88,7 +89,7 @@ struct FriendsTimetablesView: View {
 
 		return GeometryReader { geo in
 			VStack(alignment: .center) {
-				Text(receivedTimetable.sender)
+				Text(friend.friend.displayName)
 					.font(.title2)
 					.bold()
 					.lineLimit(2)
@@ -153,11 +154,15 @@ struct FriendsTimetablesView: View {
 
 #Preview {
 	FriendsTimetablesView(
-		receivedTimetable: ReceivedTimetable(
-			sender: "Adon Omeri",
-			subjects: debugTimetable,
-			receivedAt: Date()
-		)
+		friend: FriendSummary(
+			relationshipID: UUID(),
+			friend: FriendProfile(userID: UUID(), displayName: "Adon Omeri", email: nil, appearanceData: nil),
+			state: .friends,
+			requestedAt: .now,
+			acceptedAt: .now,
+			timetable: nil
+		),
+		timetable: FriendTimetable(title: "Adon's Timetable", subjects: debugTimetable, updatedAt: .now)
 	)
 	.monospaced()
 }

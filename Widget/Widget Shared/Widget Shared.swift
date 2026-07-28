@@ -31,14 +31,14 @@ struct Provider: TimelineProvider {
 
 	func getSnapshot(in _: Context, completion: @escaping (TimetableEntry) -> Void) {
 		let subjects = Defaults[.timetable]
-		let receivedTimetables = Defaults[.receivedTimetables]
+		let friends = Defaults[.friends]
 		let schoolCalendar = Defaults[.schoolCalendar]
 		completion(
 			TimetableEntry(
 				date: .now,
 				subjects: subjects,
 				ownerSchedule: scheduleItem(name: "You", subjects: subjects, at: .now, schoolCalendar: schoolCalendar),
-				friendSchedules: friendSchedules(for: receivedTimetables, at: .now, schoolCalendar: schoolCalendar),
+				friendSchedules: friendSchedules(for: friends, at: .now, schoolCalendar: schoolCalendar),
 				isPlaceholder: false,
 				relevance: nil
 			)
@@ -47,7 +47,7 @@ struct Provider: TimelineProvider {
 
 	func getTimeline(in _: Context, completion: @escaping (Timeline<TimetableEntry>) -> Void) {
 		let subjects = Defaults[.timetable]
-		let receivedTimetables = Defaults[.receivedTimetables]
+		let friends = Defaults[.friends]
 		let schoolCalendar = Defaults[.schoolCalendar]
 
 		let calendar = SchoolCalendarProjection.perthCalendar
@@ -57,7 +57,7 @@ struct Provider: TimelineProvider {
 			completion(
 				Timeline(
 					entries: [
-						makeEntry(date: now, subjects: subjects, receivedTimetables: receivedTimetables, calendar: calendar, schoolCalendar: schoolCalendar),
+						makeEntry(date: now, subjects: subjects, friends: friends, calendar: calendar, schoolCalendar: schoolCalendar),
 					],
 					policy: .after(now.addingTimeInterval(60 * 60))
 				)
@@ -66,7 +66,7 @@ struct Provider: TimelineProvider {
 		}
 
 		var entries: [TimetableEntry] = [
-			makeEntry(date: now, subjects: subjects, receivedTimetables: receivedTimetables, calendar: calendar, schoolCalendar: schoolCalendar),
+			makeEntry(date: now, subjects: subjects, friends: friends, calendar: calendar, schoolCalendar: schoolCalendar),
 		]
 
 		guard
@@ -98,7 +98,7 @@ struct Provider: TimelineProvider {
 		}
 
 		entries.append(
-			makeEntry(date: preSchool, subjects: subjects, receivedTimetables: receivedTimetables, calendar: calendar, schoolCalendar: schoolCalendar)
+			makeEntry(date: preSchool, subjects: subjects, friends: friends, calendar: calendar, schoolCalendar: schoolCalendar)
 		)
 
 		for period in SchoolStateEngine.activePeriods(for: dayIndex) {
@@ -109,7 +109,7 @@ struct Provider: TimelineProvider {
 				of: schoolDay
 			) {
 				entries.append(
-					makeEntry(date: start, subjects: subjects, receivedTimetables: receivedTimetables, calendar: calendar, schoolCalendar: schoolCalendar)
+					makeEntry(date: start, subjects: subjects, friends: friends, calendar: calendar, schoolCalendar: schoolCalendar)
 				)
 			}
 
@@ -120,13 +120,13 @@ struct Provider: TimelineProvider {
 				of: schoolDay
 			) {
 				entries.append(
-					makeEntry(date: end, subjects: subjects, receivedTimetables: receivedTimetables, calendar: calendar, schoolCalendar: schoolCalendar)
+					makeEntry(date: end, subjects: subjects, friends: friends, calendar: calendar, schoolCalendar: schoolCalendar)
 				)
 			}
 		}
 
 		entries.append(
-			makeEntry(date: refreshAfterSchool, subjects: subjects, receivedTimetables: receivedTimetables, calendar: calendar, schoolCalendar: schoolCalendar)
+			makeEntry(date: refreshAfterSchool, subjects: subjects, friends: friends, calendar: calendar, schoolCalendar: schoolCalendar)
 		)
 
 		completion(
@@ -168,7 +168,7 @@ struct TimetableEntry: TimelineEntry {
 private func makeEntry(
 	date: Date,
 	subjects: [Subject],
-	receivedTimetables: [ReceivedTimetable],
+	friends: [FriendSummary],
 	calendar: Calendar,
 	schoolCalendar: SchoolCalendarProjection
 ) -> TimetableEntry {
@@ -176,7 +176,7 @@ private func makeEntry(
 		date: date,
 		subjects: subjects,
 		ownerSchedule: scheduleItem(name: "You", subjects: subjects, at: date, schoolCalendar: schoolCalendar),
-		friendSchedules: friendSchedules(for: receivedTimetables, at: date, schoolCalendar: schoolCalendar),
+		friendSchedules: friendSchedules(for: friends, at: date, schoolCalendar: schoolCalendar),
 		isPlaceholder: false,
 		relevance: relevance(for: date, calendar: calendar)
 	)
@@ -192,12 +192,13 @@ private func placeholderSchoolDate(calendar: Calendar = .current) -> Date {
 }
 
 private func friendSchedules(
-	for receivedTimetables: [ReceivedTimetable],
+	for friends: [FriendSummary],
 	at date: Date,
 	schoolCalendar: SchoolCalendarProjection
 ) -> [ScheduleItem] {
-	receivedTimetables.map { timetable in
-		scheduleItem(name: timetable.sender, subjects: timetable.subjects, at: date, schoolCalendar: schoolCalendar)
+	friends.compactMap { friend in
+		guard let timetable = friend.timetable else { return nil }
+		return scheduleItem(name: friend.friend.displayName, subjects: timetable.subjects, at: date, schoolCalendar: schoolCalendar)
 	}
 }
 

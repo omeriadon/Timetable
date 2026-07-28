@@ -15,7 +15,7 @@ final class AccountBootstrapService {
 	static let shared = AccountBootstrapService(
 		ownerTimetableSync: .shared,
 		settingsSync: .shared,
-		receivedTimetableSync: .shared,
+		friendService: .shared,
 		schoolCalendarSync: .shared,
 		calendarEventsSync: .shared
 	)
@@ -24,7 +24,7 @@ final class AccountBootstrapService {
 
 	private let ownerTimetableSync: OwnerTimetableSyncService
 	private let settingsSync: AccountSettingsSyncService
-	private let receivedTimetableSync: ReceivedTimetableSyncService
+	private let friendService: FriendService
 	private let schoolCalendarSync: SchoolCalendarSyncService
 	private let calendarEventsSync: CalendarEventsSyncService
 	private var bootstrapTask: Task<Void, any Error>?
@@ -32,13 +32,13 @@ final class AccountBootstrapService {
 	private init(
 		ownerTimetableSync: OwnerTimetableSyncService,
 		settingsSync: AccountSettingsSyncService,
-		receivedTimetableSync: ReceivedTimetableSyncService,
+		friendService: FriendService,
 		schoolCalendarSync: SchoolCalendarSyncService,
 		calendarEventsSync: CalendarEventsSyncService
 	) {
 		self.ownerTimetableSync = ownerTimetableSync
 		self.settingsSync = settingsSync
-		self.receivedTimetableSync = receivedTimetableSync
+		self.friendService = friendService
 		self.schoolCalendarSync = schoolCalendarSync
 		self.calendarEventsSync = calendarEventsSync
 	}
@@ -61,8 +61,8 @@ final class AccountBootstrapService {
 			async let settings: Void = self.runBootstrapStage("Account settings") {
 				try await self.settingsSync.downloadSettings()
 			}
-			async let received: Void = self.runBootstrapStage("Received timetables") {
-				try await self.receivedTimetableSync.downloadProjectionAndOverrides()
+			async let friends: Void = self.runBootstrapStage("Friends") {
+				try await self.friendService.refresh()
 			}
 			async let created: Void = self.runBootstrapStage("Created timetables") {
 				try await CreatedTimetableService.shared.refresh()
@@ -73,7 +73,7 @@ final class AccountBootstrapService {
 			async let calendarEvents: Void = self.runBootstrapStage("Calendar events") {
 				try await self.calendarEventsSync.downloadEvents()
 			}
-			_ = await (timetable, settings, received, created, schoolCalendar, calendarEvents)
+			_ = await (timetable, settings, friends, created, schoolCalendar, calendarEvents)
 		}
 		bootstrapTask = task
 		isBootstrapping = true
