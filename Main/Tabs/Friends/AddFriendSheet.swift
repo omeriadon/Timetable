@@ -35,7 +35,7 @@ struct AddFriendSheet: View {
 			.navigationTitle("Add a Friend")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
-					Button(role: .dismiss) {
+					Button(role: .cancel) {
 						dismiss()
 					} label: {
 						Image(systemName: "xmark")

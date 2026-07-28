@@ -105,7 +105,7 @@ private struct FriendScheduleStatus {
 		let state = SchoolStateEngine.calculate(
 			at: date,
 			subjects: subjects,
-			calendar: .perthCalendar,
+			calendar: SchoolCalendarProjection.perthCalendar,
 			schoolCalendar: schoolCalendar
 		)
 		switch state {
@@ -141,7 +141,12 @@ private struct FriendScheduleStatus {
 				tint = .orange
 			case .afterSchool, .weekend:
 				title = "School's Out"
-				if let next = SchoolStateEngine.nextScheduledSubject(after: date, subjects: subjects, calendar: .perthCalendar, schoolCalendar: schoolCalendar) {
+				if let next = SchoolStateEngine.nextScheduledSubject(
+					after: date,
+					subjects: subjects,
+					calendar: SchoolCalendarProjection.perthCalendar,
+					schoolCalendar: schoolCalendar
+				) {
 					nextTitle = "Next: \(next.subject.id)"
 				} else {
 					nextTitle = "No upcoming classes"

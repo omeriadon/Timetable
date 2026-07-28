@@ -41,7 +41,7 @@ struct FriendRequestsSheet: View {
 			.navigationTitle("Friend Requests")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
-					Button(role: .dismiss) {
+					Button(role: .cancel) {
 						dismiss()
 					} label: {
 						Image(systemName: "xmark")

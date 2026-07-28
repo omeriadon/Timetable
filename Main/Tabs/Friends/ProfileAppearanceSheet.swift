@@ -86,7 +86,7 @@ struct ProfileAppearanceSheet: View {
 			.navigationTitle("Profile")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
-					Button(role: .dismiss) {
+					Button(role: .cancel) {
 						dismiss()
 					} label: {
 						Image(systemName: "xmark")
