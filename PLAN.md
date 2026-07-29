@@ -1100,8 +1100,8 @@ Validation boundary:
 - [ ] Keep update cadence proportional to the UI:
   - one second for visible countdowns;
   - slower periodic updates for labels that do not show seconds.
-- [ ] Add a Debug-only `debugOffset` numeric TextField to Watch Settings.
-- [ ] Bind the field to the shared `Defaults[.debugOffset]` value.
+- [x] Add a Debug-only `debugOffset` numeric TextField to Watch Settings.
+- [x] Bind the field to the shared `Defaults[.debugOffset]` value.
 - [ ] Recompute visible timer tabs immediately when the offset changes.
 - [ ] Keep the field human-readable and consistent with the iPhone Debug setting.
 - [ ] Do not change the Watch app icon.

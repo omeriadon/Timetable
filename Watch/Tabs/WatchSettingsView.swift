@@ -4,6 +4,7 @@ import WidgetKit
 
 struct WatchSettingsView: View {
 	@Default(.accountProfile) private var profile
+	@Default(.debugOffset) private var debugOffset
 	@State private var settings = Defaults[.accountSettings]
 	@State private var committedSettings = Defaults[.accountSettings]
 	@Environment(\.statusBadgeManager) private var badges
@@ -60,6 +61,11 @@ struct WatchSettingsView: View {
 
 				#if DEBUG
 					Section("Developer") {
+						LabeledContent("Debug Offset") {
+							TextField("Seconds", value: $debugOffset, format: .number)
+								.multilineTextAlignment(.trailing)
+								.keyboardType(.numbersAndPunctuation)
+						}
 						Button("Test Progress", systemImage: "progress.indicator") {
 							testBadge(title: "Syncing account", secondaryText: "Working", view: .progressView)
 						}
