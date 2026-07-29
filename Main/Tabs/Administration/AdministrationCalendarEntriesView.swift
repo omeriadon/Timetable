@@ -45,6 +45,9 @@ struct AdministrationCalendarEntriesView: View {
 		.task {
 			await load()
 		}
+		.refreshable {
+			await load()
+		}
 		.sheet(item: $editor) { entry in
 			AdministrationCalendarEditor(
 				entry: entry,

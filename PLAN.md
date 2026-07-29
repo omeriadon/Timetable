@@ -511,8 +511,8 @@ Validation boundary:
 - [x] Snapshot the sender email and authority.
 - [x] Update the record with aggregate outcomes.
 - [x] Return the record ID with delivery counts.
-- [ ] Add history and detail endpoints for administration.
-- [ ] Restrict history to current administrators.
+- [x] Add history and detail endpoints for administration.
+- [x] Restrict history to current administrators.
 
 ### 3.7 Sync endpoint
 
@@ -1025,13 +1025,13 @@ Validation boundary:
 - [ ] Disable Send only when trimmed title is empty or a request is active.
 - [ ] Preserve best-effort APNs delivery.
 - [ ] Show eligible, delivered, invalidated, and failed counts.
-- [ ] Add broadcast history to Administration separately from the composer.
-- [ ] Show sender email snapshot and send time.
-- [ ] Show full title, subtitle, and body without inventing placeholder content.
-- [ ] Show aggregate delivery result.
-- [ ] Add detail disclosure for structured failures if persisted.
+- [x] Add broadcast history to Administration separately from the composer.
+- [x] Show sender email snapshot and send time.
+- [x] Show full title, subtitle, and body without inventing placeholder content.
+- [x] Show aggregate delivery result.
+- [x] Add detail disclosure for structured failures if persisted.
 - [ ] Do not add pull-to-refresh to the composer.
-- [ ] Add pull-to-refresh to history.
+- [x] Add pull-to-refresh to history.
 
 ## Phase 16: TipKit setup only
 

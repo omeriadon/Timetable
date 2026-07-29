@@ -83,6 +83,9 @@ struct AdministrationView: View {
 			.task {
 				await load()
 			}
+			.refreshable {
+				await load()
+			}
 		}
 	}
 

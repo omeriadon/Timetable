@@ -40,7 +40,10 @@ struct AdministrationUsersView: View {
 			}
 		}
 		.task {
-			users = await (try? service.users()) ?? []
+			await load()
+		}
+		.refreshable {
+			await load()
 		}
 		.sheet(item: $editor) { target in
 			AdministrationUserEditor(
@@ -61,6 +64,10 @@ struct AdministrationUsersView: View {
 			$0.displayName.localizedCaseInsensitiveContains(searchText)
 				|| ($0.email?.localizedCaseInsensitiveContains(searchText) ?? false)
 		}
+	}
+
+	private func load() async {
+		users = (try? await service.users()) ?? users
 	}
 
 	private func update(_ user: AdministrationUserResponse) {

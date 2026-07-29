@@ -42,6 +42,9 @@ struct AdministrationSchoolEventsView: View {
 		}
 		.listRowSpacing(8)
 		.appNavigationTitle("School Events", accent: true)
+		.refreshable {
+			try? await service.downloadEvents()
+		}
 		.sheet(item: $editorTarget) { target in
 			AdministrationSchoolEventEditor(
 				target: target,
