@@ -1,85 +1,60 @@
-import ColorfulX
 import Defaults
 import SwiftUI
 
+#if os(iOS)
+	import PhotosUI
+#endif
+
 struct ProfileAppearanceSheet: View {
 	@Environment(\.dismiss) private var dismiss
-	@Default(.accountProfile) private var accountProfile
-	@Default(.profileAppearance) private var savedAppearance
+	@Environment(\.statusBadgeManager) private var statusBadges
 	@State private var service = FriendService.shared
-	@State private var displayName = ""
-	@State private var usesMonogram = false
-	@State private var monogram = ""
-	@State private var selectedSymbol = "paperplane.fill"
-	@State private var colors: [Color] = [.blue, .purple, .pink]
-	@State private var speed = 0.2
-	@State private var noise = 64.0
-	@State private var selectedFont = ProfileFont.rounded
+	@State private var draft: ProfileAppearanceDraft
 	@State private var isSaving = false
-	@Environment(\.statusBadgeManager) private var badges
+	@State private var presentsEmojiPicker = false
+	@State private var presentsFontPicker = false
+	@State private var presentsColourPicker = false
+	@Namespace private var editorNamespace
 
-	private let symbols = [
-		"paperplane.fill",
-		"star.fill",
-		"bolt.fill",
-		"paintpalette.fill",
-		"book.fill",
-		"figure.run",
-		"music.note",
-		"gamecontroller.fill",
-	]
+	#if os(iOS)
+		@State private var selectedPhotoItem: PhotosPickerItem?
+		@State private var photoSelectionState = ProfilePhotoSelectionState.idle
+		@State private var photoCropRequest: ProfilePhotoCropRequest?
+	#endif
+
+	init() {
+		_draft = State(initialValue: ProfileAppearanceDraft(
+			profile: Defaults[.accountProfile],
+			fallbackAppearance: Defaults[.profileAppearance]
+		))
+	}
 
 	var body: some View {
 		NavigationStack {
 			ScrollView {
 				VStack(spacing: 20) {
-					avatarPreview
+					ProfileEditorPreview(draft: draft)
 
-					TextField("Account name", text: $displayName)
+					TextField("Account name", text: $draft.displayName)
 						.textFieldStyle(.roundedBorder)
 
-					Picker("Appearance layer", selection: $usesMonogram) {
-						Label("Symbol", systemImage: "sparkles").tag(false)
-						Label("Monogram", systemImage: "character").tag(true)
-					}
-					.pickerStyle(.segmented)
+					ProfileModeControl(
+						selection: $draft.contentKind,
+						presentsBackground: draft.contentKind != .photo,
+						showBackground: showColourPicker
+					)
 
-					if usesMonogram {
-						TextField("Up to 3 letters", text: $monogram)
-							.textInputAutocapitalization(.characters)
-							.autocorrectionDisabled()
-							.textFieldStyle(.roundedBorder)
-							.onChange(of: monogram) { _, value in
-								monogram = String(value.prefix(3)).uppercased()
-							}
-						Picker("Font", selection: $selectedFont) {
-							ForEach(ProfileFont.allCases) { font in
-								Text(font.title).tag(font)
-							}
-						}
-					} else {
-						LazyVGrid(columns: [GridItem(.adaptive(minimum: 54))], spacing: 10) {
-							ForEach(symbols, id: \.self) { symbol in
-								Button(symbol, systemImage: symbol) {
-									selectedSymbol = symbol
-								}
-								.buttonStyle(.glass)
-								.tint(selectedSymbol == symbol ? .accentColor : .secondary)
-							}
-						}
-					}
+					modeEditor
 
-					VStack(alignment: .leading, spacing: 10) {
-						Text("Background")
-							.font(.headline)
-						ColorPicker("Primary colour", selection: colorBinding(index: 0))
-						ColorPicker("Secondary colour", selection: colorBinding(index: 1))
-						ColorPicker("Accent colour", selection: colorBinding(index: 2))
-						Slider(value: $speed, in: 0 ... 2) { Text("Speed") }
-						Slider(value: $noise, in: 0 ... 200) { Text("Noise") }
+					if draft.contentKind != .photo {
+						Button("Font", systemImage: "textformat", action: showFontPicker)
+							.buttonStyle(.glass)
+							.matchedTransitionSource(id: "profile-font", in: editorNamespace)
+
+						Button("Background Colours", systemImage: "paintpalette", action: showColourPicker)
+							.buttonStyle(.glass)
+							.matchedTransitionSource(id: "profile-colours", in: editorNamespace)
 					}
-					.padding()
-					.background(.thinMaterial, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
 				}
 				.padding()
 			}
@@ -87,119 +62,140 @@ struct ProfileAppearanceSheet: View {
 			.appNavigationTitle("Profile", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
-					Button(role: .cancel) {
-						dismiss()
-					} label: {
-						Image(systemName: "xmark")
-					}
+					Button(role: .cancel, action: dismiss.callAsFunction)
 				}
+
 				ToolbarItem(placement: .confirmationAction) {
-					Button("Save", systemImage: "checkmark", role: .confirm) {
-						save()
-					}
-					.buttonStyle(.glassProminent)
-					.disabled(isSaving)
+					Button("Save", systemImage: "checkmark", role: .confirm, action: save)
+						.buttonStyle(.glassProminent)
+						.disabled(isSaving || !draft.canSave)
 				}
 			}
-			.task { loadAppearance() }
+		}
+		.sheet(isPresented: $presentsEmojiPicker) {
+			ProfileEmojiPicker(selection: $draft.emoji)
+				.navigationTransition(.zoom(sourceID: "profile-emoji", in: editorNamespace))
+				.presentationDetents([.fraction(0.65)])
+		}
+		.sheet(isPresented: $presentsFontPicker) {
+			ProfileFontPicker(
+				design: $draft.fontDesign,
+				weight: $draft.fontWeight
+			)
+			.navigationTransition(.zoom(sourceID: "profile-font", in: editorNamespace))
+			.presentationDetents([.fraction(0.55)])
+		}
+		.sheet(isPresented: $presentsColourPicker) {
+			ProfileColourGrid(selection: $draft.colours)
+				.navigationTransition(.zoom(sourceID: "profile-colours", in: editorNamespace))
+				.presentationDetents([.fraction(0.65)])
+		}
+		#if os(iOS)
+			.onChange(of: selectedPhotoItem) { _, item in
+				loadPhoto(item)
+			}
+			.sheet(item: $photoCropRequest) { request in
+				ProfilePhotoCropEditor(sourceData: request.sourceData) { preparedData in
+					draft.pendingPhotoData = preparedData
+					draft.contentKind = .photo
+					photoSelectionState = .ready
+				}
+				.navigationTransition(.zoom(sourceID: "profile-photo-crop", in: editorNamespace))
+				.presentationDetents([.fraction(0.7)])
+			}
+		#endif
+	}
+
+	@ViewBuilder
+	private var modeEditor: some View {
+		switch draft.contentKind {
+			case .photo:
+				#if os(iOS)
+					ProfilePhotoControls(
+						selection: $selectedPhotoItem,
+						state: photoSelectionState,
+						hasCurrentPhoto: draft.photo != nil,
+						remove: removePhoto
+					)
+					.matchedTransitionSource(id: "profile-photo-crop", in: editorNamespace)
+				#else
+					ContentUnavailableView(
+						"Photo Editing Unavailable",
+						systemImage: "photo.badge.exclamationmark",
+						description: Text("Edit the profile photo on iPhone.")
+					)
+				#endif
+			case .monogram:
+				ProfileMonogramEditor(
+					monogram: $draft.monogram,
+					design: draft.fontDesign,
+					weight: draft.fontWeight,
+					colours: draft.colours
+				)
+			case .emoji:
+				Button("Choose Emoji", systemImage: "face.smiling", action: showEmojiPicker)
+					.buttonStyle(.glass)
+					.matchedTransitionSource(id: "profile-emoji", in: editorNamespace)
 		}
 	}
 
-	private var avatarPreview: some View {
-		ZStack {
-			ColorfulView(
-				color: $colors,
-				speed: $speed,
-				bias: .constant(0.00001),
-				noise: $noise,
-				transitionSpeed: .constant(10),
-				frameLimit: .constant(60),
-				renderScale: .constant(0.9)
-			)
-			if usesMonogram {
-				Text(monogram.isEmpty ? initials : monogram)
-					.font(selectedFont.font)
-					.foregroundStyle(.white)
-			} else {
-				Image(systemName: selectedSymbol)
-					.font(.system(size: 56, weight: .medium))
-					.foregroundStyle(.white)
+	private func showEmojiPicker() {
+		presentsEmojiPicker = true
+	}
+
+	private func showFontPicker() {
+		presentsFontPicker = true
+	}
+
+	private func showColourPicker() {
+		presentsColourPicker = true
+	}
+
+	#if os(iOS)
+		private func loadPhoto(_ item: PhotosPickerItem?) {
+			guard let item else {
+				return
+			}
+			photoSelectionState = .loading
+			Task {
+				do {
+					guard let data = try await item.loadTransferable(type: Data.self) else {
+						throw ProfilePhotoSelectionError.unreadableImage
+					}
+					let preparedSource = try await ProfilePhotoProcessor.prepareSource(data)
+					photoCropRequest = ProfilePhotoCropRequest(sourceData: preparedSource)
+				} catch {
+					photoSelectionState = .failed(error.localizedDescription)
+				}
 			}
 		}
-		.frame(width: 150, height: 150)
-		.clipShape(Circle())
-		.shadow(radius: 12)
-	}
 
-	private var initials: String {
-		let parts = displayName.split(separator: " ")
-		return String(parts.prefix(3).compactMap(\.first))
-	}
-
-	private func colorBinding(index: Int) -> Binding<Color> {
-		Binding(
-			get: { colors[index] },
-			set: { colors[index] = $0 }
-		)
-	}
-
-	private func loadAppearance() {
-		displayName = accountProfile?.displayName ?? ""
-		usesMonogram = savedAppearance.usesMonogram
-		monogram = savedAppearance.monogram
-		selectedSymbol = savedAppearance.symbol
-		selectedFont = ProfileFont(rawValue: savedAppearance.font) ?? .rounded
-		colors = savedAppearance.colours.map(\.swiftUIColor)
-		speed = savedAppearance.speed
-		noise = savedAppearance.noise
-	}
+		private func removePhoto() {
+			draft.pendingPhotoData = nil
+			draft.removesPhoto = true
+			draft.contentKind = .emoji
+			selectedPhotoItem = nil
+			photoSelectionState = .idle
+			photoCropRequest = nil
+		}
+	#endif
 
 	private func save() {
-		let appearance = ProfileAppearance(
-			usesMonogram: usesMonogram,
-			monogram: monogram,
-			symbol: selectedSymbol,
-			font: selectedFont.rawValue,
-			colours: colors.map { RGBAColor(color: $0) },
-			speed: speed,
-			noise: noise
-		)
 		isSaving = true
 		Task {
-			defer { isSaving = false }
+			defer {
+				isSaving = false
+			}
 			do {
-				if displayName != accountProfile?.displayName {
-					_ = try await SessionStore.shared.updateProfile(displayName: displayName)
-				}
-				try await service.updateProfileAppearance(appearance)
+				let profile = try await service.saveProfile(draft)
+				draft = ProfileAppearanceDraft(
+					profile: profile,
+					fallbackAppearance: profile.appearance
+				)
 				dismiss()
 			} catch {
-				badges.present(error: error, title: "Unable to save profile")
+				statusBadges.present(error: error, title: "Unable to save profile")
 			}
-		}
-	}
-}
-
-private enum ProfileFont: String, CaseIterable, Identifiable {
-	case `default`
-	case serif
-	case monospaced
-	case rounded
-
-	var id: String {
-		rawValue
-	}
-
-	var title: String {
-		rawValue.capitalized
-	}
-
-	var font: Font {
-		switch self {
-			case .default: .system(size: 52, weight: .semibold)
-			case .serif: .system(size: 52, weight: .semibold, design: .serif)
-			case .monospaced: .system(size: 52, weight: .semibold, design: .monospaced)
-			case .rounded: .system(size: 52, weight: .semibold, design: .rounded)
 		}
 	}
 }

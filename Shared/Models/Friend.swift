@@ -12,9 +12,51 @@ nonisolated struct FriendProfile: Codable, Defaults.Serializable, Identifiable, 
 	let displayName: String
 	let email: String?
 	let appearanceData: Data?
+	let appearance: ProfileAppearance?
+	let photo: ProfilePhotoMetadata?
+	let badges: [ProfileBadge]
 
 	var id: UUID {
 		userID
+	}
+
+	init(
+		userID: UUID,
+		displayName: String,
+		email: String?,
+		appearanceData: Data?,
+		appearance: ProfileAppearance? = nil,
+		photo: ProfilePhotoMetadata? = nil,
+		badges: [ProfileBadge] = []
+	) {
+		self.userID = userID
+		self.displayName = displayName
+		self.email = email
+		self.appearanceData = appearanceData
+		self.appearance = appearance
+		self.photo = photo
+		self.badges = badges
+	}
+
+	private enum CodingKeys: String, CodingKey {
+		case userID
+		case displayName
+		case email
+		case appearanceData
+		case appearance
+		case photo
+		case badges
+	}
+
+	init(from decoder: any Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		userID = try container.decode(UUID.self, forKey: .userID)
+		displayName = try container.decode(String.self, forKey: .displayName)
+		email = try container.decodeIfPresent(String.self, forKey: .email)
+		appearanceData = try container.decodeIfPresent(Data.self, forKey: .appearanceData)
+		appearance = try container.decodeIfPresent(ProfileAppearance.self, forKey: .appearance)
+		photo = try container.decodeIfPresent(ProfilePhotoMetadata.self, forKey: .photo)
+		badges = try container.decodeIfPresent([ProfileBadge].self, forKey: .badges) ?? []
 	}
 }
 
@@ -61,30 +103,6 @@ nonisolated struct FriendOrderUpdateRequest: Codable, Sendable {
 	let friendIDs: [UUID]
 }
 
-nonisolated struct ProfileAppearance: Codable, Defaults.Serializable, Hashable, Sendable {
-	let usesMonogram: Bool
-	let monogram: String
-	let symbol: String
-	let font: String
-	let colours: [RGBAColor]
-	let speed: Double
-	let noise: Double
-
-	static let `default` = ProfileAppearance(
-		usesMonogram: false,
-		monogram: "",
-		symbol: "person.fill",
-		font: "rounded",
-		colours: [
-			RGBAColor(hexString: "#6AA7FF"),
-			RGBAColor(hexString: "#B06CFF"),
-			RGBAColor(hexString: "#FA9DB3"),
-		],
-		speed: 0.2,
-		noise: 64
-	)
-}
-
 nonisolated struct FriendProfileAppearanceUpdateRequest: Codable, Sendable {
-	let appearanceData: Data
+	let appearance: ProfileAppearance
 }

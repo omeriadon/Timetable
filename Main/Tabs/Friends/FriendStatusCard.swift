@@ -24,7 +24,7 @@ struct FriendStatusCard: View {
 					Text(status.title)
 						.font(.body)
 						.contentTransition(.numericText())
-					Text(nextClassTitle)
+					Text(nextClassTitle(for: status))
 						.font(.callout)
 						.foregroundStyle(.secondary)
 				}
@@ -39,37 +39,49 @@ struct FriendStatusCard: View {
 		}
 	}
 
-	private var nextClassTitle: String {
+	private func nextClassTitle(for status: FriendScheduleStatus) -> String {
 		if status.nextTitle.hasPrefix("Next:") || status.nextTitle == "No upcoming classes" {
-			return status.nextTitle
+			status.nextTitle
+		} else {
+			"Next: \(status.nextTitle)"
 		}
-		return "Next: \(status.nextTitle)"
 	}
 }
 
 struct FriendAvatar: View {
 	private let appearance: ProfileAppearance
+	private let photo: ProfilePhotoMetadata?
+	private let badges: [ProfileBadge]
 
 	init(symbol: String) {
 		appearance = ProfileAppearance(
-			usesMonogram: false,
+			contentKind: .emoji,
 			monogram: "",
-			symbol: symbol,
-			font: "rounded",
+			emoji: symbol == "person.fill" ? "👤" : "✨",
+			fontDesign: .rounded,
+			fontWeight: .semibold,
 			colours: ProfileAppearance.default.colours,
 			speed: 0,
 			noise: 0
 		)
+		photo = nil
+		badges = []
 	}
 
 	init(profile: FriendProfile) {
-		appearance = profile.appearanceData.flatMap { try? JSONDecoder().decode(ProfileAppearance.self, from: $0) } ?? .default
+		appearance = profile.appearance
+			?? profile.appearanceData.flatMap { try? JSONDecoder().decode(ProfileAppearance.self, from: $0) }
+			?? .default
+		photo = profile.photo
+		badges = profile.badges
 	}
 
 	var body: some View {
 		ProfilePicture(
 			appearance: appearance,
+			photo: photo,
 			size: 54,
+			badges: badges,
 			accessibilityName: "Profile picture"
 		)
 	}

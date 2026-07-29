@@ -2,17 +2,20 @@ import SwiftUI
 
 struct ProfilePicture: View {
 	let appearance: ProfileAppearance
+	let photo: ProfilePhotoMetadata?
 	let size: CGFloat
 	let badges: [ProfileBadge]
 	let accessibilityName: String
 
 	init(
 		appearance: ProfileAppearance,
+		photo: ProfilePhotoMetadata? = nil,
 		size: CGFloat,
 		badges: [ProfileBadge] = [],
 		accessibilityName: String
 	) {
 		self.appearance = appearance
+		self.photo = photo
 		self.size = size
 		self.badges = badges
 		self.accessibilityName = accessibilityName
@@ -38,14 +41,26 @@ struct ProfilePicture: View {
 				endPoint: .bottomTrailing
 			)
 
-			if appearance.usesMonogram, !appearance.monogram.isEmpty {
-				Text(appearance.monogram)
-					.font(.system(size: size * 0.38, weight: .bold, design: fontDesign))
-					.foregroundStyle(.white)
-			} else {
-				Image(systemName: appearance.symbol)
-					.font(.system(size: size * 0.38, weight: .semibold))
-					.foregroundStyle(.white)
+			switch appearance.contentKind {
+				case .photo:
+					if let photo {
+						CachedProfilePhoto(metadata: photo, size: size)
+					} else {
+						ProfilePhotoPlaceholder(isLoading: false)
+					}
+				case .monogram:
+					Text(appearance.monogram)
+						.font(
+							.system(
+								size: size * 0.38,
+								weight: appearance.fontWeight.swiftUIFontWeight,
+								design: appearance.fontDesign.swiftUIFontDesign
+							)
+						)
+						.foregroundStyle(.white)
+				case .emoji:
+					Text(appearance.emoji)
+						.font(.system(size: size * 0.42))
 			}
 		}
 	}
@@ -76,24 +91,43 @@ struct ProfilePicture: View {
 		}
 	}
 
-	private var fontDesign: Font.Design {
-		switch appearance.font {
-			case "serif":
-				return .serif
-			case "monospaced":
-				return .monospaced
-			case "rounded":
-				return .rounded
-			default:
-				return .default
-		}
-	}
-
 	private var badgeAccessibilityValue: String? {
 		let labels = badges
 			.sorted { $0.priority > $1.priority }
 			.prefix(3)
 			.map(\.accessibilityLabel)
 		return labels.isEmpty ? nil : labels.joined(separator: ", ")
+	}
+}
+
+private extension ProfileFontDesign {
+	var swiftUIFontDesign: Font.Design {
+		switch self {
+			case .default:
+				.default
+			case .serif:
+				.serif
+			case .monospaced:
+				.monospaced
+			case .rounded:
+				.rounded
+		}
+	}
+}
+
+private extension ProfileFontWeight {
+	var swiftUIFontWeight: Font.Weight {
+		switch self {
+			case .regular:
+				.regular
+			case .medium:
+				.medium
+			case .semibold:
+				.semibold
+			case .bold:
+				.bold
+			case .heavy:
+				.heavy
+		}
 	}
 }

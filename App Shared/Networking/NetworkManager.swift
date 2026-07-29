@@ -9,6 +9,10 @@ import Foundation
 import Network
 import Observation
 
+extension Notification.Name {
+	static let administrationAuthorityInvalidated = Notification.Name("administrationAuthorityInvalidated")
+}
+
 enum HTTPMethod: String {
 	case delete = "DELETE"
 	case get = "GET"
@@ -58,6 +62,9 @@ enum ServerErrorCode: String, Codable {
 	case offline
 	case passGenerationFailed
 	case passRevoked
+	case profileStorageCapacityReached
+	case profileStorageWriteBudgetReached
+	case profileStorageOperationBudgetReached
 	case rateLimited
 	case sessionExpired
 	case timetableConflict
@@ -293,7 +300,9 @@ final class NetworkManager {
 		}
 
 		if body != nil {
-			request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+			if request.value(forHTTPHeaderField: "Content-Type") == nil {
+				request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+			}
 			request.httpBody = body
 		}
 
@@ -406,6 +415,10 @@ final class NetworkManager {
 				where statusCode == 404 || response.code == .notFound || response.code == .accountNotFound:
 					throw error
 
+				case let .server(statusCode, _) where statusCode == 403:
+					NotificationCenter.default.post(name: .administrationAuthorityInvalidated, object: nil)
+					throw error
+
 				default:
 					PrintError(
 						"Request failed for \(endpoint.method.rawValue) \(endpoint.path) [request_id=\(requestID)]",
@@ -502,6 +515,14 @@ final class NetworkManager {
 		body: some Encodable & Sendable
 	) async throws -> Response {
 		try await send(endpoint, body: body)
+	}
+
+	func upload<Response: Decodable & Sendable>(
+		_ endpoint: Endpoint,
+		data: Data,
+		context: NetworkRequestContext = .userInitiated
+	) async throws -> Response {
+		try await decode(execute(endpoint, body: data, context: context))
 	}
 
 	// MARK: - Downloads

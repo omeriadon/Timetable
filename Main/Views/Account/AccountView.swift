@@ -63,8 +63,19 @@ struct AccountView: View {
 	@ContentBuilder
 	private func accountRows(profile: AccountProfile) -> some View {
 		Section("Profile") {
-			Button("Edit Profile", systemImage: "person.crop.circle.badge.pencil") {
+			Button {
 				showsProfileEditor = true
+			} label: {
+				HStack(spacing: 12) {
+					ProfilePicture(
+						appearance: profile.appearance,
+						photo: profile.photo,
+						size: 44,
+						badges: profile.badges,
+						accessibilityName: profile.displayName
+					)
+					Label("Edit Profile", systemImage: "pencil")
+				}
 			}
 			.matchedTransitionSource(id: "account-profile-editor", in: profileNamespace)
 			#if os(iOS)

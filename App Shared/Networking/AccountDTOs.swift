@@ -20,6 +20,9 @@ nonisolated struct UserProfileResponse: Codable {
 	let displayName: String
 	let createdAt: Date?
 	let authority: AccountAuthority
+	let appearance: ProfileAppearance
+	let photo: ProfilePhotoMetadata?
+	let badges: [ProfileBadge]
 
 	private enum CodingKeys: String, CodingKey {
 		case id
@@ -27,6 +30,9 @@ nonisolated struct UserProfileResponse: Codable {
 		case displayName
 		case createdAt
 		case authority
+		case appearance
+		case photo
+		case badges
 	}
 
 	init(from decoder: any Decoder) throws {
@@ -36,6 +42,9 @@ nonisolated struct UserProfileResponse: Codable {
 		displayName = try container.decode(String.self, forKey: .displayName)
 		createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt)
 		authority = try container.decodeIfPresent(AccountAuthority.self, forKey: .authority) ?? .user
+		appearance = try container.decodeIfPresent(ProfileAppearance.self, forKey: .appearance) ?? .default
+		photo = try container.decodeIfPresent(ProfilePhotoMetadata.self, forKey: .photo)
+		badges = try container.decodeIfPresent([ProfileBadge].self, forKey: .badges) ?? []
 	}
 }
 
@@ -154,6 +163,9 @@ nonisolated struct AdministrationUserResponse: Codable, Identifiable, Sendable, 
 	let email: String?
 	let createdAt: Date?
 	let authority: AccountAuthority
+	let appearance: ProfileAppearance
+	let photo: ProfilePhotoMetadata?
+	let badges: [ProfileBadge]
 
 	private enum CodingKeys: String, CodingKey {
 		case id
@@ -161,6 +173,9 @@ nonisolated struct AdministrationUserResponse: Codable, Identifiable, Sendable, 
 		case email
 		case createdAt
 		case authority
+		case appearance
+		case photo
+		case badges
 	}
 
 	init(from decoder: any Decoder) throws {
@@ -170,6 +185,9 @@ nonisolated struct AdministrationUserResponse: Codable, Identifiable, Sendable, 
 		email = try container.decodeIfPresent(String.self, forKey: .email)
 		createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt)
 		authority = try container.decodeIfPresent(AccountAuthority.self, forKey: .authority) ?? .user
+		appearance = try container.decodeIfPresent(ProfileAppearance.self, forKey: .appearance) ?? .default
+		photo = try container.decodeIfPresent(ProfilePhotoMetadata.self, forKey: .photo)
+		badges = try container.decodeIfPresent([ProfileBadge].self, forKey: .badges) ?? []
 	}
 }
 
@@ -183,6 +201,16 @@ nonisolated struct ServerAccessModeUpdateRequest: Codable, Sendable {
 
 nonisolated struct ServerAccessModeResponse: Codable, Sendable {
 	let developmentAccessOnly: Bool
+}
+
+nonisolated struct ProfileStorageQuotaResponse: Codable, Sendable {
+	let storedBytes: Int64
+	let reservedBytes: Int64
+	let storageLimitBytes: Int64
+	let monthlyOperations: Int
+	let monthlyOperationLimit: Int
+	let monthlyWriteCutoff: Int
+	let writesDisabled: Bool
 }
 
 nonisolated enum AdministrationEventTagCategory: String, Codable, CaseIterable, Sendable, Identifiable {
@@ -517,5 +545,8 @@ extension AccountProfile {
 		displayName = response.displayName
 		createdAt = response.createdAt
 		authority = response.authority
+		appearance = response.appearance
+		photo = response.photo
+		badges = response.badges
 	}
 }

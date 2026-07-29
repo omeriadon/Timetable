@@ -49,20 +49,33 @@ struct AdministrationAdministratorsView: View {
 	@ViewBuilder
 	private func administratorRow(for user: AdministrationUserResponse) -> some View {
 		if user.authority == .systemOwner {
-			Label {
+			HStack {
+				ProfilePicture(
+					appearance: user.appearance,
+					photo: user.photo,
+					size: 44,
+					badges: user.badges,
+					accessibilityName: user.displayName
+				)
+
 				VStack(alignment: .leading) {
 					Text(user.displayName)
 					Text("Permanent Owner")
 						.font(.footnote)
 						.foregroundStyle(.secondary)
 				}
-			} icon: {
-				Image(systemName: "crown.fill")
-					.foregroundStyle(.yellow)
 			}
 		} else {
 			Toggle(isOn: administratorBinding(for: user)) {
-				Label {
+				HStack {
+					ProfilePicture(
+						appearance: user.appearance,
+						photo: user.photo,
+						size: 44,
+						badges: user.badges,
+						accessibilityName: user.displayName
+					)
+
 					VStack(alignment: .leading) {
 						Text(user.displayName)
 
@@ -72,8 +85,6 @@ struct AdministrationAdministratorsView: View {
 								.foregroundStyle(.secondary)
 						}
 					}
-				} icon: {
-					Image(systemName: "person.badge.shield.checkmark")
 				}
 			}
 			.disabled(isUpdating)
@@ -116,6 +127,11 @@ struct AdministrationAdministratorsView: View {
 			}
 
 			users[index] = updatedUser
+			await load()
+			NotificationCenter.default.post(
+				name: .administrationDashboardRefreshRequested,
+				object: nil
+			)
 		}
 	}
 }

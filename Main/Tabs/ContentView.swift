@@ -52,6 +52,11 @@ import SwiftUI
 			.onReceive(NotificationCenter.default.publisher(for: .openTimetableTab)) { _ in
 				selectedTab = .timetable
 			}
+			.onReceive(NotificationCenter.default.publisher(for: .administrationAuthorityInvalidated)) { _ in
+				Task {
+					_ = try? await SessionStore.shared.refreshProfile()
+				}
+			}
 			.task {
 				networkManager.startMonitoring()
 			}

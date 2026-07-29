@@ -68,6 +68,12 @@ struct AdministrationView: View {
 								} label: {
 									Label("Debug Testing", systemImage: "testtube.2")
 								}
+
+								NavigationLink {
+									AdministrationProfileStorageView()
+								} label: {
+									Label("Profile Storage", systemImage: "externaldrive.fill")
+								}
 							}
 						}
 					}
@@ -87,6 +93,11 @@ struct AdministrationView: View {
 			.refreshable {
 				await load()
 			}
+			.onReceive(NotificationCenter.default.publisher(for: .administrationDashboardRefreshRequested)) { _ in
+				Task {
+					await load()
+				}
+			}
 		}
 	}
 
@@ -101,4 +112,8 @@ struct AdministrationView: View {
 			badges.present(error: error, title: "Unable to refresh administration")
 		}
 	}
+}
+
+extension Notification.Name {
+	static let administrationDashboardRefreshRequested = Notification.Name("administrationDashboardRefreshRequested")
 }

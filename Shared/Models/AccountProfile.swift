@@ -14,6 +14,9 @@ struct AccountProfile: Codable, Defaults.Serializable, Hashable {
 	let displayName: String
 	let createdAt: Date?
 	let authority: AccountAuthority
+	let appearance: ProfileAppearance
+	let photo: ProfilePhotoMetadata?
+	let badges: [ProfileBadge]
 
 	private enum CodingKeys: String, CodingKey {
 		case id
@@ -21,6 +24,9 @@ struct AccountProfile: Codable, Defaults.Serializable, Hashable {
 		case displayName
 		case createdAt
 		case authority
+		case appearance
+		case photo
+		case badges
 	}
 
 	init(from decoder: any Decoder) throws {
@@ -30,5 +36,8 @@ struct AccountProfile: Codable, Defaults.Serializable, Hashable {
 		displayName = try container.decode(String.self, forKey: .displayName)
 		createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt)
 		authority = try container.decodeIfPresent(AccountAuthority.self, forKey: .authority) ?? .user
+		appearance = try container.decodeIfPresent(ProfileAppearance.self, forKey: .appearance) ?? .default
+		photo = try container.decodeIfPresent(ProfilePhotoMetadata.self, forKey: .photo)
+		badges = try container.decodeIfPresent([ProfileBadge].self, forKey: .badges) ?? []
 	}
 }

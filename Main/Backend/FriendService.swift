@@ -29,8 +29,10 @@ final class FriendService {
 			let result = try await (friends, requests, profile)
 			Defaults[.friends] = result.0
 			Defaults[.incomingFriendRequests] = result.1
-			if let appearanceData = result.2.appearanceData,
-			   let appearance = try? JSONDecoder().decode(ProfileAppearance.self, from: appearanceData)
+			if let appearance = result.2.appearance {
+				Defaults[.profileAppearance] = appearance
+			} else if let appearanceData = result.2.appearanceData,
+					  let appearance = try? JSONDecoder().decode(ProfileAppearance.self, from: appearanceData)
 			{
 				Defaults[.profileAppearance] = appearance
 			}
@@ -93,13 +95,36 @@ final class FriendService {
 	}
 
 	func updateProfileAppearance(_ appearance: ProfileAppearance) async throws {
-		let appearanceData = try JSONEncoder().encode(appearance)
-		let _: FriendProfile = try await networkManager.send(
+		let profile: FriendProfile = try await networkManager.send(
 			.v1FriendProfileUpdate,
-			body: FriendProfileAppearanceUpdateRequest(appearanceData: appearanceData),
+			body: FriendProfileAppearanceUpdateRequest(appearance: appearance),
 			context: .userInitiated
 		)
-		Defaults[.profileAppearance] = appearance
+		Defaults[.profileAppearance] = profile.appearance ?? appearance
+		WidgetCenter.shared.reloadAllTimelines()
+	}
+
+	func saveProfile(_ draft: ProfileAppearanceDraft) async throws -> AccountProfile {
+		if draft.displayName != Defaults[.accountProfile]?.displayName {
+			_ = try await SessionStore.shared.updateProfile(displayName: draft.displayName)
+		}
+
+		if let pendingPhotoData = draft.pendingPhotoData {
+			let _: FriendProfile = try await networkManager.upload(
+				.v1FriendProfilePhoto,
+				data: pendingPhotoData
+			)
+		}
+
+		try await updateProfileAppearance(draft.appearance)
+
+		if draft.removesPhoto {
+			try await networkManager.send(.v1FriendProfilePhotoDelete, context: .userInitiated)
+		}
+
+		let profile = try await SessionStore.shared.refreshProfile()
+		try await refresh()
+		return profile
 	}
 }
 
@@ -109,6 +134,12 @@ private extension Endpoint {
 	static let v1FriendRequests = Endpoint("/v1/friends/requests", method: .post)
 	static let v1FriendProfile = Endpoint("/v1/friends/profile")
 	static let v1FriendProfileUpdate = Endpoint("/v1/friends/profile", method: .put)
+	static let v1FriendProfilePhoto = Endpoint(
+		"/v1/friends/profile/photo",
+		method: .put,
+		headers: ["Content-Type": "image/jpeg"]
+	)
+	static let v1FriendProfilePhotoDelete = Endpoint("/v1/friends/profile/photo", method: .delete)
 
 	static func v1FriendSearch(schoolEmail: String) -> Endpoint {
 		Endpoint("/v1/friends/search", queryItems: [URLQueryItem(name: "q", value: schoolEmail)])
