@@ -129,11 +129,12 @@ nonisolated struct AdministrationCalendarEntry: Codable, Identifiable, Sendable 
 nonisolated struct AdministrationCalendarEntryRequest: Codable, Sendable { let kind: String; let label: String; let startDate: SchoolCalendarDate; let endDate: SchoolCalendarDate? }
 nonisolated struct BroadcastNotificationRequest: Codable, Sendable {
 	let title: String
-	let subtitle: String
-	let body: String
+	let subtitle: String?
+	let body: String?
 }
 
 nonisolated struct BroadcastNotificationResponse: Codable, Sendable {
+	let id: UUID?
 	let eligibleDeviceCount: Int
 	let deliveredDeviceCount: Int
 	let invalidatedDeviceCount: Int

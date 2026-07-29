@@ -21,8 +21,6 @@ struct AdministrationBroadcastNotificationView: View {
 				}
 				.disabled(
 					title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-						|| subtitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-						|| notifBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
 				)
 				.buttonStyle(.glassProminent)
 			}
@@ -32,12 +30,19 @@ struct AdministrationBroadcastNotificationView: View {
 	private func send() {
 		let request = BroadcastNotificationRequest(
 			title: title,
-			subtitle: subtitle,
-			body: notifBody
+			subtitle: subtitle.nilIfEmpty,
+			body: notifBody.nilIfEmpty
 		)
 
 		Task {
 			try? await service.broadcastNotification(request)
 		}
+	}
+}
+
+private extension String {
+	var nilIfEmpty: String? {
+		let trimmed = trimmingCharacters(in: .whitespacesAndNewlines)
+		return trimmed.isEmpty ? nil : trimmed
 	}
 }
