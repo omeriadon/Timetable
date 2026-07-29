@@ -580,8 +580,8 @@ Validation boundary:
 - [ ] Restrict email input to the school suffix.
 - [ ] Normalize pasted uppercase or whitespace-padded emails.
 - [ ] Preserve a clear registration/sign-in distinction.
-- [ ] Add verification-code request state.
-- [ ] Add six-digit code entry.
+- [x] Add verification-code request state.
+- [x] Add six-digit code entry.
 - [ ] Show ten-minute expiry.
 - [ ] Disable resend until the two-minute cooldown elapses.
 - [ ] Permit requesting a replacement code after cooldown.

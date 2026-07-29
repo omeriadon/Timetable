@@ -42,6 +42,16 @@ struct AccountAuthenticationView: View {
 				.transition(.blurReplace)
 			}
 
+			if model.mode == .signUp, model.verificationRequested {
+				AccountInputGroup(
+					title: "Verification Code",
+					systemImage: "number.square",
+					text: $model.verificationCode,
+					problems: []
+				)
+				.keyboardType(.numberPad)
+			}
+
 			AccountInputGroup(
 				title: "Email",
 				systemImage: "envelope",
@@ -77,7 +87,7 @@ struct AccountAuthenticationView: View {
 						ProgressView()
 							.transition(.blurReplace)
 					} else {
-						Text(model.mode.rawValue)
+						Text(model.mode == .signUp && !model.verificationRequested ? "Send Code" : model.mode.rawValue)
 							.font(.title3)
 							.transition(.blurReplace)
 					}

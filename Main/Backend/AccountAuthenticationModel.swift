@@ -32,6 +32,8 @@ final class AccountAuthenticationModel {
 	var email = ""
 	var password = ""
 	var passwordConfirmation = ""
+	var verificationCode = ""
+	private(set) var verificationRequested = false
 	private(set) var isSubmitting = false
 	private(set) var didAttemptSubmit = false
 	private(set) var submissionError: String?
@@ -96,11 +98,12 @@ final class AccountAuthenticationModel {
 				case .signIn:
 					try await sessionStore.signIn(email: normalizedEmail, password: password)
 				case .signUp:
-					try await sessionStore.signUp(
-						email: normalizedEmail,
-						password: password,
-						displayName: displayName.trimmingCharacters(in: .whitespacesAndNewlines)
-					)
+					if verificationRequested {
+						try await sessionStore.verifyCodeAndSignUp(email: normalizedEmail, code: verificationCode, password: password)
+					} else {
+						try await sessionStore.requestVerificationCode(email: normalizedEmail)
+						verificationRequested = true
+					}
 			}
 		} catch {
 			StatusBadgeManager.shared.addBadge(id: UUID(), title: "Unable to Sign in", secondaryText: error.localizedDescription, priority: 5, view: .error)
@@ -121,6 +124,6 @@ final class AccountAuthenticationModel {
 	}
 
 	var isAccountDetailsValid: Bool {
-		allProblems.isEmpty
+		allProblems.isEmpty && (mode != .signUp || !verificationRequested || verificationCode.count == 6)
 	}
 }
