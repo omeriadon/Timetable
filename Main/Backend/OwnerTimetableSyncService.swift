@@ -50,6 +50,20 @@ final class OwnerTimetableSyncService {
 		}
 	}
 
+	private enum RecordSyncError: LocalizedError {
+		case missingResult
+		case rejected(String)
+
+		var errorDescription: String? {
+			switch self {
+				case .missingResult:
+					"The server returned an incomplete synchronization response."
+				case let .rejected(message):
+					message
+			}
+		}
+	}
+
 	private init(networkManager: NetworkManager) {
 		self.networkManager = networkManager
 	}
@@ -107,6 +121,7 @@ final class OwnerTimetableSyncService {
 				)
 
 				Defaults[.ownerIsSearchable] = response.isSearchable
+				setOwnerTimetableRevision(response.revision)
 				Defaults[.lastServerSync] = Date.now
 			}
 		}
@@ -203,17 +218,29 @@ final class OwnerTimetableSyncService {
 
 	private func performUpload(subjects: [Subject]?) async throws -> OwnerTimetableResponse {
 		let subjects = subjects ?? Defaults[.timetable]
-
-		let response: OwnerTimetableResponse = try await networkManager.send(
-			.v1OwnerTimetableUpdate,
-			body: OwnerTimetableUpdateRequest(
+		let recordID = UUID(uuidString: Defaults[.ownerTimetableID])
+		let mutation = SyncRecordMutation(
+			mutationID: UUID(),
+			recordType: .ownerTimetable,
+			recordID: recordID,
+			operation: .upsert,
+			baseRevision: Defaults[.syncRecordRevisions].revision(
+				for: .ownerTimetable,
+				recordID: nil
+			),
+			ownerTimetable: OwnerTimetableSyncPayload(
 				subjects: subjects,
-				expectedRevision: nil,
 				isSearchable: Defaults[.ownerIsSearchable]
 			)
 		)
+		var pendingMutations = Defaults[.pendingSyncMutations]
+		pendingMutations.append(mutation)
+		Defaults[.pendingSyncMutations] = pendingMutations
 
-		cache(response)
+		let responses = try await flushPendingMutations()
+		guard let response = responses[mutation.mutationID] else {
+			throw RecordSyncError.missingResult
+		}
 
 		Print("Uploaded owner timetable revision \(response.revision)", category: .network)
 
@@ -236,8 +263,11 @@ final class OwnerTimetableSyncService {
 	}
 
 	private func performReconciliation() async throws {
+		_ = try await flushPendingMutations()
+
 		let response: OwnerTimetableResponse = try await networkManager.send(.v1OwnerTimetable)
 		cacheID(response.id)
+		setOwnerTimetableRevision(response.revision)
 
 		let localTimetable = Defaults[.timetable]
 
@@ -248,24 +278,80 @@ final class OwnerTimetableSyncService {
 			return
 		}
 
-		let updated: OwnerTimetableResponse = try await networkManager.send(
-			.v1OwnerTimetableUpdate,
-			body: OwnerTimetableUpdateRequest(
-				subjects: localTimetable,
-				expectedRevision: response.revision,
-				isSearchable: Defaults[.ownerIsSearchable]
-			)
-		)
-
-		cache(updated)
+		let updated = try await performUpload(subjects: localTimetable)
 
 		Print("Reconciled owner timetable revision \(updated.revision)", category: .network)
+	}
+
+	private func flushPendingMutations() async throws -> [UUID: OwnerTimetableResponse] {
+		var responses: [UUID: OwnerTimetableResponse] = [:]
+
+		while let mutation = Defaults[.pendingSyncMutations].first {
+			let envelope = SyncEnvelopeRequest(
+				requestID: UUID(),
+				installationID: ClientIdentityProvider.shared.identity().installationID,
+				mutations: [mutation]
+			)
+			let response: SyncEnvelopeResponse = try await networkManager.send(
+				.v1RecordSync,
+				body: envelope
+			)
+
+			guard let result = response.results.first(
+				where: { $0.mutationID == mutation.mutationID }
+			) else {
+				throw RecordSyncError.missingResult
+			}
+
+			Defaults[.syncTombstones] = response.tombstones
+			if let ownerTimetable = result.ownerTimetable {
+				cache(ownerTimetable)
+				setOwnerTimetableRevision(result.serverRevision)
+				responses[mutation.mutationID] = ownerTimetable
+			}
+
+			switch result.outcome {
+				case .accepted, .invalidReferenceDropped, .serverRecordNewer:
+					removePendingMutation(mutation.mutationID)
+				case .deletedOnServer:
+					removePendingMutation(mutation.mutationID)
+					Defaults[.timetable] = []
+					setOwnerTimetableRevision(result.serverRevision)
+				case .authorizationRejected, .validationRejected:
+					removePendingMutation(mutation.mutationID)
+					throw RecordSyncError.rejected(
+						result.message ?? "The server rejected the timetable change."
+					)
+			}
+		}
+
+		Defaults[.lastServerSync] = .now
+		return responses
+	}
+
+	private func removePendingMutation(_ mutationID: UUID) {
+		var pendingMutations = Defaults[.pendingSyncMutations]
+		pendingMutations.removeAll {
+			$0.mutationID == mutationID
+		}
+		Defaults[.pendingSyncMutations] = pendingMutations
+	}
+
+	private func setOwnerTimetableRevision(_ revision: Int) {
+		var revisions = Defaults[.syncRecordRevisions]
+		revisions.setRevision(
+			revision,
+			for: .ownerTimetable,
+			recordID: nil
+		)
+		Defaults[.syncRecordRevisions] = revisions
 	}
 
 	private func cache(_ response: OwnerTimetableResponse) {
 		Defaults[.timetable] = response.subjects
 		Defaults[.ownerIsSearchable] = response.isSearchable
 		cacheID(response.id)
+		setOwnerTimetableRevision(response.revision)
 		Defaults[.lastServerSync] = Date.now
 		Task { await SpotlightIndexer.shared.indexOwnerTimetable() }
 		WidgetCenter.shared.reloadAllTimelines()
@@ -273,6 +359,7 @@ final class OwnerTimetableSyncService {
 }
 
 private extension Endpoint {
+	static let v1RecordSync = Endpoint("/v1/sync", method: .post)
 	static let v1OwnerTimetable = Endpoint("/v1/timetables/owner")
 	static let v1OwnerTimetableUpdate = Endpoint("/v1/timetables/owner", method: .put)
 	static let v1OwnerTimetableVisibility = Endpoint("/v1/timetables/owner/visibility", method: .put)

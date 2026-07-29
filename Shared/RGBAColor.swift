@@ -8,7 +8,7 @@
 import Defaults
 import SwiftUI
 
-nonisolated struct RGBAColor: Codable, Hashable, Defaults.Serializable {
+nonisolated struct RGBAColor: Codable, Hashable, Defaults.Serializable, Sendable {
 	var r: Double
 	var g: Double
 	var b: Double

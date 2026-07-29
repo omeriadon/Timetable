@@ -49,6 +49,21 @@ extension Defaults.Keys {
 	static let installationID = Key<String>("installationID", default: "", suite: sharedDefaults)
 
 	static let lastServerSync = Key<Date?>("lastServerSync", default: nil, suite: sharedDefaults)
+	static let pendingSyncMutations = Key<[SyncRecordMutation]>(
+		"pendingSyncMutations_v1",
+		default: [],
+		suite: sharedDefaults
+	)
+	static let syncRecordRevisions = Key<SyncRecordRevisions>(
+		"syncRecordRevisions_v1",
+		default: .empty,
+		suite: sharedDefaults
+	)
+	static let syncTombstones = Key<[SyncTombstone]>(
+		"syncTombstones_v1",
+		default: [],
+		suite: sharedDefaults
+	)
 	static let receivedNameOverrides = Key<[String: String]>("receivedNameOverrides", default: [:], suite: sharedDefaults)
 	static let timetable = Key<[Subject]>("timetable", default: [], suite: sharedDefaults)
 	static let schoolCalendar = Key<SchoolCalendarProjection>("schoolCalendar", default: .empty, suite: sharedDefaults)

@@ -8,7 +8,7 @@
 import Defaults
 import Foundation
 
-nonisolated struct Subject: Hashable, Codable, Defaults.Serializable, Identifiable, Equatable {
+nonisolated struct Subject: Hashable, Codable, Defaults.Serializable, Identifiable, Equatable, Sendable {
 	var id: String
 	var symbol: String
 	var colour: RGBAColor

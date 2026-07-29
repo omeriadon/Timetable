@@ -5,7 +5,7 @@
 
 import Foundation
 
-nonisolated enum Teacher: Codable, Hashable {
+nonisolated enum Teacher: Codable, Hashable, Sendable {
 	case named(lastName: String)
 	case unknown(rawNotes: String)
 

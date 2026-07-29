@@ -394,7 +394,7 @@ nonisolated struct OwnerTimetableVisibilityUpdateRequest: Codable {
 	let isSearchable: Bool
 }
 
-nonisolated struct OwnerTimetableResponse: Codable {
+nonisolated struct OwnerTimetableResponse: Codable, Sendable {
 	let id: UUID?
 	let subjects: [Subject]
 	let revision: Int

@@ -5,11 +5,11 @@
 
 import Foundation
 
-nonisolated enum Classroom: Codable, Hashable {
+nonisolated enum Classroom: Codable, Hashable, Sendable {
 	case room(building: Building, floor: Floor?, number: Int)
 	case unknown(rawLocation: String)
 
-	nonisolated enum Building: String, Codable, Hashable, CaseIterable {
+	nonisolated enum Building: String, Codable, Hashable, CaseIterable, Sendable {
 		case mills
 		case andrews
 		case beasley
@@ -47,7 +47,7 @@ nonisolated enum Classroom: Codable, Hashable {
 		}
 	}
 
-	nonisolated enum Floor: String, Codable, Hashable, CaseIterable {
+	nonisolated enum Floor: String, Codable, Hashable, CaseIterable, Sendable {
 		case upper
 		case lower
 
