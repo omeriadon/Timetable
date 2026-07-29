@@ -68,7 +68,48 @@ nonisolated struct CreateCalendarEventRequest: Codable, Sendable {
 	let notes: String?
 	let symbol: String
 	let date: SchoolCalendarDate
-	let tagIDs: [UUID] = []
+	let tagIDs: [UUID]
+
+	init(
+		title: String,
+		notes: String?,
+		symbol: String,
+		date: SchoolCalendarDate,
+		tagIDs: [UUID] = []
+	) {
+		self.title = title
+		self.notes = notes
+		self.symbol = symbol
+		self.date = date
+		self.tagIDs = tagIDs
+	}
+}
+
+nonisolated struct EventTagCatalogueResponse: Codable, Sendable {
+	let sections: [EventTagCatalogueSection]
+}
+
+nonisolated struct EventTagCatalogueSection: Codable, Identifiable, Sendable {
+	let id: UUID
+	let category: AdministrationEventTagCategory
+	let displayName: String
+	let tags: [EventTagCatalogueTag]
+}
+
+nonisolated struct EventTagCatalogueTag: Codable, Identifiable, Sendable {
+	let id: UUID
+	let displayName: String
+	let category: AdministrationEventTagCategory
+	let symbol: String?
+	let colorHex: String?
+}
+
+nonisolated struct EventTagSubscriptionResponse: Codable, Sendable {
+	let tagIDs: [UUID]
+}
+
+nonisolated struct EventTagSubscriptionUpdateRequest: Codable, Sendable {
+	let tagIDs: [UUID]
 }
 
 nonisolated struct AdministrationDashboardResponse: Codable, Sendable {

@@ -64,9 +64,11 @@ struct AdministrationEventTagEditor: View {
 					}
 				}
 
-				Section("Associated Names") {
+				Section {
 					TextEditor(text: $associatedNames)
 						.frame(minHeight: 110)
+				} header: {
+					Text("Associated Names")
 				} footer: {
 					Text("One alternate name per line. The display name is always included.")
 				}

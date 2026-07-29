@@ -152,6 +152,14 @@ import WidgetKit
 
 			Section("Preferences") {
 				if sessionStore.isAuthenticated {
+					NavigationLink {
+						TagSubscriptionsView()
+					} label: {
+						Label("Event Tags", systemImage: "tag")
+					}
+				}
+
+				if sessionStore.isAuthenticated {
 					NavigationLink { AccountAndSyncSettingsView() } label: { Label("Updates & Notifications", systemImage: "switch.2") }
 				} else {
 					Button { showSignInRequired() } label: { Label("Updates", systemImage: "switch.2") }

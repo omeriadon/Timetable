@@ -12,6 +12,22 @@ final class AdministrationService {
 		try await networkManager.send(.v1Administration)
 	}
 
+	func tagCatalogue() async throws -> EventTagCatalogueResponse {
+		try await networkManager.send(.v1Tags)
+	}
+
+	func tagSubscriptions() async throws -> EventTagSubscriptionResponse {
+		try await networkManager.send(.v1TagSubscriptions)
+	}
+
+	func replaceTagSubscriptions(_ tagIDs: Set<UUID>) async throws -> EventTagSubscriptionResponse {
+		try await networkManager.send(
+			.v1TagSubscriptionsUpdate,
+			body: EventTagSubscriptionUpdateRequest(tagIDs: Array(tagIDs)),
+			context: .userInitiated
+		)
+	}
+
 	func users() async throws -> [AdministrationUserResponse] {
 		try await networkManager.send(.v1AdministrationUsers)
 	}
@@ -140,4 +156,7 @@ private extension Endpoint {
 	static let v1AdministrationEventTags = Endpoint("/v1/administration/event-tags")
 	static let v1AdministrationEventTagsCreate = Endpoint("/v1/administration/event-tags", method: .post)
 	static let v1AdministrationEventTagSectionsCreate = Endpoint("/v1/administration/event-tags/sections", method: .post)
+	static let v1Tags = Endpoint("/v1/tags")
+	static let v1TagSubscriptions = Endpoint("/v1/tags/subscriptions")
+	static let v1TagSubscriptionsUpdate = Endpoint("/v1/tags/subscriptions", method: .put)
 }
