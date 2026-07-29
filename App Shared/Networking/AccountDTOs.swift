@@ -115,6 +115,14 @@ nonisolated struct AdministrationUserAuthorityUpdateRequest: Codable, Sendable {
 	let authority: AccountAuthority
 }
 
+nonisolated struct ServerAccessModeUpdateRequest: Codable, Sendable {
+	let developmentAccessOnly: Bool
+}
+
+nonisolated struct ServerAccessModeResponse: Codable, Sendable {
+	let developmentAccessOnly: Bool
+}
+
 nonisolated struct AdministrationUserCreateRequest: Codable, Sendable {
 	let displayName: String
 	let email: String

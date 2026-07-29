@@ -28,6 +28,24 @@ final class AdministrationService {
 		)
 	}
 
+	func serverAccessMode(controlToken: String) async throws -> ServerAccessModeResponse {
+		try await networkManager.send(
+			serverAccessModeEndpoint(method: .get, controlToken: controlToken),
+			context: .userInitiated
+		)
+	}
+
+	func updateServerAccessMode(
+		developmentAccessOnly: Bool,
+		controlToken: String
+	) async throws -> ServerAccessModeResponse {
+		try await networkManager.send(
+			serverAccessModeEndpoint(method: .put, controlToken: controlToken),
+			body: ServerAccessModeUpdateRequest(developmentAccessOnly: developmentAccessOnly),
+			context: .userInitiated
+		)
+	}
+
 	func createUser(request: AdministrationUserCreateRequest) async throws -> AdministrationUserResponse {
 		try await networkManager.send(.v1AdministrationUsersCreate, body: request, context: .userInitiated)
 	}
@@ -54,6 +72,15 @@ final class AdministrationService {
 
 	func delete(id: UUID) async throws -> [AdministrationCalendarEntry] {
 		try await networkManager.send(Endpoint("/v1/administration/calendar/\(id.uuidString)", method: .delete), context: .userInitiated)
+	}
+
+	private func serverAccessModeEndpoint(method: HTTPMethod, controlToken: String) -> Endpoint {
+		Endpoint(
+			"/_operations/server-access-mode",
+			method: method,
+			requiresAuthentication: false,
+			headers: ["X-PMSTT-Access-Mode-Token": controlToken]
+		)
 	}
 }
 

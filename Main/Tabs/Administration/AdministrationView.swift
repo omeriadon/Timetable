@@ -3,6 +3,7 @@ import SwiftUI
 struct AdministrationView: View {
 	@State private var service = AdministrationService.shared
 	@State private var isAdmin = false
+	@State private var authority: AccountAuthority = .user
 
 	var body: some View {
 		NavigationStack {
@@ -40,7 +41,24 @@ struct AdministrationView: View {
 								Label("Broadcast Notification", systemImage: "megaphone")
 							}
 						}
+
+						if authority == .systemOwner {
+							Section("Owner Administration") {
+								NavigationLink {
+									AdministrationAdministratorsView()
+								} label: {
+									Label("Administrators", systemImage: "person.badge.shield.checkmark")
+								}
+
+								NavigationLink {
+									AdministrationDevelopmentAccessView()
+								} label: {
+									Label("Debug Testing", systemImage: "testtube.2")
+								}
+							}
+						}
 					}
+					.scrollEdgeEffect()
 				} else {
 					ContentUnavailableView(
 						"Administration Unavailable",
@@ -60,8 +78,10 @@ struct AdministrationView: View {
 		do {
 			let dashboard = try await service.dashboard()
 			isAdmin = dashboard.isAdmin
+			authority = dashboard.authority
 		} catch {
 			isAdmin = false
+			authority = .user
 		}
 	}
 }

@@ -27,17 +27,20 @@ struct Endpoint {
 	let method: HTTPMethod
 	let queryItems: [URLQueryItem]
 	let requiresAuthentication: Bool
+	let headers: [String: String]
 
 	init(
 		_ path: String,
 		method: HTTPMethod = .get,
 		queryItems: [URLQueryItem] = [],
-		requiresAuthentication: Bool = true
+		requiresAuthentication: Bool = true,
+		headers: [String: String] = [:]
 	) {
 		self.path = path
 		self.method = method
 		self.queryItems = queryItems
 		self.requiresAuthentication = requiresAuthentication
+		self.headers = headers
 	}
 }
 
@@ -281,6 +284,10 @@ final class NetworkManager {
 
 		request.setValue(UUID().uuidString, forHTTPHeaderField: "X-Request-ID")
 		request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+		for (field, value) in endpoint.headers {
+			request.setValue(value, forHTTPHeaderField: field)
+		}
 
 		if body != nil {
 			request.setValue("application/json", forHTTPHeaderField: "Content-Type")
