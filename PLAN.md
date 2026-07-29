@@ -1125,7 +1125,7 @@ Validation boundary:
 
 - [ ] Activate R2 in the Cloudflare dashboard.
 - [ ] Create a private Standard bucket named `timetable-profile-images` or another approved lowercase name.
-- [ ] Select the Oceania location hint.
+- [ ] Leave location on Automatic unless the pmstt server’s region makes an explicit location hint preferable.
 - [ ] Leave public development URL access disabled.
 - [ ] Do not attach a public custom domain.
 - [ ] Create an Account API token with Object Read & Write permission.
