@@ -70,8 +70,50 @@ nonisolated struct CreateCalendarEventRequest: Codable, Sendable {
 	let date: SchoolCalendarDate
 }
 
-nonisolated struct AdministrationDashboardResponse: Codable, Sendable { let isAdmin: Bool }
-nonisolated struct AdministrationUserResponse: Codable, Identifiable, Sendable, Equatable { let id: UUID; let displayName: String; let email: String?; let createdAt: Date? }
+nonisolated struct AdministrationDashboardResponse: Codable, Sendable {
+	let isAdmin: Bool
+	let authority: AccountAuthority
+
+	private enum CodingKeys: String, CodingKey {
+		case isAdmin
+		case authority
+	}
+
+	init(from decoder: any Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		isAdmin = try container.decode(Bool.self, forKey: .isAdmin)
+		authority = try container.decodeIfPresent(AccountAuthority.self, forKey: .authority) ?? .user
+	}
+}
+
+nonisolated struct AdministrationUserResponse: Codable, Identifiable, Sendable, Equatable {
+	let id: UUID
+	let displayName: String
+	let email: String?
+	let createdAt: Date?
+	let authority: AccountAuthority
+
+	private enum CodingKeys: String, CodingKey {
+		case id
+		case displayName
+		case email
+		case createdAt
+		case authority
+	}
+
+	init(from decoder: any Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		id = try container.decode(UUID.self, forKey: .id)
+		displayName = try container.decode(String.self, forKey: .displayName)
+		email = try container.decodeIfPresent(String.self, forKey: .email)
+		createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt)
+		authority = try container.decodeIfPresent(AccountAuthority.self, forKey: .authority) ?? .user
+	}
+}
+
+nonisolated struct AdministrationUserAuthorityUpdateRequest: Codable, Sendable {
+	let authority: AccountAuthority
+}
 nonisolated struct AdministrationUserCreateRequest: Codable, Sendable {
 	let displayName: String
 	let email: String

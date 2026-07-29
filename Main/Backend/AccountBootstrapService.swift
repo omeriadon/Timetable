@@ -50,6 +50,9 @@ final class AccountBootstrapService {
 		}
 
 		let task = Task<Void, any Error> { @MainActor in
+			async let account: Void = self.runBootstrapStage("Account") {
+				_ = try await SessionStore.shared.refreshProfile()
+			}
 			async let timetable: Void = self.runBootstrapStage("Owner timetable") {
 				if Platform.current.allowsOwnerMutation {
 					try await self.ownerTimetableSync.reconcileOwnerTimetable()
@@ -73,7 +76,7 @@ final class AccountBootstrapService {
 			async let calendarEvents: Void = self.runBootstrapStage("Calendar events") {
 				try await self.calendarEventsSync.downloadEvents()
 			}
-			_ = await (timetable, settings, friends, created, schoolCalendar, calendarEvents)
+			_ = await (account, timetable, settings, friends, created, schoolCalendar, calendarEvents)
 		}
 		bootstrapTask = task
 		isBootstrapping = true

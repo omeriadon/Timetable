@@ -73,7 +73,7 @@ extension Notification.Name {
 		@Binding var selectedTab: MainTab
 		@Binding var watchSync: PhoneWatchSyncBridge
 		@Binding var rootSyncStatus: SyncMode
-		@Default(.calendarEvents) private var calendarEvents
+		@Default(.accountProfile) private var accountProfile
 
 		func makeCoordinator() -> Coordinator {
 			Coordinator(self)
@@ -91,14 +91,14 @@ extension Notification.Name {
 				UITab(title: "Timetable", image: UIImage(systemName: "calendar.day.timeline.left"), identifier: "timetable") { _ in
 					UIHostingController(rootView: TimetableView(watchSync: $watchSync, syncStatus: $rootSyncStatus))
 				},
-				UITab(title: "Settings", image: UIImage(systemName: "gear"), identifier: "settings") { _ in
-					UIHostingController(rootView: SettingsView(watchSync: watchSync, syncStatus: $rootSyncStatus))
-				},
 				UITab(title: "Friends", image: UIImage(systemName: "person.2"), identifier: "friends") { _ in
 					UIHostingController(rootView: FriendsView())
 				},
+				UITab(title: "Settings", image: UIImage(systemName: "gear"), identifier: "settings") { _ in
+					UIHostingController(rootView: SettingsView(watchSync: watchSync, syncStatus: $rootSyncStatus))
+				},
 			]
-			if calendarEvents.canManageGlobalEvents {
+			if canShowAdministration {
 				tabs.append(UITab(title: "Admin", image: UIImage(systemName: "calendar.badge.lock"), identifier: "administration") { _ in
 					UIHostingController(rootView: AdministrationView())
 				})
@@ -112,8 +112,8 @@ extension Notification.Name {
 		func updateUIViewController(_ tabBarController: UITabBarController, context: Context) {
 			context.coordinator.parent = self
 			let hasAdministrationTab = tabBarController.tabs.contains { $0.identifier == "administration" }
-			if calendarEvents.canManageGlobalEvents != hasAdministrationTab {
-				if calendarEvents.canManageGlobalEvents {
+			if canShowAdministration != hasAdministrationTab {
+				if canShowAdministration {
 					tabBarController.tabs.append(UITab(title: "Admin", image: UIImage(systemName: "calendar.badge.lock"), identifier: "administration") { _ in
 						UIHostingController(rootView: AdministrationView())
 					})
@@ -125,6 +125,10 @@ extension Notification.Name {
 				}
 			}
 			context.coordinator.selectTabIfRequested(selectedTab)
+		}
+
+		private var canShowAdministration: Bool {
+			accountProfile?.authority.isAdministrator ?? false
 		}
 
 		@MainActor

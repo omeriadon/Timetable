@@ -20,6 +20,14 @@ final class AdministrationService {
 		try await networkManager.send(Endpoint("/v1/administration/users/\(id.uuidString)", method: .put), body: request, context: .userInitiated)
 	}
 
+	func updateUserAuthority(id: UUID, authority: AccountAuthority) async throws -> AdministrationUserResponse {
+		try await networkManager.send(
+			Endpoint("/v1/administration/users/\(id.uuidString)/authority", method: .put),
+			body: AdministrationUserAuthorityUpdateRequest(authority: authority),
+			context: .userInitiated
+		)
+	}
+
 	func createUser(request: AdministrationUserCreateRequest) async throws -> AdministrationUserResponse {
 		try await networkManager.send(.v1AdministrationUsersCreate, body: request, context: .userInitiated)
 	}
