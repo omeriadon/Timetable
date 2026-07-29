@@ -764,11 +764,11 @@ Validation boundary:
 
 ### 11.1 Navigation and initial state
 
-- [ ] Remove the profile editor entry from Friends.
-- [ ] Add Profile under Settings > Account.
-- [ ] Present it using the host Settings namespace and a unique matched transition source.
-- [ ] Use `.appNavigationTitle`.
-- [ ] Apply `.scrollEdgeEffect()`.
+- [x] Remove the profile editor entry from Friends.
+- [x] Add Profile under Settings > Account.
+- [x] Present it using the host Settings namespace and a unique matched transition source.
+- [x] Use `.appNavigationTitle`.
+- [x] Apply `.scrollEdgeEffect()`.
 - [ ] Load the saved appearance before presenting editable controls where possible.
 - [ ] Initialize local editor state from the cached authoritative profile in `init` or a dedicated model.
 - [ ] Eliminate the visible default-icon-to-owned-icon animation.
@@ -863,29 +863,29 @@ Validation boundary:
 
 ### 12.1 Main Friends list
 
-- [ ] Replace `.navigationTitle("Friends")` with `.appNavigationTitle("Friends")`.
-- [ ] Apply `.scrollEdgeEffect()`.
-- [ ] Keep refreshable behavior.
-- [ ] Remove the Profile toolbar button.
+- [x] Replace `.navigationTitle("Friends")` with `.appNavigationTitle("Friends")`.
+- [x] Apply `.scrollEdgeEffect()`.
+- [x] Keep refreshable behavior.
+- [x] Remove the Profile toolbar button.
 - [ ] Preserve friend-request and add-friend matched transitions.
 - [ ] Replace current brown paper with white paper.
 - [ ] Clip the paper image using the established Today/Planner card technique.
 - [ ] Prevent a resizable paper image from claiming the full screen or row proposal.
 - [ ] Use the reusable profile-picture component.
-- [ ] Remove the disclosure chevron if sheet presentation no longer implies navigation.
-- [ ] Make the entire visible card the only hit target.
-- [ ] Present friend details as a matched-transition sheet from the row.
-- [ ] Give each friend row a stable unique transition ID.
+- [x] Remove the disclosure chevron if sheet presentation no longer implies navigation.
+- [x] Make the entire visible card the only hit target.
+- [x] Present friend details as a matched-transition sheet from the row.
+- [x] Give each friend row a stable unique transition ID.
 
 ### 12.2 Friend row content
 
-- [ ] Preserve current-class prominence.
-- [ ] Render next class slightly smaller.
-- [ ] Apply `.secondary` foreground style to next class.
-- [ ] Prefix it with `Next:`.
-- [ ] Avoid a double prefix when `FriendScheduleStatus` already returns `Next:`.
+- [x] Preserve current-class prominence.
+- [x] Render next class slightly smaller.
+- [x] Apply `.secondary` foreground style to next class.
+- [x] Prefix it with `Next:`.
+- [x] Avoid a double prefix when `FriendScheduleStatus` already returns `Next:`.
 - [ ] Keep live school/activity status.
-- [ ] Remove redundant relationship labels.
+- [x] Remove redundant relationship labels.
 - [ ] Keep the row readable at fixed medium Dynamic Type only if explicitly retained for this surface.
 
 ### 12.3 Drag reordering

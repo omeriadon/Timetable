@@ -83,7 +83,8 @@ struct ProfileAppearanceSheet: View {
 				}
 				.padding()
 			}
-			.navigationTitle("Profile")
+			.scrollEdgeEffect()
+			.appNavigationTitle("Profile", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {

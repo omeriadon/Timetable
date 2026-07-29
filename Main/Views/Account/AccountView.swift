@@ -12,7 +12,9 @@ struct AccountView: View {
 	@State private var sessionStore = SessionStore.shared
 	@Default(.userDisplayName) private var displayName
 	@State private var showDeleteConfirmation = false
+	@State private var showsProfileEditor = false
 	@State private var isDeleting = false
+	@Namespace private var profileNamespace
 	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
@@ -49,12 +51,22 @@ struct AccountView: View {
 		} message: {
 			Text("This permanently deletes your account and server data.")
 		}
+		.sheet(isPresented: $showsProfileEditor) {
+			ProfileAppearanceSheet()
+				.navigationTransition(.zoom(sourceID: "account-profile-editor", in: profileNamespace))
+				.presentationDetents([.fraction(0.7)])
+				.presentationDragIndicator(.hidden)
+		}
 		.animation(.easeInOut, value: sessionStore.state)
 	}
 
 	@ContentBuilder
 	private func accountRows(profile: AccountProfile) -> some View {
 		Section("Profile") {
+			Button("Edit Profile", systemImage: "person.crop.circle.badge.pencil") {
+				showsProfileEditor = true
+			}
+			.matchedTransitionSource(id: "account-profile-editor", in: profileNamespace)
 			#if os(iOS)
 				LabeledContent("Name") {
 					TextField("Name", text: $displayName)

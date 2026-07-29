@@ -23,16 +23,9 @@ struct FriendsView: View {
 					friendSearchResults
 				}
 			}
-			.navigationTitle("Friends")
-			.navigationBarTitleDisplayMode(.inline)
+			.scrollEdgeEffect()
+			.appNavigationTitle("Friends", accent: true)
 			.toolbar {
-				ToolbarItem(placement: .topBarLeading) {
-					Button("Profile", systemImage: "person.crop.circle") {
-						sheet = .profile
-					}
-					.matchedTransitionSource(id: FriendsSheet.profile.transitionID, in: sheetNamespace)
-				}
-
 				ToolbarItemGroup(placement: .topBarTrailing) {
 					Button("Friend requests", systemImage: incomingFriendRequests.isEmpty ? "bell" : "bell.badge") {
 						sheet = .requests
@@ -62,11 +55,6 @@ struct FriendsView: View {
 						FriendRequestsSheet()
 							.navigationTransition(.zoom(sourceID: sheet.transitionID, in: sheetNamespace))
 							.presentationDetents([.fraction(0.6)])
-							.presentationDragIndicator(.hidden)
-					case .profile:
-						ProfileAppearanceSheet()
-							.navigationTransition(.zoom(sourceID: sheet.transitionID, in: sheetNamespace))
-							.presentationDetents([.fraction(0.7)])
 							.presentationDragIndicator(.hidden)
 				}
 			}
@@ -217,7 +205,6 @@ private struct FriendOrderDropDelegate: DropDelegate {
 private enum FriendsSheet: String, Identifiable {
 	case addFriend
 	case requests
-	case profile
 
 	var id: String {
 		rawValue

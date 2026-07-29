@@ -21,17 +21,14 @@ struct FriendStatusCard: View {
 							.foregroundStyle(status.tint)
 					}
 
-					Text("Now: \(status.title)")
+					Text(status.title)
 						.font(.body)
 						.contentTransition(.numericText())
-					Text(status.nextTitle)
+					Text(nextClassTitle)
 						.font(.callout)
 						.foregroundStyle(.secondary)
 				}
 
-				Image(systemName: "chevron.right")
-					.font(.headline)
-					.foregroundStyle(.secondary)
 			}
 			.padding(18)
 			.frame(minHeight: 132)
@@ -40,6 +37,13 @@ struct FriendStatusCard: View {
 			.contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
 			.animation(.bouncy, value: status.title)
 		}
+	}
+
+	private var nextClassTitle: String {
+		if status.nextTitle.hasPrefix("Next:") || status.nextTitle == "No upcoming classes" {
+			return status.nextTitle
+		}
+		return "Next: \(status.nextTitle)"
 	}
 }
 
