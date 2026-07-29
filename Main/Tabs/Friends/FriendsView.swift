@@ -70,8 +70,14 @@ struct FriendsView: View {
 							.presentationDragIndicator(.hidden)
 				}
 			}
-			.navigationDestination(item: $selectedFriend) { friend in
+			.sheet(item: $selectedFriend) { friend in
 				FriendDetailView(friend: friend)
+					.navigationTransition(
+						.zoom(
+							sourceID: friendTransitionID(friend),
+							in: sheetNamespace
+						)
+					)
 			}
 		}
 		.dynamicTypeSize(.medium)
@@ -95,6 +101,10 @@ struct FriendsView: View {
 							FriendStatusCard(friend: friend)
 						}
 						.buttonStyle(.plain)
+						.matchedTransitionSource(
+							id: friendTransitionID(friend),
+							in: sheetNamespace
+						)
 						.onDrag {
 							draggedFriend = friend
 							return NSItemProvider(object: friend.id.uuidString as NSString)
@@ -166,6 +176,10 @@ struct FriendsView: View {
 				try? await service.refresh()
 			}
 		}
+	}
+
+	private func friendTransitionID(_ friend: FriendSummary) -> String {
+		"friend-\(friend.id.uuidString)"
 	}
 }
 

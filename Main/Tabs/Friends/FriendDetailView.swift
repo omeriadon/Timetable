@@ -6,6 +6,7 @@ struct FriendDetailView: View {
 	@State private var service = FriendService.shared
 	@State private var selectedTab = FriendDetailTab.main
 	@State private var action: FriendAction?
+	@State private var showsReportConfirmation = false
 	@State private var isLoading = true
 	@Environment(\.dismiss) private var dismiss
 	@Environment(\.statusBadgeManager) private var badges
@@ -39,8 +40,8 @@ struct FriendDetailView: View {
 			}
 			.padding()
 		}
-		.navigationTitle(friend.friend.displayName)
-		.navigationBarTitleDisplayMode(.inline)
+		.scrollEdgeEffect()
+		.appNavigationTitle(friend.friend.displayName, accent: true)
 		.toolbar {
 			ToolbarItem(placement: .topBarTrailing) {
 				Menu("Friend actions", systemImage: "ellipsis.circle") {
@@ -48,10 +49,7 @@ struct FriendDetailView: View {
 						action = .remove
 					}
 					Button("Report", systemImage: "exclamationmark.bubble", role: .destructive) {
-						report()
-					}
-					Button("Block", systemImage: "hand.raised.fill", role: .destructive) {
-						action = .block
+						showsReportConfirmation = true
 					}
 				}
 			}
@@ -73,6 +71,14 @@ struct FriendDetailView: View {
 		} message: {
 			Text(action?.message ?? "")
 		}
+		.alert("Report Friend?", isPresented: $showsReportConfirmation) {
+			Button("Cancel", role: .cancel) {}
+			Button("Report", role: .destructive) {
+				report()
+			}
+		} message: {
+			Text("This sends a report for review. The friend remains visible in your account.")
+		}
 		.task { await load() }
 	}
 
@@ -88,12 +94,7 @@ struct FriendDetailView: View {
 	private func perform(_ action: FriendAction) {
 		Task {
 			do {
-				switch action {
-					case .remove:
-						try await service.remove(friendID: friend.friend.id)
-					case .block:
-						try await service.block(friendID: friend.friend.id)
-				}
+				try await service.remove(friendID: friend.friend.id)
 				dismiss()
 			} catch {
 				badges.present(error: error, title: "Unable to update friend")
@@ -122,11 +123,6 @@ private struct FriendDetailHeader: View {
 			VStack(alignment: .leading, spacing: 4) {
 				Text(friend.displayName)
 					.font(.title2.weight(.semibold))
-				if let email = friend.email {
-					Text(email)
-						.font(.caption.monospaced())
-						.foregroundStyle(.secondary)
-				}
 			}
 		}
 		.padding(18)
@@ -140,10 +136,6 @@ private struct FriendOverview: View {
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 18) {
-			LabeledContent("Status") {
-				Label("Friend", systemImage: "person.2.fill")
-					.foregroundStyle(.tint)
-			}
 			LabeledContent("Friends since") {
 				Text(detail.acceptedAt, format: .dateTime.month().day().year())
 			}
@@ -200,20 +192,16 @@ private enum FriendDetailTab: CaseIterable, Hashable, Identifiable {
 
 private enum FriendAction {
 	case remove
-	case block
 
 	var title: String {
-		self == .remove ? "Remove Friend" : "Block Friend"
+		"Remove Friend"
 	}
 
 	var symbol: String {
-		self == .remove ? "person.badge.minus" : "hand.raised.fill"
+		"person.badge.minus"
 	}
 
 	var message: String {
-		switch self {
-			case .remove: "This removes the friend and their timetable from your account."
-			case .block: "This removes the friend and prevents future friend requests."
-		}
+		"This removes the friend and their timetable from your account."
 	}
 }

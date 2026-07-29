@@ -491,7 +491,7 @@ Validation boundary:
 - [ ] Add an authenticated pmstt deletion endpoint that updates the profile and then removes superseded R2 data.
 - [ ] Return structured capacity and operation-budget errors from all profile-image endpoints.
 - [ ] Add photo URL/revision and badges to friend and self-profile responses.
-- [ ] Do not include friend email in normal friend responses.
+- [x] Do not include friend email in normal friend responses.
 - [ ] Keep email in authenticated self-account responses and privileged administration responses.
 - [ ] Ensure profile-update requests cannot set badges or authority.
 
@@ -901,20 +901,20 @@ Validation boundary:
 
 ### 12.4 Friend detail sheet
 
-- [ ] Move friend detail presentation from `navigationDestination` to `.sheet(item:)`.
-- [ ] Attach the sheet to the Friends root.
-- [ ] Apply matched zoom transition from the tapped row.
-- [ ] Use `.appNavigationTitle`.
-- [ ] Apply `.scrollEdgeEffect()`.
-- [ ] Keep the General/Week custom segmented control with SF Symbols.
+- [x] Move friend detail presentation from `navigationDestination` to `.sheet(item:)`.
+- [x] Attach the sheet to the Friends root.
+- [x] Apply matched zoom transition from the tapped row.
+- [x] Use `.appNavigationTitle`.
+- [x] Apply `.scrollEdgeEffect()`.
+- [x] Keep the General/Week custom segmented control with SF Symbols.
 - [ ] Preserve live status.
-- [ ] Remove friend email.
-- [ ] Put destructive actions in the intended visible bottom controls or action menu according to final visual implementation.
-- [ ] Use SF Symbols in Remove and Report buttons.
-- [ ] Attach remove confirmation dialog to the detail-sheet root.
-- [ ] Attach report alert to the detail-sheet root.
-- [ ] Remove the existing Block action and related client state.
-- [ ] Keep the approved actions limited to Remove and Report.
+- [x] Remove friend email.
+- [x] Put destructive actions in the intended visible bottom controls or action menu according to final visual implementation.
+- [x] Use SF Symbols in Remove and Report buttons.
+- [x] Attach remove confirmation dialog to the detail-sheet root.
+- [x] Attach report alert to the detail-sheet root.
+- [x] Remove the existing Block action and related client state.
+- [x] Keep the approved actions limited to Remove and Report.
 
 ### 12.5 Exact shared comparison
 
