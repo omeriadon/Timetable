@@ -133,7 +133,9 @@ private struct FriendDetailHeader: View {
 			}
 		}
 		.padding(18)
-		.background(Image("paper").resizable().scaledToFill())
+		.background {
+			FriendPaperBackground(cornerRadius: 26)
+		}
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 26, style: .continuous))
 	}
 }
@@ -204,7 +206,9 @@ private struct FriendOverview: View {
 			}
 		}
 		.padding(18)
-		.background(Image("paper").resizable().scaledToFill())
+		.background {
+			FriendPaperBackground(cornerRadius: 26)
+		}
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 26, style: .continuous))
 	}
 
@@ -468,7 +472,9 @@ private struct FriendWeek: View {
 		if let timetable = detail.timetable {
 			TimetablePreviewGrid(subjects: timetable.subjects)
 				.padding(18)
-				.background(Image("paper").resizable().scaledToFill())
+				.background {
+					FriendPaperBackground(cornerRadius: 26)
+				}
 				.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 26, style: .continuous))
 		} else {
 			ContentUnavailableView("No Timetable", systemImage: "calendar.badge.exclamationmark")

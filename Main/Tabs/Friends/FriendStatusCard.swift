@@ -32,7 +32,9 @@ struct FriendStatusCard: View {
 			}
 			.padding(18)
 			.frame(minHeight: 132)
-			.background(Image("paper").resizable().scaledToFill())
+			.background {
+				FriendPaperBackground(cornerRadius: 28)
+			}
 			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
 			.contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
 			.animation(.bouncy, value: status.title)
