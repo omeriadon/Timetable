@@ -123,6 +123,81 @@ nonisolated struct ServerAccessModeResponse: Codable, Sendable {
 	let developmentAccessOnly: Bool
 }
 
+nonisolated enum AdministrationEventTagCategory: String, Codable, CaseIterable, Sendable, Identifiable {
+	case yearGroup
+	case subject
+	case sport
+	case general
+
+	var id: String {
+		rawValue
+	}
+
+	var displayName: String {
+		switch self {
+			case .yearGroup:
+				"Year Groups"
+			case .subject:
+				"Subjects"
+			case .sport:
+				"Sports"
+			case .general:
+				"General"
+		}
+	}
+}
+
+nonisolated struct AdministrationEventTagCatalogueResponse: Codable, Sendable {
+	let sections: [AdministrationEventTagSection]
+}
+
+nonisolated struct AdministrationEventTagSection: Codable, Identifiable, Sendable {
+	let id: UUID
+	let category: AdministrationEventTagCategory
+	let displayName: String
+	let sortOrder: Int
+	let isArchived: Bool
+	let revision: Int
+	let tags: [AdministrationEventTag]
+}
+
+nonisolated struct AdministrationEventTag: Codable, Identifiable, Sendable {
+	let id: UUID
+	let sectionID: UUID
+	let slug: String
+	let displayName: String
+	let category: AdministrationEventTagCategory
+	let symbol: String?
+	let colorHex: String?
+	let sortOrder: Int
+	let isArchived: Bool
+	let revision: Int
+	let associatedNames: [String]
+}
+
+nonisolated struct AdministrationEventTagRequest: Codable, Sendable {
+	let sectionID: UUID
+	let slug: String
+	let displayName: String
+	let symbol: String?
+	let colorHex: String?
+	let sortOrder: Int
+	let isArchived: Bool
+	let associatedNames: [String]
+}
+
+nonisolated struct AdministrationEventTagSectionCreateRequest: Codable, Sendable {
+	let category: AdministrationEventTagCategory
+	let displayName: String
+	let sortOrder: Int
+}
+
+nonisolated struct AdministrationEventTagSectionUpdateRequest: Codable, Sendable {
+	let displayName: String
+	let sortOrder: Int
+	let isArchived: Bool
+}
+
 nonisolated struct AdministrationUserCreateRequest: Codable, Sendable {
 	let displayName: String
 	let email: String

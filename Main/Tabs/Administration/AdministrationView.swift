@@ -18,6 +18,12 @@ struct AdministrationView: View {
 							}
 
 							NavigationLink {
+								AdministrationEventTagsView()
+							} label: {
+								Label("Event Tags", systemImage: "tag")
+							}
+
+							NavigationLink {
 								AdministrationCalendarEntriesView(kind: "term")
 							} label: {
 								Label("Term Dates", systemImage: "calendar")

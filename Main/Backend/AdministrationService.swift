@@ -62,6 +62,52 @@ final class AdministrationService {
 		try await networkManager.send(.v1AdministrationBroadcastNotification, body: request, context: .userInitiated)
 	}
 
+	func eventTags() async throws -> AdministrationEventTagCatalogueResponse {
+		try await networkManager.send(.v1AdministrationEventTags)
+	}
+
+	func createEventTag(
+		_ request: AdministrationEventTagRequest
+	) async throws -> AdministrationEventTagCatalogueResponse {
+		try await networkManager.send(
+			.v1AdministrationEventTagsCreate,
+			body: request,
+			context: .userInitiated
+		)
+	}
+
+	func updateEventTag(
+		id: UUID,
+		request: AdministrationEventTagRequest
+	) async throws -> AdministrationEventTagCatalogueResponse {
+		try await networkManager.send(
+			Endpoint("/v1/administration/event-tags/\(id.uuidString)", method: .put),
+			body: request,
+			context: .userInitiated
+		)
+	}
+
+	func createEventTagSection(
+		_ request: AdministrationEventTagSectionCreateRequest
+	) async throws -> AdministrationEventTagCatalogueResponse {
+		try await networkManager.send(
+			.v1AdministrationEventTagSectionsCreate,
+			body: request,
+			context: .userInitiated
+		)
+	}
+
+	func updateEventTagSection(
+		id: UUID,
+		request: AdministrationEventTagSectionUpdateRequest
+	) async throws -> AdministrationEventTagCatalogueResponse {
+		try await networkManager.send(
+			Endpoint("/v1/administration/event-tags/sections/\(id.uuidString)", method: .put),
+			body: request,
+			context: .userInitiated
+		)
+	}
+
 	func calendar() async throws -> [AdministrationCalendarEntry] {
 		try await networkManager.send(.v1AdministrationCalendar)
 	}
@@ -91,4 +137,7 @@ private extension Endpoint {
 	static let v1AdministrationCalendar = Endpoint("/v1/administration/calendar")
 	static let v1AdministrationCalendarCreate = Endpoint("/v1/administration/calendar", method: .post)
 	static let v1AdministrationBroadcastNotification = Endpoint("/v1/administration/broadcast-notification", method: .post)
+	static let v1AdministrationEventTags = Endpoint("/v1/administration/event-tags")
+	static let v1AdministrationEventTagsCreate = Endpoint("/v1/administration/event-tags", method: .post)
+	static let v1AdministrationEventTagSectionsCreate = Endpoint("/v1/administration/event-tags/sections", method: .post)
 }
