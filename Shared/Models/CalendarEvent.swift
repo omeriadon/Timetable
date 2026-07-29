@@ -8,6 +8,28 @@ nonisolated struct CalendarEvent: Codable, Defaults.Serializable, Hashable, Iden
 	let symbol: String
 	let date: SchoolCalendarDate
 	let isGlobal: Bool
+	let tagIDs: [UUID]
+
+	private enum CodingKeys: String, CodingKey {
+		case id
+		case title
+		case notes
+		case symbol
+		case date
+		case isGlobal
+		case tagIDs
+	}
+
+	init(from decoder: any Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		id = try container.decode(UUID.self, forKey: .id)
+		title = try container.decode(String.self, forKey: .title)
+		notes = try container.decodeIfPresent(String.self, forKey: .notes)
+		symbol = try container.decode(String.self, forKey: .symbol)
+		date = try container.decode(SchoolCalendarDate.self, forKey: .date)
+		isGlobal = try container.decode(Bool.self, forKey: .isGlobal)
+		tagIDs = try container.decodeIfPresent([UUID].self, forKey: .tagIDs) ?? []
+	}
 }
 
 nonisolated struct CalendarEventsProjection: Codable, Defaults.Serializable, Hashable, Sendable {

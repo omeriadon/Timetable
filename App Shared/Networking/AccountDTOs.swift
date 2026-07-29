@@ -68,6 +68,7 @@ nonisolated struct CreateCalendarEventRequest: Codable, Sendable {
 	let notes: String?
 	let symbol: String
 	let date: SchoolCalendarDate
+	let tagIDs: [UUID] = []
 }
 
 nonisolated struct AdministrationDashboardResponse: Codable, Sendable {

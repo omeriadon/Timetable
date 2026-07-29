@@ -11,6 +11,9 @@ struct AdministrationSchoolEventEditor: View {
 	@State private var symbol: String
 	@State private var date: Date
 	@State private var showsSymbolPicker = false
+	@State private var administrationService = AdministrationService.shared
+	@State private var tagSections: [AdministrationEventTagSection] = []
+	@State private var selectedTagIDs: Set<UUID>
 
 	init(
 		target: AdministrationSchoolEventEditorTarget,
@@ -24,6 +27,7 @@ struct AdministrationSchoolEventEditor: View {
 		_notes = State(initialValue: target.event?.notes ?? "")
 		_symbol = State(initialValue: target.event?.symbol ?? "calendar")
 		_date = State(initialValue: target.event?.date.startOfDay() ?? TimetableClock.now)
+		_selectedTagIDs = State(initialValue: Set(target.event?.tagIDs ?? []))
 	}
 
 	var body: some View {
@@ -38,6 +42,26 @@ struct AdministrationSchoolEventEditor: View {
 					showsSymbolPicker = true
 				} label: {
 					Label("Symbol", systemImage: symbol)
+				}
+
+				ForEach(tagSections) { section in
+					Section(section.displayName) {
+						ForEach(section.tags.filter { !$0.isArchived }) { tag in
+							Toggle(
+								tag.displayName,
+								isOn: Binding(
+									get: { selectedTagIDs.contains(tag.id) },
+									set: { isSelected in
+										if isSelected {
+											selectedTagIDs.insert(tag.id)
+										} else {
+											selectedTagIDs.remove(tag.id)
+										}
+									}
+								)
+							)
+						}
+					}
 				}
 			}
 			.appNavigationTitle(target.event == nil ? "School Event" : "Edit School Event", accent: true)
@@ -66,6 +90,13 @@ struct AdministrationSchoolEventEditor: View {
 				}
 			}
 		}
+		.task {
+			guard let catalogue = try? await administrationService.eventTags() else {
+				return
+			}
+
+			tagSections = catalogue.sections.filter { !$0.isArchived }
+		}
 		.sheet(isPresented: $showsSymbolPicker) {
 			AdministrationEventSymbolPicker(symbol: $symbol)
 		}
@@ -76,7 +107,8 @@ struct AdministrationSchoolEventEditor: View {
 			title: title,
 			notes: notes.isEmpty ? nil : notes,
 			symbol: symbol,
-			date: SchoolCalendarDate(date)
+			date: SchoolCalendarDate(date),
+			tagIDs: Array(selectedTagIDs)
 		)
 
 		Task {
