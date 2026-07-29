@@ -931,17 +931,17 @@ Validation boundary:
 
 ### 12.6 Class popovers
 
-- [ ] Make current class, next class, shared class, and shared subject rows interactive where data exists.
-- [ ] Attach popovers to the detail-sheet root.
-- [ ] Give each popover source a stable item identity.
-- [ ] Show the useful subset available for the selected relationship:
+- [x] Make current class, next class, shared class, and shared subject rows interactive where data exists.
+- [x] Attach popovers to the detail-sheet root.
+- [x] Give each popover source a stable item identity.
+- [x] Show the useful subset available for the selected relationship:
   - subject;
   - classroom;
   - teacher;
   - matching days/periods;
   - whether it is an exact shared class or subject-only match.
-- [ ] Avoid showing empty labels.
-- [ ] Use a compact presentation that adapts to iPhone sheet behavior.
+- [x] Avoid showing empty labels.
+- [x] Use a compact presentation that adapts to iPhone sheet behavior.
 
 ## Phase 13: Settings and main tab structure
 

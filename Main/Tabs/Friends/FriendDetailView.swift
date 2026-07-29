@@ -7,6 +7,7 @@ struct FriendDetailView: View {
 	@State private var service = FriendService.shared
 	@State private var selectedTab = FriendDetailTab.main
 	@State private var action: FriendAction?
+	@State private var selectedSubjectContext: FriendSubjectContext?
 	@State private var showsReportConfirmation = false
 	@State private var isLoading = true
 	@Environment(\.dismiss) private var dismiss
@@ -30,8 +31,10 @@ struct FriendDetailView: View {
 						.frame(maxWidth: .infinity, minHeight: 180)
 				} else if let detail {
 					switch selectedTab {
-						case .main:
-							FriendOverview(detail: detail)
+					case .main:
+						FriendOverview(detail: detail) { context in
+							selectedSubjectContext = context
+						}
 						case .week:
 							FriendWeek(detail: detail)
 					}
@@ -79,6 +82,9 @@ struct FriendDetailView: View {
 			}
 		} message: {
 			Text("This sends a report for review. The friend remains visible in your account.")
+		}
+		.popover(item: $selectedSubjectContext) { context in
+			FriendSubjectContextPopover(context: context, friendName: friend.friend.displayName)
 		}
 		.task { await load() }
 	}
@@ -134,7 +140,9 @@ private struct FriendDetailHeader: View {
 
 private struct FriendOverview: View {
 	let detail: FriendDetail
+	let showSubjectContext: (FriendSubjectContext) -> Void
 	@Default(.timetable) private var ownerSubjects
+	@Default(.schoolCalendar) private var schoolCalendar
 
 	var body: some View {
 		let comparison = FriendTimetableComparison(
@@ -143,6 +151,8 @@ private struct FriendOverview: View {
 		)
 
 		VStack(alignment: .leading, spacing: 18) {
+			currentAndNextClasses
+
 			LabeledContent("Friends since") {
 				Text(detail.acceptedAt, format: .dateTime.month().day().year())
 			}
@@ -154,18 +164,24 @@ private struct FriendOverview: View {
 					.foregroundStyle(.secondary)
 			} else {
 				ForEach(comparison.sharedClasses) { sharedClass in
-					VStack(alignment: .leading, spacing: 3) {
-						Label(sharedClass.subjectName, systemImage: sharedClass.symbol)
-							.foregroundStyle(sharedClass.colour.swiftUIColor)
-						if !sharedClass.classroom.isEmpty {
-							Text(sharedClass.classroom)
+					Button {
+						showSubjectContext(sharedClass.context)
+					} label: {
+						VStack(alignment: .leading, spacing: 3) {
+							Label(sharedClass.subjectName, systemImage: sharedClass.symbol)
+								.foregroundStyle(sharedClass.colour.swiftUIColor)
+							if !sharedClass.classroom.isEmpty {
+								Text(sharedClass.classroom)
+									.font(.footnote)
+									.foregroundStyle(.secondary)
+							}
+							Text(sharedClass.slotSummary)
 								.font(.footnote)
 								.foregroundStyle(.secondary)
 						}
-						Text(sharedClass.slotSummary)
-							.font(.footnote)
-							.foregroundStyle(.secondary)
+						.frame(maxWidth: .infinity, alignment: .leading)
 					}
+					.buttonStyle(.plain)
 				}
 			}
 
@@ -176,14 +192,69 @@ private struct FriendOverview: View {
 					.foregroundStyle(.secondary)
 			} else {
 				ForEach(comparison.sharedSubjects) { subject in
-					Label(subject.subjectName, systemImage: subject.symbol)
-						.foregroundStyle(subject.colour.swiftUIColor)
+					Button {
+						showSubjectContext(subject.context)
+					} label: {
+						Label(subject.subjectName, systemImage: subject.symbol)
+							.foregroundStyle(subject.colour.swiftUIColor)
+							.frame(maxWidth: .infinity, alignment: .leading)
+					}
+					.buttonStyle(.plain)
 				}
 			}
 		}
 		.padding(18)
 		.background(Image("paper").resizable().scaledToFill())
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 26, style: .continuous))
+	}
+
+	private var currentAndNextClasses: some View {
+		let subjects = detail.timetable?.subjects ?? []
+		let state = SchoolStateEngine.calculate(
+			at: TimetableClock.now,
+			subjects: subjects,
+			calendar: SchoolCalendarProjection.perthCalendar,
+			schoolCalendar: schoolCalendar
+		)
+
+		return VStack(alignment: .leading, spacing: 8) {
+			if let currentSubject = state.currentSubject {
+				contextButton(
+					title: "Current Class",
+					subject: currentSubject,
+					relationship: .current
+				)
+			}
+
+			if case let .subject(nextSubject)? = state.nextDestination {
+				contextButton(
+					title: state.currentSubject == nil ? "Next Class" : "Up Next",
+					subject: nextSubject,
+					relationship: .next
+				)
+			}
+		}
+	}
+
+	private func contextButton(
+		title: String,
+		subject: Subject,
+		relationship: FriendSubjectRelationship
+	) -> some View {
+		Button {
+			showSubjectContext(
+				FriendSubjectContext(
+					subject: subject,
+					relationship: relationship
+				)
+			)
+		} label: {
+			LabeledContent(title) {
+				Label(subject.id, systemImage: subject.symbol)
+					.foregroundStyle(subject.colour.swiftUIColor)
+			}
+		}
+		.buttonStyle(.plain)
 	}
 }
 
@@ -210,7 +281,8 @@ private struct FriendTimetableComparison {
 						SharedSubject(
 							subjectName: ownerSubject.id,
 							symbol: ownerSubject.symbol,
-							colour: ownerSubject.colour
+							colour: ownerSubject.colour,
+							subject: ownerSubject
 						)
 					)
 				}
@@ -236,6 +308,7 @@ private struct FriendTimetableComparison {
 						subjectName: ownerSubject.id,
 						symbol: ownerSubject.symbol,
 						colour: ownerSubject.colour,
+						subject: ownerSubject,
 						classroom: ownerSubject.classroom.displayName,
 						slots: overlappingSlots
 					)
@@ -259,6 +332,7 @@ private struct SharedClass: Identifiable {
 	let subjectName: String
 	let symbol: String
 	let colour: RGBAColor
+	let subject: Subject
 	let classroom: String
 	let slots: [Slot]
 
@@ -272,15 +346,118 @@ private struct SharedClass: Identifiable {
 			.map { "\(TimetableLayout.shortDayLabels[$0.day]) \(TimetableLayout.sessions[$0.session])" }
 			.joined(separator: ", ")
 	}
+
+	var context: FriendSubjectContext {
+		FriendSubjectContext(
+			subject: subject,
+			relationship: .sharedClass(slotSummary: slotSummary)
+		)
+	}
 }
 
 private struct SharedSubject: Identifiable {
 	let subjectName: String
 	let symbol: String
 	let colour: RGBAColor
+	let subject: Subject
 
 	var id: String {
 		subjectName
+	}
+
+	var context: FriendSubjectContext {
+		FriendSubjectContext(subject: subject, relationship: .sharedSubject)
+	}
+}
+
+private struct FriendSubjectContext: Identifiable {
+	let subject: Subject
+	let relationship: FriendSubjectRelationship
+
+	var id: String {
+		"\(relationship.id)|\(subject.id)|\(subject.classroom.editorValue)"
+	}
+}
+
+private enum FriendSubjectRelationship: Hashable {
+	case current
+	case next
+	case sharedClass(slotSummary: String)
+	case sharedSubject
+
+	var id: String {
+		switch self {
+			case .current:
+				return "current"
+			case .next:
+				return "next"
+			case .sharedClass:
+				return "shared-class"
+			case .sharedSubject:
+				return "shared-subject"
+		}
+	}
+
+	var title: String {
+		switch self {
+			case .current:
+				return "Current Class"
+			case .next:
+				return "Next Class"
+			case .sharedClass:
+				return "Shared Class"
+			case .sharedSubject:
+				return "Shared Subject"
+		}
+	}
+}
+
+private struct FriendSubjectContextPopover: View {
+	let context: FriendSubjectContext
+	let friendName: String
+
+	var body: some View {
+		VStack(alignment: .leading, spacing: 12) {
+			Label(context.relationship.title, systemImage: "person.text.rectangle")
+				.font(.caption.weight(.semibold))
+				.foregroundStyle(.secondary)
+
+			Label(context.subject.id, systemImage: context.subject.symbol)
+				.font(.headline)
+				.foregroundStyle(context.subject.colour.swiftUIColor)
+
+			contextRow("Friend", value: friendName, systemImage: "person.fill")
+			contextRow("Classroom", value: context.subject.classroom.displayName, systemImage: "door.left.hand.open")
+			contextRow("Teacher", value: context.subject.teacher.displayName, systemImage: "person.crop.circle")
+
+			if case let .sharedClass(slotSummary) = context.relationship {
+				contextRow("Matching periods", value: slotSummary, systemImage: "calendar.badge.checkmark")
+			}
+		}
+		.frame(width: 290, alignment: .leading)
+		.padding()
+		.presentationCompactAdaptation(.popover)
+	}
+
+	private func contextRow(_ title: String, value: String, systemImage: String) -> some View {
+		Group {
+			if !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+				LabeledContent(title) {
+					Label(value, systemImage: systemImage)
+						.labelStyle(.titleAndIcon)
+						.multilineTextAlignment(.trailing)
+				}
+			}
+		}
+	}
+}
+
+private extension SchoolState {
+	var currentSubject: Subject? {
+		if case let .lesson(lesson) = self {
+			return lesson.subject
+		}
+		return nil
 	}
 }
 
