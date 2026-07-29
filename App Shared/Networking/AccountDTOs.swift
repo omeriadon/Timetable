@@ -114,6 +114,7 @@ nonisolated struct AdministrationUserResponse: Codable, Identifiable, Sendable, 
 nonisolated struct AdministrationUserAuthorityUpdateRequest: Codable, Sendable {
 	let authority: AccountAuthority
 }
+
 nonisolated struct AdministrationUserCreateRequest: Codable, Sendable {
 	let displayName: String
 	let email: String

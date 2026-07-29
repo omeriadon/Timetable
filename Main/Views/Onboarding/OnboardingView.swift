@@ -277,9 +277,6 @@ struct OnboardingView: View {
 			}) {
 				OnboardingNotificationPermissionView()
 			},
-			OnboardingPage(id: "timetableTypes", title: "Timetable Types") {
-				TimetableTypesTutorial()
-			},
 			OnboardingPage(id: "actualFinished", title: "Ready to use Timetable!") {
 				OnboardingCompletion()
 			},
