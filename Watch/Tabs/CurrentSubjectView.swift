@@ -5,26 +5,36 @@
 //   Created by Adon Omeri on 11/6/2026.
 //
 
-import Combine
 import Defaults
 import SwiftUI
 
 struct CurrentSubjectView: View {
 	@Default(.timetable) private var subjects
 	@Default(.schoolCalendar) private var schoolCalendar
-
-	let now: Date
-
-	private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+	@Default(.debugOffset) private var debugOffset
 
 	var body: some View {
-		let state = SchoolStateEngine.calculate(
-			at: now,
-			subjects: subjects,
-			calendar: SchoolCalendarProjection.perthCalendar,
-			schoolCalendar: schoolCalendar
-		)
+		TimelineView(.periodic(from: .now, by: 1)) { context in
+			let now = TimetableClock.adjusted(context.date)
+			let state = SchoolStateEngine.calculate(
+				at: now,
+				subjects: subjects,
+				calendar: SchoolCalendarProjection.perthCalendar,
+				schoolCalendar: schoolCalendar
+			)
 
+			content(state: state, now: now)
+				.background {
+					WatchSchoolProgressBackground(state: state, now: now)
+						.animation(.smooth, value: state)
+						.ignoresSafeArea()
+				}
+		}
+		.id(debugOffset)
+	}
+
+	@ViewBuilder
+	private func content(state: SchoolState, now: Date) -> some View {
 		Group {
 			switch state {
 				case let .beforeSchool(next):
@@ -107,7 +117,6 @@ struct CurrentSubjectView: View {
 	) -> some View {
 		GeometryReader { geo in
 			if let nextText, let end {
-				// 2. Calculate remaining time using the synchronized parent 'now'
 				VStack(alignment: .center) {
 					Spacer()
 					Spacer()
@@ -129,7 +138,7 @@ struct CurrentSubjectView: View {
 
 					Spacer()
 
-					Text(timerInterval: now ... end)
+					Text(timerInterval: now ... end, countsDown: true, showsHours: true)
 						.contentTransition(.numericText())
 						.animation(.easeInOut, value: now)
 						.font(.title2)
@@ -209,6 +218,6 @@ struct CurrentSubjectView: View {
 }
 
 #Preview {
-	CurrentSubjectView(now: TimetableClock.now)
+	CurrentSubjectView()
 		.monospaced()
 }

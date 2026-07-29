@@ -5,7 +5,6 @@
 //   Created by Adon Omeri on 11/6/2026.
 //
 
-import Combine
 import Defaults
 import SwiftUI
 
@@ -13,18 +12,29 @@ struct FriendsTimetablesView: View {
 	let friend: FriendSummary
 	let timetable: FriendTimetable
 	@Default(.schoolCalendar) private var schoolCalendar
-
-	@State private var now = TimetableClock.now
-	private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+	@Default(.debugOffset) private var debugOffset
 
 	var body: some View {
-		let state = SchoolStateEngine.calculate(
-			at: now,
-			subjects: timetable.subjects,
-			calendar: SchoolCalendarProjection.perthCalendar,
-			schoolCalendar: schoolCalendar
-		)
+		TimelineView(.periodic(from: .now, by: 1)) { context in
+			let now = TimetableClock.adjusted(context.date)
+			let state = SchoolStateEngine.calculate(
+				at: now,
+				subjects: timetable.subjects,
+				calendar: SchoolCalendarProjection.perthCalendar,
+				schoolCalendar: schoolCalendar
+			)
 
+			content(state: state, now: now)
+				.background {
+					WatchSchoolProgressBackground(state: state, now: now)
+						.animation(.smooth, value: state)
+						.ignoresSafeArea()
+				}
+		}
+		.id(debugOffset)
+	}
+
+	private func content(state: SchoolState, now: Date) -> some View {
 		let title: String
 		let symbol: String
 		let color: Color
@@ -112,7 +122,7 @@ struct FriendsTimetablesView: View {
 				Spacer()
 
 				if let countdownEnd {
-					Text(timerInterval: now ... countdownEnd)
+					Text(timerInterval: now ... countdownEnd, countsDown: true, showsHours: true)
 						.contentTransition(.numericText())
 						.animation(.easeInOut, value: now)
 						.font(.title3)
@@ -144,11 +154,6 @@ struct FriendsTimetablesView: View {
 		}
 		.dynamicTypeSize(.xSmall)
 		.tint(color)
-		.onReceive(timer) { value in
-			withAnimation(.default) {
-				now = TimetableClock.adjusted(value)
-			}
-		}
 	}
 }
 

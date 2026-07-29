@@ -1089,21 +1089,21 @@ Validation boundary:
 
 ## Phase 19: Explicit Watch-only cleanup
 
-- [ ] Replace shared Watch `containerBackground` use with equivalent per-view `background`.
-- [ ] Keep each Watch view’s existing visual background.
-- [ ] Trace the current `Timer.publish` ownership in `WatchTimetablesTabView`.
-- [ ] Confirm timer cancellation, tab identity, and background transitions when switching tabs.
-- [ ] Move periodic time ownership into each visible timer-dependent tab where necessary.
-- [ ] Prefer `TimelineView(.periodic(...))` for view-driven school-state refresh when it remains active inside the tab container.
-- [ ] Ensure Current, Friends, and any other time-derived tab recompute school state after period boundaries.
-- [ ] Ensure `Text(timerInterval:)` receives valid moving intervals and is not recreated from a permanently stale `now`.
-- [ ] Keep update cadence proportional to the UI:
+- [x] Replace shared Watch `containerBackground` use with equivalent per-view `background`.
+- [x] Keep each Watch view’s existing visual background.
+- [x] Trace the current `Timer.publish` ownership in `WatchTimetablesTabView`.
+- [x] Confirm timer cancellation, tab identity, and background transitions when switching tabs.
+- [x] Move periodic time ownership into each visible timer-dependent tab where necessary.
+- [x] Prefer `TimelineView(.periodic(...))` for view-driven school-state refresh when it remains active inside the tab container.
+- [x] Ensure Current, Friends, and any other time-derived tab recompute school state after period boundaries.
+- [x] Ensure `Text(timerInterval:)` receives valid moving intervals and is not recreated from a permanently stale `now`.
+- [x] Keep update cadence proportional to the UI:
   - one second for visible countdowns;
   - slower periodic updates for labels that do not show seconds.
 - [x] Add a Debug-only `debugOffset` numeric TextField to Watch Settings.
 - [x] Bind the field to the shared `Defaults[.debugOffset]` value.
-- [ ] Recompute visible timer tabs immediately when the offset changes.
-- [ ] Keep the field human-readable and consistent with the iPhone Debug setting.
+- [x] Recompute visible timer tabs immediately when the offset changes.
+- [x] Keep the field human-readable and consistent with the iPhone Debug setting.
 - [ ] Do not change the Watch app icon.
 - [ ] Do not redesign Watch navigation or profile pictures in this phase.
 - [ ] Do not expand the reusable avatar to Watch yet.
