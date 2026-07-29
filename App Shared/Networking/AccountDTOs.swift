@@ -267,6 +267,28 @@ nonisolated struct BroadcastNotificationResponse: Codable, Sendable {
 	let failedDeviceCount: Int
 }
 
+nonisolated enum BroadcastNotificationDeliveryState: String, Codable, Sendable {
+	case pending
+	case completed
+	case failed
+}
+
+nonisolated struct BroadcastNotificationHistoryResponse: Codable, Identifiable, Sendable {
+	let id: UUID
+	let senderEmail: String
+	let senderAuthority: AccountAuthority
+	let title: String
+	let subtitle: String?
+	let body: String?
+	let eligibleDeviceCount: Int
+	let deliveredDeviceCount: Int
+	let invalidatedDeviceCount: Int
+	let failedDeviceCount: Int
+	let deliveryState: BroadcastNotificationDeliveryState
+	let failureSummary: String?
+	let createdAt: Date?
+}
+
 nonisolated struct NotificationSettingsUpdateRequest: Codable, Sendable {
 	let notificationsEnabled: Bool
 	let broadcastNotificationsEnabled: Bool

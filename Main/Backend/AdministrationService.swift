@@ -78,6 +78,10 @@ final class AdministrationService {
 		try await networkManager.send(.v1AdministrationBroadcastNotification, body: request, context: .userInitiated)
 	}
 
+	func broadcastNotifications() async throws -> [BroadcastNotificationHistoryResponse] {
+		try await networkManager.send(.v1AdministrationBroadcastNotifications)
+	}
+
 	func eventTags() async throws -> AdministrationEventTagCatalogueResponse {
 		try await networkManager.send(.v1AdministrationEventTags)
 	}
@@ -153,6 +157,7 @@ private extension Endpoint {
 	static let v1AdministrationCalendar = Endpoint("/v1/administration/calendar")
 	static let v1AdministrationCalendarCreate = Endpoint("/v1/administration/calendar", method: .post)
 	static let v1AdministrationBroadcastNotification = Endpoint("/v1/administration/broadcast-notification", method: .post)
+	static let v1AdministrationBroadcastNotifications = Endpoint("/v1/administration/broadcast-notifications")
 	static let v1AdministrationEventTags = Endpoint("/v1/administration/event-tags")
 	static let v1AdministrationEventTagsCreate = Endpoint("/v1/administration/event-tags", method: .post)
 	static let v1AdministrationEventTagSectionsCreate = Endpoint("/v1/administration/event-tags/sections", method: .post)

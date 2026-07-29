@@ -46,6 +46,12 @@ struct AdministrationView: View {
 							} label: {
 								Label("Broadcast Notification", systemImage: "megaphone")
 							}
+
+							NavigationLink {
+								AdministrationBroadcastHistoryView()
+							} label: {
+								Label("Broadcast History", systemImage: "clock.arrow.circlepath")
+							}
 						}
 
 						if authority == .systemOwner {
