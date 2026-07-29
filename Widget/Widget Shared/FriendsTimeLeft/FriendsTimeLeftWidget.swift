@@ -37,6 +37,7 @@ struct FriendsTimeLeftWidget: Widget {
 			subjects: debugTimetable,
 			ownerSchedule: nil,
 			friendSchedules: [],
+			upcomingEvents: [],
 			isPlaceholder: false,
 			relevance: TimelineEntryRelevance(
 				score: 1.0,
@@ -53,6 +54,7 @@ struct FriendsTimeLeftWidget: Widget {
 			subjects: debugTimetable,
 			ownerSchedule: nil,
 			friendSchedules: [],
+			upcomingEvents: [],
 			isPlaceholder: false,
 			relevance: TimelineEntryRelevance(
 				score: 1.0,

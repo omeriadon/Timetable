@@ -1,5 +1,6 @@
 import Defaults
 import Foundation
+import WidgetKit
 
 @MainActor
 final class CalendarEventsSyncService {
@@ -15,6 +16,7 @@ final class CalendarEventsSyncService {
 		let response: CalendarEventsResponse = try await networkManager.send(.v1CalendarEvents)
 		Defaults[.calendarEvents] = response.projection
 		Defaults[.lastServerSync] = .now
+		WidgetCenter.shared.reloadAllTimelines()
 	}
 
 	func createEvent(_ request: CreateCalendarEventRequest, globally: Bool) async throws {
@@ -24,6 +26,7 @@ final class CalendarEventsSyncService {
 			context: .userInitiated
 		)
 		Defaults[.calendarEvents] = response.projection
+		WidgetCenter.shared.reloadAllTimelines()
 	}
 
 	func deleteEvent(id: UUID, globally: Bool) async throws {
@@ -32,6 +35,7 @@ final class CalendarEventsSyncService {
 			context: .userInitiated
 		)
 		Defaults[.calendarEvents] = response.projection
+		WidgetCenter.shared.reloadAllTimelines()
 	}
 
 	func updateEvent(id: UUID, request: CreateCalendarEventRequest, globally: Bool) async throws {
@@ -41,6 +45,7 @@ final class CalendarEventsSyncService {
 			context: .userInitiated
 		)
 		Defaults[.calendarEvents] = response.projection
+		WidgetCenter.shared.reloadAllTimelines()
 	}
 }
 

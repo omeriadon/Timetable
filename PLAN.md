@@ -216,12 +216,12 @@ Validation boundary:
   - active/archived state;
   - created and updated timestamps;
   - server revision.
-- [ ] Define a normalization function for subject and classroom comparisons.
+- [x] Define a normalization function for subject and classroom comparisons.
   - trim;
   - collapse internal whitespace;
   - case-fold using a stable locale;
   - preserve the original display value.
-- [ ] Define a versioned `.timetable` document.
+- [x] Define a versioned `.timetable` document.
   - format version;
   - shared identifier;
   - optional locator kind only if UUID and alias need disambiguation;
@@ -593,10 +593,10 @@ Validation boundary:
 
 ### 6.2 Name and year group
 
-- [ ] Treat the verified school email as the required account identifier.
-- [ ] Derive the initial display name from `firstname.lastname`.
-- [ ] Strip trailing digits from the last name.
-- [ ] Capitalize the derived first and last names.
+- [x] Treat the verified school email as the required account identifier.
+- [x] Derive the initial display name from `firstname.lastname`.
+- [x] Strip trailing digits from the last name.
+- [x] Capitalize the derived first and last names.
 - [x] Add year-group selection during onboarding.
 - [x] Show Year 7, Year 8, Year 9, Year 10, Year 11, and Leavers.
 - [x] Use global year-group tags from the server rather than hardcoded presentation-only values.
@@ -1040,7 +1040,7 @@ Validation boundary:
 - [x] Disable CloudKit/iCloud synchronization.
 - [x] In Debug builds, reset the TipKit datastore before configuration.
 - [x] In Release builds, retain display state for the installation.
-- [ ] Do not define or show any `Tip` types.
+- [x] Do not define or show any `Tip` types.
 - [x] Keep reset behavior out of production.
 - [ ] Confirm reinstall naturally resets installation-local state.
 
@@ -1061,10 +1061,10 @@ Validation boundary:
 
 ## Phase 18: Large summary widget
 
-- [ ] Add a new large-only widget configuration.
-- [ ] Prevent small and medium families from selecting it.
-- [ ] Fix Dynamic Type to `.medium`.
-- [ ] Build timeline entry data in the provider.
+- [x] Add a new large-only widget configuration.
+- [x] Prevent small and medium families from selecting it.
+- [x] Fix Dynamic Type to `.medium`.
+- [x] Build timeline entry data in the provider.
 - [ ] Include:
   - current owner subject/state;
   - up to three ordered friends;
@@ -1072,11 +1072,11 @@ Validation boundary:
   - upcoming calendar events;
   - profile-picture data or cached image representation.
 - [ ] Reserve a clean model/UI extension point for future friend statuses.
-- [ ] Do not render a status placeholder or add a user-status endpoint in this phase.
+- [x] Do not render a status placeholder or add a user-status endpoint in this phase.
 - [ ] Ensure all content fits without runtime truncation in the large family.
-- [ ] Prioritize the first three persisted friend-order entries.
-- [ ] Add `Next:` to the existing Friends widget where requested.
-- [ ] Avoid network requests from the widget view.
+- [x] Prioritize the first three persisted friend-order entries.
+- [x] Add `Next:` to the existing Friends widget where requested.
+- [x] Avoid network requests from the widget view.
 - [ ] Cache profile photos in the shared App Group at an appropriate downsampled size.
 - [ ] Trigger timeline reload after:
   - friend reorder;
@@ -1084,8 +1084,8 @@ Validation boundary:
   - friend profile refresh;
   - timetable sync;
   - calendar event sync.
-- [ ] Use current timeline entries so countdowns and class state do not begin stale.
-- [ ] Constrain text widths and monospaced timers where required.
+- [x] Use current timeline entries so countdowns and class state do not begin stale.
+- [x] Constrain text widths and monospaced timers where required.
 
 ## Phase 19: Explicit Watch-only cleanup
 

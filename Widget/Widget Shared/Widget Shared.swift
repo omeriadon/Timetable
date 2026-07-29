@@ -24,6 +24,7 @@ struct Provider: TimelineProvider {
 				scheduleItem(name: "Alex", subjects: debugTimetable, at: date, schoolCalendar: schoolCalendar),
 				scheduleItem(name: "Sam", subjects: debugTimetable, at: date, schoolCalendar: schoolCalendar),
 			],
+			upcomingEvents: [],
 			isPlaceholder: true,
 			relevance: nil
 		)
@@ -39,6 +40,7 @@ struct Provider: TimelineProvider {
 				subjects: subjects,
 				ownerSchedule: scheduleItem(name: "You", subjects: subjects, at: .now, schoolCalendar: schoolCalendar),
 				friendSchedules: friendSchedules(for: friends, at: .now, schoolCalendar: schoolCalendar),
+				upcomingEvents: upcomingEvents(from: Defaults[.calendarEvents], after: .now),
 				isPlaceholder: false,
 				relevance: nil
 			)
@@ -159,6 +161,7 @@ struct TimetableEntry: TimelineEntry {
 	let subjects: [Subject]
 	let ownerSchedule: ScheduleItem?
 	let friendSchedules: [ScheduleItem]
+	let upcomingEvents: [CalendarEvent]
 	let isPlaceholder: Bool
 	let relevance: TimelineEntryRelevance?
 }
@@ -177,9 +180,21 @@ private func makeEntry(
 		subjects: subjects,
 		ownerSchedule: scheduleItem(name: "You", subjects: subjects, at: date, schoolCalendar: schoolCalendar),
 		friendSchedules: friendSchedules(for: friends, at: date, schoolCalendar: schoolCalendar),
+		upcomingEvents: upcomingEvents(from: Defaults[.calendarEvents], after: date),
 		isPlaceholder: false,
 		relevance: relevance(for: date, calendar: calendar)
 	)
+}
+
+private func upcomingEvents(
+	from projection: CalendarEventsProjection,
+	after date: Date
+) -> [CalendarEvent] {
+	let startDate = SchoolCalendarDate(date)
+	return projection.allEvents
+		.filter { $0.date >= startDate }
+		.prefix(3)
+		.map { $0 }
 }
 
 private func placeholderSchoolDate(calendar: Calendar = .current) -> Date {
@@ -202,7 +217,7 @@ private func friendSchedules(
 	}
 }
 
-private func scheduleItem(name: String, subjects: [Subject], at date: Date, schoolCalendar: SchoolCalendarProjection) -> ScheduleItem {
+func scheduleItem(name: String, subjects: [Subject], at date: Date, schoolCalendar: SchoolCalendarProjection) -> ScheduleItem {
 	let calendar = SchoolCalendarProjection.perthCalendar
 	let adjustedDate = TimetableClock.adjusted(date)
 	let state = SchoolStateEngine.calculate(at: adjustedDate, subjects: subjects, calendar: calendar, schoolCalendar: schoolCalendar)
