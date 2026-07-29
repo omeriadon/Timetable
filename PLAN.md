@@ -606,12 +606,12 @@ Validation boundary:
 
 ### 6.3 Successful sign-in regression
 
-- [ ] Trace every write to onboarding page ID and completion state.
+- [x] Trace every write to onboarding page ID and completion state.
 - [ ] Reproduce the source sequence that sets the page back to `1`.
-- [ ] Separate authentication bootstrap progress from onboarding page navigation.
-- [ ] Prevent `SessionStore.apply(..., bootstrap: true)` completion from resetting an already-valid page.
-- [ ] Preserve the current page when account bootstrap publishes Defaults changes.
-- [ ] Reset onboarding only through explicit onboarding versioning or account deletion/sign-out rules.
+- [x] Separate authentication bootstrap progress from onboarding page navigation.
+- [x] Prevent `SessionStore.apply(..., bootstrap: true)` completion from resetting an already-valid page.
+- [x] Preserve the current page when account bootstrap publishes Defaults changes.
+- [x] Reset onboarding only through explicit onboarding versioning or account deletion/sign-out rules.
 
 ## Phase 7: Tag catalogue, subscriptions, and event editing on iPhone
 
