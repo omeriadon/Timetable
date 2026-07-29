@@ -15,6 +15,7 @@ import ColorfulX
 import Defaults
 import Foundation
 import SwiftUI
+import TipKit
 
 struct ImportResult: Equatable {
 	let success: Bool
@@ -51,6 +52,13 @@ struct TimetableApp: App {
 	#endif
 
 	init() {
+		#if DEBUG
+			try? Tips.resetDatastore()
+		#endif
+		try? Tips.configure([
+			.datastoreLocation(.applicationDefault)
+		])
+
 		#if os(macOS)
 			UserDefaults.standard.set(false, forKey: "NSFullScreenMenuItemEverywhere")
 		#endif

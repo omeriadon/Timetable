@@ -1035,13 +1035,13 @@ Validation boundary:
 
 ## Phase 16: TipKit setup only
 
-- [ ] Add `TipKit` import and one-time application configuration.
-- [ ] Configure local-only datastore behavior.
-- [ ] Disable CloudKit/iCloud synchronization.
-- [ ] In Debug builds, reset the TipKit datastore before configuration.
-- [ ] In Release builds, retain display state for the installation.
+- [x] Add `TipKit` import and one-time application configuration.
+- [x] Configure local-only datastore behavior.
+- [x] Disable CloudKit/iCloud synchronization.
+- [x] In Debug builds, reset the TipKit datastore before configuration.
+- [x] In Release builds, retain display state for the installation.
 - [ ] Do not define or show any `Tip` types.
-- [ ] Keep reset behavior out of production.
+- [x] Keep reset behavior out of production.
 - [ ] Confirm reinstall naturally resets installation-local state.
 
 ## Phase 17: Versioned `.timetable` format
