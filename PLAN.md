@@ -171,16 +171,16 @@ Validation boundary:
 
 ## Phase 0: Baseline and implementation bookkeeping
 
-- [ ] Re-read both worktrees before implementation.
-- [ ] Record all unrelated modified, staged, and untracked files in Timetable.
-- [ ] Record all unrelated modified, staged, and untracked files in `pmstt`.
-- [ ] Confirm the live Timetable branch and `pmstt` branch.
+- [x] Re-read both worktrees before implementation.
+- [x] Record all unrelated modified, staged, and untracked files in Timetable.
+- [x] Record all unrelated modified, staged, and untracked files in `pmstt`.
+- [x] Confirm the live Timetable branch and `pmstt` branch.
 - [ ] Confirm the active Xcode project tabs.
 - [ ] Confirm filesystem-synchronized groups before proposing any manual `.pbxproj` edits.
 - [ ] If a package must be added through Xcode project settings, stop for the user to add it through the Xcode UI.
-- [ ] Create a phase checklist from this document.
-- [ ] Keep each commit limited to one behavior or one contract/migration unit.
-- [ ] Inspect staged file names after every hook before committing.
+- [x] Create a phase checklist from this document.
+- [x] Keep each commit limited to one behavior or one contract/migration unit.
+- [x] Inspect staged file names after every hook before committing.
 
 ## Phase 1: Shared naming and server contract design
 
@@ -192,7 +192,7 @@ Validation boundary:
   - `user`
   - `administrator`
   - `systemOwner`
-- [ ] Define `ProfileBadge`.
+- [x] Define `ProfileBadge`.
   - stable identifier;
   - SF Symbol name;
   - optional background RGBA colour;
@@ -317,8 +317,8 @@ Validation boundary:
 - [x] Seed a General tag and subscribe new users to it by default.
 - [x] Keep Sport and General data-driven rather than branching on their names.
 - [x] Require administrators to create subject tags manually.
-- [ ] Normalize and uniquely constrain associated names used for import matching.
-- [ ] Prevent ambiguous associated names from belonging to more than one active subject tag.
+- [x] Normalize and uniquely constrain associated names used for import matching.
+- [x] Prevent ambiguous associated names from belonging to more than one active subject tag.
 - [ ] Ensure stale tag IDs in client payloads are ignored and reported as dropped.
 - [x] Add tag revisions or updated timestamps for incremental synchronization.
 
@@ -649,11 +649,11 @@ Validation boundary:
 - [x] Exclude the year-group section from private-event tag selection.
 - [x] Do not add filtering or search based on private-event tags.
 - [x] Never publish private events through a tag association.
-- [ ] Keep school/global event authority read-only for ordinary users.
+- [x] Keep school/global event authority read-only for ordinary users.
 - [ ] Preserve existing matched transitions.
 - [ ] Keep short tag selection sheets within the requested fractional detent range where content permits.
-- [ ] Do not add optional start time.
-- [ ] Preserve title, notes, and symbol behavior unless superseded by the emoji/profile work.
+- [x] Do not add optional start time.
+- [x] Preserve title, notes, and symbol behavior unless superseded by the emoji/profile work.
 
 ## Phase 8: Calendar import behavior
 
@@ -737,19 +737,19 @@ Validation boundary:
 
 ### 10.2 Reusable renderer
 
-- [ ] Create one public iPhone profile-picture component.
-- [ ] Accept a concrete square size proposed by the caller.
-- [ ] Derive every internal dimension from component width/height.
-- [ ] Keep the main circle at the full requested size regardless of badges.
-- [ ] Render badges with `overlay`.
-- [ ] Position badges relative to the avatar bounds.
-- [ ] Use z-index for badge layering.
-- [ ] Let badge visuals extend outside the circle without changing external measurement.
-- [ ] Clip only the avatar content, not the badge overlay.
-- [ ] Render authority and future badges from the array.
+- [x] Create one public iPhone profile-picture component.
+- [x] Accept a concrete square size proposed by the caller.
+- [x] Derive every internal dimension from component width/height.
+- [x] Keep the main circle at the full requested size regardless of badges.
+- [x] Render badges with `overlay`.
+- [x] Position badges relative to the avatar bounds.
+- [x] Use z-index for badge layering.
+- [x] Let badge visuals extend outside the circle without changing external measurement.
+- [x] Clip only the avatar content, not the badge overlay.
+- [x] Render authority and future badges from the array.
 - [ ] Add stable placeholders for missing or loading photos.
 - [ ] Cache server images by revision.
-- [ ] Add accessibility text that describes the person and relevant badge meaning.
+- [x] Add accessibility text that describes the person and relevant badge meaning.
 
 ### 10.3 ColourfulX rendering
 
@@ -871,7 +871,7 @@ Validation boundary:
 - [ ] Replace current brown paper with white paper.
 - [ ] Clip the paper image using the established Today/Planner card technique.
 - [ ] Prevent a resizable paper image from claiming the full screen or row proposal.
-- [ ] Use the reusable profile-picture component.
+- [x] Use the reusable profile-picture component.
 - [x] Remove the disclosure chevron if sheet presentation no longer implies navigation.
 - [x] Make the entire visible card the only hit target.
 - [x] Present friend details as a matched-transition sheet from the row.
@@ -897,7 +897,7 @@ Validation boundary:
 - [x] Roll back or refresh if the server rejects the order.
 - [x] Prevent search results from participating in friend priority order.
 - [x] Propagate the new order to widget snapshots and timelines.
-- [ ] Keep the first three friends as summary-widget priority.
+- [x] Keep the first three friends as summary-widget priority.
 
 ### 12.4 Friend detail sheet
 
@@ -1267,52 +1267,52 @@ The exact sequence may split further when source boundaries require it.
 
 ### `pmstt`
 
-- [ ] `add account authority`
-- [ ] `add email verification challenges`
-- [ ] `remove apple authentication`
-- [ ] `add global event tags`
+- [x] `add account authority`
+- [x] `add email verification challenges`
+- [x] `remove apple authentication`
+- [x] `add global event tags`
 - [ ] `add profile media`
 - [ ] `enforce profile storage quotas`
 - [ ] `add profile badges`
-- [ ] `persist friend order`
-- [ ] `store broadcast history`
+- [x] `persist friend order`
+- [x] `store broadcast history`
 - [ ] `add record sync metadata`
 - [ ] `add record sync endpoint`
-- [ ] `add timestamps to server logs`
+- [x] `add timestamps to server logs`
 
 ### Timetable
 
-- [ ] `add account authority contracts`
-- [ ] `replace apple sign in with email verification`
-- [ ] `add year group onboarding`
-- [ ] `fix onboarding state after sign in`
-- [ ] `reset calendar import errors`
-- [ ] `improve calendar import sampling`
-- [ ] `add tag subscriptions`
-- [ ] `add event tag selection`
+- [x] `add account authority contracts`
+- [x] `replace apple sign in with email verification`
+- [x] `add year group onboarding`
+- [x] `fix onboarding state after sign in`
+- [x] `reset calendar import errors`
+- [x] `improve calendar import sampling`
+- [x] `add tag subscriptions`
+- [x] `add event tag selection`
 - [ ] `sync records by server revision`
 - [ ] `add reusable profile pictures`
-- [ ] `move profile editor to settings`
+- [x] `move profile editor to settings`
 - [ ] `add photo profile editor`
 - [ ] `replace profile symbols with emoji`
 - [ ] `add profile font controls`
 - [ ] `add profile colour grid`
 - [ ] `redesign friends rows`
-- [ ] `show friend details in a sheet`
-- [ ] `fix shared class matching`
-- [ ] `persist friend priority`
-- [ ] `reorder main tabs`
-- [ ] `refresh administration views`
-- [ ] `improve administration account data`
-- [ ] `manage administrators`
-- [ ] `show broadcast history`
-- [ ] `configure tipkit`
-- [ ] `version timetable share files`
-- [ ] `add summary widget`
-- [ ] `update friends widget next class`
-- [ ] `make watch backgrounds view local`
-- [ ] `keep watch timers updating`
-- [ ] `add watch debug time offset`
+- [x] `show friend details in a sheet`
+- [x] `fix shared class matching`
+- [x] `persist friend priority`
+- [x] `reorder main tabs`
+- [x] `refresh administration views`
+- [x] `improve administration account data`
+- [x] `manage administrators`
+- [x] `show broadcast history`
+- [x] `configure tipkit`
+- [x] `version timetable share files`
+- [x] `add summary widget`
+- [x] `update friends widget next class`
+- [x] `make watch backgrounds view local`
+- [x] `keep watch timers updating`
+- [x] `add watch debug time offset`
 
 ## Explicit exclusions
 

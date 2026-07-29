@@ -67,34 +67,11 @@ struct FriendAvatar: View {
 	}
 
 	var body: some View {
-		ZStack {
-			LinearGradient(
-				colors: appearance.colours.map(\.swiftUIColor),
-				startPoint: .topLeading,
-				endPoint: .bottomTrailing
-			)
-			if appearance.usesMonogram, !appearance.monogram.isEmpty {
-				Text(appearance.monogram)
-					.font(.system(size: 20, weight: .bold, design: fontDesign))
-					.foregroundStyle(.white)
-			} else {
-				Image(systemName: appearance.symbol)
-					.font(.title2)
-					.foregroundStyle(.white)
-			}
-		}
-		.frame(width: 54, height: 54)
-		.clipShape(Circle())
-		.accessibilityHidden(true)
-	}
-
-	private var fontDesign: Font.Design {
-		switch appearance.font {
-			case "serif": .serif
-			case "monospaced": .monospaced
-			case "rounded": .rounded
-			default: .default
-		}
+		ProfilePicture(
+			appearance: appearance,
+			size: 54,
+			accessibilityName: "Profile picture"
+		)
 	}
 }
 
