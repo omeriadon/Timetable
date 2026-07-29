@@ -64,6 +64,11 @@ extension Defaults.Keys {
 		default: [],
 		suite: sharedDefaults
 	)
+	static let syncCursor = Key<String?>(
+		"syncCursor_v1",
+		default: nil,
+		suite: sharedDefaults
+	)
 	static let receivedNameOverrides = Key<[String: String]>("receivedNameOverrides", default: [:], suite: sharedDefaults)
 	static let timetable = Key<[Subject]>("timetable", default: [], suite: sharedDefaults)
 	static let schoolCalendar = Key<SchoolCalendarProjection>("schoolCalendar", default: .empty, suite: sharedDefaults)

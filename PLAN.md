@@ -1,6 +1,7 @@
 # Timetable Implementation Plan
 
-Status: planning only. No implementation has started.
+Status: source implementation substantially complete. Build, runtime, deployment,
+Cloudflare, PM2, and device verification remain user-run.
 
 Primary scope:
 
@@ -176,7 +177,7 @@ Validation boundary:
 - [x] Record all unrelated modified, staged, and untracked files in `pmstt`.
 - [x] Confirm the live Timetable branch and `pmstt` branch.
 - [ ] Confirm the active Xcode project tabs.
-- [ ] Confirm filesystem-synchronized groups before proposing any manual `.pbxproj` edits.
+- [x] Confirm filesystem-synchronized groups before proposing any manual `.pbxproj` edits.
 - [ ] If a package must be added through Xcode project settings, stop for the user to add it through the Xcode UI.
 - [x] Create a phase checklist from this document.
 - [x] Keep each commit limited to one behavior or one contract/migration unit.
@@ -226,7 +227,7 @@ Validation boundary:
   - shared identifier;
   - optional locator kind only if UUID and alias need disambiguation;
   - no embedded timetable content.
-- [ ] Define `SyncEnvelope`.
+- [x] Define `SyncEnvelope`.
   - server time;
   - request identifier;
   - client installation identifier;
@@ -236,14 +237,14 @@ Validation boundary:
   - tombstones;
   - conflicts;
   - next server cursor if needed.
-- [ ] Define conflict outcomes.
+- [x] Define conflict outcomes.
   - accepted client mutation;
   - server record already newer;
   - deleted on server;
   - invalid reference dropped;
   - authorization rejected;
   - validation rejected.
-- [ ] Define client behavior for every conflict outcome before adding UI.
+- [x] Define client behavior for every conflict outcome before adding UI.
 
 ## Phase 2: `pmstt` database foundations
 
@@ -277,11 +278,11 @@ Validation boundary:
 
 ### 2.3 Apple-account removal
 
-- [ ] Identify Apple-only accounts as accounts with no password hash.
-- [ ] Preserve accounts that have both a password hash and Apple subject.
-- [ ] Add a migration or explicit maintenance command that deletes Apple-only accounts and their dependent data.
-- [ ] Rely on database cascade behavior only after auditing every relationship.
-- [ ] Explicitly cover:
+- [x] Identify Apple-only accounts as accounts with no password hash.
+- [x] Preserve accounts that have both a password hash and Apple subject.
+- [x] Add a migration or explicit maintenance command that deletes Apple-only accounts and their dependent data.
+- [x] Rely on database cascade behavior only after auditing every relationship.
+- [x] Explicitly cover:
   - sessions and refresh tokens;
   - devices and APNs tokens;
   - Live Activity records;
@@ -294,13 +295,13 @@ Validation boundary:
   - passes and registrations;
   - aliases;
   - profile media.
-- [ ] Remove Apple identity fields after the deletion migration is safely ordered.
-- [ ] Clear Apple identity fields from preserved password accounts before removing the columns.
-- [ ] Remove Apple-auth server routes.
+- [x] Remove Apple identity fields after the deletion migration is safely ordered.
+- [x] Clear Apple identity fields from preserved password accounts before removing the columns.
+- [x] Remove Apple-auth server routes.
 - [x] Remove Apple server-notification routes.
 - [x] Remove Apple JWT configuration that is no longer used.
-- [ ] Remove Apple account-state DTOs and admin JSON fields.
-- [ ] Keep migration ordering reversible at the schema level where practical; account deletion itself is intentionally destructive.
+- [x] Remove Apple account-state DTOs and admin JSON fields.
+- [x] Keep migration ordering reversible at the schema level where practical; account deletion itself is intentionally destructive.
 
 ### 2.4 Global tags and subscriptions
 
@@ -309,17 +310,17 @@ Validation boundary:
 - [x] Add associated tag names as a normalized child table or validated array field.
 - [x] Add an account-to-tag subscription join table.
 - [x] Add a calendar-event-to-tag join table.
-- [ ] Add uniqueness constraints for normalized active tag names within categories.
+- [x] Add uniqueness constraints for normalized active tag names within categories.
 - [x] Add stable ordering within each category.
 - [x] Add foreign-key behavior for archived or deleted tags.
-- [ ] Prefer archive plus association cleanup over hard delete.
+- [x] Prefer archive plus association cleanup over hard delete.
 - [x] Seed Year 7, Year 8, Year 9, Year 10, Year 11, and Leavers.
 - [x] Seed a General tag and subscribe new users to it by default.
 - [x] Keep Sport and General data-driven rather than branching on their names.
 - [x] Require administrators to create subject tags manually.
 - [x] Normalize and uniquely constrain associated names used for import matching.
 - [x] Prevent ambiguous associated names from belonging to more than one active subject tag.
-- [ ] Ensure stale tag IDs in client payloads are ignored and reported as dropped.
+- [x] Ensure stale tag IDs in client payloads are ignored and reported as dropped.
 - [x] Add tag revisions or updated timestamps for incremental synchronization.
 
 ### 2.5 Broadcast history
@@ -351,62 +352,62 @@ Validation boundary:
 
 - [ ] Use a private Cloudflare R2 Standard bucket for profile-photo objects.
 - [ ] Keep R2 credentials in deployed environment configuration only.
-- [ ] Store only object keys and image metadata in PostgreSQL.
-- [ ] Use revisioned object keys such as `avatars/<userID>/<revision>.jpg`.
+- [x] Store only object keys and image metadata in PostgreSQL.
+- [x] Use revisioned object keys such as `avatars/<userID>/<revision>.jpg`.
 - [ ] Keep the bucket private.
 - [ ] Do not enable the public `r2.dev` URL or a public custom domain.
-- [ ] Mediate uploads, downloads, HEAD checks, and deletions through pmstt.
-- [ ] Do not use reusable direct-to-R2 presigned URLs because they bypass exact operation accounting.
-- [ ] Let pmstt authenticate the caller before every profile-image operation.
-- [ ] Add profile-media metadata.
-- [ ] Associate at most one active profile photo with a user.
-- [ ] Store content type, byte size, dimensions, checksum, revision, and update time.
-- [ ] Enforce square dimensions or server-crop defensively.
-- [ ] Enforce the one-megabyte limit server-side.
-- [ ] Accept only explicitly supported raster formats.
-- [ ] Strip unneeded metadata.
-- [ ] Prevent SVG or arbitrary file uploads.
-- [ ] Define authenticated upload, fetch, and delete routes.
-- [ ] Delete superseded R2 objects only after the new database reference commits successfully.
-- [ ] Add orphan-object cleanup for abandoned uploads and failed database transactions.
-- [ ] Provide cache validation using revision, ETag, or content hash.
-- [ ] Let pmstt answer a matching conditional request with `304 Not Modified` from database metadata without reading R2.
-- [ ] Add profile badges to friend/profile DTOs.
-- [ ] Derive authority badges on the server rather than accepting them from profile edits.
-- [ ] Keep future manually assigned badges possible without changing avatar rendering.
+- [x] Mediate uploads, downloads, HEAD checks, and deletions through pmstt.
+- [x] Do not use reusable direct-to-R2 presigned URLs because they bypass exact operation accounting.
+- [x] Let pmstt authenticate the caller before every profile-image operation.
+- [x] Add profile-media metadata.
+- [x] Associate at most one active profile photo with a user.
+- [x] Store content type, byte size, dimensions, checksum, revision, and update time.
+- [x] Enforce square dimensions or server-crop defensively.
+- [x] Enforce the one-megabyte limit server-side.
+- [x] Accept only explicitly supported raster formats.
+- [x] Strip unneeded metadata.
+- [x] Prevent SVG or arbitrary file uploads.
+- [x] Define authenticated upload, fetch, and delete routes.
+- [x] Delete superseded R2 objects only after the new database reference commits successfully.
+- [x] Add orphan-object cleanup for abandoned uploads and failed database transactions.
+- [x] Provide cache validation using revision, ETag, or content hash.
+- [x] Let pmstt answer a matching conditional request with `304 Not Modified` from database metadata without reading R2.
+- [x] Add profile badges to friend/profile DTOs.
+- [x] Derive authority badges on the server rather than accepting them from profile edits.
+- [x] Keep future manually assigned badges possible without changing avatar rendering.
 
 ### 2.7 R2 quota enforcement
 
-- [ ] Add one database row representing the global profile-storage quota state.
-- [ ] Track every known R2 object, including active, superseded, temporary, and orphaned objects.
-- [ ] Track the exact stored-byte total from known object metadata.
-- [ ] Use 9,000,000,000 bytes as the hard stored-object ceiling.
-- [ ] Reserve the incoming object’s bytes atomically before uploading.
-- [ ] Reject an upload when the reservation would exceed the hard byte ceiling.
-- [ ] Keep the old image’s bytes counted until its R2 deletion succeeds.
-- [ ] Release an upload reservation only when it is proven that no R2 object was created.
-- [ ] Add a monthly operation-counter row keyed by UTC year and month.
-- [ ] Count all application-mediated R2 calls against one conservative operation budget.
-- [ ] Count PUT, GET, HEAD, DELETE, LIST, and cleanup operations.
-- [ ] Reserve an operation atomically before sending the R2 request.
-- [ ] Do not decrement the counter after an attempted R2 request because a failed request may still be billable.
-- [ ] Enforce a hard maximum of 900,000 reserved operations per UTC calendar month.
-- [ ] Stop profile-image mutations before the hard limit to preserve a read reserve.
-- [ ] Use 850,000 operations as the write cutoff.
-- [ ] Permit cached/conditional reads that do not contact R2 after the write cutoff.
-- [ ] Permit R2 reads until the 900,000 hard limit.
-- [ ] Reject storage exhaustion with HTTP `507 Insufficient Storage` and structured code `profileStorageCapacityReached`.
-- [ ] Reject mutation-budget exhaustion with HTTP `429 Too Many Requests` and structured code `profileStorageWriteBudgetReached`.
-- [ ] Reject hard operation-budget exhaustion with HTTP `429 Too Many Requests` and structured code `profileStorageOperationBudgetReached`.
-- [ ] Include a `Retry-After` value ending at the next UTC calendar month for monthly operation-budget errors.
-- [ ] Preserve existing cached profile pictures when an R2 quota error occurs.
-- [ ] Never change the authoritative profile-photo revision when upload or finalization fails.
-- [ ] Add administrator-visible current byte usage, monthly operation usage, limits, and remaining allowance.
-- [ ] Add warning logs at 80%, 90%, and 95% of each quota.
-- [ ] Query Cloudflare R2 GraphQL analytics periodically for reconciliation.
-- [ ] Treat Cloudflare analytics as delayed audit data, not the synchronous enforcement source.
-- [ ] Reconcile tracked object bytes against R2 metrics and controlled bucket listings.
-- [ ] Disable new writes and surface an administration warning if reconciliation reports usage above local accounting.
+- [x] Add one database row representing the global profile-storage quota state.
+- [x] Track every known R2 object, including active, superseded, temporary, and orphaned objects.
+- [x] Track the exact stored-byte total from known object metadata.
+- [x] Use 9,000,000,000 bytes as the hard stored-object ceiling.
+- [x] Reserve the incoming object’s bytes atomically before uploading.
+- [x] Reject an upload when the reservation would exceed the hard byte ceiling.
+- [x] Keep the old image’s bytes counted until its R2 deletion succeeds.
+- [x] Release an upload reservation only when it is proven that no R2 object was created.
+- [x] Add a monthly operation-counter row keyed by UTC year and month.
+- [x] Count all application-mediated R2 calls against one conservative operation budget.
+- [x] Count PUT, GET, HEAD, DELETE, LIST, and cleanup operations.
+- [x] Reserve an operation atomically before sending the R2 request.
+- [x] Do not decrement the counter after an attempted R2 request because a failed request may still be billable.
+- [x] Enforce a hard maximum of 900,000 reserved operations per UTC calendar month.
+- [x] Stop profile-image mutations before the hard limit to preserve a read reserve.
+- [x] Use 850,000 operations as the write cutoff.
+- [x] Permit cached/conditional reads that do not contact R2 after the write cutoff.
+- [x] Permit R2 reads until the 900,000 hard limit.
+- [x] Reject storage exhaustion with HTTP `507 Insufficient Storage` and structured code `profileStorageCapacityReached`.
+- [x] Reject mutation-budget exhaustion with HTTP `429 Too Many Requests` and structured code `profileStorageWriteBudgetReached`.
+- [x] Reject hard operation-budget exhaustion with HTTP `429 Too Many Requests` and structured code `profileStorageOperationBudgetReached`.
+- [x] Include a `Retry-After` value ending at the next UTC calendar month for monthly operation-budget errors.
+- [x] Preserve existing cached profile pictures when an R2 quota error occurs.
+- [x] Never change the authoritative profile-photo revision when upload or finalization fails.
+- [x] Add administrator-visible current byte usage, monthly operation usage, limits, and remaining allowance.
+- [x] Add warning logs at 80%, 90%, and 95% of each quota.
+- [x] Query Cloudflare R2 GraphQL analytics periodically for reconciliation.
+- [x] Treat Cloudflare analytics as delayed audit data, not the synchronous enforcement source.
+- [x] Reconcile tracked object bytes against R2 metrics and controlled bucket listings.
+- [x] Disable new writes and surface an administration warning if reconciliation reports usage above local accounting.
 
 ### 2.8 Friend order
 
@@ -429,7 +430,7 @@ Validation boundary:
 - [ ] Avoid using a single owner-timetable revision for unrelated settings and events.
 - [ ] Add migrations for records that currently have only whole-blob storage.
 - [ ] Keep server-owned school calendar and administration data download-only.
-- [ ] Define retention for tombstones so offline clients can observe deletions.
+- [x] Define retention for tombstones so offline clients can observe deletions.
 
 ## Phase 3: `pmstt` endpoint and middleware changes
 
@@ -448,9 +449,9 @@ Validation boundary:
 - [x] Capitalize the first and last names for display.
 - [x] Reject registration addresses that do not provide the required first-name and last-name components.
 - [x] Reject non-school emails at every account mutation boundary.
-- [ ] Keep login failure responses non-enumerating where appropriate.
+- [x] Keep login failure responses non-enumerating where appropriate.
 - [x] Remove client and server Apple login endpoints.
-- [ ] Invalidate sessions for accounts deleted by the Apple-only cleanup.
+- [x] Invalidate sessions for accounts deleted by the Apple-only cleanup.
 
 ### 3.2 Administration authority
 
@@ -459,7 +460,7 @@ Validation boundary:
 - [x] Return `403` when authority has been revoked.
 - [x] Add system-owner-only endpoints to grant and revoke administrator authority.
 - [x] Reject role changes for either permanent owner.
-- [ ] Include authority and badges in administration account data.
+- [x] Include authority and badges in administration account data.
 - [x] Add an administration dashboard response that distinguishes `administrator` and `systemOwner`.
 
 ### 3.3 Tag endpoints
@@ -480,28 +481,28 @@ Validation boundary:
 - [x] Return year-only school events to accounts matching one of the event’s year-group tags.
 - [x] Let users unsubscribe from General even though new accounts receive it by default.
 - [x] Keep administrator event-management visibility independent of subscriber filtering.
-- [ ] Include dropped/archived association information in mutation responses where useful.
+- [x] Include dropped/archived association information in mutation responses where useful.
 
 ### 3.4 Profile endpoints
 
-- [ ] Replace opaque appearance-data-only handling with an explicit versioned appearance DTO.
-- [ ] Retain legacy decode support during migration.
-- [ ] Add an authenticated pmstt upload endpoint that validates, reserves quota, and writes to R2.
-- [ ] Add an authenticated pmstt image endpoint that supports ETag and conditional requests.
-- [ ] Add an authenticated pmstt deletion endpoint that updates the profile and then removes superseded R2 data.
-- [ ] Return structured capacity and operation-budget errors from all profile-image endpoints.
-- [ ] Add photo URL/revision and badges to friend and self-profile responses.
+- [x] Replace opaque appearance-data-only handling with an explicit versioned appearance DTO.
+- [x] Retain legacy decode support during migration.
+- [x] Add an authenticated pmstt upload endpoint that validates, reserves quota, and writes to R2.
+- [x] Add an authenticated pmstt image endpoint that supports ETag and conditional requests.
+- [x] Add an authenticated pmstt deletion endpoint that updates the profile and then removes superseded R2 data.
+- [x] Return structured capacity and operation-budget errors from all profile-image endpoints.
+- [x] Add photo URL/revision and badges to friend and self-profile responses.
 - [x] Do not include friend email in normal friend responses.
-- [ ] Keep email in authenticated self-account responses and privileged administration responses.
-- [ ] Ensure profile-update requests cannot set badges or authority.
+- [x] Keep email in authenticated self-account responses and privileged administration responses.
+- [x] Ensure profile-update requests cannot set badges or authority.
 
 ### 3.5 Friend endpoints
 
 - [x] Return persisted friend order.
 - [x] Add reorder endpoint.
-- [ ] Keep report behavior unchanged apart from confirmation UI.
+- [x] Keep report behavior unchanged apart from confirmation UI.
 - [x] Compute or return enough timetable data for exact shared-class/shared-subject comparison.
-- [ ] Avoid server claims that depend on unnormalized subject or classroom values.
+- [x] Avoid server claims that depend on unnormalized subject or classroom values.
 
 ### 3.6 Broadcast endpoints
 
@@ -516,29 +517,29 @@ Validation boundary:
 
 ### 3.7 Sync endpoint
 
-- [ ] Add a batched record-level synchronization endpoint.
-- [ ] Apply each record mutation independently where safe.
-- [ ] Use a transaction per coupled record set, not one transaction for the entire account.
-- [ ] Compare client base revision with current server revision.
-- [ ] Never compare client wall-clock dates to choose a winner.
-- [ ] Return current server records for conflicts.
-- [ ] Return server time once per response.
+- [x] Add a batched record-level synchronization endpoint.
+- [x] Apply each record mutation independently where safe.
+- [x] Use a transaction per coupled record set, not one transaction for the entire account.
+- [x] Compare client base revision with current server revision.
+- [x] Never compare client wall-clock dates to choose a winner.
+- [x] Return current server records for conflicts.
+- [x] Return server time once per response.
 - [ ] Return dropped tag references explicitly.
-- [ ] Return server-side tombstones.
-- [ ] Make retries idempotent using mutation IDs.
-- [ ] Prevent replay of already accepted mutations.
-- [ ] Log conflict decisions with record type and IDs but no sensitive payloads.
+- [x] Return server-side tombstones.
+- [x] Make retries idempotent using mutation IDs.
+- [x] Prevent replay of already accepted mutations.
+- [x] Log conflict decisions with record type and IDs but no sensitive payloads.
 
 ## Phase 4: `pmstt` logging timestamps
 
 - [x] Inspect the active LoggingSystem bootstrap and deployed log handler.
 - [x] Configure one consistent timestamp prefix at the log-handler formatter layer.
 - [x] Use ISO 8601 with timezone or an explicitly agreed local timezone.
-- [ ] Include milliseconds if concurrent request ordering requires them.
+- [x] Include milliseconds if concurrent request ordering requires them.
 - [x] Avoid manually prepending timestamps in every `logger` call.
 - [x] Preserve log level, label, metadata, source, and message.
 - [ ] Confirm PM2 does not add a second conflicting timestamp.
-- [ ] Document the deployed format.
+- [x] Document the deployed format.
 - [ ] User runtime check:
   - startup message;
   - ordinary request log;
@@ -549,26 +550,26 @@ Validation boundary:
 ## Phase 5: Shared client contracts and local cache
 
 - [x] Add `AccountAuthority`.
-- [ ] Add explicit profile appearance DTOs.
-- [ ] Add `ProfileContentKind`.
+- [x] Add explicit profile appearance DTOs.
+- [x] Add `ProfileContentKind`.
   - photo;
   - monogram;
   - emoji.
-- [ ] Add discrete `ProfileFontDesign`.
-- [ ] Add discrete `ProfileFontWeight`.
-- [ ] Add one-to-three background colours.
-- [ ] Add photo revision/URL metadata.
-- [ ] Add `[ProfileBadge]`.
-- [ ] Decode legacy symbol-based appearances into the closest emoji/monogram default without crashing.
+- [x] Add discrete `ProfileFontDesign`.
+- [x] Add discrete `ProfileFontWeight`.
+- [x] Add one-to-three background colours.
+- [x] Add photo revision/URL metadata.
+- [x] Add `[ProfileBadge]`.
+- [x] Decode legacy symbol-based appearances into the closest emoji/monogram default without crashing.
 - [x] Add global tag models and category ordering.
 - [x] Add current-user tag subscriptions.
 - [x] Add tagged event models.
 - [x] Add friend order.
-- [ ] Add per-record sync metadata.
-- [ ] Add pending mutation storage.
-- [ ] Add tombstone storage where offline deletion is supported.
+- [x] Add per-record sync metadata.
+- [x] Add pending mutation storage.
+- [x] Add tombstone storage where offline deletion is supported.
 - [ ] Add TipKit configuration marker only if needed outside TipKit’s own datastore.
-- [ ] Version every changed Defaults payload that needs backwards decoding.
+- [x] Version every changed Defaults payload that needs backwards decoding.
 - [x] Preserve generated `Encodable` behavior by isolating legacy decode-only keys.
 
 ## Phase 6: Email-only authentication and onboarding
@@ -577,7 +578,7 @@ Validation boundary:
 
 - [x] Remove Sign in with Apple UI and authorization handlers.
 - [x] Remove Apple-specific loading and error states.
-- [ ] Restrict email input to the school suffix.
+- [x] Restrict email input to the school suffix.
 - [x] Normalize pasted uppercase or whitespace-padded emails.
 - [x] Preserve a clear registration/sign-in distinction.
 - [x] Add verification-code request state.
@@ -589,7 +590,7 @@ Validation boundary:
 - [x] Handle already-used, expired, invalid, and rate-limited codes distinctly.
 - [x] Use system-symbol button labels.
 - [x] Use `.glassProminent` and confirm role for the final verification action.
-- [ ] Keep modal modifiers on the authentication root.
+- [x] Keep modal modifiers on the authentication root.
 
 ### 6.2 Name and year group
 
@@ -650,8 +651,8 @@ Validation boundary:
 - [x] Do not add filtering or search based on private-event tags.
 - [x] Never publish private events through a tag association.
 - [x] Keep school/global event authority read-only for ordinary users.
-- [ ] Preserve existing matched transitions.
-- [ ] Keep short tag selection sheets within the requested fractional detent range where content permits.
+- [x] Preserve existing matched transitions.
+- [x] Keep short tag selection sheets within the requested fractional detent range where content permits.
 - [x] Do not add optional start time.
 - [x] Preserve title, notes, and symbol behavior unless superseded by the emoji/profile work.
 
@@ -694,46 +695,46 @@ Validation boundary:
 
 ### 9.1 Client mutation tracking
 
-- [ ] Replace broad “last sync” meaning with per-record server revision state.
-- [ ] Generate stable mutation IDs.
-- [ ] Persist pending mutations before sending.
-- [ ] Include base server revision with every mutation.
-- [ ] Retry pending mutations idempotently.
-- [ ] Clear a mutation only after an accepted or definitively rejected server result.
-- [ ] Keep a human-readable aggregate last-successful-sync time for Settings.
+- [x] Replace broad “last sync” meaning with per-record server revision state.
+- [x] Generate stable mutation IDs.
+- [x] Persist pending mutations before sending.
+- [x] Include base server revision with every mutation.
+- [x] Retry pending mutations idempotently.
+- [x] Clear a mutation only after an accepted or definitively rejected server result.
+- [x] Keep a human-readable aggregate last-successful-sync time for Settings.
 
 ### 9.2 Merge behavior
 
-- [ ] Accept server response revisions as authoritative.
-- [ ] Replace local records when the server revision is newer.
-- [ ] Apply accepted local mutations using returned server records.
-- [ ] Remove records represented by server tombstones.
-- [ ] Drop missing tag associations without failing unrelated mutations.
-- [ ] Keep conflicts isolated to individual records.
+- [x] Accept server response revisions as authoritative.
+- [x] Replace local records when the server revision is newer.
+- [x] Apply accepted local mutations using returned server records.
+- [x] Remove records represented by server tombstones.
+- [x] Drop missing tag associations without failing unrelated mutations.
+- [x] Keep conflicts isolated to individual records.
 - [ ] Do not let one calendar event conflict block timetable or settings sync.
 - [ ] Recompute widgets, Spotlight, notifications, and Watch handoff only for affected datasets.
 
 ### 9.3 Existing owner timetable migration
 
-- [ ] Map the current whole-timetable revision contract into the new envelope.
-- [ ] Decide whether each `Subject` is a record or the owner timetable remains one record.
+- [x] Map the current whole-timetable revision contract into the new envelope.
+- [x] Decide whether each `Subject` is a record or the owner timetable remains one record.
 - [ ] If subjects become individual records, define stable subject IDs independent of editable names.
-- [ ] Preserve server searchability as its own mutable record.
-- [ ] Preserve current authoritative server behavior for non-empty server owner data.
-- [ ] Keep older endpoint compatibility until the client cutover is complete.
+- [x] Preserve server searchability in the owner-timetable record payload.
+- [x] Preserve current authoritative server behavior for non-empty server owner data.
+- [x] Keep older endpoint compatibility until the client cutover is complete.
 
 ## Phase 10: Reusable profile-picture system
 
 ### 10.1 Data model
 
-- [ ] Replace `usesMonogram` and `symbol` branching with an explicit content kind.
-- [ ] Support photo, monogram, and emoji.
-- [ ] Keep one-to-three background colours for monogram and emoji modes.
-- [ ] Hide background controls in photo mode.
-- [ ] Hide monogram and emoji overlays in photo mode.
-- [ ] Store Unicode emoji directly.
-- [ ] Store font design and weight only where text rendering uses them.
-- [ ] Store badges outside user-editable appearance data.
+- [x] Replace `usesMonogram` and `symbol` branching with an explicit content kind.
+- [x] Support photo, monogram, and emoji.
+- [x] Keep one-to-three background colours for monogram and emoji modes.
+- [x] Hide background controls in photo mode.
+- [x] Hide monogram and emoji overlays in photo mode.
+- [x] Store Unicode emoji directly.
+- [x] Store font design and weight only where text rendering uses them.
+- [x] Store badges outside user-editable appearance data.
 
 ### 10.2 Reusable renderer
 
@@ -747,18 +748,18 @@ Validation boundary:
 - [x] Let badge visuals extend outside the circle without changing external measurement.
 - [x] Clip only the avatar content, not the badge overlay.
 - [x] Render authority and future badges from the array.
-- [ ] Add stable placeholders for missing or loading photos.
-- [ ] Cache server images by revision.
+- [x] Add stable placeholders for missing or loading photos.
+- [x] Cache server images by revision.
 - [x] Add accessibility text that describes the person and relevant badge meaning.
 
 ### 10.3 ColourfulX rendering
 
-- [ ] Replace the current small-avatar gradient fallback with the shared ColorfulX-backed background where appropriate.
-- [ ] Adjust ColorfulX render parameters so the gradient variation remains visible at small avatar sizes.
-- [ ] Prefer render configuration, coordinate mapping, or container sizing over literal `.scaleEffect`.
-- [ ] Keep frame rate and render scale bounded.
-- [ ] Avoid one animated ColorfulX timeline per off-screen friend row if a static rendered representation is sufficient.
-- [ ] Reuse a cached/static representation for scrolling lists if live animation harms performance.
+- [x] Replace the current small-avatar gradient fallback with the shared ColorfulX-backed background where appropriate.
+- [x] Adjust ColorfulX render parameters so the gradient variation remains visible at small avatar sizes.
+- [x] Prefer render configuration, coordinate mapping, or container sizing over literal `.scaleEffect`.
+- [x] Keep frame rate and render scale bounded.
+- [x] Avoid one animated ColorfulX timeline per off-screen friend row if a static rendered representation is sufficient.
+- [x] Reuse a cached/static representation for scrolling lists if live animation harms performance.
 
 ## Phase 11: Profile editor in Settings
 
@@ -769,36 +770,36 @@ Validation boundary:
 - [x] Present it using the host Settings namespace and a unique matched transition source.
 - [x] Use `.appNavigationTitle`.
 - [x] Apply `.scrollEdgeEffect()`.
-- [ ] Load the saved appearance before presenting editable controls where possible.
-- [ ] Initialize local editor state from the cached authoritative profile in `init` or a dedicated model.
-- [ ] Eliminate the visible default-icon-to-owned-icon animation.
+- [x] Load the saved appearance before presenting editable controls where possible.
+- [x] Initialize local editor state from the cached authoritative profile in `init` or a dedicated model.
+- [x] Eliminate the visible default-icon-to-owned-icon animation.
 
 ### 11.2 Mode selector
 
-- [ ] Reuse the Timetable tab’s custom segmented picker.
-- [ ] Make the left segment a menu-style selector for Photo, Monogram, and Emoji.
-- [ ] Add reasonable SF Symbols to every option.
-- [ ] Show the background segment only for Monogram and Emoji.
-- [ ] Animate its blur and opacity when Photo is selected.
-- [ ] Animate the remaining foreground selector into the center when it is the only segment.
-- [ ] Restore the two-segment layout when a compatible foreground is selected.
-- [ ] Avoid SwiftUI’s default segmented picker where the mock-ups show the custom control.
+- [x] Reuse the Timetable tab’s custom segmented picker.
+- [x] Make the left segment a menu-style selector for Photo, Monogram, and Emoji.
+- [x] Add reasonable SF Symbols to every option.
+- [x] Show the background segment only for Monogram and Emoji.
+- [x] Animate its blur and opacity when Photo is selected.
+- [x] Animate the remaining foreground selector into the center when it is the only segment.
+- [x] Restore the two-segment layout when a compatible foreground is selected.
+- [x] Avoid SwiftUI’s default segmented picker where the mock-ups show the custom control.
 
 ### 11.3 Photo selection and crop
 
-- [ ] Use PhotosPicker for image selection.
-- [ ] Decode the selected transferable off the main UI path.
-- [ ] Present a square crop editor.
-- [ ] Support drag to reposition.
-- [ ] Support pinch to zoom.
-- [ ] Prevent empty space inside the final square crop.
-- [ ] Render the final square using `ImageRenderer` or an appropriate image pipeline.
-- [ ] Downsample before upload.
-- [ ] Encode to a supported format below one megabyte.
-- [ ] Show the actual circular mask preview while cropping.
-- [ ] Preserve the previous profile image until the new upload succeeds.
-- [ ] Allow removal or replacement of the current photo.
-- [ ] Handle Photos permission and decode failures without corrupting appearance state.
+- [x] Use PhotosPicker for image selection.
+- [x] Decode the selected transferable off the main UI path.
+- [x] Present a square crop editor.
+- [x] Support drag to reposition.
+- [x] Support pinch to zoom.
+- [x] Prevent empty space inside the final square crop.
+- [x] Render the final square using `ImageRenderer` or an appropriate image pipeline.
+- [x] Downsample before upload.
+- [x] Encode to a supported format below one megabyte.
+- [x] Show the actual circular mask preview while cropping.
+- [x] Preserve the previous profile image until the new upload succeeds.
+- [x] Allow removal or replacement of the current photo.
+- [x] Handle Photos permission and decode failures without corrupting appearance state.
 
 ### 11.4 Emoji picker
 
@@ -806,58 +807,58 @@ Validation boundary:
 - [ ] Remove the old iPhone profile dependency on SFSymbolsPicker.
 - [ ] Load sectioned emoji data through `EmojiIndexProvider`.
 - [ ] Use SwiftEmoji’s grid.
-- [ ] Add emoji search.
-- [ ] Use relevance or alphabetical search, not usage ranking.
-- [ ] Disable `EmojiUsageTracker`.
-- [ ] Do not call `recordUse`.
-- [ ] Do not request or display favourites.
-- [ ] Persist only `emoji.character`.
-- [ ] Keep the picker’s modal attached to the profile-editor root.
+- [x] Add emoji search.
+- [x] Use relevance or alphabetical search, not usage ranking.
+- [x] Disable `EmojiUsageTracker`.
+- [x] Do not call `recordUse`.
+- [x] Do not request or display favourites.
+- [x] Persist only the Unicode emoji character.
+- [x] Keep the picker’s modal attached to the profile-editor root.
 
 ### 11.5 Monogram editing
 
-- [ ] Place the transparent TextField directly inside the monogram preview/pop control.
-- [ ] Preserve the visual typography while editing.
-- [ ] Enforce the agreed character limit.
-- [ ] Normalize casing without moving cursor state unnecessarily.
-- [ ] Keep the field accessible and focusable.
-- [ ] Avoid a separate rounded-border TextField below the preview.
+- [x] Place the transparent TextField directly inside the monogram preview/pop control.
+- [x] Preserve the visual typography while editing.
+- [x] Enforce the agreed character limit.
+- [x] Normalize casing without moving cursor state unnecessarily.
+- [x] Keep the field accessible and focusable.
+- [x] Avoid a separate rounded-border TextField below the preview.
 
 ### 11.6 Font popover
 
-- [ ] Attach a font popover to its root profile-editor host.
-- [ ] Show the four existing designs:
+- [x] Attach a font popover to its root profile-editor host.
+- [x] Show the four existing designs:
   - default;
   - serif;
   - monospaced;
   - rounded.
-- [ ] Render each sample using `.font(.system(size:weight:design:))`.
-- [ ] Add the ticked weight slider below the four designs.
-- [ ] Map ticks to explicit SwiftUI weights.
-- [ ] Persist the selected design and weight.
-- [ ] Ensure preview and reusable renderer use the same mapping.
+- [x] Render each sample using `.font(.system(size:weight:design:))`.
+- [x] Add the ticked weight slider below the four designs.
+- [x] Map ticks to explicit SwiftUI weights.
+- [x] Persist the selected design and weight.
+- [x] Ensure preview and reusable renderer use the same mapping.
 
 ### 11.7 Colour grid
 
-- [ ] Replace three ColorPickers.
-- [ ] Build one dense palette of approximately fifteen columns by ten rows in portrait width.
-- [ ] Use no inter-cell padding.
-- [ ] Permit one-to-three selected colours.
-- [ ] Show selection without requiring colour order.
-- [ ] Reject a fourth selection.
-- [ ] Permit deselection only while at least one colour remains.
-- [ ] Feed the selected set into ColorfulX.
-- [ ] Keep colour identifiers stable across launches.
+- [x] Replace three ColorPickers.
+- [x] Build one dense palette of approximately fifteen columns by ten rows in portrait width.
+- [x] Use no inter-cell padding.
+- [x] Permit one-to-three selected colours.
+- [x] Show selection without requiring colour order.
+- [x] Reject a fourth selection.
+- [x] Permit deselection only while at least one colour remains.
+- [x] Feed the selected set into ColorfulX.
+- [x] Keep colour identifiers stable across launches.
 
 ### 11.8 Save transaction
 
-- [ ] Separate display-name update, appearance update, and photo upload without exposing partial corrupt state.
-- [ ] Upload the new photo before switching the authoritative content kind to Photo.
-- [ ] Save appearance before deleting an old photo when switching away from Photo.
-- [ ] Refresh the authoritative profile response after save.
-- [ ] Update local caches once from that response.
-- [ ] Refresh Friends and widgets only after authoritative save succeeds.
-- [ ] Use a prominent confirm button with system image.
+- [x] Separate display-name update, appearance update, and photo upload without exposing partial corrupt state.
+- [x] Upload the new photo before switching the authoritative content kind to Photo.
+- [x] Save appearance before deleting an old photo when switching away from Photo.
+- [x] Refresh the authoritative profile response after save.
+- [x] Update local caches once from that response.
+- [x] Refresh Friends and widgets only after authoritative save succeeds.
+- [x] Use a prominent confirm button with system image.
 
 ## Phase 12: Friends iPhone redesign
 
@@ -867,10 +868,10 @@ Validation boundary:
 - [x] Apply `.scrollEdgeEffect()`.
 - [x] Keep refreshable behavior.
 - [x] Remove the Profile toolbar button.
-- [ ] Preserve friend-request and add-friend matched transitions.
-- [ ] Replace current brown paper with white paper.
-- [ ] Clip the paper image using the established Today/Planner card technique.
-- [ ] Prevent a resizable paper image from claiming the full screen or row proposal.
+- [x] Preserve friend-request and add-friend matched transitions.
+- [x] Replace current brown paper with white paper.
+- [x] Clip the paper image using the established Today/Planner card technique.
+- [x] Prevent a resizable paper image from claiming the full screen or row proposal.
 - [x] Use the reusable profile-picture component.
 - [x] Remove the disclosure chevron if sheet presentation no longer implies navigation.
 - [x] Make the entire visible card the only hit target.
@@ -884,7 +885,7 @@ Validation boundary:
 - [x] Apply `.secondary` foreground style to next class.
 - [x] Prefix it with `Next:`.
 - [x] Avoid a double prefix when `FriendScheduleStatus` already returns `Next:`.
-- [ ] Keep live school/activity status.
+- [x] Keep live school/activity status.
 - [x] Remove redundant relationship labels.
 - [ ] Keep the row readable at fixed medium Dynamic Type only if explicitly retained for this surface.
 
@@ -907,7 +908,7 @@ Validation boundary:
 - [x] Use `.appNavigationTitle`.
 - [x] Apply `.scrollEdgeEffect()`.
 - [x] Keep the General/Week custom segmented control with SF Symbols.
-- [ ] Preserve live status.
+- [x] Preserve live status.
 - [x] Remove friend email.
 - [x] Put destructive actions in the intended visible bottom controls or action menu according to final visual implementation.
 - [x] Use SF Symbols in Remove and Report buttons.
@@ -949,14 +950,14 @@ Validation boundary:
 - [x] Preserve the custom UIKit tab bridge and prominent-action behavior.
 - [x] Update `MainTab` mapping.
 - [x] Update programmatic tab selection.
-- [ ] Update notification-based deep links to Settings and Timetable.
+- [x] Update notification-based deep links to Settings and Timetable.
 - [x] Keep Administration as the fourth conditional tab after Settings.
 - [x] Make admin-tab visibility derive from current server authority, not calendar-event cache capability.
 - [x] Remove the admin tab immediately after an authority-refresh response reports no access.
 - [x] Keep the account signed in.
 - [x] Add Profile under Settings > Account.
-- [ ] Reuse the profile picture in the Settings account row.
-- [ ] Show authority badges on the Settings profile picture.
+- [x] Reuse the profile picture in the Settings account row.
+- [x] Show authority badges on the Settings profile picture.
 
 ## Phase 14: Administration refresh and account data
 
@@ -985,9 +986,9 @@ Validation boundary:
 - [x] Give associated names a readable token/list editor.
 - [x] Normalize aliases before saving.
 - [x] Show validation when an alias conflicts with another active subject tag.
-- [ ] Keep year-group canonical values protected while permitting approved display metadata changes.
-- [ ] Keep destructive archive actions behind confirmation dialogs attached to the administration root.
-- [ ] Use matched transitions and unique source IDs for compact tag and section editors.
+- [x] Keep year-group canonical values protected while permitting approved display metadata changes.
+- [x] Keep destructive archive actions behind confirmation dialogs attached to the administration root.
+- [x] Use matched transitions and unique source IDs for compact tag and section editors.
 - [x] Use fractional sheet detents for short tag and section forms.
 - [x] Add `.refreshable` to the tag-management list.
 
@@ -1008,13 +1009,13 @@ Validation boundary:
 ### 14.4 Administrator management
 
 - [x] Show current authority in user rows and detail.
-- [ ] Show administrator badge overlays using the reusable profile picture.
-- [ ] Show permanent-owner badge according to the final distinction.
+- [x] Show administrator badge overlays using the reusable profile picture.
+- [x] Show permanent-owner badge according to the final distinction.
 - [x] Only system owners see grant/revoke controls.
 - [x] Confirm grant and revoke operations.
 - [x] Prevent revoking either permanent owner.
-- [ ] Refresh target account and current dashboard after a role change.
-- [ ] If the current account somehow loses ordinary admin authority, handle the next `403` by removing the admin tab.
+- [x] Refresh target account and current dashboard after a role change.
+- [x] If the current account somehow loses ordinary admin authority, handle the next `403` by removing the admin tab.
 - [x] Record authority changes in an audit record with actor, target, old role, new role, and timestamp.
 
 ## Phase 15: Broadcast composer and history
@@ -1030,7 +1031,7 @@ Validation boundary:
 - [x] Show full title, subtitle, and body without inventing placeholder content.
 - [x] Show aggregate delivery result.
 - [x] Add detail disclosure for structured failures if persisted.
-- [ ] Do not add pull-to-refresh to the composer.
+- [x] Do not add pull-to-refresh to the composer.
 - [x] Add pull-to-refresh to history.
 
 ## Phase 16: TipKit setup only
@@ -1065,20 +1066,20 @@ Validation boundary:
 - [x] Prevent small and medium families from selecting it.
 - [x] Fix Dynamic Type to `.medium`.
 - [x] Build timeline entry data in the provider.
-- [ ] Include:
+- [x] Include:
   - current owner subject/state;
   - up to three ordered friends;
   - each friend’s current subject/state;
   - upcoming calendar events;
   - profile-picture data or cached image representation.
-- [ ] Reserve a clean model/UI extension point for future friend statuses.
+- [x] Reserve a clean model/UI extension point for future friend statuses.
 - [x] Do not render a status placeholder or add a user-status endpoint in this phase.
 - [ ] Ensure all content fits without runtime truncation in the large family.
 - [x] Prioritize the first three persisted friend-order entries.
 - [x] Add `Next:` to the existing Friends widget where requested.
 - [x] Avoid network requests from the widget view.
-- [ ] Cache profile photos in the shared App Group at an appropriate downsampled size.
-- [ ] Trigger timeline reload after:
+- [x] Cache profile photos in the shared App Group at an appropriate downsampled size.
+- [x] Trigger timeline reload after:
   - friend reorder;
   - profile update;
   - friend profile refresh;
@@ -1104,19 +1105,19 @@ Validation boundary:
 - [x] Bind the field to the shared `Defaults[.debugOffset]` value.
 - [x] Recompute visible timer tabs immediately when the offset changes.
 - [x] Keep the field human-readable and consistent with the iPhone Debug setting.
-- [ ] Do not change the Watch app icon.
-- [ ] Do not redesign Watch navigation or profile pictures in this phase.
-- [ ] Do not expand the reusable avatar to Watch yet.
+- [x] Do not change the Watch app icon.
+- [x] Do not redesign Watch navigation or profile pictures in this phase.
+- [x] Do not expand the reusable avatar to Watch yet.
 
 ## Phase 20: Platform audit after iPhone completion
 
-- [ ] Audit Codable compatibility on iPadOS, macOS, Watch, widgets, Messages, App Intents, and Live Activities.
-- [ ] Keep new profile DTOs decodable even where the UI is not yet updated.
-- [ ] Ensure unsupported profile photo surfaces fall back safely.
-- [ ] Ensure authority changes do not expose an admin destination on unsupported platforms.
-- [ ] Ensure tag filtering does not remove server-authoritative calendar data accidentally.
-- [ ] Ensure record-level sync changes do not break Watch bootstrap.
-- [ ] Schedule separate parity work rather than widening iPhone commits.
+- [x] Audit Codable compatibility on iPadOS, macOS, Watch, widgets, Messages, App Intents, and Live Activities.
+- [x] Keep new profile DTOs decodable even where the UI is not yet updated.
+- [x] Ensure unsupported profile photo surfaces fall back safely.
+- [x] Ensure authority changes do not expose an admin destination on unsupported platforms.
+- [x] Ensure tag filtering does not remove server-authoritative calendar data accidentally.
+- [x] Ensure record-level sync changes do not break Watch bootstrap.
+- [x] Schedule separate parity work rather than widening iPhone commits.
 
 ## User-run verification matrix
 
@@ -1271,13 +1272,13 @@ The exact sequence may split further when source boundaries require it.
 - [x] `add email verification challenges`
 - [x] `remove apple authentication`
 - [x] `add global event tags`
-- [ ] `add profile media`
-- [ ] `enforce profile storage quotas`
-- [ ] `add profile badges`
+- [x] `add profile media`
+- [x] `enforce profile storage quotas`
+- [x] `add profile badges`
 - [x] `persist friend order`
 - [x] `store broadcast history`
-- [ ] `add record sync metadata`
-- [ ] `add record sync endpoint`
+- [x] `add record sync metadata`
+- [x] `add record sync endpoint`
 - [x] `add timestamps to server logs`
 
 ### Timetable
@@ -1290,14 +1291,14 @@ The exact sequence may split further when source boundaries require it.
 - [x] `improve calendar import sampling`
 - [x] `add tag subscriptions`
 - [x] `add event tag selection`
-- [ ] `sync records by server revision`
-- [ ] `add reusable profile pictures`
+- [x] `sync records by server revision`
+- [x] `add reusable profile pictures`
 - [x] `move profile editor to settings`
-- [ ] `add photo profile editor`
-- [ ] `replace profile symbols with emoji`
-- [ ] `add profile font controls`
-- [ ] `add profile colour grid`
-- [ ] `redesign friends rows`
+- [x] `add photo profile editor`
+- [x] `replace profile symbols with emoji`
+- [x] `add profile font controls`
+- [x] `add profile colour grid`
+- [x] `redesign friends rows`
 - [x] `show friend details in a sheet`
 - [x] `fix shared class matching`
 - [x] `persist friend priority`

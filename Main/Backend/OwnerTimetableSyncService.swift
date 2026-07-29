@@ -285,25 +285,36 @@ final class OwnerTimetableSyncService {
 
 	private func flushPendingMutations() async throws -> [UUID: OwnerTimetableResponse] {
 		var responses: [UUID: OwnerTimetableResponse] = [:]
+		var hasPolledServer = false
 
-		while let mutation = Defaults[.pendingSyncMutations].first {
+		while !hasPolledServer || !Defaults[.pendingSyncMutations].isEmpty {
+			let mutation = Defaults[.pendingSyncMutations].first
 			let envelope = SyncEnvelopeRequest(
 				requestID: UUID(),
 				installationID: ClientIdentityProvider.shared.identity().installationID,
-				mutations: [mutation]
+				mutations: mutation.map { [$0] } ?? [],
+				cursor: Defaults[.syncCursor]
 			)
 			let response: SyncEnvelopeResponse = try await networkManager.send(
 				.v1RecordSync,
 				body: envelope
 			)
+			hasPolledServer = true
 
+			apply(response.tombstones)
+			if let nextCursor = response.nextCursor {
+				Defaults[.syncCursor] = nextCursor
+			}
+
+			guard let mutation else {
+				continue
+			}
 			guard let result = response.results.first(
 				where: { $0.mutationID == mutation.mutationID }
 			) else {
 				throw RecordSyncError.missingResult
 			}
 
-			Defaults[.syncTombstones] = response.tombstones
 			if let ownerTimetable = result.ownerTimetable {
 				cache(ownerTimetable)
 				setOwnerTimetableRevision(result.serverRevision)
@@ -327,6 +338,66 @@ final class OwnerTimetableSyncService {
 
 		Defaults[.lastServerSync] = .now
 		return responses
+	}
+
+	private func apply(_ tombstones: [SyncTombstone]) {
+		guard !tombstones.isEmpty else {
+			return
+		}
+
+		var storedTombstones = Defaults[.syncTombstones]
+		var revisions = Defaults[.syncRecordRevisions]
+		var removedOwnerTimetable = false
+
+		for tombstone in tombstones {
+			guard tombstone.revision > revisions.revision(
+				for: tombstone.recordType,
+				recordID: nil
+			) else {
+				continue
+			}
+
+			switch tombstone.recordType {
+				case .ownerTimetable:
+					let cachedRecordID = UUID(
+						uuidString: Defaults[.ownerTimetableID]
+					)
+					guard cachedRecordID == nil ||
+						cachedRecordID == tombstone.recordID
+					else {
+						continue
+					}
+
+					Defaults[.timetable] = []
+					Defaults[.ownerTimetableID] = ""
+					removedOwnerTimetable = true
+			}
+
+			revisions.setRevision(
+				tombstone.revision,
+				for: tombstone.recordType,
+				recordID: nil
+			)
+			storedTombstones.removeAll {
+				$0.recordType == tombstone.recordType &&
+					$0.recordID == tombstone.recordID
+			}
+			storedTombstones.append(tombstone)
+		}
+
+		let retentionCutoff = Date.now.addingTimeInterval(-90 * 24 * 60 * 60)
+		storedTombstones.removeAll {
+			$0.deletedAt < retentionCutoff
+		}
+		Defaults[.syncTombstones] = storedTombstones
+		Defaults[.syncRecordRevisions] = revisions
+
+		if removedOwnerTimetable {
+			Task {
+				await SpotlightIndexer.shared.indexOwnerTimetable()
+			}
+			WidgetCenter.shared.reloadAllTimelines()
+		}
 	}
 
 	private func removePendingMutation(_ mutationID: UUID) {

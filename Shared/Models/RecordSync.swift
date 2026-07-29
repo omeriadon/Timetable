@@ -32,6 +32,7 @@ nonisolated struct SyncEnvelopeRequest: Codable, Sendable {
 	let requestID: UUID
 	let installationID: String
 	let mutations: [SyncRecordMutation]
+	let cursor: String?
 }
 
 nonisolated struct SyncTombstone: Codable, Defaults.Serializable, Sendable {
