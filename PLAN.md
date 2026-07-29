@@ -262,18 +262,18 @@ Validation boundary:
 
 ### 2.2 Email verification
 
-- [ ] Add an email-verification challenge model.
-- [ ] Store a hashed code, never the plaintext code.
-- [ ] Store normalized email.
-- [ ] Store creation, expiry, resend-available, used, and attempt timestamps.
-- [ ] Add a bounded failed-attempt counter.
+- [x] Add an email-verification challenge model.
+- [x] Store a hashed code, never the plaintext code.
+- [x] Store normalized email.
+- [x] Store creation, expiry, resend-available, used, and attempt timestamps.
+- [x] Add a bounded failed-attempt counter.
 - [ ] Add rate limits per normalized email, installation, and source IP.
-- [ ] Invalidate older live codes when a replacement code is issued.
-- [ ] Mark a code used atomically with account creation or email verification.
+- [x] Invalidate older live codes when a replacement code is issued.
+- [x] Mark a code used atomically with account creation or email verification.
 - [ ] Clean expired challenges without affecting accounts.
 - [ ] Configure the existing Resend integration for verification messages.
 - [ ] Keep API keys exclusively in deployed environment configuration.
-- [ ] Add mail content for the six-digit code and ten-minute expiry.
+- [x] Add mail content for the six-digit code and ten-minute expiry.
 
 ### 2.3 Apple-account removal
 
@@ -436,16 +436,16 @@ Validation boundary:
 ### 3.1 Authentication endpoints
 
 - [ ] Replace direct registration with a verification-first flow.
-- [ ] Add request-code endpoint.
+- [x] Add request-code endpoint.
 - [ ] Normalize and validate the school email before sending.
 - [ ] Return resend availability and challenge expiry.
-- [ ] Add verify-code-and-register endpoint.
-- [ ] Atomically consume the code.
+- [x] Add verify-code-and-register endpoint.
+- [x] Atomically consume the code.
 - [ ] Keep password validation and hashing.
-- [ ] Derive the default display name from the normalized email local part.
-- [ ] Split the local part using the required `firstname.lastname` format.
-- [ ] Strip trailing digits from the last-name component.
-- [ ] Capitalize the first and last names for display.
+- [x] Derive the default display name from the normalized email local part.
+- [x] Split the local part using the required `firstname.lastname` format.
+- [x] Strip trailing digits from the last-name component.
+- [x] Capitalize the first and last names for display.
 - [ ] Reject registration addresses that do not provide the required first-name and last-name components.
 - [ ] Reject non-school emails at every account mutation boundary.
 - [ ] Keep login failure responses non-enumerating where appropriate.
