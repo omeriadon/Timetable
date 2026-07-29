@@ -29,8 +29,23 @@ Validation boundary:
 - Tag selection is sectioned by tag category.
 - Tags use a wrapping flow layout: each chip takes its intrinsic width, fills the current row, then wraps.
 - Global tag categories include year groups, subjects, sport, and general.
+- Year-group tags are Year 7, Year 8, Year 9, Year 10, Year 11, and Leavers.
+- Leavers is the user-facing name for Year 12.
+- Administrators create, edit, archive, and reorder tags and tag sections.
+- Subject tags are created manually by administrators.
+- Every tag has administrator-managed associated names used for normalized import matching.
+- An unmatched imported subject does not create a tag and does not change subscriptions.
+- Tags on private events are decorative metadata only.
+- Private-event tags do not enable filtering or search and never expose the event to another user.
+- Private events cannot be assigned a year-group tag.
+- School events are visible only when their non-year tags intersect the user’s subscribed tags.
+- Multiple non-year tags use OR matching.
+- A tagged school event with a year-group restriction additionally requires the user’s year group to match.
+- Year-group matching is an AND gate over the ordinary non-year OR rule.
+- General is subscribed by default but users may unsubscribe from it.
 - If an event references a tag that no longer exists, the client and server drop that association safely.
 - Normal migrations should preserve valid tag associations.
+- Removed tags are archived instead of hard-deleted.
 - A calendar import can offer to replace only the user’s existing subject-tag subscriptions with subject tags detected from the import.
 - Replacing imported subject-tag subscriptions must preserve year-group, sport, general, and any future non-subject subscriptions.
 - Valid account emails end exactly in `@student.education.wa.edu.au`, compared case-insensitively after trimming and normalization.
@@ -38,7 +53,10 @@ Validation boundary:
 - Verification codes expire after ten minutes.
 - A replacement code may be requested after two minutes.
 - Existing Apple-only accounts are deleted as part of the Apple Sign In removal.
+- An Apple-only account is an account without a password credential.
+- Accounts with both Apple and password credentials remain and lose only their Apple credential.
 - Sync conflicts use the smallest reasonable mutable record as their unit.
+- Record-level conflict handling covers every mutable dataset that two devices could edit.
 - Device wall-clock time is not authoritative.
 - Server-issued revisions and server timestamps resolve conflicts.
 - Broadcast title is required.
@@ -54,9 +72,13 @@ Validation boundary:
 - The weight control is a ticked slider.
 - Profile colour selection accepts one, two, or three colours.
 - Colour selection order is not meaningful.
+- The profile colour grid uses a fixed curated palette bundled with the app.
 - Badges contain an SF Symbol and optional background and symbol colours.
 - Profile badges are modular and represented as an array.
 - Badges are overlays and never reduce the base avatar circle.
+- Ordinary administrators and permanent owners use different authority badges.
+- At most three badges are shown.
+- Multiple badges stack leftwards from the bottom-right anchor without moving the anchor farther right.
 - The initial reusable profile-picture rollout covers iPhone surfaces where the current user or friends appear.
 - Friend removal uses a confirmation dialog.
 - Friend reporting uses an alert confirmation.
@@ -85,40 +107,25 @@ Validation boundary:
 - Removing administrator access does not sign the user out.
 - Removed administrators immediately receive `403 Forbidden` from protected administration endpoints.
 - The administration tab disappears after the client refreshes authority.
+- Administration remains a fourth conditional tab after Settings.
 - Watch content background work replaces the existing `containerBackground` composition with the equivalent per-view `background` composition.
+- The Watch app icon is not changed by Codex.
+- Watch timers must continue updating while their containing tabs are visible.
+- Watch Debug settings include a runtime debug-offset text field backed by the shared offset.
 - The large summary widget shows at most three friends.
+- Friend status in the summary widget is a future stub only; no visible or functional status feature is implemented now.
 - Widget Dynamic Type is fixed at `.medium`.
 - Friends can be reordered by drag.
 - Friend order is server-persisted and determines widget priority.
 
 ## Open decisions requiring answers before their dependent phases
 
-- Define the actual year-group tag set. The likely set is Years 7 through 12.
-- Define who creates, edits, archives, and orders global tags. The likely owner is the administration UI.
-- Define whether subject tags are:
-  - created only by administrators;
-  - automatically created from normalized imports;
-  - or drawn from a pre-seeded school subject catalogue.
-- Clarify the event/tag relationship:
-  - school events have tags and users subscribe to tags to receive matching school events;
-  - private events also carry tags for personal organization;
-  - or assigning a private event to a tag publishes or exposes it to other subscribers.
-- Define whether the “Sport” and “General” requirements mean one tag each or categories containing multiple administrator-created tags.
-- Define the admin-tab location after the three primary tabs become Timetable, Friends, Settings.
-- Define whether the iPhone-first freeze postpones the explicitly requested Watch icon/background changes, or only postpones profile-picture parity on Watch.
-- Define what “friends can display their status” means in the new summary widget:
-  - derived school state such as In Class, Free, On Break, or Offline;
-  - a user-authored status;
-  - or both.
-- Define the badge distinction between permanent privileged accounts and ordinary administrators:
-  - one shared `shield.fill` administrator badge;
-  - or a distinct symbol/colour for permanent owners.
-- Define how multiple profile badges are placed when more than one exists.
-- Define whether the profile colour grid uses a fixed curated palette committed to the app or a server-provided palette.
-- Define whether a removed global tag is hard-deleted or archived. Archiving is safer for event history and migrations.
-- Define the exact scope of the sync redesign:
-  - only client-authored mutable account data;
-  - or every cached resource, including friends, received timetables, authored timetables, school data, and administration data.
+- Define the exact symbol and colours for the permanent-owner badge. The ordinary administrator badge remains `shield.fill`.
+- Define whether a subject/classroom match should appear in both Shared Classes and Shared Subjects, or only in Shared Classes.
+- Define visibility for a school event with no non-year tags:
+  - visible to every user who passes any year restriction;
+  - or invalid until an administrator adds at least one non-year tag.
+- Confirm Cloudflare R2 as the profile-photo object store after reviewing the storage recommendation.
 
 ## Architecture constraints
 
@@ -199,6 +206,7 @@ Validation boundary:
   - stable slug;
   - display name;
   - category;
+  - associated names used for matching;
   - optional symbol;
   - optional colour;
   - sort order;
@@ -266,7 +274,8 @@ Validation boundary:
 
 ### 2.3 Apple-account removal
 
-- [ ] Identify Apple-only accounts by authoritative criteria.
+- [ ] Identify Apple-only accounts as accounts with no password hash.
+- [ ] Preserve accounts that have both a password hash and Apple subject.
 - [ ] Add a migration or explicit maintenance command that deletes Apple-only accounts and their dependent data.
 - [ ] Rely on database cascade behavior only after auditing every relationship.
 - [ ] Explicitly cover:
@@ -283,6 +292,7 @@ Validation boundary:
   - aliases;
   - profile media.
 - [ ] Remove Apple identity fields after the deletion migration is safely ordered.
+- [ ] Clear Apple identity fields from preserved password accounts before removing the columns.
 - [ ] Remove Apple-auth server routes.
 - [ ] Remove Apple server-notification routes.
 - [ ] Remove Apple JWT configuration that is no longer used.
@@ -291,16 +301,22 @@ Validation boundary:
 
 ### 2.4 Global tags and subscriptions
 
+- [ ] Add an administrator-managed tag-section table.
 - [ ] Add the global tag table.
+- [ ] Add associated tag names as a normalized child table or validated array field.
 - [ ] Add an account-to-tag subscription join table.
 - [ ] Add a calendar-event-to-tag join table.
 - [ ] Add uniqueness constraints for normalized active tag names within categories.
 - [ ] Add stable ordering within each category.
 - [ ] Add foreign-key behavior for archived or deleted tags.
 - [ ] Prefer archive plus association cleanup over hard delete.
-- [ ] Seed year-group tags.
-- [ ] Seed Sport and General according to the final product decision.
-- [ ] Create the subject-tag population path according to the final product decision.
+- [ ] Seed Year 7, Year 8, Year 9, Year 10, Year 11, and Leavers.
+- [ ] Give Leavers the canonical year-group value for Year 12 while retaining the Leavers display name.
+- [ ] Seed a General tag and subscribe new users to it by default.
+- [ ] Keep Sport and General data-driven rather than branching on their names.
+- [ ] Require administrators to create subject tags manually.
+- [ ] Normalize and uniquely constrain associated names used for import matching.
+- [ ] Prevent ambiguous associated names from belonging to more than one active subject tag.
 - [ ] Ensure stale tag IDs in client payloads are ignored and reported as dropped.
 - [ ] Add tag revisions or updated timestamps for incremental synchronization.
 
@@ -331,6 +347,13 @@ Validation boundary:
 
 ### 2.6 Profile media and badges
 
+- [ ] Use a private Cloudflare R2 bucket for profile-photo objects, subject to final approval.
+- [ ] Keep R2 credentials in deployed environment configuration only.
+- [ ] Store only object keys and image metadata in PostgreSQL.
+- [ ] Use revisioned object keys such as `avatars/<userID>/<revision>.jpg`.
+- [ ] Keep the bucket private.
+- [ ] Serve short-lived authenticated reads through pmstt or short-lived presigned GET URLs.
+- [ ] Prefer server-issued upload authorization and a validation/finalization step.
 - [ ] Add profile-media metadata.
 - [ ] Associate at most one active profile photo with a user.
 - [ ] Store content type, byte size, dimensions, checksum, revision, and update time.
@@ -340,6 +363,8 @@ Validation boundary:
 - [ ] Strip unneeded metadata.
 - [ ] Prevent SVG or arbitrary file uploads.
 - [ ] Define authenticated upload, fetch, and delete routes.
+- [ ] Delete superseded R2 objects only after the new database reference commits successfully.
+- [ ] Add orphan-object cleanup for abandoned uploads and failed database transactions.
 - [ ] Provide cache validation using revision, ETag, or content hash.
 - [ ] Add profile badges to friend/profile DTOs.
 - [ ] Derive authority badges on the server rather than accepting them from profile edits.
@@ -379,7 +404,11 @@ Validation boundary:
 - [ ] Add verify-code-and-register endpoint.
 - [ ] Atomically consume the code.
 - [ ] Keep password validation and hashing.
-- [ ] Derive display name according to the final name source.
+- [ ] Derive the default display name from the normalized email local part.
+- [ ] Split the local part using the required `firstname.lastname` format.
+- [ ] Strip trailing digits from the last-name component.
+- [ ] Capitalize the first and last names for display.
+- [ ] Reject registration addresses that do not provide the required first-name and last-name components.
 - [ ] Reject non-school emails at every account mutation boundary.
 - [ ] Keep login failure responses non-enumerating where appropriate.
 - [ ] Remove client and server Apple login endpoints.
@@ -401,17 +430,23 @@ Validation boundary:
 - [ ] Add current-user tag-subscription endpoint.
 - [ ] Add atomic replacement of subject-only subscriptions.
 - [ ] Preserve all non-subject subscriptions during subject replacement.
-- [ ] Add administration tag create/update/archive/order endpoints if administrators own tag management.
+- [ ] Add administration tag-section create/update/archive/order endpoints.
+- [ ] Add administration tag create/update/archive/order endpoints.
+- [ ] Validate associated names and reject ambiguous active subject aliases.
 - [ ] Add tag IDs to school/global calendar event requests and responses.
-- [ ] Add tag IDs to private-event requests and responses according to the final relationship decision.
-- [ ] Filter user-visible school events by subscription rules without breaking administrator visibility.
+- [ ] Add non-year tag IDs to private-event requests and responses as decorative metadata.
+- [ ] Reject year-group tag IDs on private events.
+- [ ] Filter user-visible school events using the non-year OR rule.
+- [ ] Apply year-group tags as a separate required match when an event has a year restriction.
+- [ ] Let users unsubscribe from General even though new accounts receive it by default.
+- [ ] Keep administrator event-management visibility independent of subscriber filtering.
 - [ ] Include dropped/archived association information in mutation responses where useful.
 
 ### 3.4 Profile endpoints
 
 - [ ] Replace opaque appearance-data-only handling with an explicit versioned appearance DTO.
 - [ ] Retain legacy decode support during migration.
-- [ ] Add photo upload and deletion endpoints.
+- [ ] Add R2-backed photo upload, finalization, fetch authorization, and deletion endpoints.
 - [ ] Add photo URL/revision and badges to friend and self-profile responses.
 - [ ] Do not include friend email in normal friend responses.
 - [ ] Keep email in authenticated self-account responses and privileged administration responses.
@@ -516,8 +551,11 @@ Validation boundary:
 ### 6.2 Name and year group
 
 - [ ] Treat the verified school email as the required account identifier.
-- [ ] Confirm the source used to establish the person’s display name.
+- [ ] Derive the initial display name from `firstname.lastname`.
+- [ ] Strip trailing digits from the last name.
+- [ ] Capitalize the derived first and last names.
 - [ ] Add year-group selection during onboarding.
+- [ ] Show Year 7, Year 8, Year 9, Year 10, Year 11, and Leavers.
 - [ ] Use global year-group tags from the server rather than hardcoded presentation-only values.
 - [ ] Persist the selected year-group subscription through the tag-subscription endpoint.
 - [ ] Make the onboarding page unable to advance until a valid year group is saved.
@@ -551,7 +589,11 @@ Validation boundary:
 
 - [ ] Add a Settings destination for subscribed tags if required by the final navigation decision.
 - [ ] Show year groups, subjects, sport, and general in sections.
-- [ ] Allow multiple subscriptions except where year-group rules require one.
+- [ ] Allow multiple non-year subscriptions.
+- [ ] Require exactly one year-group subscription during onboarding.
+- [ ] Permit changing the account year group later through the approved Settings location.
+- [ ] Subscribe new accounts to General by default.
+- [ ] Allow users to remove General.
 - [ ] Save changes atomically.
 - [ ] Roll back local selection if the server rejects the update.
 - [ ] Drop archived/missing tags from the cache.
@@ -560,7 +602,10 @@ Validation boundary:
 ### 7.3 Event editor
 
 - [ ] Add tags to school/global event DTOs and administration event editing.
-- [ ] Add tag selection to private event editing according to the final relationship decision.
+- [ ] Add decorative non-year tag selection to private event editing.
+- [ ] Exclude the year-group section from private-event tag selection.
+- [ ] Do not add filtering or search based on private-event tags.
+- [ ] Never publish private events through a tag association.
 - [ ] Keep school/global event authority read-only for ordinary users.
 - [ ] Preserve existing matched transitions.
 - [ ] Keep short tag selection sheets within the requested fractional detent range where content permits.
@@ -825,7 +870,8 @@ Validation boundary:
 - [ ] Use SF Symbols in Remove and Report buttons.
 - [ ] Attach remove confirmation dialog to the detail-sheet root.
 - [ ] Attach report alert to the detail-sheet root.
-- [ ] Keep Block only if it remains part of the approved design.
+- [ ] Remove the existing Block action and related client state.
+- [ ] Keep the approved actions limited to Remove and Report.
 
 ### 12.5 Exact shared comparison
 
@@ -835,7 +881,7 @@ Validation boundary:
 - [ ] Treat missing classroom as matching only another missing classroom.
 - [ ] Build Shared Classes from identical subject and classroom pairs.
 - [ ] Build Shared Subjects from identical subject names.
-- [ ] Exclude exact shared classes from Shared Subjects only if the UI would otherwise duplicate them; confirm during implementation.
+- [ ] Apply the final decision on whether a class match also appears in Shared Subjects.
 - [ ] Deduplicate repeated weekly occurrences.
 - [ ] Preserve stable order based on the owner timetable or normalized name.
 - [ ] Render empty states separately for both sections.
@@ -861,7 +907,7 @@ Validation boundary:
 - [ ] Update `MainTab` mapping.
 - [ ] Update programmatic tab selection.
 - [ ] Update notification-based deep links to Settings and Timetable.
-- [ ] Place Administration according to the final open decision.
+- [ ] Keep Administration as the fourth conditional tab after Settings.
 - [ ] Make admin-tab visibility derive from current server authority, not calendar-event cache capability.
 - [ ] Remove the admin tab immediately after an authority-refresh response reports no access.
 - [ ] Keep the account signed in.
@@ -885,7 +931,24 @@ Validation boundary:
 - [ ] Ensure refresh operations replace authoritative snapshots without duplicating rows.
 - [ ] Present refresh failures through status badges.
 
-### 14.2 Account JSON disclosure hierarchy
+### 14.2 Tag and section management
+
+- [ ] Add a Tags destination to Administration.
+- [ ] Use disclosure groups for tag sections.
+- [ ] Show each section’s tags inside its disclosure group.
+- [ ] Support adding, renaming, reordering, and archiving sections.
+- [ ] Support adding, editing, reordering, and archiving tags.
+- [ ] Edit each tag’s display name, category, associated names, symbol, and colour.
+- [ ] Give associated names a readable token/list editor.
+- [ ] Normalize aliases before saving.
+- [ ] Show validation when an alias conflicts with another active subject tag.
+- [ ] Keep year-group canonical values protected while permitting approved display metadata changes.
+- [ ] Keep destructive archive actions behind confirmation dialogs attached to the administration root.
+- [ ] Use matched transitions and unique source IDs for compact tag and section editors.
+- [ ] Use fractional sheet detents for short tag and section forms.
+- [ ] Add `.refreshable` to the tag-management list.
+
+### 14.3 Account JSON disclosure hierarchy
 
 - [ ] Preserve complete sanitized account JSON.
 - [ ] Preserve recursive direct/base64 JSON decoding.
@@ -899,7 +962,7 @@ Validation boundary:
 - [ ] Bound large raw sections without truncating stored data.
 - [ ] Exclude password hashes, verification-code hashes, APNs credentials, and other authentication secrets.
 
-### 14.3 Administrator management
+### 14.4 Administrator management
 
 - [ ] Show current authority in user rows and detail.
 - [ ] Show administrator badge overlays using the reusable profile picture.
@@ -950,7 +1013,7 @@ Validation boundary:
 - [ ] Handle deleted, private, malformed, unsupported-version, and not-found documents.
 - [ ] Preserve Universal Link and Messages `/share/<locator>` behavior.
 - [ ] Do not embed current subject data in new exports.
-- [ ] Decide whether legacy embedded-content `.timetable` files remain importable for one compatibility release.
+- [ ] Do not add a legacy decoder because no prior `.timetable` file format exists.
 - [ ] Refresh the received timetable cache after a successful fetch/import.
 
 ## Phase 18: Large summary widget
@@ -963,9 +1026,10 @@ Validation boundary:
   - current owner subject/state;
   - up to three ordered friends;
   - each friend’s current subject/state;
-  - each friend’s requested status definition;
   - upcoming calendar events;
   - profile-picture data or cached image representation.
+- [ ] Reserve a clean model/UI extension point for future friend statuses.
+- [ ] Do not render a status placeholder or add a user-status endpoint in this phase.
 - [ ] Ensure all content fits without runtime truncation in the large family.
 - [ ] Prioritize the first three persisted friend-order entries.
 - [ ] Add `Next:` to the existing Friends widget where requested.
@@ -982,11 +1046,22 @@ Validation boundary:
 
 ## Phase 19: Explicit Watch-only cleanup
 
-- [ ] Confirm this phase is not postponed by the iPhone-first rule.
-- [ ] Change the Watch app icon background asset to pitch black.
-- [ ] Preserve foreground artwork and required safe area.
 - [ ] Replace shared Watch `containerBackground` use with equivalent per-view `background`.
 - [ ] Keep each Watch view’s existing visual background.
+- [ ] Trace the current `Timer.publish` ownership in `WatchTimetablesTabView`.
+- [ ] Confirm timer cancellation, tab identity, and background transitions when switching tabs.
+- [ ] Move periodic time ownership into each visible timer-dependent tab where necessary.
+- [ ] Prefer `TimelineView(.periodic(...))` for view-driven school-state refresh when it remains active inside the tab container.
+- [ ] Ensure Current, Friends, and any other time-derived tab recompute school state after period boundaries.
+- [ ] Ensure `Text(timerInterval:)` receives valid moving intervals and is not recreated from a permanently stale `now`.
+- [ ] Keep update cadence proportional to the UI:
+  - one second for visible countdowns;
+  - slower periodic updates for labels that do not show seconds.
+- [ ] Add a Debug-only `debugOffset` numeric TextField to Watch Settings.
+- [ ] Bind the field to the shared `Defaults[.debugOffset]` value.
+- [ ] Recompute visible timer tabs immediately when the offset changes.
+- [ ] Keep the field human-readable and consistent with the iPhone Debug setting.
+- [ ] Do not change the Watch app icon.
 - [ ] Do not redesign Watch navigation or profile pictures in this phase.
 - [ ] Do not expand the reusable avatar to Watch yet.
 
@@ -1102,8 +1177,10 @@ Validation boundary:
 - [ ] Confirm the large summary widget fits owner, three friends, and events.
 - [ ] Confirm widget Dynamic Type remains medium.
 - [ ] Confirm reordered friends change widget priority.
-- [ ] Confirm the Watch icon background is pitch black.
 - [ ] Confirm each Watch view preserves its prior background after modifier replacement.
+- [ ] Confirm countdowns continue updating after switching between Watch tabs.
+- [ ] Confirm school state changes when a period boundary passes while the tab remains open.
+- [ ] Change Watch Debug Offset and confirm visible timer tabs update immediately.
 
 ## Planned atomic commit sequence
 
@@ -1154,7 +1231,8 @@ The exact sequence may split further when source boundaries require it.
 - [ ] `add summary widget`
 - [ ] `update friends widget next class`
 - [ ] `make watch backgrounds view local`
-- [ ] `make watch icon background black`
+- [ ] `keep watch timers updating`
+- [ ] `add watch debug time offset`
 
 ## Explicit exclusions
 
@@ -1170,4 +1248,8 @@ The exact sequence may split further when source boundaries require it.
 - No Apple Sign In compatibility after the destructive migration.
 - No device-clock-based last-write-wins logic.
 - No broad Watch, macOS, or iPadOS profile redesign during the iPhone-first phases.
+- No Watch app icon changes.
+- No friend-status feature beyond an internal future extension point.
+- No legacy `.timetable` decoder because this is the first format.
+- No Block action in friend details.
 - No builds or tests run by Codex.
