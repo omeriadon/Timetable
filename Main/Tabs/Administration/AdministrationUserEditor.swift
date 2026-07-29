@@ -180,7 +180,7 @@ private enum AdministrationJSONFormatter {
 		return formattedJSON
 	}
 
-	nonisolated private static func expandEmbeddedJSON(in object: Any) -> Any {
+	private nonisolated static func expandEmbeddedJSON(in object: Any) -> Any {
 		switch object {
 			case let dictionary as [String: Any]:
 				dictionary.mapValues(expandEmbeddedJSON(in:))
@@ -196,7 +196,7 @@ private enum AdministrationJSONFormatter {
 		}
 	}
 
-	nonisolated private static func expandJSON(from string: String) -> Any? {
+	private nonisolated static func expandJSON(from string: String) -> Any? {
 		if let object = jsonObject(from: Data(string.utf8)) {
 			return expandEmbeddedJSON(in: object)
 		}
@@ -208,7 +208,7 @@ private enum AdministrationJSONFormatter {
 		return expandEmbeddedJSON(in: object)
 	}
 
-	nonisolated private static func jsonObject(from data: Data) -> Any? {
+	private nonisolated static func jsonObject(from data: Data) -> Any? {
 		guard let object = try? JSONSerialization.jsonObject(with: data), JSONSerialization.isValidJSONObject(object) else {
 			return nil
 		}

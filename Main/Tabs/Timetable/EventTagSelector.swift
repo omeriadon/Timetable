@@ -55,7 +55,7 @@ struct TagFlowLayout: Layout {
 	func sizeThatFits(
 		proposal: ProposedViewSize,
 		subviews: Subviews,
-		cache: inout ()
+		cache _: inout ()
 	) -> CGSize {
 		let maxWidth = proposal.width ?? .greatestFiniteMagnitude
 		var width: CGFloat = 0
@@ -78,9 +78,9 @@ struct TagFlowLayout: Layout {
 
 	func placeSubviews(
 		in bounds: CGRect,
-		proposal: ProposedViewSize,
+		proposal _: ProposedViewSize,
 		subviews: Subviews,
-		cache: inout ()
+		cache _: inout ()
 	) {
 		var x = bounds.minX
 		var y = bounds.minY
