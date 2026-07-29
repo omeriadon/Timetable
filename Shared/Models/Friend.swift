@@ -57,6 +57,10 @@ nonisolated struct CreateFriendRequest: Codable, Sendable {
 	let schoolEmail: String
 }
 
+nonisolated struct FriendOrderUpdateRequest: Codable, Sendable {
+	let friendIDs: [UUID]
+}
+
 nonisolated struct ProfileAppearance: Codable, Defaults.Serializable, Hashable, Sendable {
 	let usesMonogram: Bool
 	let monogram: String

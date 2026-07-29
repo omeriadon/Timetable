@@ -410,13 +410,13 @@ Validation boundary:
 
 ### 2.8 Friend order
 
-- [ ] Add a per-user friend-priority/order field on the friendship relationship.
-- [ ] Model order independently for each side of a friendship.
-- [ ] Backfill a deterministic initial order using accepted time and stable ID.
-- [ ] Add an atomic reorder endpoint.
-- [ ] Validate that submitted IDs are exactly the caller’s current friends.
-- [ ] Normalize sparse or duplicated order values on the server.
-- [ ] Return friends in persisted user order.
+- [x] Add a per-user friend-priority/order field on the friendship relationship.
+- [x] Model order independently for each side of a friendship.
+- [x] Backfill a deterministic initial order using accepted time and stable ID.
+- [x] Add an atomic reorder endpoint.
+- [x] Validate that submitted IDs are exactly the caller’s current friends.
+- [x] Normalize sparse or duplicated order values on the server.
+- [x] Return friends in persisted user order.
 
 ### 2.9 Record-level sync metadata
 
@@ -497,8 +497,8 @@ Validation boundary:
 
 ### 3.5 Friend endpoints
 
-- [ ] Return persisted friend order.
-- [ ] Add reorder endpoint.
+- [x] Return persisted friend order.
+- [x] Add reorder endpoint.
 - [ ] Keep report behavior unchanged apart from confirmation UI.
 - [ ] Compute or return enough timetable data for exact shared-class/shared-subject comparison.
 - [ ] Avoid server claims that depend on unnormalized subject or classroom values.

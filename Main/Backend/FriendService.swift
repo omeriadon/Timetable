@@ -82,6 +82,16 @@ final class FriendService {
 		try await refresh()
 	}
 
+	func reorder(friendIDs: [UUID]) async throws {
+		let orderedFriends: [FriendSummary] = try await networkManager.send(
+			.v1FriendOrder,
+			body: FriendOrderUpdateRequest(friendIDs: friendIDs),
+			context: .userInitiated
+		)
+		Defaults[.friends] = orderedFriends
+		WidgetCenter.shared.reloadAllTimelines()
+	}
+
 	func updateProfileAppearance(_ appearance: ProfileAppearance) async throws {
 		let appearanceData = try JSONEncoder().encode(appearance)
 		let _: FriendProfile = try await networkManager.send(
@@ -115,4 +125,6 @@ private extension Endpoint {
 	static func v1BlockFriend(_ friendID: UUID) -> Endpoint {
 		Endpoint("/v1/friends/\(friendID.uuidString)/block", method: .post)
 	}
+
+	static let v1FriendOrder = Endpoint("/v1/friends/order", method: .put)
 }
