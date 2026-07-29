@@ -244,7 +244,7 @@ struct OnboardingView: View {
 	private func makePages(
 		calendarGranted: Bool,
 		notificationGranted: Bool,
-		isAuthenticated _: Bool,
+		isAuthenticated: Bool,
 		hasServerTimetable: Bool
 	) -> [OnboardingPage] {
 		[
@@ -262,6 +262,11 @@ struct OnboardingView: View {
 			},
 			OnboardingPage(id: "account", title: "Your Account") {
 				OnboardingAccountView()
+			},
+			OnboardingPage(id: "year-group", title: "Your Year Group", isVisible: {
+				isAuthenticated
+			}) {
+				OnboardingYearGroupView()
 			},
 			OnboardingPage(id: "calendar-import", title: "Import Your Timetable", isVisible: {
 				!hasServerTimetable
