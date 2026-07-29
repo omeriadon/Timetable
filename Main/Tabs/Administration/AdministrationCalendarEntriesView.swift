@@ -6,6 +6,7 @@ struct AdministrationCalendarEntriesView: View {
 	@State private var service = AdministrationService.shared
 	@State private var entries: [AdministrationCalendarEntry] = []
 	@State private var editor: AdministrationCalendarEntry?
+	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
 		List {
@@ -58,7 +59,12 @@ struct AdministrationCalendarEntriesView: View {
 	}
 
 	private func load() async {
-		entries = await (try? service.calendar())?.filter { $0.kind == kind } ?? []
+		do {
+			let calendarEntries = try await service.calendar()
+			entries = calendarEntries.filter { $0.kind == kind }
+		} catch {
+			badges.present(error: error, title: "Unable to refresh calendar entries")
+		}
 	}
 
 	private func save(

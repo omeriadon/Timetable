@@ -4,6 +4,7 @@ struct AdministrationEventTagsView: View {
 	@State private var service = AdministrationService.shared
 	@State private var catalogue = AdministrationEventTagCatalogueResponse(sections: [])
 	@State private var editor: AdministrationEventTagEditorTarget?
+	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
 		List {
@@ -95,11 +96,11 @@ struct AdministrationEventTagsView: View {
 	}
 
 	private func load() async {
-		guard let response = try? await service.eventTags() else {
-			return
+		do {
+			catalogue = try await service.eventTags()
+		} catch {
+			badges.present(error: error, title: "Unable to refresh event tags")
 		}
-
-		catalogue = response
 	}
 
 	private func saveTag(

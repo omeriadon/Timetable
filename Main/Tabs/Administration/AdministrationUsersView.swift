@@ -5,6 +5,7 @@ struct AdministrationUsersView: View {
 	@State private var users: [AdministrationUserResponse] = []
 	@State private var searchText = ""
 	@State private var editor: AdministrationUserEditorTarget?
+	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
 		List(filteredUsers) { user in
@@ -67,7 +68,11 @@ struct AdministrationUsersView: View {
 	}
 
 	private func load() async {
-		users = (try? await service.users()) ?? users
+		do {
+			users = try await service.users()
+		} catch {
+			badges.present(error: error, title: "Unable to refresh users")
+		}
 	}
 
 	private func update(_ user: AdministrationUserResponse) {

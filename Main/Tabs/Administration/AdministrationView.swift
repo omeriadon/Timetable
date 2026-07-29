@@ -4,6 +4,7 @@ struct AdministrationView: View {
 	@State private var service = AdministrationService.shared
 	@State private var isAdmin = false
 	@State private var authority: AccountAuthority = .user
+	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
 		NavigationStack {
@@ -97,6 +98,7 @@ struct AdministrationView: View {
 		} catch {
 			isAdmin = false
 			authority = .user
+			badges.present(error: error, title: "Unable to refresh administration")
 		}
 	}
 }

@@ -12,6 +12,7 @@ struct AdministrationUserEditor: View {
 	@State private var password = ""
 	@State private var rawData = ""
 	@State private var showsDeleteConfirmation = false
+	@Environment(\.statusBadgeManager) private var badges
 
 	init(
 		target: AdministrationUserEditorTarget,
@@ -50,6 +51,9 @@ struct AdministrationUserEditor: View {
 				}
 			}
 			.appNavigationTitle(target.user == nil ? "New User" : "User", accent: true)
+			.refreshable {
+				await loadAccountData()
+			}
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {
@@ -88,12 +92,18 @@ struct AdministrationUserEditor: View {
 		} message: {
 			Text("This permanently deletes the account and its associated records.")
 		}
-		.task {
-			guard let user = target.user else {
-				return
-			}
+		.task { await loadAccountData() }
+	}
 
-			rawData = await (try? service.userDetail(id: user.id).rawData) ?? "Unable to load account data."
+	private func loadAccountData() async {
+		guard let user = target.user else {
+			return
+		}
+
+		do {
+			rawData = try await service.userDetail(id: user.id).rawData
+		} catch {
+			badges.present(error: error, title: "Unable to load account data")
 		}
 	}
 

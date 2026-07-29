@@ -5,10 +5,12 @@ struct AdministrationBroadcastNotificationView: View {
 	@State private var title = ""
 	@State private var subtitle = ""
 	@State private var notifBody = ""
+	@State private var isSending = false
+	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
 		Form {
-			TextField("Title", text: $title)
+			TextField("Title *", text: $title)
 			TextField("Subtitle", text: $subtitle)
 			TextField("Message", text: $notifBody, axis: .vertical)
 				.lineLimit(4 ... 8)
@@ -20,7 +22,7 @@ struct AdministrationBroadcastNotificationView: View {
 					send()
 				}
 				.disabled(
-					title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+					title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSending
 				)
 				.buttonStyle(.glassProminent)
 			}
@@ -35,7 +37,20 @@ struct AdministrationBroadcastNotificationView: View {
 		)
 
 		Task {
-			try? await service.broadcastNotification(request)
+			isSending = true
+			defer {
+				isSending = false
+			}
+
+			do {
+				_ = try await service.broadcastNotification(request)
+				title = ""
+				subtitle = ""
+				notifBody = ""
+				badges.addBadge(id: UUID(), title: "Broadcast sent", priority: 3, view: .success)
+			} catch {
+				badges.present(error: error, title: "Unable to send broadcast")
+			}
 		}
 	}
 }

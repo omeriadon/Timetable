@@ -3,6 +3,7 @@ import SwiftUI
 struct AdministrationBroadcastHistoryView: View {
 	@State private var service = AdministrationService.shared
 	@State private var records: [BroadcastNotificationHistoryResponse] = []
+	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
 		List(records) { record in
@@ -47,6 +48,10 @@ struct AdministrationBroadcastHistoryView: View {
 	}
 
 	private func load() async {
-		records = (try? await service.broadcastNotifications()) ?? records
+		do {
+			records = try await service.broadcastNotifications()
+		} catch {
+			badges.present(error: error, title: "Unable to refresh broadcast history")
+		}
 	}
 }

@@ -5,6 +5,7 @@ struct AdministrationSchoolEventsView: View {
 	@Default(.calendarEvents) private var events
 	@State private var service = CalendarEventsSyncService.shared
 	@State private var editorTarget: AdministrationSchoolEventEditorTarget?
+	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
 		List {
@@ -43,7 +44,7 @@ struct AdministrationSchoolEventsView: View {
 		.listRowSpacing(8)
 		.appNavigationTitle("School Events", accent: true)
 		.refreshable {
-			try? await service.downloadEvents()
+			await refreshEvents()
 		}
 		.sheet(item: $editorTarget) { target in
 			AdministrationSchoolEventEditor(
@@ -63,6 +64,14 @@ struct AdministrationSchoolEventsView: View {
 			try await service.updateEvent(id: existingEvent.id, request: request, globally: true)
 		} else {
 			try await service.createEvent(request, globally: true)
+		}
+	}
+
+	private func refreshEvents() async {
+		do {
+			try await service.downloadEvents()
+		} catch {
+			badges.present(error: error, title: "Unable to refresh school events")
 		}
 	}
 

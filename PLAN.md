@@ -954,7 +954,7 @@ Validation boundary:
 - [x] Make admin-tab visibility derive from current server authority, not calendar-event cache capability.
 - [x] Remove the admin tab immediately after an authority-refresh response reports no access.
 - [x] Keep the account signed in.
-- [ ] Add Profile under Settings > Account.
+- [x] Add Profile under Settings > Account.
 - [ ] Reuse the profile picture in the Settings account row.
 - [ ] Show authority badges on the Settings profile picture.
 
@@ -962,17 +962,17 @@ Validation boundary:
 
 ### 14.1 Refreshable administration surfaces
 
-- [ ] Add `.refreshable` to Administration dashboard content.
-- [ ] Add `.refreshable` to Users.
-- [ ] Add `.refreshable` to user detail/account data.
-- [ ] Add `.refreshable` to school calendar date ranges.
-- [ ] Add `.refreshable` to pupil-free/skipped dates.
-- [ ] Add `.refreshable` to school events.
-- [ ] Add `.refreshable` to tag management if added.
-- [ ] Add `.refreshable` to broadcast history if added.
-- [ ] Do not add `.refreshable` to the broadcast composer.
-- [ ] Ensure refresh operations replace authoritative snapshots without duplicating rows.
-- [ ] Present refresh failures through status badges.
+- [x] Add `.refreshable` to Administration dashboard content.
+- [x] Add `.refreshable` to Users.
+- [x] Add `.refreshable` to user detail/account data.
+- [x] Add `.refreshable` to school calendar date ranges.
+- [x] Add `.refreshable` to pupil-free/skipped dates.
+- [x] Add `.refreshable` to school events.
+- [x] Add `.refreshable` to tag management if added.
+- [x] Add `.refreshable` to broadcast history if added.
+- [x] Do not add `.refreshable` to the broadcast composer.
+- [x] Ensure refresh operations replace authoritative snapshots without duplicating rows.
+- [x] Present refresh failures through status badges.
 
 ### 14.2 Tag and section management
 
@@ -993,17 +993,17 @@ Validation boundary:
 
 ### 14.3 Account JSON disclosure hierarchy
 
-- [ ] Preserve complete sanitized account JSON.
-- [ ] Preserve recursive direct/base64 JSON decoding.
-- [ ] Parse the top-level JSON object.
-- [ ] Render each top-level item as a DisclosureGroup.
-- [ ] For object and array children, render second-level items as DisclosureGroups.
-- [ ] Below the second level, render readable raw/pretty JSON text.
-- [ ] Keep text selectable and monospaced.
-- [ ] Keep deterministic sorted keys.
-- [ ] Avoid hiding scalar top-level values.
-- [ ] Bound large raw sections without truncating stored data.
-- [ ] Exclude password hashes, verification-code hashes, APNs credentials, and other authentication secrets.
+- [x] Preserve complete sanitized account JSON.
+- [x] Preserve recursive direct/base64 JSON decoding.
+- [x] Parse the top-level JSON object.
+- [x] Render each top-level item as a DisclosureGroup.
+- [x] For object and array children, render second-level items as DisclosureGroups.
+- [x] Below the second level, render readable raw/pretty JSON text.
+- [x] Keep text selectable and monospaced.
+- [x] Keep deterministic sorted keys.
+- [x] Avoid hiding scalar top-level values.
+- [x] Bound large raw sections without truncating stored data.
+- [x] Exclude password hashes, verification-code hashes, APNs credentials, and other authentication secrets.
 
 ### 14.4 Administrator management
 
@@ -1019,12 +1019,12 @@ Validation boundary:
 
 ## Phase 15: Broadcast composer and history
 
-- [ ] Keep title required and visibly marked.
-- [ ] Permit empty subtitle.
-- [ ] Permit empty body.
-- [ ] Disable Send only when trimmed title is empty or a request is active.
-- [ ] Preserve best-effort APNs delivery.
-- [ ] Show eligible, delivered, invalidated, and failed counts.
+- [x] Keep title required and visibly marked.
+- [x] Permit empty subtitle.
+- [x] Permit empty body.
+- [x] Disable Send only when trimmed title is empty or a request is active.
+- [x] Preserve best-effort APNs delivery.
+- [x] Show eligible, delivered, invalidated, and failed counts.
 - [x] Add broadcast history to Administration separately from the composer.
 - [x] Show sender email snapshot and send time.
 - [x] Show full title, subtitle, and body without inventing placeholder content.
