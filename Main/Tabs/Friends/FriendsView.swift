@@ -1,5 +1,6 @@
 import Defaults
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct FriendsView: View {
 	@Default(.friends) private var friends
@@ -10,6 +11,7 @@ struct FriendsView: View {
 	@State private var sheet: FriendsSheet?
 	@State private var selectedFriend: FriendSummary?
 	@State private var isSearching = false
+	@State private var draggedFriend: FriendSummary?
 	@Namespace private var sheetNamespace
 
 	var body: some View {
@@ -93,6 +95,19 @@ struct FriendsView: View {
 							FriendStatusCard(friend: friend)
 						}
 						.buttonStyle(.plain)
+						.onDrag {
+							draggedFriend = friend
+							return NSItemProvider(object: friend.id.uuidString as NSString)
+						}
+						.onDrop(
+							of: [.text],
+							delegate: FriendOrderDropDelegate(
+								target: friend,
+								draggedFriend: $draggedFriend,
+								friends: $friends,
+								save: saveFriendOrder
+							)
+						)
 					}
 				}
 			}
@@ -141,6 +156,47 @@ struct FriendsView: View {
 		} catch {
 			searchResults = []
 		}
+	}
+
+	private func saveFriendOrder(_ orderedFriends: [FriendSummary]) {
+		Task {
+			do {
+				try await service.reorder(friendIDs: orderedFriends.map(\.friend.id))
+			} catch {
+				try? await service.refresh()
+			}
+		}
+	}
+}
+
+private struct FriendOrderDropDelegate: DropDelegate {
+	let target: FriendSummary
+	@Binding var draggedFriend: FriendSummary?
+	@Binding var friends: [FriendSummary]
+	let save: ([FriendSummary]) -> Void
+
+	func dropEntered(info _: DropInfo) {
+		guard let draggedFriend, draggedFriend != target,
+			let from = friends.firstIndex(of: draggedFriend),
+			let to = friends.firstIndex(of: target)
+		else {
+			return
+		}
+
+		withAnimation(.snappy) {
+			friends.move(
+				fromOffsets: IndexSet(integer: from),
+				toOffset: to > from ? to + 1 : to
+			)
+		}
+	}
+
+	func performDrop(info _: DropInfo) -> Bool {
+		defer {
+			draggedFriend = nil
+		}
+		save(friends)
+		return true
 	}
 }
 

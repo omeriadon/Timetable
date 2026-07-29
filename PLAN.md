@@ -890,13 +890,13 @@ Validation boundary:
 
 ### 12.3 Drag reordering
 
-- [ ] Add an edit/reorder interaction suitable for the existing ScrollView.
-- [ ] Use stable friend IDs.
-- [ ] Update local order immediately during drag.
-- [ ] Save the final order once per completed drag.
-- [ ] Roll back or refresh if the server rejects the order.
-- [ ] Prevent search results from participating in friend priority order.
-- [ ] Propagate the new order to widget snapshots and timelines.
+- [x] Add an edit/reorder interaction suitable for the existing ScrollView.
+- [x] Use stable friend IDs.
+- [x] Update local order immediately during drag.
+- [x] Save the final order once per completed drag.
+- [x] Roll back or refresh if the server rejects the order.
+- [x] Prevent search results from participating in friend priority order.
+- [x] Propagate the new order to widget snapshots and timelines.
 - [ ] Keep the first three friends as summary-widget priority.
 
 ### 12.4 Friend detail sheet
