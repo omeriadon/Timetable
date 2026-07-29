@@ -53,7 +53,6 @@ enum ServerErrorCode: String, Codable {
 	case conflict
 	case emailAlreadyExists
 	case internalServerError
-	case invalidAppleIdentityToken
 	case invalidCredentials
 	case invalidRequest
 	case invalidTimetable
