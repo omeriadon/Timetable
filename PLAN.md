@@ -325,7 +325,7 @@ Validation boundary:
 ### 2.5 Broadcast history
 
 - [x] Add `BroadcastNotificationRecord`.
-- [ ] Persist:
+- [x] Persist:
   - title;
   - optional subtitle;
   - optional body;
@@ -340,7 +340,7 @@ Validation boundary:
   - failed count;
   - terminal delivery state;
   - structured failure summary.
-- [ ] Decide whether individual device delivery outcomes need a child table.
+- [x] Decide whether individual device delivery outcomes need a child table.
 - [x] Save the record before delivery begins.
 - [x] Update aggregate outcomes after best-effort delivery finishes.
 - [x] Retain a failed record if delivery throws before fan-out completes.
