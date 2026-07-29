@@ -24,6 +24,19 @@ nonisolated struct RefreshRequest: Codable {
 	let refreshToken: String
 }
 
+nonisolated struct VerificationCodeRequest: Codable {
+	let email: String
+	let installationID: String
+}
+
+nonisolated struct VerificationRegistrationRequest: Codable {
+	let email: String
+	let code: String
+	let password: String
+	let platform: Platform.RawValue
+	let installationID: String
+}
+
 nonisolated struct LogoutRequest: Codable {
 	let refreshToken: String
 }

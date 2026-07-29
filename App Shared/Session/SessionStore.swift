@@ -130,6 +130,23 @@ final class SessionStore {
 		try await apply(response, bootstrap: true)
 	}
 
+	func requestVerificationCode(email: String) async throws {
+		let identity = ClientIdentityProvider.shared.identity()
+		try await networkManager.send(
+			.v1AuthRequestCode,
+			body: VerificationCodeRequest(email: email, installationID: identity.installationID)
+		)
+	}
+
+	func verifyCodeAndSignUp(email: String, code: String, password: String) async throws {
+		let identity = ClientIdentityProvider.shared.identity()
+		let response: TokenResponse = try await networkManager.send(
+			.v1AuthVerifyCodeRegister,
+			body: VerificationRegistrationRequest(email: email, code: code, password: password, platform: identity.platform.rawValue, installationID: identity.installationID)
+		)
+		try await apply(response, bootstrap: true)
+	}
+
 	func signIn(email: String, password: String, context: NetworkRequestContext = .background) async throws {
 		Print("Signing in account", category: .account)
 		let identity = ClientIdentityProvider.shared.identity()
@@ -296,6 +313,8 @@ private extension Endpoint {
 	static let v1AuthLogout = Endpoint("/v1/auth/logout", method: .delete)
 	static let v1AuthRefresh = Endpoint("/v1/auth/refresh", method: .post, requiresAuthentication: false)
 	static let v1AuthRegister = Endpoint("/v1/auth/register", method: .post, requiresAuthentication: false)
+	static let v1AuthRequestCode = Endpoint("/v1/auth/request-code", method: .post, requiresAuthentication: false)
+	static let v1AuthVerifyCodeRegister = Endpoint("/v1/auth/verify-code-register", method: .post, requiresAuthentication: false)
 	static let v1Profile = Endpoint("/v1/account")
 	static let v1ProfileDelete = Endpoint("/v1/account", method: .delete)
 	static let v1ProfileUpdate = Endpoint("/v1/account", method: .put)
