@@ -500,7 +500,7 @@ Validation boundary:
 - [x] Return persisted friend order.
 - [x] Add reorder endpoint.
 - [ ] Keep report behavior unchanged apart from confirmation UI.
-- [ ] Compute or return enough timetable data for exact shared-class/shared-subject comparison.
+- [x] Compute or return enough timetable data for exact shared-class/shared-subject comparison.
 - [ ] Avoid server claims that depend on unnormalized subject or classroom values.
 
 ### 3.6 Broadcast endpoints
@@ -918,16 +918,16 @@ Validation boundary:
 
 ### 12.5 Exact shared comparison
 
-- [ ] Compare the signed-in owner timetable to the friend timetable.
-- [ ] Normalize subject names case-insensitively.
-- [ ] Normalize classroom names case-insensitively.
-- [ ] Treat missing classroom as matching only another missing classroom.
-- [ ] Build Shared Classes from identical subject and classroom pairs.
-- [ ] Build Shared Subjects from identical subject names.
-- [ ] Include exact subject/classroom matches in Shared Subjects as well as Shared Classes.
-- [ ] Deduplicate repeated weekly occurrences.
-- [ ] Preserve stable order based on the owner timetable or normalized name.
-- [ ] Render empty states separately for both sections.
+- [x] Compare the signed-in owner timetable to the friend timetable.
+- [x] Normalize subject names case-insensitively.
+- [x] Normalize classroom names case-insensitively.
+- [x] Treat missing classroom as matching only another missing classroom.
+- [x] Build Shared Classes from identical subject and classroom pairs.
+- [x] Build Shared Subjects from identical subject names.
+- [x] Include exact subject/classroom matches in Shared Subjects as well as Shared Classes.
+- [x] Deduplicate repeated weekly occurrences.
+- [x] Preserve stable order based on the owner timetable or normalized name.
+- [x] Render empty states separately for both sections.
 
 ### 12.6 Class popovers
 

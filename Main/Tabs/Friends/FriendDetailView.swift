@@ -1,4 +1,5 @@
 import SwiftUI
+import Defaults
 
 struct FriendDetailView: View {
 	let friend: FriendSummary
@@ -133,8 +134,14 @@ private struct FriendDetailHeader: View {
 
 private struct FriendOverview: View {
 	let detail: FriendDetail
+	@Default(.timetable) private var ownerSubjects
 
 	var body: some View {
+		let comparison = FriendTimetableComparison(
+			ownerSubjects: ownerSubjects,
+			friendSubjects: detail.timetable?.subjects ?? []
+		)
+
 		VStack(alignment: .leading, spacing: 18) {
 			LabeledContent("Friends since") {
 				Text(detail.acceptedAt, format: .dateTime.month().day().year())
@@ -142,19 +149,138 @@ private struct FriendOverview: View {
 
 			Text("Shared Classes")
 				.font(.headline)
-			if let timetable = detail.timetable, !timetable.subjects.isEmpty {
-				ForEach(timetable.subjects.prefix(4)) { subject in
-					Label(subject.id, systemImage: subject.symbol)
+			if comparison.sharedClasses.isEmpty {
+				Text("No shared classes.")
+					.foregroundStyle(.secondary)
+			} else {
+				ForEach(comparison.sharedClasses) { sharedClass in
+					VStack(alignment: .leading, spacing: 3) {
+						Label(sharedClass.subjectName, systemImage: sharedClass.symbol)
+							.foregroundStyle(sharedClass.colour.swiftUIColor)
+						if !sharedClass.classroom.isEmpty {
+							Text(sharedClass.classroom)
+								.font(.footnote)
+								.foregroundStyle(.secondary)
+						}
+						Text(sharedClass.slotSummary)
+							.font(.footnote)
+							.foregroundStyle(.secondary)
+					}
+				}
+			}
+
+			Text("Shared Subjects")
+				.font(.headline)
+			if comparison.sharedSubjects.isEmpty {
+				Text("No shared subjects.")
+					.foregroundStyle(.secondary)
+			} else {
+				ForEach(comparison.sharedSubjects) { subject in
+					Label(subject.subjectName, systemImage: subject.symbol)
 						.foregroundStyle(subject.colour.swiftUIColor)
 				}
-			} else {
-				Text("No timetable has been shared yet.")
-					.foregroundStyle(.secondary)
 			}
 		}
 		.padding(18)
 		.background(Image("paper").resizable().scaledToFill())
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 26, style: .continuous))
+	}
+}
+
+private struct FriendTimetableComparison {
+	let sharedClasses: [SharedClass]
+	let sharedSubjects: [SharedSubject]
+
+	init(ownerSubjects: [Subject], friendSubjects: [Subject]) {
+		var classes: [SharedClass] = []
+		var subjects: [SharedSubject] = []
+		var seenClassKeys = Set<String>()
+		var seenSubjectKeys = Set<String>()
+
+		for ownerSubject in ownerSubjects {
+			let normalizedSubject = Self.normalized(ownerSubject.id)
+			let matchingSubjects = friendSubjects.filter {
+				Self.normalized($0.id) == normalizedSubject
+			}
+
+			for friendSubject in matchingSubjects {
+				let subjectKey = normalizedSubject
+				if seenSubjectKeys.insert(subjectKey).inserted {
+					subjects.append(
+						SharedSubject(
+							subjectName: ownerSubject.id,
+							symbol: ownerSubject.symbol,
+							colour: ownerSubject.colour
+						)
+					)
+				}
+
+				let ownerClassroom = Self.normalized(ownerSubject.classroom.editorValue)
+				let friendClassroom = Self.normalized(friendSubject.classroom.editorValue)
+				guard ownerClassroom == friendClassroom else {
+					continue
+				}
+
+				let overlappingSlots = ownerSubject.slots.filter(friendSubject.slots.contains)
+				guard !overlappingSlots.isEmpty else {
+					continue
+				}
+
+				let classKey = "\(normalizedSubject)|\(ownerClassroom)"
+				guard seenClassKeys.insert(classKey).inserted else {
+					continue
+				}
+
+				classes.append(
+					SharedClass(
+						subjectName: ownerSubject.id,
+						symbol: ownerSubject.symbol,
+						colour: ownerSubject.colour,
+						classroom: ownerSubject.classroom.displayName,
+						slots: overlappingSlots
+					)
+				)
+			}
+		}
+
+		sharedClasses = classes
+		sharedSubjects = subjects
+	}
+
+	private static func normalized(_ value: String) -> String {
+		value
+			.folding(options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive], locale: Locale(identifier: "en_US_POSIX"))
+			.split(whereSeparator: \.isWhitespace)
+			.joined(separator: " ")
+	}
+}
+
+private struct SharedClass: Identifiable {
+	let subjectName: String
+	let symbol: String
+	let colour: RGBAColor
+	let classroom: String
+	let slots: [Slot]
+
+	var id: String {
+		"\(subjectName)|\(classroom)"
+	}
+
+	var slotSummary: String {
+		slots
+			.sorted { ($0.day, $0.session) < ($1.day, $1.session) }
+			.map { "\(TimetableLayout.shortDayLabels[$0.day]) \(TimetableLayout.sessions[$0.session])" }
+			.joined(separator: ", ")
+	}
+}
+
+private struct SharedSubject: Identifiable {
+	let subjectName: String
+	let symbol: String
+	let colour: RGBAColor
+
+	var id: String {
+		subjectName
 	}
 }
 
