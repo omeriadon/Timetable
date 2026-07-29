@@ -15,6 +15,7 @@ struct OnboardingCalendarImportView: View {
 	@Environment(\.onboardingPageContext) private var context
 
 	@State private var clickedImport = false
+	@State private var errorResetTask: Task<Void, Never>?
 
 	var body: some View {
 		ZStack {
@@ -41,11 +42,15 @@ struct OnboardingCalendarImportView: View {
 
 				case true:
 					CalendarImportView(dismissesWhenFinished: false) { succeeded in
+						errorResetTask?.cancel()
 						context.configure(
 							canAdvance: succeeded,
 							isWorking: false,
 							statusMessage: succeeded ? "Calendar imported." : "Calendar import failed."
 						)
+						if !succeeded {
+							scheduleErrorReset()
+						}
 					}
 					.padding(10)
 					.padding(.top, 5)
@@ -58,7 +63,18 @@ struct OnboardingCalendarImportView: View {
 		}
 		.onDisappear {
 			clickedImport = false
+			errorResetTask?.cancel()
 		}
 		.animation(.easeInOut, value: clickedImport)
+	}
+
+	private func scheduleErrorReset() {
+		errorResetTask = Task {
+			try? await Task.sleep(for: .seconds(4))
+			guard !Task.isCancelled, context.statusMessage == "Calendar import failed." else {
+				return
+			}
+			context.configure(canAdvance: false, statusMessage: nil)
+		}
 	}
 }

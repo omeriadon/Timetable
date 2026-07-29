@@ -18,6 +18,7 @@ struct CalendarImportView: View {
 
 	@State private var calendarImportStatus = CalendarImportStatus.loading
 	@State private var calendarImportStep = CalendarImportStep.checkingAuthorisation
+	@State private var errorResetTask: Task<Void, Never>?
 
 	var body: some View {
 		VStack(spacing: 14) {
@@ -84,8 +85,7 @@ struct CalendarImportView: View {
 			if case .error = calendarImportStatus {
 				if !dismissesWhenFinished {
 					Button("Try Again", systemImage: "arrow.clockwise") {
-						calendarImportStatus = .loading
-						calendarImportStep = .checkingAuthorisation
+						beginImportAttempt()
 						Task { await performCalendarImport() }
 					}
 					.buttonStyle(.glassProminent)
@@ -94,7 +94,11 @@ struct CalendarImportView: View {
 		}
 		.animation(.easeInOut, value: calendarImportStep)
 		.task {
+			beginImportAttempt()
 			await performCalendarImport()
+		}
+		.onDisappear {
+			errorResetTask?.cancel()
 		}
 		.ignoresSafeArea()
 		.padding([.horizontal], 32)
@@ -114,12 +118,35 @@ struct CalendarImportView: View {
 		calendarImportStep = .error(error)
 		calendarImportStatus = .error
 		completion?(false)
+		scheduleErrorReset(for: error)
 		Task {
 			PrintError("[iOS] error: \(error)")
 			if dismissesWhenFinished {
 				try? await Task.sleep(for: .seconds(2))
 				dismiss()
 			}
+		}
+	}
+
+	func beginImportAttempt() {
+		errorResetTask?.cancel()
+		errorResetTask = nil
+		calendarImportStatus = .loading
+		calendarImportStep = .checkingAuthorisation
+	}
+
+	func scheduleErrorReset(for error: String) {
+		errorResetTask?.cancel()
+		errorResetTask = Task {
+			try? await Task.sleep(for: .seconds(4))
+			guard !Task.isCancelled else {
+				return
+			}
+			guard case .error = calendarImportStatus, calendarImportStep == .error(error) else {
+				return
+			}
+			calendarImportStatus = .loading
+			calendarImportStep = .checkingAuthorisation
 		}
 	}
 

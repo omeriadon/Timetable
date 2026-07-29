@@ -682,13 +682,13 @@ Validation boundary:
 
 ### 8.3 Error reset
 
-- [ ] Centralize import error-state reset scheduling.
-- [ ] Reset every error after four seconds.
-- [ ] Cancel an old reset task when a new attempt begins.
-- [ ] Guard against an old task resetting a newer state.
-- [ ] Reset calendar-onboarding error presentation after four seconds.
-- [ ] Keep successful import state stable.
-- [ ] Do not reset successful completion after four seconds.
+- [x] Centralize import error-state reset scheduling.
+- [x] Reset every error after four seconds.
+- [x] Cancel an old reset task when a new attempt begins.
+- [x] Guard against an old task resetting a newer state.
+- [x] Reset calendar-onboarding error presentation after four seconds.
+- [x] Keep successful import state stable.
+- [x] Do not reset successful completion after four seconds.
 
 ## Phase 9: Record-level synchronization
 
