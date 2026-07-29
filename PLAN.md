@@ -42,6 +42,8 @@ Validation boundary:
 - Multiple non-year tags use OR matching.
 - A tagged school event with a year-group restriction additionally requires the user’s year group to match.
 - Year-group matching is an AND gate over the ordinary non-year OR rule.
+- A school event with no tags is visible to everyone in the school.
+- A school event with only year-group tags is visible to users whose year group matches.
 - General is subscribed by default but users may unsubscribe from it.
 - If an event references a tag that no longer exists, the client and server drop that association safely.
 - Normal migrations should preserve valid tag associations.
@@ -63,6 +65,11 @@ Validation boundary:
 - Broadcast subtitle and body are optional and may be empty.
 - Broadcast records persist the complete message, audience, sender, time, and delivery result.
 - Profile images are uploaded to the server.
+- Profile-image objects are stored in a private Cloudflare R2 Standard bucket.
+- PostgreSQL stores profile-image metadata and R2 object keys, not image bytes.
+- pmstt mediates every R2 object operation so application quotas can be enforced.
+- Profile storage has a hard application limit of 9,000,000,000 bytes.
+- Profile storage has a hard application limit of 900,000 total R2 operations per UTC calendar month.
 - Profile images are cropped to a square before upload.
 - Profile-image payloads have a one-megabyte maximum.
 - Emoji profile content is persisted as Unicode text.
@@ -88,6 +95,7 @@ Validation boundary:
 - Shared-class comparisons are case-insensitive and whitespace-normalized.
 - A shared class requires identical normalized subject names and identical normalized classrooms.
 - A shared subject requires only an identical normalized subject name.
+- An identical subject/classroom match appears in both Shared Classes and Shared Subjects.
 - Friend email is not shown in friend account details.
 - The redundant relationship “Status: Friend” row is removed; live school/activity status remains.
 - The main iPhone tab order is Timetable, Friends, Settings.
@@ -121,11 +129,6 @@ Validation boundary:
 ## Open decisions requiring answers before their dependent phases
 
 - Define the exact symbol and colours for the permanent-owner badge. The ordinary administrator badge remains `shield.fill`.
-- Define whether a subject/classroom match should appear in both Shared Classes and Shared Subjects, or only in Shared Classes.
-- Define visibility for a school event with no non-year tags:
-  - visible to every user who passes any year restriction;
-  - or invalid until an administrator adds at least one non-year tag.
-- Confirm Cloudflare R2 as the profile-photo object store after reviewing the storage recommendation.
 
 ## Architecture constraints
 
@@ -347,13 +350,15 @@ Validation boundary:
 
 ### 2.6 Profile media and badges
 
-- [ ] Use a private Cloudflare R2 bucket for profile-photo objects, subject to final approval.
+- [ ] Use a private Cloudflare R2 Standard bucket for profile-photo objects.
 - [ ] Keep R2 credentials in deployed environment configuration only.
 - [ ] Store only object keys and image metadata in PostgreSQL.
 - [ ] Use revisioned object keys such as `avatars/<userID>/<revision>.jpg`.
 - [ ] Keep the bucket private.
-- [ ] Serve short-lived authenticated reads through pmstt or short-lived presigned GET URLs.
-- [ ] Prefer server-issued upload authorization and a validation/finalization step.
+- [ ] Do not enable the public `r2.dev` URL or a public custom domain.
+- [ ] Mediate uploads, downloads, HEAD checks, and deletions through pmstt.
+- [ ] Do not use reusable direct-to-R2 presigned URLs because they bypass exact operation accounting.
+- [ ] Let pmstt authenticate the caller before every profile-image operation.
 - [ ] Add profile-media metadata.
 - [ ] Associate at most one active profile photo with a user.
 - [ ] Store content type, byte size, dimensions, checksum, revision, and update time.
@@ -366,11 +371,45 @@ Validation boundary:
 - [ ] Delete superseded R2 objects only after the new database reference commits successfully.
 - [ ] Add orphan-object cleanup for abandoned uploads and failed database transactions.
 - [ ] Provide cache validation using revision, ETag, or content hash.
+- [ ] Let pmstt answer a matching conditional request with `304 Not Modified` from database metadata without reading R2.
 - [ ] Add profile badges to friend/profile DTOs.
 - [ ] Derive authority badges on the server rather than accepting them from profile edits.
 - [ ] Keep future manually assigned badges possible without changing avatar rendering.
 
-### 2.7 Friend order
+### 2.7 R2 quota enforcement
+
+- [ ] Add one database row representing the global profile-storage quota state.
+- [ ] Track every known R2 object, including active, superseded, temporary, and orphaned objects.
+- [ ] Track the exact stored-byte total from known object metadata.
+- [ ] Use 9,000,000,000 bytes as the hard stored-object ceiling.
+- [ ] Reserve the incoming object’s bytes atomically before uploading.
+- [ ] Reject an upload when the reservation would exceed the hard byte ceiling.
+- [ ] Keep the old image’s bytes counted until its R2 deletion succeeds.
+- [ ] Release an upload reservation only when it is proven that no R2 object was created.
+- [ ] Add a monthly operation-counter row keyed by UTC year and month.
+- [ ] Count all application-mediated R2 calls against one conservative operation budget.
+- [ ] Count PUT, GET, HEAD, DELETE, LIST, and cleanup operations.
+- [ ] Reserve an operation atomically before sending the R2 request.
+- [ ] Do not decrement the counter after an attempted R2 request because a failed request may still be billable.
+- [ ] Enforce a hard maximum of 900,000 reserved operations per UTC calendar month.
+- [ ] Stop profile-image mutations before the hard limit to preserve a read reserve.
+- [ ] Use 850,000 operations as the write cutoff.
+- [ ] Permit cached/conditional reads that do not contact R2 after the write cutoff.
+- [ ] Permit R2 reads until the 900,000 hard limit.
+- [ ] Reject storage exhaustion with HTTP `507 Insufficient Storage` and structured code `profileStorageCapacityReached`.
+- [ ] Reject mutation-budget exhaustion with HTTP `429 Too Many Requests` and structured code `profileStorageWriteBudgetReached`.
+- [ ] Reject hard operation-budget exhaustion with HTTP `429 Too Many Requests` and structured code `profileStorageOperationBudgetReached`.
+- [ ] Include a `Retry-After` value ending at the next UTC calendar month for monthly operation-budget errors.
+- [ ] Preserve existing cached profile pictures when an R2 quota error occurs.
+- [ ] Never change the authoritative profile-photo revision when upload or finalization fails.
+- [ ] Add administrator-visible current byte usage, monthly operation usage, limits, and remaining allowance.
+- [ ] Add warning logs at 80%, 90%, and 95% of each quota.
+- [ ] Query Cloudflare R2 GraphQL analytics periodically for reconciliation.
+- [ ] Treat Cloudflare analytics as delayed audit data, not the synchronous enforcement source.
+- [ ] Reconcile tracked object bytes against R2 metrics and controlled bucket listings.
+- [ ] Disable new writes and surface an administration warning if reconciliation reports usage above local accounting.
+
+### 2.8 Friend order
 
 - [ ] Add a per-user friend-priority/order field on the friendship relationship.
 - [ ] Model order independently for each side of a friendship.
@@ -380,7 +419,7 @@ Validation boundary:
 - [ ] Normalize sparse or duplicated order values on the server.
 - [ ] Return friends in persisted user order.
 
-### 2.8 Record-level sync metadata
+### 2.9 Record-level sync metadata
 
 - [ ] Inventory every client-authored mutable record.
 - [ ] Give each in-scope record:
@@ -438,6 +477,8 @@ Validation boundary:
 - [ ] Reject year-group tag IDs on private events.
 - [ ] Filter user-visible school events using the non-year OR rule.
 - [ ] Apply year-group tags as a separate required match when an event has a year restriction.
+- [ ] Return untagged school events to every authenticated school account.
+- [ ] Return year-only school events to accounts matching one of the event’s year-group tags.
 - [ ] Let users unsubscribe from General even though new accounts receive it by default.
 - [ ] Keep administrator event-management visibility independent of subscriber filtering.
 - [ ] Include dropped/archived association information in mutation responses where useful.
@@ -446,7 +487,10 @@ Validation boundary:
 
 - [ ] Replace opaque appearance-data-only handling with an explicit versioned appearance DTO.
 - [ ] Retain legacy decode support during migration.
-- [ ] Add R2-backed photo upload, finalization, fetch authorization, and deletion endpoints.
+- [ ] Add an authenticated pmstt upload endpoint that validates, reserves quota, and writes to R2.
+- [ ] Add an authenticated pmstt image endpoint that supports ETag and conditional requests.
+- [ ] Add an authenticated pmstt deletion endpoint that updates the profile and then removes superseded R2 data.
+- [ ] Return structured capacity and operation-budget errors from all profile-image endpoints.
 - [ ] Add photo URL/revision and badges to friend and self-profile responses.
 - [ ] Do not include friend email in normal friend responses.
 - [ ] Keep email in authenticated self-account responses and privileged administration responses.
@@ -881,7 +925,7 @@ Validation boundary:
 - [ ] Treat missing classroom as matching only another missing classroom.
 - [ ] Build Shared Classes from identical subject and classroom pairs.
 - [ ] Build Shared Subjects from identical subject names.
-- [ ] Apply the final decision on whether a class match also appears in Shared Subjects.
+- [ ] Include exact subject/classroom matches in Shared Subjects as well as Shared Classes.
 - [ ] Deduplicate repeated weekly occurrences.
 - [ ] Preserve stable order based on the owner timetable or normalized name.
 - [ ] Render empty states separately for both sections.
@@ -1077,6 +1121,33 @@ Validation boundary:
 
 ## User-run verification matrix
 
+### Cloudflare R2 provisioning
+
+- [ ] Activate R2 in the Cloudflare dashboard.
+- [ ] Create a private Standard bucket named `timetable-profile-images` or another approved lowercase name.
+- [ ] Select the Oceania location hint.
+- [ ] Leave public development URL access disabled.
+- [ ] Do not attach a public custom domain.
+- [ ] Create an Account API token with Object Read & Write permission.
+- [ ] Scope the token to the single profile-image bucket.
+- [ ] Record the Access Key ID and Secret Access Key at creation time.
+- [ ] Record the Cloudflare Account ID.
+- [ ] Put all credentials in the deployed PM2/process environment, never the repository.
+- [ ] Configure:
+  - `R2_ACCOUNT_ID`;
+  - `R2_ACCESS_KEY_ID`;
+  - `R2_SECRET_ACCESS_KEY`;
+  - `R2_BUCKET`;
+  - `R2_ENDPOINT`.
+- [ ] Set `R2_STORAGE_LIMIT_BYTES=9000000000`.
+- [ ] Set `R2_MONTHLY_OPERATION_LIMIT=900000`.
+- [ ] Set `R2_MONTHLY_WRITE_CUTOFF=850000`.
+- [ ] Restart pmstt with its updated production environment only after implementation.
+- [ ] Confirm upload, conditional read, replacement, and deletion through pmstt.
+- [ ] Confirm the bucket remains inaccessible without valid credentials.
+- [ ] Confirm the administration quota display matches server accounting.
+- [ ] Compare server accounting with the Cloudflare R2 dashboard and GraphQL metrics.
+
 ### Server migration and authentication
 
 - [ ] Back up the database before the destructive Apple-only account cleanup.
@@ -1182,6 +1253,15 @@ Validation boundary:
 - [ ] Confirm school state changes when a period boundary passes while the tab remains open.
 - [ ] Change Watch Debug Offset and confirm visible timer tabs update immediately.
 
+### R2 quota failures
+
+- [ ] Set a temporary low byte limit and confirm an upload receives `507` with `profileStorageCapacityReached`.
+- [ ] Set a temporary low write cutoff and confirm profile-image mutation receives `429` with `profileStorageWriteBudgetReached`.
+- [ ] Set a temporary low operation limit and confirm R2-backed reads receive `429` with `profileStorageOperationBudgetReached`.
+- [ ] Confirm quota failures preserve the existing profile image and revision.
+- [ ] Confirm `Retry-After` points to the next UTC month for monthly operation errors.
+- [ ] Confirm conditional `304` responses do not consume an R2 operation.
+
 ## Planned atomic commit sequence
 
 The exact sequence may split further when source boundaries require it.
@@ -1193,6 +1273,7 @@ The exact sequence may split further when source boundaries require it.
 - [ ] `remove apple authentication`
 - [ ] `add global event tags`
 - [ ] `add profile media`
+- [ ] `enforce profile storage quotas`
 - [ ] `add profile badges`
 - [ ] `persist friend order`
 - [ ] `store broadcast history`
