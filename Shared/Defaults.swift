@@ -10,7 +10,7 @@ import Foundation
 
 private let sharedDefaults = UserDefaults(suiteName: "group.omeriadon.timetable") ?? UserDefaults.standard
 
-let onboardingVersion: Int = 4
+let onboardingVersion: Int = 5
 
 enum SharedDefaultsStore {
 	static let suiteName = "group.omeriadon.timetable"
@@ -40,7 +40,6 @@ extension Defaults.Keys {
 
 	static let hasCompletedAccountBootstrap = Key<Bool>("hasCompletedAccountBootstrap", default: false, suite: sharedDefaults)
 
-	// these two need version updating
 	static let hasCompletedOnboarding = Key<Bool>("hasCompletedOnboarding_v\(onboardingVersion)", default: false, suite: sharedDefaults)
 	static let onboardingPageID = Key<String>("onboardingPageID_v\(onboardingVersion)", default: "", suite: sharedDefaults)
 
