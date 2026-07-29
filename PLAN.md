@@ -464,22 +464,22 @@ Validation boundary:
 
 ### 3.3 Tag endpoints
 
-- [ ] Add authenticated tag catalogue endpoint.
-- [ ] Add current-user tag-subscription endpoint.
+- [x] Add authenticated tag catalogue endpoint.
+- [x] Add current-user tag-subscription endpoint.
 - [ ] Add atomic replacement of subject-only subscriptions.
 - [ ] Preserve all non-subject subscriptions during subject replacement.
-- [ ] Add administration tag-section create/update/archive/order endpoints.
-- [ ] Add administration tag create/update/archive/order endpoints.
-- [ ] Validate associated names and reject ambiguous active subject aliases.
-- [ ] Add tag IDs to school/global calendar event requests and responses.
-- [ ] Add non-year tag IDs to private-event requests and responses as decorative metadata.
-- [ ] Reject year-group tag IDs on private events.
-- [ ] Filter user-visible school events using the non-year OR rule.
-- [ ] Apply year-group tags as a separate required match when an event has a year restriction.
-- [ ] Return untagged school events to every authenticated school account.
-- [ ] Return year-only school events to accounts matching one of the event’s year-group tags.
-- [ ] Let users unsubscribe from General even though new accounts receive it by default.
-- [ ] Keep administrator event-management visibility independent of subscriber filtering.
+- [x] Add administration tag-section create/update/archive/order endpoints.
+- [x] Add administration tag create/update/archive/order endpoints.
+- [x] Validate associated names and reject ambiguous active subject aliases.
+- [x] Add tag IDs to school/global calendar event requests and responses.
+- [x] Add non-year tag IDs to private-event requests and responses as decorative metadata.
+- [x] Reject year-group tag IDs on private events.
+- [x] Filter user-visible school events using the non-year OR rule.
+- [x] Apply year-group tags as a separate required match when an event has a year restriction.
+- [x] Return untagged school events to every authenticated school account.
+- [x] Return year-only school events to accounts matching one of the event’s year-group tags.
+- [x] Let users unsubscribe from General even though new accounts receive it by default.
+- [x] Keep administrator event-management visibility independent of subscriber filtering.
 - [ ] Include dropped/archived association information in mutation responses where useful.
 
 ### 3.4 Profile endpoints
@@ -617,38 +617,38 @@ Validation boundary:
 
 ### 7.1 Reusable wrapping tag selector
 
-- [ ] Create a reusable flow-layout container using SwiftUI Layout.
-- [ ] Measure each tag chip intrinsically.
-- [ ] Fill available width and wrap without square-grid assumptions.
-- [ ] Group tags into ordered sections.
-- [ ] Show selected state clearly without relying on colour alone.
-- [ ] Support single and multiple selection configurations.
-- [ ] Add accessibility labels, selected traits, and section context.
-- [ ] Do not add search.
-- [ ] Do not introduce explicit fixed chip widths.
-- [ ] Use reasonable section spacing while preserving readable code.
+- [x] Create a reusable flow-layout container using SwiftUI Layout.
+- [x] Measure each tag chip intrinsically.
+- [x] Fill available width and wrap without square-grid assumptions.
+- [x] Group tags into ordered sections.
+- [x] Show selected state clearly without relying on colour alone.
+- [x] Support single and multiple selection configurations.
+- [x] Add accessibility labels, selected traits, and section context.
+- [x] Do not add search.
+- [x] Do not introduce explicit fixed chip widths.
+- [x] Use reasonable section spacing while preserving readable code.
 
 ### 7.2 Account subscriptions
 
-- [ ] Add a Settings destination for subscribed tags if required by the final navigation decision.
-- [ ] Show year groups, subjects, sport, and general in sections.
-- [ ] Allow multiple non-year subscriptions.
+- [x] Add a Settings destination for subscribed tags if required by the final navigation decision.
+- [x] Show year groups, subjects, sport, and general in sections.
+- [x] Allow multiple non-year subscriptions.
 - [ ] Require exactly one year-group subscription during onboarding.
-- [ ] Permit changing the account year group later through the approved Settings location.
+- [x] Permit changing the account year group later through the approved Settings location.
 - [ ] Subscribe new accounts to General by default.
-- [ ] Allow users to remove General.
-- [ ] Save changes atomically.
-- [ ] Roll back local selection if the server rejects the update.
-- [ ] Drop archived/missing tags from the cache.
-- [ ] Surface save failures through the existing status-badge system.
+- [x] Allow users to remove General.
+- [x] Save changes atomically.
+- [x] Roll back local selection if the server rejects the update.
+- [x] Drop archived/missing tags from the cache.
+- [x] Surface save failures through the existing status-badge system.
 
 ### 7.3 Event editor
 
-- [ ] Add tags to school/global event DTOs and administration event editing.
-- [ ] Add decorative non-year tag selection to private event editing.
-- [ ] Exclude the year-group section from private-event tag selection.
-- [ ] Do not add filtering or search based on private-event tags.
-- [ ] Never publish private events through a tag association.
+- [x] Add tags to school/global event DTOs and administration event editing.
+- [x] Add decorative non-year tag selection to private event editing.
+- [x] Exclude the year-group section from private-event tag selection.
+- [x] Do not add filtering or search based on private-event tags.
+- [x] Never publish private events through a tag association.
 - [ ] Keep school/global event authority read-only for ordinary users.
 - [ ] Preserve existing matched transitions.
 - [ ] Keep short tag selection sheets within the requested fractional detent range where content permits.
@@ -976,20 +976,20 @@ Validation boundary:
 
 ### 14.2 Tag and section management
 
-- [ ] Add a Tags destination to Administration.
-- [ ] Use disclosure groups for tag sections.
-- [ ] Show each section’s tags inside its disclosure group.
-- [ ] Support adding, renaming, reordering, and archiving sections.
-- [ ] Support adding, editing, reordering, and archiving tags.
+- [x] Add a Tags destination to Administration.
+- [x] Use disclosure groups for tag sections.
+- [x] Show each section’s tags inside its disclosure group.
+- [x] Support adding, renaming, reordering, and archiving sections.
+- [x] Support adding, editing, reordering, and archiving tags.
 - [ ] Edit each tag’s display name, category, associated names, symbol, and colour.
-- [ ] Give associated names a readable token/list editor.
-- [ ] Normalize aliases before saving.
-- [ ] Show validation when an alias conflicts with another active subject tag.
+- [x] Give associated names a readable token/list editor.
+- [x] Normalize aliases before saving.
+- [x] Show validation when an alias conflicts with another active subject tag.
 - [ ] Keep year-group canonical values protected while permitting approved display metadata changes.
 - [ ] Keep destructive archive actions behind confirmation dialogs attached to the administration root.
 - [ ] Use matched transitions and unique source IDs for compact tag and section editors.
-- [ ] Use fractional sheet detents for short tag and section forms.
-- [ ] Add `.refreshable` to the tag-management list.
+- [x] Use fractional sheet detents for short tag and section forms.
+- [x] Add `.refreshable` to the tag-management list.
 
 ### 14.3 Account JSON disclosure hierarchy
 
