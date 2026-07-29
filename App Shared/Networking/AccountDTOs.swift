@@ -226,6 +226,9 @@ nonisolated struct ProfileStorageQuotaResponse: Codable, Sendable {
 	let monthlyOperationLimit: Int
 	let monthlyWriteCutoff: Int
 	let writesDisabled: Bool
+	let reconciledStoredBytes: Int64?
+	let reconciliationWarning: Bool?
+	let reconciledAt: Date?
 }
 
 nonisolated enum AdministrationEventTagCategory: String, Codable, CaseIterable, Sendable, Identifiable {

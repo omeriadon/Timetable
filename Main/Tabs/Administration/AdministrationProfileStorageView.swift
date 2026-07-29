@@ -36,6 +36,38 @@ struct AdministrationProfileStorageView: View {
 						value: quota.writesDisabled ? "Disabled" : "Available"
 					)
 				}
+
+				Section("Cloudflare Reconciliation") {
+					LabeledContent(
+						"Status",
+						value: quota.reconciliationWarning == true ? "Accounting Mismatch" : "Current"
+					)
+
+					if let reconciledStoredBytes = quota.reconciledStoredBytes {
+						LabeledContent(
+							"Reported Storage",
+							value: formattedBytes(reconciledStoredBytes)
+						)
+					}
+
+					if let reconciledAt = quota.reconciledAt {
+						LabeledContent(
+							"Last Checked",
+							value: reconciledAt.formatted(
+								date: .abbreviated,
+								time: .standard
+							)
+						)
+					}
+
+					if quota.reconciliationWarning == true {
+						Label(
+							"Cloudflare reports more stored data than local accounting. New profile photo writes are disabled.",
+							systemImage: "exclamationmark.triangle.fill"
+						)
+						.foregroundStyle(.orange)
+					}
+				}
 			} else {
 				ProgressView("Loading profile storage")
 			}
