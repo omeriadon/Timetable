@@ -297,8 +297,8 @@ Validation boundary:
 - [ ] Remove Apple identity fields after the deletion migration is safely ordered.
 - [ ] Clear Apple identity fields from preserved password accounts before removing the columns.
 - [ ] Remove Apple-auth server routes.
-- [ ] Remove Apple server-notification routes.
-- [ ] Remove Apple JWT configuration that is no longer used.
+- [x] Remove Apple server-notification routes.
+- [x] Remove Apple JWT configuration that is no longer used.
 - [ ] Remove Apple account-state DTOs and admin JSON fields.
 - [ ] Keep migration ordering reversible at the schema level where practical; account deletion itself is intentionally destructive.
 
