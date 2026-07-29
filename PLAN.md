@@ -454,13 +454,13 @@ Validation boundary:
 
 ### 3.2 Administration authority
 
-- [ ] Replace environment-email-list middleware with current database authority checks.
-- [ ] Resolve the user from the active session on every admin request.
-- [ ] Return `403` when authority has been revoked.
-- [ ] Add system-owner-only endpoints to grant and revoke administrator authority.
-- [ ] Reject role changes for either permanent owner.
+- [x] Replace environment-email-list middleware with current database authority checks.
+- [x] Resolve the user from the active session on every admin request.
+- [x] Return `403` when authority has been revoked.
+- [x] Add system-owner-only endpoints to grant and revoke administrator authority.
+- [x] Reject role changes for either permanent owner.
 - [ ] Include authority and badges in administration account data.
-- [ ] Add an administration dashboard response that distinguishes `administrator` and `systemOwner`.
+- [x] Add an administration dashboard response that distinguishes `administrator` and `systemOwner`.
 
 ### 3.3 Tag endpoints
 
@@ -560,16 +560,16 @@ Validation boundary:
 - [ ] Add photo revision/URL metadata.
 - [ ] Add `[ProfileBadge]`.
 - [ ] Decode legacy symbol-based appearances into the closest emoji/monogram default without crashing.
-- [ ] Add global tag models and category ordering.
-- [ ] Add current-user tag subscriptions.
-- [ ] Add tagged event models.
-- [ ] Add friend order.
+- [x] Add global tag models and category ordering.
+- [x] Add current-user tag subscriptions.
+- [x] Add tagged event models.
+- [x] Add friend order.
 - [ ] Add per-record sync metadata.
 - [ ] Add pending mutation storage.
 - [ ] Add tombstone storage where offline deletion is supported.
 - [ ] Add TipKit configuration marker only if needed outside TipKit’s own datastore.
 - [ ] Version every changed Defaults payload that needs backwards decoding.
-- [ ] Preserve generated `Encodable` behavior by isolating legacy decode-only keys.
+- [x] Preserve generated `Encodable` behavior by isolating legacy decode-only keys.
 
 ## Phase 6: Email-only authentication and onboarding
 
@@ -633,9 +633,9 @@ Validation boundary:
 - [x] Add a Settings destination for subscribed tags if required by the final navigation decision.
 - [x] Show year groups, subjects, sport, and general in sections.
 - [x] Allow multiple non-year subscriptions.
-- [ ] Require exactly one year-group subscription during onboarding.
+- [x] Require exactly one year-group subscription during onboarding.
 - [x] Permit changing the account year group later through the approved Settings location.
-- [ ] Subscribe new accounts to General by default.
+- [x] Subscribe new accounts to General by default.
 - [x] Allow users to remove General.
 - [x] Save changes atomically.
 - [x] Roll back local selection if the server rejects the update.
