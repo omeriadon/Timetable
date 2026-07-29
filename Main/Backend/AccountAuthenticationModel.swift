@@ -25,15 +25,29 @@ final class AccountAuthenticationModel {
 			didAttemptSubmit = false
 			submissionError = nil
 			passwordConfirmation = ""
+			resetVerificationChallenge()
 		}
 	}
 
-	var displayName = ""
-	var email = ""
+	var email = "" {
+		didSet {
+			let sanitizedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+			if email != sanitizedEmail {
+				email = sanitizedEmail
+				return
+			}
+			guard oldValue.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() != normalizedEmail else {
+				return
+			}
+			resetVerificationChallenge()
+		}
+	}
 	var password = ""
 	var passwordConfirmation = ""
 	var verificationCode = ""
 	private(set) var verificationRequested = false
+	private(set) var verificationExpiresAt: Date?
+	private(set) var resendAvailableAt: Date?
 	private(set) var isSubmitting = false
 	private(set) var didAttemptSubmit = false
 	private(set) var submissionError: String?
@@ -42,17 +56,6 @@ final class AccountAuthenticationModel {
 
 	init(sessionStore: SessionStore? = nil) {
 		self.sessionStore = sessionStore ?? .shared
-	}
-
-	var displayNameProblems: [String] {
-		guard mode == .signUp else { return [] }
-		var problems: [String] = []
-		let trimmed = displayName.trimmingCharacters(in: .whitespacesAndNewlines)
-
-		if trimmed.count > 30 {
-			problems.append("Your name must contain 30 characters or fewer.")
-		}
-		return problems
 	}
 
 	var emailProblems: [String] {
@@ -64,6 +67,9 @@ final class AccountAuthenticationModel {
 		}
 		if trimmed.count > 45 {
 			problems.append("Your email must contain 45 characters or fewer.")
+		}
+		if mode == .signUp, !trimmed.lowercased().hasSuffix("@student.education.wa.edu.au") {
+			problems.append("Use your school email address.")
 		}
 		return problems
 	}
@@ -101,8 +107,10 @@ final class AccountAuthenticationModel {
 					if verificationRequested {
 						try await sessionStore.verifyCodeAndSignUp(email: normalizedEmail, code: verificationCode, password: password)
 					} else {
-						try await sessionStore.requestVerificationCode(email: normalizedEmail)
+						let challenge = try await sessionStore.requestVerificationCode(email: normalizedEmail)
 						verificationRequested = true
+						verificationExpiresAt = challenge.expiresAt
+						resendAvailableAt = challenge.resendAvailableAt
 					}
 			}
 		} catch {
@@ -116,7 +124,7 @@ final class AccountAuthenticationModel {
 	}
 
 	private var allProblems: [String] {
-		displayNameProblems + emailProblems + passwordProblems + passwordConfirmationProblems
+		emailProblems + passwordProblems + passwordConfirmationProblems
 	}
 
 	var problemText: String {
@@ -125,5 +133,30 @@ final class AccountAuthenticationModel {
 
 	var isAccountDetailsValid: Bool {
 		allProblems.isEmpty && (mode != .signUp || !verificationRequested || verificationCode.count == 6)
+	}
+
+	func requestReplacementCode() async {
+		guard !isSubmitting, let resendAvailableAt, resendAvailableAt <= .now else {
+			return
+		}
+
+		isSubmitting = true
+		defer { isSubmitting = false }
+
+		do {
+			let challenge = try await sessionStore.requestVerificationCode(email: normalizedEmail)
+			verificationCode = ""
+			verificationExpiresAt = challenge.expiresAt
+			resendAvailableAt = challenge.resendAvailableAt
+		} catch {
+			submissionError = error.localizedDescription
+		}
+	}
+
+	private func resetVerificationChallenge() {
+		verificationCode = ""
+		verificationRequested = false
+		verificationExpiresAt = nil
+		resendAvailableAt = nil
 	}
 }

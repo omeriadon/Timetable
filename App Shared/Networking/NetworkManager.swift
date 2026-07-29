@@ -62,6 +62,9 @@ enum ServerErrorCode: String, Codable {
 	case sessionExpired
 	case timetableConflict
 	case unauthorized
+	case verificationCodeExpired
+	case verificationCodeInvalid
+	case verificationCodeUsed
 	case unknown
 
 	init(from decoder: any Decoder) throws {

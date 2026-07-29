@@ -267,12 +267,12 @@ Validation boundary:
 - [x] Store normalized email.
 - [x] Store creation, expiry, resend-available, used, and attempt timestamps.
 - [x] Add a bounded failed-attempt counter.
-- [ ] Add rate limits per normalized email, installation, and source IP.
+- [x] Add rate limits per normalized email, installation, and source IP.
 - [x] Invalidate older live codes when a replacement code is issued.
 - [x] Mark a code used atomically with account creation or email verification.
-- [ ] Clean expired challenges without affecting accounts.
-- [ ] Configure the existing Resend integration for verification messages.
-- [ ] Keep API keys exclusively in deployed environment configuration.
+- [x] Clean expired challenges without affecting accounts.
+- [x] Configure the existing Resend integration for verification messages.
+- [x] Keep API keys exclusively in deployed environment configuration.
 - [x] Add mail content for the six-digit code and ten-minute expiry.
 
 ### 2.3 Apple-account removal
@@ -435,19 +435,19 @@ Validation boundary:
 
 ### 3.1 Authentication endpoints
 
-- [ ] Replace direct registration with a verification-first flow.
+- [x] Replace direct registration with a verification-first flow.
 - [x] Add request-code endpoint.
-- [ ] Normalize and validate the school email before sending.
-- [ ] Return resend availability and challenge expiry.
+- [x] Normalize and validate the school email before sending.
+- [x] Return resend availability and challenge expiry.
 - [x] Add verify-code-and-register endpoint.
 - [x] Atomically consume the code.
-- [ ] Keep password validation and hashing.
+- [x] Keep password validation and hashing.
 - [x] Derive the default display name from the normalized email local part.
 - [x] Split the local part using the required `firstname.lastname` format.
 - [x] Strip trailing digits from the last-name component.
 - [x] Capitalize the first and last names for display.
-- [ ] Reject registration addresses that do not provide the required first-name and last-name components.
-- [ ] Reject non-school emails at every account mutation boundary.
+- [x] Reject registration addresses that do not provide the required first-name and last-name components.
+- [x] Reject non-school emails at every account mutation boundary.
 - [ ] Keep login failure responses non-enumerating where appropriate.
 - [x] Remove client and server Apple login endpoints.
 - [ ] Invalidate sessions for accounts deleted by the Apple-only cleanup.
@@ -578,17 +578,17 @@ Validation boundary:
 - [x] Remove Sign in with Apple UI and authorization handlers.
 - [x] Remove Apple-specific loading and error states.
 - [ ] Restrict email input to the school suffix.
-- [ ] Normalize pasted uppercase or whitespace-padded emails.
-- [ ] Preserve a clear registration/sign-in distinction.
+- [x] Normalize pasted uppercase or whitespace-padded emails.
+- [x] Preserve a clear registration/sign-in distinction.
 - [x] Add verification-code request state.
 - [x] Add six-digit code entry.
-- [ ] Show ten-minute expiry.
-- [ ] Disable resend until the two-minute cooldown elapses.
-- [ ] Permit requesting a replacement code after cooldown.
-- [ ] Invalidate the previous local challenge state when replacement succeeds.
-- [ ] Handle already-used, expired, invalid, and rate-limited codes distinctly.
-- [ ] Use system-symbol button labels.
-- [ ] Use `.glassProminent` and confirm role for the final verification action.
+- [x] Show ten-minute expiry.
+- [x] Disable resend until the two-minute cooldown elapses.
+- [x] Permit requesting a replacement code after cooldown.
+- [x] Invalidate the previous local challenge state when replacement succeeds.
+- [x] Handle already-used, expired, invalid, and rate-limited codes distinctly.
+- [x] Use system-symbol button labels.
+- [x] Use `.glassProminent` and confirm role for the final verification action.
 - [ ] Keep modal modifiers on the authentication root.
 
 ### 6.2 Name and year group

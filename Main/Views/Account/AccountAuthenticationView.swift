@@ -32,16 +32,6 @@ struct AccountAuthenticationView: View {
 			Spacer()
 				.frame(height: 20)
 
-			if model.mode == .signUp {
-				AccountInputGroup(
-					title: "Name",
-					systemImage: "person",
-					text: $model.displayName,
-					problems: model.displayName.isEmpty ? [] : model.displayNameProblems
-				)
-				.transition(.blurReplace)
-			}
-
 			if model.mode == .signUp, model.verificationRequested {
 				AccountInputGroup(
 					title: "Verification Code",
@@ -50,6 +40,27 @@ struct AccountAuthenticationView: View {
 					problems: []
 				)
 				.keyboardType(.numberPad)
+
+				if let verificationExpiresAt = model.verificationExpiresAt {
+					Text("Code expires \(verificationExpiresAt, style: .relative)")
+						.font(.footnote)
+						.foregroundStyle(.secondary)
+				}
+
+				if let resendAvailableAt = model.resendAvailableAt {
+					TimelineView(.periodic(from: .now, by: 1)) { context in
+						if resendAvailableAt <= context.date {
+							Button(action: requestReplacementCode) {
+								Label("Send Replacement Code", systemImage: "arrow.clockwise")
+							}
+							.buttonStyle(.glass)
+						} else {
+							Text("Replacement available \(resendAvailableAt, style: .relative)")
+								.font(.footnote)
+								.foregroundStyle(.secondary)
+						}
+					}
+				}
 			}
 
 			AccountInputGroup(
@@ -81,13 +92,16 @@ struct AccountAuthenticationView: View {
 			Spacer()
 				.frame(height: 20)
 
-			Button(action: submit) {
+			Button(role: model.mode == .signUp && model.verificationRequested ? .confirm : nil, action: submit) {
 				ZStack {
 					if model.isSubmitting {
 						ProgressView()
 							.transition(.blurReplace)
 					} else {
-						Text(model.mode == .signUp && !model.verificationRequested ? "Send Code" : model.mode.rawValue)
+						Label(
+							model.mode == .signUp && !model.verificationRequested ? "Send Code" : model.mode.rawValue,
+							systemImage: model.mode == .signUp && !model.verificationRequested ? "envelope.badge" : "checkmark.circle"
+						)
 							.font(.title3)
 							.transition(.blurReplace)
 					}
@@ -109,6 +123,12 @@ struct AccountAuthenticationView: View {
 	private func submit() {
 		Task {
 			await model.submit()
+		}
+	}
+
+	private func requestReplacementCode() {
+		Task {
+			await model.requestReplacementCode()
 		}
 	}
 

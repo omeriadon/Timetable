@@ -113,32 +113,22 @@ final class SessionStore {
 		}
 	}
 
-	func signUp(email: String, password: String, displayName: String) async throws {
-		guard Platform.current.allowsAccountCreation else { throw SessionStoreError.platformActionUnavailable }
+	func requestVerificationCode(email: String) async throws -> VerificationCodeResponse {
+		guard Platform.current.allowsAccountCreation else {
+			throw SessionStoreError.platformActionUnavailable
+		}
 		let identity = ClientIdentityProvider.shared.identity()
-		Print("Signing up account", category: .account)
-		let response: TokenResponse = try await networkManager.send(
-			.v1AuthRegister,
-			body: RegisterRequest(
-				email: email,
-				password: password,
-				displayName: displayName,
-				platform: identity.platform.rawValue,
-				installationID: identity.installationID
-			)
-		)
-		try await apply(response, bootstrap: true)
-	}
-
-	func requestVerificationCode(email: String) async throws {
-		let identity = ClientIdentityProvider.shared.identity()
-		try await networkManager.send(
+		let response: VerificationCodeResponse = try await networkManager.send(
 			.v1AuthRequestCode,
 			body: VerificationCodeRequest(email: email, installationID: identity.installationID)
 		)
+		return response
 	}
 
 	func verifyCodeAndSignUp(email: String, code: String, password: String) async throws {
+		guard Platform.current.allowsAccountCreation else {
+			throw SessionStoreError.platformActionUnavailable
+		}
 		let identity = ClientIdentityProvider.shared.identity()
 		let response: TokenResponse = try await networkManager.send(
 			.v1AuthVerifyCodeRegister,
@@ -312,7 +302,6 @@ private extension Endpoint {
 	static let v1AuthLogin = Endpoint("/v1/auth/login", method: .post, requiresAuthentication: false)
 	static let v1AuthLogout = Endpoint("/v1/auth/logout", method: .delete)
 	static let v1AuthRefresh = Endpoint("/v1/auth/refresh", method: .post, requiresAuthentication: false)
-	static let v1AuthRegister = Endpoint("/v1/auth/register", method: .post, requiresAuthentication: false)
 	static let v1AuthRequestCode = Endpoint("/v1/auth/request-code", method: .post, requiresAuthentication: false)
 	static let v1AuthVerifyCodeRegister = Endpoint("/v1/auth/verify-code-register", method: .post, requiresAuthentication: false)
 	static let v1Profile = Endpoint("/v1/account")
