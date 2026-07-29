@@ -466,8 +466,8 @@ Validation boundary:
 
 - [x] Add authenticated tag catalogue endpoint.
 - [x] Add current-user tag-subscription endpoint.
-- [ ] Add atomic replacement of subject-only subscriptions.
-- [ ] Preserve all non-subject subscriptions during subject replacement.
+- [x] Add atomic replacement of subject-only subscriptions.
+- [x] Preserve all non-subject subscriptions during subject replacement.
 - [x] Add administration tag-section create/update/archive/order endpoints.
 - [x] Add administration tag create/update/archive/order endpoints.
 - [x] Validate associated names and reject ambiguous active subject aliases.
@@ -597,12 +597,12 @@ Validation boundary:
 - [ ] Derive the initial display name from `firstname.lastname`.
 - [ ] Strip trailing digits from the last name.
 - [ ] Capitalize the derived first and last names.
-- [ ] Add year-group selection during onboarding.
-- [ ] Show Year 7, Year 8, Year 9, Year 10, Year 11, and Leavers.
-- [ ] Use global year-group tags from the server rather than hardcoded presentation-only values.
-- [ ] Persist the selected year-group subscription through the tag-subscription endpoint.
-- [ ] Make the onboarding page unable to advance until a valid year group is saved.
-- [ ] Restore the saved year group if onboarding is reopened.
+- [x] Add year-group selection during onboarding.
+- [x] Show Year 7, Year 8, Year 9, Year 10, Year 11, and Leavers.
+- [x] Use global year-group tags from the server rather than hardcoded presentation-only values.
+- [x] Persist the selected year-group subscription through the tag-subscription endpoint.
+- [x] Make the onboarding page unable to advance until a valid year group is saved.
+- [x] Restore the saved year group if onboarding is reopened.
 
 ### 6.3 Successful sign-in regression
 
