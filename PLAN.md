@@ -945,15 +945,15 @@ Validation boundary:
 
 ## Phase 13: Settings and main tab structure
 
-- [ ] Reorder the primary tabs to Timetable, Friends, Settings.
-- [ ] Preserve the custom UIKit tab bridge and prominent-action behavior.
-- [ ] Update `MainTab` mapping.
-- [ ] Update programmatic tab selection.
+- [x] Reorder the primary tabs to Timetable, Friends, Settings.
+- [x] Preserve the custom UIKit tab bridge and prominent-action behavior.
+- [x] Update `MainTab` mapping.
+- [x] Update programmatic tab selection.
 - [ ] Update notification-based deep links to Settings and Timetable.
-- [ ] Keep Administration as the fourth conditional tab after Settings.
-- [ ] Make admin-tab visibility derive from current server authority, not calendar-event cache capability.
-- [ ] Remove the admin tab immediately after an authority-refresh response reports no access.
-- [ ] Keep the account signed in.
+- [x] Keep Administration as the fourth conditional tab after Settings.
+- [x] Make admin-tab visibility derive from current server authority, not calendar-event cache capability.
+- [x] Remove the admin tab immediately after an authority-refresh response reports no access.
+- [x] Keep the account signed in.
 - [ ] Add Profile under Settings > Account.
 - [ ] Reuse the profile picture in the Settings account row.
 - [ ] Show authority badges on the Settings profile picture.
