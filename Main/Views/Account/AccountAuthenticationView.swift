@@ -5,18 +5,15 @@
 //   Created by Adon Omeri on 28/6/2026.
 //
 
-import AuthenticationServices
 import SwiftUI
 
 struct AccountAuthenticationView: View {
 	@State private var model = AccountAuthenticationModel()
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	let allowsSignUp: Bool
-	let allowsAppleSignIn: Bool
 
-	init(allowsSignUp: Bool = false, allowsAppleSignIn: Bool = true) {
+	init(allowsSignUp: Bool = false) {
 		self.allowsSignUp = allowsSignUp
-		self.allowsAppleSignIn = allowsAppleSignIn
 	}
 
 	var body: some View {
@@ -93,21 +90,6 @@ struct AccountAuthenticationView: View {
 			.frame(maxWidth: .infinity)
 			.disabled(model.isSubmitting || !model.isAccountDetailsValid)
 
-			if allowsAppleSignIn {
-				SignInWithAppleButton(.continue) { request in
-					request.requestedScopes = [.fullName, .email]
-				} onCompletion: { result in
-					handleAppleCompletion(result)
-				}
-				.controlSize(.large)
-				.buttonSizing(.flexible)
-				.signInWithAppleButtonStyle(.white)
-				#if os(iOS)
-					.frame(height: 50)
-				#endif
-					.clipShape(.capsule)
-					.disabled(model.isSubmitting)
-			}
 		}
 		.padding(20)
 		.appNavigationTitle("Account")
@@ -120,14 +102,4 @@ struct AccountAuthenticationView: View {
 		}
 	}
 
-	private func handleAppleCompletion(_ result: Result<ASAuthorization, any Error>) {
-		switch result {
-			case let .success(authorization):
-				Task {
-					await model.completeAppleAuthorization(authorization)
-				}
-			case let .failure(error):
-				model.handleAppleAuthorizationError(error)
-		}
-	}
 }

@@ -449,7 +449,7 @@ Validation boundary:
 - [ ] Reject registration addresses that do not provide the required first-name and last-name components.
 - [ ] Reject non-school emails at every account mutation boundary.
 - [ ] Keep login failure responses non-enumerating where appropriate.
-- [ ] Remove client and server Apple login endpoints.
+- [x] Remove client and server Apple login endpoints.
 - [ ] Invalidate sessions for accounts deleted by the Apple-only cleanup.
 
 ### 3.2 Administration authority
@@ -575,8 +575,8 @@ Validation boundary:
 
 ### 6.1 Authentication UI
 
-- [ ] Remove Sign in with Apple UI and authorization handlers.
-- [ ] Remove Apple-specific loading and error states.
+- [x] Remove Sign in with Apple UI and authorization handlers.
+- [x] Remove Apple-specific loading and error states.
 - [ ] Restrict email input to the school suffix.
 - [ ] Normalize pasted uppercase or whitespace-padded emails.
 - [ ] Preserve a clear registration/sign-in distinction.

@@ -5,7 +5,6 @@
 //   Created by Adon Omeri on 28/6/2026.
 //
 
-import AuthenticationServices
 import Foundation
 import Observation
 
@@ -107,23 +106,6 @@ final class AccountAuthenticationModel {
 			StatusBadgeManager.shared.addBadge(id: UUID(), title: "Unable to Sign in", secondaryText: error.localizedDescription, priority: 5, view: .error)
 			submissionError = error.localizedDescription
 		}
-	}
-
-	func completeAppleAuthorization(_ authorization: ASAuthorization) async {
-		submissionError = nil
-		isSubmitting = true
-		defer { isSubmitting = false }
-
-		do {
-			try await sessionStore.signInWithApple(authorization)
-		} catch {
-			submissionError = error.localizedDescription
-		}
-	}
-
-	func handleAppleAuthorizationError(_ error: any Error) {
-		guard (error as? ASAuthorizationError)?.code != .canceled else { return }
-		submissionError = error.localizedDescription
 	}
 
 	private var normalizedEmail: String {

@@ -5,14 +5,12 @@
 //   Created by Adon Omeri on 28/6/2026.
 //
 
-import AuthenticationServices
 import Defaults
 import Foundation
 import Observation
 
 enum SessionStoreError: LocalizedError {
 	case credentialPersistenceFailed
-	case invalidIdentityToken
 	case missingRefreshToken
 	case platformActionUnavailable
 
@@ -20,8 +18,6 @@ enum SessionStoreError: LocalizedError {
 		switch self {
 			case .credentialPersistenceFailed:
 				"Session credentials could not be stored."
-			case .invalidIdentityToken:
-				"The Apple identity token was invalid."
 			case .missingRefreshToken:
 				"Refresh token is missing."
 			case .platformActionUnavailable:
@@ -149,37 +145,6 @@ final class SessionStore {
 		try await apply(response, bootstrap: true)
 	}
 
-	func signInWithApple(_ authorization: ASAuthorization, context: NetworkRequestContext = .background) async throws {
-		guard Platform.current.allowsAppleAuthentication else { throw SessionStoreError.platformActionUnavailable }
-		guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential else {
-			throw SessionStoreError.invalidIdentityToken
-		}
-
-		guard let identityTokenData = credential.identityToken,
-		      let identityToken = String(data: identityTokenData, encoding: .utf8)
-		else {
-			throw SessionStoreError.invalidIdentityToken
-		}
-
-		let formatter = PersonNameComponentsFormatter()
-		formatter.style = .default
-		let displayName = credential.fullName
-			.map { formatter.string(from: $0).trimmingCharacters(in: .whitespacesAndNewlines) }
-			.flatMap { $0.isEmpty ? nil : $0 }
-
-		let identity = ClientIdentityProvider.shared.identity()
-		let response: TokenResponse = try await networkManager.send(
-			.v1AuthApple,
-			body: AppleSignInRequest(
-				identityToken: identityToken,
-				displayName: displayName,
-				platform: identity.platform.rawValue,
-				installationID: identity.installationID
-			),
-			context: context
-		)
-		try await apply(response, bootstrap: true)
-	}
 
 	func refreshSilently() async throws {
 		guard let refreshToken else {
@@ -327,7 +292,6 @@ final class SessionStore {
 }
 
 private extension Endpoint {
-	static let v1AuthApple = Endpoint("/v1/auth/apple", method: .post, requiresAuthentication: false)
 	static let v1AuthLogin = Endpoint("/v1/auth/login", method: .post, requiresAuthentication: false)
 	static let v1AuthLogout = Endpoint("/v1/auth/logout", method: .delete)
 	static let v1AuthRefresh = Endpoint("/v1/auth/refresh", method: .post, requiresAuthentication: false)
