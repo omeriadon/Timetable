@@ -10,15 +10,6 @@ nonisolated enum SyncMutationOperation: String, Codable, Defaults.Serializable, 
 	case delete
 }
 
-nonisolated enum SyncMutationOutcome: String, Codable, Sendable {
-	case accepted
-	case serverRecordNewer
-	case deletedOnServer
-	case invalidReferenceDropped
-	case authorizationRejected
-	case validationRejected
-}
-
 nonisolated struct OwnerTimetableSyncPayload: Codable, Defaults.Serializable, Sendable {
 	let subjects: [Subject]
 	let isSearchable: Bool
@@ -43,31 +34,11 @@ nonisolated struct SyncEnvelopeRequest: Codable, Sendable {
 	let mutations: [SyncRecordMutation]
 }
 
-nonisolated struct SyncMutationResult: Codable, Sendable {
-	let mutationID: UUID
-	let recordType: SyncRecordType
-	let recordID: UUID?
-	let outcome: SyncMutationOutcome
-	let serverRevision: Int
-	let ownerTimetable: OwnerTimetableResponse?
-	let droppedReferenceIDs: [UUID]
-	let message: String?
-}
-
 nonisolated struct SyncTombstone: Codable, Defaults.Serializable, Sendable {
 	let recordType: SyncRecordType
 	let recordID: UUID
 	let revision: Int
 	let deletedAt: Date
-}
-
-nonisolated struct SyncEnvelopeResponse: Codable, Sendable {
-	let serverTime: Date
-	let requestID: UUID
-	let installationID: String
-	let results: [SyncMutationResult]
-	let tombstones: [SyncTombstone]
-	let nextCursor: String?
 }
 
 nonisolated struct SyncRecordRevisions: Codable, Defaults.Serializable, Sendable {
