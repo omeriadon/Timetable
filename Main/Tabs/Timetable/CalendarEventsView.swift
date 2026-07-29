@@ -437,6 +437,9 @@ private struct CalendarEventEditor: View {
 	@State private var date: Date
 	@State private var isSaving = false
 	@State private var showsSymbolPicker = false
+	@State private var administrationService = AdministrationService.shared
+	@State private var tagSections: [EventTagCatalogueSection] = []
+	@State private var selectedTagIDs: Set<UUID>
 
 	init(target: CalendarEventEditorTarget, canManageGlobalEvents: Bool, save: @escaping (CreateCalendarEventRequest, CalendarEvent?) async throws -> Void, delete: @escaping (CalendarEvent) async throws -> Void) {
 		self.target = target
@@ -448,6 +451,7 @@ private struct CalendarEventEditor: View {
 		_notes = State(initialValue: event?.notes ?? "")
 		_symbol = State(initialValue: event?.symbol ?? "calendar")
 		_date = State(initialValue: event?.date.startOfDay() ?? TimetableClock.now)
+		_selectedTagIDs = State(initialValue: Set(event?.tagIDs ?? []))
 	}
 
 	private var isReadOnlyGlobalEvent: Bool {
@@ -477,6 +481,12 @@ private struct CalendarEventEditor: View {
 					} label: {
 						Label("Symbol", systemImage: symbol)
 					}
+
+					EventTagSelector(
+						sections: tagSections,
+						allowsYearGroups: target.scope == .globalEvent,
+						selectedTagIDs: $selectedTagIDs
+					)
 				}
 			}
 			.appNavigationTitle(navigationTitle)
@@ -508,6 +518,13 @@ private struct CalendarEventEditor: View {
 			}
 		}
 		.sheet(isPresented: $showsSymbolPicker) { CalendarEventSymbolPicker(symbol: $symbol) }
+		.task {
+			guard let catalogue = try? await administrationService.tagCatalogue() else {
+				return
+			}
+
+			tagSections = catalogue.sections
+		}
 	}
 
 	@ViewBuilder
@@ -534,7 +551,13 @@ private struct CalendarEventEditor: View {
 
 	private func submit() {
 		isSaving = true
-		let request = CreateCalendarEventRequest(title: title, notes: notes.isEmpty ? nil : notes, symbol: symbol, date: SchoolCalendarDate(date))
+		let request = CreateCalendarEventRequest(
+			title: title,
+			notes: notes.isEmpty ? nil : notes,
+			symbol: symbol,
+			date: SchoolCalendarDate(date),
+			tagIDs: Array(selectedTagIDs)
+		)
 		Task {
 			do { try await save(request, target.event); dismiss() }
 			catch { isSaving = false; badges.addBadge(id: UUID(), title: "Unable to save event", secondaryText: error.localizedDescription, priority: 4, view: .error) }

@@ -208,7 +208,7 @@ private enum AdministrationJSONFormatter {
 		return expandEmbeddedJSON(in: object)
 	}
 
-	private static func jsonObject(from data: Data) -> Any? {
+	nonisolated private static func jsonObject(from data: Data) -> Any? {
 		guard let object = try? JSONSerialization.jsonObject(with: data), JSONSerialization.isValidJSONObject(object) else {
 			return nil
 		}
