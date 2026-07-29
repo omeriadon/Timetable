@@ -108,9 +108,7 @@ struct CalendarImportView: View {
 		.presentationDragIndicator(.hidden)
 	}
 
-	func moveForward(to step: CalendarImportStep) async {
-		let delay = Double.random(in: 0.5 ... 1.5)
-		try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+	func moveForward(to step: CalendarImportStep) {
 		calendarImportStep = step
 	}
 
@@ -153,12 +151,12 @@ struct CalendarImportView: View {
 	func performCalendarImport() async {
 		do {
 			Print("[iOS] Calendar Import: Starting authorization check...")
-			await moveForward(to: .checkingAuthorisation)
+			moveForward(to: .checkingAuthorisation)
 
 			let eventStore = EKEventStore()
 
 			Print("[iOS] Calendar Import: Requesting calendar access...")
-			await moveForward(to: .requestionCalendarAccess)
+			moveForward(to: .requestionCalendarAccess)
 
 			let authorized = try await eventStore.requestFullAccessToEvents()
 
@@ -168,7 +166,7 @@ struct CalendarImportView: View {
 			}
 
 			Print("[iOS] Calendar Import: Searching for Compass calendar...")
-			await moveForward(to: .findingCalendar)
+			moveForward(to: .findingCalendar)
 
 			guard let calendar = eventStore.calendars(for: .event).first(where: {
 				$0.title.range(of: "Compass", options: .caseInsensitive) != nil
@@ -178,28 +176,28 @@ struct CalendarImportView: View {
 			}
 
 			Print("[iOS] Calendar Import: Fetching events...")
-			await moveForward(to: .fetchingEvents)
+			moveForward(to: .fetchingEvents)
 
 			let events = try await fetchCompassEvents(from: eventStore, calendar: calendar)
 
 			Print("[iOS] Calendar Import: Matching events to time slots...")
-			await moveForward(to: .matchingEvents)
+			moveForward(to: .matchingEvents)
 
 			let importedSubjects = try await matchEventsToTimeSlots(events)
 
 			Print("[iOS] Calendar Import: Processing subjects...")
-			await moveForward(to: .processingSubjects)
+			moveForward(to: .processingSubjects)
 			let translatedSubjects = translateSubjects(importedSubjects)
 
 			Print("[iOS] Calendar Import: Validating...")
-			await moveForward(to: .finalising)
+			moveForward(to: .finalising)
 
 			let updatedSubjects = translatedSubjects
 				.sorted { $0.id.localizedCaseInsensitiveCompare($1.id) == .orderedAscending }
 				.filter { !$0.slots.isEmpty }
 			subjects = try await ServerSyncCoordinator.shared.saveOwnerTimetable(updatedSubjects)
 
-			await moveForward(to: .done)
+			moveForward(to: .done)
 			Print("[iOS] Calendar Import: Success!")
 			calendarImportStatus = .success
 			completion?(true)

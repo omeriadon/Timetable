@@ -659,13 +659,13 @@ Validation boundary:
 
 ### 8.1 Import performance and sampling
 
-- [ ] Inventory every deliberate sleep/delay in the import state machine.
-- [ ] Remove or shorten presentation-only delays while retaining visible state transitions.
-- [ ] Never delay actual calendar parsing or persistence merely for animation.
-- [ ] Change sample extraction from Monday-only to every weekday in every sampled week.
-- [ ] Deduplicate equivalent detected subjects.
-- [ ] Normalize subject names before tag matching.
-- [ ] Preserve original display names in imported timetable subjects.
+- [x] Inventory every deliberate sleep/delay in the import state machine.
+- [x] Remove or shorten presentation-only delays while retaining visible state transitions.
+- [x] Never delay actual calendar parsing or persistence merely for animation.
+- [x] Change sample extraction from Monday-only to every weekday in every sampled week.
+- [x] Deduplicate equivalent detected subjects.
+- [x] Normalize subject names before tag matching.
+- [x] Preserve original display names in imported timetable subjects.
 
 ### 8.2 Subject-tag replacement prompt
 

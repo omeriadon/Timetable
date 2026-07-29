@@ -94,12 +94,13 @@ func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Subject] {
 
 	let calendar = Calendar.current
 
-	// Track frequency of title claims on unique slots across the 6-week window
-	// Key: "day,session" -> Value: [SubjectTitle : OccurrencesCount]
+	// Track frequency of normalized title claims on unique slots across the
+	// six-week window. The first original title remains the display value.
+	// Key: "day,session" -> Value: [NormalizedSubjectTitle : OccurrencesCount]
 	var slotScoreboard: [String: [String: Int]] = [:]
 
 	// Track overall metadata for subjects we discover
-	var subjectMeta: [String: (color: RGBAColor, symbol: String, classroom: Classroom, teacher: Teacher)] = [:]
+	var subjectMeta: [String: (displayName: String, color: RGBAColor, symbol: String, classroom: Classroom, teacher: Teacher)] = [:]
 
 	// 1. First Pass: Parse events and score frequencies across the 6 weeks
 	for event in events {
@@ -113,6 +114,10 @@ func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Subject] {
 
 		let day = weekday - 2 // Mon = 0, Tue = 1, ..., Fri = 4
 		let dayStart = calendar.startOfDay(for: event.startDate)
+		let normalizedTitle = normalizedImportedSubjectName(title)
+		guard !normalizedTitle.isEmpty else {
+			continue
+		}
 
 		guard let matchedSlot = timeSlots.first(where: { slot in
 			guard
@@ -126,8 +131,9 @@ func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Subject] {
 		}
 
 		// Store metadata if it's the first time seeing this item
-		if subjectMeta[title] == nil {
-			subjectMeta[title] = (
+		if subjectMeta[normalizedTitle] == nil {
+			subjectMeta[normalizedTitle] = (
+				displayName: title,
 				color: RGBAColor(color: AvailableColors.allCases.randomElement()!.SwiftUIColor),
 				symbol: translateSymbol(title),
 				classroom: Classroom(rawLocation: event.location ?? ""),
@@ -138,7 +144,7 @@ func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Subject] {
 		// Update the scoreboard for this explicit time slot
 		let slotKey = "\(day),\(matchedSlot.session)"
 		var scores = slotScoreboard[slotKey] ?? [:]
-		scores[title] = (scores[title] ?? 0) + 1
+		scores[normalizedTitle] = (scores[normalizedTitle] ?? 0) + 1
 		slotScoreboard[slotKey] = scores
 	}
 
@@ -164,15 +170,15 @@ func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Subject] {
 	// 3. Map directly to clean structural models, strictly dropping items that lost all their slots
 	return subjectSlotsMap
 		.filter { !$0.value.isEmpty } // Drop 0-slot items immediately before mapping
-		.compactMap { name, slots in
-			guard let meta = subjectMeta[name] else { return nil }
+		.compactMap { normalizedName, slots in
+			guard let meta = subjectMeta[normalizedName] else { return nil }
 
 			let sortedUniqueSlots = Array(Set(slots)).sorted {
 				$0.day == $1.day ? $0.session < $1.session : $0.day < $1.day
 			}
 
 			return Subject(
-				id: name,
+				id: meta.displayName,
 				symbol: meta.symbol,
 				colour: meta.color,
 				slots: sortedUniqueSlots,
@@ -181,6 +187,16 @@ func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Subject] {
 			)
 		}
 		.sorted { $0.id < $1.id }
+}
+
+private func normalizedImportedSubjectName(_ name: String) -> String {
+	name
+		.folding(
+			options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive],
+			locale: Locale(identifier: "en_US_POSIX")
+		)
+		.split(whereSeparator: \.isWhitespace)
+		.joined(separator: " ")
 }
 
 // MARK: - CalendarImportStep
