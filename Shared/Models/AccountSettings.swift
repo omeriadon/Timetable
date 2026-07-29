@@ -30,6 +30,7 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 	var notificationLeadTimes: Set<NotificationLeadTime>
 	var breakToPeriodNotificationLeadTimes: Set<NotificationLeadTime>
 	var eventNotificationSchedules: Set<EventNotificationSchedule>
+	var serverRevision: Int
 
 	private enum LegacyCodingKeys: String, CodingKey {
 		case notificationLeadTime
@@ -42,10 +43,20 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 		broadcastNotificationsEnabled: true,
 		notificationLeadTimes: [.zero],
 		breakToPeriodNotificationLeadTimes: [.zero],
-		eventNotificationSchedules: []
+		eventNotificationSchedules: [],
+		serverRevision: 0
 	)
 
-	init(liveActivitiesEnabled: Bool, highlightsCurrentDay: Bool = true, notificationsEnabled: Bool, broadcastNotificationsEnabled: Bool, notificationLeadTimes: Set<NotificationLeadTime>, breakToPeriodNotificationLeadTimes: Set<NotificationLeadTime> = [.zero], eventNotificationSchedules: Set<EventNotificationSchedule> = []) {
+	init(
+		liveActivitiesEnabled: Bool,
+		highlightsCurrentDay: Bool = true,
+		notificationsEnabled: Bool,
+		broadcastNotificationsEnabled: Bool,
+		notificationLeadTimes: Set<NotificationLeadTime>,
+		breakToPeriodNotificationLeadTimes: Set<NotificationLeadTime> = [.zero],
+		eventNotificationSchedules: Set<EventNotificationSchedule> = [],
+		serverRevision: Int = 0
+	) {
 		self.liveActivitiesEnabled = liveActivitiesEnabled
 		self.highlightsCurrentDay = highlightsCurrentDay
 		self.notificationsEnabled = notificationsEnabled
@@ -53,6 +64,7 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 		self.notificationLeadTimes = notificationLeadTimes
 		self.breakToPeriodNotificationLeadTimes = breakToPeriodNotificationLeadTimes
 		self.eventNotificationSchedules = eventNotificationSchedules
+		self.serverRevision = serverRevision
 	}
 
 	init(from decoder: any Decoder) throws {
@@ -71,5 +83,6 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 		}
 		breakToPeriodNotificationLeadTimes = try container.decodeIfPresent(Set<NotificationLeadTime>.self, forKey: .breakToPeriodNotificationLeadTimes) ?? Self.default.breakToPeriodNotificationLeadTimes
 		eventNotificationSchedules = try container.decodeIfPresent(Set<EventNotificationSchedule>.self, forKey: .eventNotificationSchedules) ?? Self.default.eventNotificationSchedules
+		serverRevision = try container.decodeIfPresent(Int.self, forKey: .serverRevision) ?? 0
 	}
 }

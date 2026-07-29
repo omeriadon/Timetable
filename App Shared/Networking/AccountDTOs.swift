@@ -398,6 +398,7 @@ nonisolated struct NotificationSettingsUpdateRequest: Codable, Sendable {
 	let notificationLeadTimes: Set<NotificationLeadTime>
 	let breakToPeriodNotificationLeadTimes: Set<NotificationLeadTime>
 	let eventNotificationSchedules: Set<EventNotificationSchedule>
+	let serverRevision: Int
 
 	init(_ settings: AccountSettings) {
 		notificationsEnabled = settings.notificationsEnabled
@@ -405,6 +406,7 @@ nonisolated struct NotificationSettingsUpdateRequest: Codable, Sendable {
 		notificationLeadTimes = settings.notificationLeadTimes
 		breakToPeriodNotificationLeadTimes = settings.breakToPeriodNotificationLeadTimes
 		eventNotificationSchedules = settings.eventNotificationSchedules
+		serverRevision = settings.serverRevision
 	}
 }
 
