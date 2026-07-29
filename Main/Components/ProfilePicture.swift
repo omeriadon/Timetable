@@ -1,3 +1,4 @@
+import ColorfulX
 import SwiftUI
 
 struct ProfilePicture: View {
@@ -6,19 +7,22 @@ struct ProfilePicture: View {
 	let size: CGFloat
 	let badges: [ProfileBadge]
 	let accessibilityName: String
+	let animatesBackground: Bool
 
 	init(
 		appearance: ProfileAppearance,
 		photo: ProfilePhotoMetadata? = nil,
 		size: CGFloat,
 		badges: [ProfileBadge] = [],
-		accessibilityName: String
+		accessibilityName: String,
+		animatesBackground: Bool = false
 	) {
 		self.appearance = appearance
 		self.photo = photo
 		self.size = size
 		self.badges = badges
 		self.accessibilityName = accessibilityName
+		self.animatesBackground = animatesBackground
 	}
 
 	var body: some View {
@@ -35,11 +39,7 @@ struct ProfilePicture: View {
 
 	private var avatarContent: some View {
 		ZStack {
-			LinearGradient(
-				colors: appearance.colours.map(\.swiftUIColor),
-				startPoint: .topLeading,
-				endPoint: .bottomTrailing
-			)
+			profileBackground
 
 			switch appearance.contentKind {
 				case .photo:
@@ -62,6 +62,27 @@ struct ProfilePicture: View {
 					Text(appearance.emoji)
 						.font(.system(size: size * 0.42))
 			}
+		}
+	}
+
+	@ViewBuilder
+	private var profileBackground: some View {
+		if animatesBackground, appearance.contentKind != .photo {
+			ColorfulView(
+				color: .constant(appearance.colours.map(\.swiftUIColor)),
+				speed: .constant(appearance.speed),
+				bias: .constant(0.00001),
+				noise: .constant(appearance.noise),
+				transitionSpeed: .constant(4),
+				frameLimit: .constant(30),
+				renderScale: .constant(0.75)
+			)
+		} else {
+			LinearGradient(
+				colors: appearance.colours.map(\.swiftUIColor),
+				startPoint: .topLeading,
+				endPoint: .bottomTrailing
+			)
 		}
 	}
 

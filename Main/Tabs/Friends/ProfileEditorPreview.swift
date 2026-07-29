@@ -30,7 +30,8 @@ struct ProfileEditorPreview: View {
 			appearance: draft.appearance,
 			photo: draft.photo,
 			size: 150,
-			accessibilityName: "Profile preview"
+			accessibilityName: "Profile preview",
+			animatesBackground: true
 		)
 	}
 }
