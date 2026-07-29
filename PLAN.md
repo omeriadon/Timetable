@@ -421,15 +421,23 @@ Validation boundary:
 
 ### 2.9 Record-level sync metadata
 
-- [ ] Inventory every client-authored mutable record.
+- [x] Inventory every client-authored mutable record.
+  - owner timetable: one revisioned singleton record;
+  - private calendar events: independent UUID records;
+  - account settings: one coupled singleton settings record;
+  - account profile: display name and appearance singleton plus revisioned photo media;
+  - tag subscriptions: one atomically replaced subscription set;
+  - friend order: one atomically reordered relationship set;
+  - received timetable name overrides: one record per received serial number;
+  - authored/shared timetables: independent UUID records with existing revisions.
 - [ ] Give each in-scope record:
   - stable record ID;
   - server revision;
   - server updated timestamp;
   - optional deletion tombstone.
-- [ ] Avoid using a single owner-timetable revision for unrelated settings and events.
+- [x] Avoid using a single owner-timetable revision for unrelated settings and events.
 - [ ] Add migrations for records that currently have only whole-blob storage.
-- [ ] Keep server-owned school calendar and administration data download-only.
+- [x] Keep server-owned school calendar and administration data download-only.
 - [x] Define retention for tombstones so offline clients can observe deletions.
 
 ## Phase 3: `pmstt` endpoint and middleware changes

@@ -348,11 +348,18 @@ final class OwnerTimetableSyncService {
 		var storedTombstones = Defaults[.syncTombstones]
 		var revisions = Defaults[.syncRecordRevisions]
 		var removedOwnerTimetable = false
+		var removedPrivateCalendarEvent = false
 
 		for tombstone in tombstones {
+			let revisionRecordID: UUID? = switch tombstone.recordType {
+				case .ownerTimetable:
+					nil
+				case .privateCalendarEvent:
+					tombstone.recordID
+			}
 			guard tombstone.revision > revisions.revision(
 				for: tombstone.recordType,
-				recordID: nil
+				recordID: revisionRecordID
 			) else {
 				continue
 			}
@@ -371,12 +378,25 @@ final class OwnerTimetableSyncService {
 					Defaults[.timetable] = []
 					Defaults[.ownerTimetableID] = ""
 					removedOwnerTimetable = true
+				case .privateCalendarEvent:
+					let projection = Defaults[.calendarEvents]
+					let remainingEvents = projection.privateEvents.filter {
+						$0.id != tombstone.recordID
+					}
+					if remainingEvents.count != projection.privateEvents.count {
+						Defaults[.calendarEvents] = CalendarEventsProjection(
+							globalEvents: projection.globalEvents,
+							privateEvents: remainingEvents,
+							canManageGlobalEvents: projection.canManageGlobalEvents
+						)
+						removedPrivateCalendarEvent = true
+					}
 			}
 
 			revisions.setRevision(
 				tombstone.revision,
 				for: tombstone.recordType,
-				recordID: nil
+				recordID: revisionRecordID
 			)
 			storedTombstones.removeAll {
 				$0.recordType == tombstone.recordType &&
@@ -396,6 +416,8 @@ final class OwnerTimetableSyncService {
 			Task {
 				await SpotlightIndexer.shared.indexOwnerTimetable()
 			}
+		}
+		if removedOwnerTimetable || removedPrivateCalendarEvent {
 			WidgetCenter.shared.reloadAllTimelines()
 		}
 	}

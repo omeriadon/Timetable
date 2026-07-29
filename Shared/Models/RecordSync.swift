@@ -3,6 +3,7 @@ import Foundation
 
 nonisolated enum SyncRecordType: String, Codable, Defaults.Serializable, Sendable {
 	case ownerTimetable
+	case privateCalendarEvent
 }
 
 nonisolated enum SyncMutationOperation: String, Codable, Defaults.Serializable, Sendable {

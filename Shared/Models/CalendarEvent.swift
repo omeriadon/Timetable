@@ -9,6 +9,8 @@ nonisolated struct CalendarEvent: Codable, Defaults.Serializable, Hashable, Iden
 	let date: SchoolCalendarDate
 	let isGlobal: Bool
 	let tagIDs: [UUID]
+	let revision: Int
+	let updatedAt: Date?
 
 	private enum CodingKeys: String, CodingKey {
 		case id
@@ -18,6 +20,8 @@ nonisolated struct CalendarEvent: Codable, Defaults.Serializable, Hashable, Iden
 		case date
 		case isGlobal
 		case tagIDs
+		case revision
+		case updatedAt
 	}
 
 	init(from decoder: any Decoder) throws {
@@ -29,6 +33,8 @@ nonisolated struct CalendarEvent: Codable, Defaults.Serializable, Hashable, Iden
 		date = try container.decode(SchoolCalendarDate.self, forKey: .date)
 		isGlobal = try container.decode(Bool.self, forKey: .isGlobal)
 		tagIDs = try container.decodeIfPresent([UUID].self, forKey: .tagIDs) ?? []
+		revision = try container.decodeIfPresent(Int.self, forKey: .revision) ?? 0
+		updatedAt = try container.decodeIfPresent(Date.self, forKey: .updatedAt)
 	}
 }
 

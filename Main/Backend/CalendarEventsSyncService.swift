@@ -22,7 +22,9 @@ final class CalendarEventsSyncService {
 	func createEvent(_ request: CreateCalendarEventRequest, globally: Bool) async throws {
 		let response: CalendarEventsResponse = try await networkManager.send(
 			globally ? .v1GlobalCalendarEvents : .v1PrivateCalendarEvents,
-			body: request,
+			body: globally
+				? request
+				: request.withSyncMetadata(id: UUID(), baseRevision: 0),
 			context: .userInitiated
 		)
 		Defaults[.calendarEvents] = response.projection
@@ -30,8 +32,17 @@ final class CalendarEventsSyncService {
 	}
 
 	func deleteEvent(id: UUID, globally: Bool) async throws {
+		let event = Defaults[.calendarEvents].allEvents.first {
+			$0.id == id
+		}
+		let revisionQuery = globally
+			? ""
+			: "?baseRevision=\(event?.revision ?? 0)"
 		let response: CalendarEventsResponse = try await networkManager.send(
-			Endpoint("/v1/events/\(globally ? "global" : "private")/\(id.uuidString)", method: .delete),
+			Endpoint(
+				"/v1/events/\(globally ? "global" : "private")/\(id.uuidString)\(revisionQuery)",
+				method: .delete
+			),
 			context: .userInitiated
 		)
 		Defaults[.calendarEvents] = response.projection
@@ -39,9 +50,15 @@ final class CalendarEventsSyncService {
 	}
 
 	func updateEvent(id: UUID, request: CreateCalendarEventRequest, globally: Bool) async throws {
+		let event = Defaults[.calendarEvents].allEvents.first {
+			$0.id == id
+		}
 		let response: CalendarEventsResponse = try await networkManager.send(
 			Endpoint("/v1/events/\(globally ? "global" : "private")/\(id.uuidString)", method: .put),
-			body: request,
+			body: request.withSyncMetadata(
+				id: id,
+				baseRevision: event?.revision ?? 0
+			),
 			context: .userInitiated
 		)
 		Defaults[.calendarEvents] = response.projection

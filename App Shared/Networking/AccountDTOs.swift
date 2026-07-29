@@ -73,24 +73,45 @@ nonisolated struct CalendarEventsResponse: Codable, Sendable {
 }
 
 nonisolated struct CreateCalendarEventRequest: Codable, Sendable {
+	let id: UUID?
 	let title: String
 	let notes: String?
 	let symbol: String
 	let date: SchoolCalendarDate
 	let tagIDs: [UUID]
+	let baseRevision: Int?
 
 	init(
+		id: UUID? = nil,
 		title: String,
 		notes: String?,
 		symbol: String,
 		date: SchoolCalendarDate,
-		tagIDs: [UUID] = []
+		tagIDs: [UUID] = [],
+		baseRevision: Int? = nil
 	) {
+		self.id = id
 		self.title = title
 		self.notes = notes
 		self.symbol = symbol
 		self.date = date
 		self.tagIDs = tagIDs
+		self.baseRevision = baseRevision
+	}
+
+	func withSyncMetadata(
+		id: UUID,
+		baseRevision: Int
+	) -> CreateCalendarEventRequest {
+		CreateCalendarEventRequest(
+			id: id,
+			title: title,
+			notes: notes,
+			symbol: symbol,
+			date: date,
+			tagIDs: tagIDs,
+			baseRevision: baseRevision
+		)
 	}
 }
 
