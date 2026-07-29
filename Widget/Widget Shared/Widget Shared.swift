@@ -34,11 +34,18 @@ struct Provider: TimelineProvider {
 		let subjects = Defaults[.timetable]
 		let friends = Defaults[.friends]
 		let schoolCalendar = Defaults[.schoolCalendar]
+		let accountProfile = Defaults[.accountProfile]
 		completion(
 			TimetableEntry(
 				date: .now,
 				subjects: subjects,
-				ownerSchedule: scheduleItem(name: "You", subjects: subjects, at: .now, schoolCalendar: schoolCalendar),
+				ownerSchedule: scheduleItem(
+					name: "You",
+					subjects: subjects,
+					at: .now,
+					schoolCalendar: schoolCalendar,
+					profile: accountProfile.map(ScheduleProfile.init)
+				),
 				friendSchedules: friendSchedules(for: friends, at: .now, schoolCalendar: schoolCalendar),
 				upcomingEvents: upcomingEvents(from: Defaults[.calendarEvents], after: .now),
 				isPlaceholder: false,
@@ -152,6 +159,34 @@ nonisolated struct ScheduleItem: Identifiable {
 	let currentState: SchoolState
 	let nextScheduledSubject: ScheduledSubject?
 	let backgroundColour: Color
+	let profile: ScheduleProfile?
+	let futureStatus: FriendStatusStub?
+}
+
+nonisolated struct ScheduleProfile {
+	let appearance: ProfileAppearance
+	let photo: ProfilePhotoMetadata?
+	let badges: [ProfileBadge]
+
+	init(_ account: AccountProfile) {
+		appearance = account.appearance
+		photo = account.photo
+		badges = account.badges
+	}
+
+	init(_ friend: FriendProfile) {
+		appearance = friend.appearance
+			?? friend.appearanceData.flatMap {
+				try? JSONDecoder().decode(ProfileAppearance.self, from: $0)
+			}
+			?? .default
+		photo = friend.photo
+		badges = friend.badges
+	}
+}
+
+nonisolated struct FriendStatusStub {
+	let identifier: String
 }
 
 // MARK: - TimetableEntry
@@ -175,10 +210,17 @@ private func makeEntry(
 	calendar: Calendar,
 	schoolCalendar: SchoolCalendarProjection
 ) -> TimetableEntry {
+	let accountProfile = Defaults[.accountProfile]
 	TimetableEntry(
 		date: date,
 		subjects: subjects,
-		ownerSchedule: scheduleItem(name: "You", subjects: subjects, at: date, schoolCalendar: schoolCalendar),
+		ownerSchedule: scheduleItem(
+			name: "You",
+			subjects: subjects,
+			at: date,
+			schoolCalendar: schoolCalendar,
+			profile: accountProfile.map(ScheduleProfile.init)
+		),
 		friendSchedules: friendSchedules(for: friends, at: date, schoolCalendar: schoolCalendar),
 		upcomingEvents: upcomingEvents(from: Defaults[.calendarEvents], after: date),
 		isPlaceholder: false,
@@ -213,11 +255,23 @@ private func friendSchedules(
 ) -> [ScheduleItem] {
 	friends.compactMap { friend in
 		guard let timetable = friend.timetable else { return nil }
-		return scheduleItem(name: friend.friend.displayName, subjects: timetable.subjects, at: date, schoolCalendar: schoolCalendar)
+		return scheduleItem(
+			name: friend.friend.displayName,
+			subjects: timetable.subjects,
+			at: date,
+			schoolCalendar: schoolCalendar,
+			profile: ScheduleProfile(friend.friend)
+		)
 	}
 }
 
-func scheduleItem(name: String, subjects: [Subject], at date: Date, schoolCalendar: SchoolCalendarProjection) -> ScheduleItem {
+func scheduleItem(
+	name: String,
+	subjects: [Subject],
+	at date: Date,
+	schoolCalendar: SchoolCalendarProjection,
+	profile: ScheduleProfile? = nil
+) -> ScheduleItem {
 	let calendar = SchoolCalendarProjection.perthCalendar
 	let adjustedDate = TimetableClock.adjusted(date)
 	let state = SchoolStateEngine.calculate(at: adjustedDate, subjects: subjects, calendar: calendar, schoolCalendar: schoolCalendar)
@@ -236,7 +290,14 @@ func scheduleItem(name: String, subjects: [Subject], at date: Date, schoolCalend
 		case .afterSchool, .weekend, .noTimetable: .black
 	}
 
-	return ScheduleItem(name: name, currentState: state, nextScheduledSubject: nextScheduledSubject, backgroundColour: backgroundColour)
+	return ScheduleItem(
+		name: name,
+		currentState: state,
+		nextScheduledSubject: nextScheduledSubject,
+		backgroundColour: backgroundColour,
+		profile: profile,
+		futureStatus: nil
+	)
 }
 
 // MARK: - nextSchoolDay

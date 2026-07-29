@@ -36,6 +36,10 @@ final class FriendService {
 			{
 				Defaults[.profileAppearance] = appearance
 			}
+			await cacheWidgetProfilePhotos(
+				profile: result.2,
+				friends: result.0
+			)
 			Defaults[.lastServerSync] = .now
 			WidgetCenter.shared.reloadAllTimelines()
 		}
@@ -123,8 +127,30 @@ final class FriendService {
 		}
 
 		let profile = try await SessionStore.shared.refreshProfile()
+		if let photo = profile.photo {
+			_ = await ProfileImageCache.shared.imageData(
+				for: photo,
+				displaySize: 36
+			)
+		}
 		try await refresh()
 		return profile
+	}
+
+	private func cacheWidgetProfilePhotos(
+		profile: FriendProfile,
+		friends: [FriendSummary]
+	) async {
+		var metadata = friends.compactMap(\.friend.photo)
+		if let photo = profile.photo {
+			metadata.append(photo)
+		}
+		for photo in metadata {
+			_ = await ProfileImageCache.shared.imageData(
+				for: photo,
+				displaySize: 36
+			)
+		}
 	}
 }
 

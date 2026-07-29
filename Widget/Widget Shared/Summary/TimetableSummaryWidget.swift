@@ -2,6 +2,10 @@ import Defaults
 import SwiftUI
 import WidgetKit
 
+#if canImport(UIKit)
+	import UIKit
+#endif
+
 struct TimetableSummaryWidget: Widget {
 	let kind = "TimetableSummary"
 
@@ -41,9 +45,11 @@ private struct TimetableSummaryView: View {
 
 	private var header: some View {
 		HStack(alignment: .center, spacing: 10) {
-			Image(systemName: ownerSymbol)
-				.font(.title2)
-				.frame(width: 28)
+			WidgetProfilePicture(
+				profile: entry.ownerSchedule?.profile,
+				fallbackSymbol: ownerSymbol,
+				size: 34
+			)
 
 			VStack(alignment: .leading, spacing: 2) {
 				Text("You")
@@ -72,9 +78,11 @@ private struct TimetableSummaryView: View {
 
 			ForEach(entry.friendSchedules.prefix(3)) { schedule in
 				HStack(spacing: 8) {
-					Image(systemName: symbol(for: schedule.currentState))
-						.frame(width: 18)
-						.foregroundStyle(schedule.backgroundColour)
+					WidgetProfilePicture(
+						profile: schedule.profile,
+						fallbackSymbol: symbol(for: schedule.currentState),
+						size: 28
+					)
 					Text(schedule.name)
 						.font(.subheadline.weight(.medium))
 						.lineLimit(1)
@@ -182,6 +190,93 @@ private struct TimetableSummaryView: View {
 			case .noTimetable:
 				return "calendar.badge.exclamationmark"
 		}
+	}
+}
+
+private struct WidgetProfilePicture: View {
+	let profile: ScheduleProfile?
+	let fallbackSymbol: String
+	let size: CGFloat
+
+	var body: some View {
+		ZStack {
+			if let profile {
+				LinearGradient(
+					colors: profile.appearance.colours.map(\.swiftUIColor),
+					startPoint: .topLeading,
+					endPoint: .bottomTrailing
+				)
+
+				profileContent(profile)
+			} else {
+				Color.secondary.opacity(0.2)
+
+				Image(systemName: fallbackSymbol)
+					.font(.system(size: size * 0.42, weight: .semibold))
+			}
+		}
+		.frame(width: size, height: size)
+		.clipShape(Circle())
+		.overlay(alignment: .bottomTrailing) {
+			if let badge = profile?.badges
+				.sorted(by: { $0.priority > $1.priority })
+				.first
+			{
+				Image(systemName: badge.symbol)
+					.font(.system(size: size * 0.16, weight: .bold))
+					.foregroundStyle(badge.symbolColor?.swiftUIColor ?? .white)
+					.frame(width: size * 0.28, height: size * 0.28)
+					.background(
+						badge.backgroundColor?.swiftUIColor ?? .black,
+						in: Circle()
+					)
+			}
+		}
+	}
+
+	@ViewBuilder
+	private func profileContent(_ profile: ScheduleProfile) -> some View {
+		switch profile.appearance.contentKind {
+			case .photo:
+				if let photo = profile.photo,
+				   let image = WidgetProfilePhotoCache.image(for: photo)
+				{
+					Image(uiImage: image)
+						.resizable()
+						.scaledToFill()
+				} else {
+					Image(systemName: "person.fill")
+						.font(.system(size: size * 0.42, weight: .semibold))
+				}
+			case .monogram:
+				Text(profile.appearance.monogram)
+					.font(.system(size: size * 0.36, weight: .semibold))
+			case .emoji:
+				Text(profile.appearance.emoji)
+					.font(.system(size: size * 0.42))
+		}
+	}
+}
+
+private enum WidgetProfilePhotoCache {
+	static func image(for metadata: ProfilePhotoMetadata) -> UIImage? {
+		guard let directory = FileManager.default.containerURL(
+			forSecurityApplicationGroupIdentifier: SharedDefaultsStore.suiteName
+		)?.appending(path: "ProfileImages", directoryHint: .isDirectory),
+			let files = try? FileManager.default.contentsOfDirectory(
+				at: directory,
+				includingPropertiesForKeys: nil
+			),
+			let file = files.first(where: {
+				$0.lastPathComponent.hasPrefix(
+					"\(metadata.checksum)-\(metadata.revision)-"
+				)
+			}),
+			let data = try? Data(contentsOf: file)
+		else {
+			return nil
+		}
+		return UIImage(data: data)
 	}
 }
 
