@@ -184,11 +184,11 @@ Validation boundary:
 
 ## Phase 1: Shared naming and server contract design
 
-- [ ] Choose the permanent privileged-role product name.
+- [x] Choose the permanent privileged-role product name.
   - Recommended internal name: `systemOwner`.
   - Recommended UI name: `Owner Administrator`.
   - Do not use database role names as user-facing copy without review.
-- [ ] Define `AccountAuthority` as a closed server contract.
+- [x] Define `AccountAuthority` as a closed server contract.
   - `user`
   - `administrator`
   - `systemOwner`
@@ -199,12 +199,12 @@ Validation boundary:
   - optional symbol RGBA colour;
   - priority/order;
   - accessibility label.
-- [ ] Define tag category identifiers.
+- [x] Define tag category identifiers.
   - `yearGroup`
   - `subject`
   - `sport`
   - `general`
-- [ ] Define `EventTag`.
+- [x] Define `EventTag`.
   - stable UUID;
   - stable slug;
   - display name;
@@ -249,16 +249,16 @@ Validation boundary:
 
 ### 2.1 Account authority
 
-- [ ] Add an account-authority field or role relationship to `User`.
-- [ ] Backfill the two permanent accounts as `systemOwner`.
-- [ ] Backfill current configured administrators as `administrator` where appropriate.
-- [ ] Ensure the two permanent email identities resolve to `systemOwner` even if a bad database value exists.
-- [ ] Prevent changing or deleting the authority of a `systemOwner`.
-- [ ] Prevent ordinary administrators from changing authority.
-- [ ] Permit only `systemOwner` accounts to grant and revoke `administrator`.
-- [ ] Add authority to authenticated profile/bootstrap responses.
-- [ ] Remove calendar-event management capability as a proxy for global administration authority.
-- [ ] Keep calendar-event management as a capability derived from the authority contract.
+- [x] Add an account-authority field or role relationship to `User`.
+- [x] Backfill the two permanent accounts as `systemOwner`.
+- [x] Backfill current configured administrators as `administrator` where appropriate.
+- [x] Ensure the two permanent email identities resolve to `systemOwner` even if a bad database value exists.
+- [x] Prevent changing or deleting the authority of a `systemOwner`.
+- [x] Prevent ordinary administrators from changing authority.
+- [x] Permit only `systemOwner` accounts to grant and revoke `administrator`.
+- [x] Add authority to authenticated profile/bootstrap responses.
+- [x] Remove calendar-event management capability as a proxy for global administration authority.
+- [x] Keep calendar-event management as a capability derived from the authority contract.
 
 ### 2.2 Email verification
 
@@ -304,28 +304,27 @@ Validation boundary:
 
 ### 2.4 Global tags and subscriptions
 
-- [ ] Add an administrator-managed tag-section table.
-- [ ] Add the global tag table.
-- [ ] Add associated tag names as a normalized child table or validated array field.
-- [ ] Add an account-to-tag subscription join table.
-- [ ] Add a calendar-event-to-tag join table.
+- [x] Add an administrator-managed tag-section table.
+- [x] Add the global tag table.
+- [x] Add associated tag names as a normalized child table or validated array field.
+- [x] Add an account-to-tag subscription join table.
+- [x] Add a calendar-event-to-tag join table.
 - [ ] Add uniqueness constraints for normalized active tag names within categories.
-- [ ] Add stable ordering within each category.
-- [ ] Add foreign-key behavior for archived or deleted tags.
+- [x] Add stable ordering within each category.
+- [x] Add foreign-key behavior for archived or deleted tags.
 - [ ] Prefer archive plus association cleanup over hard delete.
-- [ ] Seed Year 7, Year 8, Year 9, Year 10, Year 11, and Leavers.
-- [ ] Give Leavers the canonical year-group value for Year 12 while retaining the Leavers display name.
-- [ ] Seed a General tag and subscribe new users to it by default.
-- [ ] Keep Sport and General data-driven rather than branching on their names.
-- [ ] Require administrators to create subject tags manually.
+- [x] Seed Year 7, Year 8, Year 9, Year 10, Year 11, and Leavers.
+- [x] Seed a General tag and subscribe new users to it by default.
+- [x] Keep Sport and General data-driven rather than branching on their names.
+- [x] Require administrators to create subject tags manually.
 - [ ] Normalize and uniquely constrain associated names used for import matching.
 - [ ] Prevent ambiguous associated names from belonging to more than one active subject tag.
 - [ ] Ensure stale tag IDs in client payloads are ignored and reported as dropped.
-- [ ] Add tag revisions or updated timestamps for incremental synchronization.
+- [x] Add tag revisions or updated timestamps for incremental synchronization.
 
 ### 2.5 Broadcast history
 
-- [ ] Add `BroadcastNotificationRecord`.
+- [x] Add `BroadcastNotificationRecord`.
 - [ ] Persist:
   - title;
   - optional subtitle;
@@ -342,11 +341,11 @@ Validation boundary:
   - terminal delivery state;
   - structured failure summary.
 - [ ] Decide whether individual device delivery outcomes need a child table.
-- [ ] Save the record before delivery begins.
-- [ ] Update aggregate outcomes after best-effort delivery finishes.
-- [ ] Retain a failed record if delivery throws before fan-out completes.
-- [ ] Never require subtitle or body.
-- [ ] Reject a whitespace-only title.
+- [x] Save the record before delivery begins.
+- [x] Update aggregate outcomes after best-effort delivery finishes.
+- [x] Retain a failed record if delivery throws before fan-out completes.
+- [x] Never require subtitle or body.
+- [x] Reject a whitespace-only title.
 
 ### 2.6 Profile media and badges
 
@@ -506,12 +505,12 @@ Validation boundary:
 
 ### 3.6 Broadcast endpoints
 
-- [ ] Decode optional subtitle and body.
-- [ ] Trim title and reject it when empty.
-- [ ] Create the persistent broadcast record before APNs fan-out.
-- [ ] Snapshot the sender email and authority.
-- [ ] Update the record with aggregate outcomes.
-- [ ] Return the record ID with delivery counts.
+- [x] Decode optional subtitle and body.
+- [x] Trim title and reject it when empty.
+- [x] Create the persistent broadcast record before APNs fan-out.
+- [x] Snapshot the sender email and authority.
+- [x] Update the record with aggregate outcomes.
+- [x] Return the record ID with delivery counts.
 - [ ] Add history and detail endpoints for administration.
 - [ ] Restrict history to current administrators.
 
@@ -532,12 +531,12 @@ Validation boundary:
 
 ## Phase 4: `pmstt` logging timestamps
 
-- [ ] Inspect the active LoggingSystem bootstrap and deployed log handler.
-- [ ] Configure one consistent timestamp prefix at the log-handler formatter layer.
-- [ ] Use ISO 8601 with timezone or an explicitly agreed local timezone.
+- [x] Inspect the active LoggingSystem bootstrap and deployed log handler.
+- [x] Configure one consistent timestamp prefix at the log-handler formatter layer.
+- [x] Use ISO 8601 with timezone or an explicitly agreed local timezone.
 - [ ] Include milliseconds if concurrent request ordering requires them.
-- [ ] Avoid manually prepending timestamps in every `logger` call.
-- [ ] Preserve log level, label, metadata, source, and message.
+- [x] Avoid manually prepending timestamps in every `logger` call.
+- [x] Preserve log level, label, metadata, source, and message.
 - [ ] Confirm PM2 does not add a second conflicting timestamp.
 - [ ] Document the deployed format.
 - [ ] User runtime check:
@@ -549,7 +548,7 @@ Validation boundary:
 
 ## Phase 5: Shared client contracts and local cache
 
-- [ ] Add `AccountAuthority`.
+- [x] Add `AccountAuthority`.
 - [ ] Add explicit profile appearance DTOs.
 - [ ] Add `ProfileContentKind`.
   - photo;
