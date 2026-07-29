@@ -22,7 +22,7 @@ struct AdministrationDevelopmentAccessView: View {
 				.disabled(controlToken.isEmpty || isUpdating)
 			}
 
-			Section("Development Access") {
+			Section {
 				Toggle(
 					"Restrict Server to Owners",
 					isOn: Binding(
@@ -31,6 +31,8 @@ struct AdministrationDevelopmentAccessView: View {
 					)
 				)
 				.disabled(developmentAccessOnly == nil || controlToken.isEmpty || isUpdating)
+			} header: {
+				Text("Development Access")
 			} footer: {
 				Text("When enabled, only the two permanent owner accounts can use the server. Existing sessions remain intact but receive an access error.")
 			}
