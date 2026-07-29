@@ -16,6 +16,11 @@ struct AdministrationEventTagEditor: View {
 	@State private var isArchived: Bool
 	@State private var associatedNames: String
 	@State private var isSaving = false
+	@State private var showsArchiveConfirmation = false
+
+	private var isCanonicalYearGroup: Bool {
+		tag?.category == .yearGroup
+	}
 
 	init(
 		tag: AdministrationEventTag?,
@@ -45,6 +50,7 @@ struct AdministrationEventTagEditor: View {
 					TextField("Slug", text: $slug)
 						.textInputAutocapitalization(.never)
 						.autocorrectionDisabled()
+						.disabled(isCanonicalYearGroup)
 					TextField("Symbol", text: $symbol)
 						.textInputAutocapitalization(.never)
 						.autocorrectionDisabled()
@@ -53,6 +59,7 @@ struct AdministrationEventTagEditor: View {
 						.autocorrectionDisabled()
 					Stepper("Sort Order: \(sortOrder)", value: $sortOrder)
 					Toggle("Archive Tag", isOn: $isArchived)
+						.disabled(isCanonicalYearGroup)
 				}
 
 				Section("Section") {
@@ -62,15 +69,21 @@ struct AdministrationEventTagEditor: View {
 								.tag(section.id)
 						}
 					}
+					.disabled(isCanonicalYearGroup)
 				}
 
 				Section {
 					TextEditor(text: $associatedNames)
 						.frame(minHeight: 110)
+						.disabled(isCanonicalYearGroup)
 				} header: {
 					Text("Associated Names")
 				} footer: {
-					Text("One alternate name per line. The display name is always included.")
+					Text(
+						isCanonicalYearGroup
+							? "Canonical year-group names cannot be changed."
+							: "One alternate name per line. The display name is always included."
+					)
 				}
 			}
 			.scrollEdgeEffect()
@@ -84,13 +97,30 @@ struct AdministrationEventTagEditor: View {
 
 				ToolbarItem(placement: .confirmationAction) {
 					Button("Save", systemImage: "checkmark", role: .confirm) {
-						Task {
-							await saveTag()
+						if tag?.isArchived == false, isArchived {
+							showsArchiveConfirmation = true
+						} else {
+							Task {
+								await saveTag()
+							}
 						}
 					}
 					.buttonStyle(.glassProminent)
 					.disabled(displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || slug.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSaving)
 				}
+			}
+			.confirmationDialog(
+				"Archive Tag?",
+				isPresented: $showsArchiveConfirmation,
+				titleVisibility: .visible
+			) {
+				Button("Archive Tag", systemImage: "archivebox", role: .destructive) {
+					Task {
+						await saveTag()
+					}
+				}
+			} message: {
+				Text("Archived tags are removed from active selection and subscriptions.")
 			}
 		}
 		.presentationDetents([.fraction(0.7)])

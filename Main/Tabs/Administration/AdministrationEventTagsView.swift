@@ -5,6 +5,7 @@ struct AdministrationEventTagsView: View {
 	@State private var catalogue = AdministrationEventTagCatalogueResponse(sections: [])
 	@State private var editor: AdministrationEventTagEditorTarget?
 	@Environment(\.statusBadgeManager) private var badges
+	@Namespace private var editorNamespace
 
 	var body: some View {
 		List {
@@ -29,10 +30,20 @@ struct AdministrationEventTagsView: View {
 						}
 						.buttonStyle(.plain)
 						.opacity(tag.isArchived ? 0.55 : 1)
+						.matchedTransitionSource(
+							id: AdministrationEventTagEditorTarget.tag(tag, section: section).id,
+							in: editorNamespace
+						)
 					}
 
-					Button("Add Tag", systemImage: "plus") {
-						editor = .newTag(section)
+					if section.category != .yearGroup {
+						Button("Add Tag", systemImage: "plus") {
+							editor = .newTag(section)
+						}
+						.matchedTransitionSource(
+							id: AdministrationEventTagEditorTarget.newTag(section).id,
+							in: editorNamespace
+						)
 					}
 				} label: {
 					HStack(spacing: 12) {
@@ -48,6 +59,10 @@ struct AdministrationEventTagsView: View {
 							editor = .section(section)
 						}
 						.buttonStyle(.borderless)
+						.matchedTransitionSource(
+							id: AdministrationEventTagEditorTarget.section(section).id,
+							in: editorNamespace
+						)
 					}
 				}
 				.opacity(section.isArchived ? 0.55 : 1)
@@ -56,6 +71,10 @@ struct AdministrationEventTagsView: View {
 			Button("Add Section", systemImage: "folder.badge.plus") {
 				editor = .newSection
 			}
+			.matchedTransitionSource(
+				id: AdministrationEventTagEditorTarget.newSection.id,
+				in: editorNamespace
+			)
 		}
 		.scrollEdgeEffect()
 		.appNavigationTitle("Event Tags", accent: true)
@@ -92,6 +111,12 @@ struct AdministrationEventTagsView: View {
 						save: saveSection
 					)
 			}
+			.navigationTransition(
+				.zoom(
+					sourceID: target.id,
+					in: editorNamespace
+				)
+			)
 		}
 	}
 

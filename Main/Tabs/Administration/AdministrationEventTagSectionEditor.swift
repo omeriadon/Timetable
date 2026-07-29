@@ -14,6 +14,7 @@ struct AdministrationEventTagSectionEditor: View {
 	@State private var sortOrder: Int
 	@State private var isArchived: Bool
 	@State private var isSaving = false
+	@State private var showsArchiveConfirmation = false
 
 	init(
 		section: AdministrationEventTagSection?,
@@ -59,13 +60,30 @@ struct AdministrationEventTagSectionEditor: View {
 
 				ToolbarItem(placement: .confirmationAction) {
 					Button("Save", systemImage: "checkmark", role: .confirm) {
-						Task {
-							await saveSection()
+						if section?.isArchived == false, isArchived {
+							showsArchiveConfirmation = true
+						} else {
+							Task {
+								await saveSection()
+							}
 						}
 					}
 					.buttonStyle(.glassProminent)
 					.disabled(displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSaving)
 				}
+			}
+			.confirmationDialog(
+				"Archive Section?",
+				isPresented: $showsArchiveConfirmation,
+				titleVisibility: .visible
+			) {
+				Button("Archive Section", systemImage: "archivebox", role: .destructive) {
+					Task {
+						await saveSection()
+					}
+				}
+			} message: {
+				Text("Archived sections and their tags are removed from active selection.")
 			}
 		}
 		.presentationDetents([.fraction(0.6)])
