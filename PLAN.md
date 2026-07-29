@@ -1046,18 +1046,18 @@ Validation boundary:
 
 ## Phase 17: Versioned `.timetable` format
 
-- [ ] Add the versioned share-document model.
-- [ ] Encode only the shared identifier and format version.
-- [ ] Use a stable content type declaration.
-- [ ] Update file export.
-- [ ] Update file import.
-- [ ] Validate supported version before fetching.
-- [ ] Resolve identifier through the authenticated shared-timetable fetch path.
-- [ ] Handle deleted, private, malformed, unsupported-version, and not-found documents.
-- [ ] Preserve Universal Link and Messages `/share/<locator>` behavior.
-- [ ] Do not embed current subject data in new exports.
-- [ ] Do not add a legacy decoder because no prior `.timetable` file format exists.
-- [ ] Refresh the received timetable cache after a successful fetch/import.
+- [x] Add the versioned share-document model.
+- [x] Encode only the shared identifier and format version.
+- [x] Use a stable content type declaration.
+- [x] Update file export.
+- [x] Update file import.
+- [x] Validate supported version before fetching.
+- [x] Resolve identifier through the authenticated shared-timetable fetch path.
+- [x] Handle deleted, private, malformed, unsupported-version, and not-found documents.
+- [x] Preserve Universal Link and Messages `/share/<locator>` behavior.
+- [x] Do not embed current subject data in new exports.
+- [x] Do not add a legacy decoder because no prior `.timetable` file format exists.
+- [x] Refresh the received timetable cache after a successful fetch/import.
 
 ## Phase 18: Large summary widget
 
