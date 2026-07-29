@@ -13,4 +13,22 @@ struct AccountProfile: Codable, Defaults.Serializable, Hashable {
 	let email: String?
 	let displayName: String
 	let createdAt: Date?
+	let authority: AccountAuthority
+
+	private enum CodingKeys: String, CodingKey {
+		case id
+		case email
+		case displayName
+		case createdAt
+		case authority
+	}
+
+	init(from decoder: any Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		id = try container.decode(String.self, forKey: .id)
+		email = try container.decodeIfPresent(String.self, forKey: .email)
+		displayName = try container.decode(String.self, forKey: .displayName)
+		createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt)
+		authority = try container.decodeIfPresent(AccountAuthority.self, forKey: .authority) ?? .user
+	}
 }
