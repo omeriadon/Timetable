@@ -135,6 +135,21 @@ nonisolated struct EventTagCatalogueTag: Codable, Identifiable, Sendable {
 
 nonisolated struct EventTagSubscriptionResponse: Codable, Sendable {
 	let tagIDs: [UUID]
+	let droppedTagIDs: [UUID]
+
+	private enum CodingKeys: String, CodingKey {
+		case tagIDs
+		case droppedTagIDs
+	}
+
+	init(from decoder: any Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		tagIDs = try container.decode([UUID].self, forKey: .tagIDs)
+		droppedTagIDs = try container.decodeIfPresent(
+			[UUID].self,
+			forKey: .droppedTagIDs
+		) ?? []
+	}
 }
 
 nonisolated struct EventTagSubscriptionUpdateRequest: Codable, Sendable {
