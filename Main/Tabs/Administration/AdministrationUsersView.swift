@@ -15,6 +15,9 @@ struct AdministrationUsersView: View {
 				Label {
 					VStack(alignment: .leading) {
 						Text(user.displayName)
+						Text(user.authority.displayName)
+							.font(.caption)
+							.foregroundStyle(authorityColor(for: user.authority))
 
 						if let email = user.email {
 							Text(email)
@@ -94,6 +97,17 @@ struct AdministrationUsersView: View {
 
 	private func delete(_ user: AdministrationUserResponse) {
 		users.removeAll { $0.id == user.id }
+	}
+
+	private func authorityColor(for authority: AccountAuthority) -> Color {
+		switch authority {
+			case .systemOwner:
+				.yellow
+			case .administrator:
+				.accentColor
+			case .user:
+				.secondary
+		}
 	}
 }
 

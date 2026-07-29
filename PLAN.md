@@ -981,7 +981,7 @@ Validation boundary:
 - [x] Show each section’s tags inside its disclosure group.
 - [x] Support adding, renaming, reordering, and archiving sections.
 - [x] Support adding, editing, reordering, and archiving tags.
-- [ ] Edit each tag’s display name, category, associated names, symbol, and colour.
+- [x] Edit each tag’s display name, category, associated names, symbol, and colour.
 - [x] Give associated names a readable token/list editor.
 - [x] Normalize aliases before saving.
 - [x] Show validation when an alias conflicts with another active subject tag.
@@ -1007,15 +1007,15 @@ Validation boundary:
 
 ### 14.4 Administrator management
 
-- [ ] Show current authority in user rows and detail.
+- [x] Show current authority in user rows and detail.
 - [ ] Show administrator badge overlays using the reusable profile picture.
 - [ ] Show permanent-owner badge according to the final distinction.
-- [ ] Only system owners see grant/revoke controls.
-- [ ] Confirm grant and revoke operations.
-- [ ] Prevent revoking either permanent owner.
+- [x] Only system owners see grant/revoke controls.
+- [x] Confirm grant and revoke operations.
+- [x] Prevent revoking either permanent owner.
 - [ ] Refresh target account and current dashboard after a role change.
 - [ ] If the current account somehow loses ordinary admin authority, handle the next `403` by removing the admin tab.
-- [ ] Record authority changes in an audit record with actor, target, old role, new role, and timestamp.
+- [x] Record authority changes in an audit record with actor, target, old role, new role, and timestamp.
 
 ## Phase 15: Broadcast composer and history
 

@@ -13,4 +13,15 @@ nonisolated enum AccountAuthority: String, Codable, CaseIterable, Hashable, Send
 				true
 		}
 	}
+
+	var displayName: String {
+		switch self {
+			case .user:
+				"User"
+			case .administrator:
+				"Administrator"
+			case .systemOwner:
+				"System Owner"
+		}
+	}
 }

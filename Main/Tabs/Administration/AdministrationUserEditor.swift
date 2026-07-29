@@ -29,6 +29,12 @@ struct AdministrationUserEditor: View {
 	var body: some View {
 		NavigationStack {
 			Form {
+				if let user = target.user {
+					Section("Authority") {
+						LabeledContent("Role", value: user.authority.displayName)
+					}
+				}
+
 				TextField("Name", text: $displayName)
 				TextField("Email", text: $email)
 					.textInputAutocapitalization(.never)
