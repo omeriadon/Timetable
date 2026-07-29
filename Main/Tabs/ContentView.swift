@@ -52,6 +52,9 @@ import SwiftUI
 			.onReceive(NotificationCenter.default.publisher(for: .openTimetableTab)) { _ in
 				selectedTab = .timetable
 			}
+			.onReceive(NotificationCenter.default.publisher(for: .openSettingsTab)) { _ in
+				selectedTab = .settings
+			}
 			.onReceive(NotificationCenter.default.publisher(for: .administrationAuthorityInvalidated)) { _ in
 				Task {
 					_ = try? await SessionStore.shared.refreshProfile()
