@@ -189,7 +189,7 @@ func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Subject] {
 		.sorted { $0.id < $1.id }
 }
 
-private func normalizedImportedSubjectName(_ name: String) -> String {
+nonisolated func normalizedImportedSubjectName(_ name: String) -> String {
 	name
 		.folding(
 			options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive],
@@ -209,12 +209,13 @@ enum CalendarImportStep: Equatable {
 	case matchingEvents
 	case processingSubjects
 	case finalising
+	case choosingSubjectTags
 	case done
 
 	case error(String)
 
 	var total: Int {
-		8
+		9
 	}
 
 	var progress: Int {
@@ -233,8 +234,10 @@ enum CalendarImportStep: Equatable {
 				6
 			case .finalising:
 				7
-			case .done:
+			case .choosingSubjectTags:
 				8
+			case .done:
+				9
 			case .error:
 				total
 		}
@@ -256,6 +259,8 @@ enum CalendarImportStep: Equatable {
 				"Translating titles..."
 			case .finalising:
 				"Finalising..."
+			case .choosingSubjectTags:
+				"Choose subject tags..."
 			case .done:
 				""
 			case let .error(t):

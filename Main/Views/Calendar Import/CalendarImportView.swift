@@ -19,6 +19,10 @@ struct CalendarImportView: View {
 	@State private var calendarImportStatus = CalendarImportStatus.loading
 	@State private var calendarImportStep = CalendarImportStep.checkingAuthorisation
 	@State private var errorResetTask: Task<Void, Never>?
+	@State private var subjectTagProposal: SubjectTagReplacementProposal?
+	@State private var isApplyingSubjectTags = false
+	@State private var successDetail = "You can change subjects, teachers and classrooms in settings if they have issues."
+	@State private var administrationService = AdministrationService.shared
 
 	var body: some View {
 		VStack(spacing: 14) {
@@ -47,7 +51,7 @@ struct CalendarImportView: View {
 					case .success:
 						VStack {
 							Text("Import complete")
-							Text("You can change subjects, teachers and classrooms in settings if they have issues.")
+							Text(successDetail)
 								.font(.body)
 						}
 						.padding(.bottom, 20)
@@ -100,10 +104,31 @@ struct CalendarImportView: View {
 		.onDisappear {
 			errorResetTask?.cancel()
 		}
+		.confirmationDialog(
+			"Replace Subject Tags?",
+			isPresented: Binding(
+				get: { subjectTagProposal != nil },
+				set: { _ in }
+			),
+			titleVisibility: .visible
+		) {
+			Button("Keep Current Subject Tags", systemImage: "tag.slash") {
+				keepCurrentSubjectTags()
+			}
+			.disabled(isApplyingSubjectTags)
+
+			Button("Replace Subject Tags", systemImage: "arrow.triangle.2.circlepath", role: .confirm) {
+				replaceSubjectTags()
+			}
+			.buttonStyle(.glassProminent)
+			.disabled(isApplyingSubjectTags)
+		} message: {
+			Text(subjectTagProposal?.message ?? "")
+		}
 		.ignoresSafeArea()
 		.padding([.horizontal], 32)
 		.monospaced()
-		.presentationDetents(dismissesWhenFinished ? [.fraction(0.4)] : [.large])
+		.presentationDetents(dismissesWhenFinished ? [.fraction(0.55)] : [.large])
 		.interactiveDismissDisabled()
 		.presentationDragIndicator(.hidden)
 	}
@@ -129,6 +154,9 @@ struct CalendarImportView: View {
 	func beginImportAttempt() {
 		errorResetTask?.cancel()
 		errorResetTask = nil
+		subjectTagProposal = nil
+		isApplyingSubjectTags = false
+		successDetail = "You can change subjects, teachers and classrooms in settings if they have issues."
 		calendarImportStatus = .loading
 		calendarImportStep = .checkingAuthorisation
 	}
@@ -197,18 +225,99 @@ struct CalendarImportView: View {
 				.filter { !$0.slots.isEmpty }
 			subjects = try await ServerSyncCoordinator.shared.saveOwnerTimetable(updatedSubjects)
 
-			moveForward(to: .done)
-			Print("[iOS] Calendar Import: Success!")
-			calendarImportStatus = .success
-			completion?(true)
-			if dismissesWhenFinished {
-				try? await Task.sleep(for: .seconds(2))
-				dismiss()
-				calendarImportStatus = .loading
-			}
+			await prepareSubjectTagUpdate(for: updatedSubjects)
 
 		} catch {
 			errorAndExit(error.localizedDescription)
+		}
+	}
+
+	private func prepareSubjectTagUpdate(for importedSubjects: [Subject]) async {
+		do {
+			async let catalogueRequest = administrationService.tagCatalogue()
+			async let subscriptionsRequest = administrationService.tagSubscriptions()
+			let (catalogue, subscriptions) = try await (catalogueRequest, subscriptionsRequest)
+
+			let subjectTags = catalogue.sections
+				.filter { $0.category == .subject }
+				.flatMap(\.tags)
+			let subjectTagIDs = Set(subjectTags.map(\.id))
+			let currentSubjectTagIDs = Set(subscriptions.tagIDs).intersection(subjectTagIDs)
+			let importedNames = Set(importedSubjects.map { normalizedImportedSubjectName($0.id) })
+			let proposedSubjectTags = subjectTags.filter { tag in
+				let associatedNames = tag.associatedNames + [tag.displayName]
+				return associatedNames.contains { importedNames.contains(normalizedImportedSubjectName($0)) }
+			}
+			let proposedSubjectTagIDs = Set(proposedSubjectTags.map(\.id))
+
+			guard proposedSubjectTagIDs != currentSubjectTagIDs else {
+				completeImport(detail: "Your existing subject tags already match the imported timetable.")
+				return
+			}
+
+			guard !currentSubjectTagIDs.isEmpty else {
+				await applySubjectTagReplacement(proposedSubjectTagIDs)
+				return
+			}
+
+			moveForward(to: .choosingSubjectTags)
+			subjectTagProposal = SubjectTagReplacementProposal(
+				proposedTagIDs: proposedSubjectTagIDs,
+				currentTagNames: subjectTags
+					.filter { currentSubjectTagIDs.contains($0.id) }
+					.map(\.displayName)
+					.sorted(),
+				proposedTagNames: proposedSubjectTags
+					.map(\.displayName)
+					.sorted()
+			)
+		} catch {
+			completeImport(detail: "The timetable was imported, but subject tags could not be checked. Your existing subscriptions were preserved.")
+		}
+	}
+
+	private func keepCurrentSubjectTags() {
+		subjectTagProposal = nil
+		completeImport(detail: "The timetable was imported. Your existing subject tags were kept.")
+	}
+
+	private func replaceSubjectTags() {
+		guard let subjectTagProposal else {
+			return
+		}
+
+		isApplyingSubjectTags = true
+		Task {
+			await applySubjectTagReplacement(subjectTagProposal.proposedTagIDs)
+		}
+	}
+
+	private func applySubjectTagReplacement(_ tagIDs: Set<UUID>) async {
+		defer {
+			isApplyingSubjectTags = false
+			subjectTagProposal = nil
+		}
+
+		do {
+			_ = try await administrationService.replaceSubjectTagSubscriptions(tagIDs)
+			completeImport(detail: "The timetable and matching subject tags were imported.")
+		} catch {
+			completeImport(detail: "The timetable was imported, but subject tags could not be updated. Your existing subscriptions were preserved.")
+		}
+	}
+
+	private func completeImport(detail: String) {
+		moveForward(to: .done)
+		Print("[iOS] Calendar Import: Success!")
+		successDetail = detail
+		calendarImportStatus = .success
+		completion?(true)
+
+		if dismissesWhenFinished {
+			Task {
+				try? await Task.sleep(for: .seconds(2))
+				dismiss()
+			}
 		}
 	}
 }

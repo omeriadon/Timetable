@@ -669,16 +669,16 @@ Validation boundary:
 
 ### 8.2 Subject-tag replacement prompt
 
-- [ ] Fetch the latest tag catalogue before finalizing import.
-- [ ] Match imported subjects to normalized global subject tags.
-- [ ] Build the proposed subject-tag set.
-- [ ] If the user already has subject subscriptions and the proposed set differs, show an explicit override prompt.
-- [ ] Explain that only subject tags change.
-- [ ] Preserve year-group, sport, general, and future non-subject subscriptions.
-- [ ] Permit keeping the current subject tags.
-- [ ] Permit replacing them with imported subject tags.
-- [ ] Do not fail the timetable import merely because tag matching or subscription saving fails.
-- [ ] Surface partial success accurately.
+- [x] Fetch the latest tag catalogue before finalizing import.
+- [x] Match imported subjects to normalized global subject tags.
+- [x] Build the proposed subject-tag set.
+- [x] If the user already has subject subscriptions and the proposed set differs, show an explicit override prompt.
+- [x] Explain that only subject tags change.
+- [x] Preserve year-group, sport, general, and future non-subject subscriptions.
+- [x] Permit keeping the current subject tags.
+- [x] Permit replacing them with imported subject tags.
+- [x] Do not fail the timetable import merely because tag matching or subscription saving fails.
+- [x] Surface partial success accurately.
 
 ### 8.3 Error reset
 

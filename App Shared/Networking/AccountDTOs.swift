@@ -102,6 +102,26 @@ nonisolated struct EventTagCatalogueTag: Codable, Identifiable, Sendable {
 	let category: AdministrationEventTagCategory
 	let symbol: String?
 	let colorHex: String?
+	let associatedNames: [String]
+
+	private enum CodingKeys: String, CodingKey {
+		case id
+		case displayName
+		case category
+		case symbol
+		case colorHex
+		case associatedNames
+	}
+
+	init(from decoder: any Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		id = try container.decode(UUID.self, forKey: .id)
+		displayName = try container.decode(String.self, forKey: .displayName)
+		category = try container.decode(AdministrationEventTagCategory.self, forKey: .category)
+		symbol = try container.decodeIfPresent(String.self, forKey: .symbol)
+		colorHex = try container.decodeIfPresent(String.self, forKey: .colorHex)
+		associatedNames = try container.decodeIfPresent([String].self, forKey: .associatedNames) ?? [displayName]
+	}
 }
 
 nonisolated struct EventTagSubscriptionResponse: Codable, Sendable {
