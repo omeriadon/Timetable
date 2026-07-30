@@ -31,7 +31,7 @@ enum SessionStoreError: LocalizedError {
 final class SessionStore {
 	static let shared = SessionStore(networkManager: .shared)
 
-	private(set) var state: AuthenticationState = Self.initialState
+	private(set) var state: AuthenticationState = SessionStore.initialState
 
 	var isAuthenticated: Bool {
 		if case .authenticated = state {
