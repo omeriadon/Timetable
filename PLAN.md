@@ -436,7 +436,7 @@ Validation boundary:
   - server updated timestamp;
   - optional deletion tombstone.
 - [x] Avoid using a single owner-timetable revision for unrelated settings and events.
-- [ ] Add migrations for records that currently have only whole-blob storage.
+- [x] Add migrations for records that currently have only whole-blob storage.
 - [x] Keep server-owned school calendar and administration data download-only.
 - [x] Define retention for tombstones so offline clients can observe deletions.
 

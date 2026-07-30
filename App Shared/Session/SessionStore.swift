@@ -186,7 +186,11 @@ final class SessionStore {
 		Print("Updating account profile", category: .account)
 		let response: UserProfileResponse = try await networkManager.send(
 			.v1ProfileUpdate,
-			body: UpdateProfileRequest(displayName: displayName, email: email)
+			body: UpdateProfileRequest(
+				displayName: displayName,
+				email: email,
+				baseRevision: Defaults[.accountProfile]?.revision ?? 0
+			)
 		)
 		return persist(response)
 	}

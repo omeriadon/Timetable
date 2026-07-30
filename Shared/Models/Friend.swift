@@ -15,6 +15,7 @@ nonisolated struct FriendProfile: Codable, Defaults.Serializable, Identifiable, 
 	let appearance: ProfileAppearance?
 	let photo: ProfilePhotoMetadata?
 	let badges: [ProfileBadge]
+	let revision: Int
 
 	var id: UUID {
 		userID
@@ -27,7 +28,8 @@ nonisolated struct FriendProfile: Codable, Defaults.Serializable, Identifiable, 
 		appearanceData: Data?,
 		appearance: ProfileAppearance? = nil,
 		photo: ProfilePhotoMetadata? = nil,
-		badges: [ProfileBadge] = []
+		badges: [ProfileBadge] = [],
+		revision: Int = 0
 	) {
 		self.userID = userID
 		self.displayName = displayName
@@ -36,6 +38,7 @@ nonisolated struct FriendProfile: Codable, Defaults.Serializable, Identifiable, 
 		self.appearance = appearance
 		self.photo = photo
 		self.badges = badges
+		self.revision = revision
 	}
 
 	private enum CodingKeys: String, CodingKey {
@@ -46,6 +49,7 @@ nonisolated struct FriendProfile: Codable, Defaults.Serializable, Identifiable, 
 		case appearance
 		case photo
 		case badges
+		case revision
 	}
 
 	init(from decoder: any Decoder) throws {
@@ -57,6 +61,7 @@ nonisolated struct FriendProfile: Codable, Defaults.Serializable, Identifiable, 
 		appearance = try container.decodeIfPresent(ProfileAppearance.self, forKey: .appearance)
 		photo = try container.decodeIfPresent(ProfilePhotoMetadata.self, forKey: .photo)
 		badges = try container.decodeIfPresent([ProfileBadge].self, forKey: .badges) ?? []
+		revision = try container.decodeIfPresent(Int.self, forKey: .revision) ?? 0
 	}
 }
 
@@ -105,4 +110,5 @@ nonisolated struct FriendOrderUpdateRequest: Codable, Sendable {
 
 nonisolated struct FriendProfileAppearanceUpdateRequest: Codable, Sendable {
 	let appearance: ProfileAppearance
+	let baseRevision: Int
 }

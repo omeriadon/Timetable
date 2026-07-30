@@ -101,10 +101,14 @@ final class FriendService {
 	func updateProfileAppearance(_ appearance: ProfileAppearance) async throws {
 		let profile: FriendProfile = try await networkManager.send(
 			.v1FriendProfileUpdate,
-			body: FriendProfileAppearanceUpdateRequest(appearance: appearance),
+			body: FriendProfileAppearanceUpdateRequest(
+				appearance: appearance,
+				baseRevision: Defaults[.accountProfile]?.revision ?? 0
+			),
 			context: .userInitiated
 		)
 		Defaults[.profileAppearance] = profile.appearance ?? appearance
+		_ = try await SessionStore.shared.refreshProfile()
 		WidgetCenter.shared.reloadAllTimelines()
 	}
 

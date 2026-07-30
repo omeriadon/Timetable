@@ -17,6 +17,7 @@ struct AccountProfile: Codable, Defaults.Serializable, Hashable {
 	let appearance: ProfileAppearance
 	let photo: ProfilePhotoMetadata?
 	let badges: [ProfileBadge]
+	let revision: Int
 
 	private enum CodingKeys: String, CodingKey {
 		case id
@@ -27,6 +28,7 @@ struct AccountProfile: Codable, Defaults.Serializable, Hashable {
 		case appearance
 		case photo
 		case badges
+		case revision
 	}
 
 	init(from decoder: any Decoder) throws {
@@ -39,5 +41,6 @@ struct AccountProfile: Codable, Defaults.Serializable, Hashable {
 		appearance = try container.decodeIfPresent(ProfileAppearance.self, forKey: .appearance) ?? .default
 		photo = try container.decodeIfPresent(ProfilePhotoMetadata.self, forKey: .photo)
 		badges = try container.decodeIfPresent([ProfileBadge].self, forKey: .badges) ?? []
+		revision = try container.decodeIfPresent(Int.self, forKey: .revision) ?? 0
 	}
 }

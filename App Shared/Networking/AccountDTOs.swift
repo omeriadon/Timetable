@@ -23,6 +23,7 @@ nonisolated struct UserProfileResponse: Codable {
 	let appearance: ProfileAppearance
 	let photo: ProfilePhotoMetadata?
 	let badges: [ProfileBadge]
+	let revision: Int
 
 	private enum CodingKeys: String, CodingKey {
 		case id
@@ -33,6 +34,7 @@ nonisolated struct UserProfileResponse: Codable {
 		case appearance
 		case photo
 		case badges
+		case revision
 	}
 
 	init(from decoder: any Decoder) throws {
@@ -45,12 +47,14 @@ nonisolated struct UserProfileResponse: Codable {
 		appearance = try container.decodeIfPresent(ProfileAppearance.self, forKey: .appearance) ?? .default
 		photo = try container.decodeIfPresent(ProfilePhotoMetadata.self, forKey: .photo)
 		badges = try container.decodeIfPresent([ProfileBadge].self, forKey: .badges) ?? []
+		revision = try container.decodeIfPresent(Int.self, forKey: .revision) ?? 0
 	}
 }
 
 nonisolated struct UpdateProfileRequest: Codable {
 	let displayName: String?
 	let email: String?
+	let baseRevision: Int
 }
 
 nonisolated struct SchoolCalendarResponse: Codable, Sendable {
@@ -605,5 +609,6 @@ extension AccountProfile {
 		appearance = response.appearance
 		photo = response.photo
 		badges = response.badges
+		revision = response.revision
 	}
 }
