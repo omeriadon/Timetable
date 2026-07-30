@@ -31,7 +31,7 @@ enum SessionStoreError: LocalizedError {
 final class SessionStore {
 	static let shared = SessionStore(networkManager: .shared)
 
-	private(set) var state: AuthenticationState
+	private(set) var state: AuthenticationState = .restoring
 
 	var isAuthenticated: Bool {
 		if case .authenticated = state {
@@ -53,11 +53,6 @@ final class SessionStore {
 
 	private init(networkManager: NetworkManager) {
 		self.networkManager = networkManager
-		if let profile = Defaults[.accountProfile] {
-			state = .authenticated(profile)
-		} else {
-			state = .restoring
-		}
 		configureNetworkAuthentication()
 	}
 
