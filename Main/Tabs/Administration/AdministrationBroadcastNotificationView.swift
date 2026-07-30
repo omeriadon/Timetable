@@ -30,6 +30,18 @@ struct AdministrationBroadcastNotificationView: View {
 	}
 
 	private func send() {
+		guard !isSending else {
+			return
+		}
+		isSending = true
+		let badgeID = UUID()
+		badges.addBadge(
+			id: badgeID,
+			title: "Sending broadcast",
+			priority: 3,
+			view: .progressView
+		)
+
 		let request = BroadcastNotificationRequest(
 			title: title,
 			subtitle: subtitle.nilIfEmpty,
@@ -37,7 +49,6 @@ struct AdministrationBroadcastNotificationView: View {
 		)
 
 		Task {
-			isSending = true
 			defer {
 				isSending = false
 			}
@@ -47,9 +58,18 @@ struct AdministrationBroadcastNotificationView: View {
 				title = ""
 				subtitle = ""
 				notifBody = ""
-				badges.addBadge(id: UUID(), title: "Broadcast sent", priority: 3, view: .success)
+				badges.updateBadge(
+					id: badgeID,
+					title: "Broadcast sent",
+					view: .success
+				)
 			} catch {
-				badges.present(error: error, title: "Unable to send broadcast")
+				badges.updateBadge(
+					id: badgeID,
+					title: "Unable to send broadcast",
+					secondaryText: error.localizedDescription,
+					view: .error
+				)
 			}
 		}
 	}
