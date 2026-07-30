@@ -12,5 +12,4 @@ import WidgetKit
 func SharedWidgetBundle() -> some Widget {
 	WeeklyScheduleWidget()
 	FriendsTimeLeftWidget()
-	TimetableSummaryWidget()
 }

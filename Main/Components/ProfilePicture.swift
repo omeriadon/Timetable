@@ -34,7 +34,7 @@ struct ProfilePicture: View {
 			}
 			.accessibilityElement(children: .ignore)
 			.accessibilityLabel(accessibilityName)
-			.accessibilityValue(badgeAccessibilityValue)
+			.accessibilityValue(badgeAccessibilityValue ?? "")
 	}
 
 	private var avatarContent: some View {
@@ -53,8 +53,8 @@ struct ProfilePicture: View {
 						.font(
 							.system(
 								size: size * 0.38,
-								weight: appearance.fontWeight.swiftUIFontWeight,
-								design: appearance.fontDesign.swiftUIFontDesign
+								weight: appearance.fontWeight.profilePictureFontWeight,
+								design: appearance.fontDesign.profilePictureFontDesign
 							)
 						)
 						.foregroundStyle(.white)
@@ -122,7 +122,7 @@ struct ProfilePicture: View {
 }
 
 private extension ProfileFontDesign {
-	var swiftUIFontDesign: Font.Design {
+	var profilePictureFontDesign: Font.Design {
 		switch self {
 			case .default:
 				.default
@@ -137,7 +137,7 @@ private extension ProfileFontDesign {
 }
 
 private extension ProfileFontWeight {
-	var swiftUIFontWeight: Font.Weight {
+	var profilePictureFontWeight: Font.Weight {
 		switch self {
 			case .regular:
 				.regular

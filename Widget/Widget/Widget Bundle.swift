@@ -15,5 +15,6 @@ struct TimetableWidgetBundle: WidgetBundle {
 		#if os(iOS)
 			SchoolDayLiveActivityWidget()
 		#endif
+		TimetableSummaryWidget()
 	}
 }

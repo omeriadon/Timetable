@@ -211,7 +211,7 @@ private func makeEntry(
 	schoolCalendar: SchoolCalendarProjection
 ) -> TimetableEntry {
 	let accountProfile = Defaults[.accountProfile]
-	TimetableEntry(
+	return TimetableEntry(
 		date: date,
 		subjects: subjects,
 		ownerSchedule: scheduleItem(

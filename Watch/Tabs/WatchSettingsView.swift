@@ -64,7 +64,6 @@ struct WatchSettingsView: View {
 						LabeledContent("Debug Offset") {
 							TextField("Seconds", value: $debugOffset, format: .number)
 								.multilineTextAlignment(.trailing)
-								.keyboardType(.numbersAndPunctuation)
 						}
 						Button("Test Progress", systemImage: "progress.indicator") {
 							testBadge(title: "Syncing account", secondaryText: "Working", view: .progressView)

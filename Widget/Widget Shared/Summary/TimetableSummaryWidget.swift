@@ -1,3 +1,4 @@
+#if !os(watchOS)
 import Defaults
 import SwiftUI
 import WidgetKit
@@ -295,3 +296,4 @@ private enum WidgetProfilePhotoCache {
 		relevance: nil
 	)
 }
+#endif

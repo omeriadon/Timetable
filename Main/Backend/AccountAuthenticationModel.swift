@@ -136,7 +136,10 @@ final class AccountAuthenticationModel {
 	}
 
 	func requestReplacementCode() async {
-		guard !isSubmitting, let resendAvailableAt, resendAvailableAt <= .now else {
+		guard !isSubmitting,
+			  let resendAvailableAt = self.resendAvailableAt,
+			  resendAvailableAt <= .now
+		else {
 			return
 		}
 
@@ -147,7 +150,7 @@ final class AccountAuthenticationModel {
 			let challenge = try await sessionStore.requestVerificationCode(email: normalizedEmail)
 			verificationCode = ""
 			verificationExpiresAt = challenge.expiresAt
-			resendAvailableAt = challenge.resendAvailableAt
+			self.resendAvailableAt = challenge.resendAvailableAt
 		} catch {
 			submissionError = error.localizedDescription
 		}

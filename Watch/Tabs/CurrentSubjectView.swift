@@ -112,9 +112,10 @@ struct CurrentSubjectView: View {
 		symbol: String,
 		color: Color,
 		nextText: String?,
-		start _: Date?,
+		start: Date?,
 		end: Date?
 	) -> some View {
+		let now = start ?? TimetableClock.adjusted(.now)
 		GeometryReader { geo in
 			if let nextText, let end {
 				VStack(alignment: .center) {

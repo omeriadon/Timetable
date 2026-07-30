@@ -26,7 +26,7 @@ struct ProfileEmojiPicker: View {
 					spacing: 8
 				) {
 					ForEach(filteredEmojis, id: \.self) { emoji in
-						Button("Choose \(emoji)") {
+						Button {
 							selection = emoji
 							dismiss()
 						} label: {

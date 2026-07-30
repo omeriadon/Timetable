@@ -12,7 +12,7 @@ struct ProfileColourGrid: View {
 			ScrollView {
 				LazyVGrid(columns: columns, spacing: 0) {
 					ForEach(palette) { item in
-						Button("Toggle colour") {
+						Button {
 							toggle(item.colour)
 						} label: {
 							Label {

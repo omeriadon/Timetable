@@ -85,31 +85,33 @@ struct AdministrationEventTagsView: View {
 			await load()
 		}
 		.sheet(item: $editor) { target in
-			switch target {
-				case let .tag(tag, section):
-					AdministrationEventTagEditor(
-						tag: tag,
-						section: section,
-						sections: catalogue.sections,
-						save: saveTag
-					)
-				case let .newTag(section):
-					AdministrationEventTagEditor(
-						tag: nil,
-						section: section,
-						sections: catalogue.sections,
-						save: saveTag
-					)
-				case let .section(section):
-					AdministrationEventTagSectionEditor(
-						section: section,
-						save: saveSection
-					)
-				case .newSection:
-					AdministrationEventTagSectionEditor(
-						section: nil,
-						save: saveSection
-					)
+			Group {
+				switch target {
+					case let .tag(tag, section):
+						AdministrationEventTagEditor(
+							tag: tag,
+							section: section,
+							sections: catalogue.sections,
+							save: saveTag
+						)
+					case let .newTag(section):
+						AdministrationEventTagEditor(
+							tag: nil,
+							section: section,
+							sections: catalogue.sections,
+							save: saveTag
+						)
+					case let .section(section):
+						AdministrationEventTagSectionEditor(
+							section: section,
+							save: saveSection
+						)
+					case .newSection:
+						AdministrationEventTagSectionEditor(
+							section: nil,
+							save: saveSection
+						)
+				}
 			}
 			.navigationTransition(
 				.zoom(

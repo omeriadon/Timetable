@@ -1,4 +1,5 @@
 import Foundation
+#if !os(watchOS)
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -73,3 +74,4 @@ enum TimetableShareDocumentError: LocalizedError {
 		}
 	}
 }
+#endif
