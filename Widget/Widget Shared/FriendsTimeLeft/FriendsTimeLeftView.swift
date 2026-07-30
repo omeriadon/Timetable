@@ -84,7 +84,14 @@ struct FriendsTimeLeftView: View {
 	let schedules: [ScheduleItem]
 
 	var body: some View {
-		let owner = entry.ownerSchedule ?? ScheduleItem(name: "You", currentState: .noTimetable, nextScheduledSubject: nil, backgroundColour: .black)
+		let owner = entry.ownerSchedule ?? ScheduleItem(
+			name: "You",
+			currentState: .noTimetable,
+			nextScheduledSubject: nil,
+			backgroundColour: .black,
+			profile: nil,
+			futureStatus: nil
+		)
 
 		return VStack(alignment: .leading, spacing: 0) {
 			FriendsCurrentRow(schedule: owner, now: TimetableClock.adjusted(entry.date))
