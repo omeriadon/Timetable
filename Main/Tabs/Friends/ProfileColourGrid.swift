@@ -31,7 +31,7 @@ struct ProfileColourGrid: View {
 								Image(systemName: "paintpalette")
 									.hidden()
 									.frame(width: 0)
-								}
+							}
 						}
 						.buttonStyle(.plain)
 						.accessibilityValue(contains(item.colour) ? "Selected" : "Not selected")

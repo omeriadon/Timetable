@@ -342,6 +342,7 @@ nonisolated struct AdministrationUserUpdateRequest: Codable, Sendable {
 	let email: String
 	let password: String?
 }
+
 nonisolated struct AdministrationUserDetailResponse: Codable, Sendable {
 	let rawData: String
 }
@@ -360,6 +361,7 @@ nonisolated struct AdministrationCalendarEntryRequest: Codable, Sendable {
 	let startDate: SchoolCalendarDate
 	let endDate: SchoolCalendarDate?
 }
+
 nonisolated struct BroadcastNotificationRequest: Codable, Sendable {
 	let title: String
 	let subtitle: String?

@@ -236,7 +236,7 @@ private func upcomingEvents(
 	return projection.allEvents
 		.filter { $0.date >= startDate }
 		.prefix(3)
-		.map { $0 }
+		.map(\.self)
 }
 
 private func placeholderSchoolDate(calendar: Calendar = .current) -> Date {

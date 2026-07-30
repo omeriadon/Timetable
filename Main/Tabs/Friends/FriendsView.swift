@@ -179,8 +179,8 @@ private struct FriendOrderDropDelegate: DropDelegate {
 
 	func dropEntered(info _: DropInfo) {
 		guard let draggedFriend, draggedFriend != target,
-			let from = friends.firstIndex(of: draggedFriend),
-			let to = friends.firstIndex(of: target)
+		      let from = friends.firstIndex(of: draggedFriend),
+		      let to = friends.firstIndex(of: target)
 		else {
 			return
 		}

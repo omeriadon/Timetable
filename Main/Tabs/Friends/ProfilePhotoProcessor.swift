@@ -13,8 +13,8 @@
 					kCGImageSourceThumbnailMaxPixelSize: 2048,
 				]
 				guard let source = CGImageSourceCreateWithData(sourceData as CFData, nil),
-					  let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary),
-					  let data = UIImage(cgImage: image).jpegData(compressionQuality: 0.95)
+				      let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary),
+				      let data = UIImage(cgImage: image).jpegData(compressionQuality: 0.95)
 				else {
 					throw ProfilePhotoSelectionError.unreadableImage
 				}
@@ -30,7 +30,7 @@
 		) async throws -> Data {
 			try await Task.detached(priority: .userInitiated) {
 				guard let source = CGImageSourceCreateWithData(sourceData as CFData, nil),
-					  let image = CGImageSourceCreateImageAtIndex(source, 0, nil)
+				      let image = CGImageSourceCreateImageAtIndex(source, 0, nil)
 				else {
 					throw ProfilePhotoSelectionError.unreadableImage
 				}
@@ -53,15 +53,15 @@
 				}
 
 				guard let colourSpace = CGColorSpace(name: CGColorSpace.sRGB),
-					  let context = CGContext(
-						data: nil,
-						width: 1024,
-						height: 1024,
-						bitsPerComponent: 8,
-						bytesPerRow: 1024 * 4,
-						space: colourSpace,
-						bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
-					  )
+				      let context = CGContext(
+				      	data: nil,
+				      	width: 1024,
+				      	height: 1024,
+				      	bitsPerComponent: 8,
+				      	bytesPerRow: 1024 * 4,
+				      	space: colourSpace,
+				      	bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+				      )
 				else {
 					throw ProfilePhotoSelectionError.encodingFailed
 				}

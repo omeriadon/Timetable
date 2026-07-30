@@ -70,8 +70,8 @@ nonisolated struct ProfileAppearance: Codable, Defaults.Serializable, Hashable, 
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		version = try container.decodeIfPresent(Int.self, forKey: .version) ?? 1
 		monogram = try container.decodeIfPresent(String.self, forKey: .monogram) ?? ""
-		colours = Array(
-			try container.decodeIfPresent([RGBAColor].self, forKey: .colours) ?? Self.defaultColours
+		colours = try Array(
+			container.decodeIfPresent([RGBAColor].self, forKey: .colours) ?? Self.defaultColours
 		).prefix(3).map(\.self)
 		speed = try container.decodeIfPresent(Double.self, forKey: .speed) ?? 0.2
 		noise = try container.decodeIfPresent(Double.self, forKey: .noise) ?? 64

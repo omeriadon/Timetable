@@ -35,75 +35,73 @@ struct CurrentSubjectView: View {
 
 	@ViewBuilder
 	private func content(state: SchoolState, now: Date) -> some View {
-		Group {
-			switch state {
-				case let .beforeSchool(next):
+		switch state {
+			case let .beforeSchool(next):
+				createProgressView(
+					title: next.subject.id,
+					symbol: next.subject.symbol,
+					color: next.subject.colour.swiftUIColor,
+					nextText: nil,
+					start: now,
+					end: next.interval.start
+				)
+
+			case let .lesson(lesson):
+				createProgressView(
+					title: lesson.subject.id,
+					symbol: lesson.subject.symbol,
+					color: lesson.subject.colour.swiftUIColor,
+					nextText: lesson.next.title,
+					start: lesson.interval.start,
+					end: lesson.interval.end
+				)
+
+			case let .freePeriod(period):
+				createProgressView(
+					title: "Free Period",
+					symbol: "studentdesk",
+					color: .blue,
+					nextText: period.next.title,
+					start: period.interval.start,
+					end: period.interval.end
+				)
+
+			case let .recess(breakState), let .lunch(breakState):
+				let type: BreakType = if case .recess = state {
+					.recess
+				} else {
+					.lunch
+				}
+				createProgressView(
+					title: type.description,
+					symbol: type.symbol,
+					color: .orange,
+					nextText: breakState.next.title,
+					start: breakState.interval.start,
+					end: breakState.interval.end
+				)
+
+			case .afterSchool, .weekend:
+				if let next = SchoolStateEngine.nextScheduledSubject(
+					after: now,
+					subjects: subjects,
+					calendar: SchoolCalendarProjection.perthCalendar,
+					schoolCalendar: schoolCalendar
+				) {
 					createProgressView(
-						title: next.subject.id,
-						symbol: next.subject.symbol,
-						color: next.subject.colour.swiftUIColor,
-						nextText: nil,
+						title: "School's Out",
+						symbol: "house.fill",
+						color: .secondary,
+						nextText: "Next: \(next.subject.id)",
 						start: now,
 						end: next.interval.start
 					)
+				} else {
+					ContentUnavailableView("School's Out", systemImage: "house.fill")
+				}
 
-				case let .lesson(lesson):
-					createProgressView(
-						title: lesson.subject.id,
-						symbol: lesson.subject.symbol,
-						color: lesson.subject.colour.swiftUIColor,
-						nextText: lesson.next.title,
-						start: lesson.interval.start,
-						end: lesson.interval.end
-					)
-
-				case let .freePeriod(period):
-					createProgressView(
-						title: "Free Period",
-						symbol: "studentdesk",
-						color: .blue,
-						nextText: period.next.title,
-						start: period.interval.start,
-						end: period.interval.end
-					)
-
-				case let .recess(breakState), let .lunch(breakState):
-					let type: BreakType = if case .recess = state {
-						.recess
-					} else {
-						.lunch
-					}
-					createProgressView(
-						title: type.description,
-						symbol: type.symbol,
-						color: .orange,
-						nextText: breakState.next.title,
-						start: breakState.interval.start,
-						end: breakState.interval.end
-					)
-
-				case .afterSchool, .weekend:
-					if let next = SchoolStateEngine.nextScheduledSubject(
-						after: now,
-						subjects: subjects,
-						calendar: SchoolCalendarProjection.perthCalendar,
-						schoolCalendar: schoolCalendar
-					) {
-						createProgressView(
-							title: "School's Out",
-							symbol: "house.fill",
-							color: .secondary,
-							nextText: "Next: \(next.subject.id)",
-							start: now,
-							end: next.interval.start
-						)
-					} else {
-						ContentUnavailableView("School's Out", systemImage: "house.fill")
-					}
-
-				case .noTimetable:
-					ContentUnavailableView("No Timetable", systemImage: "calendar.badge.exclamationmark")
-			}
+			case .noTimetable:
+				ContentUnavailableView("No Timetable", systemImage: "calendar.badge.exclamationmark")
 		}
 	}
 
@@ -116,7 +114,8 @@ struct CurrentSubjectView: View {
 		end: Date?
 	) -> some View {
 		let now = start ?? TimetableClock.adjusted(.now)
-		GeometryReader { geo in
+
+		return GeometryReader { geo in
 			if let nextText, let end {
 				VStack(alignment: .center) {
 					Spacer()

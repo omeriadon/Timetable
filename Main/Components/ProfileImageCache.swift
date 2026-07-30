@@ -24,8 +24,8 @@ final class ProfileImageCache {
 		}
 
 		guard let endpoint = endpoint(for: metadata.url),
-			  let original = try? await networkManager.download(endpoint),
-			  let downsampled = await Self.downsample(original, maximumPixelSize: max(96, Int(displaySize * 3)))
+		      let original = try? await networkManager.download(endpoint),
+		      let downsampled = await Self.downsample(original, maximumPixelSize: max(96, Int(displaySize * 3)))
 		else {
 			return nil
 		}
@@ -75,7 +75,7 @@ final class ProfileImageCache {
 				kCGImageSourceThumbnailMaxPixelSize: maximumPixelSize,
 			]
 			guard let source = CGImageSourceCreateWithData(data as CFData, nil),
-				  let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
+			      let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
 			else {
 				return nil
 			}

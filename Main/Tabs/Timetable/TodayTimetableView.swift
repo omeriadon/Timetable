@@ -21,7 +21,7 @@ struct TodayTimetableView: View {
 						.padding(.horizontal, 10)
 						.lineLimit(1)
 						.font(.system(size: 200))
-						.minimumScaleFactor(0.1)
+						.minimumScaleFactor(0.01)
 						.foregroundStyle(.white)
 
 					if let noSchoolDay {

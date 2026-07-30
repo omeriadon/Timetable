@@ -28,7 +28,6 @@ struct FriendStatusCard: View {
 						.font(.callout)
 						.foregroundStyle(.secondary)
 				}
-
 			}
 			.padding(18)
 			.frame(minHeight: 132)

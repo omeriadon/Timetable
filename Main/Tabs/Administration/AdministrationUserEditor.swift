@@ -222,6 +222,7 @@ private enum AdministrationJSONFormatter {
 		}
 		return format(json)
 	}
+
 	static func format(_ json: String) -> String {
 		guard
 			let data = json.data(using: .utf8),

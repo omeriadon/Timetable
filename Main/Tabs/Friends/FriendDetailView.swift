@@ -1,5 +1,5 @@
-import SwiftUI
 import Defaults
+import SwiftUI
 
 struct FriendDetailView: View {
 	let friend: FriendSummary
@@ -31,10 +31,10 @@ struct FriendDetailView: View {
 						.frame(maxWidth: .infinity, minHeight: 180)
 				} else if let detail {
 					switch selectedTab {
-					case .main:
-						FriendOverview(detail: detail) { context in
-							selectedSubjectContext = context
-						}
+						case .main:
+							FriendOverview(detail: detail) { context in
+								selectedSubjectContext = context
+							}
 						case .week:
 							FriendWeek(detail: detail)
 					}
@@ -98,7 +98,7 @@ struct FriendDetailView: View {
 		}
 	}
 
-	private func perform(_ action: FriendAction) {
+	private func perform(_: FriendAction) {
 		Task {
 			do {
 				try await service.remove(friendID: friend.friend.id)
@@ -392,26 +392,26 @@ private enum FriendSubjectRelationship: Hashable {
 	var id: String {
 		switch self {
 			case .current:
-				return "current"
+				"current"
 			case .next:
-				return "next"
+				"next"
 			case .sharedClass:
-				return "shared-class"
+				"shared-class"
 			case .sharedSubject:
-				return "shared-subject"
+				"shared-subject"
 		}
 	}
 
 	var title: String {
 		switch self {
 			case .current:
-				return "Current Class"
+				"Current Class"
 			case .next:
-				return "Next Class"
+				"Next Class"
 			case .sharedClass:
-				return "Shared Class"
+				"Shared Class"
 			case .sharedSubject:
-				return "Shared Subject"
+				"Shared Subject"
 		}
 	}
 }
@@ -443,14 +443,13 @@ private struct FriendSubjectContextPopover: View {
 		.presentationCompactAdaptation(.popover)
 	}
 
+	@ViewBuilder
 	private func contextRow(_ title: String, value: String, systemImage: String) -> some View {
-		Group {
-			if !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-				LabeledContent(title) {
-					Label(value, systemImage: systemImage)
-						.labelStyle(.titleAndIcon)
-						.multilineTextAlignment(.trailing)
-				}
+		if !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+			LabeledContent(title) {
+				Label(value, systemImage: systemImage)
+					.labelStyle(.titleAndIcon)
+					.multilineTextAlignment(.trailing)
 			}
 		}
 	}

@@ -32,7 +32,7 @@ final class FriendService {
 			if let appearance = result.2.appearance {
 				Defaults[.profileAppearance] = appearance
 			} else if let appearanceData = result.2.appearanceData,
-					  let appearance = try? JSONDecoder().decode(ProfileAppearance.self, from: appearanceData)
+			          let appearance = try? JSONDecoder().decode(ProfileAppearance.self, from: appearanceData)
 			{
 				Defaults[.profileAppearance] = appearance
 			}

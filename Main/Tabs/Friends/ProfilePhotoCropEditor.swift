@@ -62,8 +62,7 @@
 						errorMessage = nil
 					}
 				}
-			)) {
-			} message: {
+			)) {} message: {
 				Text(errorMessage ?? "")
 			}
 		}

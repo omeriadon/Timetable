@@ -42,6 +42,7 @@ final class AccountAuthenticationModel {
 			resetVerificationChallenge()
 		}
 	}
+
 	var password = ""
 	var passwordConfirmation = ""
 	var verificationCode = ""
@@ -137,8 +138,8 @@ final class AccountAuthenticationModel {
 
 	func requestReplacementCode() async {
 		guard !isSubmitting,
-			  let resendAvailableAt = self.resendAvailableAt,
-			  resendAvailableAt <= .now
+		      let resendAvailableAt,
+		      resendAvailableAt <= .now
 		else {
 			return
 		}

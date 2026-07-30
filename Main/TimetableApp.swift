@@ -56,7 +56,7 @@ struct TimetableApp: App {
 			try? Tips.resetDatastore()
 		#endif
 		try? Tips.configure([
-			.datastoreLocation(.applicationDefault)
+			.datastoreLocation(.applicationDefault),
 		])
 
 		#if os(macOS)

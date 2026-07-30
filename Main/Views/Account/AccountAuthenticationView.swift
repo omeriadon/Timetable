@@ -102,8 +102,8 @@ struct AccountAuthenticationView: View {
 							model.mode == .signUp && !model.verificationRequested ? "Send Code" : model.mode.rawValue,
 							systemImage: model.mode == .signUp && !model.verificationRequested ? "envelope.badge" : "checkmark.circle"
 						)
-							.font(.title3)
-							.transition(.blurReplace)
+						.font(.title3)
+						.transition(.blurReplace)
 					}
 				}
 			}
@@ -113,7 +113,6 @@ struct AccountAuthenticationView: View {
 			.controlSize(.large)
 			.frame(maxWidth: .infinity)
 			.disabled(model.isSubmitting || !model.isAccountDetailsValid)
-
 		}
 		.padding(20)
 		.appNavigationTitle("Account")
@@ -131,5 +130,4 @@ struct AccountAuthenticationView: View {
 			await model.requestReplacementCode()
 		}
 	}
-
 }

@@ -118,11 +118,10 @@ final class SessionStore {
 			throw SessionStoreError.platformActionUnavailable
 		}
 		let identity = ClientIdentityProvider.shared.identity()
-		let response: VerificationCodeResponse = try await networkManager.send(
+		return try await networkManager.send(
 			.v1AuthRequestCode,
 			body: VerificationCodeRequest(email: email, installationID: identity.installationID)
 		)
-		return response
 	}
 
 	func verifyCodeAndSignUp(email: String, code: String, password: String) async throws {
@@ -151,7 +150,6 @@ final class SessionStore {
 	func acceptProvisionedSession(_ response: TokenResponse) async throws {
 		try await apply(response, bootstrap: true)
 	}
-
 
 	func refreshSilently() async throws {
 		guard let refreshToken else {

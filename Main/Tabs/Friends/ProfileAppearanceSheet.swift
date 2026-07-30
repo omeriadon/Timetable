@@ -91,18 +91,18 @@ struct ProfileAppearanceSheet: View {
 				.presentationDetents([.fraction(0.65)])
 		}
 		#if os(iOS)
-			.onChange(of: selectedPhotoItem) { _, item in
-				loadPhoto(item)
+		.onChange(of: selectedPhotoItem) { _, item in
+			loadPhoto(item)
+		}
+		.sheet(item: $photoCropRequest) { request in
+			ProfilePhotoCropEditor(sourceData: request.sourceData) { preparedData in
+				draft.pendingPhotoData = preparedData
+				draft.contentKind = .photo
+				photoSelectionState = .ready
 			}
-			.sheet(item: $photoCropRequest) { request in
-				ProfilePhotoCropEditor(sourceData: request.sourceData) { preparedData in
-					draft.pendingPhotoData = preparedData
-					draft.contentKind = .photo
-					photoSelectionState = .ready
-				}
-				.navigationTransition(.zoom(sourceID: "profile-photo-crop", in: editorNamespace))
-				.presentationDetents([.fraction(0.7)])
-			}
+			.navigationTransition(.zoom(sourceID: "profile-photo-crop", in: editorNamespace))
+			.presentationDetents([.fraction(0.7)])
+		}
 		#endif
 	}
 
