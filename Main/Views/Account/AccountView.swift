@@ -54,7 +54,7 @@ struct AccountView: View {
 		.sheet(isPresented: $showsProfileEditor) {
 			ProfileAppearanceSheet()
 				.navigationTransition(.zoom(sourceID: "account-profile-editor", in: profileNamespace))
-				.presentationDetents([.fraction(0.7)])
+				.presentationDetents([.large])
 				.presentationDragIndicator(.hidden)
 		}
 		.animation(.easeInOut, value: sessionStore.state)

@@ -20,6 +20,7 @@
 		2A79F3B330138FD2003CA797 /* SFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2A79F3B230138FD2003CA797 /* SFSymbolsPicker */; };
 		2A79F3B630138FFC003CA797 /* WindowOverlay in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2A79F3B530138FFC003CA797 /* WindowOverlay */; };
 		2A79F3B93013924E003CA797 /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A79F3B83013924E003CA797 /* IrregularGradient */; };
+		2A99A535301C3525005E48F7 /* SwiftEmoji in Frameworks */ = {isa = PBXBuildFile; productRef = 2A99A534301C3525005E48F7 /* SwiftEmoji */; };
 		2AA6DF242FDFAC9000BBC70E /* Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2AA6DF142FDFAC8F00BBC70E /* Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2AA6DF2C2FDFADAE00BBC70E /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AA6DF2B2FDFADAE00BBC70E /* Defaults */; };
 		2AB674D7300E387100A6815A /* Sticker in Frameworks */ = {isa = PBXBuildFile; productRef = 2AB674D6300E387100A6815A /* Sticker */; };
@@ -194,6 +195,7 @@
 				"Widget Shared/Live Activity/SchoolDayActivityAttributes.swift",
 				"Widget Shared/Live Activity/SchoolDayLiveActivityWidget.swift",
 				"Widget Shared/Live Activity/StaticIrregularGradient.swift",
+				"Widget Shared/Summary/TimetableSummaryWidget.swift",
 				Widget/Assets.xcassets,
 				"Widget/Widget Bundle.swift",
 				"Widget/Widget-InfoPlist.xcstrings",
@@ -372,6 +374,7 @@
 				2ABBBA042FF4AD3A00878A9D /* PortalHeaders in Frameworks */,
 				2A79F3B330138FD2003CA797 /* SFSymbolsPicker in Frameworks */,
 				2ABBBA062FF4AD3A00878A9D /* PortalTransitions in Frameworks */,
+				2A99A535301C3525005E48F7 /* SwiftEmoji in Frameworks */,
 			);
 		};
 		2A098C802F9DB842002065BE /* Frameworks */ = {
@@ -487,6 +490,7 @@
 				2A79F3B230138FD2003CA797 /* SFSymbolsPicker */,
 				2A79F3B530138FFC003CA797 /* WindowOverlay */,
 				2A79F3B83013924E003CA797 /* IrregularGradient */,
+				2A99A534301C3525005E48F7 /* SwiftEmoji */,
 			);
 			productName = Timetable;
 			productReference = 2A02378B2F9C8EA000AB1E1F /* Timetable.app */;
@@ -660,6 +664,7 @@
 				2A79F3AE30138FAB003CA797 /* XCLocalSwiftPackageReference "../Sticker-main" */,
 				2A79F3B130138FD2003CA797 /* XCLocalSwiftPackageReference "../SFSymbolsPickerForSwiftUI-main" */,
 				2A79F3B430138FFC003CA797 /* XCLocalSwiftPackageReference "../swiftui-window-overlay-main" */,
+				2A99A533301C3525005E48F7 /* XCRemoteSwiftPackageReference "SwiftEmoji" */,
 			);
 			preferredProjectObjectVersion = 110;
 			productRefGroup = 2A02378C2F9C8EA000AB1E1F /* Products */;
@@ -1536,6 +1541,14 @@
 				minimumVersion = 2.1.0;
 			};
 		};
+		2A99A533301C3525005E48F7 /* XCRemoteSwiftPackageReference "SwiftEmoji" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Aeastr/SwiftEmoji";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.0;
+			};
+		};
 		2ABBBA022FF4AD3A00878A9D /* XCRemoteSwiftPackageReference "Portal" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Aeastr/Portal";
@@ -1606,6 +1619,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */;
 			productName = IrregularGradient;
+		};
+		2A99A534301C3525005E48F7 /* SwiftEmoji */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A99A533301C3525005E48F7 /* XCRemoteSwiftPackageReference "SwiftEmoji" */;
+			productName = SwiftEmoji;
 		};
 		2AA6DF2B2FDFADAE00BBC70E /* Defaults */ = {
 			isa = XCSwiftPackageProductDependency;

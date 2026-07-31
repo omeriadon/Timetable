@@ -3,6 +3,7 @@ import SwiftUI
 
 #if os(iOS)
 	import PhotosUI
+	import SwiftEmojiIndex
 #endif
 
 struct ProfileAppearanceSheet: View {
@@ -36,29 +37,101 @@ struct ProfileAppearanceSheet: View {
 					ProfileEditorPreview(draft: draft)
 
 					TextField("Account name", text: $draft.displayName)
-						.textFieldStyle(.roundedBorder)
+						.textFieldStyle(.plain)
+						.padding(5)
+						.padding(.horizontal, 4)
+						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 15))
 
-					ProfileModeControl(
-						selection: $draft.contentKind,
-						presentsBackground: draft.contentKind != .photo,
-						showBackground: showColourPicker
+					TabsPicker(
+						items: [
+							("Photo", "photo"),
+							("Monogram", "character"),
+							("Emoji", "face.smiling"),
+						],
+						selection: Binding(
+							get: {
+								ProfileContentKind.allCases.firstIndex(of: draft.contentKind)!
+							},
+							set: {
+								draft.contentKind = ProfileContentKind.allCases[$0]
+							}
+						)
 					)
+					.frame(height: 40)
 
-					modeEditor
+					if draft.contentKind == .monogram {
+						GlassEffectContainer(spacing: 5) {
+							HStack {
+								Button("Font", systemImage: "textformat", action: showFontPicker)
+									.buttonStyle(.glass)
+									.popover(isPresented: $presentsFontPicker) {
+										ProfileFontPicker(
+											design: $draft.fontDesign,
+											weight: $draft.fontWeight
+										)
+										.presentationCompactAdaptation(.popover)
+									}
+
+								Spacer()
+									.frame(width: 5)
+
+								TextField("Monogram", text: draft.$monogram)
+									.textCase(.upper)
+									.textFieldStyle(.plain)
+									.padding(5)
+									.padding(.horizontal, 4)
+									.glassEffect(.clear.interactive())
+									.accessibilityLabel("Profile monogram")
+									.onChange(of: monogram) { _, value in
+										let normalized = String(value.prefix(3)).uppercased()
+										if normalized != value {
+											monogram = normalized
+										}
+									}
+							}
+							.transition(.blurReplace)
+						}
+					}
+
+					if draft.contentKind == .photo {
+						#if os(iOS)
+							ProfilePhotoControls(
+								selection: $selectedPhotoItem,
+								state: photoSelectionState,
+								hasCurrentPhoto: draft.photo != nil,
+								remove: removePhoto
+							)
+							.matchedTransitionSource(id: "profile-photo-crop", in: editorNamespace)
+							.transition(.blurReplace)
+						#else
+							ContentUnavailableView(
+								"Photo Editing Unavailable",
+								systemImage: "photo.badge.exclamationmark",
+								description: Text("Edit the profile photo on iPhone.")
+							)
+							.transition(.blurReplace)
+						#endif
+					} else if draft.contentKind == .emoji {
+						Button("Choose Emoji", systemImage: "face.smiling", action: showEmojiPicker)
+							.buttonStyle(.glass)
+							.matchedTransitionSource(id: "profile-emoji", in: editorNamespace)
+							.transition(.blurReplace)
+					}
 
 					if draft.contentKind != .photo {
-						Button("Font", systemImage: "textformat", action: showFontPicker)
-							.buttonStyle(.glass)
-							.matchedTransitionSource(id: "profile-font", in: editorNamespace)
-
-						Button("Background Colours", systemImage: "paintpalette", action: showColourPicker)
-							.buttonStyle(.glass)
-							.matchedTransitionSource(id: "profile-colours", in: editorNamespace)
+						Text("Background")
+							.frame(maxWidth: .infinity, alignment: .leading)
+							.foregroundStyle(.secondary)
+							.padding(.top)
+						ProfileColourGrid(selection: $draft.colours)
+							.clipShape(ConcentricRectangle())
+							.transition(.blurReplace)
 					}
 				}
+				.animation(.easeInOut, value: draft.contentKind)
 				.padding()
 			}
-			.scrollEdgeEffect()
+			.scrollBounceBehavior(.basedOnSize)
 			.appNavigationTitle("Profile", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
@@ -75,20 +148,7 @@ struct ProfileAppearanceSheet: View {
 		.sheet(isPresented: $presentsEmojiPicker) {
 			ProfileEmojiPicker(selection: $draft.emoji)
 				.navigationTransition(.zoom(sourceID: "profile-emoji", in: editorNamespace))
-				.presentationDetents([.fraction(0.65)])
-		}
-		.sheet(isPresented: $presentsFontPicker) {
-			ProfileFontPicker(
-				design: $draft.fontDesign,
-				weight: $draft.fontWeight
-			)
-			.navigationTransition(.zoom(sourceID: "profile-font", in: editorNamespace))
-			.presentationDetents([.fraction(0.55)])
-		}
-		.sheet(isPresented: $presentsColourPicker) {
-			ProfileColourGrid(selection: $draft.colours)
-				.navigationTransition(.zoom(sourceID: "profile-colours", in: editorNamespace))
-				.presentationDetents([.fraction(0.65)])
+				.presentationDetents([.large])
 		}
 		#if os(iOS)
 		.onChange(of: selectedPhotoItem) { _, item in
@@ -104,39 +164,6 @@ struct ProfileAppearanceSheet: View {
 			.presentationDetents([.fraction(0.7)])
 		}
 		#endif
-	}
-
-	@ViewBuilder
-	private var modeEditor: some View {
-		switch draft.contentKind {
-			case .photo:
-				#if os(iOS)
-					ProfilePhotoControls(
-						selection: $selectedPhotoItem,
-						state: photoSelectionState,
-						hasCurrentPhoto: draft.photo != nil,
-						remove: removePhoto
-					)
-					.matchedTransitionSource(id: "profile-photo-crop", in: editorNamespace)
-				#else
-					ContentUnavailableView(
-						"Photo Editing Unavailable",
-						systemImage: "photo.badge.exclamationmark",
-						description: Text("Edit the profile photo on iPhone.")
-					)
-				#endif
-			case .monogram:
-				ProfileMonogramEditor(
-					monogram: $draft.monogram,
-					design: draft.fontDesign,
-					weight: draft.fontWeight,
-					colours: draft.colours
-				)
-			case .emoji:
-				Button("Choose Emoji", systemImage: "face.smiling", action: showEmojiPicker)
-					.buttonStyle(.glass)
-					.matchedTransitionSource(id: "profile-emoji", in: editorNamespace)
-		}
 	}
 
 	private func showEmojiPicker() {

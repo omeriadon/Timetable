@@ -1,53 +1,44 @@
+import SwiftEmoji
 import SwiftUI
 
 struct ProfileEmojiPicker: View {
 	@Environment(\.dismiss) private var dismiss
-	@Binding var selection: String
+
 	@State private var searchText = ""
 
-	private let emojis = [
-		"😀", "😃", "😄", "😁", "😆", "🥹", "😊", "🙂", "🙃", "😉",
-		"😍", "🥰", "😘", "😎", "🤓", "🧐", "🥳", "🤩", "🫡", "🤠",
-		"🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯",
-		"🦁", "🐮", "🐷", "🐸", "🐵", "🦄", "🐝", "🦋", "🐙", "🦖",
-		"🍎", "🍊", "🍋", "🍉", "🍇", "🍓", "🍒", "🥝", "🍕", "🍔",
-		"⚽️", "🏀", "🏈", "⚾️", "🎾", "🏐", "🏉", "🎱", "🏓", "🏸",
-		"🎨", "🎭", "🎮", "🎸", "🎹", "🎺", "🎻", "🥁", "📚", "✏️",
-		"⭐️", "🌟", "✨", "⚡️", "🔥", "🌈", "☀️", "🌙", "🌊", "🍀",
-		"❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💖",
-		"🚗", "🚌", "🚲", "✈️", "🚀", "🛸", "⛵️", "🚂", "🚁", "🏎️",
-	]
+	@State private var sections: [EmojiSection] = []
+
+	@Binding private var selected: Emoji?
+
+	@State private var searchResults: [Emoji] = []
+
+	init(selection: Binding<String>) {
+		_selected = Binding(
+			get: {
+				Emoji(selection.wrappedValue)
+			},
+			set: { emoji in
+				guard let emoji else { return }
+				selection.wrappedValue = emoji.character
+			}
+		)
+	}
 
 	var body: some View {
 		NavigationStack {
 			ScrollView {
-				LazyVGrid(
-					columns: [GridItem(.adaptive(minimum: 48), spacing: 8)],
-					spacing: 8
-				) {
-					ForEach(filteredEmojis, id: \.self) { emoji in
-						Button {
-							selection = emoji
-							dismiss()
-						} label: {
-							Label {
-								Text(emoji)
-									.font(.title)
-							} icon: {
-								Image(systemName: "face.smiling")
-									.hidden()
-									.frame(width: 0)
-							}
-							.frame(minWidth: 44, minHeight: 44)
-							.background(
-								selection == emoji ? Color.accentColor.opacity(0.18) : .clear,
-								in: .circle
-							)
-						}
-						.buttonStyle(.plain)
+				ZStack {
+					if searchText.isEmpty {
+						EmojiGrid(sections: sections, selection: $selected)
+							.transition(.blurReplace)
+
+					} else {
+						EmojiGrid(emojis: searchResults, selection: $selected)
+							.transition(.blurReplace)
 					}
 				}
-				.padding()
+				.padding(.horizontal)
+				.animation(.easeInOut, value: searchText.isEmpty)
 			}
 			.searchable(text: $searchText, prompt: "Search emoji")
 			.appNavigationTitle("Emoji", accent: true)
@@ -57,34 +48,14 @@ struct ProfileEmojiPicker: View {
 				}
 			}
 		}
-	}
-
-	private var filteredEmojis: [String] {
-		guard !searchText.isEmpty else {
-			return emojis
+		.onChange(of: searchText) { _, query in
+			Task {
+				searchResults = query.isEmpty ? [] :
+					await EmojiIndexProvider.shared.search(query, ranking: .usage)
+			}
 		}
-		return emojis.filter {
-			$0.localizedStandardContains(searchText)
-				|| emojiSearchName($0).localizedStandardContains(searchText)
-		}
-	}
-
-	private func emojiSearchName(_ emoji: String) -> String {
-		switch emoji {
-			case "📚":
-				"books school study"
-			case "✏️":
-				"pencil school write"
-			case "⚽️", "🏀", "🏈", "⚾️", "🎾", "🏐", "🏉", "🎱", "🏓", "🏸":
-				"sport ball game"
-			case "🎨", "🎭", "🎮", "🎸", "🎹", "🎺", "🎻", "🥁":
-				"art music game hobby"
-			case "⭐️", "🌟", "✨":
-				"star sparkle"
-			case "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💖":
-				"heart love"
-			default:
-				emoji
+		.task {
+			sections = await (try? EmojiIndexProvider.shared.sections) ?? []
 		}
 	}
 }

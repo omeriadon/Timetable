@@ -1,5 +1,5 @@
 {
-  "originHash" : "e670f9ab02ccda5171d7b172d6b71e9d19658a7071528c7a0310948684922ae7",
+  "originHash" : "7e4a57158aafef69ef8f39963a190aefb2b30257dd3755211c2634c6fe93cf15",
   "pins" : [
     {
       "identity" : "chronicle",
@@ -125,6 +125,15 @@
       "state" : {
         "revision" : "4799286537280063c85a32f09884cfbca301b1a1",
         "version" : "602.0.0"
+      }
+    },
+    {
+      "identity" : "swiftemoji",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Aeastr/SwiftEmoji",
+      "state" : {
+        "revision" : "dd8adc55bb81177d3f55e97514ed793fb9cd8eb4",
+        "version" : "1.1.0"
       }
     },
     {

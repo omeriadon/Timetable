@@ -52,15 +52,19 @@ struct ProfilePicture: View {
 					Text(appearance.monogram)
 						.font(
 							.system(
-								size: size * 0.38,
+								size: 100,
 								weight: appearance.fontWeight.profilePictureFontWeight,
 								design: appearance.fontDesign.profilePictureFontDesign
 							)
 						)
+						.minimumScaleFactor(0.1)
 						.foregroundStyle(.white)
+						.padding(size * 0.15)
 				case .emoji:
 					Text(appearance.emoji)
-						.font(.system(size: size * 0.42))
+						.font(.system(size: 100))
+						.minimumScaleFactor(0.1)
+						.padding(size * 0.15)
 			}
 		}
 	}
@@ -71,7 +75,7 @@ struct ProfilePicture: View {
 			ColorfulView(
 				color: .constant(appearance.colours.map(\.swiftUIColor)),
 				speed: .constant(appearance.speed),
-				bias: .constant(0.00001),
+				bias: .constant(1),
 				noise: .constant(appearance.noise),
 				transitionSpeed: .constant(4),
 				frameLimit: .constant(30),

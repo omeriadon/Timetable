@@ -6,36 +6,40 @@ struct ProfileFontPicker: View {
 	@Binding var weight: ProfileFontWeight
 
 	var body: some View {
-		NavigationStack {
-			Form {
-				Section("Design") {
-					ForEach(ProfileFontDesign.allCases) { candidate in
-						Button(candidate.title, systemImage: design == candidate ? "checkmark.circle.fill" : "circle") {
-							design = candidate
-						}
-						.font(.system(.body, design: candidate.swiftUIFontDesign))
+		Form {
+			Section("Design") {
+				ForEach(ProfileFontDesign.allCases) { candidate in
+					Button {
+						design = candidate
+					} label: {
+						Label(candidate.title, systemImage: design == candidate ? "checkmark.circle.fill" : "circle")
+							.contentTransition(.symbolEffect(.replace.upUp.wholeSymbol, options: .nonRepeating))
+							.font(.system(.body, design: candidate.swiftUIFontDesign))
 					}
-				}
-
-				Section("Weight") {
-					Picker("Weight", selection: $weight) {
-						ForEach(ProfileFontWeight.allCases) { candidate in
-							Text(candidate.title)
-								.fontWeight(candidate.swiftUIFontWeight)
-								.tag(candidate)
-						}
-					}
-					.pickerStyle(.palette)
 				}
 			}
-			.appNavigationTitle("Profile Font", accent: true)
-			.toolbar {
-				ToolbarItem(placement: .confirmationAction) {
-					Button("Done", systemImage: "checkmark", role: .confirm, action: dismiss.callAsFunction)
-						.buttonStyle(.glassProminent)
-				}
+
+			Section("Weight") {
+				let allCases = ProfileFontWeight.allCases
+
+				Slider(
+					value: Binding(
+						get: {
+							Double(allCases.firstIndex(of: weight) ?? 0)
+						},
+						set: { newValue in
+							let index = Int(round(newValue))
+							if allCases.indices.contains(index) {
+								weight = allCases[index]
+							}
+						}
+					),
+					in: 0 ... Double(allCases.count - 1),
+					step: 1
+				)
 			}
 		}
+		.frame(width: 250, height: 350)
 	}
 }
 

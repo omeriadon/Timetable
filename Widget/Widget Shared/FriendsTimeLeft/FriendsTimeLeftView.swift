@@ -118,7 +118,7 @@ struct FriendsTimeLeftView: View {
 	}
 }
 
-private struct FriendsCurrentRow: View {
+struct FriendsCurrentRow: View {
 	let schedule: ScheduleItem
 	let now: Date
 

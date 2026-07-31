@@ -4,47 +4,37 @@ struct ProfileColourGrid: View {
 	@Environment(\.dismiss) private var dismiss
 	@Binding var selection: [RGBAColor]
 
-	private let columns = Array(repeating: GridItem(.flexible(), spacing: 0), count: 15)
+	private static let columnCount = 15
+
+	private let columns = Array(
+		repeating: GridItem(.flexible(), spacing: 0),
+		count: Self.columnCount
+	)
+
 	private let palette = Self.makePalette()
 
 	var body: some View {
-		NavigationStack {
-			ScrollView {
-				LazyVGrid(columns: columns, spacing: 0) {
-					ForEach(palette) { item in
-						Button {
-							toggle(item.colour)
-						} label: {
-							Label {
+		LazyVGrid(columns: columns, spacing: 0) {
+			ForEach(palette) { item in
+				Button {
+					toggle(item.colour)
+				} label: {
+					Rectangle()
+						.fill(item.colour.swiftUIColor)
+						.aspectRatio(1, contentMode: .fit)
+						.overlay {
+							if contains(item.colour) {
 								Rectangle()
-									.fill(item.colour.swiftUIColor)
-									.aspectRatio(1, contentMode: .fit)
-									.overlay {
-										if contains(item.colour) {
-											Image(systemName: "checkmark")
-												.bold()
-												.foregroundStyle(.white)
-												.shadow(radius: 1)
-										}
-									}
-							} icon: {
-								Image(systemName: "paintpalette")
-									.hidden()
-									.frame(width: 0)
+									.strokeBorder(.white, lineWidth: 2)
+									.transition(.opacity)
 							}
 						}
-						.buttonStyle(.plain)
-						.accessibilityValue(contains(item.colour) ? "Selected" : "Not selected")
-					}
+						.animation(.snappy, value: contains(item.colour))
 				}
-				.padding()
-			}
-			.appNavigationTitle("Background Colours", accent: true)
-			.toolbar {
-				ToolbarItem(placement: .confirmationAction) {
-					Button("Done", systemImage: "checkmark", role: .confirm, action: dismiss.callAsFunction)
-						.buttonStyle(.glassProminent)
-				}
+				.buttonStyle(.plain)
+				.accessibilityValue(
+					contains(item.colour) ? "Selected" : "Not selected"
+				)
 			}
 		}
 	}
@@ -54,13 +44,16 @@ struct ProfileColourGrid: View {
 			guard selection.count > 1 else {
 				return
 			}
+
 			selection.remove(at: index)
-		} else {
-			guard selection.count < 3 else {
-				return
-			}
-			selection.append(colour)
+			return
 		}
+
+		if selection.count >= 3 {
+			selection.remove(at: 0)
+		}
+
+		selection.append(colour)
 	}
 
 	private func contains(_ colour: RGBAColor) -> Bool {
@@ -69,8 +62,8 @@ struct ProfileColourGrid: View {
 
 	private static func makePalette() -> [ProfilePaletteColour] {
 		(0 ..< 10).flatMap { row in
-			(0 ..< 15).map { column in
-				let hue = Double(column) / 15
+			(0 ..< Self.columnCount).map { column in
+				let hue = Double(column) / Double(Self.columnCount)
 				let saturation = 0.35 + (Double(row) * 0.06)
 				let brightness = 0.98 - (Double(row) * 0.065)
 				let colour = rgba(hue: hue, saturation: min(saturation, 0.95), brightness: max(brightness, 0.32))

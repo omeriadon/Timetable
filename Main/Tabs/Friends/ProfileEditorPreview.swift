@@ -12,7 +12,7 @@ struct ProfileEditorPreview: View {
 					Image(uiImage: image)
 						.resizable()
 						.scaledToFill()
-						.frame(width: 150, height: 150)
+						.frame(width: 200, height: 200)
 						.clipShape(.circle)
 						.accessibilityLabel("Selected profile photo")
 				} else {
@@ -29,7 +29,7 @@ struct ProfileEditorPreview: View {
 		ProfilePicture(
 			appearance: draft.appearance,
 			photo: draft.photo,
-			size: 150,
+			size: 200,
 			accessibilityName: "Profile preview",
 			animatesBackground: true
 		)
