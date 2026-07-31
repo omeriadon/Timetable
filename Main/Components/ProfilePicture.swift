@@ -2,8 +2,13 @@ import ColorfulX
 import SwiftUI
 
 struct ProfilePicture: View {
+	private enum PhotoSource {
+		case remote(ProfilePhotoMetadata)
+		case local(Image)
+	}
+
 	let appearance: ProfileAppearance
-	let photo: ProfilePhotoMetadata?
+	private let photoSource: PhotoSource?
 	let size: CGFloat?
 	let badges: [ProfileBadge]
 	let accessibilityName: String
@@ -18,7 +23,23 @@ struct ProfilePicture: View {
 		animatesBackground: Bool = false
 	) {
 		self.appearance = appearance
-		self.photo = photo
+		photoSource = photo.map(PhotoSource.remote)
+		self.size = size
+		self.badges = badges
+		self.accessibilityName = accessibilityName
+		self.animatesBackground = animatesBackground
+	}
+
+	init(
+		appearance: ProfileAppearance,
+		localImage: Image,
+		size: CGFloat? = nil,
+		badges: [ProfileBadge] = [],
+		accessibilityName: String,
+		animatesBackground: Bool = false
+	) {
+		self.appearance = appearance
+		photoSource = .local(localImage)
 		self.size = size
 		self.badges = badges
 		self.accessibilityName = accessibilityName
@@ -57,10 +78,15 @@ struct ProfilePicture: View {
 
 			switch appearance.contentKind {
 				case .photo:
-					if let photo {
-						CachedProfilePhoto(metadata: photo, size: size)
-					} else {
-						ProfilePhotoPlaceholder(isLoading: false)
+					switch photoSource {
+						case let .remote(metadata):
+							CachedProfilePhoto(metadata: metadata, size: size)
+						case let .local(image):
+							image
+								.resizable()
+								.scaledToFill()
+						case nil:
+							ProfilePhotoPlaceholder(isLoading: false)
 					}
 
 				case .monogram:

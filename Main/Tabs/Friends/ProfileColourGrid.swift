@@ -24,9 +24,10 @@ struct ProfileColourGrid: View {
 						.aspectRatio(1, contentMode: .fit)
 						.overlay {
 							if contains(item.colour) {
-								Rectangle()
-									.strokeBorder(.white, lineWidth: 3)
-									.transition(.opacity)
+								ConcentricRectangle(corners: .concentric(), isUniform: false)
+									.stroke(.white, lineWidth: 6)
+									.clipShape(ConcentricRectangle(corners: .concentric(), isUniform: false))
+									.transition(.blurReplace)
 							}
 						}
 						.animation(.snappy, value: contains(item.colour))

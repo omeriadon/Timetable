@@ -34,7 +34,7 @@ struct ProfileAppearanceSheet: View {
 		NavigationStack {
 			VStack(spacing: 20) {
 				ProfileEditorPreview(draft: draft)
-					.padding(.horizontal)
+					.padding(.horizontal, 30)
 					.frame(maxHeight: .infinity)
 
 				HStack {
@@ -158,20 +158,20 @@ struct ProfileAppearanceSheet: View {
 				}
 
 				if draft.contentKind != .photo {
-					VStack(alignment: .leading) {
+					VStack(alignment: .center) {
 						Text("Background")
 							.frame(maxWidth: .infinity, alignment: .leading)
 							.foregroundStyle(.secondary)
 						ProfileColourGrid(selection: $draft.colours)
 							.clipShape(ConcentricRectangle(corners: .concentric(minimum: 12), isUniform: true))
 					}
-					.ignoresSafeArea(.all, edges: .bottom)
 					.transition(.blurReplace)
 				}
 			}
 			.animation(.easeInOut, value: draft.contentKind)
 			.padding([.horizontal, .top], 10)
 			.padding(.bottom, 10)
+			.ignoresSafeArea(.all, edges: .bottom)
 			.appNavigationTitle("Profile", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {

@@ -7,13 +7,14 @@ struct ProfileEditorPreview: View {
 		Group {
 			#if os(iOS)
 				if let pendingPhotoData = draft.pendingPhotoData,
-				   let image = UIImage(data: pendingPhotoData)
+				   let uiImage = UIImage(data: pendingPhotoData)
 				{
-					Image(uiImage: image)
-						.resizable()
-						.scaledToFill()
-						.clipShape(.circle)
-						.accessibilityLabel("Selected profile photo")
+					ProfilePicture(
+						appearance: draft.appearance,
+						localImage: Image(uiImage: uiImage),
+						accessibilityName: "Profile preview",
+						animatesBackground: true
+					)
 				} else {
 					profilePicture
 				}
