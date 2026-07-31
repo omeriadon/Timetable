@@ -25,7 +25,7 @@ struct ProfileColourGrid: View {
 						.overlay {
 							if contains(item.colour) {
 								Rectangle()
-									.strokeBorder(.white, lineWidth: 2)
+									.strokeBorder(.white, lineWidth: 3)
 									.transition(.opacity)
 							}
 						}

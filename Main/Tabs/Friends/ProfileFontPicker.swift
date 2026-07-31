@@ -13,7 +13,7 @@ struct ProfileFontPicker: View {
 						design = candidate
 					} label: {
 						Label(candidate.title, systemImage: design == candidate ? "checkmark.circle.fill" : "circle")
-							.contentTransition(.symbolEffect(.replace.upUp.wholeSymbol, options: .nonRepeating))
+							.contentTransition(.symbolEffect(.replace.wholeSymbol, options: .nonRepeating))
 							.font(.system(.body, design: candidate.swiftUIFontDesign))
 					}
 				}
@@ -39,18 +39,5 @@ struct ProfileFontPicker: View {
 				)
 			}
 		}
-		.frame(width: 250, height: 350)
-	}
-}
-
-private extension ProfileFontDesign {
-	var title: String {
-		rawValue.capitalized
-	}
-}
-
-private extension ProfileFontWeight {
-	var title: String {
-		rawValue.capitalized
 	}
 }

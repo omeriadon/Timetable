@@ -4,7 +4,7 @@ import SwiftUI
 struct ProfilePicture: View {
 	let appearance: ProfileAppearance
 	let photo: ProfilePhotoMetadata?
-	let size: CGFloat
+	let size: CGFloat?
 	let badges: [ProfileBadge]
 	let accessibilityName: String
 	let animatesBackground: Bool
@@ -12,7 +12,7 @@ struct ProfilePicture: View {
 	init(
 		appearance: ProfileAppearance,
 		photo: ProfilePhotoMetadata? = nil,
-		size: CGFloat,
+		size: CGFloat? = nil,
 		badges: [ProfileBadge] = [],
 		accessibilityName: String,
 		animatesBackground: Bool = false
@@ -26,18 +26,32 @@ struct ProfilePicture: View {
 	}
 
 	var body: some View {
-		avatarContent
+		Group {
+			if let size {
+				content(size: size)
+			} else {
+				GeometryReader { proxy in
+					let resolved = min(proxy.size.width, proxy.size.height)
+					content(size: resolved)
+						.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+				}
+			}
+		}
+		.accessibilityElement(children: .ignore)
+		.accessibilityLabel(accessibilityName)
+		.accessibilityValue(badgeAccessibilityValue ?? "")
+	}
+
+	private func content(size: CGFloat) -> some View {
+		avatarContent(size: size)
 			.frame(width: size, height: size)
 			.clipShape(Circle())
 			.overlay(alignment: .bottomTrailing) {
-				badgeStack
+				badgeStack(size: size)
 			}
-			.accessibilityElement(children: .ignore)
-			.accessibilityLabel(accessibilityName)
-			.accessibilityValue(badgeAccessibilityValue ?? "")
 	}
 
-	private var avatarContent: some View {
+	private func avatarContent(size: CGFloat) -> some View {
 		ZStack {
 			profileBackground
 
@@ -48,22 +62,28 @@ struct ProfilePicture: View {
 					} else {
 						ProfilePhotoPlaceholder(isLoading: false)
 					}
+
 				case .monogram:
 					Text(appearance.monogram)
 						.font(
 							.system(
-								size: 100,
-								weight: appearance.fontWeight.profilePictureFontWeight,
-								design: appearance.fontDesign.profilePictureFontDesign
+								size: 150,
+								weight: appearance.fontWeight.profilePictureFontWeight
 							)
 						)
-						.minimumScaleFactor(0.1)
+						.fontDesign(appearance.fontDesign.profilePictureFontDesign)
+						.minimumScaleFactor(0.01)
 						.foregroundStyle(.white)
 						.padding(size * 0.15)
+						.contentTransition(.numericText())
+						.animation(.easeInOut, value: appearance.fontDesign.profilePictureFontDesign)
+						.animation(.easeInOut, value: appearance.fontWeight.profilePictureFontWeight)
+						.animation(.easeInOut, value: appearance.monogram)
+
 				case .emoji:
 					Text(appearance.emoji)
-						.font(.system(size: 100))
-						.minimumScaleFactor(0.1)
+						.font(.system(size: 150))
+						.minimumScaleFactor(0.01)
 						.padding(size * 0.15)
 			}
 		}
@@ -91,7 +111,7 @@ struct ProfilePicture: View {
 	}
 
 	@ViewBuilder
-	private var badgeStack: some View {
+	private func badgeStack(size: CGFloat) -> some View {
 		let visibleBadges = badges
 			.sorted { $0.priority > $1.priority }
 			.prefix(3)
@@ -122,37 +142,5 @@ struct ProfilePicture: View {
 			.prefix(3)
 			.map(\.accessibilityLabel)
 		return labels.isEmpty ? nil : labels.joined(separator: ", ")
-	}
-}
-
-private extension ProfileFontDesign {
-	var profilePictureFontDesign: Font.Design {
-		switch self {
-			case .default:
-				.default
-			case .serif:
-				.serif
-			case .monospaced:
-				.monospaced
-			case .rounded:
-				.rounded
-		}
-	}
-}
-
-private extension ProfileFontWeight {
-	var profilePictureFontWeight: Font.Weight {
-		switch self {
-			case .regular:
-				.regular
-			case .medium:
-				.medium
-			case .semibold:
-				.semibold
-			case .bold:
-				.bold
-			case .heavy:
-				.heavy
-		}
 	}
 }

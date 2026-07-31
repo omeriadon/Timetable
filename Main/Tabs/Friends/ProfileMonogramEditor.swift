@@ -14,20 +14,3 @@ extension ProfileFontDesign {
 		}
 	}
 }
-
-extension ProfileFontWeight {
-	var swiftUIFontWeight: Font.Weight {
-		switch self {
-			case .regular:
-				.regular
-			case .medium:
-				.medium
-			case .semibold:
-				.semibold
-			case .bold:
-				.bold
-			case .heavy:
-				.heavy
-		}
-	}
-}
