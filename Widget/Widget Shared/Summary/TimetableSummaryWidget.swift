@@ -42,6 +42,7 @@
 			.padding()
 			.foregroundStyle(.white)
 			.dynamicTypeSize(.medium)
+			.monospaced()
 		}
 
 		private var header: some View {
