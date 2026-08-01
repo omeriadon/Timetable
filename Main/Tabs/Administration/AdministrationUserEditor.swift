@@ -175,6 +175,12 @@ private struct AdministrationJSONRenderer: View {
 
 private struct AdministrationJSONValueView: View {
 	let value: Any
+	let depth: Int
+
+	init(value: Any, depth: Int = 0) {
+		self.value = value
+		self.depth = depth
+	}
 
 	var body: some View {
 		valueView(value)
@@ -187,9 +193,7 @@ private struct AdministrationJSONValueView: View {
 					VStack(alignment: .leading, spacing: 4) {
 						ForEach(dictionary.keys.sorted(), id: \.self) { key in
 							DisclosureGroup {
-								if let child = dictionary[key] {
-									AdministrationJSONValueView(value: child)
-								}
+								childView(dictionary[key] ?? NSNull(), nextDepth: depth + 1)
 							} label: {
 								Text(key)
 									.font(.system(.caption, design: .monospaced).weight(.semibold))
@@ -203,20 +207,39 @@ private struct AdministrationJSONValueView: View {
 					VStack(alignment: .leading, spacing: 4) {
 						ForEach(Array(array.enumerated()), id: \.offset) { index, child in
 							DisclosureGroup("Item \(index + 1)") {
-								AdministrationJSONValueView(value: child)
+								childView(child, nextDepth: depth + 1)
 							}
 						}
 					}
 				)
 
 			default:
-				AnyView(
-					Text(AdministrationJSONFormatter.primitiveDescription(value))
-						.font(.system(.caption, design: .monospaced))
-						.textSelection(.enabled)
-						.fixedSize(horizontal: false, vertical: true)
-				)
+				AnyView(AdministrationJSONFormattedValue(value: value))
 		}
+	}
+
+	private func childView(_ value: Any, nextDepth: Int) -> AnyView {
+		if nextDepth >= 2 {
+			return AnyView(AdministrationJSONFormattedValue(value: value))
+		}
+
+		return AnyView(AdministrationJSONValueView(value: value, depth: nextDepth))
+	}
+}
+
+private struct AdministrationJSONFormattedValue: View {
+	let value: Any
+
+	var body: some View {
+		ScrollView(.horizontal, showsIndicators: false) {
+			Text(AdministrationJSONFormatter.formattedDescription(value))
+				.font(.system(.caption, design: .monospaced))
+				.textSelection(.enabled)
+				.fixedSize(horizontal: true, vertical: true)
+				.frame(maxWidth: .infinity, alignment: .topLeading)
+		}
+		.scrollBounceBehavior(.basedOnSize, axes: .horizontal)
+		.frame(maxWidth: .infinity, alignment: .leading)
 	}
 }
 
@@ -228,7 +251,7 @@ private struct AdministrationJSONText: View {
 			Text(value)
 				.font(.system(.caption, design: .monospaced))
 				.textSelection(.enabled)
-				.fixedSize(horizontal: true, vertical: true)
+				.fixedSize(horizontal: false, vertical: true)
 				.frame(maxWidth: .infinity, alignment: .topLeading)
 		}
 		.scrollBounceBehavior(.basedOnSize, axes: .horizontal)
@@ -260,6 +283,17 @@ private enum AdministrationJSONFormatter {
 			default:
 				String(describing: value)
 		}
+	}
+
+	static func formattedDescription(_ value: Any) -> String {
+		if let data = try? JSONSerialization.data(
+			withJSONObject: value,
+			options: [.prettyPrinted, .sortedKeys, .fragmentsAllowed]
+		), let string = String(data: data, encoding: .utf8) {
+			return string
+		}
+
+		return primitiveDescription(value)
 	}
 
 	private nonisolated static func expandEmbeddedJSON(in value: Any) -> Any {
