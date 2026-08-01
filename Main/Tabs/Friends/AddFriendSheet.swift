@@ -80,7 +80,7 @@ struct AddFriendSheet: View {
 	}
 
 	private func search(for query: String) async {
-		guard !query.isEmpty else {
+		guard query.count >= 2 else {
 			results = []
 			isSearching = false
 			return

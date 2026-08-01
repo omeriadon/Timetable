@@ -57,6 +57,7 @@ final class FriendService {
 	}
 
 	func sendRequest(to schoolEmail: String) async throws -> FriendSummary {
+		Print("Sending friend request API request", category: .network)
 		let result: FriendSummary = try await networkManager.send(
 			.v1FriendRequests,
 			body: CreateFriendRequest(schoolEmail: schoolEmail),

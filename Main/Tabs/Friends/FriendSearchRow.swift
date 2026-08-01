@@ -52,15 +52,21 @@ struct FriendSearchRow: View {
 	}
 
 	private func sendRequest() {
-		guard let email = result.profile.email else { return }
+		guard let email = result.profile.email else {
+			PrintError("Friend search result has no email address", category: .network)
+			return
+		}
 		isSending = true
+		Print("Sending friend request", category: .network)
 		Task {
 			defer { isSending = false }
 			do {
 				_ = try await service.sendRequest(to: email)
 				requestSent = true
+				Print("Friend request sent", category: .network)
 			} catch {
 				badges.present(error: error, title: "Unable to send friend request")
+				PrintError("Friend request failed", category: .network, error: error)
 			}
 		}
 	}

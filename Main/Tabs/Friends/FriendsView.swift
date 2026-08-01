@@ -159,8 +159,9 @@ struct FriendsView: View {
 
 	private func search(for value: String) async {
 		let query = value.trimmingCharacters(in: .whitespacesAndNewlines)
-		guard !query.isEmpty else {
+		guard query.count >= 2 else {
 			searchResults = []
+			isSearching = false
 			return
 		}
 		isSearching = true
