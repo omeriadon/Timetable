@@ -66,12 +66,42 @@ import WidgetKit
 					} else {
 						List { list }
 							.listStyle(.sidebar)
-							.scrollEdgeEffect(offset: 0.95, maxBlurRadius: 1, maximumOpacity: 0.2)
 					}
 				}
+				.scrollEdgeEffect(offset: 0.95, maxBlurRadius: 1, maximumOpacity: 0.2)
 				.scrollEdgeEffectStyle(.soft, for: .top)
 				.scrollContentBackground(.hidden)
 				.appNavigationTitle("Settings", style: .main, accent: true)
+			}
+		}
+
+		private var accountBackground: some View {
+			AccountBackgroundView(profile: Defaults[.accountProfile])
+		}
+
+		private struct AccountBackgroundView: View {
+			let profile: AccountProfile?
+
+			@State private var colours: [Color] = [.black, .black]
+			@State private var noise: Double = 0
+			@State private var speed: Double = 0
+
+			var body: some View {
+				ColorfulView(
+					color: .constant(colours),
+					speed: .constant(speed),
+					bias: .constant(0.000000000000001),
+					noise: .constant(noise),
+					transitionSpeed: .constant(4),
+					renderScale: .constant(3)
+				)
+				.task(id: profile?.id) {
+					guard let profile else { return }
+					let loaded = await profile.profilePictureColours()
+					colours = loaded.map(\.swiftUIColor)
+					noise = profile.profilePictureNoise
+					speed = profile.profilePictureSpeed
+				}
 			}
 		}
 
@@ -83,10 +113,14 @@ import WidgetKit
 				} label: {
 					Label {
 						Text(userDisplayName)
+							.font(.title)
 					} icon: {
-						ProfilePicture(size: 30, accessibilityName: "Profile Picture")
+						ProfilePicture(size: 50, accessibilityName: "Profile Picture")
+							.padding(.trailing)
 					}
+					.padding(.leading, 10)
 				}
+				.listRowBackground(accountBackground)
 			}
 
 			Section("My Timetable") {

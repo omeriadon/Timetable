@@ -9,7 +9,7 @@
 		let remove: () -> Void
 
 		var body: some View {
-			VStack(spacing: 12) {
+			VStack(spacing: 25) {
 				PhotosPicker(selection: $selection, matching: .images) {
 					Label(hasCurrentPhoto ? "Replace Photo" : "Choose Photo", systemImage: "photo.on.rectangle")
 				}
@@ -31,7 +31,8 @@
 						EmptyView()
 				}
 			}
-			.padding(.bottom)
+			.padding(.bottom, 10)
+			.padding(.horizontal, 8)
 		}
 	}
 #endif

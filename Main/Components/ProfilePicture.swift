@@ -225,7 +225,7 @@ enum ProfilePictureVisuals {
 	}
 
 	private static func palette(from data: Data) async -> [RGBAColor]? {
-		await Task.detached(priority: .utility) {
+		await Task.detached(priority: .userInitiated) {
 			guard let source = CGImageSourceCreateWithData(data as CFData, nil),
 			      let image = CGImageSourceCreateImageAtIndex(source, 0, nil),
 			      let providerData = image.dataProvider?.data,

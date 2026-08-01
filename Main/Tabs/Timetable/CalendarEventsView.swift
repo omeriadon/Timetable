@@ -20,29 +20,26 @@ struct DatesView: View {
 		ScrollView {
 			LazyVStack(alignment: .leading, spacing: 16, pinnedViews: [.sectionHeaders]) {
 				Section {
-					ZStack {
-						if timelineEntries.isEmpty {
-							ContentUnavailableView(
-								"No Upcoming Events",
-								systemImage: "calendar",
-								description: Text("Add a personal event or wait for the school calendar to update.")
-							)
-							.frame(maxWidth: .infinity)
-							.padding(.vertical, 36)
-						} else {
-							ForEach(timelineEntries) { entry in
-								animatedScrollCard(timelineEntry(entry))
-							}
+					if timelineEntries.isEmpty {
+						ContentUnavailableView(
+							"No Upcoming Events",
+							systemImage: "calendar",
+							description: Text("Add a personal event or wait for the school calendar to update.")
+						)
+						.frame(maxWidth: .infinity)
+						.padding(.vertical, 36)
+					} else {
+						ForEach(timelineEntries) { entry in
+							animatedScrollCard(timelineEntry(entry))
 						}
 					}
-					.scrollEdgeEffect(offset: 0.85, maxBlurRadius: 6, maximumOpacity: 1)
+
 				} header: {
 					plannerSectionHeader("Upcoming")
 				}
 
 				Section {
 					termDateCards
-						.scrollEdgeEffect(offset: 0.85, maxBlurRadius: 6, maximumOpacity: 1)
 				} header: {
 					plannerSectionHeader("Term Dates")
 				}

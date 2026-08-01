@@ -34,110 +34,110 @@ struct ProfileAppearanceSheet: View {
 		NavigationStack {
 			ScrollView {
 				VStack(spacing: 20) {
-				if draft.contentKind == .monogram {
-					GlassEffectContainer(spacing: 5) {
-						HStack {
-							Button(action: showFontPicker) {
-								Label {
-									Text("Font")
-								} icon: {
-									Image(systemName: "textformat")
+					if draft.contentKind == .monogram {
+						GlassEffectContainer(spacing: 5) {
+							HStack {
+								Button(action: showFontPicker) {
+									Label {
+										Text("Font")
+									} icon: {
+										Image(systemName: "textformat")
+											.foregroundStyle(.tertiary)
+											.font(.caption)
+									}
+								}
+								.buttonStyle(.glass)
+								.popover(isPresented: $presentsFontPicker) {
+									ProfileFontPicker(
+										design: $draft.fontDesign,
+										weight: $draft.fontWeight
+									)
+									.frame(width: 300, height: 400)
+									.presentationCompactAdaptation(.popover)
+								}
+
+								Spacer()
+									.frame(width: 15)
+
+								HStack {
+									Text("Monogram")
 										.foregroundStyle(.tertiary)
 										.font(.caption)
+
+									TextField("", text: $draft.monogram)
+										.textCase(.uppercase)
+										.textFieldStyle(.plain)
+										.accessibilityLabel("Profile monogram")
+										.onChange(of: draft.monogram) { _, value in
+											let normalized = String(value.prefix(3)).uppercased()
+											if normalized != value {
+												draft.monogram = normalized
+											}
+										}
 								}
+								.padding(5)
+								.padding(.horizontal, 5)
+								.glassEffect(.clear.interactive())
 							}
-							.buttonStyle(.glass)
-							.popover(isPresented: $presentsFontPicker) {
-								ProfileFontPicker(
-									design: $draft.fontDesign,
-									weight: $draft.fontWeight
-								)
-								.frame(width: 300, height: 400)
-								.presentationCompactAdaptation(.popover)
-							}
+						}
+						.transition(.blurReplace)
+					}
 
-							Spacer()
-								.frame(width: 15)
-
-							HStack {
-								Text("Monogram")
+					if draft.contentKind == .photo {
+						#if os(iOS)
+							ProfilePhotoControls(
+								selection: $selectedPhotoItem,
+								state: photoSelectionState,
+								hasCurrentPhoto: draft.photo != nil,
+								remove: removePhoto
+							)
+							.matchedTransitionSource(id: "profile-photo-crop", in: editorNamespace)
+							.transition(.blurReplace)
+						#else
+							ContentUnavailableView(
+								"Photo Editing Unavailable",
+								systemImage: "photo.badge.exclamationmark",
+								description: Text("Edit the profile photo on iPhone.")
+							)
+							.transition(.blurReplace)
+						#endif
+					} else if draft.contentKind == .emoji {
+						Button(action: showEmojiPicker) {
+							Label {
+								Text("Choose Emoji")
+							} icon: {
+								Image(systemName: "face.smiling")
 									.foregroundStyle(.tertiary)
 									.font(.caption)
-
-								TextField("", text: $draft.monogram)
-									.textCase(.uppercase)
-									.textFieldStyle(.plain)
-									.accessibilityLabel("Profile monogram")
-									.onChange(of: draft.monogram) { _, value in
-										let normalized = String(value.prefix(3)).uppercased()
-										if normalized != value {
-											draft.monogram = normalized
-										}
-									}
 							}
-							.padding(5)
-							.padding(.horizontal, 5)
-							.glassEffect(.clear.interactive())
 						}
+						.buttonStyle(.glass)
+						.matchedTransitionSource(id: "profile-emoji", in: editorNamespace)
+						.transition(.blurReplace)
+						.buttonSizing(.flexible)
 					}
-					.transition(.blurReplace)
-				}
 
-				if draft.contentKind == .photo {
-					#if os(iOS)
-						ProfilePhotoControls(
-							selection: $selectedPhotoItem,
-							state: photoSelectionState,
-							hasCurrentPhoto: draft.photo != nil,
-							remove: removePhoto
-						)
-						.matchedTransitionSource(id: "profile-photo-crop", in: editorNamespace)
-						.transition(.blurReplace)
-					#else
-						ContentUnavailableView(
-							"Photo Editing Unavailable",
-							systemImage: "photo.badge.exclamationmark",
-							description: Text("Edit the profile photo on iPhone.")
-						)
-						.transition(.blurReplace)
-					#endif
-				} else if draft.contentKind == .emoji {
-					Button(action: showEmojiPicker) {
-						Label {
-							Text("Choose Emoji")
-						} icon: {
-							Image(systemName: "face.smiling")
-								.foregroundStyle(.tertiary)
-								.font(.caption)
+					if draft.contentKind != .photo {
+						VStack(alignment: .center, spacing: 10) {
+							Text("Background")
+								.frame(maxWidth: .infinity, alignment: .leading)
+								.foregroundStyle(.secondary)
+
+							VStack(alignment: .leading, spacing: 10) {
+								LabeledContent("Animation Speed", value: draft.speed, format: .number.precision(.fractionLength(2)))
+								Slider(value: $draft.speed, in: 0 ... 5, step: 0.05)
+									.accessibilityLabel("Animation Speed")
+
+								LabeledContent("Texture Noise", value: draft.noise, format: .number.precision(.fractionLength(0)))
+								Slider(value: $draft.noise, in: 0 ... 100, step: 1)
+									.accessibilityLabel("Texture Noise")
+							}
+
+							ProfileColourGrid(selection: $draft.colours)
+								.clipShape(ConcentricRectangle(corners: .concentric(minimum: 20), isUniform: false))
 						}
+						.transition(.blurReplace)
 					}
-					.buttonStyle(.glass)
-					.matchedTransitionSource(id: "profile-emoji", in: editorNamespace)
-					.transition(.blurReplace)
-					.buttonSizing(.flexible)
-				}
-
-				if draft.contentKind != .photo {
-					VStack(alignment: .center, spacing: 10) {
-						Text("Background")
-							.frame(maxWidth: .infinity, alignment: .leading)
-							.foregroundStyle(.secondary)
-
-					VStack(alignment: .leading, spacing: 10) {
-						LabeledContent("Animation Speed", value: draft.speed, format: .number.precision(.fractionLength(2)))
-						Slider(value: $draft.speed, in: 0...5, step: 0.05)
-							.accessibilityLabel("Animation Speed")
-
-						LabeledContent("Texture Noise", value: draft.noise, format: .number.precision(.fractionLength(0)))
-						Slider(value: $draft.noise, in: 0...100, step: 1)
-							.accessibilityLabel("Texture Noise")
-					}
-
-					ProfileColourGrid(selection: $draft.colours)
-						.clipShape(ConcentricRectangle(corners: .concentric(minimum: 20), isUniform: false))
-				}
-					.transition(.blurReplace)
-				}
 				}
 				.animation(.easeInOut, value: draft.contentKind)
 				.padding([.horizontal, .top], 10)
@@ -148,7 +148,7 @@ struct ProfileAppearanceSheet: View {
 			.safeAreaBar(edge: .top, alignment: .center, spacing: 12) {
 				VStack(spacing: 12) {
 					ProfileEditorPreview(draft: draft)
-						.frame(width: 300, height: 300)
+						.frame(width: 250, height: 250)
 
 					HStack {
 						Text("Name")

@@ -78,6 +78,7 @@ struct TimetableView: View {
 					mainView
 						.containerRelativeFrame(.horizontal)
 						.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.7)
+						.scrollEdgeEffect(offset: 0.9, maxBlurRadius: 6, maximumOpacity: 1)
 						.id(1)
 
 					DatesView()

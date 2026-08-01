@@ -70,7 +70,6 @@ struct TimetableSummaryView: View {
 					)
 					Text(schedule.name)
 						.font(.subheadline.monospaced())
-						.foregroundStyle(.secondary)
 						.lineLimit(1)
 					Spacer()
 					Text(title(for: schedule.currentState))
