@@ -22,7 +22,7 @@ struct ProfileEditorPreview: View {
 				profilePicture
 			#endif
 		}
-		.shadow(color: .white.opacity(0.3), radius: 14)
+		.shadow(radius: 14)
 	}
 
 	private var profilePicture: some View {

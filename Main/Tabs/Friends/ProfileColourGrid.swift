@@ -30,7 +30,7 @@ struct ProfileColourGrid: View {
 									.transition(.blurReplace)
 							}
 						}
-						.animation(.snappy, value: contains(item.colour))
+						.animation(.snappy(duration: 1), value: contains(item.colour))
 				}
 				.buttonStyle(.plain)
 				.accessibilityValue(
@@ -38,6 +38,7 @@ struct ProfileColourGrid: View {
 				)
 			}
 		}
+		.compositingGroup()
 	}
 
 	private func toggle(_ colour: RGBAColor) {

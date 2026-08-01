@@ -158,12 +158,12 @@ struct ProfileAppearanceSheet: View {
 				}
 
 				if draft.contentKind != .photo {
-					VStack(alignment: .center) {
+					VStack(alignment: .center, spacing: 4) {
 						Text("Background")
 							.frame(maxWidth: .infinity, alignment: .leading)
 							.foregroundStyle(.secondary)
 						ProfileColourGrid(selection: $draft.colours)
-							.clipShape(ConcentricRectangle(corners: .concentric(minimum: 12), isUniform: true))
+							.clipShape(ConcentricRectangle(corners: .concentric(minimum: 20), isUniform: false))
 					}
 					.transition(.blurReplace)
 				}
