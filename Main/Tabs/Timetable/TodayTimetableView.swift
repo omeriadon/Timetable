@@ -202,11 +202,12 @@ private struct TodayCountdown: View {
 					.bold()
 
 				Text("Nothing Scheduled Today")
+					.foregroundStyle(.secondary)
 					.font(.title2)
 					.multilineTextAlignment(.center)
-					.bold()
 
 				Text("Next: \(next.subject.id)")
+					.foregroundStyle(.tertiary)
 			}
 			.frame(maxWidth: .infinity, alignment: .center)
 			.foregroundStyle(.white)

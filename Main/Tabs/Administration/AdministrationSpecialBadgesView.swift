@@ -81,7 +81,7 @@ struct AdministrationSpecialBadgesView: View {
 	private var displayedBadges: [AdministrationSpecialBadgeResponse] {
 		[
 			administrationBadge(for: .systemOwner),
-			administrationBadge(for: .administrator)
+			administrationBadge(for: .administrator),
 		] + badges
 	}
 

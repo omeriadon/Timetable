@@ -30,7 +30,7 @@ struct ProfileColourGrid: View {
 									.transition(.blurReplace)
 							}
 						}
-						.animation(.snappy(duration: 1), value: contains(item.colour))
+						.animation(.snappy(duration: 0.1), value: contains(item.colour))
 				}
 				.buttonStyle(.plain)
 				.accessibilityValue(

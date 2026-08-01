@@ -29,8 +29,8 @@ struct FriendStatusCard: View {
 						.foregroundStyle(.secondary)
 				}
 			}
+			.foregroundStyle(.black)
 			.padding(18)
-			.frame(minHeight: 132)
 			.background {
 				FriendPaperBackground(cornerRadius: 28)
 			}

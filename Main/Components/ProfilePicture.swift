@@ -121,11 +121,11 @@ struct ProfilePicture: View {
 			ColorfulView(
 				color: .constant(appearance.colours.map(\.swiftUIColor)),
 				speed: .constant(appearance.speed),
-				bias: .constant(1),
+				bias: .constant(0.000000000000001),
 				noise: .constant(appearance.noise),
 				transitionSpeed: .constant(4),
 				frameLimit: .constant(30),
-				renderScale: .constant(0.75)
+				renderScale: .constant(2)
 			)
 		} else {
 			LinearGradient(

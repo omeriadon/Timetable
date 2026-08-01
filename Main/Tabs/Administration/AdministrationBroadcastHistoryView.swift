@@ -90,13 +90,15 @@ private struct AdministrationBroadcastHistoryDetailView: View {
 			}
 		}
 		.appNavigationTitle(currentRecord.isDeleted ? "Deleted Broadcast" : "Broadcast", accent: true)
-		.safeAreaBar(edge: .bottom) {
-			if !currentRecord.isDeleted {
-				Button("Delete Notification", systemImage: "trash", role: .destructive) {
-					showsDeleteConfirmation = true
+		toolbar {
+			ToolbarItem(placement: .bottomBar) {
+				if !currentRecord.isDeleted {
+					Button("Delete Notification", systemImage: "trash", role: .destructive) {
+						showsDeleteConfirmation = true
+					}
+					.buttonStyle(.glassProminent)
+					.tint(.red)
 				}
-				.buttonStyle(.glassProminent)
-				.tint(.red)
 			}
 		}
 		.confirmationDialog("Delete Notification?", isPresented: $showsDeleteConfirmation, titleVisibility: .visible) {
