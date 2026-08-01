@@ -73,31 +73,3 @@ nonisolated struct EventNotificationSchedule: Codable, Defaults.Serializable, Ha
 		}
 	}
 }
-
-extension SchoolCalendarDate: Comparable {
-	nonisolated static func < (lhs: Self, rhs: Self) -> Bool {
-		if lhs.year != rhs.year {
-			return lhs.year < rhs.year
-		}
-		if lhs.month != rhs.month {
-			return lhs.month < rhs.month
-		}
-		return lhs.day < rhs.day
-	}
-
-	nonisolated init(_ date: Date, calendar: Calendar = SchoolCalendarProjection.perthCalendar) {
-		let components = calendar.dateComponents([.year, .month, .day], from: date)
-		year = components.year ?? 0
-		month = components.month ?? 0
-		day = components.day ?? 0
-	}
-
-	nonisolated func startOfDay(calendar: Calendar = SchoolCalendarProjection.perthCalendar) -> Date? {
-		calendar.date(from: components)
-	}
-
-	nonisolated var displayLabel: String {
-		guard let date = startOfDay() else { return "" }
-		return date.formatted(.dateTime.weekday(.wide).day().month(.wide))
-	}
-}

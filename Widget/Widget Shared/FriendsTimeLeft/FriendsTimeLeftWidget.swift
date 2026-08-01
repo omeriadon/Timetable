@@ -14,7 +14,11 @@ struct FriendsTimeLeftWidget: Widget {
 	var body: some WidgetConfiguration {
 		StaticConfiguration(kind: kind, provider: Provider()) { entry in
 			FriendsTimeLeftView(entry: entry, schedules: entry.friendSchedules)
-				.containerBackground(.black, for: .widget)
+				.containerBackground(for: .widget) {
+					Image("paperBlack")
+						.resizable()
+						.aspectRatio(contentMode: .fill)
+				}
 				.widgetURL(URL(string: "timetable://timetable"))
 				.redacted(reason: entry.isPlaceholder ? .placeholder : [])
 		}

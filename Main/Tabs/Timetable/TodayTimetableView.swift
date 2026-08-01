@@ -392,12 +392,13 @@ private struct TodaySchoolTimeline: View {
 	}
 
 	private var currentTimeMarker: some View {
-		Color.clear
-			.frame(maxWidth: .infinity, alignment: .leading)
-			.frame(height: 15)
-			.glassEffect(.regular.tint(.red), in: CurrentTimeMarkerShape())
-			.padding(.horizontal, -3)
-			.accessibilityLabel("Current time")
+		GeometryReader { geo in
+			Color.clear
+				.frame(width: geo.size.width - 6, alignment: .center)
+				.frame(height: 15)
+				.glassEffect(.regular.tint(.red), in: CurrentTimeMarkerShape())
+				.accessibilityLabel("Current time")
+		}
 	}
 
 	private func periodRowWidth(for availableWidth: CGFloat) -> CGFloat {

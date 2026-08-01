@@ -7,7 +7,6 @@ struct FriendDetailView: View {
 	@State private var service = FriendService.shared
 	@State private var selectedTab = FriendDetailTab.main
 	@State private var action: FriendAction?
-	@State private var selectedSubjectContext: FriendSubjectContext?
 	@State private var showsReportConfirmation = false
 	@State private var isLoading = true
 	@Environment(\.dismiss) private var dismiss
@@ -38,9 +37,7 @@ struct FriendDetailView: View {
 					} else if let detail {
 						switch selectedTab {
 							case .main:
-								FriendOverview(detail: detail) { context in
-									selectedSubjectContext = context
-								}
+								FriendOverview(detail: detail, friendName: friend.friend.displayName)
 							case .week:
 								FriendWeek(detail: detail)
 						}
@@ -138,10 +135,6 @@ struct FriendDetailView: View {
 			} message: {
 				Text("This sends a report for review. The friend remains visible in your account.")
 			}
-			.popover(item: $selectedSubjectContext) { context in
-				FriendSubjectContextPopover(context: context, friendName: friend.friend.displayName)
-					.fixedSize()
-			}
 			.task { await load() }
 		}
 	}
@@ -199,7 +192,7 @@ private struct FriendDetailHeader: View {
 
 private struct FriendOverview: View {
 	let detail: FriendDetail
-	let showSubjectContext: (FriendSubjectContext) -> Void
+	let friendName: String
 	@Default(.timetable) private var ownerSubjects
 	@Default(.schoolCalendar) private var schoolCalendar
 
@@ -212,6 +205,10 @@ private struct FriendOverview: View {
 		VStack(alignment: .leading, spacing: 14) {
 			currentAndNextClasses
 
+			sharedClassesCard(comparison.sharedClasses)
+
+			sharedSubjectsCard(comparison.sharedSubjects)
+
 			VStack(alignment: .leading, spacing: 6) {
 				Text("Friends since")
 					.font(.headline)
@@ -222,19 +219,13 @@ private struct FriendOverview: View {
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.background {
 				FriendPaperBackground(cornerRadius: 22)
+					.opacity(0.5)
 			}
 			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-
-			sharedClassesCard(comparison.sharedClasses, showSubjectContext: showSubjectContext)
-
-			sharedSubjectsCard(comparison.sharedSubjects, showSubjectContext: showSubjectContext)
 		}
 	}
 
-	private func sharedClassesCard(
-		_ classes: [SharedClass],
-		showSubjectContext: @escaping (FriendSubjectContext) -> Void
-	) -> some View {
+	private func sharedClassesCard(_ classes: [SharedClass]) -> some View {
 		VStack(alignment: .leading, spacing: 10) {
 			Text("Shared Classes")
 				.font(.headline)
@@ -248,9 +239,7 @@ private struct FriendOverview: View {
 						Divider()
 					}
 
-					Button {
-						showSubjectContext(sharedClass.context)
-					} label: {
+					FriendSubjectButton(context: sharedClass.context, friendName: friendName) {
 						HStack(alignment: .top, spacing: 12) {
 							Label(sharedClass.subjectName, systemImage: sharedClass.symbol)
 								.foregroundStyle(sharedClass.colour.swiftUIColor)
@@ -266,7 +255,6 @@ private struct FriendOverview: View {
 						}
 						.frame(maxWidth: .infinity, alignment: .leading)
 					}
-					.buttonStyle(.plain)
 				}
 			}
 		}
@@ -278,10 +266,7 @@ private struct FriendOverview: View {
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
 	}
 
-	private func sharedSubjectsCard(
-		_ subjects: [SharedSubject],
-		showSubjectContext: @escaping (FriendSubjectContext) -> Void
-	) -> some View {
+	private func sharedSubjectsCard(_ subjects: [SharedSubject]) -> some View {
 		VStack(alignment: .leading, spacing: 10) {
 			Text("Shared Subjects")
 				.font(.headline)
@@ -291,14 +276,11 @@ private struct FriendOverview: View {
 					.foregroundStyle(.secondary)
 			} else {
 				ForEach(subjects) { subject in
-					Button {
-						showSubjectContext(subject.context)
-					} label: {
+					FriendSubjectButton(context: subject.context, friendName: friendName) {
 						Label(subject.subjectName, systemImage: subject.symbol)
 							.foregroundStyle(subject.colour.swiftUIColor)
 							.frame(maxWidth: .infinity, alignment: .leading)
 					}
-					.buttonStyle(.plain)
 				}
 			}
 		}
@@ -321,11 +303,7 @@ private struct FriendOverview: View {
 
 		return VStack(alignment: .leading, spacing: 8) {
 			if let currentSubject = state.currentSubject {
-				contextButton(
-					title: "Current Class",
-					subject: currentSubject,
-					relationship: .current
-				)
+				contextButton(title: "Current Class", subject: currentSubject, relationship: .current)
 			}
 
 			if case let .subject(nextSubject)? = state.nextDestination {
@@ -348,20 +326,38 @@ private struct FriendOverview: View {
 		subject: Subject,
 		relationship: FriendSubjectRelationship
 	) -> some View {
-		Button {
-			showSubjectContext(
-				FriendSubjectContext(
-					subject: subject,
-					relationship: relationship
-				)
-			)
-		} label: {
+		FriendSubjectButton(
+			context: FriendSubjectContext(subject: subject, relationship: relationship),
+			friendName: friendName
+		) {
 			LabeledContent(title) {
 				Label(subject.id, systemImage: subject.symbol)
 					.foregroundStyle(subject.colour.swiftUIColor)
 			}
 		}
+	}
+}
+
+/// Owns its own popover state so it presents anchored to the exact button tapped,
+/// instead of a single shared `.popover(item:)` on an ancestor view.
+private struct FriendSubjectButton<Label: View>: View {
+	let context: FriendSubjectContext
+	let friendName: String
+	@ViewBuilder let label: () -> Label
+	@State private var showsPopover = false
+
+	var body: some View {
+		Button {
+			showsPopover = true
+		} label: {
+			label()
+		}
 		.buttonStyle(.plain)
+		.popover(isPresented: $showsPopover) {
+			FriendSubjectContextPopover(context: context, friendName: friendName)
+				.fixedSize()
+				.padding(10)
+		}
 	}
 }
 
@@ -477,13 +473,9 @@ private struct SharedSubject: Identifiable {
 	}
 }
 
-private struct FriendSubjectContext: Identifiable {
+private struct FriendSubjectContext {
 	let subject: Subject
 	let relationship: FriendSubjectRelationship
-
-	var id: String {
-		"\(relationship.id)|\(subject.id)|\(subject.classroom.editorValue)"
-	}
 }
 
 private enum FriendSubjectRelationship: Hashable {
@@ -491,19 +483,6 @@ private enum FriendSubjectRelationship: Hashable {
 	case next
 	case sharedClass(slotSummary: String)
 	case sharedSubject
-
-	var id: String {
-		switch self {
-			case .current:
-				"current"
-			case .next:
-				"next"
-			case .sharedClass:
-				"shared-class"
-			case .sharedSubject:
-				"shared-subject"
-		}
-	}
 
 	var title: String {
 		switch self {
@@ -533,7 +512,6 @@ private struct FriendSubjectContextPopover: View {
 				.font(.headline)
 				.foregroundStyle(context.subject.colour.swiftUIColor)
 
-			contextRow("Friend", value: friendName, systemImage: "person.fill")
 			contextRow("Classroom", value: context.subject.classroom.displayName, systemImage: "door.left.hand.open")
 			contextRow("Teacher", value: context.subject.teacher.displayName, systemImage: "person.crop.circle")
 

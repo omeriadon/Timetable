@@ -20,7 +20,11 @@ struct WeeklyScheduleWidget: Widget {
 			provider: WeeklyScheduleProvider()
 		) { entry in
 			WeeklyScheduleView(entry: entry)
-				.containerBackground(.black, for: .widget)
+				.containerBackground(for: .widget) {
+					Image("paperBlack")
+						.resizable()
+						.aspectRatio(contentMode: .fill)
+				}
 				.widgetURL(URL(string: "timetable://timetable"))
 				.redacted(reason: entry.isPlaceholder ? .placeholder : [])
 		}

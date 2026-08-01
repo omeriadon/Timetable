@@ -15,16 +15,19 @@ struct TimetableSummaryView: View {
 		VStack(alignment: .leading, spacing: 12) {
 			header
 
+			Spacer(minLength: 1)
+
 			Divider()
 
 			friendSection
+
+			Spacer(minLength: 1)
 
 			if !entry.upcomingEvents.isEmpty {
 				Divider()
 				eventSection
 			}
 		}
-		.padding()
 		.foregroundStyle(.white)
 		.dynamicTypeSize(.medium)
 		.monospaced()
@@ -55,8 +58,8 @@ struct TimetableSummaryView: View {
 	private var friendSection: some View {
 		VStack(alignment: .leading, spacing: 8) {
 			Label("Friends", systemImage: "person.2.fill")
-				.font(.caption.weight(.semibold))
-				.foregroundStyle(.secondary)
+				.font(.caption)
+				.foregroundStyle(.tertiary)
 
 			ForEach(entry.friendSchedules.prefix(3)) { schedule in
 				HStack(spacing: 8) {
@@ -81,21 +84,24 @@ struct TimetableSummaryView: View {
 	private var eventSection: some View {
 		VStack(alignment: .leading, spacing: 8) {
 			Label("Upcoming Events", systemImage: "calendar")
-				.font(.caption.monospaced())
-				.foregroundStyle(.secondary)
+				.font(.caption)
+				.foregroundStyle(.tertiary)
 
-			ForEach(entry.upcomingEvents) { event in
+			ForEach(entry.upcomingEvents.prefix(3)) { event in
 				HStack(spacing: 8) {
 					Image(systemName: event.symbol)
 						.frame(width: 18)
 					Text(event.title)
-						.font(.subheadline.weight(.medium))
+						.font(.subheadline)
 						.lineLimit(1)
 					Spacer()
-					Text(event.date.displayLabel)
-						.font(.caption)
-						.foregroundStyle(.secondary)
-						.lineLimit(1)
+
+					if let date = event.date.date {
+						Text(date, format: .dateTime.day().month(.abbreviated))
+							.font(.caption)
+							.foregroundStyle(.secondary)
+							.lineLimit(1)
+					}
 				}
 			}
 		}

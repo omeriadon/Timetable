@@ -173,7 +173,6 @@ private struct AdministrationJSONRenderer: View {
 	}
 }
 
-
 private struct AdministrationJSONValueView: View {
 	let value: Any
 
@@ -184,7 +183,7 @@ private struct AdministrationJSONValueView: View {
 	private func valueView(_ value: Any) -> AnyView {
 		switch value {
 			case let dictionary as [String: Any]:
-				return AnyView(
+				AnyView(
 					VStack(alignment: .leading, spacing: 4) {
 						ForEach(dictionary.keys.sorted(), id: \.self) { key in
 							DisclosureGroup {
@@ -200,7 +199,7 @@ private struct AdministrationJSONValueView: View {
 				)
 
 			case let array as [Any]:
-				return AnyView(
+				AnyView(
 					VStack(alignment: .leading, spacing: 4) {
 						ForEach(Array(array.enumerated()), id: \.offset) { index, child in
 							DisclosureGroup("Item \(index + 1)") {
@@ -211,7 +210,7 @@ private struct AdministrationJSONValueView: View {
 				)
 
 			default:
-				return AnyView(
+				AnyView(
 					Text(AdministrationJSONFormatter.primitiveDescription(value))
 						.font(.system(.caption, design: .monospaced))
 						.textSelection(.enabled)
@@ -263,7 +262,7 @@ private enum AdministrationJSONFormatter {
 		}
 	}
 
-	private static func expandEmbeddedJSON(in value: Any) -> Any {
+	private nonisolated static func expandEmbeddedJSON(in value: Any) -> Any {
 		switch value {
 			case let dictionary as [String: Any]:
 				dictionary.mapValues(expandEmbeddedJSON(in:))
@@ -276,7 +275,7 @@ private enum AdministrationJSONFormatter {
 		}
 	}
 
-	private static func expandJSON(from string: String) -> Any? {
+	private nonisolated static func expandJSON(from string: String) -> Any? {
 		if let object = jsonObject(from: Data(string.utf8)) {
 			return expandEmbeddedJSON(in: object)
 		}
@@ -288,7 +287,7 @@ private enum AdministrationJSONFormatter {
 		return expandEmbeddedJSON(in: object)
 	}
 
-	private static func jsonObject(from data: Data) -> Any? {
+	private nonisolated static func jsonObject(from data: Data) -> Any? {
 		guard let object = try? JSONSerialization.jsonObject(with: data), JSONSerialization.isValidJSONObject(object) else {
 			return nil
 		}

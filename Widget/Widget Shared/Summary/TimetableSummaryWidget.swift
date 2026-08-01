@@ -13,7 +13,11 @@ struct TimetableSummaryWidget: Widget {
 	var body: some WidgetConfiguration {
 		StaticConfiguration(kind: kind, provider: Provider()) { entry in
 			TimetableSummaryView(entry: entry)
-				.containerBackground(.black, for: .widget)
+				.containerBackground(for: .widget) {
+					Image("paperBlack")
+						.resizable()
+						.aspectRatio(contentMode: .fill)
+				}
 				.widgetURL(URL(string: "timetable://timetable"))
 				.redacted(reason: entry.isPlaceholder ? .placeholder : [])
 		}

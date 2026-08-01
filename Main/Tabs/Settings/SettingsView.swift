@@ -82,9 +82,9 @@ import WidgetKit
 					AccountView()
 				} label: {
 					Label {
-						Text("userDisplayName")
+						Text(userDisplayName)
 					} icon: {
-						ProfilePicture(appearance: .default, accessibilityName: "Profile Picture")
+						ProfilePicture(appearance: \\ HERE, size: 30, accessibilityName: "Profile Picture")
 					}
 				}
 			}

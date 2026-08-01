@@ -22,13 +22,57 @@ nonisolated struct TimeOfDay: Codable, Hashable {
 	}
 }
 
-nonisolated struct SchoolCalendarDate: Codable, Hashable, Sendable {
+nonisolated struct SchoolCalendarDate: Comparable, Codable, Hashable, Sendable {
 	let year: Int
 	let month: Int
 	let day: Int
 
 	var components: DateComponents {
 		DateComponents(year: year, month: month, day: day)
+	}
+
+	var date: Date? {
+		Calendar.current.date(from: components)
+	}
+
+	var displayLabel: String {
+		guard let date = Calendar.current.date(from: components) else {
+			return "\(day)/\(month)/\(year)"
+		}
+
+		return date.formatted(
+			.dateTime
+				.weekday(.abbreviated)
+				.day()
+				.month(.abbreviated)
+		)
+	}
+
+	nonisolated static func < (lhs: Self, rhs: Self) -> Bool {
+		if lhs.year != rhs.year {
+			return lhs.year < rhs.year
+		}
+		if lhs.month != rhs.month {
+			return lhs.month < rhs.month
+		}
+		return lhs.day < rhs.day
+	}
+
+	init(year: Int, month: Int, day: Int) {
+		self.year = year
+		self.month = month
+		self.day = day
+	}
+
+	nonisolated init(_ date: Date, calendar: Calendar = SchoolCalendarProjection.perthCalendar) {
+		let components = calendar.dateComponents([.year, .month, .day], from: date)
+		year = components.year ?? 0
+		month = components.month ?? 0
+		day = components.day ?? 0
+	}
+
+	nonisolated func startOfDay(calendar: Calendar = SchoolCalendarProjection.perthCalendar) -> Date? {
+		calendar.date(from: components)
 	}
 }
 

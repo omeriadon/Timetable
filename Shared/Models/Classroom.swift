@@ -99,9 +99,9 @@ nonisolated enum Classroom: Codable, Hashable, Sendable {
 		switch self {
 			case let .room(building, floor, number):
 				if let floor {
-					"\(building.displayName), \(floor.displayName), \(number)"
+					"\(building.displayName) \(floor.displayName) \(number)"
 				} else {
-					"\(building.displayName), \(number)"
+					"\(building.displayName) \(number)"
 				}
 			case let .unknown(rawLocation): rawLocation
 		}

@@ -63,15 +63,61 @@ struct ProfileColourGrid: View {
 	}
 
 	private static func makePalette() -> [ProfilePaletteColour] {
-		(0 ..< 10).flatMap { row in
-			(0 ..< Self.columnCount).map { column in
-				let hue = Double(column) / Double(Self.columnCount)
-				let saturation = 0.35 + (Double(row) * 0.06)
-				let brightness = 0.98 - (Double(row) * 0.065)
-				let colour = rgba(hue: hue, saturation: min(saturation, 0.95), brightness: max(brightness, 0.32))
+		let colourRowCount = 12
+		let saturation = 0.75
+
+		var rows: [[ProfilePaletteColour]] = (0 ..< colourRowCount).map { row in
+			let t = Double(row) / Double(colourRowCount - 1)
+			let lightness = 0.92 - t * 0.84
+
+			return (0 ..< columnCount).map { column in
+				let hue = Double(column) / Double(columnCount)
+				let (r, g, b) = hslToRGB(hue: hue, saturation: saturation, lightness: lightness)
+				let colour = RGBAColor(red: r, green: g, blue: b, alpha: 1)
 				return ProfilePaletteColour(id: "\(row)-\(column)", colour: colour)
 			}
 		}
+
+		let greyRow = (0 ..< columnCount).map { column -> ProfilePaletteColour in
+			let t = Double(column) / Double(columnCount - 1)
+			let lightness = 1 - t
+			let colour = RGBAColor(red: lightness, green: lightness, blue: lightness, alpha: 1)
+			return ProfilePaletteColour(id: "grey-\(column)", colour: colour)
+		}
+		rows.append(greyRow)
+
+		return rows.flatMap(\.self)
+	}
+
+	private static func hslToRGB(hue: Double, saturation: Double, lightness: Double) -> (Double, Double, Double) {
+		if saturation == 0 {
+			return (lightness, lightness, lightness)
+		}
+
+		let q = lightness < 0.5 ? lightness * (1 + saturation) : lightness + saturation - lightness * saturation
+		let p = 2 * lightness - q
+
+		func hueToRGB(_ t: Double) -> Double {
+			var t = t
+			if t < 0 {
+				t += 1
+			}
+			if t > 1 {
+				t -= 1
+			}
+			if t < 1 / 6 {
+				return p + (q - p) * 6 * t
+			}
+			if t < 1 / 2 {
+				return q
+			}
+			if t < 2 / 3 {
+				return p + (q - p) * (2 / 3 - t) * 6
+			}
+			return p
+		}
+
+		return (hueToRGB(hue + 1 / 3), hueToRGB(hue), hueToRGB(hue - 1 / 3))
 	}
 
 	private static func rgba(hue: Double, saturation: Double, brightness: Double) -> RGBAColor {

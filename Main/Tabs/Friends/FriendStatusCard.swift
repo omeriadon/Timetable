@@ -98,43 +98,56 @@ private struct FriendScheduleStatus {
 	let tint: Color
 
 	init(subjects: [Subject], at date: Date, schoolCalendar: SchoolCalendarProjection) {
+		// Stub out anything related to user location because this feature has not been built yet.
+
 		let state = SchoolStateEngine.calculate(
 			at: date,
 			subjects: subjects,
 			calendar: SchoolCalendarProjection.perthCalendar,
 			schoolCalendar: schoolCalendar
 		)
+
 		switch state {
 			case let .beforeSchool(next):
 				title = "Before School"
 				nextTitle = "Next: \(next.subject.id)"
 				symbol = "clock"
-				availability = "Before school"
-				tint = .blue
+//				availability = "Before school"
+				availability = "Unavailable"
+//				tint = .blue
+				tint = .black
 			case let .lesson(lesson):
 				title = lesson.subject.id
 				nextTitle = lesson.next.title
 				symbol = lesson.subject.symbol
-				availability = "In class"
-				tint = lesson.subject.colour.swiftUIColor
+//				availability = "In class"
+				availability = "Unavailable"
+//				tint = lesson.subject.colour.swiftUIColor
+				tint = .black
 			case let .freePeriod(period):
 				title = "Free Period"
 				nextTitle = period.next.title
 				symbol = "studentdesk"
-				availability = "Free"
-				tint = .mint
+//				availability = "Free"
+				availability = "Unavailable"
+//				tint = .mint
+				tint = .black
 			case let .recess(state):
 				title = BreakType.recess.description
 				nextTitle = state.next.title
 				symbol = BreakType.recess.symbol
-				availability = "On break"
-				tint = .orange
+//				availability = "On break"
+				availability = "Unavailable"
+//				tint = .orange
+				tint = .black
 			case let .lunch(state):
 				title = BreakType.lunch.description
 				nextTitle = state.next.title
 				symbol = BreakType.lunch.symbol
-				availability = "On break"
-				tint = .orange
+//				availability = "On break"
+				availability = "Unavailable"
+//				tint = .orange
+				tint = .black
 			case .afterSchool, .weekend:
 				title = "School's Out"
 				if let next = SchoolStateEngine.nextScheduledSubject(
@@ -148,14 +161,18 @@ private struct FriendScheduleStatus {
 					nextTitle = "No upcoming classes"
 				}
 				symbol = "house.fill"
-				availability = "Offline"
-				tint = .secondary
+//				availability = "Offline"
+				availability = "Unavailable"
+//				tint = .secondary
+				tint = .black
 			case .noTimetable:
 				title = "No Timetable"
 				nextTitle = "This friend has not uploaded a timetable."
 				symbol = "calendar.badge.exclamationmark"
+//				availability = "Unavailable"
 				availability = "Unavailable"
-				tint = .secondary
+//				tint = .secondary
+				tint = .black
 		}
 	}
 }
