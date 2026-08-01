@@ -5,7 +5,13 @@ struct FriendSearchRow: View {
 	@State private var service = FriendService.shared
 	@State private var isSending = false
 	@State private var requestSent = false
+	@State private var relationship: FriendRelationshipState?
 	@Environment(\.statusBadgeManager) private var badges
+
+	init(result: FriendSearchResult) {
+		self.result = result
+		_relationship = State(initialValue: result.relationship)
+	}
 
 	var body: some View {
 		HStack(spacing: 14) {
@@ -25,11 +31,15 @@ struct FriendSearchRow: View {
 			action
 		}
 		.padding(.vertical, 8)
+		.onChange(of: result.relationship) { _, value in
+			relationship = value
+			requestSent = value == .pendingOutgoing
+		}
 	}
 
 	@ViewBuilder
 	private var action: some View {
-		switch result.relationship {
+		switch relationship {
 			case .friends:
 				Label("Friends", systemImage: "person.2.fill")
 					.font(.caption.weight(.semibold))
@@ -63,9 +73,16 @@ struct FriendSearchRow: View {
 		Task {
 			defer { isSending = false }
 			do {
-				_ = try await service.sendRequest(to: email)
-				requestSent = true
+				let summary = try await service.sendRequest(to: email)
+				relationship = summary.state
+				requestSent = summary.state == .pendingOutgoing
 				Print("Friend request sent", category: .network)
+			} catch let NetworkError.server(statusCode, response)
+				where statusCode == 409 && response.message == "You are already friends."
+			{
+				relationship = .friends
+				try? await service.refresh()
+				Print("Friend relationship refreshed after conflict", category: .network)
 			} catch {
 				badges.present(error: error, title: "Unable to send friend request")
 				PrintError("Friend request failed", category: .network, error: error)
