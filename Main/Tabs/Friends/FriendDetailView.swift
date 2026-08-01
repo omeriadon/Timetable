@@ -225,10 +225,6 @@ private struct FriendOverview: View {
 		}
 		.padding(14)
 		.frame(maxWidth: .infinity, alignment: .leading)
-		.background {
-			FriendPaperBackground(cornerRadius: 25)
-		}
-		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 25, style: .continuous))
 	}
 
 	private func sharedClassesCard(_ classes: [SharedClass]) -> some View {
@@ -262,7 +258,7 @@ private struct FriendOverview: View {
 						.padding(14)
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.background {
-							FriendBrownPaperBackground(cornerRadius: 13)
+							FriendPaperBackground(cornerRadius: 13)
 						}
 						.clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
 					}
@@ -272,7 +268,7 @@ private struct FriendOverview: View {
 		.padding(14)
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.background {
-			FriendPaperBackground(cornerRadius: 25)
+			FriendBrownPaperBackground(cornerRadius: 25)
 		}
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 25, style: .continuous))
 	}
@@ -292,7 +288,7 @@ private struct FriendOverview: View {
 						.padding(14)
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.background {
-							FriendBrownPaperBackground(cornerRadius: 13)
+							FriendPaperBackground(cornerRadius: 13)
 						}
 						.clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
 				}
@@ -301,11 +297,12 @@ private struct FriendOverview: View {
 		.padding(14)
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.background {
-			FriendPaperBackground(cornerRadius: 25)
+			FriendBrownPaperBackground(cornerRadius: 25)
 		}
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 25, style: .continuous))
 	}
 
+	@ViewBuilder
 	private var currentAndNextClasses: some View {
 		let subjects = detail.timetable?.subjects ?? []
 		let state = SchoolStateEngine.calculate(
@@ -315,24 +312,33 @@ private struct FriendOverview: View {
 			schoolCalendar: schoolCalendar
 		)
 
-		return VStack(alignment: .leading, spacing: 8) {
-			if let currentSubject = state.currentSubject {
-				contextButton(title: "Current Class", subject: currentSubject)
-			}
+		if let currentSubject = state.currentSubject {
+			currentAndNextClassesCard {
+				VStack(alignment: .leading, spacing: 8) {
+					contextButton(title: "Current Class", subject: currentSubject)
 
-			if case let .subject(nextSubject)? = state.nextDestination {
-				contextButton(
-					title: state.currentSubject == nil ? "Next Class" : "Up Next",
-					subject: nextSubject
-				)
+					if case let .subject(nextSubject)? = state.nextDestination {
+						contextButton(title: "Up Next", subject: nextSubject)
+					}
+				}
+			}
+		} else if case let .subject(nextSubject)? = state.nextDestination {
+			currentAndNextClassesCard {
+				contextButton(title: "Next Class", subject: nextSubject)
 			}
 		}
-		.padding(14)
-		.frame(maxWidth: .infinity, alignment: .leading)
-		.background {
-			FriendBrownPaperBackground(cornerRadius: 13)
-		}
-		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+	}
+
+	private func currentAndNextClassesCard<Content: View>(
+		@ViewBuilder content: () -> Content
+	) -> some View {
+		content()
+			.padding(14)
+			.frame(maxWidth: .infinity, alignment: .leading)
+			.background {
+				FriendBrownPaperBackground(cornerRadius: 13)
+			}
+			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
 	}
 
 	private func contextButton(

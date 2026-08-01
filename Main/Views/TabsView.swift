@@ -169,11 +169,11 @@ class TabsView: PlatformView {
 		#if os(iOS)
 			backgroundView.clipsToBounds = true
 			backgroundView.isUserInteractionEnabled = false
-			insertSubview(backgroundView, aboveSubview: bottomStackView)
+			insertSubview(backgroundView, belowSubview: bottomStackView)
 		#else
 			backgroundView.wantsLayer = true
 			backgroundView.layer?.masksToBounds = true
-			addSubview(backgroundView, positioned: .above, relativeTo: bottomStackView)
+			addSubview(backgroundView, positioned: .below, relativeTo: bottomStackView)
 		#endif
 	}
 

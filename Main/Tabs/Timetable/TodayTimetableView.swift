@@ -370,12 +370,6 @@ private struct TodaySchoolTimeline: View {
 		}
 		.padding(10)
 		.frame(height: cardHeight, alignment: .top)
-		.onTapGesture {
-			withAnimation(.snappy(duration: 0.28)) {
-				expandedPeriodNumber = isExpanded ? nil : period.number
-			}
-		}
-
 		.accessibilityLabel(subject?.id ?? "Free Period")
 		.accessibilityValue(isExpanded ? "Expanded" : "Collapsed")
 		.background {
@@ -389,6 +383,12 @@ private struct TodaySchoolTimeline: View {
 			.clipShape(RoundedRectangle(cornerRadius: periodCornerRadius, style: .continuous))
 		}
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: periodCornerRadius, style: .continuous))
+		.contentShape(RoundedRectangle(cornerRadius: periodCornerRadius, style: .continuous))
+		.onTapGesture {
+			withAnimation(.snappy(duration: 0.28)) {
+				expandedPeriodNumber = isExpanded ? nil : period.number
+			}
+		}
 	}
 
 	private var currentTimeMarker: some View {
