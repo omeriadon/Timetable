@@ -53,7 +53,7 @@ struct AdministrationDevelopmentAccessView: View {
 			await load()
 		}
 		.confirmationDialog(
-				pendingDevelopmentAccessOnly == true ? "Restrict Server to System Administrators?" : "Restore Normal Server Access?",
+			pendingDevelopmentAccessOnly == true ? "Restrict Server to System Administrators?" : "Restore Normal Server Access?",
 			isPresented: Binding(
 				get: { pendingDevelopmentAccessOnly != nil },
 				set: { isPresented in

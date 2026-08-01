@@ -125,7 +125,7 @@ struct ProfilePicture: View {
 				noise: .constant(appearance.noise),
 				transitionSpeed: .constant(4),
 				frameLimit: .constant(30),
-				renderScale: .constant(2)
+				renderScale: .constant(4)
 			)
 		} else {
 			LinearGradient(

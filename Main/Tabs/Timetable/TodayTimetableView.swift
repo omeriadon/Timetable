@@ -293,7 +293,7 @@ private struct TodaySchoolTimeline: View {
 			}
 			.clipShape(RoundedRectangle(cornerRadius: outerCornerRadius))
 		}
-		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: outerCornerRadius))
+		.glassEffect(.clear, in: RoundedRectangle(cornerRadius: outerCornerRadius))
 	}
 
 	private var periodsLayer: some View {
@@ -330,52 +330,52 @@ private struct TodaySchoolTimeline: View {
 		let isExpanded = expandedPeriodNumber == period.number
 		let baseCardHeight = max(44, duration - 8)
 		let cardHeight = baseCardHeight + (isExpanded ? 48 : 0)
-		Button {
+
+		VStack(alignment: .leading, spacing: 8) {
+			HStack(alignment: .top) {
+				HStack(alignment: .top, spacing: 10) {
+					Text("\(period.number)")
+						.font(.caption.monospacedDigit())
+						.frame(width: 15)
+
+					VStack(alignment: .leading, spacing: 4) {
+						Text(subject?.id ?? "Free Period")
+							.lineLimit(2)
+							.font(.title2)
+
+						if isExpanded, let subject {
+							Label(subject.teacher.displayName, systemImage: "person.fill")
+								.font(.subheadline)
+								.foregroundStyle(.secondary)
+
+							Label(subject.classroom.displayName, systemImage: "door.left.hand.open")
+								.font(.subheadline)
+								.foregroundStyle(.secondary)
+						}
+					}
+				}
+				.frame(maxHeight: .infinity, alignment: .topLeading)
+
+				Spacer()
+
+				if let subject {
+					Image(systemName: subject.symbol)
+						.resizable()
+						.aspectRatio(contentMode: .fit)
+						.frame(width: max(18, baseCardHeight - 40), height: max(18, baseCardHeight - 40))
+						.padding(.trailing, 10)
+						.foregroundStyle(subject.colour.swiftUIColor)
+				}
+			}
+		}
+		.padding(10)
+		.frame(height: cardHeight, alignment: .top)
+		.onTapGesture {
 			withAnimation(.snappy(duration: 0.28)) {
 				expandedPeriodNumber = isExpanded ? nil : period.number
 			}
-		} label: {
-			VStack(alignment: .leading, spacing: 8) {
-				HStack(alignment: .top) {
-					HStack(alignment: .top, spacing: 10) {
-						Text("\(period.number)")
-							.font(.caption.monospacedDigit())
-							.frame(width: 15)
-
-						VStack(alignment: .leading, spacing: 4) {
-							Text(subject?.id ?? "Free Period")
-								.lineLimit(2)
-								.font(.title2)
-
-							if isExpanded, let subject {
-								Label(subject.teacher.displayName, systemImage: "person.fill")
-									.font(.subheadline)
-									.foregroundStyle(.secondary)
-
-								Label(subject.classroom.displayName, systemImage: "door.left.hand.open")
-									.font(.subheadline)
-									.foregroundStyle(.secondary)
-							}
-						}
-					}
-					.frame(maxHeight: .infinity, alignment: .topLeading)
-
-					Spacer()
-
-					if let subject {
-						Image(systemName: subject.symbol)
-							.resizable()
-							.aspectRatio(contentMode: .fit)
-							.frame(width: max(18, baseCardHeight - 40), height: max(18, baseCardHeight - 40))
-							.padding(.trailing, 10)
-							.foregroundStyle(subject.colour.swiftUIColor)
-					}
-				}
-			}
-			.padding(10)
-			.frame(height: cardHeight, alignment: .top)
 		}
-		.buttonStyle(.plain)
+
 		.accessibilityLabel(subject?.id ?? "Free Period")
 		.accessibilityValue(isExpanded ? "Expanded" : "Collapsed")
 		.background {

@@ -54,7 +54,6 @@ struct AdministrationUserEditor: View {
 							AdministrationJSONRenderer(json: rawData)
 						}
 					}
-
 				}
 			}
 			.appNavigationTitle(target.user == nil ? "New User" : "User", accent: true)

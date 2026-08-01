@@ -41,7 +41,6 @@ struct AdministrationBroadcastHistoryView: View {
 			badges.present(error: error, title: "Unable to refresh broadcast history")
 		}
 	}
-
 }
 
 private struct AdministrationBroadcastHistoryDetailView: View {

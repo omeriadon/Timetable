@@ -72,6 +72,7 @@ struct TimetableView: View {
 					)
 					.containerRelativeFrame(.horizontal)
 					.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.7)
+					.scrollEdgeEffect(offset: 0.9, maxBlurRadius: 4, maximumOpacity: 0.7)
 					.id(0)
 
 					mainView
@@ -81,7 +82,7 @@ struct TimetableView: View {
 
 					DatesView()
 						.containerRelativeFrame(.horizontal)
-						.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.95, maxBlurRadius: 1, maximumOpacity: 0.7)
+						.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.7)
 						.id(2)
 				}
 				.scrollTargetLayout()
@@ -89,7 +90,6 @@ struct TimetableView: View {
 			.scrollTargetBehavior(.paging)
 			.scrollIndicators(.hidden)
 			.scrollPosition(id: $scrollPosition)
-			.scrollEdgeEffect(offset: 0.9, maxBlurRadius: 4, maximumOpacity: 0.7)
 			.safeAreaBar(edge: .top, alignment: .center, spacing: 0) {
 				TabsPicker(
 					items: [

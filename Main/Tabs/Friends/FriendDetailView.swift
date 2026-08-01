@@ -167,9 +167,9 @@ private struct FriendOverview: View {
 
 			VStack(alignment: .leading, spacing: 6) {
 				Text("Friends since")
-				.font(.headline)
+					.font(.headline)
 				Text(detail.acceptedAt, format: .dateTime.month().day().year())
-				.foregroundStyle(.secondary)
+					.foregroundStyle(.secondary)
 			}
 			.padding(18)
 			.frame(maxWidth: .infinity, alignment: .leading)

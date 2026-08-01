@@ -87,12 +87,12 @@ struct FriendsView: View {
 						Button {
 							selectedFriend = friend
 						} label: {
-						FriendStatusCard(friend: friend)
-							.scrollTransition(.animated(.snappy(duration: 0.3))) { card, phase in
-								card
-									.opacity(reduceMotion || phase.isIdentity ? 1 : 0.65)
-									.scaleEffect(reduceMotion || phase.isIdentity ? 1 : 0.96)
-							}
+							FriendStatusCard(friend: friend)
+								.scrollTransition(.animated(.snappy(duration: 0.3))) { card, phase in
+									card
+										.opacity(reduceMotion || phase.isIdentity ? 1 : 0.65)
+										.scaleEffect(reduceMotion || phase.isIdentity ? 1 : 0.96)
+								}
 						}
 						.buttonStyle(.plain)
 						.matchedTransitionSource(
