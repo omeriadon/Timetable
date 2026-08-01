@@ -19,6 +19,7 @@
 				if hasCurrentPhoto {
 					Button("Remove Photo", systemImage: "trash", role: .destructive, action: remove)
 						.buttonStyle(.glass)
+						.tint(.red)
 						.buttonSizing(.flexible)
 				}
 

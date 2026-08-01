@@ -8,6 +8,7 @@ import SwiftUI
 
 struct ProfileAppearanceSheet: View {
 	@Environment(\.dismiss) private var dismiss
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	@Environment(\.statusBadgeManager) private var statusBadges
 	@State private var service = FriendService.shared
 	@State private var draft: ProfileAppearanceDraft
@@ -175,7 +176,7 @@ struct ProfileAppearanceSheet: View {
 								ProfileContentKind.allCases.firstIndex(of: draft.contentKind)!
 							},
 							set: {
-								draft.contentKind = ProfileContentKind.allCases[$0]
+								setContentKind(ProfileContentKind.allCases[$0])
 							}
 						)
 					)
@@ -252,14 +253,22 @@ struct ProfileAppearanceSheet: View {
 		}
 
 		private func removePhoto() {
-			draft.pendingPhotoData = nil
-			draft.removesPhoto = true
-			draft.contentKind = .emoji
+			withAnimation(reduceMotion ? .none : .smooth(duration: 0.35)) {
+				draft.pendingPhotoData = nil
+				draft.removesPhoto = true
+				draft.contentKind = .emoji
+			}
 			selectedPhotoItem = nil
 			photoSelectionState = .idle
 			photoCropRequest = nil
 		}
 	#endif
+
+	private func setContentKind(_ contentKind: ProfileContentKind) {
+		withAnimation(reduceMotion ? .none : .smooth(duration: 0.35)) {
+			draft.contentKind = contentKind
+		}
+	}
 
 	private func save() {
 		isSaving = true
