@@ -168,6 +168,7 @@ class TabsView: PlatformView {
 		backgroundView = makeGlassView(tint: .brown)
 		#if os(iOS)
 			backgroundView.clipsToBounds = true
+			backgroundView.isUserInteractionEnabled = false
 			insertSubview(backgroundView, aboveSubview: bottomStackView)
 		#else
 			backgroundView.wantsLayer = true

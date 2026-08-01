@@ -29,7 +29,7 @@ struct FriendDetailView: View {
 							}
 						)
 					)
-					.frame(height: 52)
+					.frame(height: 40)
 
 					if isLoading {
 						ProgressView()
@@ -215,14 +215,20 @@ private struct FriendOverview: View {
 				Text(detail.acceptedAt, format: .dateTime.month().day().year())
 					.foregroundStyle(.secondary)
 			}
-			.padding(18)
+			.padding(14)
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.background {
-				FriendPaperBackground(cornerRadius: 22)
-					.opacity(0.5)
+				FriendBrownPaperBackground(cornerRadius: 13)
 			}
-			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+			.opacity(0.5)
 		}
+		.padding(14)
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.background {
+			FriendPaperBackground(cornerRadius: 25)
+		}
+		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 25, style: .continuous))
 	}
 
 	private func sharedClassesCard(_ classes: [SharedClass]) -> some View {
@@ -253,17 +259,22 @@ private struct FriendOverview: View {
 									.foregroundStyle(.secondary)
 							}
 						}
+						.padding(14)
 						.frame(maxWidth: .infinity, alignment: .leading)
+						.background {
+							FriendBrownPaperBackground(cornerRadius: 13)
+						}
+						.clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
 					}
 				}
 			}
 		}
-		.padding(18)
+		.padding(14)
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.background {
-			FriendPaperBackground(cornerRadius: 22)
+			FriendPaperBackground(cornerRadius: 25)
 		}
-		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 25, style: .continuous))
 	}
 
 	private func sharedSubjectsCard(_ subjects: [SharedSubject]) -> some View {
@@ -276,20 +287,23 @@ private struct FriendOverview: View {
 					.foregroundStyle(.secondary)
 			} else {
 				ForEach(subjects) { subject in
-					FriendSubjectButton(context: subject.context, friendName: friendName) {
-						Label(subject.subjectName, systemImage: subject.symbol)
-							.foregroundStyle(subject.colour.swiftUIColor)
-							.frame(maxWidth: .infinity, alignment: .leading)
-					}
+					Label(subject.subjectName, systemImage: subject.symbol)
+						.foregroundStyle(subject.colour.swiftUIColor)
+						.padding(14)
+						.frame(maxWidth: .infinity, alignment: .leading)
+						.background {
+							FriendBrownPaperBackground(cornerRadius: 13)
+						}
+						.clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
 				}
 			}
 		}
-		.padding(18)
+		.padding(14)
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.background {
-			FriendPaperBackground(cornerRadius: 22)
+			FriendPaperBackground(cornerRadius: 25)
 		}
-		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 25, style: .continuous))
 	}
 
 	private var currentAndNextClasses: some View {
@@ -303,38 +317,52 @@ private struct FriendOverview: View {
 
 		return VStack(alignment: .leading, spacing: 8) {
 			if let currentSubject = state.currentSubject {
-				contextButton(title: "Current Class", subject: currentSubject, relationship: .current)
+				contextButton(title: "Current Class", subject: currentSubject)
 			}
 
 			if case let .subject(nextSubject)? = state.nextDestination {
 				contextButton(
 					title: state.currentSubject == nil ? "Next Class" : "Up Next",
-					subject: nextSubject,
-					relationship: .next
+					subject: nextSubject
 				)
 			}
 		}
 		.padding(14)
+		.frame(maxWidth: .infinity, alignment: .leading)
 		.background {
-			FriendPaperBackground(cornerRadius: 22)
+			FriendBrownPaperBackground(cornerRadius: 13)
 		}
-		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
 	}
 
 	private func contextButton(
 		title: String,
-		subject: Subject,
-		relationship: FriendSubjectRelationship
+		subject: Subject
 	) -> some View {
-		FriendSubjectButton(
-			context: FriendSubjectContext(subject: subject, relationship: relationship),
-			friendName: friendName
-		) {
-			LabeledContent(title) {
-				Label(subject.id, systemImage: subject.symbol)
-					.foregroundStyle(subject.colour.swiftUIColor)
-			}
+		LabeledContent(title) {
+			Label(subject.id, systemImage: subject.symbol)
+				.foregroundStyle(subject.colour.swiftUIColor)
 		}
+	}
+}
+
+private struct FriendBrownPaperBackground: View {
+	let cornerRadius: CGFloat
+
+	var body: some View {
+		GeometryReader { proxy in
+			Image("paper")
+				.resizable()
+				.scaledToFill()
+				.frame(width: proxy.size.width, height: proxy.size.height)
+				.clipped()
+		}
+		.clipShape(
+			RoundedRectangle(
+				cornerRadius: cornerRadius,
+				style: .continuous
+			)
+		)
 	}
 }
 

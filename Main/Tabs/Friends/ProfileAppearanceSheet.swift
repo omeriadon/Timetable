@@ -166,6 +166,18 @@ struct ProfileAppearanceSheet: View {
 							.clipShape(ConcentricRectangle(corners: .concentric(minimum: 20), isUniform: false))
 					}
 					.transition(.blurReplace)
+
+					VStack(alignment: .leading, spacing: 10) {
+						LabeledContent("Animation Speed", value: draft.speed, format: .number.precision(.fractionLength(2)))
+						Slider(value: $draft.speed, in: 0...2, step: 0.05)
+							.accessibilityLabel("Animation Speed")
+
+						LabeledContent("Texture Noise", value: draft.noise, format: .number.precision(.fractionLength(0)))
+						Slider(value: $draft.noise, in: 0...100, step: 1)
+							.accessibilityLabel("Texture Noise")
+					}
+					.padding(.horizontal, 4)
+					.transition(.blurReplace)
 				}
 			}
 			.animation(.easeInOut, value: draft.contentKind)
