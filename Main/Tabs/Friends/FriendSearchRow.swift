@@ -47,6 +47,8 @@ struct FriendSearchRow: View {
 					sendRequest()
 				}
 				.buttonStyle(.glassProminent)
+				.tint(.blue)
+				.foregroundStyle(.white)
 				.disabled(isSending || requestSent)
 		}
 	}

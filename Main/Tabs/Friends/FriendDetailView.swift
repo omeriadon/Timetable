@@ -48,7 +48,6 @@ struct FriendDetailView: View {
 				.foregroundStyle(.black)
 				.padding()
 			}
-			.scrollEdgeEffect()
 			.toolbar {
 				ToolbarItem(placement: .topBarLeading) {
 					Button(role: .cancel) {
@@ -329,8 +328,8 @@ private struct FriendOverview: View {
 		}
 	}
 
-	private func currentAndNextClassesCard<Content: View>(
-		@ViewBuilder content: () -> Content
+	private func currentAndNextClassesCard(
+		@ViewBuilder content: () -> some View
 	) -> some View {
 		content()
 			.padding(14)

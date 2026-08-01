@@ -34,8 +34,6 @@ struct FriendStatusCard: View {
 						.font(.callout)
 						.foregroundStyle(.secondary)
 				}
-
-				Spacer(minLength: 0)
 			}
 			.foregroundStyle(.black)
 			.padding(18)
