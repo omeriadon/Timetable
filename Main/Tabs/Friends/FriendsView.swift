@@ -49,12 +49,12 @@ struct FriendsView: View {
 					case .addFriend:
 						AddFriendSheet()
 							.navigationTransition(.zoom(sourceID: sheet.transitionID, in: sheetNamespace))
-							.presentationDetents([.fraction(0.55)])
+							.presentationDetents([.large])
 							.presentationDragIndicator(.hidden)
 					case .requests:
 						FriendRequestsSheet()
 							.navigationTransition(.zoom(sourceID: sheet.transitionID, in: sheetNamespace))
-							.presentationDetents([.fraction(0.6)])
+							.presentationDetents([.fraction(0.6), .large])
 							.presentationDragIndicator(.hidden)
 				}
 			}

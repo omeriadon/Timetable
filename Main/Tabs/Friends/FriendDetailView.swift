@@ -14,79 +14,82 @@ struct FriendDetailView: View {
 	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
-		ScrollView {
-			VStack(alignment: .leading, spacing: 20) {
-				FriendDetailHeader(friend: friend.friend)
+		NavigationStack {
+			ScrollView {
+				VStack(alignment: .leading, spacing: 20) {
+					FriendDetailHeader(friend: friend.friend)
 
-				Picker("Friend detail", selection: $selectedTab) {
-					ForEach(FriendDetailTab.allCases) { tab in
-						Label(tab.title, systemImage: tab.symbol)
-							.tag(tab)
+					Picker("Friend detail", selection: $selectedTab) {
+						ForEach(FriendDetailTab.allCases) { tab in
+							Label(tab.title, systemImage: tab.symbol)
+								.tag(tab)
+						}
 					}
-				}
-				.pickerStyle(.segmented)
+					.pickerStyle(.segmented)
 
-				if isLoading {
-					ProgressView()
-						.frame(maxWidth: .infinity, minHeight: 180)
-				} else if let detail {
-					switch selectedTab {
-						case .main:
-							FriendOverview(detail: detail) { context in
-								selectedSubjectContext = context
-							}
-						case .week:
-							FriendWeek(detail: detail)
-					}
-				} else {
-					ContentUnavailableView("Friend Unavailable", systemImage: "person.crop.circle.badge.exclamationmark")
-				}
-			}
-			.padding()
-		}
-		.scrollEdgeEffect()
-		.appNavigationTitle(friend.friend.displayName, accent: true)
-		.toolbar {
-			ToolbarItem(placement: .topBarTrailing) {
-				Menu("Friend actions", systemImage: "ellipsis.circle") {
-					Button("Remove Friend", systemImage: "person.badge.minus", role: .destructive) {
-						action = .remove
-					}
-					Button("Report", systemImage: "exclamationmark.bubble", role: .destructive) {
-						showsReportConfirmation = true
+					if isLoading {
+						ProgressView()
+							.frame(maxWidth: .infinity, minHeight: 180)
+					} else if let detail {
+						switch selectedTab {
+							case .main:
+								FriendOverview(detail: detail) { context in
+									selectedSubjectContext = context
+								}
+							case .week:
+								FriendWeek(detail: detail)
+						}
+					} else {
+						ContentUnavailableView("Friend Unavailable", systemImage: "person.crop.circle.badge.exclamationmark")
 					}
 				}
+				.foregroundStyle(.black)
+				.padding()
 			}
-		}
-		.confirmationDialog(action?.title ?? "", isPresented: Binding(
-			get: { action != nil },
-			set: {
-				if !$0 {
-					action = nil
+			.scrollEdgeEffect()
+			.appNavigationTitle(friend.friend.displayName, accent: true)
+			.toolbar {
+				ToolbarItem(placement: .topBarTrailing) {
+					Menu("Friend actions", systemImage: "ellipsis.circle") {
+						Button("Remove Friend", systemImage: "person.badge.minus", role: .destructive) {
+							action = .remove
+						}
+						Button("Report", systemImage: "exclamationmark.bubble", role: .destructive) {
+							showsReportConfirmation = true
+						}
+					}
 				}
 			}
-		)) {
-			if let action {
-				Button(action.title, systemImage: action.symbol, role: .destructive) {
-					perform(action)
+			.confirmationDialog(action?.title ?? "", isPresented: Binding(
+				get: { action != nil },
+				set: {
+					if !$0 {
+						action = nil
+					}
 				}
+			)) {
+				if let action {
+					Button(action.title, systemImage: action.symbol, role: .destructive) {
+						perform(action)
+					}
+				}
+				Button("Cancel", role: .cancel) {}
+			} message: {
+				Text(action?.message ?? "")
 			}
-			Button("Cancel", role: .cancel) {}
-		} message: {
-			Text(action?.message ?? "")
-		}
-		.alert("Report Friend?", isPresented: $showsReportConfirmation) {
-			Button("Cancel", role: .cancel) {}
-			Button("Report", role: .destructive) {
-				report()
+			.alert("Report Friend?", isPresented: $showsReportConfirmation) {
+				Button("Cancel", role: .cancel) {}
+				Button("Report", role: .destructive) {
+					report()
+				}
+			} message: {
+				Text("This sends a report for review. The friend remains visible in your account.")
 			}
-		} message: {
-			Text("This sends a report for review. The friend remains visible in your account.")
+			.popover(item: $selectedSubjectContext) { context in
+				FriendSubjectContextPopover(context: context, friendName: friend.friend.displayName)
+			}
+			.task { await load() }
 		}
-		.popover(item: $selectedSubjectContext) { context in
-			FriendSubjectContextPopover(context: context, friendName: friend.friend.displayName)
-		}
-		.task { await load() }
 	}
 
 	private func load() async {

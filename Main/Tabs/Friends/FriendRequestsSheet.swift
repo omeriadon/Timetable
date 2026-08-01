@@ -38,7 +38,7 @@ struct FriendRequestsSheet: View {
 				}
 			}
 			.listStyle(.insetGrouped)
-			.navigationTitle("Friend Requests")
+			.appNavigationTitle("Friend Requests")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {

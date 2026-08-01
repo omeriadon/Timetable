@@ -32,7 +32,7 @@ struct AddFriendSheet: View {
 				}
 			}
 			.listStyle(.insetGrouped)
-			.navigationTitle("Add a Friend")
+			.appNavigationTitle("Add a Friend")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {
