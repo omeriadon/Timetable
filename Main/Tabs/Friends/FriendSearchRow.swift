@@ -27,7 +27,7 @@ struct FriendSearchRow: View {
 				}
 			}
 
-			Spacer()
+			Spacer(minLength: 1)
 			action
 		}
 		.padding(.vertical, 8)

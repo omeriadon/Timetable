@@ -394,7 +394,7 @@ private struct FriendOverview: View {
 				)
 			)
 
-		content()
+		return content()
 			.padding(14)
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.background {

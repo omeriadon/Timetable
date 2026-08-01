@@ -12,6 +12,8 @@ struct AdministrationEventTagsView: View {
 			LazyVStack(alignment: .leading, spacing: 22) {
 				ForEach(catalogue.sections) { section in
 					sectionView(section)
+						.padding(5)
+						.background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
 						.opacity(section.isArchived ? 0.55 : 1)
 				}
 				.padding()
@@ -77,7 +79,6 @@ struct AdministrationEventTagsView: View {
 				Button("Edit Section", systemImage: "slider.horizontal.3") {
 					editor = .section(section)
 				}
-				.padding(.trailing, 40)
 				.labelStyle(.iconOnly)
 				.buttonStyle(.borderless)
 				.foregroundStyle(.white)
@@ -95,14 +96,10 @@ struct AdministrationEventTagsView: View {
 						Label(tag.displayName, systemImage: tag.symbol ?? "tag")
 							.padding(.horizontal, 12)
 							.padding(.vertical, 8)
-							.background(.thinMaterial, in: Capsule())
-							.overlay {
-								Capsule()
-									.stroke(.white.opacity(0.5), lineWidth: 0.5)
-							}
 					}
-					.buttonStyle(.plain)
+					.buttonStyle(.glassProminent)
 					.foregroundStyle(.white)
+					.tint(RGBAColor(hexString: tag.colorHex ?? "fff").swiftUIColor)
 					.opacity(tag.isArchived ? 0.55 : 1)
 					.matchedTransitionSource(
 						id: AdministrationEventTagEditorTarget.tag(tag, section: section).id,
@@ -114,7 +111,7 @@ struct AdministrationEventTagsView: View {
 					Button("Add Tag", systemImage: "plus") {
 						editor = .newTag(section)
 					}
-					.buttonStyle(.bordered)
+					.buttonStyle(.glass)
 					.foregroundStyle(.white)
 					.matchedTransitionSource(
 						id: AdministrationEventTagEditorTarget.newTag(section).id,
