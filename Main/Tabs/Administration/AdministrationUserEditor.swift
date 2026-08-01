@@ -253,7 +253,7 @@ private enum AdministrationJSONFormatter {
 	static func childRows(from value: Any, parentID: String) -> [AdministrationJSONRow]? {
 		switch value {
 			case let dictionary as [String: Any]:
-				return dictionary.keys.sorted().map { key in
+				dictionary.keys.sorted().map { key in
 					AdministrationJSONRow(
 						id: "\(parentID).dictionary-\(key)",
 						label: key,
@@ -261,7 +261,7 @@ private enum AdministrationJSONFormatter {
 					)
 				}
 			case let array as [Any]:
-				return array.enumerated().map { index, value in
+				array.enumerated().map { index, value in
 					AdministrationJSONRow(
 						id: "\(parentID).array-\(index)",
 						label: "Item \(index + 1)",
@@ -269,7 +269,7 @@ private enum AdministrationJSONFormatter {
 					)
 				}
 			default:
-				return nil
+				nil
 		}
 	}
 

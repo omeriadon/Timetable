@@ -76,31 +76,28 @@ private struct AdministrationBroadcastHistoryDetailView: View {
 					LabeledContent("Failure", value: failureSummary)
 				}
 			}
+
+			if !currentRecord.isDeleted {
+				Button("Delete Notification", systemImage: "trash", role: .destructive) {
+					showsDeleteConfirmation = true
+				}
+				.buttonStyle(.glassProminent)
+				.tint(.red)
+				.confirmationDialog("Delete Notification?", isPresented: $showsDeleteConfirmation, titleVisibility: .visible) {
+					Button("Delete Notification", systemImage: "trash", role: .destructive) {
+						Task {
+							do {
+								currentRecord = try await service.deleteBroadcastNotification(id: currentRecord.id)
+							} catch {
+								badges.present(error: error, title: "Unable to delete notification")
+							}
+						}
+					}
+				} message: {
+					Text("This marks the broadcast as deleted and sends a removal push to subscribed devices.")
+				}
+			}
 		}
 		.appNavigationTitle(currentRecord.isDeleted ? "Deleted Broadcast" : "Broadcast", accent: true)
-		.toolbar {
-			ToolbarItem(placement: .bottomBar) {
-				if !currentRecord.isDeleted {
-					Button("Delete Notification", systemImage: "trash", role: .destructive) {
-						showsDeleteConfirmation = true
-					}
-					.buttonStyle(.glassProminent)
-					.tint(.red)
-				}
-			}
-		}
-		.confirmationDialog("Delete Notification?", isPresented: $showsDeleteConfirmation, titleVisibility: .visible) {
-			Button("Delete Notification", systemImage: "trash", role: .destructive) {
-				Task {
-					do {
-						currentRecord = try await service.deleteBroadcastNotification(id: currentRecord.id)
-					} catch {
-						badges.present(error: error, title: "Unable to delete notification")
-					}
-				}
-			}
-		} message: {
-			Text("This marks the broadcast as deleted and sends a removal push to subscribed devices.")
-		}
 	}
 }

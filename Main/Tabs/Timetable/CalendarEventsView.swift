@@ -47,7 +47,6 @@ struct DatesView: View {
 			.padding()
 		}
 		.scrollEdgeEffect()
-
 		.safeAreaBar(edge: .bottom, spacing: 10) {
 			Button {
 				presentationTarget = .createEvent(.privateEvent)
