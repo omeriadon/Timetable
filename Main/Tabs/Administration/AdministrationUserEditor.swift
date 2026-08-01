@@ -157,49 +157,65 @@ struct AdministrationUserEditor: View {
 
 private struct AdministrationJSONRenderer: View {
 	let json: String
-	private let object: [String: Any]
+	private let value: Any?
 
 	init(json: String) {
 		self.json = json
-		object = AdministrationJSONFormatter.object(from: json) ?? [:]
+		value = AdministrationJSONFormatter.value(from: json)
 	}
 
 	var body: some View {
-		if object.isEmpty {
-			AdministrationJSONText(value: json)
+		if let value {
+			AdministrationJSONValueView(value: value)
 		} else {
-			ForEach(object.keys.sorted(), id: \.self) { key in
-				DisclosureGroup(key) {
-					valueView(object[key])
-				}
-			}
+			AdministrationJSONText(value: json)
 		}
 	}
+}
 
-	@ViewBuilder
-	private func valueView(_ value: Any?) -> some View {
+
+private struct AdministrationJSONValueView: View {
+	let value: Any
+
+	var body: some View {
+		valueView(value)
+	}
+
+	private func valueView(_ value: Any) -> AnyView {
 		switch value {
 			case let dictionary as [String: Any]:
-				ForEach(dictionary.keys.sorted(), id: \.self) { key in
-					DisclosureGroup(key) {
-						AdministrationJSONText(
-							value: AdministrationJSONFormatter.formatObject(dictionary[key] ?? NSNull())
-						)
+				return AnyView(
+					VStack(alignment: .leading, spacing: 4) {
+						ForEach(dictionary.keys.sorted(), id: \.self) { key in
+							DisclosureGroup {
+								if let child = dictionary[key] {
+									AdministrationJSONValueView(value: child)
+								}
+							} label: {
+								Text(key)
+									.font(.system(.caption, design: .monospaced).weight(.semibold))
+							}
+						}
 					}
-				}
+				)
 
 			case let array as [Any]:
-				ForEach(Array(array.enumerated()), id: \.offset) { index, item in
-					DisclosureGroup("Item \(index + 1)") {
-						AdministrationJSONText(
-							value: AdministrationJSONFormatter.formatObject(item)
-						)
+				return AnyView(
+					VStack(alignment: .leading, spacing: 4) {
+						ForEach(Array(array.enumerated()), id: \.offset) { index, child in
+							DisclosureGroup("Item \(index + 1)") {
+								AdministrationJSONValueView(value: child)
+							}
+						}
 					}
-				}
+				)
 
 			default:
-				AdministrationJSONText(
-					value: AdministrationJSONFormatter.formatObject(value ?? NSNull())
+				return AnyView(
+					Text(AdministrationJSONFormatter.primitiveDescription(value))
+						.font(.system(.caption, design: .monospaced))
+						.textSelection(.enabled)
+						.fixedSize(horizontal: false, vertical: true)
 				)
 		}
 	}
@@ -222,64 +238,45 @@ private struct AdministrationJSONText: View {
 }
 
 private enum AdministrationJSONFormatter {
-	static func object(from json: String) -> [String: Any]? {
+	static func value(from json: String) -> Any? {
 		guard let data = json.data(using: .utf8) else {
 			return nil
 		}
 
-		return try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+		guard let object = try? JSONSerialization.jsonObject(with: data) else {
+			return nil
+		}
+
+		return expandEmbeddedJSON(in: object)
 	}
 
-	static func formatObject(_ object: Any) -> String {
-		guard JSONSerialization.isValidJSONObject(object), let data = try? JSONSerialization.data(withJSONObject: object, options: [.prettyPrinted, .sortedKeys]), let json = String(data: data, encoding: .utf8) else {
-			return String(describing: object)
+	static func primitiveDescription(_ value: Any) -> String {
+		switch value {
+			case let string as String:
+				string
+			case let number as NSNumber:
+				number.stringValue
+			case _ as NSNull:
+				"null"
+			default:
+				String(describing: value)
 		}
-		return format(json)
 	}
 
-	static func format(_ json: String) -> String {
-		guard
-			let data = json.data(using: .utf8),
-			let object = try? JSONSerialization.jsonObject(with: data)
-		else {
-			return json
-		}
-
-		guard JSONSerialization.isValidJSONObject(object) else {
-			return json
-		}
-
-		let expandedObject = expandEmbeddedJSON(in: object)
-		guard
-			let formattedData = try? JSONSerialization.data(
-				withJSONObject: expandedObject,
-				options: [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
-			),
-			let formattedJSON = String(data: formattedData, encoding: .utf8)
-		else {
-			return json
-		}
-
-		return formattedJSON
-	}
-
-	private nonisolated static func expandEmbeddedJSON(in object: Any) -> Any {
-		switch object {
+	private static func expandEmbeddedJSON(in value: Any) -> Any {
+		switch value {
 			case let dictionary as [String: Any]:
 				dictionary.mapValues(expandEmbeddedJSON(in:))
-
 			case let array as [Any]:
 				array.map(expandEmbeddedJSON(in:))
-
 			case let string as String:
 				expandJSON(from: string) ?? string
-
 			default:
-				object
+				value
 		}
 	}
 
-	private nonisolated static func expandJSON(from string: String) -> Any? {
+	private static func expandJSON(from string: String) -> Any? {
 		if let object = jsonObject(from: Data(string.utf8)) {
 			return expandEmbeddedJSON(in: object)
 		}
@@ -291,7 +288,7 @@ private enum AdministrationJSONFormatter {
 		return expandEmbeddedJSON(in: object)
 	}
 
-	private nonisolated static func jsonObject(from data: Data) -> Any? {
+	private static func jsonObject(from data: Data) -> Any? {
 		guard let object = try? JSONSerialization.jsonObject(with: data), JSONSerialization.isValidJSONObject(object) else {
 			return nil
 		}
