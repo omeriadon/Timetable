@@ -279,7 +279,7 @@ enum ProfilePictureVisuals {
 		}.value
 	}
 
-	private struct PaletteBin: Hashable, Sendable {
+	private nonisolated struct PaletteBin: Hashable, Sendable {
 		let red: Int
 		let green: Int
 		let blue: Int
