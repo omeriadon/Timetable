@@ -74,8 +74,9 @@ struct AccountView: View {
 						badges: profile.badges,
 						accessibilityName: profile.displayName
 					)
-					Label("Edit Profile", systemImage: "pencil")
+					Text("Edit Profile")
 				}
+				.foregroundStyle(.accent)
 			}
 			.matchedTransitionSource(id: "account-profile-editor", in: profileNamespace)
 			#if os(iOS)

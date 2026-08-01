@@ -114,6 +114,7 @@ final class AdministrationService {
 		)
 	}
 
+	@discardableResult
 	func updateSpecialBadge(
 		id: UUID,
 		request: AdministrationSpecialBadgeRequest

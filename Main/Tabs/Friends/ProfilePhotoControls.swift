@@ -14,6 +14,7 @@
 					Label(hasCurrentPhoto ? "Replace Photo" : "Choose Photo", systemImage: "photo.on.rectangle")
 				}
 				.buttonStyle(.glass)
+				.buttonSizing(.flexible)
 
 				if hasCurrentPhoto {
 					Button("Remove Photo", systemImage: "trash", role: .destructive, action: remove)
@@ -30,6 +31,7 @@
 						EmptyView()
 				}
 			}
+			.padding(.bottom)
 		}
 	}
 #endif

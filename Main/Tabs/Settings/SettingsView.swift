@@ -81,7 +81,11 @@ import WidgetKit
 				NavigationLink {
 					AccountView()
 				} label: {
-					Label(userDisplayName, systemImage: "person.crop.circle")
+					Label {
+						Text("userDisplayName")
+					} icon: {
+						ProfilePicture(appearance: .default, accessibilityName: "Profile Picture")
+					}
 				}
 			}
 

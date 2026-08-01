@@ -17,8 +17,6 @@ struct FriendDetailView: View {
 		NavigationStack {
 			ScrollView {
 				VStack(alignment: .leading, spacing: 20) {
-					FriendDetailHeader(friend: friend.friend)
-
 					TabsPicker(
 						items: FriendDetailTab.allCases.map { ($0.title, $0.symbol) },
 						selection: Binding(
@@ -75,7 +73,6 @@ struct FriendDetailView: View {
 							.font(.largeTitle)
 							.bold()
 							.monospaced()
-							.foregroundStyle(.accent)
 					}
 				}
 				.sharedBackgroundVisibility(.hidden)
@@ -87,7 +84,7 @@ struct FriendDetailView: View {
 				}
 
 				ToolbarItem(placement: .principal) {
-					HStack {
+					HStack(spacing: 15) {
 						ProfilePicture(
 							appearance: .default,
 							photo: friend.friend.photo,

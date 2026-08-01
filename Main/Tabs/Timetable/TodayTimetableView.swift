@@ -396,7 +396,7 @@ private struct TodaySchoolTimeline: View {
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.frame(height: 15)
 			.glassEffect(.regular.tint(.red), in: CurrentTimeMarkerShape())
-			.padding(.horizontal, -1)
+			.padding(.horizontal, -3)
 			.accessibilityLabel("Current time")
 	}
 

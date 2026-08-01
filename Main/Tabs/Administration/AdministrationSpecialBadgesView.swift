@@ -169,7 +169,11 @@ struct AdministrationSpecialBadgesView: View {
 						)
 					)
 				} else {
-					try? await service.updateSpecialBadge(id: badge.id, request: request)
+					do {
+						try await service.updateSpecialBadge(id: badge.id, request: request)
+					} catch {
+						statusBadges.addBadge(id: UUID(), title: "Unable to update badge", secondaryText: error.localizedDescription, priority: 3, view: .error)
+					}
 				}
 			}
 
