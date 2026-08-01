@@ -19,6 +19,7 @@
 				if hasCurrentPhoto {
 					Button("Remove Photo", systemImage: "trash", role: .destructive, action: remove)
 						.buttonStyle(.glass)
+						.buttonSizing(.flexible)
 				}
 
 				switch state {
@@ -31,7 +32,6 @@
 						EmptyView()
 				}
 			}
-			.padding(.bottom, 10)
 			.padding(.horizontal, 8)
 		}
 	}
