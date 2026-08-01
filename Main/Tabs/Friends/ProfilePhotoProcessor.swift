@@ -71,12 +71,10 @@
 					throw ProfilePhotoSelectionError.encodingFailed
 				}
 				let resized = UIImage(cgImage: resizedImage)
-				for quality in stride(from: 0.9, through: 0.2, by: -0.1) {
-					if let data = resized.jpegData(compressionQuality: quality), data.count <= 1_000_000 {
-						return data
-					}
+				guard let data = resized.jpegData(compressionQuality: 0.9) else {
+					throw ProfilePhotoSelectionError.encodingFailed
 				}
-				throw ProfilePhotoSelectionError.imageTooLarge
+				return data
 			}.value
 		}
 	}
