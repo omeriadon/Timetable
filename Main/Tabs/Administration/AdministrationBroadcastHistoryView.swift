@@ -9,8 +9,7 @@ struct AdministrationBroadcastHistoryView: View {
 		List(records) { record in
 			NavigationLink {
 				AdministrationBroadcastHistoryDetailView(
-					record: record,
-					delete: delete
+					record: record
 				)
 			} label: {
 				Label {
@@ -43,30 +42,20 @@ struct AdministrationBroadcastHistoryView: View {
 		}
 	}
 
-	private func delete(_ record: BroadcastNotificationHistoryResponse) async throws -> BroadcastNotificationHistoryResponse {
-		let updated = try await service.deleteBroadcastNotification(id: record.id)
-		if let index = records.firstIndex(where: { $0.id == updated.id }) {
-			records[index] = updated
-		}
-		return updated
-	}
 }
 
 private struct AdministrationBroadcastHistoryDetailView: View {
 	let record: BroadcastNotificationHistoryResponse
-	let delete: (BroadcastNotificationHistoryResponse) async throws -> BroadcastNotificationHistoryResponse
 
-	@Environment(\.dismiss) private var dismiss
+	@State private var service = AdministrationService.shared
 	@Environment(\.statusBadgeManager) private var badges
 	@State private var showsDeleteConfirmation = false
 	@State private var currentRecord: BroadcastNotificationHistoryResponse
 
 	init(
-		record: BroadcastNotificationHistoryResponse,
-		delete: @escaping (BroadcastNotificationHistoryResponse) async throws -> BroadcastNotificationHistoryResponse
+		record: BroadcastNotificationHistoryResponse
 	) {
 		self.record = record
-		self.delete = delete
 		_currentRecord = State(initialValue: record)
 	}
 
@@ -90,7 +79,7 @@ private struct AdministrationBroadcastHistoryDetailView: View {
 			}
 		}
 		.appNavigationTitle(currentRecord.isDeleted ? "Deleted Broadcast" : "Broadcast", accent: true)
-		toolbar {
+		.toolbar {
 			ToolbarItem(placement: .bottomBar) {
 				if !currentRecord.isDeleted {
 					Button("Delete Notification", systemImage: "trash", role: .destructive) {
@@ -105,7 +94,7 @@ private struct AdministrationBroadcastHistoryDetailView: View {
 			Button("Delete Notification", systemImage: "trash", role: .destructive) {
 				Task {
 					do {
-						currentRecord = try await delete(currentRecord)
+						currentRecord = try await service.deleteBroadcastNotification(id: currentRecord.id)
 					} catch {
 						badges.present(error: error, title: "Unable to delete notification")
 					}

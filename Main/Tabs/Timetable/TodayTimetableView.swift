@@ -5,6 +5,7 @@ struct TodayTimetableView: View {
 	let subjects: [Subject]
 	@Default(.schoolCalendar) private var schoolCalendar
 	@Default(.calendarEvents) private var calendarEvents
+	@State private var expandedPeriodNumber: Int?
 
 	var body: some View {
 		TimelineView(.periodic(from: .now, by: 1)) { context in
@@ -65,7 +66,12 @@ struct TodayTimetableView: View {
 					}
 
 					if let dayIndex = schoolCalendar.dayIndex(for: now), schoolCalendar.isSchoolDay(now), !subjects.isEmpty {
-						TodaySchoolTimeline(subjects: subjects, dayIndex: dayIndex, now: now)
+						TodaySchoolTimeline(
+							subjects: subjects,
+							dayIndex: dayIndex,
+							now: now,
+							expandedPeriodNumber: $expandedPeriodNumber
+						)
 					} else if schoolEvents.isEmpty, personalEvents.isEmpty, upcomingEvents.isEmpty, noSchoolDay == nil {
 						TodayCountdown(subjects: subjects, schoolCalendar: schoolCalendar, now: now)
 					}
@@ -230,6 +236,7 @@ private struct TodaySchoolTimeline: View {
 	let subjects: [Subject]
 	let dayIndex: Int
 	let now: Date
+	@Binding var expandedPeriodNumber: Int?
 	private let minuteHeight: CGFloat = 1.35
 	private let outerCornerRadius = TodayCardLayout.outerCornerRadius
 	private let periodCornerRadius = TodayCardLayout.innerCornerRadius
@@ -242,8 +249,6 @@ private struct TodaySchoolTimeline: View {
 	private var periods: [SchoolPeriod] {
 		SchoolStateEngine.activePeriods(for: dayIndex)
 	}
-
-	@State private var expandedPeriodNumber: Int?
 
 	private var dayEnd: TimeOfDay {
 		SchoolStateEngine.schoolEnd(for: dayIndex)
