@@ -46,6 +46,9 @@ struct AdministrationDevelopmentAccessView: View {
 		}
 		.scrollEdgeEffect()
 		.appNavigationTitle("Debug Testing", accent: true)
+		.task {
+			await load()
+		}
 		.refreshable {
 			await load()
 		}
