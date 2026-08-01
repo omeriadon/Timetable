@@ -18,7 +18,8 @@ struct TodayTimetableView: View {
 					Text(now.formatted(.dateTime.weekday(.wide).day().month(.wide).hour(.defaultDigits(amPM: .wide)).minute(.defaultDigits).second(.defaultDigits)))
 						.contentTransition(.numericText())
 						.animation(.easeInOut, value: now)
-						.padding(.horizontal, 10)
+						.frame(maxWidth: .infinity, alignment: .center)
+						.multilineTextAlignment(.center)
 						.lineLimit(1)
 						.font(.system(size: 200))
 						.minimumScaleFactor(0.01)
@@ -208,10 +209,12 @@ private struct TodayCountdown: View {
 				Text("Next: \(next.subject.id)")
 			}
 			.frame(maxWidth: .infinity, alignment: .center)
+			.foregroundStyle(.white)
 			.padding(.top, 40)
 
 		} else {
 			ContentUnavailableView("Nothing Scheduled", systemImage: "calendar")
+				.foregroundStyle(.white)
 				.padding(.top, 40)
 		}
 	}

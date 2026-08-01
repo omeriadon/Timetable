@@ -24,11 +24,11 @@ struct SymbolPickerSheet: View {
 				autoDismiss: true
 			)
 		#else
-			Form {
-				TextField("SF Symbol name", text: selectedSymbolBinding)
-				Label("Preview", systemImage: selectedSymbolBinding.wrappedValue)
-			}
-			.padding()
+			ContentUnavailableView(
+				"Symbol Picker Unavailable",
+				systemImage: selectedSymbolBinding.wrappedValue,
+				description: Text("SF Symbols can be selected on iPhone and iPad.")
+			)
 		#endif
 	}
 

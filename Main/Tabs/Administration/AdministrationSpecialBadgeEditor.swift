@@ -16,6 +16,7 @@ struct AdministrationSpecialBadgeEditor: View {
 	@State private var selectedUserIDs: Set<UUID>
 	@State private var isSaving = false
 	@State private var showsDeleteConfirmation = false
+	@State private var showsSymbolPicker = false
 
 	init(
 		target: AdministrationSpecialBadgeEditorTarget,
@@ -36,30 +37,38 @@ struct AdministrationSpecialBadgeEditor: View {
 		_selectedUserIDs = State(initialValue: Set(badge?.assignedUserIDs ?? []))
 	}
 
+	private var isBuiltIn: Bool {
+		target.badge.map { BuiltInProfileBadgeConfiguration.authority(for: $0.id) != nil } ?? false
+	}
+
 	var body: some View {
 		NavigationStack {
 			Form {
 				Section("Badge") {
-					TextField("SF Symbol", text: $symbol)
-						.textInputAutocapitalization(.never)
-						.autocorrectionDisabled()
+					Button {
+						showsSymbolPicker = true
+					} label: {
+						Label("Symbol", systemImage: symbol)
+					}
 					TextField("Accessibility Label", text: $accessibilityLabel)
 					Stepper("Priority: \(priority)", value: $priority, in: 0 ... 10000)
 					ColorPicker("Background", selection: $backgroundColor, supportsOpacity: true)
 					ColorPicker("Symbol", selection: $symbolColor, supportsOpacity: true)
 				}
 
-				Section {
-					NavigationLink {
-						AdministrationSpecialBadgeUsersView(
-							users: users,
-							selectedUserIDs: $selectedUserIDs
-						)
-					} label: {
-						Label("Users (\(selectedUserIDs.count))", systemImage: "person.2")
+				if !isBuiltIn {
+					Section {
+						NavigationLink {
+							AdministrationSpecialBadgeUsersView(
+								users: users,
+								selectedUserIDs: $selectedUserIDs
+							)
+						} label: {
+							Label("Users (\(selectedUserIDs.count))", systemImage: "person.2")
+						}
+					} footer: {
+						Text("Selected users receive this badge when the badge is saved. Deselect a user to remove it.")
 					}
-				} footer: {
-					Text("Selected users receive this badge when the badge is saved. Deselect a user to remove it.")
 				}
 			}
 			.appNavigationTitle(target.badge == nil ? "New Badge" : "Edit Badge", accent: true)
@@ -81,7 +90,7 @@ struct AdministrationSpecialBadgeEditor: View {
 				}
 			}
 			.safeAreaBar(edge: .bottom) {
-				if let badge = target.badge {
+				if let badge = target.badge, !isBuiltIn {
 					Button("Delete Badge", systemImage: "trash", role: .destructive) {
 						showsDeleteConfirmation = true
 					}
@@ -90,7 +99,10 @@ struct AdministrationSpecialBadgeEditor: View {
 				}
 			}
 		}
-		.presentationDetents([.fraction(0.7), .large])
+		.presentationDetents([.large])
+		.sheet(isPresented: $showsSymbolPicker) {
+			AdministrationEventSymbolPicker(symbol: $symbol)
+		}
 		.confirmationDialog("Delete Badge?", isPresented: $showsDeleteConfirmation, titleVisibility: .visible) {
 			if let badge = target.badge {
 				Button("Delete Badge", systemImage: "trash", role: .destructive) {

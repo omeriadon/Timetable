@@ -46,7 +46,9 @@ nonisolated struct UserProfileResponse: Codable {
 		authority = try container.decodeIfPresent(AccountAuthority.self, forKey: .authority) ?? .user
 		appearance = try container.decodeIfPresent(ProfileAppearance.self, forKey: .appearance) ?? .default
 		photo = try container.decodeIfPresent(ProfilePhotoMetadata.self, forKey: .photo)
-		badges = try container.decodeIfPresent([ProfileBadge].self, forKey: .badges) ?? []
+		let serverBadges = try container.decodeIfPresent([ProfileBadge].self, forKey: .badges) ?? []
+		let authorityBadge = BuiltInProfileBadgeConfiguration.badge(for: authority).map { [$0] } ?? []
+		badges = serverBadges.filter { BuiltInProfileBadgeConfiguration.authority(for: $0.id) == nil } + authorityBadge
 		revision = try container.decodeIfPresent(Int.self, forKey: .revision) ?? 0
 	}
 }
@@ -227,7 +229,9 @@ nonisolated struct AdministrationUserResponse: Codable, Identifiable, Sendable, 
 		authority = try container.decodeIfPresent(AccountAuthority.self, forKey: .authority) ?? .user
 		appearance = try container.decodeIfPresent(ProfileAppearance.self, forKey: .appearance) ?? .default
 		photo = try container.decodeIfPresent(ProfilePhotoMetadata.self, forKey: .photo)
-		badges = try container.decodeIfPresent([ProfileBadge].self, forKey: .badges) ?? []
+		let serverBadges = try container.decodeIfPresent([ProfileBadge].self, forKey: .badges) ?? []
+		let authorityBadge = BuiltInProfileBadgeConfiguration.badge(for: authority).map { [$0] } ?? []
+		badges = serverBadges.filter { BuiltInProfileBadgeConfiguration.authority(for: $0.id) == nil } + authorityBadge
 	}
 }
 
@@ -416,8 +420,44 @@ nonisolated struct BroadcastNotificationHistoryResponse: Codable, Identifiable, 
 	let invalidatedDeviceCount: Int
 	let failedDeviceCount: Int
 	let deliveryState: BroadcastNotificationDeliveryState
+	let isDeleted: Bool
 	let failureSummary: String?
 	let createdAt: Date?
+
+	private enum CodingKeys: String, CodingKey {
+		case id
+		case senderEmail
+		case senderAuthority
+		case title
+		case subtitle
+		case body
+		case eligibleDeviceCount
+		case deliveredDeviceCount
+		case invalidatedDeviceCount
+		case failedDeviceCount
+		case deliveryState
+		case isDeleted
+		case failureSummary
+		case createdAt
+	}
+
+	init(from decoder: any Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		id = try container.decode(UUID.self, forKey: .id)
+		senderEmail = try container.decode(String.self, forKey: .senderEmail)
+		senderAuthority = try container.decode(AccountAuthority.self, forKey: .senderAuthority)
+		title = try container.decode(String.self, forKey: .title)
+		subtitle = try container.decodeIfPresent(String.self, forKey: .subtitle)
+		body = try container.decodeIfPresent(String.self, forKey: .body)
+		eligibleDeviceCount = try container.decode(Int.self, forKey: .eligibleDeviceCount)
+		deliveredDeviceCount = try container.decode(Int.self, forKey: .deliveredDeviceCount)
+		invalidatedDeviceCount = try container.decode(Int.self, forKey: .invalidatedDeviceCount)
+		failedDeviceCount = try container.decode(Int.self, forKey: .failedDeviceCount)
+		deliveryState = try container.decode(BroadcastNotificationDeliveryState.self, forKey: .deliveryState)
+		isDeleted = try container.decodeIfPresent(Bool.self, forKey: .isDeleted) ?? false
+		failureSummary = try container.decodeIfPresent(String.self, forKey: .failureSummary)
+		createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt)
+	}
 }
 
 nonisolated struct NotificationSettingsUpdateRequest: Codable, Sendable {

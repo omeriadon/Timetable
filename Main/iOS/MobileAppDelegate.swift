@@ -43,6 +43,14 @@
 			PrintError("APNs registration failed", category: .network, error: error)
 		}
 
+		func application(
+			_: UIApplication,
+			didReceiveRemoteNotification userInfo: [AnyHashable: Any]
+		) async -> UIBackgroundFetchResult {
+			await BroadcastNotificationCleanup.removeDeliveredNotification(for: userInfo)
+			return .newData
+		}
+
 		func userNotificationCenter(
 			_: UNUserNotificationCenter,
 			willPresent _: UNNotification

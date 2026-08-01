@@ -16,11 +16,11 @@ struct AdministrationEventSymbolPicker: View {
 				autoDismiss: true
 			)
 		#else
-			Form {
-				TextField("SF Symbol Name", text: $symbol)
-				Label("Preview", systemImage: symbol)
-			}
-			.padding()
+			ContentUnavailableView(
+				"Symbol Picker Unavailable",
+				systemImage: symbol,
+				description: Text("SF Symbols can be selected on iPhone and iPad.")
+			)
 		#endif
 	}
 }

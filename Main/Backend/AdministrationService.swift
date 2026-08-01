@@ -89,6 +89,13 @@ final class AdministrationService {
 		try await networkManager.send(.v1AdministrationBroadcastNotifications)
 	}
 
+	func deleteBroadcastNotification(id: UUID) async throws -> BroadcastNotificationHistoryResponse {
+		try await networkManager.send(
+			Endpoint("/v1/administration/broadcast-notifications/\(id.uuidString)", method: .delete),
+			context: .userInitiated
+		)
+	}
+
 	func profileStorageQuota() async throws -> ProfileStorageQuotaResponse {
 		try await networkManager.send(.v1AdministrationProfileStorageQuota)
 	}

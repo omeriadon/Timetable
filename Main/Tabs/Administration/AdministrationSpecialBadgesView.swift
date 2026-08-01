@@ -10,7 +10,7 @@ struct AdministrationSpecialBadgesView: View {
 
 	var body: some View {
 		List {
-			ForEach(badges) { badge in
+			ForEach(displayedBadges) { badge in
 				Button {
 					editor = .edit(badge)
 				} label: {
@@ -78,12 +78,37 @@ struct AdministrationSpecialBadgesView: View {
 		"special-badge-\(badge.id.uuidString)"
 	}
 
+	private var displayedBadges: [AdministrationSpecialBadgeResponse] {
+		[
+			administrationBadge(for: .systemOwner),
+			administrationBadge(for: .administrator)
+		] + badges
+	}
+
+	private func administrationBadge(for authority: AccountAuthority) -> AdministrationSpecialBadgeResponse {
+		let badge = BuiltInProfileBadgeConfiguration.badge(for: authority)!
+		return AdministrationSpecialBadgeResponse(
+			id: badge.id,
+			symbol: badge.symbol,
+			backgroundColor: badge.backgroundColor,
+			symbolColor: badge.symbolColor,
+			priority: badge.priority,
+			accessibilityLabel: badge.accessibilityLabel,
+			assignedUserIDs: []
+		)
+	}
+
 	private func load() async {
 		do {
 			badges = try await service.specialBadges()
-			users = try await service.users()
 		} catch {
 			statusBadges.present(error: error, title: "Unable to load special badges")
+		}
+
+		do {
+			users = try await service.users()
+		} catch {
+			statusBadges.present(error: error, title: "Unable to load badge users")
 		}
 	}
 
@@ -92,6 +117,20 @@ struct AdministrationSpecialBadgesView: View {
 		id: UUID?,
 		userIDs: Set<UUID>
 	) async throws -> AdministrationSpecialBadgeResponse {
+		if let id, let builtInAuthority = BuiltInProfileBadgeConfiguration.authority(for: id) {
+			BuiltInProfileBadgeConfiguration.update(
+				ProfileBadge(
+					id: id,
+					symbol: request.symbol,
+					backgroundColor: request.backgroundColor,
+					symbolColor: request.symbolColor,
+					priority: request.priority,
+					accessibilityLabel: request.accessibilityLabel
+				)
+			)
+			return administrationBadge(for: builtInAuthority)
+		}
+
 		let savedBadge = if let id {
 			try await service.updateSpecialBadge(id: id, request: request)
 		} else {

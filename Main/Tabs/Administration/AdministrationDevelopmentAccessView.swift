@@ -9,14 +9,18 @@ struct AdministrationDevelopmentAccessView: View {
 	var body: some View {
 		Form {
 			Section {
-				Toggle(
-					"Restrict Server to Owners",
-					isOn: Binding(
-						get: { developmentAccessOnly ?? false },
-						set: { pendingDevelopmentAccessOnly = $0 }
+				if let developmentAccessOnly {
+					Toggle(
+						"Restrict Server to Owners",
+						isOn: Binding(
+							get: { developmentAccessOnly },
+							set: { pendingDevelopmentAccessOnly = $0 }
+						)
 					)
-				)
-				.disabled(developmentAccessOnly == nil || isUpdating)
+					.disabled(isUpdating)
+				} else {
+					ProgressView("Loading Server Access")
+				}
 			} header: {
 				Text("Development Access")
 			} footer: {

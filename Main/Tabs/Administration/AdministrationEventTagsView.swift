@@ -8,69 +8,13 @@ struct AdministrationEventTagsView: View {
 	@Namespace private var editorNamespace
 
 	var body: some View {
-		List {
-			ForEach(catalogue.sections) { section in
-				DisclosureGroup {
-					ForEach(section.tags) { tag in
-						Button {
-							editor = .tag(tag, section: section)
-						} label: {
-							Label {
-								VStack(alignment: .leading, spacing: 4) {
-									Text(tag.displayName)
-										.foregroundStyle(.primary)
-									Text(tag.slug)
-										.font(.footnote.monospaced())
-										.foregroundStyle(.secondary)
-								}
-							} icon: {
-								Image(systemName: tag.symbol ?? "tag")
-							}
-							.padding(.vertical, 4)
-						}
-						.buttonStyle(.plain)
-						.opacity(tag.isArchived ? 0.55 : 1)
-						.matchedTransitionSource(
-							id: AdministrationEventTagEditorTarget.tag(tag, section: section).id,
-							in: editorNamespace
-						)
-					}
-
-					if section.category != .yearGroup {
-						Button("Add Tag", systemImage: "plus") {
-							editor = .newTag(section)
-						}
-						.matchedTransitionSource(
-							id: AdministrationEventTagEditorTarget.newTag(section).id,
-							in: editorNamespace
-						)
-					}
-				} label: {
-					HStack(spacing: 12) {
-						Label {
-							VStack(alignment: .leading, spacing: 4) {
-								Text(section.displayName)
-								Text(section.category.displayName)
-									.font(.footnote)
-									.foregroundStyle(.secondary)
-							}
-						} icon: {
-							Image(systemName: section.isArchived ? "archivebox" : "folder")
-								.foregroundStyle(.accent)
-						}
-						Spacer()
-						Button("Edit Section", systemImage: "slider.horizontal.3") {
-							editor = .section(section)
-						}
-						.labelStyle(.iconOnly)
-						.buttonStyle(.borderless)
-						.matchedTransitionSource(
-							id: AdministrationEventTagEditorTarget.section(section).id,
-							in: editorNamespace
-						)
-					}
+		ScrollView {
+			LazyVStack(alignment: .leading, spacing: 22) {
+				ForEach(catalogue.sections) { section in
+					sectionView(section)
+						.opacity(section.isArchived ? 0.55 : 1)
 				}
-				.opacity(section.isArchived ? 0.55 : 1)
+				.padding()
 			}
 		}
 		.scrollEdgeEffect()
@@ -113,6 +57,75 @@ struct AdministrationEventTagsView: View {
 		}
 	}
 
+	@ViewBuilder
+	private func sectionView(_ section: AdministrationEventTagSection) -> some View {
+		VStack(alignment: .leading, spacing: 12) {
+			HStack(spacing: 12) {
+				Label {
+					VStack(alignment: .leading, spacing: 4) {
+						Text(section.displayName)
+						Text(section.category.displayName)
+							.font(.footnote)
+							.foregroundStyle(.secondary)
+					}
+				} icon: {
+					Image(systemName: section.isArchived ? "archivebox" : "folder")
+						.foregroundStyle(.accent)
+				}
+
+				Spacer()
+
+				Button("Edit Section", systemImage: "slider.horizontal.3") {
+					editor = .section(section)
+				}
+				.padding(.trailing, 40)
+				.labelStyle(.iconOnly)
+				.buttonStyle(.borderless)
+				.foregroundStyle(.white)
+				.matchedTransitionSource(
+					id: AdministrationEventTagEditorTarget.section(section).id,
+					in: editorNamespace
+				)
+			}
+
+			WrappingHStack(spacing: 8, lineSpacing: 8) {
+				ForEach(section.tags) { tag in
+					Button {
+						editor = .tag(tag, section: section)
+					} label: {
+						Label(tag.displayName, systemImage: tag.symbol ?? "tag")
+							.padding(.horizontal, 12)
+							.padding(.vertical, 8)
+							.background(.thinMaterial, in: Capsule())
+							.overlay {
+								Capsule()
+									.stroke(.white.opacity(0.5), lineWidth: 0.5)
+							}
+					}
+					.buttonStyle(.plain)
+					.foregroundStyle(.white)
+					.opacity(tag.isArchived ? 0.55 : 1)
+					.matchedTransitionSource(
+						id: AdministrationEventTagEditorTarget.tag(tag, section: section).id,
+						in: editorNamespace
+					)
+				}
+
+				if section.category != .yearGroup {
+					Button("Add Tag", systemImage: "plus") {
+						editor = .newTag(section)
+					}
+					.buttonStyle(.bordered)
+					.foregroundStyle(.white)
+					.matchedTransitionSource(
+						id: AdministrationEventTagEditorTarget.newTag(section).id,
+						in: editorNamespace
+					)
+				}
+			}
+		}
+	}
+
 	private func load() async {
 		do {
 			catalogue = try await service.eventTags()
@@ -137,6 +150,76 @@ struct AdministrationEventTagsView: View {
 		existingID: UUID
 	) async throws {
 		catalogue = try await service.updateEventTagSection(id: existingID, request: request)
+	}
+}
+
+private struct WrappingHStack: Layout {
+	let spacing: CGFloat
+	let lineSpacing: CGFloat
+
+	func sizeThatFits(
+		proposed proposal: ProposedViewSize,
+		subviews: Subviews,
+		cache: inout Cache
+	) -> CGSize {
+		layoutResult(proposal: proposal, subviews: subviews).size
+	}
+
+	func placeSubviews(
+		in bounds: CGRect,
+		proposed _: ProposedViewSize,
+		subviews: Subviews,
+		cache: inout Cache
+	) {
+		let result = layoutResult(
+			proposal: ProposedViewSize(width: bounds.width, height: bounds.height),
+			subviews: subviews
+		)
+
+		for (index, point) in result.positions.enumerated() {
+			subviews[index].place(
+				at: CGPoint(x: bounds.minX + point.x, y: bounds.minY + point.y),
+				anchor: .topLeading,
+				proposal: ProposedViewSize(result.sizes[index])
+			)
+		}
+	}
+
+	private func layoutResult(proposal: ProposedViewSize, subviews: Subviews) -> LayoutResult {
+		let availableWidth = proposal.width ?? .infinity
+		var positions: [CGPoint] = []
+		var sizes: [CGSize] = []
+		var currentX: CGFloat = 0
+		var currentY: CGFloat = 0
+		var lineHeight: CGFloat = 0
+		var contentWidth: CGFloat = 0
+
+		for subview in subviews {
+			let size = subview.sizeThatFits(ProposedViewSize(width: availableWidth, height: nil))
+			if currentX > 0, currentX + size.width > availableWidth {
+				currentX = 0
+				currentY += lineHeight + lineSpacing
+				lineHeight = 0
+			}
+
+			positions.append(CGPoint(x: currentX, y: currentY))
+			sizes.append(size)
+			currentX += size.width + spacing
+			lineHeight = max(lineHeight, size.height)
+			contentWidth = max(contentWidth, currentX - spacing)
+		}
+
+		return LayoutResult(
+			size: CGSize(width: min(contentWidth, availableWidth), height: currentY + lineHeight),
+			positions: positions,
+			sizes: sizes
+		)
+	}
+
+	private struct LayoutResult {
+		let size: CGSize
+		let positions: [CGPoint]
+		let sizes: [CGSize]
 	}
 }
 

@@ -18,26 +18,30 @@ struct DatesView: View {
 
 	var body: some View {
 		ScrollView {
-			LazyVStack(alignment: .leading, spacing: 16) {
-				Text("Upcoming")
-					.font(.title.bold())
-
-				if timelineEntries.isEmpty {
-					ContentUnavailableView(
-						"No Upcoming Events",
-						systemImage: "calendar",
-						description: Text("Add a personal event or wait for the school calendar to update.")
-					)
-					.frame(maxWidth: .infinity)
-					.padding(.vertical, 36)
-				} else {
-					ForEach(timelineEntries) { entry in
-						animatedScrollCard(timelineEntry(entry))
+			LazyVStack(alignment: .leading, spacing: 16, pinnedViews: [.sectionHeaders]) {
+				Section {
+					if timelineEntries.isEmpty {
+						ContentUnavailableView(
+							"No Upcoming Events",
+							systemImage: "calendar",
+							description: Text("Add a personal event or wait for the school calendar to update.")
+						)
+						.frame(maxWidth: .infinity)
+						.padding(.vertical, 36)
+					} else {
+						ForEach(timelineEntries) { entry in
+							animatedScrollCard(timelineEntry(entry))
+						}
 					}
+				} header: {
+					plannerSectionHeader("Upcoming")
 				}
 
-				termDates
-					.zIndex(0)
+				Section {
+					termDateCards
+				} header: {
+					plannerSectionHeader("Term Dates")
+				}
 			}
 			.padding()
 		}
@@ -116,20 +120,22 @@ struct DatesView: View {
 		.navigationTransition(.zoom(sourceID: transitionID, in: eventEditorNamespace))
 	}
 
-	private var termDates: some View {
-		VStack(alignment: .leading, spacing: 12) {
-			Text("Term Dates")
-				.font(.title2.bold())
-
-			ForEach(Array(schoolCalendar.termRanges.enumerated()), id: \.offset) { _, range in
-				if range.intersects(dateWindow) {
-					animatedScrollCard(
-						timelineEntryContent(PlannerTimelineEntry(termRange: range))
-					)
-				}
+	private var termDateCards: some View {
+		ForEach(Array(schoolCalendar.termRanges.enumerated()), id: \.offset) { _, range in
+			if range.intersects(dateWindow) {
+				animatedScrollCard(
+					timelineEntryContent(PlannerTimelineEntry(termRange: range))
+				)
 			}
 		}
-		.padding(.top, 20)
+	}
+
+	private func plannerSectionHeader(_ title: String) -> some View {
+		Text(title)
+			.font(.title.bold())
+			.frame(maxWidth: .infinity, alignment: .leading)
+			.padding(.vertical, 6)
+			.background(.ultraThinMaterial)
 	}
 
 	@ViewBuilder
@@ -578,7 +584,11 @@ private struct CalendarEventSymbolPicker: View {
 		#if os(iOS)
 			SymbolsPicker(selection: $symbol, title: "", searchLabel: "Search symbols...", autoDismiss: true)
 		#else
-			Form { TextField("SF Symbol name", text: $symbol); Label("Preview", systemImage: symbol) }.padding()
+			ContentUnavailableView(
+				"Symbol Picker Unavailable",
+				systemImage: symbol,
+				description: Text("SF Symbols can be selected on iPhone and iPad.")
+			)
 		#endif
 	}
 }

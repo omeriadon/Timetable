@@ -92,6 +92,7 @@ struct AdministrationView: View {
 					)
 				}
 			}
+			.tint(.white)
 			.appNavigationTitle("Administration", style: .main, accent: true)
 			.task {
 				await load()

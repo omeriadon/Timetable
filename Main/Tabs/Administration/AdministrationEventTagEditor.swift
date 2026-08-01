@@ -1,3 +1,4 @@
+import Foundation
 import SwiftUI
 
 struct AdministrationEventTagEditor: View {
@@ -10,12 +11,13 @@ struct AdministrationEventTagEditor: View {
 	@State private var slug: String
 	@State private var displayName: String
 	@State private var symbol: String
-	@State private var colorHex: String
-	@State private var sortOrder: Int
+	@State private var colour: Color
+	private let sortOrder: Int
 	@State private var isArchived: Bool
 	@State private var associatedNames: String
 	@State private var isSaving = false
 	@State private var showsArchiveConfirmation = false
+	@State private var showsSymbolPicker = false
 
 	private var isCanonicalYearGroup: Bool {
 		tag?.category == .yearGroup
@@ -33,8 +35,8 @@ struct AdministrationEventTagEditor: View {
 		_slug = State(initialValue: tag?.slug ?? "")
 		_displayName = State(initialValue: tag?.displayName ?? "")
 		_symbol = State(initialValue: tag?.symbol ?? "")
-		_colorHex = State(initialValue: tag?.colorHex ?? "")
-		_sortOrder = State(initialValue: tag?.sortOrder ?? section.tags.count)
+		_colour = State(initialValue: RGBAColor(hexString: tag?.colorHex ?? "#6AA7FF").swiftUIColor)
+		sortOrder = tag?.sortOrder ?? section.tags.count
 		_isArchived = State(initialValue: tag?.isArchived ?? false)
 		_associatedNames = State(initialValue: tag?.associatedNames.joined(separator: "\n") ?? "")
 	}
@@ -48,13 +50,12 @@ struct AdministrationEventTagEditor: View {
 						.textInputAutocapitalization(.never)
 						.autocorrectionDisabled()
 						.disabled(isCanonicalYearGroup)
-					TextField("Symbol", text: $symbol)
-						.textInputAutocapitalization(.never)
-						.autocorrectionDisabled()
-					TextField("Colour Hex", text: $colorHex)
-						.textInputAutocapitalization(.never)
-						.autocorrectionDisabled()
-					Stepper("Sort Order: \(sortOrder)", value: $sortOrder)
+					Button {
+						showsSymbolPicker = true
+					} label: {
+						Label("Symbol", systemImage: symbol)
+					}
+					ColorPicker("Colour", selection: $colour, supportsOpacity: false)
 					Toggle("Archive Tag", isOn: $isArchived)
 						.disabled(isCanonicalYearGroup)
 				}
@@ -110,7 +111,10 @@ struct AdministrationEventTagEditor: View {
 				Text("Archived tags are removed from active selection and subscriptions.")
 			}
 		}
-		.presentationDetents([.fraction(0.7)])
+		.presentationDetents([.large])
+		.sheet(isPresented: $showsSymbolPicker) {
+			AdministrationEventSymbolPicker(symbol: $symbol)
+		}
 	}
 
 	private func saveTag() async {
@@ -124,7 +128,7 @@ struct AdministrationEventTagEditor: View {
 			slug: slug,
 			displayName: displayName,
 			symbol: symbol.nilIfBlank,
-			colorHex: colorHex.nilIfBlank,
+			colorHex: colour.toHexString,
 			sortOrder: sortOrder,
 			isArchived: isArchived,
 			associatedNames: associatedNames
@@ -138,6 +142,18 @@ struct AdministrationEventTagEditor: View {
 		} catch {
 			return
 		}
+	}
+}
+
+private extension Color {
+	var toHexString: String {
+		let rgba = toRGBA()
+		return String(
+			format: "#%02X%02X%02X",
+			Int(rgba.r * 255),
+			Int(rgba.g * 255),
+			Int(rgba.b * 255)
+		)
 	}
 }
 
