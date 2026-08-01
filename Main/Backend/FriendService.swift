@@ -52,8 +52,8 @@ final class FriendService {
 		try await task.value
 	}
 
-	func search(schoolEmail: String) async throws -> [FriendSearchResult] {
-		try await networkManager.send(.v1FriendSearch(schoolEmail: schoolEmail), context: .userInitiated)
+	func search(query: String) async throws -> [FriendSearchResult] {
+		try await networkManager.send(.v1FriendSearch(query: query), context: .userInitiated)
 	}
 
 	func sendRequest(to schoolEmail: String) async throws -> FriendSummary {
@@ -171,8 +171,8 @@ private extension Endpoint {
 	)
 	static let v1FriendProfilePhotoDelete = Endpoint("/v1/friends/profile/photo", method: .delete)
 
-	static func v1FriendSearch(schoolEmail: String) -> Endpoint {
-		Endpoint("/v1/friends/search", queryItems: [URLQueryItem(name: "q", value: schoolEmail)])
+	static func v1FriendSearch(query: String) -> Endpoint {
+		Endpoint("/v1/friends/search", queryItems: [URLQueryItem(name: "q", value: query)])
 	}
 
 	static func v1AcceptFriendRequest(_ relationshipID: UUID) -> Endpoint {

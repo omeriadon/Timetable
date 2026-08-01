@@ -158,15 +158,15 @@ struct FriendsView: View {
 	}
 
 	private func search(for value: String) async {
-		let schoolEmail = value.trimmingCharacters(in: .whitespacesAndNewlines)
-		guard schoolEmail.contains("@") else {
+		let query = value.trimmingCharacters(in: .whitespacesAndNewlines)
+		guard !query.isEmpty else {
 			searchResults = []
 			return
 		}
 		isSearching = true
 		defer { isSearching = false }
 		do {
-			searchResults = try await service.search(schoolEmail: schoolEmail)
+			searchResults = try await service.search(query: query)
 		} catch {
 			searchResults = []
 		}
