@@ -1,15 +1,11 @@
 import SwiftUI
 
 struct AdministrationEventTagSectionEditor: View {
-	let section: AdministrationEventTagSection?
-	let save: (
-		AdministrationEventTagSectionCreateRequest?,
-		AdministrationEventTagSectionUpdateRequest?,
-		UUID?
-	) async throws -> Void
+	let section: AdministrationEventTagSection
+	let save: (AdministrationEventTagSectionUpdateRequest, UUID) async throws -> Void
+	let saveTag: (AdministrationEventTagRequest, UUID?) async throws -> Void
 
 	@Environment(\.dismiss) private var dismiss
-	@State private var category: AdministrationEventTagCategory
 	@State private var displayName: String
 	@State private var sortOrder: Int
 	@State private var isArchived: Bool
@@ -17,19 +13,16 @@ struct AdministrationEventTagSectionEditor: View {
 	@State private var showsArchiveConfirmation = false
 
 	init(
-		section: AdministrationEventTagSection?,
-		save: @escaping (
-			AdministrationEventTagSectionCreateRequest?,
-			AdministrationEventTagSectionUpdateRequest?,
-			UUID?
-		) async throws -> Void
+		section: AdministrationEventTagSection,
+		save: @escaping (AdministrationEventTagSectionUpdateRequest, UUID) async throws -> Void,
+		saveTag: @escaping (AdministrationEventTagRequest, UUID?) async throws -> Void
 	) {
 		self.section = section
 		self.save = save
-		_category = State(initialValue: section?.category ?? .subject)
-		_displayName = State(initialValue: section?.displayName ?? "")
-		_sortOrder = State(initialValue: section?.sortOrder ?? 0)
-		_isArchived = State(initialValue: section?.isArchived ?? false)
+		self.saveTag = saveTag
+		_displayName = State(initialValue: section.displayName)
+		_sortOrder = State(initialValue: section.sortOrder)
+		_isArchived = State(initialValue: section.isArchived)
 	}
 
 	var body: some View {
@@ -37,20 +30,22 @@ struct AdministrationEventTagSectionEditor: View {
 			Form {
 				Section("Section") {
 					TextField("Display Name", text: $displayName)
-					Picker("Category", selection: $category) {
-						ForEach(AdministrationEventTagCategory.allCases) { category in
-							Text(category.displayName)
-								.tag(category)
-						}
-					}
-					.disabled(section != nil)
+					LabeledContent("Category", value: section.category.displayName)
 					Stepper("Sort Order: \(sortOrder)", value: $sortOrder)
 					Toggle("Archive Section", isOn: $isArchived)
-						.disabled(section == nil)
+
+					NavigationLink {
+						AdministrationEventTagSectionTagsView(
+							section: section,
+							save: saveTag
+						)
+					} label: {
+						Label("Tags", systemImage: "tag")
+					}
 				}
 			}
 			.scrollEdgeEffect()
-			.appNavigationTitle(section == nil ? "Add Section" : "Edit Section", accent: true)
+			.appNavigationTitle("Edit Section", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {
@@ -60,7 +55,7 @@ struct AdministrationEventTagSectionEditor: View {
 
 				ToolbarItem(placement: .confirmationAction) {
 					Button("Save", systemImage: "checkmark", role: .confirm) {
-						if section?.isArchived == false, isArchived {
+						if !section.isArchived, isArchived {
 							showsArchiveConfirmation = true
 						} else {
 							Task {
@@ -96,27 +91,14 @@ struct AdministrationEventTagSectionEditor: View {
 		}
 
 		do {
-			if let section {
-				try await save(
-					nil,
-					AdministrationEventTagSectionUpdateRequest(
-						displayName: displayName,
-						sortOrder: sortOrder,
-						isArchived: isArchived
-					),
-					section.id
-				)
-			} else {
-				try await save(
-					AdministrationEventTagSectionCreateRequest(
-						category: category,
-						displayName: displayName,
-						sortOrder: sortOrder
-					),
-					nil,
-					nil
-				)
-			}
+			try await save(
+				AdministrationEventTagSectionUpdateRequest(
+					displayName: displayName,
+					sortOrder: sortOrder,
+					isArchived: isArchived
+				),
+				section.id
+			)
 			dismiss()
 		} catch {
 			return

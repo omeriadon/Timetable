@@ -235,6 +235,28 @@ nonisolated struct AdministrationUserAuthorityUpdateRequest: Codable, Sendable {
 	let authority: AccountAuthority
 }
 
+nonisolated struct AdministrationSpecialBadgeResponse: Codable, Identifiable, Sendable, Equatable {
+	let id: UUID
+	let symbol: String
+	let backgroundColor: RGBAColor?
+	let symbolColor: RGBAColor?
+	let priority: Int
+	let accessibilityLabel: String
+	let assignedUserIDs: [UUID]
+}
+
+nonisolated struct AdministrationSpecialBadgeRequest: Codable, Sendable {
+	let symbol: String
+	let backgroundColor: RGBAColor?
+	let symbolColor: RGBAColor?
+	let priority: Int
+	let accessibilityLabel: String
+}
+
+nonisolated struct AdministrationSpecialBadgeAssignmentsRequest: Codable, Sendable {
+	let userIDs: [UUID]
+}
+
 nonisolated struct ServerAccessModeUpdateRequest: Codable, Sendable {
 	let developmentAccessOnly: Bool
 }

@@ -8,36 +8,52 @@ struct EventTagSelector: View {
 	var body: some View {
 		ForEach(sections) { section in
 			if allowsYearGroups || section.category != .yearGroup {
-				Section(section.displayName) {
-					TagFlowLayout(spacing: 8) {
-						ForEach(section.tags) { tag in
-							Button {
-								toggle(tag, in: section)
-							} label: {
-								Label(tag.displayName, systemImage: tag.symbol ?? "tag")
-									.font(.subheadline.weight(.medium))
-									.padding(.horizontal, 10)
-									.padding(.vertical, 7)
-									.background {
-										Capsule()
-											.fill(selectedTagIDs.contains(tag.id) ? Color.accentColor.opacity(0.22) : Color.secondary.opacity(0.12))
-									}
-									.overlay {
-										Capsule()
-											.stroke(selectedTagIDs.contains(tag.id) ? Color.accentColor : Color.clear, lineWidth: 1)
-									}
-							}
-							.buttonStyle(.plain)
-							.accessibilityAddTraits(selectedTagIDs.contains(tag.id) ? .isSelected : [])
-						}
+				Section {
+					NavigationLink {
+						EventTagSelectionView(
+							section: section,
+							allowsYearGroups: allowsYearGroups,
+							selectedTagIDs: $selectedTagIDs
+						)
+					} label: {
+						Label("Tags", systemImage: "tag")
 					}
-					.padding(.vertical, 4)
+				} header: {
+					Text(section.displayName)
 				}
 			}
 		}
 	}
+}
 
-	private func toggle(_ tag: EventTagCatalogueTag, in section: EventTagCatalogueSection) {
+private struct EventTagSelectionView: View {
+	let section: EventTagCatalogueSection
+	let allowsYearGroups: Bool
+	@Binding var selectedTagIDs: Set<UUID>
+
+	var body: some View {
+		List {
+			ForEach(section.tags) { tag in
+				Button {
+					toggle(tag)
+				} label: {
+					HStack {
+						Label(tag.displayName, systemImage: tag.symbol ?? "tag")
+						Spacer()
+						if selectedTagIDs.contains(tag.id) {
+							Image(systemName: "checkmark")
+								.foregroundStyle(.accent)
+						}
+					}
+				}
+				.buttonStyle(.plain)
+				.accessibilityAddTraits(selectedTagIDs.contains(tag.id) ? .isSelected : [])
+			}
+		}
+		.navigationTitle(section.displayName)
+	}
+
+	private func toggle(_ tag: EventTagCatalogueTag) {
 		if section.category == .yearGroup, allowsYearGroups {
 			selectedTagIDs.subtract(section.tags.map(\.id))
 			selectedTagIDs.insert(tag.id)

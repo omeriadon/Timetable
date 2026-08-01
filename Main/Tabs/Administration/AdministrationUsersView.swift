@@ -12,7 +12,15 @@ struct AdministrationUsersView: View {
 			Button {
 				editor = .edit(user)
 			} label: {
-				Label {
+				HStack(spacing: 12) {
+					ProfilePicture(
+						appearance: user.appearance,
+						photo: user.photo,
+						size: 44,
+						badges: user.badges,
+						accessibilityName: user.displayName
+					)
+
 					VStack(alignment: .leading) {
 						Text(user.displayName)
 						Text(user.authority.displayName)
@@ -25,8 +33,6 @@ struct AdministrationUsersView: View {
 								.foregroundStyle(.secondary)
 						}
 					}
-				} icon: {
-					Image(systemName: "person")
 				}
 			}
 		}

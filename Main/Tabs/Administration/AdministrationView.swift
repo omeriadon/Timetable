@@ -74,6 +74,12 @@ struct AdministrationView: View {
 								} label: {
 									Label("Profile Storage", systemImage: "externaldrive.fill")
 								}
+
+								NavigationLink {
+									AdministrationSpecialBadgesView()
+								} label: {
+									Label("Special Badges", systemImage: "rosette")
+								}
 							}
 						}
 					}

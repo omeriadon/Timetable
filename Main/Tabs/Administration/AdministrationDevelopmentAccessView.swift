@@ -2,26 +2,12 @@ import SwiftUI
 
 struct AdministrationDevelopmentAccessView: View {
 	@State private var service = AdministrationService.shared
-	@State private var controlToken = ""
 	@State private var developmentAccessOnly: Bool?
 	@State private var pendingDevelopmentAccessOnly: Bool?
 	@State private var isUpdating = false
 
 	var body: some View {
 		Form {
-			Section("Server Control Token") {
-				SecureField("Control Token", text: $controlToken)
-					.textInputAutocapitalization(.never)
-					.autocorrectionDisabled()
-
-				Button("Load Server Mode", systemImage: "arrow.clockwise") {
-					Task {
-						await load()
-					}
-				}
-				.disabled(controlToken.isEmpty || isUpdating)
-			}
-
 			Section {
 				Toggle(
 					"Restrict Server to Owners",
@@ -30,7 +16,7 @@ struct AdministrationDevelopmentAccessView: View {
 						set: { pendingDevelopmentAccessOnly = $0 }
 					)
 				)
-				.disabled(developmentAccessOnly == nil || controlToken.isEmpty || isUpdating)
+				.disabled(developmentAccessOnly == nil || isUpdating)
 			} header: {
 				Text("Development Access")
 			} footer: {
@@ -40,10 +26,6 @@ struct AdministrationDevelopmentAccessView: View {
 		.scrollEdgeEffect()
 		.appNavigationTitle("Debug Testing", accent: true)
 		.refreshable {
-			guard !controlToken.isEmpty else {
-				return
-			}
-
 			await load()
 		}
 		.confirmationDialog(
@@ -82,7 +64,7 @@ struct AdministrationDevelopmentAccessView: View {
 			isUpdating = false
 		}
 
-		guard let response = try? await service.serverAccessMode(controlToken: controlToken) else {
+		guard let response = try? await service.serverAccessMode() else {
 			return
 		}
 
@@ -98,8 +80,7 @@ struct AdministrationDevelopmentAccessView: View {
 			}
 
 			guard let response = try? await service.updateServerAccessMode(
-				developmentAccessOnly: developmentAccessOnly,
-				controlToken: controlToken
+				developmentAccessOnly: developmentAccessOnly
 			) else {
 				return
 			}

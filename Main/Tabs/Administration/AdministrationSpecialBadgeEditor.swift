@@ -1,0 +1,139 @@
+import SwiftUI
+
+struct AdministrationSpecialBadgeEditor: View {
+	let target: AdministrationSpecialBadgeEditorTarget
+	let users: [AdministrationUserResponse]
+	let save: (AdministrationSpecialBadgeRequest, UUID?, Set<UUID>) async throws -> AdministrationSpecialBadgeResponse
+	let delete: (AdministrationSpecialBadgeResponse) async throws -> Void
+
+	@Environment(\.dismiss) private var dismiss
+	@Environment(\.statusBadgeManager) private var statusBadges
+	@State private var symbol: String
+	@State private var accessibilityLabel: String
+	@State private var priority: Int
+	@State private var backgroundColor: Color
+	@State private var symbolColor: Color
+	@State private var selectedUserIDs: Set<UUID>
+	@State private var isSaving = false
+	@State private var showsDeleteConfirmation = false
+
+	init(
+		target: AdministrationSpecialBadgeEditorTarget,
+		users: [AdministrationUserResponse],
+		save: @escaping (AdministrationSpecialBadgeRequest, UUID?, Set<UUID>) async throws -> AdministrationSpecialBadgeResponse,
+		delete: @escaping (AdministrationSpecialBadgeResponse) async throws -> Void
+	) {
+		self.target = target
+		self.users = users
+		self.save = save
+		self.delete = delete
+		let badge = target.badge
+		_symbol = State(initialValue: badge?.symbol ?? "star.fill")
+		_accessibilityLabel = State(initialValue: badge?.accessibilityLabel ?? "Special badge")
+		_priority = State(initialValue: badge?.priority ?? 50)
+		_backgroundColor = State(initialValue: badge?.backgroundColor?.swiftUIColor ?? .blue)
+		_symbolColor = State(initialValue: badge?.symbolColor?.swiftUIColor ?? .white)
+		_selectedUserIDs = State(initialValue: Set(badge?.assignedUserIDs ?? []))
+	}
+
+	var body: some View {
+		NavigationStack {
+			Form {
+				Section("Badge") {
+					TextField("SF Symbol", text: $symbol)
+						.textInputAutocapitalization(.never)
+						.autocorrectionDisabled()
+					TextField("Accessibility Label", text: $accessibilityLabel)
+					Stepper("Priority: \(priority)", value: $priority, in: 0 ... 10000)
+					ColorPicker("Background", selection: $backgroundColor, supportsOpacity: true)
+					ColorPicker("Symbol", selection: $symbolColor, supportsOpacity: true)
+				}
+
+				Section {
+					NavigationLink {
+						AdministrationSpecialBadgeUsersView(
+							users: users,
+							selectedUserIDs: $selectedUserIDs
+						)
+					} label: {
+						Label("Users (\(selectedUserIDs.count))", systemImage: "person.2")
+					}
+				} footer: {
+					Text("Selected users receive this badge when the badge is saved. Deselect a user to remove it.")
+				}
+			}
+			.appNavigationTitle(target.badge == nil ? "New Badge" : "Edit Badge", accent: true)
+			.toolbar {
+				ToolbarItem(placement: .cancellationAction) {
+					Button(role: .cancel) {
+						dismiss()
+					}
+				}
+
+				ToolbarItem(placement: .confirmationAction) {
+					Button(target.badge == nil ? "Create" : "Save", systemImage: target.badge == nil ? "plus" : "checkmark", role: .confirm) {
+						Task {
+							await saveBadge()
+						}
+					}
+					.buttonStyle(.glassProminent)
+					.disabled(symbol.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || accessibilityLabel.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSaving)
+				}
+			}
+			.safeAreaBar(edge: .bottom) {
+				if let badge = target.badge {
+					Button("Delete Badge", systemImage: "trash", role: .destructive) {
+						showsDeleteConfirmation = true
+					}
+					.buttonStyle(.glassProminent)
+					.tint(.red)
+				}
+			}
+		}
+		.presentationDetents([.fraction(0.7), .large])
+		.confirmationDialog("Delete Badge?", isPresented: $showsDeleteConfirmation, titleVisibility: .visible) {
+			if let badge = target.badge {
+				Button("Delete Badge", systemImage: "trash", role: .destructive) {
+					Task {
+						await deleteBadge(badge)
+					}
+				}
+			}
+		} message: {
+			Text("This removes the badge from every assigned user.")
+		}
+	}
+
+	private func saveBadge() async {
+		isSaving = true
+		defer {
+			isSaving = false
+		}
+
+		do {
+			_ = try await save(
+				AdministrationSpecialBadgeRequest(
+					symbol: symbol.trimmingCharacters(in: .whitespacesAndNewlines),
+					backgroundColor: backgroundColor.toRGBA(),
+					symbolColor: symbolColor.toRGBA(),
+					priority: priority,
+					accessibilityLabel: accessibilityLabel.trimmingCharacters(in: .whitespacesAndNewlines)
+				),
+				target.badge?.id,
+				selectedUserIDs
+			)
+			dismiss()
+		} catch {
+			statusBadges.present(error: error, title: "Unable to save badge")
+		}
+	}
+
+	private func deleteBadge(_ badge: AdministrationSpecialBadgeResponse) async {
+		do {
+			try await delete(badge)
+			dismiss()
+		} catch {
+			statusBadges.present(error: error, title: "Unable to delete badge")
+		}
+	}
+}

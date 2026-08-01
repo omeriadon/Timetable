@@ -3,13 +3,14 @@ import SwiftUI
 struct AdministrationAdministratorsView: View {
 	@State private var service = AdministrationService.shared
 	@State private var users: [AdministrationUserResponse] = []
+	@State private var searchText = ""
 	@State private var pendingChange: AdministratorAuthorityChange?
 	@State private var isUpdating = false
 
 	var body: some View {
 		List {
 			Section {
-				ForEach(users) { user in
+				ForEach(filteredUsers) { user in
 					administratorRow(for: user)
 				}
 			} footer: {
@@ -18,6 +19,7 @@ struct AdministrationAdministratorsView: View {
 		}
 		.scrollEdgeEffect()
 		.appNavigationTitle("Administrators", accent: true)
+		.searchable(text: $searchText, prompt: "Search users")
 		.refreshable {
 			await load()
 		}
@@ -105,6 +107,17 @@ struct AdministrationAdministratorsView: View {
 
 	private func load() async {
 		users = await (try? service.users()) ?? []
+	}
+
+	private var filteredUsers: [AdministrationUserResponse] {
+		guard !searchText.isEmpty else {
+			return users
+		}
+
+		return users.filter {
+			$0.displayName.localizedCaseInsensitiveContains(searchText)
+				|| ($0.email?.localizedCaseInsensitiveContains(searchText) ?? false)
+		}
 	}
 
 	private func updateAuthority(_ change: AdministratorAuthorityChange) {

@@ -52,19 +52,18 @@ final class AdministrationService {
 		)
 	}
 
-	func serverAccessMode(controlToken: String) async throws -> ServerAccessModeResponse {
+	func serverAccessMode() async throws -> ServerAccessModeResponse {
 		try await networkManager.send(
-			serverAccessModeEndpoint(method: .get, controlToken: controlToken),
+			.v1AdministrationServerAccessModeGet,
 			context: .userInitiated
 		)
 	}
 
 	func updateServerAccessMode(
-		developmentAccessOnly: Bool,
-		controlToken: String
+		developmentAccessOnly: Bool
 	) async throws -> ServerAccessModeResponse {
 		try await networkManager.send(
-			serverAccessModeEndpoint(method: .put, controlToken: controlToken),
+			.v1AdministrationServerAccessModeUpdate,
 			body: ServerAccessModeUpdateRequest(developmentAccessOnly: developmentAccessOnly),
 			context: .userInitiated
 		)
@@ -92,6 +91,49 @@ final class AdministrationService {
 
 	func profileStorageQuota() async throws -> ProfileStorageQuotaResponse {
 		try await networkManager.send(.v1AdministrationProfileStorageQuota)
+	}
+
+	func specialBadges() async throws -> [AdministrationSpecialBadgeResponse] {
+		try await networkManager.send(.v1AdministrationSpecialBadges)
+	}
+
+	func createSpecialBadge(
+		_ request: AdministrationSpecialBadgeRequest
+	) async throws -> AdministrationSpecialBadgeResponse {
+		try await networkManager.send(
+			.v1AdministrationSpecialBadgesCreate,
+			body: request,
+			context: .userInitiated
+		)
+	}
+
+	func updateSpecialBadge(
+		id: UUID,
+		request: AdministrationSpecialBadgeRequest
+	) async throws -> AdministrationSpecialBadgeResponse {
+		try await networkManager.send(
+			Endpoint("/v1/administration/badges/\(id.uuidString)", method: .put),
+			body: request,
+			context: .userInitiated
+		)
+	}
+
+	func replaceSpecialBadgeUsers(
+		id: UUID,
+		userIDs: Set<UUID>
+	) async throws -> AdministrationSpecialBadgeResponse {
+		try await networkManager.send(
+			Endpoint("/v1/administration/badges/\(id.uuidString)/users", method: .put),
+			body: AdministrationSpecialBadgeAssignmentsRequest(userIDs: Array(userIDs)),
+			context: .userInitiated
+		)
+	}
+
+	func deleteSpecialBadge(id: UUID) async throws {
+		try await networkManager.send(
+			Endpoint("/v1/administration/badges/\(id.uuidString)", method: .delete),
+			context: .userInitiated
+		)
 	}
 
 	func eventTags() async throws -> AdministrationEventTagCatalogueResponse {
@@ -151,15 +193,6 @@ final class AdministrationService {
 	func delete(id: UUID) async throws -> [AdministrationCalendarEntry] {
 		try await networkManager.send(Endpoint("/v1/administration/calendar/\(id.uuidString)", method: .delete), context: .userInitiated)
 	}
-
-	private func serverAccessModeEndpoint(method: HTTPMethod, controlToken: String) -> Endpoint {
-		Endpoint(
-			"/_operations/server-access-mode",
-			method: method,
-			requiresAuthentication: false,
-			headers: ["X-PMSTT-Access-Mode-Token": controlToken]
-		)
-	}
 }
 
 private extension Endpoint {
@@ -171,6 +204,10 @@ private extension Endpoint {
 	static let v1AdministrationBroadcastNotification = Endpoint("/v1/administration/broadcast-notification", method: .post)
 	static let v1AdministrationBroadcastNotifications = Endpoint("/v1/administration/broadcast-notifications")
 	static let v1AdministrationProfileStorageQuota = Endpoint("/v1/administration/profile-storage-quota")
+	static let v1AdministrationSpecialBadges = Endpoint("/v1/administration/badges")
+	static let v1AdministrationSpecialBadgesCreate = Endpoint("/v1/administration/badges", method: .post)
+	static let v1AdministrationServerAccessModeGet = Endpoint("/_operations/server-access-mode")
+	static let v1AdministrationServerAccessModeUpdate = Endpoint("/_operations/server-access-mode", method: .put)
 	static let v1AdministrationEventTags = Endpoint("/v1/administration/event-tags")
 	static let v1AdministrationEventTagsCreate = Endpoint("/v1/administration/event-tags", method: .post)
 	static let v1AdministrationEventTagSectionsCreate = Endpoint("/v1/administration/event-tags/sections", method: .post)

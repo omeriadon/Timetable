@@ -239,6 +239,8 @@ private struct TodaySchoolTimeline: View {
 		SchoolStateEngine.activePeriods(for: dayIndex)
 	}
 
+	@State private var expandedPeriodNumber: Int?
+
 	private var dayEnd: TimeOfDay {
 		SchoolStateEngine.schoolEnd(for: dayIndex)
 	}
@@ -316,32 +318,57 @@ private struct TodaySchoolTimeline: View {
 	@ViewBuilder private func periodRow(_ period: SchoolPeriod) -> some View {
 		let subject = subject(for: period)
 		let duration = CGFloat(period.end.minutesSinceMidnight - period.start.minutesSinceMidnight) * minuteHeight
-		let cardHeight = max(44, duration - 8)
-		HStack(alignment: .center) {
-			HStack(alignment: .center, spacing: 10) {
-				Text("\(period.number)")
-					.font(.caption.monospacedDigit())
-					.frame(width: 15)
-
-				Text(subject?.id ?? "Free Period")
-					.lineLimit(2)
-					.font(.title2)
+		let isExpanded = expandedPeriodNumber == period.number
+		let baseCardHeight = max(44, duration - 8)
+		let cardHeight = baseCardHeight + (isExpanded ? 48 : 0)
+		Button {
+			withAnimation(.snappy(duration: 0.28)) {
+				expandedPeriodNumber = isExpanded ? nil : period.number
 			}
-			.frame(maxHeight: .infinity, alignment: .topLeading)
+		} label: {
+			VStack(alignment: .leading, spacing: 8) {
+				HStack(alignment: .top) {
+					HStack(alignment: .top, spacing: 10) {
+						Text("\(period.number)")
+							.font(.caption.monospacedDigit())
+							.frame(width: 15)
 
-			Spacer()
+						VStack(alignment: .leading, spacing: 4) {
+							Text(subject?.id ?? "Free Period")
+								.lineLimit(2)
+								.font(.title2)
 
-			if let subject {
-				Image(systemName: subject.symbol)
-					.resizable()
-					.aspectRatio(contentMode: .fit)
-					.frame(width: cardHeight - 40, height: cardHeight - 40)
-					.padding(.trailing, 10)
-					.foregroundStyle(subject.colour.swiftUIColor)
+							if isExpanded, let subject {
+								Label(subject.teacher.displayName, systemImage: "person.fill")
+									.font(.subheadline)
+									.foregroundStyle(.secondary)
+
+								Label(subject.classroom.displayName, systemImage: "door.left.hand.open")
+									.font(.subheadline)
+									.foregroundStyle(.secondary)
+							}
+						}
+					}
+					.frame(maxHeight: .infinity, alignment: .topLeading)
+
+					Spacer()
+
+					if let subject {
+						Image(systemName: subject.symbol)
+							.resizable()
+							.aspectRatio(contentMode: .fit)
+							.frame(width: max(18, baseCardHeight - 40), height: max(18, baseCardHeight - 40))
+							.padding(.trailing, 10)
+							.foregroundStyle(subject.colour.swiftUIColor)
+					}
+				}
 			}
+			.padding(10)
+			.frame(height: cardHeight, alignment: .top)
 		}
-		.padding(10)
-		.frame(height: cardHeight, alignment: .top)
+		.buttonStyle(.plain)
+		.accessibilityLabel(subject?.id ?? "Free Period")
+		.accessibilityValue(isExpanded ? "Expanded" : "Collapsed")
 		.background {
 			GeometryReader { proxy in
 				Image("paperWhite")

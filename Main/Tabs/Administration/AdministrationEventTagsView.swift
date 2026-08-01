@@ -47,17 +47,22 @@ struct AdministrationEventTagsView: View {
 					}
 				} label: {
 					HStack(spacing: 12) {
-						Image(systemName: section.isArchived ? "archivebox" : "folder")
-						VStack(alignment: .leading, spacing: 4) {
-							Text(section.displayName)
-							Text(section.category.displayName)
-								.font(.footnote)
-								.foregroundStyle(.secondary)
+						Label {
+							VStack(alignment: .leading, spacing: 4) {
+								Text(section.displayName)
+								Text(section.category.displayName)
+									.font(.footnote)
+									.foregroundStyle(.secondary)
+							}
+						} icon: {
+							Image(systemName: section.isArchived ? "archivebox" : "folder")
+								.foregroundStyle(.accent)
 						}
 						Spacer()
 						Button("Edit Section", systemImage: "slider.horizontal.3") {
 							editor = .section(section)
 						}
+						.labelStyle(.iconOnly)
 						.buttonStyle(.borderless)
 						.matchedTransitionSource(
 							id: AdministrationEventTagEditorTarget.section(section).id,
@@ -67,14 +72,6 @@ struct AdministrationEventTagsView: View {
 				}
 				.opacity(section.isArchived ? 0.55 : 1)
 			}
-
-			Button("Add Section", systemImage: "folder.badge.plus") {
-				editor = .newSection
-			}
-			.matchedTransitionSource(
-				id: AdministrationEventTagEditorTarget.newSection.id,
-				in: editorNamespace
-			)
 		}
 		.scrollEdgeEffect()
 		.appNavigationTitle("Event Tags", accent: true)
@@ -104,12 +101,8 @@ struct AdministrationEventTagsView: View {
 					case let .section(section):
 						AdministrationEventTagSectionEditor(
 							section: section,
-							save: saveSection
-						)
-					case .newSection:
-						AdministrationEventTagSectionEditor(
-							section: nil,
-							save: saveSection
+							save: saveSection,
+							saveTag: saveTag
 						)
 				}
 			}
@@ -142,15 +135,10 @@ struct AdministrationEventTagsView: View {
 	}
 
 	private func saveSection(
-		_ createRequest: AdministrationEventTagSectionCreateRequest?,
-		_ updateRequest: AdministrationEventTagSectionUpdateRequest?,
-		existingID: UUID?
+		_ request: AdministrationEventTagSectionUpdateRequest,
+		existingID: UUID
 	) async throws {
-		if let existingID, let updateRequest {
-			catalogue = try await service.updateEventTagSection(id: existingID, request: updateRequest)
-		} else if let createRequest {
-			catalogue = try await service.createEventTagSection(createRequest)
-		}
+		catalogue = try await service.updateEventTagSection(id: existingID, request: request)
 	}
 }
 
@@ -158,7 +146,6 @@ enum AdministrationEventTagEditorTarget: Identifiable {
 	case tag(AdministrationEventTag, section: AdministrationEventTagSection)
 	case newTag(AdministrationEventTagSection)
 	case section(AdministrationEventTagSection)
-	case newSection
 
 	var id: String {
 		switch self {
@@ -168,8 +155,6 @@ enum AdministrationEventTagEditorTarget: Identifiable {
 				"new-tag-\(section.id.uuidString)"
 			case let .section(section):
 				"section-\(section.id.uuidString)"
-			case .newSection:
-				"new-section"
 		}
 	}
 }

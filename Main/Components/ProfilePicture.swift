@@ -153,7 +153,7 @@ struct ProfilePicture: View {
 						.background(badge.backgroundColor?.swiftUIColor ?? .black, in: Circle())
 						.overlay {
 							Circle()
-								.stroke(.white.opacity(0.85), lineWidth: max(1, size * 0.025))
+								.stroke(.white.opacity(0.85), lineWidth: 0.5)
 						}
 						.zIndex(Double(badge.priority))
 						.accessibilityLabel(badge.accessibilityLabel)
