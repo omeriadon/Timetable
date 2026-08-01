@@ -35,3 +35,11 @@ This project also has a server, the source code for which is at [omeriadon/pmstt
 ## Build and Run
 1. Open project in Xcode
 2. Run watchOS or iOS/macOS scheme.
+
+To change the base url to use your own hosted instance of `pmstt`, go to `NetworkManager` and change the base url.
+
+The server requires a few things to work:
+- A CloudFlare R2 bucket (for storing profile images)
+- An APNs key (For sending notifications and Live Activities)
+- Resend API Key (for sending emails)
+- Change the admin emails to change the system administrators (the admins that can't change roles, normally reserved for 1-2 people. These system admins can then manage other admins, etc.
