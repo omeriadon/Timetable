@@ -88,14 +88,12 @@ struct AdministrationEventTagsView: View {
 						AdministrationEventTagEditor(
 							tag: tag,
 							section: section,
-							sections: catalogue.sections,
 							save: saveTag
 						)
 					case let .newTag(section):
 						AdministrationEventTagEditor(
 							tag: nil,
 							section: section,
-							sections: catalogue.sections,
 							save: saveTag
 						)
 					case let .section(section):

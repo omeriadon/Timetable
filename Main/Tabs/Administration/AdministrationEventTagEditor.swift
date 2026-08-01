@@ -3,7 +3,6 @@ import SwiftUI
 struct AdministrationEventTagEditor: View {
 	let tag: AdministrationEventTag?
 	let section: AdministrationEventTagSection
-	let sections: [AdministrationEventTagSection]
 	let save: (AdministrationEventTagRequest, UUID?) async throws -> Void
 
 	@Environment(\.dismiss) private var dismiss
@@ -25,14 +24,12 @@ struct AdministrationEventTagEditor: View {
 	init(
 		tag: AdministrationEventTag?,
 		section: AdministrationEventTagSection,
-		sections: [AdministrationEventTagSection],
 		save: @escaping (AdministrationEventTagRequest, UUID?) async throws -> Void
 	) {
 		self.tag = tag
 		self.section = section
-		self.sections = sections
 		self.save = save
-		_sectionID = State(initialValue: tag?.sectionID ?? section.id)
+		_sectionID = State(initialValue: section.id)
 		_slug = State(initialValue: tag?.slug ?? "")
 		_displayName = State(initialValue: tag?.displayName ?? "")
 		_symbol = State(initialValue: tag?.symbol ?? "")
@@ -60,16 +57,6 @@ struct AdministrationEventTagEditor: View {
 					Stepper("Sort Order: \(sortOrder)", value: $sortOrder)
 					Toggle("Archive Tag", isOn: $isArchived)
 						.disabled(isCanonicalYearGroup)
-				}
-
-				Section("Section") {
-					Picker("Section", selection: $sectionID) {
-						ForEach(sections) { section in
-							Text(section.displayName)
-								.tag(section.id)
-						}
-					}
-					.disabled(isCanonicalYearGroup)
 				}
 
 				Section {

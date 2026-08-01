@@ -51,6 +51,12 @@ struct AdministrationUserEditor: View {
 						if rawData.isEmpty {
 							Text("Loading...")
 						} else {
+							AdministrationJSONRenderer(json: rawData)
+						}
+					}
+
+					if !rawData.isEmpty {
+						Section("Formatted JSON") {
 							AdministrationJSONViewer(json: rawData)
 						}
 					}
@@ -155,16 +161,74 @@ struct AdministrationUserEditor: View {
 	}
 }
 
+private struct AdministrationJSONRenderer: View {
+	let json: String
+	private let object: [String: Any]
+
+	init(json: String) {
+		self.json = json
+		object = AdministrationJSONFormatter.object(from: json) ?? [:]
+	}
+
+	var body: some View {
+		if object.isEmpty {
+			AdministrationJSONText(value: json)
+		} else {
+			ForEach(object.keys.sorted(), id: \.self) { key in
+				DisclosureGroup(key) {
+					valueView(object[key])
+				}
+			}
+		}
+	}
+
+	@ViewBuilder
+	private func valueView(_ value: Any?) -> some View {
+		switch value {
+			case let dictionary as [String: Any]:
+				ForEach(dictionary.keys.sorted(), id: \.self) { key in
+					DisclosureGroup(key) {
+						AdministrationJSONText(
+							value: AdministrationJSONFormatter.formatObject(dictionary[key] ?? NSNull())
+						)
+					}
+				}
+
+			case let array as [Any]:
+				ForEach(Array(array.enumerated()), id: \.offset) { index, item in
+					DisclosureGroup("Item \(index + 1)") {
+						AdministrationJSONText(
+							value: AdministrationJSONFormatter.formatObject(item)
+						)
+					}
+				}
+
+			default:
+				AdministrationJSONText(
+					value: AdministrationJSONFormatter.formatObject(value ?? NSNull())
+				)
+		}
+	}
+}
+
 private struct AdministrationJSONViewer: View {
 	let json: String
 
 	var body: some View {
+		AdministrationJSONText(value: AdministrationJSONFormatter.format(json))
+	}
+}
+
+private struct AdministrationJSONText: View {
+	let value: String
+
+	var body: some View {
 		ScrollView(.horizontal) {
-			Text(AdministrationJSONFormatter.format(json))
+			Text(value)
 				.font(.system(.caption, design: .monospaced))
 				.textSelection(.enabled)
 				.fixedSize(horizontal: true, vertical: true)
-				.frame(maxHeight: .infinity, alignment: .topLeading)
+				.frame(maxWidth: .infinity, alignment: .topLeading)
 		}
 		.scrollBounceBehavior(.basedOnSize, axes: .horizontal)
 		.frame(maxWidth: .infinity, alignment: .leading)
@@ -172,6 +236,14 @@ private struct AdministrationJSONViewer: View {
 }
 
 private enum AdministrationJSONFormatter {
+	static func object(from json: String) -> [String: Any]? {
+		guard let data = json.data(using: .utf8) else {
+			return nil
+		}
+
+		return try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+	}
+
 	static func formatObject(_ object: Any) -> String {
 		guard JSONSerialization.isValidJSONObject(object), let data = try? JSONSerialization.data(withJSONObject: object, options: [.prettyPrinted, .sortedKeys]), let json = String(data: data, encoding: .utf8) else {
 			return String(describing: object)
