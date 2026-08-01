@@ -46,7 +46,8 @@ struct FriendDetailView: View {
 					}
 				}
 				.foregroundStyle(.black)
-				.padding()
+				.padding(.vertical)
+				.padding(.horizontal, FriendDetailLayout.horizontalPadding)
 			}
 			.toolbar {
 				ToolbarItem(placement: .topBarLeading) {
@@ -217,12 +218,20 @@ private struct FriendOverview: View {
 			.padding(14)
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.background {
-				FriendBrownPaperBackground(cornerRadius: 13)
+				FriendPaperBackground(
+					cornerRadius: FriendDetailLayout.cardCornerRadius
+				)
 			}
-			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
-			.opacity(0.5)
+			.glassEffect(
+				.clear.interactive(),
+				in: RoundedRectangle(
+					cornerRadius: FriendDetailLayout.cardCornerRadius,
+					style: .continuous
+				)
+			)
 		}
-		.padding(14)
+		.padding(.vertical, 14)
+		.padding(.horizontal, FriendDetailLayout.horizontalPadding)
 		.frame(maxWidth: .infinity, alignment: .leading)
 	}
 
@@ -257,9 +266,23 @@ private struct FriendOverview: View {
 						.padding(14)
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.background {
-							FriendPaperBackground(cornerRadius: 13)
+							FriendPaperBackground(
+								cornerRadius: FriendDetailLayout.itemCornerRadius
+							)
 						}
-						.clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
+						.clipShape(
+							RoundedRectangle(
+								cornerRadius: FriendDetailLayout.itemCornerRadius,
+								style: .continuous
+							)
+						)
+						.glassEffect(
+							.clear.interactive(),
+							in: RoundedRectangle(
+								cornerRadius: FriendDetailLayout.itemCornerRadius,
+								style: .continuous
+							)
+						)
 					}
 				}
 			}
@@ -267,9 +290,17 @@ private struct FriendOverview: View {
 		.padding(14)
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.background {
-			FriendBrownPaperBackground(cornerRadius: 25)
+			FriendBrownPaperBackground(
+				cornerRadius: FriendDetailLayout.cardCornerRadius
+			)
 		}
-		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 25, style: .continuous))
+		.glassEffect(
+			.clear.interactive(),
+			in: RoundedRectangle(
+				cornerRadius: FriendDetailLayout.cardCornerRadius,
+				style: .continuous
+			)
+		)
 	}
 
 	private func sharedSubjectsCard(_ subjects: [SharedSubject]) -> some View {
@@ -287,18 +318,40 @@ private struct FriendOverview: View {
 						.padding(14)
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.background {
-							FriendPaperBackground(cornerRadius: 13)
+							FriendPaperBackground(
+								cornerRadius: FriendDetailLayout.itemCornerRadius
+							)
 						}
-						.clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
+						.clipShape(
+							RoundedRectangle(
+								cornerRadius: FriendDetailLayout.itemCornerRadius,
+								style: .continuous
+							)
+						)
+						.glassEffect(
+							.clear,
+							in: RoundedRectangle(
+								cornerRadius: FriendDetailLayout.itemCornerRadius,
+								style: .continuous
+							)
+						)
 				}
 			}
 		}
 		.padding(14)
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.background {
-			FriendBrownPaperBackground(cornerRadius: 25)
+			FriendBrownPaperBackground(
+				cornerRadius: FriendDetailLayout.cardCornerRadius
+			)
 		}
-		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 25, style: .continuous))
+		.glassEffect(
+			.clear.interactive(),
+			in: RoundedRectangle(
+				cornerRadius: FriendDetailLayout.cardCornerRadius,
+				style: .continuous
+			)
+		)
 	}
 
 	@ViewBuilder
@@ -312,32 +365,45 @@ private struct FriendOverview: View {
 		)
 
 		if let currentSubject = state.currentSubject {
-			currentAndNextClassesCard {
+			currentAndNextClassesCard(isCompact: state.nextSubject == nil) {
 				VStack(alignment: .leading, spacing: 8) {
 					contextButton(title: "Current Class", subject: currentSubject)
 
-					if case let .subject(nextSubject)? = state.nextDestination {
+					if let nextSubject = state.nextSubject {
 						contextButton(title: "Up Next", subject: nextSubject)
 					}
 				}
 			}
-		} else if case let .subject(nextSubject)? = state.nextDestination {
-			currentAndNextClassesCard {
+		} else if let nextSubject = state.nextSubject {
+			currentAndNextClassesCard(isCompact: true) {
 				contextButton(title: "Next Class", subject: nextSubject)
 			}
 		}
 	}
 
 	private func currentAndNextClassesCard(
+		isCompact: Bool,
 		@ViewBuilder content: () -> some View
 	) -> some View {
+		let shape = isCompact
+			? AnyShape(Capsule())
+			: AnyShape(
+				RoundedRectangle(
+					cornerRadius: FriendDetailLayout.cardCornerRadius,
+					style: .continuous
+				)
+			)
+
 		content()
 			.padding(14)
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.background {
-				FriendBrownPaperBackground(cornerRadius: 13)
+				FriendBrownPaperBackground(shape: shape)
 			}
-			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+			.glassEffect(
+				.clear.interactive(),
+				in: shape
+			)
 	}
 
 	private func contextButton(
@@ -352,7 +418,15 @@ private struct FriendOverview: View {
 }
 
 private struct FriendBrownPaperBackground: View {
-	let cornerRadius: CGFloat
+	let shape: AnyShape
+
+	init(cornerRadius: CGFloat) {
+		shape = AnyShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+	}
+
+	init(shape: AnyShape) {
+		self.shape = shape
+	}
 
 	var body: some View {
 		GeometryReader { proxy in
@@ -362,13 +436,14 @@ private struct FriendBrownPaperBackground: View {
 				.frame(width: proxy.size.width, height: proxy.size.height)
 				.clipped()
 		}
-		.clipShape(
-			RoundedRectangle(
-				cornerRadius: cornerRadius,
-				style: .continuous
-			)
-		)
+		.clipShape(shape)
 	}
+}
+
+private enum FriendDetailLayout {
+	static let horizontalPadding: CGFloat = 8
+	static let cardCornerRadius: CGFloat = 25
+	static let itemCornerRadius: CGFloat = 13
 }
 
 /// Owns its own popover state so it presents anchored to the exact button tapped,
@@ -574,6 +649,14 @@ private extension SchoolState {
 		if case let .lesson(lesson) = self {
 			return lesson.subject
 		}
+		return nil
+	}
+
+	var nextSubject: Subject? {
+		if case let .subject(subject)? = nextDestination {
+			return subject
+		}
+
 		return nil
 	}
 }
