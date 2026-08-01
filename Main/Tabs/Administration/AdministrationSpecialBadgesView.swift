@@ -35,6 +35,7 @@ struct AdministrationSpecialBadgesView: View {
 				Button("Add Badge", systemImage: "plus", role: .confirm) {
 					editor = .create
 				}
+				.foregroundStyle(.white)
 				.buttonStyle(.glassProminent)
 				.matchedTransitionSource(id: "special-badge-create", in: namespace)
 			}
