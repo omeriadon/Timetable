@@ -5,6 +5,8 @@ struct AdministrationDevelopmentAccessView: View {
 	@State private var developmentAccessOnly: Bool?
 	@State private var pendingDevelopmentAccessOnly: Bool?
 	@State private var isUpdating = false
+	@State private var loadError: String?
+	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
 		Form {
@@ -18,6 +20,21 @@ struct AdministrationDevelopmentAccessView: View {
 						)
 					)
 					.disabled(isUpdating)
+				} else if let loadError {
+					VStack(alignment: .leading, spacing: 12) {
+						Label("Unable to load server access", systemImage: "exclamationmark.triangle")
+							.foregroundStyle(.orange)
+
+						Text(loadError)
+							.font(.footnote)
+							.foregroundStyle(.secondary)
+
+						Button("Retry", systemImage: "arrow.clockwise") {
+							Task {
+								await load()
+							}
+						}
+					}
 				} else {
 					ProgressView("Loading Server Access")
 				}
@@ -64,15 +81,22 @@ struct AdministrationDevelopmentAccessView: View {
 
 	private func load() async {
 		isUpdating = true
+		loadError = nil
 		defer {
 			isUpdating = false
 		}
 
-		guard let response = try? await service.serverAccessMode() else {
-			return
-		}
+		Print("Loading server access mode", category: .network)
 
-		developmentAccessOnly = response.developmentAccessOnly
+		do {
+			let response = try await service.serverAccessMode()
+			developmentAccessOnly = response.developmentAccessOnly
+			Print("Loaded server access mode: development_access_only=\(response.developmentAccessOnly)", category: .network)
+		} catch {
+			loadError = error.localizedDescription
+			PrintError("Unable to load server access mode", category: .network, error: error)
+			badges.present(error: error, title: "Unable to load server access")
+		}
 	}
 
 	private func update(developmentAccessOnly: Bool) {
@@ -83,13 +107,16 @@ struct AdministrationDevelopmentAccessView: View {
 				pendingDevelopmentAccessOnly = nil
 			}
 
-			guard let response = try? await service.updateServerAccessMode(
-				developmentAccessOnly: developmentAccessOnly
-			) else {
-				return
+			do {
+				let response = try await service.updateServerAccessMode(
+					developmentAccessOnly: developmentAccessOnly
+				)
+				self.developmentAccessOnly = response.developmentAccessOnly
+				Print("Updated server access mode: development_access_only=\(response.developmentAccessOnly)", category: .network)
+			} catch {
+				PrintError("Unable to update server access mode", category: .network, error: error)
+				badges.present(error: error, title: "Unable to update server access")
 			}
-
-			self.developmentAccessOnly = response.developmentAccessOnly
 		}
 	}
 }
