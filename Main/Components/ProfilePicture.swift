@@ -1,5 +1,6 @@
 import ColorfulX
 import Defaults
+import ImageIO
 import SwiftUI
 
 struct ProfilePicture: View {
@@ -183,5 +184,104 @@ struct ProfilePicture: View {
 			.prefix(3)
 			.map(\.accessibilityLabel)
 		return labels.isEmpty ? nil : labels.joined(separator: ", ")
+	}
+}
+
+extension AccountProfile {
+	var profilePictureNoise: Double {
+		appearance.contentKind == .photo ? ProfilePictureVisuals.photoNoise : appearance.noise
+	}
+
+	var profilePictureSpeed: Double {
+		appearance.contentKind == .photo ? ProfilePictureVisuals.photoSpeed : appearance.speed
+	}
+
+	func profilePictureColours() async -> [RGBAColor] {
+		await ProfilePictureVisuals.colours(
+			for: appearance,
+			photo: photo
+		)
+	}
+}
+
+enum ProfilePictureVisuals {
+	static let photoNoise = 20.0
+	static let photoSpeed = 0.9
+
+	static func colours(
+		for appearance: ProfileAppearance,
+		photo: ProfilePhotoMetadata?
+	) async -> [RGBAColor] {
+		guard appearance.contentKind == .photo,
+		      let photo,
+		      let data = await ProfileImageCache.shared.imageData(for: photo, displaySize: 96),
+		      let palette = await palette(from: data),
+		      !palette.isEmpty
+		else {
+			return Array(appearance.colours.prefix(3))
+		}
+
+		return palette
+	}
+
+	private static func palette(from data: Data) async -> [RGBAColor]? {
+		await Task.detached(priority: .utility) {
+			guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+			      let image = CGImageSourceCreateImageAtIndex(source, 0, nil),
+			      let providerData = image.dataProvider?.data,
+			      let bytes = CFDataGetBytePtr(providerData),
+			      image.bitsPerPixel == 32
+			else {
+				return nil
+			}
+
+			let width = image.width
+			let height = image.height
+			let bytesPerPixel = image.bitsPerPixel / 8
+			let isLittleEndian = image.bitmapInfo.contains(.byteOrder32Little)
+			var bins: [PaletteBin: Int] = [:]
+
+			for y in stride(from: 0, to: height, by: max(1, height / 24)) {
+				for x in stride(from: 0, to: width, by: max(1, width / 24)) {
+					let offset = y * image.bytesPerRow + x * bytesPerPixel
+					let first = Double(bytes[offset]) / 255
+					let second = Double(bytes[offset + 1]) / 255
+					let third = Double(bytes[offset + 2]) / 255
+					let alpha = Double(bytes[offset + 3]) / 255
+
+					guard alpha > 0.2 else {
+						continue
+					}
+
+					let red = isLittleEndian ? third : first
+					let green = second
+					let blue = isLittleEndian ? first : third
+					let bin = PaletteBin(
+						red: Int(red * 12),
+						green: Int(green * 12),
+						blue: Int(blue * 12)
+					)
+					bins[bin, default: 0] += 1
+				}
+			}
+
+			return bins
+				.sorted { $0.value > $1.value }
+				.prefix(3)
+				.map { bin, _ in
+					RGBAColor(
+						red: (Double(bin.red) + 0.5) / 12,
+						green: (Double(bin.green) + 0.5) / 12,
+						blue: (Double(bin.blue) + 0.5) / 12,
+						alpha: 1
+					)
+				}
+		}.value
+	}
+
+	private struct PaletteBin: Hashable, Sendable {
+		let red: Int
+		let green: Int
+		let blue: Int
 	}
 }
