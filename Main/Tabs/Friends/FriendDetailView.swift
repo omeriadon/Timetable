@@ -54,10 +54,59 @@ struct FriendDetailView: View {
 				.padding()
 			}
 			.scrollEdgeEffect()
-			.appNavigationTitle(friend.friend.displayName, accent: true)
 			.toolbar {
+				ToolbarItem(placement: .topBarLeading) {
+					Button(role: .cancel) {
+						dismiss()
+					}
+				}
+
+				let view = ToolbarItem(placement: .principal) {
+					HStack {
+						ProfilePicture(
+							appearance: .default,
+							photo: friend.friend.photo,
+							size: 44,
+							badges: friend.friend.badges,
+							accessibilityName: friend.friend.displayName,
+							animatesBackground: true
+						)
+						Text(friend.friend.displayName)
+							.font(.largeTitle)
+							.bold()
+							.monospaced()
+							.foregroundStyle(.accent)
+					}
+				}
+				.sharedBackgroundVisibility(.hidden)
+
+				if #available(anyAppleOS 27, *) {
+					view.contentMarginsRemoved()
+				} else {
+					view
+				}
+
+				ToolbarItem(placement: .principal) {
+					HStack {
+						ProfilePicture(
+							appearance: .default,
+							photo: friend.friend.photo,
+							size: 44,
+							badges: friend.friend.badges,
+							accessibilityName: friend.friend.displayName,
+							animatesBackground: true
+						)
+						Text(friend.friend.displayName)
+							.font(.largeTitle)
+							.bold()
+							.monospaced()
+							.foregroundStyle(.accent)
+					}
+				}
+				.sharedBackgroundVisibility(.hidden)
+
 				ToolbarItem(placement: .topBarTrailing) {
-					Menu("Friend actions", systemImage: "ellipsis.circle") {
+					Menu("Friend actions", systemImage: "ellipsis") {
 						Button("Remove Friend", systemImage: "person.badge.minus", role: .destructive) {
 							action = .remove
 						}
@@ -94,6 +143,7 @@ struct FriendDetailView: View {
 			}
 			.popover(item: $selectedSubjectContext) { context in
 				FriendSubjectContextPopover(context: context, friendName: friend.friend.displayName)
+					.fixedSize()
 			}
 			.task { await load() }
 		}

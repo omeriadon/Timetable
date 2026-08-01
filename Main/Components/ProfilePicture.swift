@@ -20,7 +20,7 @@ struct ProfilePicture: View {
 		size: CGFloat? = nil,
 		badges: [ProfileBadge] = [],
 		accessibilityName: String,
-		animatesBackground: Bool = false
+		animatesBackground: Bool = true
 	) {
 		self.appearance = appearance
 		photoSource = photo.map(PhotoSource.remote)

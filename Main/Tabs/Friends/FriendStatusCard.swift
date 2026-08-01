@@ -12,14 +12,8 @@ struct FriendStatusCard: View {
 				FriendAvatar(profile: friend.friend)
 
 				VStack(alignment: .leading, spacing: 5) {
-					HStack {
-						Text(friend.friend.displayName)
-							.font(.title3.weight(.semibold))
-						Spacer()
-						Label(status.availability, systemImage: status.symbol)
-							.font(.caption.weight(.medium))
-							.foregroundStyle(status.tint)
-					}
+					Text(friend.friend.displayName)
+						.font(.title3.weight(.semibold))
 
 					Text(status.title)
 						.font(.body)
@@ -28,6 +22,14 @@ struct FriendStatusCard: View {
 						.font(.callout)
 						.foregroundStyle(.secondary)
 				}
+
+				Spacer(minLength: 1)
+
+				Label(status.availability, systemImage: status.symbol)
+					.fontWeight(.medium)
+					.padding(5)
+					.glassEffect(.regular.tint(status.tint).interactive(), in: Capsule())
+					.foregroundStyle(.white)
 			}
 			.foregroundStyle(.black)
 			.padding(18)

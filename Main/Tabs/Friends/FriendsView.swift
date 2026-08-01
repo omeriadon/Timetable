@@ -17,23 +17,27 @@ struct FriendsView: View {
 
 	var body: some View {
 		NavigationStack {
-			Group {
+			ZStack {
 				if searchText.isEmpty {
 					friendsList
+						.transition(.blurReplace)
 				} else {
 					friendSearchResults
+						.transition(.blurReplace)
 				}
 			}
+			.animation(.easeInOut, value: searchText.isEmpty)
 			.scrollEdgeEffect()
-			.appNavigationTitle("Friends", accent: true)
+			.appNavigationTitle("Friends", style: .main, accent: true)
 			.toolbar {
-				ToolbarItemGroup(placement: .topBarTrailing) {
+				ToolbarItem(placement: .topBarLeading) {
 					Button("Friend requests", systemImage: incomingFriendRequests.isEmpty ? "bell" : "bell.badge") {
 						sheet = .requests
 					}
 					.matchedTransitionSource(id: FriendsSheet.requests.transitionID, in: sheetNamespace)
 					.accessibilityValue(incomingFriendRequests.isEmpty ? "No pending requests" : "\(incomingFriendRequests.count) pending requests")
-
+				}
+				ToolbarItem(placement: .topBarTrailing) {
 					Button("Add friend", systemImage: "person.badge.plus") {
 						sheet = .addFriend
 					}
@@ -72,6 +76,17 @@ struct FriendsView: View {
 		.dynamicTypeSize(.medium)
 	}
 
+	private func animatedScrollCard(_ content: some View) -> some View {
+		let shouldReduceMotion = reduceMotion
+
+		return content
+			.scrollTransition(.animated(.snappy(duration: 0.3))) { card, phase in
+				card
+					.opacity(shouldReduceMotion || phase.isIdentity ? 1 : 0.65)
+					.scaleEffect(shouldReduceMotion || phase.isIdentity ? 1 : 0.96)
+			}
+	}
+
 	private var friendsList: some View {
 		ScrollView {
 			LazyVStack(spacing: 14) {
@@ -87,12 +102,7 @@ struct FriendsView: View {
 						Button {
 							selectedFriend = friend
 						} label: {
-							FriendStatusCard(friend: friend)
-								.scrollTransition(.animated(.snappy(duration: 0.3))) { card, phase in
-									card
-										.opacity(reduceMotion || phase.isIdentity ? 1 : 0.65)
-										.scaleEffect(reduceMotion || phase.isIdentity ? 1 : 0.96)
-								}
+							animatedScrollCard(FriendStatusCard(friend: friend))
 						}
 						.buttonStyle(.plain)
 						.matchedTransitionSource(
