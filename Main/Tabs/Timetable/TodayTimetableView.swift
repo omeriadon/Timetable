@@ -242,6 +242,7 @@ private struct TodaySchoolTimeline: View {
 	private let periodCornerRadius = TodayCardLayout.innerCornerRadius
 	private let timelineHorizontalPadding: CGFloat = 3
 	private let periodHorizontalInset = TodayCardLayout.contentInset
+	private let expandedContentHeight: CGFloat = 48
 
 	/// Pulled these out of `body` into computed properties so both `body`
 	/// and `periodsLayer` can reference them without re-deriving anything
@@ -260,6 +261,7 @@ private struct TodaySchoolTimeline: View {
 
 	private var height: CGFloat {
 		CGFloat(totalMinutes) * minuteHeight
+			+ (expandedPeriodNumber == nil ? 0 : expandedContentHeight)
 	}
 
 	var body: some View {
@@ -305,7 +307,7 @@ private struct TodaySchoolTimeline: View {
 							.frame(width: periodRowWidth(for: geometry.size.width))
 							.offset(
 								x: periodHorizontalInset - timelineHorizontalPadding,
-								y: offset(for: period.start)
+								y: offset(for: period)
 							)
 					}
 				}
@@ -329,7 +331,7 @@ private struct TodaySchoolTimeline: View {
 		let duration = CGFloat(period.end.minutesSinceMidnight - period.start.minutesSinceMidnight) * minuteHeight
 		let isExpanded = expandedPeriodNumber == period.number
 		let baseCardHeight = max(44, duration - 8)
-		let cardHeight = baseCardHeight + (isExpanded ? 48 : 0)
+		let cardHeight = baseCardHeight + (isExpanded ? expandedContentHeight : 0)
 
 		VStack(alignment: .leading, spacing: 8) {
 			HStack(alignment: .top) {
@@ -416,14 +418,28 @@ private struct TodaySchoolTimeline: View {
 
 	private func markerOffset(for firstPeriod: SchoolPeriod) -> CGFloat {
 		guard currentMinute < firstPeriod.start.minutesSinceMidnight else {
-			return CGFloat(currentMinute - SchoolStateEngine.schoolStart.minutesSinceMidnight) * minuteHeight - 4
+			return CGFloat(currentMinute - SchoolStateEngine.schoolStart.minutesSinceMidnight) * minuteHeight
+				+ expandedContentOffset(before: currentMinute)
+				- 4
 		}
 
 		return -15
 	}
 
-	private func offset(for time: TimeOfDay) -> CGFloat {
-		CGFloat(time.minutesSinceMidnight - SchoolStateEngine.schoolStart.minutesSinceMidnight) * minuteHeight
+	private func offset(for period: SchoolPeriod) -> CGFloat {
+		CGFloat(period.start.minutesSinceMidnight - SchoolStateEngine.schoolStart.minutesSinceMidnight) * minuteHeight
+			+ expandedContentOffset(before: period.start.minutesSinceMidnight)
+	}
+
+	private func expandedContentOffset(before minute: Int) -> CGFloat {
+		guard let expandedPeriodNumber,
+		      let expandedPeriod = periods.first(where: { $0.number == expandedPeriodNumber }),
+		      expandedPeriod.end.minutesSinceMidnight <= minute
+		else {
+			return 0
+		}
+
+		return expandedContentHeight
 	}
 
 	private func subject(for period: SchoolPeriod) -> Subject? {

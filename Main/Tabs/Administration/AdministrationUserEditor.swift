@@ -50,8 +50,17 @@ struct AdministrationUserEditor: View {
 					Section("Account Data") {
 						if rawData.isEmpty {
 							Text("Loading...")
+						} else if let rows = AdministrationJSONFormatter.rootRows(from: rawData) {
+							ForEach(rows) { row in
+								DisclosureGroup {
+									AdministrationJSONValueView(value: row.value, depth: 1)
+								} label: {
+									Text(row.label)
+										.font(.system(.caption, design: .monospaced).weight(.semibold))
+								}
+							}
 						} else {
-							AdministrationJSONRenderer(json: rawData)
+							AdministrationJSONText(value: rawData)
 						}
 					}
 				}
@@ -155,24 +164,6 @@ struct AdministrationUserEditor: View {
 	}
 }
 
-private struct AdministrationJSONRenderer: View {
-	let json: String
-	private let value: Any?
-
-	init(json: String) {
-		self.json = json
-		value = AdministrationJSONFormatter.value(from: json)
-	}
-
-	var body: some View {
-		if let value {
-			AdministrationJSONValueView(value: value)
-		} else {
-			AdministrationJSONText(value: json)
-		}
-	}
-}
-
 private struct AdministrationJSONValueView: View {
 	let value: Any
 	let depth: Int
@@ -260,6 +251,33 @@ private struct AdministrationJSONText: View {
 }
 
 private enum AdministrationJSONFormatter {
+	static func rootRows(from json: String) -> [AdministrationJSONRow]? {
+		guard let value = value(from: json) else {
+			return nil
+		}
+
+		switch value {
+			case let dictionary as [String: Any]:
+				return dictionary.keys.sorted().map { key in
+					AdministrationJSONRow(
+						id: "dictionary-\(key)",
+						label: key,
+						value: dictionary[key] ?? NSNull()
+					)
+				}
+			case let array as [Any]:
+				return array.enumerated().map { index, value in
+					AdministrationJSONRow(
+						id: "array-\(index)",
+						label: "Item \(index + 1)",
+						value: value
+					)
+				}
+			default:
+				return nil
+		}
+	}
+
 	static func value(from json: String) -> Any? {
 		guard let data = json.data(using: .utf8) else {
 			return nil
@@ -328,4 +346,10 @@ private enum AdministrationJSONFormatter {
 
 		return object
 	}
+}
+
+private struct AdministrationJSONRow: Identifiable {
+	let id: String
+	let label: String
+	let value: Any
 }
