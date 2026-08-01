@@ -12,6 +12,7 @@ struct AdministrationUserEditor: View {
 	@State private var password = ""
 	@State private var rawData = ""
 	@State private var showsDeleteConfirmation = false
+	@State private var expandedAccountDataNodeIDs: Set<String> = []
 	@Environment(\.statusBadgeManager) private var badges
 
 	init(
@@ -52,11 +53,36 @@ struct AdministrationUserEditor: View {
 							Text("Loading...")
 						} else if let rows = AdministrationJSONFormatter.rootRows(from: rawData) {
 							ForEach(rows) { row in
-								DisclosureGroup {
-									AdministrationJSONValueView(value: row.value, depth: 1)
+								DisclosureGroup(isExpanded: accountDataExpansion(for: row.id)) {
+									EmptyView()
 								} label: {
 									Text(row.label)
 										.font(.system(.caption, design: .monospaced).weight(.semibold))
+								}
+
+								if expandedAccountDataNodeIDs.contains(row.id) {
+									if let secondLevelRows = AdministrationJSONFormatter.childRows(
+										from: row.value,
+										parentID: row.id
+									), !secondLevelRows.isEmpty {
+										ForEach(secondLevelRows) { secondLevelRow in
+											DisclosureGroup(isExpanded: accountDataExpansion(for: secondLevelRow.id)) {
+												EmptyView()
+											} label: {
+												Text(secondLevelRow.label)
+													.font(.system(.caption, design: .monospaced).weight(.semibold))
+											}
+											.listRowInsets(.init(top: 8, leading: 32, bottom: 8, trailing: 16))
+
+											if expandedAccountDataNodeIDs.contains(secondLevelRow.id) {
+												AdministrationJSONFormattedValue(value: secondLevelRow.value)
+													.listRowInsets(.init(top: 8, leading: 52, bottom: 8, trailing: 16))
+											}
+										}
+									} else {
+										AdministrationJSONFormattedValue(value: row.value)
+											.listRowInsets(.init(top: 8, leading: 32, bottom: 8, trailing: 16))
+									}
 								}
 							}
 						} else {
@@ -162,59 +188,20 @@ struct AdministrationUserEditor: View {
 			dismiss()
 		}
 	}
-}
 
-private struct AdministrationJSONValueView: View {
-	let value: Any
-	let depth: Int
-
-	init(value: Any, depth: Int = 0) {
-		self.value = value
-		self.depth = depth
-	}
-
-	var body: some View {
-		valueView(value)
-	}
-
-	private func valueView(_ value: Any) -> AnyView {
-		switch value {
-			case let dictionary as [String: Any]:
-				AnyView(
-					VStack(alignment: .leading, spacing: 4) {
-						ForEach(dictionary.keys.sorted(), id: \.self) { key in
-							DisclosureGroup {
-								childView(dictionary[key] ?? NSNull(), nextDepth: depth + 1)
-							} label: {
-								Text(key)
-									.font(.system(.caption, design: .monospaced).weight(.semibold))
-							}
-						}
-					}
-				)
-
-			case let array as [Any]:
-				AnyView(
-					VStack(alignment: .leading, spacing: 4) {
-						ForEach(Array(array.enumerated()), id: \.offset) { index, child in
-							DisclosureGroup("Item \(index + 1)") {
-								childView(child, nextDepth: depth + 1)
-							}
-						}
-					}
-				)
-
-			default:
-				AnyView(AdministrationJSONFormattedValue(value: value))
-		}
-	}
-
-	private func childView(_ value: Any, nextDepth: Int) -> AnyView {
-		if nextDepth >= 2 {
-			return AnyView(AdministrationJSONFormattedValue(value: value))
-		}
-
-		return AnyView(AdministrationJSONValueView(value: value, depth: nextDepth))
+	private func accountDataExpansion(for nodeID: String) -> Binding<Bool> {
+		Binding(
+			get: {
+				expandedAccountDataNodeIDs.contains(nodeID)
+			},
+			set: { isExpanded in
+				if isExpanded {
+					expandedAccountDataNodeIDs.insert(nodeID)
+				} else {
+					expandedAccountDataNodeIDs.remove(nodeID)
+				}
+			}
+		)
 	}
 }
 
@@ -256,11 +243,19 @@ private enum AdministrationJSONFormatter {
 			return nil
 		}
 
+		guard let rows = childRows(from: value, parentID: "root"), !rows.isEmpty else {
+			return nil
+		}
+
+		return rows
+	}
+
+	static func childRows(from value: Any, parentID: String) -> [AdministrationJSONRow]? {
 		switch value {
 			case let dictionary as [String: Any]:
 				return dictionary.keys.sorted().map { key in
 					AdministrationJSONRow(
-						id: "dictionary-\(key)",
+						id: "\(parentID).dictionary-\(key)",
 						label: key,
 						value: dictionary[key] ?? NSNull()
 					)
@@ -268,7 +263,7 @@ private enum AdministrationJSONFormatter {
 			case let array as [Any]:
 				return array.enumerated().map { index, value in
 					AdministrationJSONRow(
-						id: "array-\(index)",
+						id: "\(parentID).array-\(index)",
 						label: "Item \(index + 1)",
 						value: value
 					)
