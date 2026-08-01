@@ -1,4 +1,5 @@
 import ColorfulX
+import Defaults
 import SwiftUI
 
 struct ProfilePicture: View {
@@ -26,6 +27,20 @@ struct ProfilePicture: View {
 		photoSource = photo.map(PhotoSource.remote)
 		self.size = size
 		self.badges = badges
+		self.accessibilityName = accessibilityName
+		self.animatesBackground = animatesBackground
+	}
+
+	init(
+		size: CGFloat? = nil,
+		accessibilityName: String = "Profile Picture",
+		animatesBackground: Bool = true
+	) {
+		let profile = Defaults[.accountProfile]
+		appearance = profile?.appearance ?? Defaults[.profileAppearance]
+		photoSource = profile?.photo.map(PhotoSource.remote)
+		self.size = size
+		badges = profile?.badges ?? []
 		self.accessibilityName = accessibilityName
 		self.animatesBackground = animatesBackground
 	}

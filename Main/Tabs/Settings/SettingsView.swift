@@ -84,7 +84,7 @@ import WidgetKit
 					Label {
 						Text(userDisplayName)
 					} icon: {
-						ProfilePicture(appearance: \\ HERE, size: 30, accessibilityName: "Profile Picture")
+						ProfilePicture(size: 30, accessibilityName: "Profile Picture")
 					}
 				}
 			}
