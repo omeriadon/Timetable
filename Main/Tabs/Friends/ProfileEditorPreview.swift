@@ -15,6 +15,8 @@ struct ProfileEditorPreview: View {
 						accessibilityName: "Profile preview",
 						animatesBackground: true
 					)
+					.id(ProfileContentKind.photo.rawValue)
+					.transition(.blurReplace)
 				} else {
 					profilePicture
 				}
@@ -23,6 +25,7 @@ struct ProfileEditorPreview: View {
 			#endif
 		}
 		.shadow(radius: 14)
+		.animation(.easeInOut, value: draft.contentKind)
 	}
 
 	private var profilePicture: some View {
@@ -32,5 +35,7 @@ struct ProfileEditorPreview: View {
 			accessibilityName: "Profile preview",
 			animatesBackground: true
 		)
+		.id(draft.contentKind.rawValue)
+		.transition(.blurReplace)
 	}
 }
