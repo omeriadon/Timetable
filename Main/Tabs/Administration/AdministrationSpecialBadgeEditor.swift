@@ -90,7 +90,7 @@ struct AdministrationSpecialBadgeEditor: View {
 				}
 			}
 			.safeAreaBar(edge: .bottom) {
-				if let badge = target.badge, !isBuiltIn {
+				if target.badge != nil, !isBuiltIn {
 					Button("Delete Badge", systemImage: "trash", role: .destructive) {
 						showsDeleteConfirmation = true
 					}

@@ -57,7 +57,6 @@ struct AdministrationEventTagsView: View {
 		}
 	}
 
-	@ViewBuilder
 	private func sectionView(_ section: AdministrationEventTagSection) -> some View {
 		VStack(alignment: .leading, spacing: 12) {
 			HStack(spacing: 12) {
@@ -158,18 +157,18 @@ private struct WrappingHStack: Layout {
 	let lineSpacing: CGFloat
 
 	func sizeThatFits(
-		proposed proposal: ProposedViewSize,
+		proposal: ProposedViewSize,
 		subviews: Subviews,
-		cache: inout Cache
+		cache _: inout Cache
 	) -> CGSize {
 		layoutResult(proposal: proposal, subviews: subviews).size
 	}
 
 	func placeSubviews(
 		in bounds: CGRect,
-		proposed _: ProposedViewSize,
+		proposal _: ProposedViewSize,
 		subviews: Subviews,
-		cache: inout Cache
+		cache _: inout Cache
 	) {
 		let result = layoutResult(
 			proposal: ProposedViewSize(width: bounds.width, height: bounds.height),

@@ -8,7 +8,7 @@ enum BroadcastNotificationCleanup {
 
 		let center = UNUserNotificationCenter.current()
 		let delivered = await center.deliveredNotifications()
-		let identifiers = delivered.compactMap { notification in
+		let identifiers: [String] = delivered.compactMap { notification in
 			guard notification.request.content.userInfo["broadcast-id"] as? String == broadcastID else {
 				return nil
 			}
