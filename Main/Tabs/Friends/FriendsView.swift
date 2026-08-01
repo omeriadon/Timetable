@@ -12,6 +12,7 @@ struct FriendsView: View {
 	@State private var selectedFriend: FriendSummary?
 	@State private var isSearching = false
 	@State private var draggedFriend: FriendSummary?
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	@Namespace private var sheetNamespace
 
 	var body: some View {
@@ -86,7 +87,12 @@ struct FriendsView: View {
 						Button {
 							selectedFriend = friend
 						} label: {
-							FriendStatusCard(friend: friend)
+						FriendStatusCard(friend: friend)
+							.scrollTransition(.animated(.snappy(duration: 0.3))) { card, phase in
+								card
+									.opacity(reduceMotion || phase.isIdentity ? 1 : 0.65)
+									.scaleEffect(reduceMotion || phase.isIdentity ? 1 : 0.96)
+							}
 						}
 						.buttonStyle(.plain)
 						.matchedTransitionSource(

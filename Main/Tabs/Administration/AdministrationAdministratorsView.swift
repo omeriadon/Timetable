@@ -14,7 +14,7 @@ struct AdministrationAdministratorsView: View {
 					administratorRow(for: user)
 				}
 			} footer: {
-				Text("Only permanent owners can change administrator access. Permanent owners cannot be changed here.")
+				Text("Only system administrators can change administrator access. System administrators cannot be changed here.")
 			}
 		}
 		.scrollEdgeEffect()
@@ -57,12 +57,13 @@ struct AdministrationAdministratorsView: View {
 					photo: user.photo,
 					size: 44,
 					badges: user.badges,
-					accessibilityName: user.displayName
+					accessibilityName: user.displayName,
+					animatesBackground: true
 				)
 
 				VStack(alignment: .leading) {
 					Text(user.displayName)
-					Text("Permanent Owner")
+					Text("System Administrator")
 						.font(.footnote)
 						.foregroundStyle(.secondary)
 				}
@@ -75,7 +76,8 @@ struct AdministrationAdministratorsView: View {
 						photo: user.photo,
 						size: 44,
 						badges: user.badges,
-						accessibilityName: user.displayName
+						accessibilityName: user.displayName,
+						animatesBackground: true
 					)
 
 					VStack(alignment: .leading) {

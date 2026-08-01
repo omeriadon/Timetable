@@ -41,7 +41,7 @@ nonisolated enum BuiltInProfileBadgeConfiguration {
 					backgroundColor: RGBAColor(red: 1, green: 1, blue: 1, alpha: 1),
 					symbolColor: RGBAColor(red: 1, green: 1, blue: 1, alpha: 1),
 					priority: 100,
-					accessibilityLabel: "Permanent owner"
+					accessibilityLabel: "System Administrator"
 				)
 			case .administrator:
 				storedBadge(forKey: administratorKey) ?? ProfileBadge(

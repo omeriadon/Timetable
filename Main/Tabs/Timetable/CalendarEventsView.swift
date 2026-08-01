@@ -135,7 +135,7 @@ struct DatesView: View {
 			.font(.title.bold())
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.padding(.vertical, 6)
-			.background(.ultraThinMaterial)
+			.zIndex(2)
 	}
 
 	@ViewBuilder
@@ -150,7 +150,6 @@ struct DatesView: View {
 			.frame(maxWidth: .infinity)
 			.matchedTransitionSource(id: target.transitionID, in: eventEditorNamespace)
 			.contentShape(RoundedRectangle(cornerRadius: 20))
-			.zIndex(1)
 		} else {
 			timelineEntryContent(entry)
 		}

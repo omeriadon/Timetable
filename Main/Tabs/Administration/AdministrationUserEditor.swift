@@ -55,11 +55,6 @@ struct AdministrationUserEditor: View {
 						}
 					}
 
-					if !rawData.isEmpty {
-						Section("Formatted JSON") {
-							AdministrationJSONViewer(json: rawData)
-						}
-					}
 				}
 			}
 			.appNavigationTitle(target.user == nil ? "New User" : "User", accent: true)
@@ -208,14 +203,6 @@ private struct AdministrationJSONRenderer: View {
 					value: AdministrationJSONFormatter.formatObject(value ?? NSNull())
 				)
 		}
-	}
-}
-
-private struct AdministrationJSONViewer: View {
-	let json: String
-
-	var body: some View {
-		AdministrationJSONText(value: AdministrationJSONFormatter.format(json))
 	}
 }
 

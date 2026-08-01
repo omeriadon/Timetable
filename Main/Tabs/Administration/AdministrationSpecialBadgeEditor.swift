@@ -30,7 +30,7 @@ struct AdministrationSpecialBadgeEditor: View {
 		self.delete = delete
 		let badge = target.badge
 		_symbol = State(initialValue: badge?.symbol ?? "star.fill")
-		_accessibilityLabel = State(initialValue: badge?.accessibilityLabel ?? "Special badge")
+		_accessibilityLabel = State(initialValue: badge?.accessibilityLabel ?? "Badge")
 		_priority = State(initialValue: badge?.priority ?? 50)
 		_backgroundColor = State(initialValue: badge?.backgroundColor?.swiftUIColor ?? .blue)
 		_symbolColor = State(initialValue: badge?.symbolColor?.swiftUIColor ?? .white)

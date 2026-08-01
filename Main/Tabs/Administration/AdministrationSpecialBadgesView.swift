@@ -4,6 +4,8 @@ struct AdministrationSpecialBadgesView: View {
 	@State private var service = AdministrationService.shared
 	@State private var badges: [AdministrationSpecialBadgeResponse] = []
 	@State private var users: [AdministrationUserResponse] = []
+	@State private var badgeOrder: [UUID] = []
+	@State private var isReordering = false
 	@State private var editor: AdministrationSpecialBadgeEditorTarget?
 	@Environment(\.statusBadgeManager) private var statusBadges
 	@Namespace private var namespace
@@ -28,9 +30,20 @@ struct AdministrationSpecialBadgesView: View {
 				.buttonStyle(.plain)
 				.matchedTransitionSource(id: editorID(for: badge), in: namespace)
 			}
+			.onMove(perform: move)
 		}
-		.appNavigationTitle("Special Badges", accent: true)
+		.environment(\.editMode, .constant(isReordering ? .active : .inactive))
+		.appNavigationTitle("Badges", accent: true)
 		.toolbar {
+			ToolbarItem(placement: .topBarLeading) {
+				Button(
+					isReordering ? "Done" : "Reorder",
+					systemImage: isReordering ? "checkmark" : "arrow.up.arrow.down"
+				) {
+					isReordering.toggle()
+				}
+			}
+
 			ToolbarItem(placement: .confirmationAction) {
 				Button("Add Badge", systemImage: "plus", role: .confirm) {
 					editor = .create
@@ -79,10 +92,17 @@ struct AdministrationSpecialBadgesView: View {
 	}
 
 	private var displayedBadges: [AdministrationSpecialBadgeResponse] {
-		[
+		let allBadges = [
 			administrationBadge(for: .systemOwner),
 			administrationBadge(for: .administrator),
 		] + badges
+		let knownBadges = Dictionary(uniqueKeysWithValues: allBadges.map { ($0.id, $0) })
+		let orderedIDs = badgeOrder.filter { knownBadges[$0] != nil }
+		let remaining = allBadges
+			.filter { !orderedIDs.contains($0.id) }
+			.sorted { $0.priority > $1.priority }
+
+		return orderedIDs.compactMap { knownBadges[$0] } + remaining
 	}
 
 	private func administrationBadge(for authority: AccountAuthority) -> AdministrationSpecialBadgeResponse {
@@ -94,7 +114,9 @@ struct AdministrationSpecialBadgesView: View {
 			symbolColor: badge.symbolColor,
 			priority: badge.priority,
 			accessibilityLabel: badge.accessibilityLabel,
-			assignedUserIDs: []
+			assignedUserIDs: users
+				.filter { $0.authority == authority }
+				.map(\.id)
 		)
 	}
 
@@ -102,13 +124,56 @@ struct AdministrationSpecialBadgesView: View {
 		do {
 			badges = try await service.specialBadges()
 		} catch {
-			statusBadges.present(error: error, title: "Unable to load special badges")
+			statusBadges.present(error: error, title: "Unable to load badges")
 		}
 
 		do {
 			users = try await service.users()
 		} catch {
 			statusBadges.present(error: error, title: "Unable to load badge users")
+		}
+
+		if badgeOrder.isEmpty {
+			badgeOrder = displayedBadges.map(\.id)
+		}
+	}
+
+	private func move(from offsets: IndexSet, to destination: Int) {
+		var reordered = displayedBadges.map(\.id)
+		reordered.move(fromOffsets: offsets, toOffset: destination)
+		badgeOrder = reordered
+
+		Task {
+			for (index, badgeID) in reordered.enumerated() {
+				guard let badge = displayedBadges.first(where: { $0.id == badgeID }) else {
+					continue
+				}
+
+				let request = AdministrationSpecialBadgeRequest(
+					symbol: badge.symbol,
+					backgroundColor: badge.backgroundColor,
+					symbolColor: badge.symbolColor,
+					priority: reordered.count - index,
+					accessibilityLabel: badge.accessibilityLabel
+				)
+
+				if BuiltInProfileBadgeConfiguration.authority(for: badge.id) != nil {
+					BuiltInProfileBadgeConfiguration.update(
+						ProfileBadge(
+							id: badge.id,
+							symbol: badge.symbol,
+							backgroundColor: badge.backgroundColor,
+							symbolColor: badge.symbolColor,
+							priority: request.priority,
+							accessibilityLabel: badge.accessibilityLabel
+						)
+					)
+				} else {
+					try? await service.updateSpecialBadge(id: badge.id, request: request)
+				}
+			}
+
+			await load()
 		}
 	}
 
@@ -128,6 +193,7 @@ struct AdministrationSpecialBadgesView: View {
 					accessibilityLabel: request.accessibilityLabel
 				)
 			)
+			badgeOrder = displayedBadges.map(\.id)
 			return administrationBadge(for: builtInAuthority)
 		}
 

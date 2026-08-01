@@ -19,13 +19,20 @@ struct FriendDetailView: View {
 				VStack(alignment: .leading, spacing: 20) {
 					FriendDetailHeader(friend: friend.friend)
 
-					Picker("Friend detail", selection: $selectedTab) {
-						ForEach(FriendDetailTab.allCases) { tab in
-							Label(tab.title, systemImage: tab.symbol)
-								.tag(tab)
-						}
-					}
-					.pickerStyle(.segmented)
+					TabsPicker(
+						items: FriendDetailTab.allCases.map { ($0.title, $0.symbol) },
+						selection: Binding(
+							get: { FriendDetailTab.allCases.firstIndex(of: selectedTab) ?? 0 },
+							set: { index in
+								guard FriendDetailTab.allCases.indices.contains(index) else {
+									return
+								}
+
+								selectedTab = FriendDetailTab.allCases[index]
+							}
+						)
+					)
+					.frame(height: 52)
 
 					if isLoading {
 						ProgressView()
@@ -155,48 +162,88 @@ private struct FriendOverview: View {
 			friendSubjects: detail.timetable?.subjects ?? []
 		)
 
-		VStack(alignment: .leading, spacing: 18) {
+		VStack(alignment: .leading, spacing: 14) {
 			currentAndNextClasses
 
-			LabeledContent("Friends since") {
+			VStack(alignment: .leading, spacing: 6) {
+				Text("Friends since")
+				.font(.headline)
 				Text(detail.acceptedAt, format: .dateTime.month().day().year())
+				.foregroundStyle(.secondary)
 			}
+			.padding(18)
+			.frame(maxWidth: .infinity, alignment: .leading)
+			.background {
+				FriendPaperBackground(cornerRadius: 22)
+			}
+			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
 
+			sharedClassesCard(comparison.sharedClasses, showSubjectContext: showSubjectContext)
+
+			sharedSubjectsCard(comparison.sharedSubjects, showSubjectContext: showSubjectContext)
+		}
+	}
+
+	private func sharedClassesCard(
+		_ classes: [SharedClass],
+		showSubjectContext: @escaping (FriendSubjectContext) -> Void
+	) -> some View {
+		VStack(alignment: .leading, spacing: 10) {
 			Text("Shared Classes")
 				.font(.headline)
-			if comparison.sharedClasses.isEmpty {
+
+			if classes.isEmpty {
 				Text("No shared classes.")
 					.foregroundStyle(.secondary)
 			} else {
-				ForEach(comparison.sharedClasses) { sharedClass in
+				ForEach(Array(classes.enumerated()), id: \.offset) { index, sharedClass in
+					if index > 0 {
+						Divider()
+					}
+
 					Button {
 						showSubjectContext(sharedClass.context)
 					} label: {
-						VStack(alignment: .leading, spacing: 3) {
+						HStack(alignment: .top, spacing: 12) {
 							Label(sharedClass.subjectName, systemImage: sharedClass.symbol)
 								.foregroundStyle(sharedClass.colour.swiftUIColor)
-							if !sharedClass.classroom.isEmpty {
+
+							Spacer()
+
+							VStack(alignment: .trailing, spacing: 3) {
 								Text(sharedClass.classroom)
+								Text(sharedClass.slotSummary)
 									.font(.footnote)
 									.foregroundStyle(.secondary)
 							}
-							Text(sharedClass.slotSummary)
-								.font(.footnote)
-								.foregroundStyle(.secondary)
 						}
 						.frame(maxWidth: .infinity, alignment: .leading)
 					}
 					.buttonStyle(.plain)
 				}
 			}
+		}
+		.padding(18)
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.background {
+			FriendPaperBackground(cornerRadius: 22)
+		}
+		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+	}
 
+	private func sharedSubjectsCard(
+		_ subjects: [SharedSubject],
+		showSubjectContext: @escaping (FriendSubjectContext) -> Void
+	) -> some View {
+		VStack(alignment: .leading, spacing: 10) {
 			Text("Shared Subjects")
 				.font(.headline)
-			if comparison.sharedSubjects.isEmpty {
+
+			if subjects.isEmpty {
 				Text("No shared subjects.")
 					.foregroundStyle(.secondary)
 			} else {
-				ForEach(comparison.sharedSubjects) { subject in
+				ForEach(subjects) { subject in
 					Button {
 						showSubjectContext(subject.context)
 					} label: {
@@ -209,10 +256,11 @@ private struct FriendOverview: View {
 			}
 		}
 		.padding(18)
+		.frame(maxWidth: .infinity, alignment: .leading)
 		.background {
-			FriendPaperBackground(cornerRadius: 26)
+			FriendPaperBackground(cornerRadius: 22)
 		}
-		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 26, style: .continuous))
+		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
 	}
 
 	private var currentAndNextClasses: some View {
@@ -241,6 +289,11 @@ private struct FriendOverview: View {
 				)
 			}
 		}
+		.padding(14)
+		.background {
+			FriendPaperBackground(cornerRadius: 22)
+		}
+		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
 	}
 
 	private func contextButton(

@@ -56,7 +56,7 @@ struct AdministrationView: View {
 						}
 
 						if authority == .systemOwner {
-							Section("Owner Administration") {
+							Section("System Administration") {
 								NavigationLink {
 									AdministrationAdministratorsView()
 								} label: {
@@ -78,7 +78,7 @@ struct AdministrationView: View {
 								NavigationLink {
 									AdministrationSpecialBadgesView()
 								} label: {
-									Label("Special Badges", systemImage: "rosette")
+									Label("Badges", systemImage: "rosette")
 								}
 							}
 						}

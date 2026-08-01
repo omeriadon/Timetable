@@ -21,7 +21,7 @@ nonisolated enum AccountAuthority: String, Codable, CaseIterable, Hashable, Send
 			case .administrator:
 				"Administrator"
 			case .systemOwner:
-				"System Owner"
+				"System Administrator"
 		}
 	}
 }

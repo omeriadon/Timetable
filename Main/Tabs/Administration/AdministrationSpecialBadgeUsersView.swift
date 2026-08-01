@@ -16,7 +16,8 @@ struct AdministrationSpecialBadgeUsersView: View {
 						photo: user.photo,
 						size: 44,
 						badges: user.badges,
-						accessibilityName: user.displayName
+						accessibilityName: user.displayName,
+						animatesBackground: true
 					)
 
 					VStack(alignment: .leading, spacing: 4) {

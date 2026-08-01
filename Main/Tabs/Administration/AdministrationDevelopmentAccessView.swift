@@ -11,7 +11,7 @@ struct AdministrationDevelopmentAccessView: View {
 			Section {
 				if let developmentAccessOnly {
 					Toggle(
-						"Restrict Server to Owners",
+						"Restrict Server to System Administrators",
 						isOn: Binding(
 							get: { developmentAccessOnly },
 							set: { pendingDevelopmentAccessOnly = $0 }
@@ -24,7 +24,7 @@ struct AdministrationDevelopmentAccessView: View {
 			} header: {
 				Text("Development Access")
 			} footer: {
-				Text("When enabled, only the two permanent owner accounts can use the server. Existing sessions remain intact but receive an access error.")
+				Text("When enabled, only the two system administrator accounts can use the server. Existing sessions remain intact but receive an access error.")
 			}
 		}
 		.scrollEdgeEffect()
@@ -33,7 +33,7 @@ struct AdministrationDevelopmentAccessView: View {
 			await load()
 		}
 		.confirmationDialog(
-			pendingDevelopmentAccessOnly == true ? "Restrict Server to Owners?" : "Restore Normal Server Access?",
+				pendingDevelopmentAccessOnly == true ? "Restrict Server to System Administrators?" : "Restore Normal Server Access?",
 			isPresented: Binding(
 				get: { pendingDevelopmentAccessOnly != nil },
 				set: { isPresented in
@@ -46,7 +46,7 @@ struct AdministrationDevelopmentAccessView: View {
 		) {
 			if let pendingDevelopmentAccessOnly {
 				Button(
-					pendingDevelopmentAccessOnly ? "Restrict to Owners" : "Restore Normal Access",
+					pendingDevelopmentAccessOnly ? "Restrict to System Administrators" : "Restore Normal Access",
 					systemImage: pendingDevelopmentAccessOnly ? "lock.fill" : "lock.open",
 					role: .confirm
 				) {
@@ -56,7 +56,7 @@ struct AdministrationDevelopmentAccessView: View {
 		} message: {
 			Text(
 				pendingDevelopmentAccessOnly == true
-					? "All non-owner accounts will receive an access error until normal access is restored."
+					? "All non-system-administrator accounts will receive an access error until normal access is restored."
 					: "All accounts will be able to use the server again."
 			)
 		}
