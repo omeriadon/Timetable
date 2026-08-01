@@ -235,7 +235,7 @@ private func upcomingEvents(
 	let startDate = SchoolCalendarDate(date)
 	return projection.allEvents
 		.filter { $0.date >= startDate }
-		.prefix(3)
+		.prefix(4)
 		.map(\.self)
 }
 
