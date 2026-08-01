@@ -32,48 +32,8 @@ struct ProfileAppearanceSheet: View {
 
 	var body: some View {
 		NavigationStack {
-			VStack(spacing: 20) {
-				ProfileEditorPreview(draft: draft)
-					.padding(.horizontal, 30)
-					.frame(maxHeight: .infinity)
-
-				HStack {
-					Text("Name")
-						.foregroundStyle(.tertiary)
-						.font(.caption)
-
-					TextField("", text: $draft.displayName)
-						.textCase(.uppercase)
-						.textFieldStyle(.plain)
-						.accessibilityLabel("Profile monogram")
-						.onChange(of: draft.monogram) { _, value in
-							let normalized = String(value.prefix(3)).uppercased()
-							if normalized != value {
-								draft.monogram = normalized
-							}
-						}
-				}
-				.padding(5)
-				.padding(.horizontal, 5)
-				.glassEffect(.regular.interactive())
-
-				TabsPicker(
-					items: [
-						("Photo", "photo"),
-						("Monogram", "character"),
-						("Emoji", "face.smiling"),
-					],
-					selection: Binding(
-						get: {
-							ProfileContentKind.allCases.firstIndex(of: draft.contentKind)!
-						},
-						set: {
-							draft.contentKind = ProfileContentKind.allCases[$0]
-						}
-					)
-				)
-				.frame(height: 40)
-
+			ScrollView {
+				VStack(spacing: 20) {
 				if draft.contentKind == .monogram {
 					GlassEffectContainer(spacing: 5) {
 						HStack {
@@ -158,31 +118,73 @@ struct ProfileAppearanceSheet: View {
 				}
 
 				if draft.contentKind != .photo {
-					VStack(alignment: .center, spacing: 4) {
+					VStack(alignment: .center, spacing: 10) {
 						Text("Background")
 							.frame(maxWidth: .infinity, alignment: .leading)
 							.foregroundStyle(.secondary)
-						ProfileColourGrid(selection: $draft.colours)
-							.clipShape(ConcentricRectangle(corners: .concentric(minimum: 20), isUniform: false))
-					}
-					.transition(.blurReplace)
 
 					VStack(alignment: .leading, spacing: 10) {
 						LabeledContent("Animation Speed", value: draft.speed, format: .number.precision(.fractionLength(2)))
-						Slider(value: $draft.speed, in: 0...2, step: 0.05)
+						Slider(value: $draft.speed, in: 0...5, step: 0.05)
 							.accessibilityLabel("Animation Speed")
 
 						LabeledContent("Texture Noise", value: draft.noise, format: .number.precision(.fractionLength(0)))
 						Slider(value: $draft.noise, in: 0...100, step: 1)
 							.accessibilityLabel("Texture Noise")
 					}
-					.padding(.horizontal, 4)
+
+					ProfileColourGrid(selection: $draft.colours)
+						.clipShape(ConcentricRectangle(corners: .concentric(minimum: 20), isUniform: false))
+				}
 					.transition(.blurReplace)
 				}
+				}
+				.animation(.easeInOut, value: draft.contentKind)
+				.padding([.horizontal, .top], 10)
+				.padding(.bottom, 10)
 			}
-			.animation(.easeInOut, value: draft.contentKind)
-			.padding([.horizontal, .top], 10)
-			.padding(.bottom, 10)
+			.scrollEdgeEffectStyle(.hard, for: .top)
+			.scrollEdgeEffectStyle(.hard, for: .bottom)
+			.safeAreaBar(edge: .top, alignment: .center, spacing: 12) {
+				VStack(spacing: 12) {
+					ProfileEditorPreview(draft: draft)
+						.frame(width: 300, height: 300)
+
+					HStack {
+						Text("Name")
+							.foregroundStyle(.tertiary)
+							.font(.caption)
+
+						TextField("", text: $draft.displayName)
+							.textCase(.uppercase)
+							.textFieldStyle(.plain)
+							.accessibilityLabel("Profile name")
+					}
+					.padding(5)
+					.padding(.horizontal, 5)
+					.glassEffect(.regular.interactive())
+
+					TabsPicker(
+						items: [
+							("Photo", "photo"),
+							("Monogram", "character"),
+							("Emoji", "face.smiling"),
+						],
+						selection: Binding(
+							get: {
+								ProfileContentKind.allCases.firstIndex(of: draft.contentKind)!
+							},
+							set: {
+								draft.contentKind = ProfileContentKind.allCases[$0]
+							}
+						)
+					)
+					.frame(height: 40)
+				}
+				.padding(.horizontal, 10)
+				.padding(.top, 10)
+				.padding(.bottom, 12)
+			}
 			.ignoresSafeArea(.all, edges: .bottom)
 			.appNavigationTitle("Profile", accent: true)
 			.toolbar {
