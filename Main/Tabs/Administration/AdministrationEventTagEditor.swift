@@ -74,7 +74,6 @@ struct AdministrationEventTagEditor: View {
 					)
 				}
 			}
-			.scrollEdgeEffect()
 			.appNavigationTitle(tag == nil ? "Add Tag" : "Edit Tag", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
