@@ -10,10 +10,18 @@ import SwiftUI
 
 struct AccountView: View {
 	@State private var sessionStore = SessionStore.shared
+	@State private var administrationService = AdministrationService.shared
 	@Default(.userDisplayName) private var displayName
 	@State private var showDeleteConfirmation = false
 	@State private var showsProfileEditor = false
 	@State private var isDeleting = false
+	@State private var yearGroupTags: [EventTagCatalogueTag] = []
+	@State private var subscribedTagIDs: Set<UUID> = []
+	@State private var selectedYearGroupID: UUID?
+	@State private var committedYearGroupID: UUID?
+	@State private var isLoadingYearGroups = false
+	@State private var isSavingYearGroup = false
+	@State private var yearGroupsFailedToLoad = false
 	@Namespace private var profileNamespace
 	@Environment(\.statusBadgeManager) private var badges
 
@@ -30,6 +38,9 @@ struct AccountView: View {
 							List { accountRows(profile: profile) }
 								.listStyle(.insetGrouped)
 						#endif
+					}
+					.task(id: profile.id) {
+						await loadYearGroups()
 					}
 					.appNavigationTitle("Account")
 					.transition(.blurReplace)
@@ -94,6 +105,47 @@ struct AccountView: View {
 			}
 		}
 
+		Section("Year Group") {
+			if isLoadingYearGroups {
+				LabeledContent("Year Group") {
+					ProgressView()
+				}
+			} else if yearGroupTags.isEmpty {
+				if yearGroupsFailedToLoad {
+					Button("Reload Year Groups", systemImage: "arrow.clockwise") {
+						Task {
+							await loadYearGroups()
+						}
+					}
+				} else {
+					Label("No Year Groups Available", systemImage: "person.3")
+						.foregroundStyle(.secondary)
+				}
+			} else {
+				Picker("Year Group", selection: $selectedYearGroupID) {
+					Text("Select Year Group")
+						.tag(UUID?.none)
+					ForEach(yearGroupTags) { tag in
+						Label(tag.displayName, systemImage: tag.symbol ?? "person.3")
+							.tag(Optional(tag.id))
+					}
+				}
+				.pickerStyle(.menu)
+				.disabled(isSavingYearGroup)
+				.onChange(of: selectedYearGroupID) { _, selectedYearGroupID in
+					guard let selectedYearGroupID,
+					      selectedYearGroupID != committedYearGroupID
+					else {
+						return
+					}
+
+					Task {
+						await saveYearGroup(selectedYearGroupID)
+					}
+				}
+			}
+		}
+
 		Section {
 			Button("Sign Out", systemImage: "door.right.hand.open", role: .destructive, action: signOut)
 			#if os(iOS)
@@ -107,6 +159,57 @@ struct AccountView: View {
 	private func signOut() {
 		Task {
 			await sessionStore.signOut()
+		}
+	}
+
+	private func loadYearGroups() async {
+		isLoadingYearGroups = true
+		yearGroupsFailedToLoad = false
+		defer {
+			isLoadingYearGroups = false
+		}
+
+		do {
+			async let catalogue = administrationService.tagCatalogue()
+			async let subscriptions = administrationService.tagSubscriptions()
+			let result = try await (catalogue, subscriptions)
+			let tags = result.0.sections.first(where: { $0.category == .yearGroup })?.tags ?? []
+			let subscribedTagIDs = Set(result.1.tagIDs)
+			let selectedYearGroupID = tags.first(where: { subscribedTagIDs.contains($0.id) })?.id
+
+			yearGroupTags = tags
+			self.subscribedTagIDs = subscribedTagIDs
+			self.selectedYearGroupID = selectedYearGroupID
+			committedYearGroupID = selectedYearGroupID
+		} catch {
+			yearGroupTags = []
+			subscribedTagIDs = []
+			selectedYearGroupID = nil
+			committedYearGroupID = nil
+			yearGroupsFailedToLoad = true
+			badges.present(error: error, title: "Unable to load year groups")
+		}
+	}
+
+	private func saveYearGroup(_ selectedYearGroupID: UUID) async {
+		isSavingYearGroup = true
+		defer {
+			isSavingYearGroup = false
+		}
+
+		let yearGroupIDs = Set(yearGroupTags.map(\.id))
+		let proposedTagIDs = subscribedTagIDs
+			.subtracting(yearGroupIDs)
+			.union([selectedYearGroupID])
+
+		do {
+			let response = try await administrationService.replaceTagSubscriptions(proposedTagIDs)
+			subscribedTagIDs = Set(response.tagIDs)
+			committedYearGroupID = yearGroupTags.first(where: { subscribedTagIDs.contains($0.id) })?.id
+			self.selectedYearGroupID = committedYearGroupID
+		} catch {
+			self.selectedYearGroupID = committedYearGroupID
+			badges.present(error: error, title: "Unable to save year group")
 		}
 	}
 
