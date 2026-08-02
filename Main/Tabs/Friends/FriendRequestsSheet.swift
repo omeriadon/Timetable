@@ -7,6 +7,8 @@ struct FriendRequestsSheet: View {
 	@State private var outgoingRequests: [FriendSummary] = Defaults[.outgoingFriendRequests]
 	@State private var service = FriendService.shared
 	@State private var acceptingRequestID: UUID?
+	@State private var deletingRequestID: UUID?
+	@State private var requestToDelete: FriendSummary?
 	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
@@ -50,6 +52,27 @@ struct FriendRequestsSheet: View {
 			.refreshable {
 				await refreshRequests()
 			}
+			.confirmationDialog(
+				"Delete Friend Request?",
+				isPresented: Binding(
+					get: { requestToDelete != nil },
+					set: { isPresented in
+						if !isPresented {
+							requestToDelete = nil
+						}
+					}
+				),
+				titleVisibility: .visible
+			) {
+				if let requestToDelete {
+					Button("Delete Request", systemImage: "trash", role: .destructive) {
+						delete(requestToDelete)
+					}
+				}
+				Button(role: .cancel) {}
+			} message: {
+				Text("This removes the pending friend request.")
+			}
 		}
 	}
 
@@ -69,6 +92,13 @@ struct FriendRequestsSheet: View {
 			}
 			.buttonStyle(.glassProminent)
 			.disabled(acceptingRequestID == request.id)
+			Button(role: .destructive) {
+				requestToDelete = request
+			} label: {
+				Image(systemName: "trash")
+			}
+			.accessibilityLabel("Delete friend request")
+			.disabled(deletingRequestID == request.id)
 		}
 		.padding(.vertical, 6)
 		.listRowBackground(Image("paper").resizable().scaledToFill())
@@ -88,6 +118,13 @@ struct FriendRequestsSheet: View {
 			Label("Waiting", systemImage: "clock")
 				.font(.caption.weight(.semibold))
 				.foregroundStyle(.secondary)
+			Button(role: .destructive) {
+				requestToDelete = request
+			} label: {
+				Image(systemName: "trash")
+			}
+			.accessibilityLabel("Delete friend request")
+			.disabled(deletingRequestID == request.id)
 		}
 		.padding(.vertical, 6)
 		.listRowBackground(Image("paper").resizable().scaledToFill())
@@ -112,6 +149,21 @@ struct FriendRequestsSheet: View {
 				incomingRequests.removeAll { $0.id == request.id }
 			} catch {
 				badges.present(error: error, title: "Unable to accept friend request")
+			}
+		}
+	}
+
+	private func delete(_ request: FriendSummary) {
+		requestToDelete = nil
+		deletingRequestID = request.id
+		Task {
+			defer { deletingRequestID = nil }
+			do {
+				try await service.deleteRequest(request)
+				incomingRequests.removeAll { $0.id == request.id }
+				outgoingRequests.removeAll { $0.id == request.id }
+			} catch {
+				badges.present(error: error, title: "Unable to delete friend request")
 			}
 		}
 	}

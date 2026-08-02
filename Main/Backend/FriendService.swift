@@ -102,6 +102,23 @@ final class FriendService {
 		await refreshAfterMutation()
 	}
 
+	func deleteRequest(_ request: FriendSummary) async throws {
+		try await networkManager.send(
+			.v1DeleteFriendRequest(request.relationshipID),
+			context: .userInitiated
+		)
+
+		var incomingRequests = Defaults[.incomingFriendRequests]
+		incomingRequests.removeAll { $0.relationshipID == request.relationshipID }
+		Defaults[.incomingFriendRequests] = incomingRequests
+
+		var outgoingRequests = Defaults[.outgoingFriendRequests]
+		outgoingRequests.removeAll { $0.relationshipID == request.relationshipID }
+		Defaults[.outgoingFriendRequests] = outgoingRequests
+
+		await refreshAfterMutation()
+	}
+
 	func detail(for friendID: UUID) async throws -> FriendDetail {
 		try await networkManager.send(.v1Friend(friendID), context: .userInitiated)
 	}
@@ -222,6 +239,10 @@ private extension Endpoint {
 
 	static func v1AcceptFriendRequest(_ relationshipID: UUID) -> Endpoint {
 		Endpoint("/v1/friends/requests/\(relationshipID.uuidString)/accept", method: .post)
+	}
+
+	static func v1DeleteFriendRequest(_ relationshipID: UUID) -> Endpoint {
+		Endpoint("/v1/friends/requests/\(relationshipID.uuidString)", method: .delete)
 	}
 
 	static func v1Friend(_ friendID: UUID, method: HTTPMethod = .get) -> Endpoint {

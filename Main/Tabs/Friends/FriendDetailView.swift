@@ -12,6 +12,10 @@ struct FriendDetailView: View {
 	@Environment(\.dismiss) private var dismiss
 	@Environment(\.statusBadgeManager) private var badges
 
+	private var displayedFriendName: String {
+		detail?.friend.displayName ?? friend.friend.displayName
+	}
+
 	var body: some View {
 		NavigationStack {
 			ScrollView {
@@ -37,7 +41,7 @@ struct FriendDetailView: View {
 					} else if let detail {
 						switch selectedTab {
 							case .main:
-								FriendOverview(detail: detail, friendName: friend.friend.displayName)
+								FriendOverview(detail: detail, friendName: detail.friend.displayName)
 							case .week:
 								FriendWeek(detail: detail)
 						}
@@ -49,6 +53,7 @@ struct FriendDetailView: View {
 				.padding(.vertical)
 				.padding(.horizontal, FriendDetailLayout.horizontalPadding)
 			}
+			.scrollEdgeEffectStyle(.soft, for: .top)
 			.toolbar {
 				ToolbarItem(placement: .topBarLeading) {
 					Button(role: .cancel) {
@@ -63,10 +68,10 @@ struct FriendDetailView: View {
 							photo: friend.friend.photo,
 							size: 44,
 							badges: friend.friend.badges,
-							accessibilityName: friend.friend.displayName,
+							accessibilityName: displayedFriendName,
 							animatesBackground: true
 						)
-						Text(friend.friend.displayName)
+						Text(displayedFriendName)
 							.font(.largeTitle)
 							.bold()
 							.monospaced()
@@ -87,10 +92,10 @@ struct FriendDetailView: View {
 							photo: friend.friend.photo,
 							size: 44,
 							badges: friend.friend.badges,
-							accessibilityName: friend.friend.displayName,
+							accessibilityName: displayedFriendName,
 							animatesBackground: true
 						)
-						Text(friend.friend.displayName)
+						Text(displayedFriendName)
 							.font(.largeTitle)
 							.bold()
 							.monospaced()

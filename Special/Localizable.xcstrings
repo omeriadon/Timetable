@@ -1437,6 +1437,9 @@
         }
       }
     },
+    "Incoming" : {
+
+    },
     "Incoming Request" : {
 
     },
@@ -1831,9 +1834,6 @@
       }
     },
     "Preparing photo…" : {
-
-    },
-    "Priority: %lld" : {
 
     },
     "Profile" : {
@@ -2277,6 +2277,9 @@
 
     },
     "Sender" : {
+
+    },
+    "Sent" : {
 
     },
     "Sent %@" : {
@@ -3083,6 +3086,9 @@
 
     },
     "Users (%lld)" : {
+
+    },
+    "Waiting" : {
 
     },
     "Week" : {

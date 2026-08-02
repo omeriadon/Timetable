@@ -5,6 +5,10 @@ struct FriendStatusCard: View {
 	let friend: FriendSummary
 	@Default(.schoolCalendar) private var schoolCalendar
 
+	private var displayName: String {
+		friend.friend.displayName
+	}
+
 	var body: some View {
 		TimelineView(.periodic(from: .now, by: 30)) { context in
 			let status = FriendScheduleStatus(subjects: friend.timetable?.subjects ?? [], at: TimetableClock.adjusted(context.date), schoolCalendar: schoolCalendar)
@@ -13,7 +17,7 @@ struct FriendStatusCard: View {
 
 				VStack(alignment: .leading, spacing: 5) {
 					HStack {
-						Text(friend.friend.displayName)
+						Text(displayName)
 							.font(.title3.weight(.semibold))
 
 						Spacer()
