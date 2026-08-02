@@ -59,6 +59,7 @@ struct FriendDetailView: View {
 					)
 				)
 				.frame(height: 40)
+				.padding(.horizontal)
 			}
 			.toolbar {
 				ToolbarItem(placement: .topBarLeading) {
@@ -626,13 +627,14 @@ private struct FriendSubjectContextPopover: View {
 	}
 
 	private func matchingPeriodsRow(_ value: String) -> some View {
-		VStack(alignment: .trailing, spacing: 4) {
+		VStack(alignment: .leading, spacing: 4) {
 			Text("Matching periods")
 				.font(.caption)
 			Text(value)
 				.multilineTextAlignment(.trailing)
+				.frame(maxWidth: .infinity, alignment: .trailing)
 		}
-		.frame(maxWidth: .infinity, alignment: .trailing)
+		.frame(maxWidth: .infinity, alignment: .leading)
 	}
 
 	@ViewBuilder
