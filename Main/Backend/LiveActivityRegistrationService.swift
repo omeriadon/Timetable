@@ -97,6 +97,7 @@
 				for await activity in Activity<SchoolDayActivityAttributes>.activityUpdates {
 					guard let self, !Task.isCancelled else { return }
 					observeTokenUpdates(for: activity)
+					observeStateUpdates(for: activity)
 				}
 			}
 		}
@@ -200,17 +201,36 @@
 		}
 
 		private func uploadUpdateToken(_ token: Data, activityKey: String) async {
-			do {
-				try await networkManager.send(
-					.v1LiveActivityUpdateToken(activityKey: activityKey),
-					body: LiveActivityUpdateTokenRequest(
-						installationID: ClientIdentityProvider.shared.identity().installationID,
-						token: token.hexString,
-						isDebug: Self.isDebug
+			let request = LiveActivityUpdateTokenRequest(
+				installationID: ClientIdentityProvider.shared.identity().installationID,
+				token: token.hexString,
+				isDebug: Self.isDebug
+			)
+			let maximumAttempts = 4
+
+			for attempt in 0 ..< maximumAttempts {
+				guard !Task.isCancelled else { return }
+
+				do {
+					try await networkManager.send(
+						.v1LiveActivityUpdateToken(activityKey: activityKey),
+						body: request
 					)
-				)
-			} catch {
-				PrintError("Live Activity update token upload failed", category: .liveActivity, error: error)
+					Print("Uploaded Live Activity update token", category: .liveActivity)
+					return
+				} catch {
+					guard attempt + 1 < maximumAttempts else {
+						PrintError("Live Activity update token upload failed", category: .liveActivity, error: error)
+						return
+					}
+
+					let delay = UInt64(1 << attempt) * 1_000_000_000
+					do {
+						try await Task.sleep(nanoseconds: delay)
+					} catch {
+						return
+					}
+				}
 			}
 		}
 
