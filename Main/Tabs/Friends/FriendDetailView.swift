@@ -233,7 +233,7 @@ private struct FriendOverview: View {
 	private func sharedClassesCard(_ classes: [SharedClass]) -> some View {
 		VStack(alignment: .leading, spacing: 10) {
 			Text("Shared Classes")
-				.font(.headline)
+				.font(.title3)
 
 			if classes.isEmpty {
 				Text("No shared classes.")
@@ -254,7 +254,7 @@ private struct FriendOverview: View {
 									.foregroundStyle(.secondary)
 							}
 							.padding(14)
-							.frame(maxWidth: .infinity, alignment: .leading)
+							.frame(maxWidth: .infinity, alignment: .topTrailing)
 							.background {
 								FriendPaperBackground(
 									cornerRadius: FriendDetailLayout.itemCornerRadius
@@ -297,7 +297,7 @@ private struct FriendOverview: View {
 	func sharedSubjectsCard(_ subjects: [SharedSubject]) -> some View {
 		VStack(alignment: .leading, spacing: 10) {
 			Text("Shared Subjects")
-				.font(.headline)
+				.font(.title3)
 
 			if subjects.isEmpty {
 				Text("No shared subjects.")
