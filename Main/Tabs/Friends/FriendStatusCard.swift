@@ -121,7 +121,7 @@ private struct FriendScheduleStatus {
 				nextTitle = "Next: \(next.subject.id)"
 				symbol = "clock"
 //				availability = "Before school"
-				availability = "Unavailable"
+				availability = "Coming Soon"
 //				tint = .blue
 				tint = .black
 			case let .lesson(lesson):
@@ -129,7 +129,7 @@ private struct FriendScheduleStatus {
 				nextTitle = lesson.next.title
 				symbol = lesson.subject.symbol
 //				availability = "In class"
-				availability = "Unavailable"
+				availability = "Coming Soon"
 //				tint = lesson.subject.colour.swiftUIColor
 				tint = .black
 			case let .freePeriod(period):
@@ -137,7 +137,7 @@ private struct FriendScheduleStatus {
 				nextTitle = period.next.title
 				symbol = "studentdesk"
 //				availability = "Free"
-				availability = "Unavailable"
+				availability = "Coming Soon"
 //				tint = .mint
 				tint = .black
 			case let .recess(state):
@@ -145,7 +145,7 @@ private struct FriendScheduleStatus {
 				nextTitle = state.next.title
 				symbol = BreakType.recess.symbol
 //				availability = "On break"
-				availability = "Unavailable"
+				availability = "Coming Soon"
 //				tint = .orange
 				tint = .black
 			case let .lunch(state):
@@ -153,7 +153,7 @@ private struct FriendScheduleStatus {
 				nextTitle = state.next.title
 				symbol = BreakType.lunch.symbol
 //				availability = "On break"
-				availability = "Unavailable"
+				availability = "Coming Soon"
 //				tint = .orange
 				tint = .black
 			case .afterSchool, .weekend:
@@ -170,7 +170,7 @@ private struct FriendScheduleStatus {
 				}
 				symbol = "house.fill"
 //				availability = "Offline"
-				availability = "Unavailable"
+				availability = "Coming Soon"
 //				tint = .secondary
 				tint = .black
 			case .noTimetable:
@@ -178,7 +178,7 @@ private struct FriendScheduleStatus {
 				nextTitle = "This friend has not uploaded a timetable."
 				symbol = "calendar.badge.exclamationmark"
 //				availability = "Unavailable"
-				availability = "Unavailable"
+				availability = "Coming Soon"
 //				tint = .secondary
 				tint = .black
 		}
