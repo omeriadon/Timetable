@@ -458,8 +458,7 @@ private struct FriendSubjectButton<Label: View>: View {
 		.contentShape(Rectangle())
 		.popover(
 			isPresented: $showsPopover,
-			attachmentAnchor: .rect(.bounds),
-			arrowEdge: .top
+			attachmentAnchor: .rect(.bounds)
 		) {
 			FriendSubjectContextPopover(context: context, friendName: friendName)
 				.padding(10)
