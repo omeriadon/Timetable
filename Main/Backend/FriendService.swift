@@ -194,7 +194,11 @@ final class FriendService {
 	}
 
 	private func updateApplicationBadgeCount(_ count: Int) async {
-		await UNUserNotificationCenter.current().setBadgeCount(count)
+		do {
+			try await UNUserNotificationCenter.current().setBadgeCount(count)
+		} catch {
+			PrintError("Unable to update notification badge count", category: .network, error: error)
+		}
 	}
 }
 

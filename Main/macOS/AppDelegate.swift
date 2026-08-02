@@ -57,7 +57,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 		Task {
 			await refreshFriendStateIfNeeded(for: notification)
 		}
-		[.banner, .sound, .badge]
+		return [.banner, .sound, .badge]
 	}
 
 	func userNotificationCenter(
