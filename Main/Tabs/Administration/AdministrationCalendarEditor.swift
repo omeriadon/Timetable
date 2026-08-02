@@ -74,14 +74,14 @@ struct AdministrationCalendarEditor: View {
 
 		Task {
 			try? await save(request, entry.label.isEmpty ? nil : entry.id)
-				close()
+			close()
 		}
 	}
 
 	private func deleteEntry() {
 		Task {
 			try? await delete(entry.id)
-				close()
+			close()
 		}
 	}
 }

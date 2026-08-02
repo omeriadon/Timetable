@@ -89,8 +89,8 @@ struct DatesView: View {
 					target: detail,
 					close: { presentationTarget = nil }
 				)
-					.presentationDetents([.fraction(0.5)])
-					.navigationTransition(.zoom(sourceID: target.transitionID, in: eventEditorNamespace))
+				.presentationDetents([.fraction(0.5)])
+				.navigationTransition(.zoom(sourceID: target.transitionID, in: eventEditorNamespace))
 		}
 	}
 
@@ -572,7 +572,7 @@ private struct CalendarEventEditor: View {
 			tagIDs: Array(selectedTagIDs)
 		)
 		Task {
-				do { try await save(request, target.event); close() }
+			do { try await save(request, target.event); close() }
 			catch { isSaving = false; badges.addBadge(id: UUID(), title: "Unable to save event", secondaryText: error.localizedDescription, priority: 4, view: .error) }
 		}
 	}

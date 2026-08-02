@@ -206,8 +206,8 @@ struct ProfileAppearanceSheet: View {
 				selection: $draft.emoji,
 				close: { presentsEmojiPicker = false }
 			)
-				.navigationTransition(.zoom(sourceID: "profile-emoji", in: editorNamespace))
-				.presentationDetents([.large])
+			.navigationTransition(.zoom(sourceID: "profile-emoji", in: editorNamespace))
+			.presentationDetents([.large])
 		}
 		#if os(iOS)
 		.onChange(of: selectedPhotoItem) { _, item in
