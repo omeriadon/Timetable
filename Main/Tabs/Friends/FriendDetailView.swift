@@ -253,27 +253,27 @@ private struct FriendOverview: View {
 									.font(.footnote)
 									.foregroundStyle(.secondary)
 							}
-							.padding(14)
-							.frame(maxWidth: .infinity, alignment: .topTrailing)
-							.background {
-								FriendPaperBackground(
-									cornerRadius: FriendDetailLayout.itemCornerRadius
-								)
-							}
-							.clipShape(
-								RoundedRectangle(
-									cornerRadius: FriendDetailLayout.itemCornerRadius,
-									style: .continuous
-								)
-							)
-							.glassEffect(
-								.clear.interactive(),
-								in: RoundedRectangle(
-									cornerRadius: FriendDetailLayout.itemCornerRadius,
-									style: .continuous
-								)
+						}
+						.padding(14)
+						.frame(maxWidth: .infinity, alignment: .topLeading)
+						.background {
+							FriendPaperBackground(
+								cornerRadius: FriendDetailLayout.itemCornerRadius
 							)
 						}
+						.clipShape(
+							RoundedRectangle(
+								cornerRadius: FriendDetailLayout.itemCornerRadius,
+								style: .continuous
+							)
+						)
+						.glassEffect(
+							.clear.interactive(),
+							in: RoundedRectangle(
+								cornerRadius: FriendDetailLayout.itemCornerRadius,
+								style: .continuous
+							)
+						)
 					}
 				}
 			}
@@ -304,8 +304,9 @@ private struct FriendOverview: View {
 					.foregroundStyle(.secondary)
 			} else {
 				ForEach(subjects) { subject in
-					Label(subject.subjectName, systemImage: subject.symbol)
-						.foregroundStyle(subject.colour.swiftUIColor)
+					FriendSubjectButton(context: subject.context, friendName: friendName) {
+						Label(subject.subjectName, systemImage: subject.symbol)
+							.foregroundStyle(subject.colour.swiftUIColor)
 						.padding(14)
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.background {
@@ -324,8 +325,9 @@ private struct FriendOverview: View {
 							in: RoundedRectangle(
 								cornerRadius: FriendDetailLayout.itemCornerRadius,
 								style: .continuous
-							)
 						)
+							)
+					}
 				}
 			}
 		}
@@ -603,24 +605,30 @@ private struct FriendSubjectContextPopover: View {
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 12) {
-			Label(context.relationship.title, systemImage: "person.text.rectangle")
-				.font(.caption.weight(.semibold))
-				.foregroundStyle(.secondary)
-
 			Label(context.subject.id, systemImage: context.subject.symbol)
-				.font(.headline)
-				.foregroundStyle(context.subject.colour.swiftUIColor)
+				.font(.title3.weight(.semibold))
 
 			contextRow("Classroom", value: context.subject.classroom.displayName, systemImage: "door.left.hand.open")
 			contextRow("Teacher", value: context.subject.teacher.displayName, systemImage: "person.crop.circle")
 
 			if case let .sharedClass(slotSummary) = context.relationship {
-				contextRow("Matching periods", value: slotSummary, systemImage: "calendar.badge.checkmark")
+				matchingPeriodsRow(slotSummary)
 			}
 		}
 		.frame(width: 290, alignment: .leading)
 		.padding()
+		.foregroundStyle(.white)
 		.presentationCompactAdaptation(.popover)
+	}
+
+	private func matchingPeriodsRow(_ value: String) -> some View {
+		VStack(alignment: .trailing, spacing: 4) {
+			Text("Matching periods")
+				.font(.caption)
+			Text(value)
+				.multilineTextAlignment(.trailing)
+		}
+		.frame(maxWidth: .infinity, alignment: .trailing)
 	}
 
 	@ViewBuilder
