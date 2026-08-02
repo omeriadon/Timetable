@@ -18,13 +18,11 @@ import SwiftUI
 
 enum SelectedShareItem: Identifiable, Hashable {
 	case owner(id: UUID)
-	case created(id: UUID, name: String)
 	case received(id: String, name: String)
 
 	var id: String {
 		switch self {
 			case let .owner(id): "owner-\(id.uuidString)"
-			case let .created(id, _): "created-\(id.uuidString)"
 			case let .received(id, _): "received-\(id)"
 		}
 	}
@@ -32,10 +30,8 @@ enum SelectedShareItem: Identifiable, Hashable {
 
 struct ShareSelectionSheet: View {
 	@Environment(\.dismiss) private var dismiss
-	@Default(.ownerIsSearchable) var ownerIsSearchable
 	@Default(.ownerTimetableShareAlias) private var ownerTimetableShareAlias
 	@Default(.receivedTimetables) var receivedTimetables
-	@Default(.createdTimetables) var createdTimetables
 	@State private var showAliasEditor = false
 	@State private var aliasService = TimetableShareAliasService.shared
 	@Environment(\.statusBadgeManager) private var statusBadgeManager
@@ -45,7 +41,7 @@ struct ShareSelectionSheet: View {
 	var body: some View {
 		NavigationStack {
 			List {
-				if ownerIsSearchable, let ownerID = UUID(uuidString: Defaults[.ownerTimetableID]) {
+				if let ownerID = UUID(uuidString: Defaults[.ownerTimetableID]) {
 					Section("Your Timetable") {
 						if let url = TimetableShareURL.ownerURL(id: ownerID, alias: ownerTimetableShareAlias) {
 							Button {
@@ -74,26 +70,6 @@ struct ShareSelectionSheet: View {
 
 						Button("Customize Link", systemImage: "link.badge.plus") {
 							showAliasEditor = true
-						}
-					}
-				}
-
-				let created = createdTimetables.filter(\.isSearchable)
-				if !created.isEmpty {
-					Section("Created Timetables") {
-						ForEach(created) { timetable in
-							Button {
-								dismiss()
-								onSelect(.created(id: timetable.id, name: timetable.title))
-							} label: {
-								HStack {
-									Text(timetable.title)
-										.foregroundStyle(.white)
-									Spacer()
-									Image(systemName: "calendar")
-										.foregroundStyle(.accent)
-								}
-							}
 						}
 					}
 				}
@@ -151,7 +127,6 @@ extension SelectedShareItem {
 	var shareURL: URL? {
 		switch self {
 			case let .owner(id): TimetableShareURL.ownerURL(id: id)
-			case let .created(id, _): TimetableShareURL.url(locator: id.uuidString)
 			case let .received(id, _): TimetableShareURL.url(locator: id)
 		}
 	}

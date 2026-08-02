@@ -21,8 +21,9 @@ struct CreatedTimetablesSettingsView: View {
 				NavigationLink {
 					CreatedTimetableEditorView(timetable: timetable)
 				} label: {
-					VStack(alignment: .leading) { Text(timetable.title)
-						Text(timetable.isSearchable ? "Searchable" : "Hidden")
+					VStack(alignment: .leading) {
+						Text(timetable.title)
+						Text("Private")
 							.font(.caption)
 							.foregroundStyle(.secondary)
 					}
@@ -41,7 +42,9 @@ struct CreatedTimetablesSettingsView: View {
 			}
 			.toolbar {
 				ToolbarItem(placement: .topBarTrailing) {
-					Button("Create Timetable", systemImage: "plus") { showCreate = true }
+					Button("Create Timetable", systemImage: "plus") {
+						showCreate = true
+					}
 						.buttonStyle(.glassProminent)
 				}
 				.matchedTransitionSource(id: "1", in: ns)
@@ -81,7 +84,6 @@ struct CreatedTimetablesSettingsView: View {
 private struct CreatedTimetableCreateView: View {
 	@State private var title = ""
 	@State private var subjects: [Subject] = []
-	@State private var isSearchable = true
 	@State private var showSubjectEditor = false
 	@State private var isSaving = false
 	@Environment(\.dismiss) private var dismiss
@@ -91,7 +93,6 @@ private struct CreatedTimetableCreateView: View {
 		NavigationStack {
 			Form {
 				TextField("Title", text: $title)
-				Toggle("Searchable", isOn: $isSearchable)
 				Button("Edit Subjects", systemImage: "pencil") { showSubjectEditor = true }
 			}
 			.navigationBarTitleDisplayMode(.large)
@@ -134,7 +135,7 @@ private struct CreatedTimetableCreateView: View {
 		isSaving = true
 		defer { isSaving = false }
 		do {
-			try await CreatedTimetableService.shared.create(title: title, subjects: subjects, isSearchable: isSearchable)
+			try await CreatedTimetableService.shared.create(title: title, subjects: subjects)
 			dismiss()
 		} catch {
 			badges.addBadge(id: UUID(), title: "Unable to create timetable", secondaryText: error.localizedDescription, priority: 4, view: .error)
@@ -146,7 +147,6 @@ private struct CreatedTimetableEditorView: View {
 	let timetable: TimetableDetailResponse
 	@State private var title: String
 	@State private var subjects: [Subject]
-	@State private var isSearchable: Bool
 	@State private var showEditor = false
 	@State private var confirmDelete = false
 	@Environment(\.dismiss) private var dismiss
@@ -156,7 +156,6 @@ private struct CreatedTimetableEditorView: View {
 		self.timetable = timetable
 		_title = State(initialValue: timetable.title)
 		_subjects = State(initialValue: timetable.subjects)
-		_isSearchable = State(initialValue: timetable.isSearchable)
 	}
 
 	var body: some View {
@@ -164,8 +163,6 @@ private struct CreatedTimetableEditorView: View {
 			Section("Details") {
 				TextField("Title", text: $title)
 					.onSubmit { save() }
-				Toggle("Searchable", isOn: $isSearchable)
-					.onChange(of: isSearchable) { save() }
 			}
 			Section("Timetable") {
 				TimetablePreviewGrid(subjects: subjects)
@@ -212,7 +209,7 @@ private struct CreatedTimetableEditorView: View {
 	private func save() {
 		Task {
 			do {
-				try await CreatedTimetableService.shared.update(id: timetable.id, title: title, subjects: subjects, isSearchable: isSearchable)
+				try await CreatedTimetableService.shared.update(id: timetable.id, title: title, subjects: subjects)
 
 			} catch {
 				badges.addBadge(

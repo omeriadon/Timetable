@@ -32,9 +32,6 @@ import WidgetKit
 
 		@State private var showCalendarImportSheet = false
 		@State private var showEditTimetableSheet = false
-		@State private var ownerIsSearchable = Defaults[.ownerIsSearchable]
-		@State private var committedOwnerIsSearchable = Defaults[.ownerIsSearchable]
-		@State private var visibilitySaveGeneration = 0
 		@State private var showFeedbackSheet = false
 		@State private var showImportConfirmation = false
 
@@ -184,8 +181,6 @@ import WidgetKit
 					.navigationTransition(.zoom(sourceID: "sheetMorph", in: ns))
 				}
 
-				Toggle("Searchable", systemImage: "magnifyingglass", isOn: ownerVisibilityBinding)
-					.disabled(!networkManager.isOnline)
 			}
 
 			Section("Preferences") {
@@ -358,38 +353,6 @@ import WidgetKit
 
 		private var hapticsBinding: Binding<Bool> {
 			Binding(get: { hapticsEnabled }, set: { hapticsEnabled = $0 })
-		}
-
-		private var ownerVisibilityBinding: Binding<Bool> {
-			Binding(
-				get: { ownerIsSearchable },
-				set: { value in
-					guard sessionStore.isAuthenticated else {
-						ownerIsSearchable = committedOwnerIsSearchable
-						showSignInRequired()
-						return
-					}
-
-					visibilitySaveGeneration += 1
-					let generation = visibilitySaveGeneration
-					let previous = committedOwnerIsSearchable
-					ownerIsSearchable = value
-					Task { await saveOwnerVisibility(value, previous: previous, generation: generation) }
-				}
-			)
-		}
-
-		private func saveOwnerVisibility(_ proposed: Bool, previous: Bool, generation: Int) async {
-			do {
-				let committed = try await OwnerTimetableSyncService.shared.updateVisibility(proposed)
-				guard generation == visibilitySaveGeneration else { return }
-				ownerIsSearchable = committed
-				committedOwnerIsSearchable = committed
-			} catch {
-				guard generation == visibilitySaveGeneration else { return }
-				ownerIsSearchable = previous
-				statusBadgeManager.addBadge(id: UUID(), title: "Unable to update visibility", secondaryText: error.localizedDescription, priority: 4, view: .error)
-			}
 		}
 
 		private func addDebugStatusBadge(title: String, secondaryText: String? = nil, view: StatusBadgeView) {

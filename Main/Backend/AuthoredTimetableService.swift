@@ -17,9 +17,9 @@ final class CreatedTimetableService {
 		}
 	}
 
-	func update(id: UUID, title: String, subjects: [Subject], isSearchable: Bool) async throws {
+	func update(id: UUID, title: String, subjects: [Subject]) async throws {
 		try Platform.require(Platform.current.allowsCreatedTimetableMutation)
-		let value: TimetableDetailResponse = try await network.send(Endpoint("/v1/timetables/created/\(id.uuidString)", method: .put), body: CreatedTimetableUpdateRequest(title: title, subjects: subjects, isSearchable: isSearchable))
+		let value: TimetableDetailResponse = try await network.send(Endpoint("/v1/timetables/created/\(id.uuidString)", method: .put), body: CreatedTimetableUpdateRequest(title: title, subjects: subjects, isSearchable: false))
 		if let index = timetables.firstIndex(where: { $0.id == id }) {
 			timetables[index] = value
 		} else {
@@ -30,11 +30,11 @@ final class CreatedTimetableService {
 	}
 
 	@discardableResult
-	func create(title: String, subjects: [Subject], isSearchable: Bool) async throws -> TimetableDetailResponse {
+	func create(title: String, subjects: [Subject]) async throws -> TimetableDetailResponse {
 		try Platform.require(Platform.current.allowsCreatedTimetableMutation)
 		let value: TimetableDetailResponse = try await network.send(
 			Endpoint("/v1/timetables/created", method: .post),
-			body: CreatedTimetableUpdateRequest(title: title, subjects: subjects, isSearchable: isSearchable)
+			body: CreatedTimetableUpdateRequest(title: title, subjects: subjects, isSearchable: false)
 		)
 		timetables.append(value)
 		timetables.sort { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
