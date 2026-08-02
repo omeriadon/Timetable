@@ -349,6 +349,10 @@ nonisolated struct AdministrationEventTagRequest: Codable, Sendable {
 	let associatedNames: [String]
 }
 
+nonisolated struct AdministrationEventTagOrderRequest: Codable, Sendable {
+	let tagIDs: [UUID]
+}
+
 nonisolated struct AdministrationEventTagSectionCreateRequest: Codable, Sendable {
 	let category: AdministrationEventTagCategory
 	let displayName: String

@@ -3,26 +3,68 @@ import SwiftUI
 struct AdministrationEventTagsView: View {
 	@State private var service = AdministrationService.shared
 	@State private var catalogue = AdministrationEventTagCatalogueResponse(sections: [])
+	@State private var tags: [AdministrationEventTag] = []
 	@State private var editor: AdministrationEventTagEditorTarget?
+	@State private var isReordering = false
 	@Environment(\.statusBadgeManager) private var badges
 	@Namespace private var editorNamespace
 
 	var body: some View {
-		ScrollView {
-			LazyVStack(alignment: .leading, spacing: 14) {
-				ForEach(catalogue.sections) { section in
-					sectionView(section)
-						.padding(.horizontal, 14)
-						.padding(.vertical, 12)
-						.background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18))
-						.opacity(section.isArchived ? 0.55 : 1)
+		List {
+			ForEach(tags) { tag in
+				if let section = section(for: tag) {
+					Button {
+						editor = .tag(tag, section: section)
+					} label: {
+						Label {
+							VStack(alignment: .leading, spacing: 3) {
+								Text(tag.displayName)
+								Text(tag.category.displayName)
+									.font(.footnote)
+									.foregroundStyle(.secondary)
+							}
+						} icon: {
+							Image(systemName: tag.symbol ?? "tag")
+								.foregroundStyle(
+									RGBAColor(hexString: tag.colorHex ?? "#6AA7FF").swiftUIColor
+								)
+						}
+					}
+					.buttonStyle(.plain)
+					.opacity(tag.isArchived ? 0.55 : 1)
+					.matchedTransitionSource(
+						id: AdministrationEventTagEditorTarget.tag(tag, section: section).id,
+						in: editorNamespace
+					)
 				}
-				.padding(.horizontal, 12)
-				.padding(.vertical, 8)
+			}
+			.onMove(perform: move)
+		}
+		.environment(\.editMode, .constant(isReordering ? .active : .inactive))
+		.appNavigationTitle("Event Tags", accent: true)
+		.toolbar {
+			ToolbarItem(placement: .topBarLeading) {
+				Menu {
+					ForEach(addableSections) { section in
+						Button("Add \(section.displayName)", systemImage: "plus") {
+							editor = .newTag(section)
+						}
+					}
+				} label: {
+					Label("Add Tag", systemImage: "plus")
+				}
+				.disabled(addableSections.isEmpty)
+			}
+
+			ToolbarItem(placement: .confirmationAction) {
+				Button(
+					isReordering ? "Done" : "Reorder",
+					systemImage: isReordering ? "checkmark" : "arrow.up.arrow.down"
+				) {
+					isReordering.toggle()
+				}
 			}
 		}
-		.scrollEdgeEffect()
-		.appNavigationTitle("Event Tags", accent: true)
 		.task {
 			await load()
 		}
@@ -30,27 +72,19 @@ struct AdministrationEventTagsView: View {
 			await load()
 		}
 		.sheet(item: $editor) { target in
-			Group {
-				switch target {
-					case let .tag(tag, section):
-						AdministrationEventTagEditor(
-							tag: tag,
-							section: section,
-							save: saveTag
-						)
-					case let .newTag(section):
-						AdministrationEventTagEditor(
-							tag: nil,
-							section: section,
-							save: saveTag
-						)
-					case let .section(section):
-						AdministrationEventTagSectionEditor(
-							section: section,
-							save: saveSection,
-							saveTag: saveTag
-						)
-				}
+			switch target {
+				case let .tag(tag, section):
+					AdministrationEventTagEditor(
+						tag: tag,
+						section: section,
+						save: saveTag
+					)
+				case let .newTag(section):
+					AdministrationEventTagEditor(
+						tag: nil,
+						section: section,
+						save: saveTag
+					)
 			}
 			.navigationTransition(
 				.zoom(
@@ -61,72 +95,35 @@ struct AdministrationEventTagsView: View {
 		}
 	}
 
-	private func sectionView(_ section: AdministrationEventTagSection) -> some View {
-		VStack(alignment: .leading, spacing: 8) {
-			HStack(spacing: 8) {
-				Label {
-					VStack(alignment: .leading, spacing: 2) {
-						Text(section.displayName)
-						Text(section.category.displayName)
-							.font(.footnote)
-							.foregroundStyle(.secondary)
-					}
-				} icon: {
-					Image(systemName: section.isArchived ? "archivebox" : "folder")
-						.foregroundStyle(.accent)
-				}
+	private var addableSections: [AdministrationEventTagSection] {
+		catalogue.sections.filter {
+			$0.category != .yearGroup && !$0.isArchived
+		}
+	}
 
-				Spacer()
+	private func section(for tag: AdministrationEventTag) -> AdministrationEventTagSection? {
+		catalogue.sections.first { $0.id == tag.sectionID }
+	}
 
-				Button("Edit Section", systemImage: "slider.horizontal.3") {
-					editor = .section(section)
-				}
-				.labelStyle(.iconOnly)
-				.buttonStyle(.glass)
-				.foregroundStyle(.white)
-				.matchedTransitionSource(
-					id: AdministrationEventTagEditorTarget.section(section).id,
-					in: editorNamespace
+	private func move(from offsets: IndexSet, to destination: Int) {
+		tags.move(fromOffsets: offsets, toOffset: destination)
+		Task {
+			do {
+				apply(
+					try await service.reorderEventTags(
+						tagIDs: tags.map(\.id)
+					)
 				)
-			}
-
-			WrappingHStack(spacing: 6, lineSpacing: 6) {
-				ForEach(section.tags) { tag in
-					Button {
-						editor = .tag(tag, section: section)
-					} label: {
-						Label(tag.displayName, systemImage: tag.symbol ?? "tag")
-							.padding(.horizontal, 10)
-							.padding(.vertical, 6)
-					}
-					.buttonStyle(.glassProminent)
-					.foregroundStyle(.white)
-					.tint(RGBAColor(hexString: tag.colorHex ?? "fff").swiftUIColor)
-					.opacity(tag.isArchived ? 0.55 : 1)
-					.matchedTransitionSource(
-						id: AdministrationEventTagEditorTarget.tag(tag, section: section).id,
-						in: editorNamespace
-					)
-				}
-
-				if section.category != .yearGroup {
-					Button("Add Tag", systemImage: "plus") {
-						editor = .newTag(section)
-					}
-					.buttonStyle(.glass)
-					.foregroundStyle(.white)
-					.matchedTransitionSource(
-						id: AdministrationEventTagEditorTarget.newTag(section).id,
-						in: editorNamespace
-					)
-				}
+			} catch {
+				badges.present(error: error, title: "Unable to reorder event tags")
+				await load()
 			}
 		}
 	}
 
 	private func load() async {
 		do {
-			catalogue = try await service.eventTags()
+			apply(try await service.eventTags())
 		} catch {
 			badges.present(error: error, title: "Unable to refresh event tags")
 		}
@@ -136,95 +133,30 @@ struct AdministrationEventTagsView: View {
 		_ request: AdministrationEventTagRequest,
 		existingID: UUID?
 	) async throws {
-		catalogue = if let existingID {
+		let updated = if let existingID {
 			try await service.updateEventTag(id: existingID, request: request)
 		} else {
 			try await service.createEventTag(request)
 		}
+		apply(updated)
 	}
 
-	private func saveSection(
-		_ request: AdministrationEventTagSectionUpdateRequest,
-		existingID: UUID
-	) async throws {
-		catalogue = try await service.updateEventTagSection(id: existingID, request: request)
-	}
-}
-
-private struct WrappingHStack: Layout {
-	let spacing: CGFloat
-	let lineSpacing: CGFloat
-
-	func sizeThatFits(
-		proposal: ProposedViewSize,
-		subviews: Subviews,
-		cache _: inout Cache
-	) -> CGSize {
-		layoutResult(proposal: proposal, subviews: subviews).size
-	}
-
-	func placeSubviews(
-		in bounds: CGRect,
-		proposal _: ProposedViewSize,
-		subviews: Subviews,
-		cache _: inout Cache
-	) {
-		let result = layoutResult(
-			proposal: ProposedViewSize(width: bounds.width, height: bounds.height),
-			subviews: subviews
-		)
-
-		for (index, point) in result.positions.enumerated() {
-			subviews[index].place(
-				at: CGPoint(x: bounds.minX + point.x, y: bounds.minY + point.y),
-				anchor: .topLeading,
-				proposal: ProposedViewSize(result.sizes[index])
-			)
-		}
-	}
-
-	private func layoutResult(proposal: ProposedViewSize, subviews: Subviews) -> LayoutResult {
-		let availableWidth = proposal.width ?? .infinity
-		var positions: [CGPoint] = []
-		var sizes: [CGSize] = []
-		var currentX: CGFloat = 0
-		var currentY: CGFloat = 0
-		var lineHeight: CGFloat = 0
-		var contentWidth: CGFloat = 0
-
-		for subview in subviews {
-			let size = subview.sizeThatFits(ProposedViewSize(width: availableWidth, height: nil))
-			if currentX > 0, currentX + size.width > availableWidth {
-				currentX = 0
-				currentY += lineHeight + lineSpacing
-				lineHeight = 0
+	private func apply(_ catalogue: AdministrationEventTagCatalogueResponse) {
+		self.catalogue = catalogue
+		tags = catalogue.sections
+			.flatMap(\.tags)
+			.sorted {
+				if $0.sortOrder == $1.sortOrder {
+					return $0.displayName.localizedCaseInsensitiveCompare($1.displayName) == .orderedAscending
+				}
+				return $0.sortOrder < $1.sortOrder
 			}
-
-			positions.append(CGPoint(x: currentX, y: currentY))
-			sizes.append(size)
-			currentX += size.width + spacing
-			lineHeight = max(lineHeight, size.height)
-			contentWidth = max(contentWidth, currentX - spacing)
-		}
-
-		return LayoutResult(
-			size: CGSize(width: min(contentWidth, availableWidth), height: currentY + lineHeight),
-			positions: positions,
-			sizes: sizes
-		)
-	}
-
-	private struct LayoutResult {
-		let size: CGSize
-		let positions: [CGPoint]
-		let sizes: [CGSize]
 	}
 }
 
 enum AdministrationEventTagEditorTarget: Identifiable {
 	case tag(AdministrationEventTag, section: AdministrationEventTagSection)
 	case newTag(AdministrationEventTagSection)
-	case section(AdministrationEventTagSection)
 
 	var id: String {
 		switch self {
@@ -232,8 +164,6 @@ enum AdministrationEventTagEditorTarget: Identifiable {
 				"tag-\(tag.id.uuidString)"
 			case let .newTag(section):
 				"new-tag-\(section.id.uuidString)"
-			case let .section(section):
-				"section-\(section.id.uuidString)"
 		}
 	}
 }

@@ -179,6 +179,16 @@ final class AdministrationService {
 		)
 	}
 
+	func reorderEventTags(
+		tagIDs: [UUID]
+	) async throws -> AdministrationEventTagCatalogueResponse {
+		try await networkManager.send(
+			.v1AdministrationEventTagsOrder,
+			body: AdministrationEventTagOrderRequest(tagIDs: tagIDs),
+			context: .userInitiated
+		)
+	}
+
 	func createEventTagSection(
 		_ request: AdministrationEventTagSectionCreateRequest
 	) async throws -> AdministrationEventTagCatalogueResponse {
@@ -229,6 +239,7 @@ private extension Endpoint {
 	static let v1AdministrationServerAccessModeUpdate = Endpoint("/_operations/server-access-mode", method: .put)
 	static let v1AdministrationEventTags = Endpoint("/v1/administration/event-tags")
 	static let v1AdministrationEventTagsCreate = Endpoint("/v1/administration/event-tags", method: .post)
+	static let v1AdministrationEventTagsOrder = Endpoint("/v1/administration/event-tags/order", method: .put)
 	static let v1AdministrationEventTagSectionsCreate = Endpoint("/v1/administration/event-tags/sections", method: .post)
 	static let v1Tags = Endpoint("/v1/tags")
 	static let v1TagSubscriptions = Endpoint("/v1/tags/subscriptions")

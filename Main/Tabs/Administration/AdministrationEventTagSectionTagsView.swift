@@ -82,8 +82,6 @@ struct AdministrationEventTagSectionTagsView: View {
 							section: section,
 							save: saveTag
 						)
-					case .section:
-						EmptyView()
 				}
 			}
 			.navigationTransition(
