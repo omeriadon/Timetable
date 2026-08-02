@@ -9,14 +9,16 @@ struct AdministrationEventTagsView: View {
 
 	var body: some View {
 		ScrollView {
-			LazyVStack(alignment: .leading, spacing: 22) {
+			LazyVStack(alignment: .leading, spacing: 14) {
 				ForEach(catalogue.sections) { section in
 					sectionView(section)
-						.padding(5)
-						.background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
+						.padding(.horizontal, 14)
+						.padding(.vertical, 12)
+						.background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18))
 						.opacity(section.isArchived ? 0.55 : 1)
 				}
-				.padding()
+				.padding(.horizontal, 12)
+				.padding(.vertical, 8)
 			}
 		}
 		.scrollEdgeEffect()
@@ -60,10 +62,10 @@ struct AdministrationEventTagsView: View {
 	}
 
 	private func sectionView(_ section: AdministrationEventTagSection) -> some View {
-		VStack(alignment: .leading, spacing: 12) {
-			HStack(spacing: 12) {
+		VStack(alignment: .leading, spacing: 8) {
+			HStack(spacing: 8) {
 				Label {
-					VStack(alignment: .leading, spacing: 4) {
+					VStack(alignment: .leading, spacing: 2) {
 						Text(section.displayName)
 						Text(section.category.displayName)
 							.font(.footnote)
@@ -80,7 +82,7 @@ struct AdministrationEventTagsView: View {
 					editor = .section(section)
 				}
 				.labelStyle(.iconOnly)
-				.buttonStyle(.borderless)
+				.buttonStyle(.glass)
 				.foregroundStyle(.white)
 				.matchedTransitionSource(
 					id: AdministrationEventTagEditorTarget.section(section).id,
@@ -88,14 +90,14 @@ struct AdministrationEventTagsView: View {
 				)
 			}
 
-			WrappingHStack(spacing: 8, lineSpacing: 8) {
+			WrappingHStack(spacing: 6, lineSpacing: 6) {
 				ForEach(section.tags) { tag in
 					Button {
 						editor = .tag(tag, section: section)
 					} label: {
 						Label(tag.displayName, systemImage: tag.symbol ?? "tag")
-							.padding(.horizontal, 12)
-							.padding(.vertical, 8)
+							.padding(.horizontal, 10)
+							.padding(.vertical, 6)
 					}
 					.buttonStyle(.glassProminent)
 					.foregroundStyle(.white)
