@@ -30,20 +30,32 @@ private struct EventTagSelectionView: View {
 	var body: some View {
 		List {
 			ForEach(availableTags) { tag in
+				let isSelected = selectedTagIDs.contains(tag.id)
+
 				Button {
 					toggle(tag)
 				} label: {
 					HStack {
-						Label(tag.displayName, systemImage: tag.symbol ?? "tag")
+						Image(systemName: tag.symbol ?? "tag")
+							.foregroundStyle(.white)
+						Text(tag.displayName)
+							.foregroundStyle(isSelected ? .white : .primary)
 						Spacer()
-						if selectedTagIDs.contains(tag.id) {
+						if isSelected {
 							Image(systemName: "checkmark")
-								.foregroundStyle(.accent)
+								.foregroundStyle(.white)
 						}
 					}
 				}
 				.buttonStyle(.plain)
-				.accessibilityAddTraits(selectedTagIDs.contains(tag.id) ? .isSelected : [])
+				.listRowBackground {
+					RoundedRectangle(cornerRadius: 12, style: .continuous)
+						.fill(isSelected ? Color.accentColor : .clear)
+						.padding(.horizontal, 8)
+						.padding(.vertical, 2)
+						.animation(.snappy, value: isSelected)
+				}
+				.accessibilityAddTraits(isSelected ? .isSelected : [])
 			}
 		}
 		.appNavigationTitle("Tags")
@@ -63,13 +75,15 @@ private struct EventTagSelectionView: View {
 	}
 
 	private func toggle(_ tag: EventTagCatalogueTag) {
-		if tag.category == .yearGroup, allowsYearGroups {
-			selectedTagIDs.subtract(yearGroupTagIDs)
-			selectedTagIDs.insert(tag.id)
-		} else if selectedTagIDs.contains(tag.id) {
-			selectedTagIDs.remove(tag.id)
-		} else {
-			selectedTagIDs.insert(tag.id)
+		withAnimation(.snappy) {
+			if tag.category == .yearGroup, allowsYearGroups {
+				selectedTagIDs.subtract(yearGroupTagIDs)
+				selectedTagIDs.insert(tag.id)
+			} else if selectedTagIDs.contains(tag.id) {
+				selectedTagIDs.remove(tag.id)
+			} else {
+				selectedTagIDs.insert(tag.id)
+			}
 		}
 	}
 }
