@@ -261,6 +261,10 @@ nonisolated struct AdministrationSpecialBadgeAssignmentsRequest: Codable, Sendab
 	let userIDs: [UUID]
 }
 
+nonisolated struct AdministrationSpecialBadgeOrderRequest: Codable, Sendable {
+	let badgeIDs: [UUID]
+}
+
 nonisolated struct ServerAccessModeUpdateRequest: Codable, Sendable {
 	let developmentAccessOnly: Bool
 }

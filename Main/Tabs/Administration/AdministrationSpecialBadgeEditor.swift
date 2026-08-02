@@ -10,7 +10,6 @@ struct AdministrationSpecialBadgeEditor: View {
 	@Environment(\.statusBadgeManager) private var statusBadges
 	@State private var symbol: String
 	@State private var accessibilityLabel: String
-	@State private var priority: Int
 	@State private var backgroundColor: Color
 	@State private var symbolColor: Color
 	@State private var selectedUserIDs: Set<UUID>
@@ -31,7 +30,6 @@ struct AdministrationSpecialBadgeEditor: View {
 		let badge = target.badge
 		_symbol = State(initialValue: badge?.symbol ?? "star.fill")
 		_accessibilityLabel = State(initialValue: badge?.accessibilityLabel ?? "Badge")
-		_priority = State(initialValue: badge?.priority ?? 50)
 		_backgroundColor = State(initialValue: badge?.backgroundColor?.swiftUIColor ?? .blue)
 		_symbolColor = State(initialValue: badge?.symbolColor?.swiftUIColor ?? .white)
 		_selectedUserIDs = State(initialValue: Set(badge?.assignedUserIDs ?? []))
@@ -51,7 +49,6 @@ struct AdministrationSpecialBadgeEditor: View {
 						Label("Symbol", systemImage: symbol)
 					}
 					TextField("Accessibility Label", text: $accessibilityLabel)
-					Stepper("Priority: \(priority)", value: $priority, in: 0 ... 10000)
 					ColorPicker("Background", selection: $backgroundColor, supportsOpacity: true)
 					ColorPicker("Symbol", selection: $symbolColor, supportsOpacity: true)
 				}
@@ -128,7 +125,7 @@ struct AdministrationSpecialBadgeEditor: View {
 					symbol: symbol.trimmingCharacters(in: .whitespacesAndNewlines),
 					backgroundColor: backgroundColor.toRGBA(),
 					symbolColor: symbolColor.toRGBA(),
-					priority: priority,
+					priority: target.badge?.priority ?? 0,
 					accessibilityLabel: accessibilityLabel.trimmingCharacters(in: .whitespacesAndNewlines)
 				),
 				target.badge?.id,

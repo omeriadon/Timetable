@@ -1,11 +1,12 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct AdministrationSpecialBadgesView: View {
 	@State private var service = AdministrationService.shared
 	@State private var badges: [AdministrationSpecialBadgeResponse] = []
 	@State private var users: [AdministrationUserResponse] = []
 	@State private var badgeOrder: [UUID] = []
-	@State private var isReordering = false
+	@State private var draggedBadgeID: UUID?
 	@State private var editor: AdministrationSpecialBadgeEditorTarget?
 	@Environment(\.statusBadgeManager) private var statusBadges
 	@Namespace private var namespace
@@ -29,21 +30,23 @@ struct AdministrationSpecialBadgesView: View {
 				}
 				.buttonStyle(.plain)
 				.matchedTransitionSource(id: editorID(for: badge), in: namespace)
+				.onDrag {
+					draggedBadgeID = badge.id
+					return NSItemProvider(object: badge.id.uuidString as NSString)
+				}
+				.onDrop(
+					of: [.text],
+					delegate: SpecialBadgeOrderDropDelegate(
+						targetID: badge.id,
+						draggedBadgeID: $draggedBadgeID,
+						badgeOrder: $badgeOrder,
+						save: saveBadgeOrder
+					)
+				)
 			}
-			.onMove(perform: move)
 		}
-		.environment(\.editMode, .constant(isReordering ? .active : .inactive))
 		.appNavigationTitle("Badges", accent: true)
 		.toolbar {
-			ToolbarItem(placement: .topBarLeading) {
-				Button(
-					isReordering ? "Done" : "Reorder",
-					systemImage: isReordering ? "checkmark" : "arrow.up.arrow.down"
-				) {
-					isReordering.toggle()
-				}
-			}
-
 			ToolbarItem(placement: .confirmationAction) {
 				Button("Add Badge", systemImage: "plus", role: .confirm) {
 					editor = .create
@@ -92,17 +95,22 @@ struct AdministrationSpecialBadgesView: View {
 	}
 
 	private var displayedBadges: [AdministrationSpecialBadgeResponse] {
-		let allBadges = [
+		let allBadges = allAvailableBadges
+		guard !badgeOrder.isEmpty else {
+			return allBadges
+		}
+
+		let knownBadges = Dictionary(uniqueKeysWithValues: allBadges.map { ($0.id, $0) })
+		let orderedIDs = badgeOrder.filter { knownBadges[$0] != nil }
+		let remaining = allBadges.filter { !orderedIDs.contains($0.id) }
+		return orderedIDs.compactMap { knownBadges[$0] } + remaining
+	}
+
+	private var allAvailableBadges: [AdministrationSpecialBadgeResponse] {
+		[
 			administrationBadge(for: .systemOwner),
 			administrationBadge(for: .administrator),
 		] + badges
-		let knownBadges = Dictionary(uniqueKeysWithValues: allBadges.map { ($0.id, $0) })
-		let orderedIDs = badgeOrder.filter { knownBadges[$0] != nil }
-		let remaining = allBadges
-			.filter { !orderedIDs.contains($0.id) }
-			.sorted { $0.priority > $1.priority }
-
-		return orderedIDs.compactMap { knownBadges[$0] } + remaining
 	}
 
 	private func administrationBadge(for authority: AccountAuthority) -> AdministrationSpecialBadgeResponse {
@@ -134,50 +142,44 @@ struct AdministrationSpecialBadgesView: View {
 		}
 
 		if badgeOrder.isEmpty {
-			badgeOrder = displayedBadges.map(\.id)
+			badgeOrder = allAvailableBadges.map(\.id)
+		} else {
+			let knownIDs = Set(allAvailableBadges.map(\.id))
+			let existingIDs = Set(badgeOrder)
+			badgeOrder = badgeOrder.filter { knownIDs.contains($0) }
+				+ allAvailableBadges.map(\.id).filter { !existingIDs.contains($0) }
 		}
 	}
 
-	private func move(from offsets: IndexSet, to destination: Int) {
-		var reordered = displayedBadges.map(\.id)
-		reordered.move(fromOffsets: offsets, toOffset: destination)
-		badgeOrder = reordered
+	private func saveBadgeOrder(_ orderedIDs: [UUID]) {
+		for (index, badgeID) in orderedIDs.enumerated() {
+			guard BuiltInProfileBadgeConfiguration.authority(for: badgeID) != nil,
+			      let badge = allAvailableBadges.first(where: { $0.id == badgeID })
+			else {
+				continue
+			}
 
-		Task {
-			for (index, badgeID) in reordered.enumerated() {
-				guard let badge = displayedBadges.first(where: { $0.id == badgeID }) else {
-					continue
-				}
-
-				let request = AdministrationSpecialBadgeRequest(
+			BuiltInProfileBadgeConfiguration.update(
+				ProfileBadge(
+					id: badge.id,
 					symbol: badge.symbol,
 					backgroundColor: badge.backgroundColor,
 					symbolColor: badge.symbolColor,
-					priority: reordered.count - index,
+					priority: orderedIDs.count - index,
 					accessibilityLabel: badge.accessibilityLabel
 				)
+			)
+		}
 
-				if BuiltInProfileBadgeConfiguration.authority(for: badge.id) != nil {
-					BuiltInProfileBadgeConfiguration.update(
-						ProfileBadge(
-							id: badge.id,
-							symbol: badge.symbol,
-							backgroundColor: badge.backgroundColor,
-							symbolColor: badge.symbolColor,
-							priority: request.priority,
-							accessibilityLabel: badge.accessibilityLabel
-						)
-					)
-				} else {
-					do {
-						try await service.updateSpecialBadge(id: badge.id, request: request)
-					} catch {
-						statusBadges.addBadge(id: UUID(), title: "Unable to update badge", secondaryText: error.localizedDescription, priority: 3, view: .error)
-					}
-				}
+		Task {
+			let customBadgeIDs = orderedIDs.filter { BuiltInProfileBadgeConfiguration.authority(for: $0) == nil }
+			do {
+				badges = try await service.reorderSpecialBadges(badgeIDs: customBadgeIDs)
+			} catch {
+				statusBadges.present(error: error, title: "Unable to save badge order")
+				badgeOrder = []
+				await load()
 			}
-
-			await load()
 		}
 	}
 
@@ -216,13 +218,51 @@ struct AdministrationSpecialBadgesView: View {
 		} else {
 			badges.append(assignedBadge)
 		}
-		badges.sort { $0.priority > $1.priority }
-		return assignedBadge
+		if !badgeOrder.contains(assignedBadge.id) {
+			badgeOrder.append(assignedBadge.id)
+		}
+
+		let customBadgeIDs = badgeOrder.filter { BuiltInProfileBadgeConfiguration.authority(for: $0) == nil }
+		badges = try await service.reorderSpecialBadges(badgeIDs: customBadgeIDs)
+		return badges.first(where: { $0.id == assignedBadge.id }) ?? assignedBadge
 	}
 
 	private func delete(_ badge: AdministrationSpecialBadgeResponse) async throws {
 		try await service.deleteSpecialBadge(id: badge.id)
 		badges.removeAll { $0.id == badge.id }
+		badgeOrder.removeAll { $0 == badge.id }
+	}
+}
+
+private struct SpecialBadgeOrderDropDelegate: DropDelegate {
+	let targetID: UUID
+	@Binding var draggedBadgeID: UUID?
+	@Binding var badgeOrder: [UUID]
+	let save: ([UUID]) -> Void
+
+	func dropEntered(info _: DropInfo) {
+		guard let draggedBadgeID,
+		      draggedBadgeID != targetID,
+		      let from = badgeOrder.firstIndex(of: draggedBadgeID),
+		      let to = badgeOrder.firstIndex(of: targetID)
+		else {
+			return
+		}
+
+		withAnimation(.snappy) {
+			badgeOrder.move(
+				fromOffsets: IndexSet(integer: from),
+				toOffset: to > from ? to + 1 : to
+			)
+		}
+	}
+
+	func performDrop(info _: DropInfo) -> Bool {
+		defer {
+			draggedBadgeID = nil
+		}
+		save(badgeOrder)
+		return true
 	}
 }
 

@@ -114,6 +114,16 @@ final class AdministrationService {
 		)
 	}
 
+	func reorderSpecialBadges(
+		badgeIDs: [UUID]
+	) async throws -> [AdministrationSpecialBadgeResponse] {
+		try await networkManager.send(
+			.v1AdministrationSpecialBadgesOrder,
+			body: AdministrationSpecialBadgeOrderRequest(badgeIDs: badgeIDs),
+			context: .userInitiated
+		)
+	}
+
 	@discardableResult
 	func updateSpecialBadge(
 		id: UUID,
@@ -214,6 +224,7 @@ private extension Endpoint {
 	static let v1AdministrationProfileStorageQuota = Endpoint("/v1/administration/profile-storage-quota")
 	static let v1AdministrationSpecialBadges = Endpoint("/v1/administration/badges")
 	static let v1AdministrationSpecialBadgesCreate = Endpoint("/v1/administration/badges", method: .post)
+	static let v1AdministrationSpecialBadgesOrder = Endpoint("/v1/administration/badges/order", method: .put)
 	static let v1AdministrationServerAccessModeGet = Endpoint("/_operations/server-access-mode")
 	static let v1AdministrationServerAccessModeUpdate = Endpoint("/_operations/server-access-mode", method: .put)
 	static let v1AdministrationEventTags = Endpoint("/v1/administration/event-tags")
