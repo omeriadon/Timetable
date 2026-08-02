@@ -437,7 +437,7 @@ private enum CalendarEventScope: String, Identifiable {
 
 private struct CalendarEventEditor: View {
 	let target: CalendarEventEditorTarget
-	let close: () -> Void = {}
+	let close: () -> Void
 	let canManageGlobalEvents: Bool
 	let save: (CreateCalendarEventRequest, CalendarEvent?) async throws -> Void
 	let delete: (CalendarEvent) async throws -> Void
