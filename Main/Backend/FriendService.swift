@@ -56,9 +56,10 @@ final class FriendService {
 		try await networkManager.send(.v1FriendSearch(query: query), context: .userInitiated)
 	}
 
-	func refreshIncomingRequests() async throws {
+	func refreshIncomingRequests() async throws -> [FriendSummary] {
 		let requests: [FriendSummary] = try await networkManager.send(.v1IncomingFriendRequests)
 		Defaults[.incomingFriendRequests] = requests
+		return requests
 	}
 
 	func sendRequest(to schoolEmail: String) async throws -> FriendSummary {

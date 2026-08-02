@@ -3,7 +3,7 @@ import SwiftUI
 
 struct FriendRequestsSheet: View {
 	@Environment(\.dismiss) private var dismiss
-	@Default(.incomingFriendRequests) private var requests
+	@State private var requests: [FriendSummary] = Defaults[.incomingFriendRequests]
 	@State private var service = FriendService.shared
 	@State private var acceptingRequestID: UUID?
 	@Environment(\.statusBadgeManager) private var badges
@@ -59,7 +59,7 @@ struct FriendRequestsSheet: View {
 
 	private func refreshRequests() async {
 		do {
-			try await service.refreshIncomingRequests()
+			requests = try await service.refreshIncomingRequests()
 		} catch {
 			badges.present(error: error, title: "Unable to load friend requests")
 		}
@@ -71,6 +71,7 @@ struct FriendRequestsSheet: View {
 			defer { acceptingRequestID = nil }
 			do {
 				try await service.accept(request)
+				requests.removeAll { $0.id == request.id }
 			} catch {
 				badges.present(error: error, title: "Unable to accept friend request")
 			}
