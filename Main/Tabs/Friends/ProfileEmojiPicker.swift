@@ -2,14 +2,15 @@ import SwiftEmoji
 import SwiftUI
 
 struct ProfileEmojiPicker: View {
-	let close: () -> Void = {}
+	let close: () -> Void
 
 	@State private var searchText = ""
 	@State private var sections: [EmojiSection] = []
 	@Binding private var selected: Emoji?
 	@State private var searchResults: [Emoji] = []
 
-	init(selection: Binding<String>) {
+	init(selection: Binding<String>, close: @escaping () -> Void) {
+		self.close = close
 		_selected = Binding(
 			get: {
 				Emoji(selection.wrappedValue)
@@ -40,7 +41,7 @@ struct ProfileEmojiPicker: View {
 			.appNavigationTitle("Emoji", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
-					Button(role: .cancel, action: dismiss.callAsFunction)
+					Button(role: .cancel, action: close)
 				}
 			}
 		}

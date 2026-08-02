@@ -400,7 +400,7 @@ private struct NoSchoolDayDetailTarget: Identifiable {
 
 private struct NoSchoolDayDetailView: View {
 	let target: NoSchoolDayDetailTarget
-	let close: () -> Void = {}
+	let close: () -> Void
 
 	var body: some View {
 		NavigationStack {
@@ -452,9 +452,10 @@ private struct CalendarEventEditor: View {
 	@State private var tagSections: [EventTagCatalogueSection] = []
 	@State private var selectedTagIDs: Set<UUID>
 
-	init(target: CalendarEventEditorTarget, canManageGlobalEvents: Bool, save: @escaping (CreateCalendarEventRequest, CalendarEvent?) async throws -> Void, delete: @escaping (CalendarEvent) async throws -> Void) {
+	init(target: CalendarEventEditorTarget, canManageGlobalEvents: Bool, close: @escaping () -> Void, save: @escaping (CreateCalendarEventRequest, CalendarEvent?) async throws -> Void, delete: @escaping (CalendarEvent) async throws -> Void) {
 		self.target = target
 		self.canManageGlobalEvents = canManageGlobalEvents
+		self.close = close
 		self.save = save
 		self.delete = delete
 		let event = target.event

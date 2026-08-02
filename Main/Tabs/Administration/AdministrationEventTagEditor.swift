@@ -6,7 +6,7 @@ struct AdministrationEventTagEditor: View {
 	let section: AdministrationEventTagSection
 	let save: (AdministrationEventTagRequest, UUID?) async throws -> Void
 
-	let close: () -> Void = {}
+	let close: () -> Void
 	@State private var sectionID: UUID
 	@State private var slug: String
 	@State private var displayName: String
@@ -26,11 +26,13 @@ struct AdministrationEventTagEditor: View {
 	init(
 		tag: AdministrationEventTag?,
 		section: AdministrationEventTagSection,
-		save: @escaping (AdministrationEventTagRequest, UUID?) async throws -> Void
+		save: @escaping (AdministrationEventTagRequest, UUID?) async throws -> Void,
+		close: @escaping () -> Void
 	) {
 		self.tag = tag
 		self.section = section
 		self.save = save
+		self.close = close
 		_sectionID = State(initialValue: section.id)
 		_slug = State(initialValue: tag?.slug ?? "")
 		_displayName = State(initialValue: tag?.displayName ?? "")

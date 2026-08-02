@@ -191,7 +191,7 @@ struct ProfileAppearanceSheet: View {
 			.appNavigationTitle("Profile", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
-					Button(role: .cancel, action: dismiss.callAsFunction)
+					Button(role: .cancel, action: close)
 				}
 
 				ToolbarItem(placement: .confirmationAction) {
@@ -202,7 +202,10 @@ struct ProfileAppearanceSheet: View {
 			}
 		}
 		.sheet(isPresented: $presentsEmojiPicker) {
-			ProfileEmojiPicker(selection: $draft.emoji)
+			ProfileEmojiPicker(
+				selection: $draft.emoji,
+				close: { presentsEmojiPicker = false }
+			)
 				.navigationTransition(.zoom(sourceID: "profile-emoji", in: editorNamespace))
 				.presentationDetents([.large])
 		}
@@ -211,11 +214,15 @@ struct ProfileAppearanceSheet: View {
 			loadPhoto(item)
 		}
 		.sheet(item: $photoCropRequest) { request in
-			ProfilePhotoCropEditor(sourceData: request.sourceData) { preparedData in
-				draft.pendingPhotoData = preparedData
-				draft.contentKind = .photo
-				photoSelectionState = .ready
-			}
+			ProfilePhotoCropEditor(
+				sourceData: request.sourceData,
+				completion: { preparedData in
+					draft.pendingPhotoData = preparedData
+					draft.contentKind = .photo
+					photoSelectionState = .ready
+				},
+				close: { photoCropRequest = nil }
+			)
 			.navigationTransition(.zoom(sourceID: "profile-photo-crop", in: editorNamespace))
 			.presentationDetents([.fraction(0.7)])
 		}

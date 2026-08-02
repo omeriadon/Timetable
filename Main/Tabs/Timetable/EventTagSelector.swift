@@ -48,13 +48,13 @@ private struct EventTagSelectionView: View {
 					}
 				}
 				.buttonStyle(.plain)
-				.listRowBackground {
+				.listRowBackground(
 					RoundedRectangle(cornerRadius: 12, style: .continuous)
 						.fill(isSelected ? Color.accentColor : .clear)
 						.padding(.horizontal, 8)
 						.padding(.vertical, 2)
 						.animation(.snappy, value: isSelected)
-				}
+				)
 				.accessibilityAddTraits(isSelected ? .isSelected : [])
 			}
 		}

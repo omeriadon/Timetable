@@ -2,9 +2,9 @@
 	import SwiftUI
 
 	struct ProfilePhotoCropEditor: View {
-		let close: () -> Void = {}
 		let sourceData: Data
 		let completion: (Data) -> Void
+		let close: () -> Void
 		@State private var zoom = 1.0
 		@State private var lastZoom = 1.0
 		@State private var offset = CGSize.zero
@@ -46,7 +46,7 @@
 				.appNavigationTitle("Crop Photo", accent: true)
 				.toolbar {
 					ToolbarItem(placement: .cancellationAction) {
-						Button(role: .cancel, action: dismiss.callAsFunction)
+						Button(role: .cancel, action: close)
 					}
 					ToolbarItem(placement: .confirmationAction) {
 						Button("Use Photo", systemImage: "checkmark", role: .confirm, action: finish)

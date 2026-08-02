@@ -226,8 +226,8 @@ struct EventNotificationSchedulesEditor: View {
 		Button("Add Event Notification", systemImage: "plus") { isAdding = true }
 			.sheet(isPresented: $isAdding) {
 				EventNotificationScheduleSheet(
-					selection: $selection,
-					close: { isAdding = false }
+					close: { isAdding = false },
+					selection: $selection
 				)
 			}
 			.animation(reduceMotion ? nil : .snappy, value: selection)
