@@ -44,16 +44,12 @@ struct AdministrationEventTagsView: View {
 		.appNavigationTitle("Event Tags", accent: true)
 		.toolbar {
 			ToolbarItem(placement: .topBarLeading) {
-				Menu {
-					ForEach(addableSections) { section in
-						Button("Add \(section.displayName)", systemImage: "plus") {
-							editor = .newTag(section)
-						}
+				Button("Add Tag", systemImage: "plus") {
+					if let addableSection {
+						editor = .newTag(addableSection)
 					}
-				} label: {
-					Label("Add Tag", systemImage: "plus")
 				}
-				.disabled(addableSections.isEmpty)
+				.disabled(addableSection == nil)
 			}
 
 			ToolbarItem(placement: .confirmationAction) {
@@ -97,9 +93,9 @@ struct AdministrationEventTagsView: View {
 		}
 	}
 
-	private var addableSections: [AdministrationEventTagSection] {
-		catalogue.sections.filter {
-			$0.category != .yearGroup && !$0.isArchived
+	private var addableSection: AdministrationEventTagSection? {
+		catalogue.sections.first {
+			$0.category == .general && !$0.isArchived
 		}
 	}
 

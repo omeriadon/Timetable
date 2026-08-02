@@ -10,20 +10,16 @@ struct TagSubscriptionsView: View {
 
 	var body: some View {
 		List {
-			ForEach(sections) { section in
-				Section(section.displayName) {
-					ForEach(section.tags) { tag in
-						Toggle(
-							tag.displayName,
-							isOn: Binding(
-								get: { selectedTagIDs.contains(tag.id) },
-								set: { isSelected in
-									setSubscription(isSelected, for: tag, in: section)
-								}
-							)
-						)
-					}
-				}
+			ForEach(tags) { tag in
+				Toggle(
+					tag.displayName,
+					isOn: Binding(
+						get: { selectedTagIDs.contains(tag.id) },
+						set: { isSelected in
+							setSubscription(isSelected, for: tag)
+						}
+					)
+				)
 			}
 		}
 		.scrollEdgeEffect()
@@ -48,15 +44,18 @@ struct TagSubscriptionsView: View {
 		committedTagIDs = selectedTagIDs
 	}
 
-	private func setSubscription(
-		_ isSelected: Bool,
-		for tag: EventTagCatalogueTag,
-		in section: EventTagCatalogueSection
-	) {
+	private var tags: [EventTagCatalogueTag] {
+		sections.flatMap(\.tags)
+	}
+
+	private var yearGroupTagIDs: Set<UUID> {
+		Set(tags.lazy.filter { $0.category == .yearGroup }.map(\.id))
+	}
+
+	private func setSubscription(_ isSelected: Bool, for tag: EventTagCatalogueTag) {
 		var proposed = selectedTagIDs
-		if section.category == .yearGroup {
-			let yearTagIDs = Set(section.tags.map(\.id))
-			proposed.subtract(yearTagIDs)
+		if tag.category == .yearGroup {
+			proposed.subtract(yearGroupTagIDs)
 			if isSelected {
 				proposed.insert(tag.id)
 			}
