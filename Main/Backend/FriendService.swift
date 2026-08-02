@@ -69,16 +69,24 @@ final class FriendService {
 			body: CreateFriendRequest(schoolEmail: schoolEmail),
 			context: .userInitiated
 		)
-		try await refresh()
+		await refreshAfterMutation()
 		return result
 	}
 
 	func accept(_ request: FriendSummary) async throws {
-		let _: FriendSummary = try await networkManager.send(
+		let acceptedFriend: FriendSummary = try await networkManager.send(
 			.v1AcceptFriendRequest(request.relationshipID),
 			context: .userInitiated
 		)
-		try await refresh()
+		var incomingRequests = Defaults[.incomingFriendRequests]
+		incomingRequests.removeAll { $0.relationshipID == request.relationshipID }
+		Defaults[.incomingFriendRequests] = incomingRequests
+
+		var friends = Defaults[.friends]
+		friends.removeAll { $0.relationshipID == acceptedFriend.relationshipID }
+		friends.append(acceptedFriend)
+		Defaults[.friends] = friends
+		await refreshAfterMutation()
 	}
 
 	func detail(for friendID: UUID) async throws -> FriendDetail {
@@ -161,6 +169,14 @@ final class FriendService {
 				for: photo,
 				displaySize: 36
 			)
+		}
+	}
+
+	private func refreshAfterMutation() async {
+		do {
+			try await refresh()
+		} catch {
+			PrintError("Friend state refresh failed after mutation", category: .network, error: error)
 		}
 	}
 }

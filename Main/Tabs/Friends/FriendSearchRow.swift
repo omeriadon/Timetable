@@ -85,12 +85,6 @@ struct FriendSearchRow: View {
 				let summary = try await service.sendRequest(to: email)
 				relationship = summary.state
 				Print("Friend request sent", category: .network)
-			} catch let NetworkError.server(statusCode, response)
-				where statusCode == 409 && response.message == "You are already friends."
-			{
-				relationship = .friends
-				try? await service.refresh()
-				Print("Friend relationship refreshed after conflict", category: .network)
 			} catch {
 				badges.present(error: error, title: "Unable to send friend request")
 				PrintError("Friend request failed", category: .network, error: error)
