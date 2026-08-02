@@ -10,7 +10,6 @@ import SwiftUI
 
 struct AccountView: View {
 	@State private var sessionStore = SessionStore.shared
-	@State private var administrationService = AdministrationService.shared
 	@Default(.userDisplayName) private var displayName
 	@State private var showDeleteConfirmation = false
 	@State private var showsProfileEditor = false
@@ -162,6 +161,7 @@ struct AccountView: View {
 		}
 	}
 
+	@MainActor
 	private func loadYearGroups() async {
 		isLoadingYearGroups = true
 		yearGroupsFailedToLoad = false
@@ -170,11 +170,10 @@ struct AccountView: View {
 		}
 
 		do {
-			async let catalogue = administrationService.tagCatalogue()
-			async let subscriptions = administrationService.tagSubscriptions()
-			let result = try await (catalogue, subscriptions)
-			let tags = result.0.sections.first(where: { $0.category == .yearGroup })?.tags ?? []
-			let subscribedTagIDs = Set(result.1.tagIDs)
+			let catalogue = try await AdministrationService.shared.tagCatalogue()
+			let subscriptions = try await AdministrationService.shared.tagSubscriptions()
+			let tags = catalogue.sections.first(where: { $0.category == .yearGroup })?.tags ?? []
+			let subscribedTagIDs = Set(subscriptions.tagIDs)
 			let selectedYearGroupID = tags.first(where: { subscribedTagIDs.contains($0.id) })?.id
 
 			yearGroupTags = tags
@@ -191,6 +190,7 @@ struct AccountView: View {
 		}
 	}
 
+	@MainActor
 	private func saveYearGroup(_ selectedYearGroupID: UUID) async {
 		isSavingYearGroup = true
 		defer {
@@ -203,7 +203,7 @@ struct AccountView: View {
 			.union([selectedYearGroupID])
 
 		do {
-			let response = try await administrationService.replaceTagSubscriptions(proposedTagIDs)
+			let response = try await AdministrationService.shared.replaceTagSubscriptions(proposedTagIDs)
 			subscribedTagIDs = Set(response.tagIDs)
 			committedYearGroupID = yearGroupTags.first(where: { subscribedTagIDs.contains($0.id) })?.id
 			self.selectedYearGroupID = committedYearGroupID
