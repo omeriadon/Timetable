@@ -89,7 +89,7 @@ struct AdministrationProfileStorageView: View {
 				total: Double(max(1, limit))
 			)
 
-			Text("\(percentage(value: value, limit: limit))% used")
+			Text("\(percentageFraction(value: value, limit: limit).formatted(.percent.precision(.fractionLength(0)))) used")
 				.font(.footnote)
 				.foregroundStyle(.secondary)
 		}
@@ -110,10 +110,10 @@ struct AdministrationProfileStorageView: View {
 		)
 	}
 
-	private func percentage(value: Int64, limit: Int64) -> Int {
+	private func percentageFraction(value: Int64, limit: Int64) -> Double {
 		guard limit > 0 else {
 			return 0
 		}
-		return Int((Double(value) / Double(limit) * 100).rounded())
+		return Double(value) / Double(limit)
 	}
 }
