@@ -117,7 +117,8 @@ struct DatesView: View {
 				globally: event.isGlobal
 			)
 		}
-		.presentationDetents([.fraction(0.6)])
+		.presentationDetents([.fraction(0.7)])
+		.interactiveDismissDisabled()
 		.navigationTransition(.zoom(sourceID: transitionID, in: eventEditorNamespace))
 	}
 

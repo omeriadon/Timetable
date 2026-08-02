@@ -45,7 +45,7 @@ struct CreatedTimetablesSettingsView: View {
 					Button("Create Timetable", systemImage: "plus") {
 						showCreate = true
 					}
-						.buttonStyle(.glassProminent)
+					.buttonStyle(.glassProminent)
 				}
 				.matchedTransitionSource(id: "1", in: ns)
 			}

@@ -5,11 +5,8 @@ struct ProfileEmojiPicker: View {
 	@Environment(\.dismiss) private var dismiss
 
 	@State private var searchText = ""
-
 	@State private var sections: [EmojiSection] = []
-
 	@Binding private var selected: Emoji?
-
 	@State private var searchResults: [Emoji] = []
 
 	init(selection: Binding<String>) {
@@ -31,7 +28,6 @@ struct ProfileEmojiPicker: View {
 					if searchText.isEmpty {
 						EmojiGrid(sections: sections, selection: $selected)
 							.transition(.blurReplace)
-
 					} else {
 						EmojiGrid(emojis: searchResults, selection: $selected)
 							.transition(.blurReplace)
@@ -53,6 +49,10 @@ struct ProfileEmojiPicker: View {
 				searchResults = query.isEmpty ? [] :
 					await EmojiIndexProvider.shared.search(query, ranking: .usage)
 			}
+		}
+		.onChange(of: selected) { _, newValue in
+			guard newValue != nil else { return }
+			dismiss()
 		}
 		.task {
 			sections = await (try? EmojiIndexProvider.shared.sections) ?? []

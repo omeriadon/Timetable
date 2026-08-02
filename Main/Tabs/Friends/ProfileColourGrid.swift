@@ -63,7 +63,7 @@ struct ProfileColourGrid: View {
 	}
 
 	private static func makePalette() -> [ProfilePaletteColour] {
-		let colourRowCount = 12
+		let colourRowCount = 6
 		let saturation = 0.75
 
 		var rows: [[ProfilePaletteColour]] = (0 ..< colourRowCount).map { row in

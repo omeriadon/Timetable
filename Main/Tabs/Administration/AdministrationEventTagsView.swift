@@ -109,8 +109,8 @@ struct AdministrationEventTagsView: View {
 		tags.move(fromOffsets: offsets, toOffset: destination)
 		Task {
 			do {
-				apply(
-					try await service.reorderEventTags(
+				try await apply(
+					service.reorderEventTags(
 						tagIDs: tags.map(\.id)
 					)
 				)
@@ -123,7 +123,7 @@ struct AdministrationEventTagsView: View {
 
 	private func load() async {
 		do {
-			apply(try await service.eventTags())
+			try await apply(service.eventTags())
 		} catch {
 			badges.present(error: error, title: "Unable to refresh event tags")
 		}

@@ -180,7 +180,6 @@ import WidgetKit
 					.interactiveDismissDisabled()
 					.navigationTransition(.zoom(sourceID: "sheetMorph", in: ns))
 				}
-
 			}
 
 			Section("Preferences") {
