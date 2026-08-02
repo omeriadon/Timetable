@@ -12,38 +12,50 @@ struct AdministrationSpecialBadgesView: View {
 	@Namespace private var namespace
 
 	var body: some View {
-		List {
-			ForEach(displayedBadges) { badge in
-				Button {
-					editor = .edit(badge)
-				} label: {
-					HStack(spacing: 12) {
-						badgePreview(badge)
+		ScrollView {
+			LazyVStack(spacing: 10) {
+				ForEach(displayedBadges) { badge in
+					Button {
+						editor = .edit(badge)
+					} label: {
+						HStack(spacing: 12) {
+							badgePreview(badge)
 
-						VStack(alignment: .leading, spacing: 4) {
-							Text(badge.accessibilityLabel)
-							Text("\(badge.assignedUserIDs.count) users")
-								.font(.footnote)
+							VStack(alignment: .leading, spacing: 4) {
+								Text(badge.accessibilityLabel)
+								Text("\(badge.assignedUserIDs.count) users")
+									.font(.footnote)
+									.foregroundStyle(.secondary)
+							}
+
+							Spacer()
+							Image(systemName: "line.3.horizontal")
 								.foregroundStyle(.secondary)
 						}
+						.frame(maxWidth: .infinity, alignment: .leading)
+						.padding(.horizontal, 14)
+						.padding(.vertical, 10)
+						.background(.regularMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
 					}
-				}
-				.buttonStyle(.plain)
-				.matchedTransitionSource(id: editorID(for: badge), in: namespace)
-				.onDrag {
-					draggedBadgeID = badge.id
-					return NSItemProvider(object: badge.id.uuidString as NSString)
-				}
-				.onDrop(
-					of: [.text],
-					delegate: SpecialBadgeOrderDropDelegate(
-						targetID: badge.id,
-						draggedBadgeID: $draggedBadgeID,
-						badgeOrder: $badgeOrder,
-						save: saveBadgeOrder
+					.buttonStyle(.plain)
+					.contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+					.matchedTransitionSource(id: editorID(for: badge), in: namespace)
+					.onDrag {
+						draggedBadgeID = badge.id
+						return NSItemProvider(object: badge.id.uuidString as NSString)
+					}
+					.onDrop(
+						of: [.text],
+						delegate: SpecialBadgeOrderDropDelegate(
+							targetID: badge.id,
+							draggedBadgeID: $draggedBadgeID,
+							badgeOrder: $badgeOrder,
+							save: saveBadgeOrder
+						)
 					)
-				)
+				}
 			}
+			.padding()
 		}
 		.appNavigationTitle("Badges", accent: true)
 		.toolbar {
