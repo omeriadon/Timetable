@@ -247,9 +247,6 @@
     "Add" : {
 
     },
-    "Add %@" : {
-
-    },
     "Add a Friend" : {
 
     },
@@ -2670,6 +2667,9 @@
       }
     },
     "Subscribe to Compass Schedule in Calendar first." : {
+
+    },
+    "Subscribed Event Tags" : {
 
     },
     "Subtitle" : {

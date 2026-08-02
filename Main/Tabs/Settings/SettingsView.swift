@@ -187,7 +187,7 @@ import WidgetKit
 					NavigationLink {
 						TagSubscriptionsView()
 					} label: {
-						Label("Event Tags", systemImage: "tag")
+						Label("Subscribed Event Tags", systemImage: "tag")
 					}
 				}
 

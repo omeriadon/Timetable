@@ -11,15 +11,16 @@ struct TagSubscriptionsView: View {
 	var body: some View {
 		List {
 			ForEach(tags) { tag in
-				Toggle(
-					tag.displayName,
-					isOn: Binding(
+				Toggle(isOn:
+					Binding(
 						get: { selectedTagIDs.contains(tag.id) },
 						set: { isSelected in
 							setSubscription(isSelected, for: tag)
 						}
-					)
-				)
+					)) {
+						Label(tag.displayName, systemImage: tag.symbol ?? "tag")
+							.tint(.accent)
+					}
 			}
 		}
 		.scrollEdgeEffect()
