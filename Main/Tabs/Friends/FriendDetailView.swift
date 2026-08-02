@@ -24,7 +24,6 @@ struct FriendDetailView: View {
 		NavigationStack {
 			ScrollView {
 				VStack(alignment: .leading, spacing: 20) {
-
 					if isLoading {
 						ProgressView()
 							.frame(maxWidth: .infinity, minHeight: 180)
@@ -40,11 +39,11 @@ struct FriendDetailView: View {
 					}
 				}
 				.foregroundStyle(.black)
-				.padding(.vertical)
 				.padding(.horizontal, FriendDetailLayout.horizontalPadding)
 			}
+			.scrollBounceBehavior(.basedOnSize)
 			.scrollEdgeEffectStyle(.soft, for: .top)
-			.safeAreaBar(edge: .top, alignment: .center, spacing: 5) {
+			.safeAreaBar(edge: .top, alignment: .center, spacing: 0) {
 				TabsPicker(
 					items: FriendDetailTab.allCases.map { ($0.title, $0.symbol) },
 					selection: Binding(
@@ -310,25 +309,25 @@ private struct FriendOverview: View {
 					FriendSubjectButton(context: subject.context, friendName: friendName) {
 						Label(subject.subjectName, systemImage: subject.symbol)
 							.foregroundStyle(subject.colour.swiftUIColor)
-						.padding(14)
-						.frame(maxWidth: .infinity, alignment: .leading)
-						.background {
-							FriendPaperBackground(
-								cornerRadius: FriendDetailLayout.itemCornerRadius
+							.padding(14)
+							.frame(maxWidth: .infinity, alignment: .leading)
+							.background {
+								FriendPaperBackground(
+									cornerRadius: FriendDetailLayout.itemCornerRadius
+								)
+							}
+							.clipShape(
+								RoundedRectangle(
+									cornerRadius: FriendDetailLayout.itemCornerRadius,
+									style: .continuous
+								)
 							)
-						}
-						.clipShape(
-							RoundedRectangle(
-								cornerRadius: FriendDetailLayout.itemCornerRadius,
-								style: .continuous
-							)
-						)
-						.glassEffect(
-							.clear.interactive(),
-							in: RoundedRectangle(
-								cornerRadius: FriendDetailLayout.itemCornerRadius,
-								style: .continuous
-						)
+							.glassEffect(
+								.clear.interactive(),
+								in: RoundedRectangle(
+									cornerRadius: FriendDetailLayout.itemCornerRadius,
+									style: .continuous
+								)
 							)
 					}
 				}
