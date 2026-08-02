@@ -48,6 +48,20 @@ struct FriendRequestsSheet: View {
 					}
 				}
 			}
+			.task {
+				await refreshRequests()
+			}
+			.refreshable {
+				await refreshRequests()
+			}
+		}
+	}
+
+	private func refreshRequests() async {
+		do {
+			try await service.refreshIncomingRequests()
+		} catch {
+			badges.present(error: error, title: "Unable to load friend requests")
 		}
 	}
 

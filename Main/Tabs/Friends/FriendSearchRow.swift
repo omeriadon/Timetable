@@ -4,8 +4,8 @@ struct FriendSearchRow: View {
 	let result: FriendSearchResult
 	@State private var service = FriendService.shared
 	@State private var isSending = false
-	@State private var requestSent = false
 	@State private var relationship: FriendRelationshipState?
+	@State private var showsRequestConfirmation = false
 	@Environment(\.statusBadgeManager) private var badges
 
 	init(result: FriendSearchResult) {
@@ -33,7 +33,16 @@ struct FriendSearchRow: View {
 		.padding(.vertical, 8)
 		.onChange(of: result.relationship) { _, value in
 			relationship = value
-			requestSent = value == .pendingOutgoing
+		}
+		.confirmationDialog("Send Friend Request?", isPresented: $showsRequestConfirmation) {
+			Button("Send Request", systemImage: "paperplane", role: .confirm) {
+				sendRequest()
+			}
+			.buttonStyle(.glassProminent)
+
+			Button(role: .cancel) {}
+		} message: {
+			Text("This sends a friend request to \(result.profile.displayName).")
 		}
 	}
 
@@ -45,21 +54,21 @@ struct FriendSearchRow: View {
 					.font(.caption.weight(.semibold))
 					.foregroundStyle(.secondary)
 			case .pendingOutgoing:
-				Label("Pending", systemImage: "clock")
+				Label("Request Sent", systemImage: "clock")
 					.font(.caption.weight(.semibold))
 					.foregroundStyle(.secondary)
 			case .pendingIncoming:
-				Label("Requested", systemImage: "bell.badge")
+				Label("Incoming Request", systemImage: "bell.badge")
 					.font(.caption.weight(.semibold))
 					.foregroundStyle(.tint)
 			case nil:
-				Button("Request", systemImage: requestSent ? "checkmark" : "person.badge.plus", role: .confirm) {
-					sendRequest()
+				Button("Request", systemImage: "person.badge.plus") {
+					showsRequestConfirmation = true
 				}
 				.buttonStyle(.glassProminent)
 				.tint(.blue)
 				.foregroundStyle(.white)
-				.disabled(isSending || requestSent)
+				.disabled(isSending)
 		}
 	}
 
@@ -75,7 +84,6 @@ struct FriendSearchRow: View {
 			do {
 				let summary = try await service.sendRequest(to: email)
 				relationship = summary.state
-				requestSent = summary.state == .pendingOutgoing
 				Print("Friend request sent", category: .network)
 			} catch let NetworkError.server(statusCode, response)
 				where statusCode == 409 && response.message == "You are already friends."

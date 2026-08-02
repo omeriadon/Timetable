@@ -66,15 +66,9 @@ struct AddFriendSheet: View {
 				isPresented: $isSearchPresented,
 				prompt: "Search by name or email"
 			)
-			.onChange(of: query) { _, value in
-				let cleaned = value.trimmingCharacters(in: .whitespacesAndNewlines)
+			.task(id: query) {
 				completedSearchQuery = ""
-				Task { await search(for: cleaned) }
-			}
-			.onChange(of: isSearching) { _, searching in
-				if !searching {
-					completedSearchQuery = cleanedQuery
-				}
+				await search(for: cleanedQuery)
 			}
 		}
 	}
@@ -87,10 +81,18 @@ struct AddFriendSheet: View {
 		}
 
 		isSearching = true
-		defer { isSearching = false }
+		defer {
+			if !Task.isCancelled {
+				isSearching = false
+				completedSearchQuery = query
+			}
+		}
 		do {
-			results = try await service.search(query: query)
+			let searchResults = try await service.search(query: query)
+			guard !Task.isCancelled else { return }
+			results = searchResults
 		} catch {
+			guard !Task.isCancelled else { return }
 			results = []
 		}
 	}

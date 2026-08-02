@@ -35,6 +35,7 @@ struct FriendsView: View {
 						sheet = .requests
 					}
 					.matchedTransitionSource(id: FriendsSheet.requests.transitionID, in: sheetNamespace)
+					.badge(incomingFriendRequests.count)
 					.accessibilityValue(incomingFriendRequests.isEmpty ? "No pending requests" : "\(incomingFriendRequests.count) pending requests")
 				}
 				ToolbarItem(placement: .topBarTrailing) {
@@ -46,8 +47,8 @@ struct FriendsView: View {
 			}
 			.searchable(text: $searchText, prompt: "Search with a school email")
 			.task { await refresh() }
-			.onChange(of: searchText) { _, value in
-				Task { await search(for: value) }
+			.task(id: searchText) {
+				await search(for: searchText)
 			}
 			.sheet(item: $sheet) { sheet in
 				switch sheet {
@@ -165,10 +166,17 @@ struct FriendsView: View {
 			return
 		}
 		isSearching = true
-		defer { isSearching = false }
+		defer {
+			if !Task.isCancelled {
+				isSearching = false
+			}
+		}
 		do {
-			searchResults = try await service.search(query: query)
+			let results = try await service.search(query: query)
+			guard !Task.isCancelled else { return }
+			searchResults = results
 		} catch {
+			guard !Task.isCancelled else { return }
 			searchResults = []
 		}
 	}
