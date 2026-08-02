@@ -7,6 +7,8 @@ struct OnboardingYearGroupView: View {
 	@State private var subscriptions: Set<UUID> = []
 	@State private var selectedTagID: UUID?
 	@State private var isSaving = false
+	@State private var isLoading = false
+	@State private var loadFailed = false
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 24) {
@@ -16,20 +18,44 @@ struct OnboardingYearGroupView: View {
 			Text("This controls which year-group school events you receive. You can change it later in Settings.")
 				.foregroundStyle(.secondary)
 
-			ForEach(yearGroupTags) { tag in
-				Button {
-					selectedTagID = tag.id
-					Task {
-						await save()
+			if isLoading {
+				ProgressView("Loading year groups…")
+					.frame(maxWidth: .infinity)
+			} else if yearGroupTags.isEmpty {
+				ContentUnavailableView(
+					loadFailed ? "Unable to Load Year Groups" : "No Year Groups Available",
+					systemImage: loadFailed ? "arrow.trianglehead.2.clockwise" : "person.3",
+					description: Text(
+						loadFailed
+							? "The year groups could not be loaded from the server."
+							: "No year groups are currently configured."
+					)
+				)
+
+				if loadFailed {
+					Button("Retry", systemImage: "arrow.clockwise") {
+						Task {
+							await load()
+						}
 					}
-				} label: {
-					Label(tag.displayName, systemImage: selectedTagID == tag.id ? "checkmark.circle.fill" : "circle")
-						.frame(maxWidth: .infinity, alignment: .leading)
-						.padding()
-						.background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16))
+					.buttonStyle(.glassProminent)
 				}
-				.buttonStyle(.plain)
-				.disabled(isSaving)
+			} else {
+				ForEach(yearGroupTags) { tag in
+					Button {
+						selectedTagID = tag.id
+						Task {
+							await save()
+						}
+					} label: {
+						Label(tag.displayName, systemImage: selectedTagID == tag.id ? "checkmark.circle.fill" : "circle")
+							.frame(maxWidth: .infinity, alignment: .leading)
+							.padding()
+							.background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16))
+					}
+					.buttonStyle(.plain)
+					.disabled(isSaving)
+				}
 			}
 		}
 		.task {
@@ -44,18 +70,37 @@ struct OnboardingYearGroupView: View {
 	}
 
 	private func load() async {
+		isLoading = true
+		loadFailed = false
+		context.configure(canAdvance: false, isWorking: true, statusMessage: "Loading year groups…")
+		defer {
+			isLoading = false
+		}
+
 		async let catalogue = service.tagCatalogue()
 		async let currentSubscriptions = service.tagSubscriptions()
-		guard let loadedCatalogue = try? await catalogue, let loadedSubscriptions = try? await currentSubscriptions else {
-			context.configure(canAdvance: false, statusMessage: "Unable to load year groups.")
+		guard let loadedCatalogue = try? await catalogue else {
+			loadFailed = true
+			context.configure(canAdvance: false, isWorking: false, statusMessage: "Unable to load year groups.")
 			return
 		}
 
 		yearGroupTags = loadedCatalogue.sections.first(where: { $0.category == .yearGroup })?.tags ?? []
-		subscriptions = Set(loadedSubscriptions.tagIDs)
+		if let loadedSubscriptions = try? await currentSubscriptions {
+			subscriptions = Set(loadedSubscriptions.tagIDs)
+		} else {
+			subscriptions = []
+		}
+
 		selectedTagID = yearGroupTags.first(where: { subscriptions.contains($0.id) })?.id
+		guard !yearGroupTags.isEmpty else {
+			context.configure(canAdvance: false, isWorking: false, statusMessage: "No year groups are available.")
+			return
+		}
+
 		context.configure(
 			canAdvance: selectedTagID != nil,
+			isWorking: false,
 			statusMessage: selectedTagID == nil ? "Select your year group to continue." : nil
 		)
 	}
