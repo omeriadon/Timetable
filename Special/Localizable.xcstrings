@@ -811,10 +811,19 @@
     "Delete Event" : {
 
     },
+    "Delete friend request" : {
+
+    },
+    "Delete Friend Request?" : {
+
+    },
     "Delete Notification" : {
 
     },
     "Delete Notification?" : {
+
+    },
+    "Delete Request" : {
 
     },
     "Delete Subject" : {
@@ -2872,6 +2881,9 @@
       }
     },
     "This removes the badge from every assigned user." : {
+
+    },
+    "This removes the pending friend request." : {
 
     },
     "This removes the timetable from the server and revokes installed passes." : {
