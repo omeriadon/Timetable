@@ -85,7 +85,10 @@ struct DatesView: View {
 					transitionID: target.transitionID
 				)
 			case let .noSchoolDay(detail):
-				NoSchoolDayDetailView(target: detail)
+				NoSchoolDayDetailView(
+					target: detail,
+					close: { presentationTarget = nil }
+				)
 					.presentationDetents([.fraction(0.5)])
 					.navigationTransition(.zoom(sourceID: target.transitionID, in: eventEditorNamespace))
 		}
@@ -97,7 +100,8 @@ struct DatesView: View {
 	) -> some View {
 		CalendarEventEditor(
 			target: target,
-			canManageGlobalEvents: events.canManageGlobalEvents
+			canManageGlobalEvents: events.canManageGlobalEvents,
+			close: { presentationTarget = nil }
 		) { request, event in
 			if let event {
 				try await eventService.updateEvent(
@@ -396,7 +400,7 @@ private struct NoSchoolDayDetailTarget: Identifiable {
 
 private struct NoSchoolDayDetailView: View {
 	let target: NoSchoolDayDetailTarget
-	@Environment(\.dismiss) private var dismiss
+	let close: () -> Void = {}
 
 	var body: some View {
 		NavigationStack {
@@ -411,7 +415,7 @@ private struct NoSchoolDayDetailView: View {
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {
-						dismiss()
+						close()
 					}
 				}
 			}
@@ -433,10 +437,10 @@ private enum CalendarEventScope: String, Identifiable {
 
 private struct CalendarEventEditor: View {
 	let target: CalendarEventEditorTarget
+	let close: () -> Void = {}
 	let canManageGlobalEvents: Bool
 	let save: (CreateCalendarEventRequest, CalendarEvent?) async throws -> Void
 	let delete: (CalendarEvent) async throws -> Void
-	@Environment(\.dismiss) private var dismiss
 	@Environment(\.statusBadgeManager) private var badges
 	@State private var title: String
 	@State private var notes: String
@@ -501,7 +505,7 @@ private struct CalendarEventEditor: View {
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {
-						dismiss()
+						close()
 					}
 					.disabled(isSaving)
 				}
@@ -567,21 +571,18 @@ private struct CalendarEventEditor: View {
 			tagIDs: Array(selectedTagIDs)
 		)
 		Task {
-			do { try await save(request, target.event); dismiss() }
+				do { try await save(request, target.event); close() }
 			catch { isSaving = false; badges.addBadge(id: UUID(), title: "Unable to save event", secondaryText: error.localizedDescription, priority: 4, view: .error) }
 		}
 	}
 
 	private func deleteEvent(_ event: CalendarEvent) {
-		Task { do { try await delete(event); dismiss() } catch { badges.addBadge(id: UUID(), title: "Unable to delete event", secondaryText: error.localizedDescription, priority: 4, view: .error) } }
+		Task { do { try await delete(event); close() } catch { badges.addBadge(id: UUID(), title: "Unable to delete event", secondaryText: error.localizedDescription, priority: 4, view: .error) } }
 	}
 }
 
 private struct CalendarEventSymbolPicker: View {
 	@Binding var symbol: String
-	#if os(iOS)
-		@Environment(\.dismiss) private var dismiss
-	#endif
 	var body: some View {
 		#if os(iOS)
 			SymbolsPicker(selection: $symbol, title: "", searchLabel: "Search symbols...", autoDismiss: true)

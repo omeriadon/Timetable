@@ -53,7 +53,8 @@ struct AdministrationCalendarEntriesView: View {
 			AdministrationCalendarEditor(
 				entry: entry,
 				save: save,
-				delete: deleteFromEditor
+				delete: deleteFromEditor,
+				close: { editor = nil }
 			)
 		}
 	}

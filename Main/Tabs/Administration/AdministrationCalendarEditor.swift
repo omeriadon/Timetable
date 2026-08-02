@@ -4,8 +4,8 @@ struct AdministrationCalendarEditor: View {
 	let entry: AdministrationCalendarEntry
 	let save: (AdministrationCalendarEntryRequest, UUID?) async throws -> Void
 	let delete: (UUID) async throws -> Void
+	let close: () -> Void
 
-	@Environment(\.dismiss) private var dismiss
 	@State private var label: String
 	@State private var start: Date
 	@State private var end: Date
@@ -13,11 +13,13 @@ struct AdministrationCalendarEditor: View {
 	init(
 		entry: AdministrationCalendarEntry,
 		save: @escaping (AdministrationCalendarEntryRequest, UUID?) async throws -> Void,
-		delete: @escaping (UUID) async throws -> Void
+		delete: @escaping (UUID) async throws -> Void,
+		close: @escaping () -> Void
 	) {
 		self.entry = entry
 		self.save = save
 		self.delete = delete
+		self.close = close
 		_label = State(initialValue: entry.label)
 		_start = State(initialValue: entry.startDate.startOfDay() ?? .now)
 		_end = State(initialValue: entry.endDate?.startOfDay() ?? entry.startDate.startOfDay() ?? .now)
@@ -38,7 +40,7 @@ struct AdministrationCalendarEditor: View {
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {
-						dismiss()
+						close()
 					}
 				}
 
@@ -72,14 +74,14 @@ struct AdministrationCalendarEditor: View {
 
 		Task {
 			try? await save(request, entry.label.isEmpty ? nil : entry.id)
-			dismiss()
+				close()
 		}
 	}
 
 	private func deleteEntry() {
 		Task {
 			try? await delete(entry.id)
-			dismiss()
+				close()
 		}
 	}
 }

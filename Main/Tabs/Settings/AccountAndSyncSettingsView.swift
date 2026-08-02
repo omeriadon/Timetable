@@ -224,13 +224,18 @@ struct EventNotificationSchedulesEditor: View {
 			.transition(.move(edge: .top).combined(with: .opacity))
 		}
 		Button("Add Event Notification", systemImage: "plus") { isAdding = true }
-			.sheet(isPresented: $isAdding) { EventNotificationScheduleSheet(selection: $selection) }
+			.sheet(isPresented: $isAdding) {
+				EventNotificationScheduleSheet(
+					selection: $selection,
+					close: { isAdding = false }
+				)
+			}
 			.animation(reduceMotion ? nil : .snappy, value: selection)
 	}
 }
 
 private struct EventNotificationScheduleSheet: View {
-	@Environment(\.dismiss) private var dismiss
+	let close: () -> Void
 	@Binding var selection: Set<EventNotificationSchedule>
 	@State private var timeMinutes = 8 * 60
 	@State private var dayOffset = 0
@@ -268,7 +273,7 @@ private struct EventNotificationScheduleSheet: View {
 			.presentationDetents([.medium])
 			.appNavigationTitle("Event Notification", accent: true)
 			.toolbar {
-				ToolbarItem(placement: .cancellationAction) { Button(role: .cancel) { dismiss() } }
+				ToolbarItem(placement: .cancellationAction) { Button(role: .cancel) { close() } }
 				ToolbarItem(placement: .confirmationAction) {
 					Button("Add", systemImage: "plus", role: .confirm) {
 						withAnimation(reduceMotion ? nil : .snappy) {
@@ -280,7 +285,7 @@ private struct EventNotificationScheduleSheet: View {
 								)
 							)
 						}
-						dismiss()
+						close()
 					}
 					.buttonStyle(.glassProminent)
 				}

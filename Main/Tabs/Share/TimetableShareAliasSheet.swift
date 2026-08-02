@@ -6,7 +6,7 @@ import Defaults
 import SwiftUI
 
 struct TimetableShareAliasSheet: View {
-	@Environment(\.dismiss) private var dismiss
+	let close: () -> Void = {}
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	@FocusState private var isFocused: Bool
 	@State private var service = TimetableShareAliasService.shared
@@ -80,7 +80,7 @@ struct TimetableShareAliasSheet: View {
 						Button("Save") {
 							Task {
 								if await service.save() {
-									dismiss()
+									close()
 								}
 							}
 						}
@@ -93,7 +93,7 @@ struct TimetableShareAliasSheet: View {
 						Button("Remove Custom Link", role: .destructive) {
 							Task {
 								if await service.remove() {
-									dismiss()
+									close()
 								}
 							}
 						}
@@ -106,7 +106,7 @@ struct TimetableShareAliasSheet: View {
 			.toolbar {
 				ToolbarItem(placement: .topBarTrailing) {
 					Button(role: .cancel) {
-						dismiss()
+						close()
 					}
 				}
 			}

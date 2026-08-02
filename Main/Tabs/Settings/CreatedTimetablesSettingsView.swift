@@ -86,7 +86,7 @@ private struct CreatedTimetableCreateView: View {
 	@State private var subjects: [Subject] = []
 	@State private var showSubjectEditor = false
 	@State private var isSaving = false
-	@Environment(\.dismiss) private var dismiss
+	let close: () -> Void = {}
 	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
@@ -107,7 +107,7 @@ private struct CreatedTimetableCreateView: View {
 
 				ToolbarItem(placement: .cancellationAction) {
 					Button("Cancel", systemImage: "xmark", role: .cancel) {
-						dismiss()
+						close()
 					}
 					.disabled(isSaving)
 				}
@@ -136,7 +136,7 @@ private struct CreatedTimetableCreateView: View {
 		defer { isSaving = false }
 		do {
 			try await CreatedTimetableService.shared.create(title: title, subjects: subjects)
-			dismiss()
+			close()
 		} catch {
 			badges.addBadge(id: UUID(), title: "Unable to create timetable", secondaryText: error.localizedDescription, priority: 4, view: .error)
 		}
@@ -149,7 +149,7 @@ private struct CreatedTimetableEditorView: View {
 	@State private var subjects: [Subject]
 	@State private var showEditor = false
 	@State private var confirmDelete = false
-	@Environment(\.dismiss) private var dismiss
+	let close: () -> Void = {}
 	@Environment(\.statusBadgeManager) private var badges
 
 	init(timetable: TimetableDetailResponse) {
@@ -227,7 +227,7 @@ private struct CreatedTimetableEditorView: View {
 		do {
 			try await CreatedTimetableService.shared.delete(id: timetable.id)
 			badges.addBadge(id: UUID(), title: "Timetable deleted", priority: 3, view: .success)
-			dismiss()
+			close()
 		} catch {
 			badges.addBadge(id: UUID(), title: "Unable to delete timetable", secondaryText: error.localizedDescription, priority: 4, view: .error)
 		}

@@ -60,7 +60,8 @@ struct AdministrationUsersView: View {
 			AdministrationUserEditor(
 				target: target,
 				didSave: save,
-				didDelete: delete
+				didDelete: delete,
+				close: { editor = nil }
 			)
 			.presentationDetents(editor == .create ? [.fraction(0.6)] : [.large])
 		}

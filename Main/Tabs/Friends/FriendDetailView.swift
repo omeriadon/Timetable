@@ -3,13 +3,13 @@ import SwiftUI
 
 struct FriendDetailView: View {
 	let friend: FriendSummary
+	let close: () -> Void
 	@State private var detail: FriendDetail?
 	@State private var service = FriendService.shared
 	@State private var selectedTab = FriendDetailTab.main
 	@State private var action: FriendAction?
 	@State private var showsReportConfirmation = false
 	@State private var isLoading = true
-	@Environment(\.dismiss) private var dismiss
 	@Environment(\.statusBadgeManager) private var badges
 
 	private var displayedFriendName: String {
@@ -61,7 +61,7 @@ struct FriendDetailView: View {
 			.toolbar {
 				ToolbarItem(placement: .topBarLeading) {
 					Button(role: .cancel) {
-						dismiss()
+						close()
 					}
 				}
 
@@ -147,7 +147,7 @@ struct FriendDetailView: View {
 		Task {
 			do {
 				try await service.remove(friendID: friend.friend.id)
-				dismiss()
+				close()
 			} catch {
 				badges.present(error: error, title: "Unable to update friend")
 			}

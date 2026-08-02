@@ -4,8 +4,8 @@ struct AdministrationUserEditor: View {
 	let target: AdministrationUserEditorTarget
 	let didSave: (AdministrationUserResponse) -> Void
 	let didDelete: (AdministrationUserResponse) -> Void
+	let close: () -> Void
 
-	@Environment(\.dismiss) private var dismiss
 	@State private var service = AdministrationService.shared
 	@State private var displayName: String
 	@State private var email: String
@@ -18,11 +18,13 @@ struct AdministrationUserEditor: View {
 	init(
 		target: AdministrationUserEditorTarget,
 		didSave: @escaping (AdministrationUserResponse) -> Void,
-		didDelete: @escaping (AdministrationUserResponse) -> Void
+		didDelete: @escaping (AdministrationUserResponse) -> Void,
+		close: @escaping () -> Void
 	) {
 		self.target = target
 		self.didSave = didSave
 		self.didDelete = didDelete
+		self.close = close
 		_displayName = State(initialValue: target.user?.displayName ?? "")
 		_email = State(initialValue: target.user?.email ?? "")
 	}
@@ -98,7 +100,7 @@ struct AdministrationUserEditor: View {
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {
-						dismiss()
+						close()
 					}
 				}
 
@@ -172,7 +174,7 @@ struct AdministrationUserEditor: View {
 			}
 
 			didSave(savedUser)
-			dismiss()
+			close()
 		}
 	}
 
@@ -185,7 +187,7 @@ struct AdministrationUserEditor: View {
 			}
 
 			didDelete(user)
-			dismiss()
+			close()
 		}
 	}
 

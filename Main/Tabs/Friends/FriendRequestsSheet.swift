@@ -2,7 +2,7 @@ import Defaults
 import SwiftUI
 
 struct FriendRequestsSheet: View {
-	@Environment(\.dismiss) private var dismiss
+	let close: () -> Void
 	@State private var incomingRequests: [FriendSummary] = Defaults[.incomingFriendRequests]
 	@State private var outgoingRequests: [FriendSummary] = Defaults[.outgoingFriendRequests]
 	@State private var service = FriendService.shared
@@ -40,7 +40,7 @@ struct FriendRequestsSheet: View {
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {
-						dismiss()
+						close()
 					} label: {
 						Image(systemName: "xmark")
 					}

@@ -5,7 +5,7 @@ struct AdministrationEventTagSectionEditor: View {
 	let save: (AdministrationEventTagSectionUpdateRequest, UUID) async throws -> Void
 	let saveTag: (AdministrationEventTagRequest, UUID?) async throws -> Void
 
-	@Environment(\.dismiss) private var dismiss
+	let close: () -> Void = {}
 	@State private var displayName: String
 	@State private var sortOrder: Int
 	@State private var isArchived: Bool
@@ -49,7 +49,7 @@ struct AdministrationEventTagSectionEditor: View {
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {
-						dismiss()
+						close()
 					}
 				}
 
@@ -99,7 +99,7 @@ struct AdministrationEventTagSectionEditor: View {
 				),
 				section.id
 			)
-			dismiss()
+			close()
 		} catch {
 			return
 		}

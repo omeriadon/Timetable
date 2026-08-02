@@ -10,7 +10,7 @@ import EventKit
 import SwiftUI
 
 struct CalendarImportView: View {
-	@Environment(\.dismiss) var dismiss
+	let close: () -> Void = {}
 	var dismissesWhenFinished = true
 	var completion: ((Bool) -> Void)?
 
@@ -146,7 +146,7 @@ struct CalendarImportView: View {
 			PrintError("[iOS] error: \(error)")
 			if dismissesWhenFinished {
 				try? await Task.sleep(for: .seconds(2))
-				dismiss()
+				close()
 			}
 		}
 	}
@@ -316,7 +316,7 @@ struct CalendarImportView: View {
 		if dismissesWhenFinished {
 			Task {
 				try? await Task.sleep(for: .seconds(2))
-				dismiss()
+				close()
 			}
 		}
 	}

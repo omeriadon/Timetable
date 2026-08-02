@@ -2,7 +2,7 @@ import SwiftEmoji
 import SwiftUI
 
 struct ProfileEmojiPicker: View {
-	@Environment(\.dismiss) private var dismiss
+	let close: () -> Void = {}
 
 	@State private var searchText = ""
 	@State private var sections: [EmojiSection] = []
@@ -52,7 +52,7 @@ struct ProfileEmojiPicker: View {
 		}
 		.onChange(of: selected) { _, newValue in
 			guard newValue != nil else { return }
-			dismiss()
+			close()
 		}
 		.task {
 			sections = await (try? EmojiIndexProvider.shared.sections) ?? []

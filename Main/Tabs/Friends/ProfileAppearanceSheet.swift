@@ -7,7 +7,7 @@ import SwiftUI
 #endif
 
 struct ProfileAppearanceSheet: View {
-	@Environment(\.dismiss) private var dismiss
+	let close: () -> Void = {}
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	@Environment(\.statusBadgeManager) private var statusBadges
 	@State private var service = FriendService.shared
@@ -283,7 +283,7 @@ struct ProfileAppearanceSheet: View {
 					profile: profile,
 					fallbackAppearance: profile.appearance
 				)
-				dismiss()
+				close()
 			} catch {
 				statusBadges.present(error: error, title: "Unable to save profile")
 			}

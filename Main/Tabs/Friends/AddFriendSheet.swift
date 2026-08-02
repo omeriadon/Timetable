@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AddFriendSheet: View {
-	@Environment(\.dismiss) private var dismiss
+	let close: () -> Void
 	@State private var query = ""
 	@State private var results: [FriendSearchResult] = []
 	@State private var service = FriendService.shared
@@ -55,7 +55,7 @@ struct AddFriendSheet: View {
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {
-						dismiss()
+						close()
 					} label: {
 						Image(systemName: "xmark")
 					}

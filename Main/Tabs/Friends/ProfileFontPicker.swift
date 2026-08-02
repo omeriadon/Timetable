@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ProfileFontPicker: View {
-	@Environment(\.dismiss) private var dismiss
+	let close: () -> Void = {}
 	@Binding var design: ProfileFontDesign
 	@Binding var weight: ProfileFontWeight
 

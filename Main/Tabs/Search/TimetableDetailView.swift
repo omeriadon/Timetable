@@ -12,12 +12,12 @@ import SwiftUI
 struct TimetableDetailView: View {
 	let result: TimetableSearchResult
 	let portalNamespace: Namespace.ID
+	let close: () -> Void = {}
 	@State private var detail: TimetableDetailResponse?
 	@State private var showReportConfirmation = false
 	@State private var isWorking = true
 	@State private var imported = false
 	@Environment(\.statusBadgeManager) private var badges
-	@Environment(\.dismiss) private var dismiss
 
 	var body: some View {
 		NavigationStack {
@@ -60,7 +60,7 @@ struct TimetableDetailView: View {
 			.scrollEdgeEffect(direction: .clearTopDarkBottom)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
-					Button("Close", systemImage: "xmark", action: dismiss.callAsFunction)
+					Button("Close", systemImage: "xmark", action: close)
 				}
 
 				ToolbarItem(placement: .topBarTrailing) {

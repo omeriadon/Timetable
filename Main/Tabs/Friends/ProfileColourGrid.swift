@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ProfileColourGrid: View {
-	@Environment(\.dismiss) private var dismiss
+	let close: () -> Void = {}
 	@Binding var selection: [RGBAColor]
 
 	private static let columnCount = 15

@@ -2,7 +2,7 @@
 	import SwiftUI
 
 	struct ProfilePhotoCropEditor: View {
-		@Environment(\.dismiss) private var dismiss
+		let close: () -> Void = {}
 		let sourceData: Data
 		let completion: (Data) -> Void
 		@State private var zoom = 1.0
@@ -123,7 +123,7 @@
 						viewport: viewport
 					)
 					completion(data)
-					dismiss()
+					close()
 				} catch {
 					errorMessage = error.localizedDescription
 				}

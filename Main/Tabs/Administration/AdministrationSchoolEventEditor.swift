@@ -4,8 +4,8 @@ struct AdministrationSchoolEventEditor: View {
 	let target: AdministrationSchoolEventEditorTarget
 	let save: (CreateCalendarEventRequest, CalendarEvent?) async throws -> Void
 	let delete: (CalendarEvent) async throws -> Void
+	let close: () -> Void
 
-	@Environment(\.dismiss) private var dismiss
 	@State private var title: String
 	@State private var notes: String
 	@State private var symbol: String
@@ -18,11 +18,13 @@ struct AdministrationSchoolEventEditor: View {
 	init(
 		target: AdministrationSchoolEventEditorTarget,
 		save: @escaping (CreateCalendarEventRequest, CalendarEvent?) async throws -> Void,
-		delete: @escaping (CalendarEvent) async throws -> Void
+		delete: @escaping (CalendarEvent) async throws -> Void,
+		close: @escaping () -> Void
 	) {
 		self.target = target
 		self.save = save
 		self.delete = delete
+		self.close = close
 		_title = State(initialValue: target.event?.title ?? "")
 		_notes = State(initialValue: target.event?.notes ?? "")
 		_symbol = State(initialValue: target.event?.symbol ?? "calendar")
@@ -68,7 +70,7 @@ struct AdministrationSchoolEventEditor: View {
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {
-						dismiss()
+						close()
 					}
 				}
 
@@ -114,14 +116,14 @@ struct AdministrationSchoolEventEditor: View {
 
 		Task {
 			try? await save(request, target.event)
-			dismiss()
+			close()
 		}
 	}
 
 	private func deleteEvent(_ event: CalendarEvent) {
 		Task {
 			try? await delete(event)
-			dismiss()
+			close()
 		}
 	}
 }

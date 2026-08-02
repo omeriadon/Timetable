@@ -74,13 +74,15 @@ struct AdministrationEventTagsView: View {
 						AdministrationEventTagEditor(
 							tag: tag,
 							section: section,
-							save: saveTag
+							save: saveTag,
+							close: { editor = nil }
 						)
 					case let .newTag(section):
 						AdministrationEventTagEditor(
 							tag: nil,
 							section: section,
-							save: saveTag
+							save: saveTag,
+							close: { editor = nil }
 						)
 				}
 			}

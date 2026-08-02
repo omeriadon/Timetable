@@ -53,19 +53,19 @@ struct FriendsView: View {
 			.sheet(item: $sheet) { sheet in
 				switch sheet {
 					case .addFriend:
-						AddFriendSheet()
+						AddFriendSheet(close: { self.sheet = nil })
 							.navigationTransition(.zoom(sourceID: sheet.transitionID, in: sheetNamespace))
 							.presentationDetents([.large])
 							.presentationDragIndicator(.hidden)
 					case .requests:
-						FriendRequestsSheet()
+						FriendRequestsSheet(close: { self.sheet = nil })
 							.navigationTransition(.zoom(sourceID: sheet.transitionID, in: sheetNamespace))
 							.presentationDetents([.fraction(0.6), .large])
 							.presentationDragIndicator(.hidden)
 				}
 			}
 			.sheet(item: $selectedFriend) { friend in
-				FriendDetailView(friend: friend)
+				FriendDetailView(friend: friend, close: { selectedFriend = nil })
 					.navigationTransition(
 						.zoom(
 							sourceID: friendTransitionID(friend),

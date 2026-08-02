@@ -50,7 +50,8 @@ struct AdministrationSchoolEventsView: View {
 			AdministrationSchoolEventEditor(
 				target: target,
 				save: save,
-				delete: delete
+				delete: delete,
+				close: { editorTarget = nil }
 			)
 			.presentationDetents([.fraction(0.6)])
 		}

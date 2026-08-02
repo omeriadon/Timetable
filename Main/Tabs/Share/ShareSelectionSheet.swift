@@ -29,7 +29,7 @@ enum SelectedShareItem: Identifiable, Hashable {
 }
 
 struct ShareSelectionSheet: View {
-	@Environment(\.dismiss) private var dismiss
+	let close: () -> Void = {}
 	@Default(.ownerTimetableShareAlias) private var ownerTimetableShareAlias
 	@Default(.receivedTimetables) var receivedTimetables
 	@State private var showAliasEditor = false
@@ -45,7 +45,7 @@ struct ShareSelectionSheet: View {
 					Section("Your Timetable") {
 						if let url = TimetableShareURL.ownerURL(id: ownerID, alias: ownerTimetableShareAlias) {
 							Button {
-								dismiss()
+								close()
 								onSelect(.owner(id: ownerID))
 							} label: {
 								VStack {
@@ -79,7 +79,7 @@ struct ShareSelectionSheet: View {
 					Section("Saved Timetables") {
 						ForEach(received) { timetable in
 							Button {
-								dismiss()
+								close()
 								onSelect(.received(id: timetable.id, name: timetable.sender))
 							} label: {
 								HStack {
@@ -99,7 +99,7 @@ struct ShareSelectionSheet: View {
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {
-						dismiss()
+						close()
 					}
 				}
 			}

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct FeedbackView: View {
-	@Environment(\.dismiss) private var dismiss
+	let close: () -> Void = {}
 	@Environment(\.statusBadgeManager) private var badges
 	@State private var category = "Feedback"
 	@State private var message = ""
@@ -58,7 +58,7 @@ struct FeedbackView: View {
 				}
 
 				ToolbarItem(placement: .cancellationAction) {
-					Button(role: .cancel) { dismiss() }
+					Button(role: .cancel) { close() }
 				}
 				ToolbarItem(placement: .confirmationAction) {
 					Button("Send", systemImage: "checkmark", role: .confirm) { submit() }
@@ -76,7 +76,7 @@ struct FeedbackView: View {
 			do {
 				try await FeedbackService.submit(category: category, message: message)
 				badges.addBadge(id: UUID(), title: "Feedback sent", priority: 3, view: .success)
-				dismiss()
+				close()
 			} catch {
 				badges.present(error: error, title: "Unable to send feedback")
 			}

@@ -79,7 +79,8 @@ struct AdministrationSpecialBadgesView: View {
 				target: target,
 				users: users,
 				save: save,
-				delete: delete
+				delete: delete,
+				close: { editor = nil }
 			)
 			.navigationTransition(
 				.zoom(

@@ -5,8 +5,8 @@ struct AdministrationSpecialBadgeEditor: View {
 	let users: [AdministrationUserResponse]
 	let save: (AdministrationSpecialBadgeRequest, UUID?, Set<UUID>) async throws -> AdministrationSpecialBadgeResponse
 	let delete: (AdministrationSpecialBadgeResponse) async throws -> Void
+	let close: () -> Void
 
-	@Environment(\.dismiss) private var dismiss
 	@Environment(\.statusBadgeManager) private var statusBadges
 	@State private var symbol: String
 	@State private var accessibilityLabel: String
@@ -21,12 +21,14 @@ struct AdministrationSpecialBadgeEditor: View {
 		target: AdministrationSpecialBadgeEditorTarget,
 		users: [AdministrationUserResponse],
 		save: @escaping (AdministrationSpecialBadgeRequest, UUID?, Set<UUID>) async throws -> AdministrationSpecialBadgeResponse,
-		delete: @escaping (AdministrationSpecialBadgeResponse) async throws -> Void
+		delete: @escaping (AdministrationSpecialBadgeResponse) async throws -> Void,
+		close: @escaping () -> Void
 	) {
 		self.target = target
 		self.users = users
 		self.save = save
 		self.delete = delete
+		self.close = close
 		let badge = target.badge
 		_symbol = State(initialValue: badge?.symbol ?? "star.fill")
 		_accessibilityLabel = State(initialValue: badge?.accessibilityLabel ?? "Badge")
@@ -72,7 +74,7 @@ struct AdministrationSpecialBadgeEditor: View {
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {
-						dismiss()
+						close()
 					}
 				}
 
@@ -131,7 +133,7 @@ struct AdministrationSpecialBadgeEditor: View {
 				target.badge?.id,
 				selectedUserIDs
 			)
-			dismiss()
+			close()
 		} catch {
 			statusBadges.present(error: error, title: "Unable to save badge")
 		}
@@ -140,7 +142,7 @@ struct AdministrationSpecialBadgeEditor: View {
 	private func deleteBadge(_ badge: AdministrationSpecialBadgeResponse) async {
 		do {
 			try await delete(badge)
-			dismiss()
+			close()
 		} catch {
 			statusBadges.present(error: error, title: "Unable to delete badge")
 		}

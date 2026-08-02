@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SubjectEditorSheet: View {
-	@Environment(\.dismiss) var dismiss
+	let close: () -> Void = {}
 	@Environment(\.statusBadgeManager) private var statusBadgeManager
 
 	@Binding var subjects: [Subject]
@@ -65,7 +65,7 @@ struct SubjectEditorSheet: View {
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button("Cancel", systemImage: "xmark") {
-						dismiss()
+						close()
 					}
 					.keyboardShortcut(.cancelAction)
 					.disabled(isSaving)
@@ -392,7 +392,7 @@ struct SubjectEditorSheet: View {
 				}
 
 				commitToLocalModel(savedSubjects)
-				dismiss()
+				close()
 			} catch {
 				// ServerSyncCoordinator already displays the sync errors.
 				// Keep the sheet open and do not commit local Defaults.
