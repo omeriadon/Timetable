@@ -110,6 +110,7 @@ struct AdministrationEventTagEditor: View {
 				Text("Archived tags are removed from active selection and subscriptions.")
 			}
 		}
+		.interactiveDismissDisabled()
 		.presentationDetents([.large])
 		.sheet(isPresented: $showsSymbolPicker) {
 			AdministrationEventSymbolPicker(symbol: $symbol)

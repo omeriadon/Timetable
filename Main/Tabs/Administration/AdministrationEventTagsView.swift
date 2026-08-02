@@ -72,19 +72,21 @@ struct AdministrationEventTagsView: View {
 			await load()
 		}
 		.sheet(item: $editor) { target in
-			switch target {
-				case let .tag(tag, section):
-					AdministrationEventTagEditor(
-						tag: tag,
-						section: section,
-						save: saveTag
-					)
-				case let .newTag(section):
-					AdministrationEventTagEditor(
-						tag: nil,
-						section: section,
-						save: saveTag
-					)
+			ZStack {
+				switch target {
+					case let .tag(tag, section):
+						AdministrationEventTagEditor(
+							tag: tag,
+							section: section,
+							save: saveTag
+						)
+					case let .newTag(section):
+						AdministrationEventTagEditor(
+							tag: nil,
+							section: section,
+							save: saveTag
+						)
+				}
 			}
 			.navigationTransition(
 				.zoom(

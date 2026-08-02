@@ -264,6 +264,8 @@ private struct EventNotificationScheduleSheet: View {
 				}
 				.pickerStyle(.wheel)
 			}
+			.interactiveDismissDisabled()
+			.presentationDetents([.medium])
 			.appNavigationTitle("Event Notification", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) { Button(role: .cancel) { dismiss() } }

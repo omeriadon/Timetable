@@ -33,6 +33,7 @@ struct AdministrationCalendarEditor: View {
 					DatePicker("End", selection: $end, displayedComponents: .date)
 				}
 			}
+			.interactiveDismissDisabled()
 			.appNavigationTitle(entry.kind == "term" ? "Term Date" : "Pupil Free Day", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {

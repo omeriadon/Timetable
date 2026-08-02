@@ -90,6 +90,7 @@ struct AdministrationSchoolEventEditor: View {
 				}
 			}
 		}
+		.interactiveDismissDisabled()
 		.task {
 			guard let catalogue = try? await administrationService.eventTags() else {
 				return

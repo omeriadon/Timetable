@@ -496,6 +496,7 @@ private struct CalendarEventEditor: View {
 					)
 				}
 			}
+			.interactiveDismissDisabled()
 			.appNavigationTitle(navigationTitle)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
