@@ -38,7 +38,7 @@ nonisolated enum BuiltInProfileBadgeConfiguration {
 				storedBadge(forKey: systemOwnerKey) ?? ProfileBadge(
 					id: systemOwnerID,
 					symbol: "wrench.and.screwdriver",
-					backgroundColor: RGBAColor(red: 1, green: 1, blue: 1, alpha: 1),
+					backgroundColor: RGBAColor(red: 0, green: 0, blue: 0, alpha: 1),
 					symbolColor: RGBAColor(red: 1, green: 1, blue: 1, alpha: 1),
 					priority: 100,
 					accessibilityLabel: "System Administrator"
