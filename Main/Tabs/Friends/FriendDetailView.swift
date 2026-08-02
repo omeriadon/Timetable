@@ -245,70 +245,68 @@ private struct FriendOverview: View {
 			Text("Shared Classes")
 				.font(.headline)
 
-			if classes.isEmpty {
-				Text("No shared classes.")
-					.foregroundStyle(.secondary)
-			} else {
-				ForEach(Array(classes.enumerated()), id: \.offset) { index, sharedClass in
-					if index > 0 {
-						Divider()
-					}
+			ZStack {
+				if classes.isEmpty {
+					Text("No shared classes.")
+						.foregroundStyle(.secondary)
+				} else {
+					ForEach(Array(classes.enumerated()), id: \.offset) { _, sharedClass in
+						FriendSubjectButton(context: sharedClass.context, friendName: friendName) {
+							HStack(alignment: .top, spacing: 12) {
+								Label(sharedClass.subjectName, systemImage: sharedClass.symbol)
+									.foregroundStyle(sharedClass.colour.swiftUIColor)
 
-					FriendSubjectButton(context: sharedClass.context, friendName: friendName) {
-						HStack(alignment: .top, spacing: 12) {
-							Label(sharedClass.subjectName, systemImage: sharedClass.symbol)
-								.foregroundStyle(sharedClass.colour.swiftUIColor)
+								Spacer()
 
-							Spacer()
-
-							VStack(alignment: .trailing, spacing: 3) {
-								Text(sharedClass.classroom)
-								Text(sharedClass.slotSummary)
-									.font(.footnote)
-									.foregroundStyle(.secondary)
+								VStack(alignment: .trailing, spacing: 3) {
+									Text(sharedClass.classroom)
+									Text(sharedClass.slotSummary)
+										.font(.footnote)
+										.foregroundStyle(.secondary)
+								}
+								.padding(14)
+								.frame(maxWidth: .infinity, alignment: .leading)
+								.background {
+									FriendPaperBackground(
+										cornerRadius: FriendDetailLayout.itemCornerRadius
+									)
+								}
+								.clipShape(
+									RoundedRectangle(
+										cornerRadius: FriendDetailLayout.itemCornerRadius,
+										style: .continuous
+									)
+								)
+								.glassEffect(
+									.clear.interactive(),
+									in: RoundedRectangle(
+										cornerRadius: FriendDetailLayout.itemCornerRadius,
+										style: .continuous
+									)
+								)
 							}
 						}
-						.padding(14)
-						.frame(maxWidth: .infinity, alignment: .leading)
-						.background {
-							FriendPaperBackground(
-								cornerRadius: FriendDetailLayout.itemCornerRadius
-							)
-						}
-						.clipShape(
-							RoundedRectangle(
-								cornerRadius: FriendDetailLayout.itemCornerRadius,
-								style: .continuous
-							)
-						)
-						.glassEffect(
-							.clear.interactive(),
-							in: RoundedRectangle(
-								cornerRadius: FriendDetailLayout.itemCornerRadius,
-								style: .continuous
-							)
-						)
 					}
 				}
 			}
-		}
-		.padding(14)
-		.frame(maxWidth: .infinity, alignment: .leading)
-		.background {
-			FriendBrownPaperBackground(
-				cornerRadius: FriendDetailLayout.cardCornerRadius
+			.padding(14)
+			.frame(maxWidth: .infinity, alignment: .leading)
+			.background {
+				FriendBrownPaperBackground(
+					cornerRadius: FriendDetailLayout.cardCornerRadius
+				)
+			}
+			.glassEffect(
+				.clear.interactive(),
+				in: RoundedRectangle(
+					cornerRadius: FriendDetailLayout.cardCornerRadius,
+					style: .continuous
+				)
 			)
 		}
-		.glassEffect(
-			.clear.interactive(),
-			in: RoundedRectangle(
-				cornerRadius: FriendDetailLayout.cardCornerRadius,
-				style: .continuous
-			)
-		)
 	}
 
-	private func sharedSubjectsCard(_ subjects: [SharedSubject]) -> some View {
+	func sharedSubjectsCard(_ subjects: [SharedSubject]) -> some View {
 		VStack(alignment: .leading, spacing: 10) {
 			Text("Shared Subjects")
 				.font(.headline)
@@ -334,7 +332,7 @@ private struct FriendOverview: View {
 							)
 						)
 						.glassEffect(
-							.clear,
+							.clear.interactive(),
 							in: RoundedRectangle(
 								cornerRadius: FriendDetailLayout.itemCornerRadius,
 								style: .continuous
