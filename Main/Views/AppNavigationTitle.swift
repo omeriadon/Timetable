@@ -10,7 +10,7 @@ private struct AppNavigationTitleModifier: ViewModifier {
 	func body(content: Content) -> some View {
 		#if os(iOS)
 			content
-				.navigationTitle(title)
+				.appNavigationTitle(title)
 				.navigationBarTitleDisplayMode(.inline)
 				.toolbar {
 					ToolbarItem(placement: .principal) {
@@ -26,7 +26,7 @@ private struct AppNavigationTitleModifier: ViewModifier {
 		#elseif os(macOS)
 			if style == .subview {
 				content
-					.navigationTitle(title)
+					.appNavigationTitle(title)
 					.navigationBarBackButtonHidden(true)
 					.toolbar {
 						ToolbarItem(placement: .navigation) {
@@ -39,10 +39,10 @@ private struct AppNavigationTitleModifier: ViewModifier {
 						}
 					}
 			} else {
-				content.navigationTitle(title)
+				content.appNavigationTitle(title)
 			}
 		#else
-			content.navigationTitle(title)
+			content.appNavigationTitle(title)
 		#endif
 	}
 }

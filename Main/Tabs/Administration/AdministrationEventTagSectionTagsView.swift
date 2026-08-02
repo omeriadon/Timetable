@@ -56,7 +56,7 @@ struct AdministrationEventTagSectionTagsView: View {
 			}
 		}
 		.environment(\.editMode, .constant(isReordering ? .active : .inactive))
-		.navigationTitle(section.displayName)
+		.appNavigationTitle(section.displayName)
 		.toolbar {
 			ToolbarItem(placement: .confirmationAction) {
 				Button(

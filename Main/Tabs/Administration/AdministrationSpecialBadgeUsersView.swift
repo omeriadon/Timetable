@@ -40,7 +40,7 @@ struct AdministrationSpecialBadgeUsersView: View {
 			.buttonStyle(.plain)
 		}
 		.searchable(text: $searchText, prompt: "Search users")
-		.navigationTitle("Users")
+		.appNavigationTitle("Users")
 	}
 
 	private var filteredUsers: [AdministrationUserResponse] {

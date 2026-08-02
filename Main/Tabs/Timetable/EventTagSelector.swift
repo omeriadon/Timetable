@@ -46,7 +46,7 @@ private struct EventTagSelectionView: View {
 				.accessibilityAddTraits(selectedTagIDs.contains(tag.id) ? .isSelected : [])
 			}
 		}
-		.navigationTitle("Tags")
+		.appNavigationTitle("Tags")
 	}
 
 	private var availableTags: [EventTagCatalogueTag] {
