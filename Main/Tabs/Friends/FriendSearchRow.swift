@@ -5,7 +5,6 @@ struct FriendSearchRow: View {
 	@State private var service = FriendService.shared
 	@State private var isSending = false
 	@State private var relationship: FriendRelationshipState?
-	@State private var showsRequestConfirmation = false
 	@Environment(\.statusBadgeManager) private var badges
 
 	init(result: FriendSearchResult) {
@@ -34,16 +33,6 @@ struct FriendSearchRow: View {
 		.onChange(of: result.relationship) { _, value in
 			relationship = value
 		}
-		.confirmationDialog("Send Friend Request?", isPresented: $showsRequestConfirmation) {
-			Button("Send Request", systemImage: "paperplane", role: .confirm) {
-				sendRequest()
-			}
-			.buttonStyle(.glassProminent)
-
-			Button(role: .cancel) {}
-		} message: {
-			Text("This sends a friend request to \(result.profile.displayName).")
-		}
 	}
 
 	@ViewBuilder
@@ -63,7 +52,7 @@ struct FriendSearchRow: View {
 					.foregroundStyle(.tint)
 			case nil:
 				Button("Request", systemImage: "person.badge.plus") {
-					showsRequestConfirmation = true
+					sendRequest()
 				}
 				.buttonStyle(.glassProminent)
 				.tint(.blue)

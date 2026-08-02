@@ -52,7 +52,7 @@ struct FriendRequestsSheet: View {
 			.refreshable {
 				await refreshRequests()
 			}
-			.confirmationDialog(
+			.alert(
 				"Delete Friend Request?",
 				isPresented: Binding(
 					get: { requestToDelete != nil },
@@ -61,8 +61,7 @@ struct FriendRequestsSheet: View {
 							requestToDelete = nil
 						}
 					}
-				),
-				titleVisibility: .visible
+				)
 			) {
 				if let requestToDelete {
 					Button("Delete Request", systemImage: "trash", role: .destructive) {
