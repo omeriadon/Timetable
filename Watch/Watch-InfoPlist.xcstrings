@@ -1,54 +1,54 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "CFBundleDisplayName" : {
-      "comment" : "Bundle display name",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Timetable"
+  "sourceLanguage": "en",
+  "strings": {
+    "CFBundleDisplayName": {
+      "comment": "Bundle display name",
+      "extractionState": "extracted_with_value",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Timetable"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Emploi du temps"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Emploi du temps"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Orario"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orario"
           }
         }
       }
     },
-    "CFBundleName" : {
-      "comment" : "Bundle name",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Watch"
+    "CFBundleName": {
+      "comment": "Bundle name",
+      "extractionState": "extracted_with_value",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Watch"
           }
         },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Montre"
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Montre"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Orologio"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orologio"
           }
         }
       }
     }
   },
-  "version" : "1.3"
+  "version": "1.3"
 }
