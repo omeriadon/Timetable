@@ -24,20 +24,6 @@ struct FriendDetailView: View {
 		NavigationStack {
 			ScrollView {
 				VStack(alignment: .leading, spacing: 20) {
-					TabsPicker(
-						items: FriendDetailTab.allCases.map { ($0.title, $0.symbol) },
-						selection: Binding(
-							get: { FriendDetailTab.allCases.firstIndex(of: selectedTab) ?? 0 },
-							set: { index in
-								guard FriendDetailTab.allCases.indices.contains(index) else {
-									return
-								}
-
-								selectedTab = FriendDetailTab.allCases[index]
-							}
-						)
-					)
-					.frame(height: 40)
 
 					if isLoading {
 						ProgressView()
@@ -58,6 +44,22 @@ struct FriendDetailView: View {
 				.padding(.horizontal, FriendDetailLayout.horizontalPadding)
 			}
 			.scrollEdgeEffectStyle(.soft, for: .top)
+			.safeAreaBar(edge: .top, alignment: .center, spacing: 5) {
+				TabsPicker(
+					items: FriendDetailTab.allCases.map { ($0.title, $0.symbol) },
+					selection: Binding(
+						get: { FriendDetailTab.allCases.firstIndex(of: selectedTab) ?? 0 },
+						set: { index in
+							guard FriendDetailTab.allCases.indices.contains(index) else {
+								return
+							}
+
+							selectedTab = FriendDetailTab.allCases[index]
+						}
+					)
+				)
+				.frame(height: 40)
+			}
 			.toolbar {
 				ToolbarItem(placement: .topBarLeading) {
 					Button(role: .cancel) {
@@ -439,8 +441,6 @@ private enum FriendDetailLayout {
 	static let itemCornerRadius: CGFloat = 13
 }
 
-/// Owns its own popover state so it presents anchored to the exact button tapped,
-/// instead of a single shared `.popover(item:)` on an ancestor view.
 private struct FriendSubjectButton<Label: View>: View {
 	let context: FriendSubjectContext
 	let friendName: String
@@ -454,9 +454,13 @@ private struct FriendSubjectButton<Label: View>: View {
 			label()
 		}
 		.buttonStyle(.plain)
-		.popover(isPresented: $showsPopover) {
+		.contentShape(Rectangle())
+		.popover(
+			isPresented: $showsPopover,
+			attachmentAnchor: .rect(.bounds),
+			arrowEdge: .top
+		) {
 			FriendSubjectContextPopover(context: context, friendName: friendName)
-				.fixedSize()
 				.padding(10)
 		}
 	}
