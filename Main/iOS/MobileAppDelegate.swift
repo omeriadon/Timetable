@@ -53,9 +53,31 @@
 
 		func userNotificationCenter(
 			_: UNUserNotificationCenter,
-			willPresent _: UNNotification
+			willPresent notification: UNNotification
 		) async -> UNNotificationPresentationOptions {
+			Task {
+				await refreshFriendStateIfNeeded(for: notification)
+			}
 			[.banner, .sound, .badge]
+		}
+
+		func userNotificationCenter(
+			_: UNUserNotificationCenter,
+			didReceive response: UNNotificationResponse
+		) async {
+			await refreshFriendStateIfNeeded(for: response.notification)
+		}
+
+		private func refreshFriendStateIfNeeded(for notification: UNNotification) async {
+			guard notification.request.content.userInfo["notification-type"] as? String == "friend-request" else {
+				return
+			}
+
+			do {
+				try await FriendService.shared.refresh()
+			} catch {
+				PrintError("Unable to refresh friend state after notification", category: .network, error: error)
+			}
 		}
 	}
 #endif

@@ -76,6 +76,7 @@ extension Defaults.Keys {
 	static let receivedTimetables = Key<[ReceivedTimetable]>("receivedTimetables", default: [], suite: sharedDefaults)
 	static let friends = Key<[FriendSummary]>("friends", default: [], suite: sharedDefaults)
 	static let incomingFriendRequests = Key<[FriendSummary]>("incomingFriendRequests", default: [], suite: sharedDefaults)
+	static let outgoingFriendRequests = Key<[FriendSummary]>("outgoingFriendRequests", default: [], suite: sharedDefaults)
 	static let profileAppearance = Key<ProfileAppearance>("profileAppearance", default: .default, suite: sharedDefaults)
 	static let createdTimetables = Key<[TimetableDetailResponse]>("createdTimetables", default: [], suite: sharedDefaults)
 	static let pendingMessageTimetableIDs = Key<[String]>("pendingMessageTimetableIDs", default: [], suite: sharedDefaults)

@@ -3,7 +3,8 @@ import SwiftUI
 
 struct FriendRequestsSheet: View {
 	@Environment(\.dismiss) private var dismiss
-	@State private var requests: [FriendSummary] = Defaults[.incomingFriendRequests]
+	@State private var incomingRequests: [FriendSummary] = Defaults[.incomingFriendRequests]
+	@State private var outgoingRequests: [FriendSummary] = Defaults[.outgoingFriendRequests]
 	@State private var service = FriendService.shared
 	@State private var acceptingRequestID: UUID?
 	@Environment(\.statusBadgeManager) private var badges
@@ -11,29 +12,24 @@ struct FriendRequestsSheet: View {
 	var body: some View {
 		NavigationStack {
 			List {
-				if requests.isEmpty {
+				if incomingRequests.isEmpty, outgoingRequests.isEmpty {
 					ContentUnavailableView("No Friend Requests", systemImage: "bell.slash")
 						.listRowBackground(Color.clear)
 				} else {
-					ForEach(requests) { request in
-						HStack(spacing: 14) {
-							FriendAvatar(profile: request.friend)
-							VStack(alignment: .leading, spacing: 3) {
-								Text(request.friend.displayName)
-									.font(.headline)
-								Text("Sent \(request.requestedAt, format: .relative(presentation: .named))")
-									.font(.caption)
-									.foregroundStyle(.secondary)
+					if !incomingRequests.isEmpty {
+						Section("Incoming") {
+							ForEach(incomingRequests) { request in
+								incomingRequestRow(request)
 							}
-							Spacer()
-							Button("Accept", systemImage: "checkmark", role: .confirm) {
-								accept(request)
-							}
-							.buttonStyle(.glassProminent)
-							.disabled(acceptingRequestID == request.id)
 						}
-						.padding(.vertical, 6)
-						.listRowBackground(Image("paper").resizable().scaledToFill())
+					}
+
+					if !outgoingRequests.isEmpty {
+						Section("Sent") {
+							ForEach(outgoingRequests) { request in
+								outgoingRequestRow(request)
+							}
+						}
 					}
 				}
 			}
@@ -57,9 +53,51 @@ struct FriendRequestsSheet: View {
 		}
 	}
 
+	private func incomingRequestRow(_ request: FriendSummary) -> some View {
+		HStack(spacing: 14) {
+			FriendAvatar(profile: request.friend)
+			VStack(alignment: .leading, spacing: 3) {
+				Text(request.friend.displayName)
+					.font(.headline)
+				Text("Sent \(request.requestedAt, format: .relative(presentation: .named))")
+					.font(.caption)
+					.foregroundStyle(.secondary)
+			}
+			Spacer()
+			Button("Accept", systemImage: "checkmark", role: .confirm) {
+				accept(request)
+			}
+			.buttonStyle(.glassProminent)
+			.disabled(acceptingRequestID == request.id)
+		}
+		.padding(.vertical, 6)
+		.listRowBackground(Image("paper").resizable().scaledToFill())
+	}
+
+	private func outgoingRequestRow(_ request: FriendSummary) -> some View {
+		HStack(spacing: 14) {
+			FriendAvatar(profile: request.friend)
+			VStack(alignment: .leading, spacing: 3) {
+				Text(request.friend.displayName)
+					.font(.headline)
+				Text("Sent \(request.requestedAt, format: .relative(presentation: .named))")
+					.font(.caption)
+					.foregroundStyle(.secondary)
+			}
+			Spacer()
+			Label("Waiting", systemImage: "clock")
+				.font(.caption.weight(.semibold))
+				.foregroundStyle(.secondary)
+		}
+		.padding(.vertical, 6)
+		.listRowBackground(Image("paper").resizable().scaledToFill())
+	}
+
 	private func refreshRequests() async {
 		do {
-			requests = try await service.refreshIncomingRequests()
+			let snapshot = try await service.refreshFriendRequests()
+			incomingRequests = snapshot.incoming
+			outgoingRequests = snapshot.outgoing
 		} catch {
 			badges.present(error: error, title: "Unable to load friend requests")
 		}
@@ -71,7 +109,7 @@ struct FriendRequestsSheet: View {
 			defer { acceptingRequestID = nil }
 			do {
 				try await service.accept(request)
-				requests.removeAll { $0.id == request.id }
+				incomingRequests.removeAll { $0.id == request.id }
 			} catch {
 				badges.present(error: error, title: "Unable to accept friend request")
 			}

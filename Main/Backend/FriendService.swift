@@ -1,6 +1,7 @@
 import Defaults
 import Foundation
 import Observation
+import UserNotifications
 import WidgetKit
 
 @MainActor
@@ -24,20 +25,23 @@ final class FriendService {
 
 		let task = Task<Void, any Error> { @MainActor in
 			async let friends: [FriendSummary] = networkManager.send(.v1Friends)
-			async let requests: [FriendSummary] = networkManager.send(.v1IncomingFriendRequests)
+			async let incomingRequests: [FriendSummary] = networkManager.send(.v1IncomingFriendRequests)
+			async let outgoingRequests: [FriendSummary] = networkManager.send(.v1OutgoingFriendRequests)
 			async let profile: FriendProfile = networkManager.send(.v1FriendProfile)
-			let result = try await (friends, requests, profile)
+			let result = try await (friends, incomingRequests, outgoingRequests, profile)
 			Defaults[.friends] = result.0
 			Defaults[.incomingFriendRequests] = result.1
-			if let appearance = result.2.appearance {
+			Defaults[.outgoingFriendRequests] = result.2
+			await updateApplicationBadgeCount(result.1.count)
+			if let appearance = result.3.appearance {
 				Defaults[.profileAppearance] = appearance
-			} else if let appearanceData = result.2.appearanceData,
+			} else if let appearanceData = result.3.appearanceData,
 			          let appearance = try? JSONDecoder().decode(ProfileAppearance.self, from: appearanceData)
 			{
 				Defaults[.profileAppearance] = appearance
 			}
 			await cacheWidgetProfilePhotos(
-				profile: result.2,
+				profile: result.3,
 				friends: result.0
 			)
 			Defaults[.lastServerSync] = .now
@@ -57,9 +61,18 @@ final class FriendService {
 	}
 
 	func refreshIncomingRequests() async throws -> [FriendSummary] {
-		let requests: [FriendSummary] = try await networkManager.send(.v1IncomingFriendRequests)
-		Defaults[.incomingFriendRequests] = requests
-		return requests
+		let snapshot = try await refreshFriendRequests()
+		return snapshot.incoming
+	}
+
+	func refreshFriendRequests() async throws -> FriendRequestSnapshot {
+		async let incoming: [FriendSummary] = networkManager.send(.v1IncomingFriendRequests)
+		async let outgoing: [FriendSummary] = networkManager.send(.v1OutgoingFriendRequests)
+		let result = try await (incoming, outgoing)
+		Defaults[.incomingFriendRequests] = result.0
+		Defaults[.outgoingFriendRequests] = result.1
+		await updateApplicationBadgeCount(result.0.count)
+		return FriendRequestSnapshot(incoming: result.0, outgoing: result.1)
 	}
 
 	func sendRequest(to schoolEmail: String) async throws -> FriendSummary {
@@ -179,11 +192,16 @@ final class FriendService {
 			PrintError("Friend state refresh failed after mutation", category: .network, error: error)
 		}
 	}
+
+	private func updateApplicationBadgeCount(_ count: Int) async {
+		await UNUserNotificationCenter.current().setBadgeCount(count)
+	}
 }
 
 private extension Endpoint {
 	static let v1Friends = Endpoint("/v1/friends")
 	static let v1IncomingFriendRequests = Endpoint("/v1/friends/requests")
+	static let v1OutgoingFriendRequests = Endpoint("/v1/friends/requests/outgoing")
 	static let v1FriendRequests = Endpoint("/v1/friends/requests", method: .post)
 	static let v1FriendProfile = Endpoint("/v1/friends/profile")
 	static let v1FriendProfileUpdate = Endpoint("/v1/friends/profile", method: .put)
