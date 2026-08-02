@@ -8,7 +8,7 @@ private struct AppNavigationTitleModifier: ViewModifier {
 	func body(content: Content) -> some View {
 		#if os(iOS)
 			content
-				.appNavigationTitle(title)
+				.navigationTitle(title)
 				.navigationBarTitleDisplayMode(.inline)
 				.toolbar {
 					ToolbarItem(placement: .principal) {
@@ -22,9 +22,9 @@ private struct AppNavigationTitleModifier: ViewModifier {
 				.scrollEdgeEffectStyle(.soft, for: .top)
 				.scrollEdgeEffectStyle(.soft, for: .bottom)
 		#elseif os(macOS)
-			content.appNavigationTitle(title)
+			content.navigationTitle(title)
 		#else
-			content.appNavigationTitle(title)
+			content.navigationTitle(title)
 		#endif
 	}
 }
