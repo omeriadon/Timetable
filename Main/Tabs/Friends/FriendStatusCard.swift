@@ -63,6 +63,7 @@ struct FriendAvatar: View {
 	private let appearance: ProfileAppearance
 	private let photo: ProfilePhotoMetadata?
 	private let badges: [ProfileBadge]
+	private let size: CGFloat
 
 	init(symbol: String) {
 		appearance = ProfileAppearance(
@@ -77,21 +78,23 @@ struct FriendAvatar: View {
 		)
 		photo = nil
 		badges = []
+		size = 54
 	}
 
-	init(profile: FriendProfile) {
+	init(profile: FriendProfile, size: CGFloat = 54) {
 		appearance = profile.appearance
 			?? profile.appearanceData.flatMap { try? JSONDecoder().decode(ProfileAppearance.self, from: $0) }
 			?? .default
 		photo = profile.photo
 		badges = profile.badges
+		self.size = size
 	}
 
 	var body: some View {
 		ProfilePicture(
 			appearance: appearance,
 			photo: photo,
-			size: 54,
+			size: size,
 			badges: badges,
 			accessibilityName: "Profile picture"
 		)

@@ -30,7 +30,7 @@ struct CachedProfilePhoto: View {
 				ProfilePhotoPlaceholder(isLoading: !finishedLoading)
 			}
 		}
-		.task(id: metadata.revision) {
+		.task(id: metadata) {
 			data = await ProfileImageCache.shared.imageData(for: metadata, displaySize: size)
 			finishedLoading = true
 		}

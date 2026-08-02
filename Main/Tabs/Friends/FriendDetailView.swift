@@ -16,6 +16,10 @@ struct FriendDetailView: View {
 		detail?.friend.displayName ?? friend.friend.displayName
 	}
 
+	private var displayedFriendProfile: FriendProfile {
+		detail?.friend ?? friend.friend
+	}
+
 	var body: some View {
 		NavigationStack {
 			ScrollView {
@@ -63,14 +67,7 @@ struct FriendDetailView: View {
 
 				let view = ToolbarItem(placement: .principal) {
 					HStack {
-						ProfilePicture(
-							appearance: .default,
-							photo: friend.friend.photo,
-							size: 44,
-							badges: friend.friend.badges,
-							accessibilityName: displayedFriendName,
-							animatesBackground: true
-						)
+						FriendAvatar(profile: displayedFriendProfile, size: 44)
 						Text(displayedFriendName)
 							.font(.largeTitle)
 							.bold()
@@ -87,14 +84,7 @@ struct FriendDetailView: View {
 
 				ToolbarItem(placement: .principal) {
 					HStack(spacing: 15) {
-						ProfilePicture(
-							appearance: .default,
-							photo: friend.friend.photo,
-							size: 44,
-							badges: friend.friend.badges,
-							accessibilityName: displayedFriendName,
-							animatesBackground: true
-						)
+						FriendAvatar(profile: displayedFriendProfile, size: 44)
 						Text(displayedFriendName)
 							.font(.largeTitle)
 							.bold()

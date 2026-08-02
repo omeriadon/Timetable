@@ -120,7 +120,24 @@ final class FriendService {
 	}
 
 	func detail(for friendID: UUID) async throws -> FriendDetail {
-		try await networkManager.send(.v1Friend(friendID), context: .userInitiated)
+		let detail: FriendDetail = try await networkManager.send(
+			.v1Friend(friendID),
+			context: .userInitiated
+		)
+		var friends = Defaults[.friends]
+		if let index = friends.firstIndex(where: { $0.relationshipID == detail.relationshipID }) {
+			let current = friends[index]
+			friends[index] = FriendSummary(
+				relationshipID: detail.relationshipID,
+				friend: detail.friend,
+				state: .friends,
+				requestedAt: current.requestedAt,
+				acceptedAt: detail.acceptedAt,
+				timetable: detail.timetable
+			)
+			Defaults[.friends] = friends
+		}
+		return detail
 	}
 
 	func remove(friendID: UUID) async throws {

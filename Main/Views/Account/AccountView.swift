@@ -122,8 +122,6 @@ struct AccountView: View {
 				}
 			} else {
 				Picker("Year Group", selection: $selectedYearGroupID) {
-					Text("Select Year Group")
-						.tag(UUID?.none)
 					ForEach(yearGroupTags) { tag in
 						Label(tag.displayName, systemImage: tag.symbol ?? "person.3")
 							.tag(Optional(tag.id))
@@ -175,11 +173,19 @@ struct AccountView: View {
 			let tags = catalogue.sections.first(where: { $0.category == .yearGroup })?.tags ?? []
 			let subscribedTagIDs = Set(subscriptions.tagIDs)
 			let selectedYearGroupID = tags.first(where: { subscribedTagIDs.contains($0.id) })?.id
+				?? tags.first(where: { $0.displayName == "Year 7" })?.id
+				?? tags.first?.id
 
 			yearGroupTags = tags
 			self.subscribedTagIDs = subscribedTagIDs
 			self.selectedYearGroupID = selectedYearGroupID
 			committedYearGroupID = selectedYearGroupID
+
+			if !tags.contains(where: { subscribedTagIDs.contains($0.id) }),
+			   let selectedYearGroupID
+			{
+				await saveYearGroup(selectedYearGroupID)
+			}
 		} catch {
 			yearGroupTags = []
 			subscribedTagIDs = []

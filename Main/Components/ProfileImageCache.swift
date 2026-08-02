@@ -13,8 +13,8 @@ final class ProfileImageCache {
 		memoryCache.countLimit = 128
 	}
 
-	func imageData(for metadata: ProfilePhotoMetadata, displaySize: Double) async -> Data? {
-		let key = cacheKey(for: metadata, displaySize: displaySize)
+	func imageData(for metadata: ProfilePhotoMetadata, displaySize _: Double) async -> Data? {
+		let key = cacheKey(for: metadata)
 		if let data = memoryCache.object(forKey: key as NSString) {
 			return data as Data
 		}
@@ -25,7 +25,7 @@ final class ProfileImageCache {
 
 		guard let endpoint = endpoint(for: metadata.url),
 		      let original = try? await networkManager.download(endpoint),
-		      let downsampled = await Self.downsample(original, maximumPixelSize: max(96, Int(displaySize * 3)))
+		      let downsampled = await Self.downsample(original, maximumPixelSize: 256)
 		else {
 			return nil
 		}
@@ -51,8 +51,8 @@ final class ProfileImageCache {
 		return Endpoint(path, queryItems: queryItems)
 	}
 
-	private func cacheKey(for metadata: ProfilePhotoMetadata, displaySize: Double) -> String {
-		"\(metadata.checksum)-\(metadata.revision)-\(Int(displaySize.rounded()))"
+	private func cacheKey(for metadata: ProfilePhotoMetadata) -> String {
+		"\(metadata.checksum)-\(metadata.revision)"
 	}
 
 	private var cacheDirectory: URL {
