@@ -23,7 +23,7 @@ final class AccountSettingsSyncService {
 	private var syncTask: Task<Void, any Error>?
 
 	private struct PendingMutation {
-		let settings: AccountSettings
+		var settings: AccountSettings
 		let previousSettings: AccountSettings
 		let generation: Int
 	}
@@ -32,8 +32,10 @@ final class AccountSettingsSyncService {
 		self.networkManager = networkManager
 	}
 
-	func updateSettings(_ settings: AccountSettings) async throws {
+	func updateSettings(_ proposedSettings: AccountSettings) async throws {
 		let previousSettings = Defaults[.accountSettings]
+		var settings = proposedSettings
+		settings.serverRevision = previousSettings.serverRevision
 		syncGeneration += 1
 		pendingMutation = PendingMutation(
 			settings: settings,
@@ -118,10 +120,11 @@ final class AccountSettingsSyncService {
 			pendingMutation = nil
 
 			do {
-				let _: AccountSettings = try await networkManager.send(
+				let updatedSettings: AccountSettings = try await networkManager.send(
 					.v1SettingsUpdate,
 					body: mutation.settings
 				)
+				applyServerRevision(from: updatedSettings)
 				Defaults[.lastServerSync] = Date.now
 				#if os(iOS)
 					if mutation.settings.liveActivitiesEnabled,
@@ -144,6 +147,19 @@ final class AccountSettingsSyncService {
 				}
 				throw error
 			}
+		}
+	}
+
+	private func applyServerRevision(from updatedSettings: AccountSettings) {
+		if var pendingMutation {
+			pendingMutation.settings.serverRevision = updatedSettings.serverRevision
+			self.pendingMutation = pendingMutation
+
+			var localSettings = Defaults[.accountSettings]
+			localSettings.serverRevision = updatedSettings.serverRevision
+			Defaults[.accountSettings] = localSettings
+		} else {
+			Defaults[.accountSettings] = updatedSettings
 		}
 	}
 
