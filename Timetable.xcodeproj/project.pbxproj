@@ -202,7 +202,6 @@
 				"Widget Shared/Live Activity/SchoolDayLiveActivityWidget.swift",
 				"Widget Shared/Live Activity/StaticIrregularGradient.swift",
 				"Widget Shared/Summary/TimetableSummaryWidget.swift",
-				Widget/Assets.xcassets,
 				"Widget/Widget Bundle.swift",
 				"Widget/Widget-InfoPlist.xcstrings",
 			);
@@ -211,7 +210,6 @@
 		2AD85A702FE8F219004EAB2B /* Exceptions for "Widget" folder in "Widget" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				"Watch Widget/Assets.xcassets",
 				"Watch Widget/Watch Widget Bundle.swift",
 				"Watch Widget/Watch Widget-InfoPlist.xcstrings",
 			);
