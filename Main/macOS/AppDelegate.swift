@@ -1,75 +1,78 @@
+#if os(macOS)
 //
-//   AppDelegate.swift
-//   Main
+	//   AppDelegate.swift
+	//   Main
 //
-//   Created by Adon Omeri on 16/6/2026.
+	//   Created by Adon Omeri on 16/6/2026.
 //
 
-import SwiftUI
-import UserNotifications
+	import AppKit
+	import SwiftUI
+	import UserNotifications
 
-@MainActor
-class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
-	func applicationDidFinishLaunching(_: Notification) {
-		StatusBadgeOverlayWindowController.shared.start()
-		UNUserNotificationCenter.current().delegate = self
-		Task {
-			await NotificationRegistrationService.shared.uploadPendingToken()
-		}
-	}
-
-	func applicationWillFinishLaunching(_: Notification) {
-		NSWindow.allowsAutomaticWindowTabbing = false
-
-		if let mainMenu = NSApp.mainMenu {
-			let editMenuIndex = mainMenu.indexOfItem(withTitle: "View")
-
-			if editMenuIndex <= 0 {
-				mainMenu.removeItem(at: editMenuIndex)
-			}
-
-			let fileMenuIndex = mainMenu.indexOfItem(withTitle: "File")
-
-			if fileMenuIndex <= 0 {
-				mainMenu.removeItem(at: editMenuIndex)
+	@MainActor
+	class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
+		func applicationDidFinishLaunching(_: Notification) {
+			StatusBadgeOverlayWindowController.shared.start()
+			UNUserNotificationCenter.current().delegate = self
+			Task {
+				await NotificationRegistrationService.shared.uploadPendingToken()
 			}
 		}
-	}
 
-	func application(_: NSApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-		Task { await NotificationRegistrationService.shared.receive(deviceToken: deviceToken) }
-	}
+		func applicationWillFinishLaunching(_: Notification) {
+			NSWindow.allowsAutomaticWindowTabbing = false
 
-	func application(_: NSApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-		NotificationRegistrationService.shared.registrationFailed(error)
-	}
+			if let mainMenu = NSApp.mainMenu {
+				let editMenuIndex = mainMenu.indexOfItem(withTitle: "View")
 
-	func userNotificationCenter(
-		_: UNUserNotificationCenter,
-		willPresent notification: UNNotification
-	) async -> UNNotificationPresentationOptions {
-		Task {
-			await refreshFriendStateIfNeeded(for: notification)
-		}
-		return [.banner, .sound, .badge]
-	}
+				if editMenuIndex <= 0 {
+					mainMenu.removeItem(at: editMenuIndex)
+				}
 
-	func userNotificationCenter(
-		_: UNUserNotificationCenter,
-		didReceive response: UNNotificationResponse
-	) async {
-		await refreshFriendStateIfNeeded(for: response.notification)
-	}
+				let fileMenuIndex = mainMenu.indexOfItem(withTitle: "File")
 
-	private func refreshFriendStateIfNeeded(for notification: UNNotification) async {
-		guard notification.request.content.userInfo["notification-type"] as? String == "friend-request" else {
-			return
+				if fileMenuIndex <= 0 {
+					mainMenu.removeItem(at: editMenuIndex)
+				}
+			}
 		}
 
-		do {
-			try await FriendService.shared.refresh()
-		} catch {
-			PrintError("Unable to refresh friend state after notification", category: .network, error: error)
+		func application(_: NSApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+			Task { await NotificationRegistrationService.shared.receive(deviceToken: deviceToken) }
+		}
+
+		func application(_: NSApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+			NotificationRegistrationService.shared.registrationFailed(error)
+		}
+
+		func userNotificationCenter(
+			_: UNUserNotificationCenter,
+			willPresent notification: UNNotification
+		) async -> UNNotificationPresentationOptions {
+			Task {
+				await refreshFriendStateIfNeeded(for: notification)
+			}
+			return [.banner, .sound, .badge]
+		}
+
+		func userNotificationCenter(
+			_: UNUserNotificationCenter,
+			didReceive response: UNNotificationResponse
+		) async {
+			await refreshFriendStateIfNeeded(for: response.notification)
+		}
+
+		private func refreshFriendStateIfNeeded(for notification: UNNotification) async {
+			guard notification.request.content.userInfo["notification-type"] as? String == "friend-request" else {
+				return
+			}
+
+			do {
+				try await FriendService.shared.refresh()
+			} catch {
+				PrintError("Unable to refresh friend state after notification", category: .network, error: error)
+			}
 		}
 	}
-}
+#endif
