@@ -178,7 +178,6 @@
 				Tabs/Timetable/TimetableSubjectInspectorView.swift = (ios, macos, );
 				"Tabs/UI Effects/BlurView.swift" = (ios, );
 				"Tabs/UI Effects/VariableBlur.swift" = (ios, );
-				"Tabs/UI Effects/scrollEdgeEffect.swift" = (ios, );
 				Views/Account/MainPlatformAuthenticationView.swift = (ios, macos, );
 				Views/Onboarding/OnboardingPage.swift = (ios, );
 				Views/Onboarding/OnboardingPageContext.swift = (ios, );
@@ -186,6 +185,7 @@
 				Views/Onboarding/Views/CalendarImport.swift = (ios, );
 				Views/Onboarding/Views/CalendarPermission.swift = (ios, );
 				Views/Onboarding/Views/Notifications.swift = (ios, );
+				Views/Onboarding/Views/OnboardingYearGroupView.swift = (ios, );
 				Views/Onboarding/Views/SplashView.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/OnboardingAccount.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/OnboardingCompletion.swift = (ios, );

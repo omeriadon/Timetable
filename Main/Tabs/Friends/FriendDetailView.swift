@@ -85,7 +85,7 @@ struct FriendDetailView: View {
 				selectedTab = FriendDetailTab.allCases[scrollPosition]
 			}
 			.toolbar {
-				ToolbarItem(placement: .topBarLeading) {
+				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {
 						close()
 					}
@@ -120,7 +120,7 @@ struct FriendDetailView: View {
 				}
 				.sharedBackgroundVisibility(.hidden)
 
-				ToolbarItem(placement: .topBarTrailing) {
+				ToolbarItem(placement: .primaryAction) {
 					Menu("Friend actions", systemImage: "ellipsis") {
 						Button("Remove Friend", systemImage: "person.badge.minus", role: .destructive) {
 							action = .remove

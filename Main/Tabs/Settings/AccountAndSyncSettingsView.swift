@@ -267,7 +267,9 @@ private struct EventNotificationScheduleSheet: View {
 						Text(timeLabel(minutes)).tag(minutes)
 					}
 				}
+				#if os(iOS)
 				.pickerStyle(.wheel)
+				#endif
 			}
 			.interactiveDismissDisabled()
 			.presentationDetents([.medium])

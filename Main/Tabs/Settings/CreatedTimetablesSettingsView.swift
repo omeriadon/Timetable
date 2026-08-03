@@ -31,7 +31,7 @@ struct CreatedTimetablesSettingsView: View {
 			.navigationBarTitleDisplayMode(.large)
 			#endif
 			.toolbar {
-				ToolbarItem(placement: .largeTitle) {
+				ToolbarItem(placement: .principal) {
 					Text("Created Timetables")
 						.bold()
 						.font(.largeTitle)
@@ -41,7 +41,7 @@ struct CreatedTimetablesSettingsView: View {
 				}
 			}
 			.toolbar {
-				ToolbarItem(placement: .topBarTrailing) {
+				ToolbarItem(placement: .primaryAction) {
 					Button("Create Timetable", systemImage: "plus") {
 						showCreate = true
 					}
@@ -99,7 +99,7 @@ private struct CreatedTimetableCreateView: View {
 			.navigationBarTitleDisplayMode(.large)
 			#endif
 			.toolbar {
-				ToolbarItem(placement: .largeTitle) {
+				ToolbarItem(placement: .principal) {
 					Text("New Created Timetable")
 						.bold()
 						.font(.title)

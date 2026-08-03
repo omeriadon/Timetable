@@ -26,14 +26,14 @@
 			if let mainMenu = NSApp.mainMenu {
 				let editMenuIndex = mainMenu.indexOfItem(withTitle: "View")
 
-				if editMenuIndex <= 0 {
+				if editMenuIndex >= 0 {
 					mainMenu.removeItem(at: editMenuIndex)
 				}
-				s
+
 				let fileMenuIndex = mainMenu.indexOfItem(withTitle: "File")
 
-				if fileMenuIndex <= 0 {
-					mainMenu.removeItem(at: editMenuIndex)
+				if fileMenuIndex >= 0 {
+					mainMenu.removeItem(at: fileMenuIndex)
 				}
 			}
 		}

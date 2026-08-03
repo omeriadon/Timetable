@@ -41,7 +41,6 @@ struct AdministrationSchoolEventsView: View {
 				editorTarget = .create
 			}
 		}
-		.listRowSpacing(8)
 		.appNavigationTitle("School Events", accent: true)
 		.refreshable {
 			await refreshEvents()

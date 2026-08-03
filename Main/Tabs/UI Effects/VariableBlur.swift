@@ -4,11 +4,6 @@ import QuartzCore
 import SwiftUI
 import UIKit
 
-public enum VariableBlurDirection {
-	case blurredTopClearBottom
-	case blurredBottomClearTop
-}
-
 public struct VariableBlurView: UIViewRepresentable {
 	public var maxBlurRadius: CGFloat = 20
 

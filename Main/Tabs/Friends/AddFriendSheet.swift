@@ -43,7 +43,9 @@ struct AddFriendSheet: View {
 								.transition(.blurReplace)
 						}
 					}
+					#if os(iOS)
 					.listStyle(.insetGrouped)
+					#endif
 					.animation(.snappy, value: results.map(\.id))
 					.scrollEdgeEffectStyle(.soft, for: .top)
 					.scrollEdgeEffectStyle(.soft, for: .bottom)

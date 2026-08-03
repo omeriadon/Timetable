@@ -7,6 +7,11 @@
 
 import SwiftUI
 
+public enum VariableBlurDirection {
+	case blurredTopClearBottom
+	case blurredBottomClearTop
+}
+
 extension View {
 	func scrollEdgeEffect(
 		direction: BlackGradientDirection = .darkTopClearBottom,
@@ -24,11 +29,13 @@ extension View {
 							.blurredTopClearBottom
 					}
 
-					VariableBlurView(
-						maxBlurRadius: maxBlurRadius,
-						direction: direction2,
-						startOffset: offset
-					)
+					#if os(iOS)
+						VariableBlurView(
+							maxBlurRadius: maxBlurRadius,
+							direction: direction2,
+							startOffset: offset
+						)
+					#endif // os(iOS)
 
 					BlackGradientOverlay(
 						direction: direction,

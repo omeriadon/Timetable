@@ -46,7 +46,9 @@ struct AdministrationEventTagSectionTagsView: View {
 				}
 			}
 		}
+		#if os(iOS)
 		.environment(\.editMode, .constant(isReordering ? .active : .inactive))
+		#endif
 		.appNavigationTitle(section.displayName)
 		.toolbar {
 			ToolbarItem(placement: .confirmationAction) {

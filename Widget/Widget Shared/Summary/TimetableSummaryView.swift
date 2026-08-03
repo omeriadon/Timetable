@@ -5,6 +5,7 @@
 //  Created by Adon Omeri on 31/7/2026.
 //
 
+import ImageIO
 import SwiftUI
 import WidgetKit
 
@@ -228,7 +229,7 @@ private struct WidgetProfilePicture: View {
 				if let photo = profile.photo,
 				   let image = WidgetProfilePhotoCache.image(for: photo)
 				{
-					Image(uiImage: image)
+					Image(decorative: image, scale: 1)
 						.resizable()
 						.scaledToFill()
 				} else {
@@ -246,7 +247,7 @@ private struct WidgetProfilePicture: View {
 }
 
 enum WidgetProfilePhotoCache {
-	static func image(for metadata: ProfilePhotoMetadata) -> UIImage? {
+	static func image(for metadata: ProfilePhotoMetadata) -> CGImage? {
 		guard let directory = FileManager.default.containerURL(
 			forSecurityApplicationGroupIdentifier: SharedDefaultsStore.suiteName
 		)?.appending(path: "ProfileImages", directoryHint: .isDirectory),
@@ -263,6 +264,9 @@ enum WidgetProfilePhotoCache {
 		else {
 			return nil
 		}
-		return UIImage(data: data)
+		guard let source = CGImageSourceCreateWithData(data as CFData, nil) else {
+			return nil
+		}
+		return CGImageSourceCreateImageAtIndex(source, 0, nil)
 	}
 }

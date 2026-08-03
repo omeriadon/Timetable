@@ -108,7 +108,7 @@ struct TimetableShareAliasSheet: View {
 				.padding(24)
 			}
 			.toolbar {
-				ToolbarItem(placement: .topBarTrailing) {
+				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {
 						close()
 					}

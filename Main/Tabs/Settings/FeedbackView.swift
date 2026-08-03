@@ -45,12 +45,14 @@ struct FeedbackView: View {
 					}
 				#endif // os(macOS)
 			}
+			#if os(iOS)
 			.navigationBarTitleDisplayMode(.large)
+			#endif
 			.formStyle(.grouped)
 			.scrollContentBackground(.hidden)
 			.scrollEdgeEffectStyle(.soft, for: .all)
 			.toolbar {
-				ToolbarItem(placement: .largeTitle) {
+				ToolbarItem(placement: .principal) {
 					Text("Report Feedback or Bug")
 						.font(.title)
 						.multilineTextAlignment(.leading)

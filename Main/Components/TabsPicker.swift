@@ -88,7 +88,11 @@ class TabsView: PlatformView {
 
 	func selectInitialTagIndex(_ index: Int) {
 		selectedTagIndex = bottomButtons.indices.contains(index) ? index : 0
-		setNeedsLayout()
+		#if os(iOS)
+			setNeedsLayout()
+		#else
+			needsLayout = true
+		#endif
 		DispatchQueue.main.async { [weak self] in
 			guard let self else { return }
 			updateSelection(for: selectedTagIndex)

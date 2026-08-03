@@ -35,7 +35,9 @@ struct FriendRequestsSheet: View {
 					}
 				}
 			}
+			#if os(iOS)
 			.listStyle(.insetGrouped)
+			#endif
 			.appNavigationTitle("Friend Requests")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {

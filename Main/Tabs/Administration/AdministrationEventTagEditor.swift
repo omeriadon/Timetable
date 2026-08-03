@@ -49,7 +49,9 @@ struct AdministrationEventTagEditor: View {
 				Section("Tag") {
 					TextField("Display Name", text: $displayName)
 					TextField("Slug", text: $slug)
+					#if os(iOS)
 						.textInputAutocapitalization(.never)
+					#endif
 						.autocorrectionDisabled()
 						.disabled(isCanonicalYearGroup)
 					Button {
