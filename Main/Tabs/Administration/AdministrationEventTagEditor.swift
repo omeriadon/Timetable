@@ -79,6 +79,7 @@ struct AdministrationEventTagEditor: View {
 				}
 			}
 			.interactiveDismissDisabled()
+			.appGroupedFormStyle()
 			.appNavigationTitle(tag == nil ? "Add Tag" : "Edit Tag", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {

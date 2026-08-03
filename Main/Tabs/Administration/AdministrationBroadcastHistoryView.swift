@@ -6,21 +6,23 @@ struct AdministrationBroadcastHistoryView: View {
 	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
-		List(records) { record in
-			NavigationLink {
-				AdministrationBroadcastHistoryDetailView(
-					record: record
-				)
-			} label: {
-				Label {
-					VStack(alignment: .leading, spacing: 3) {
-						Text(record.title)
-						Text(record.createdAt?.formatted(date: .abbreviated, time: .shortened) ?? "Unknown date")
-							.font(.footnote)
-							.foregroundStyle(.secondary)
+		NavigationStack {
+			List(records) { record in
+				NavigationLink {
+					AdministrationBroadcastHistoryDetailView(
+						record: record
+					)
+				} label: {
+					Label {
+						VStack(alignment: .leading, spacing: 3) {
+							Text(record.title)
+							Text(record.createdAt?.formatted(date: .abbreviated, time: .shortened) ?? "Unknown date")
+								.font(.footnote)
+								.foregroundStyle(.secondary)
+						}
+					} icon: {
+						Image(systemName: record.isDeleted ? "trash" : record.deliveryState == .failed ? "exclamationmark.triangle" : "megaphone")
 					}
-				} icon: {
-					Image(systemName: record.isDeleted ? "trash" : record.deliveryState == .failed ? "exclamationmark.triangle" : "megaphone")
 				}
 			}
 		}
@@ -98,6 +100,7 @@ private struct AdministrationBroadcastHistoryDetailView: View {
 				}
 			}
 		}
+		.appGroupedFormStyle()
 		.appNavigationTitle(currentRecord.isDeleted ? "Deleted Broadcast" : "Broadcast", accent: true)
 	}
 }

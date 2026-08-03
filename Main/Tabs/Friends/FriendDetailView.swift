@@ -86,9 +86,10 @@ struct FriendDetailView: View {
 			}
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
-					Button(role: .cancel) {
+					Button("Close", systemImage: "xmark", role: .cancel) {
 						close()
 					}
+					.labelStyle(.iconOnly)
 				}
 
 				let view = ToolbarItem(placement: .principal) {
@@ -108,18 +109,6 @@ struct FriendDetailView: View {
 					view
 				}
 
-				ToolbarItem(placement: .principal) {
-					HStack(spacing: 15) {
-						FriendAvatar(profile: displayedFriendProfile, size: 44)
-						Text(displayedFriendName)
-							.font(.largeTitle)
-							.bold()
-							.monospaced()
-							.foregroundStyle(.accent)
-					}
-				}
-				.sharedBackgroundVisibility(.hidden)
-
 				ToolbarItem(placement: .primaryAction) {
 					Menu("Friend actions", systemImage: "ellipsis") {
 						Button("Remove Friend", systemImage: "person.badge.minus", role: .destructive) {
@@ -129,6 +118,7 @@ struct FriendDetailView: View {
 							showsReportConfirmation = true
 						}
 					}
+					.labelStyle(.iconOnly)
 				}
 			}
 			.confirmationDialog(action?.title ?? "", isPresented: Binding(

@@ -36,6 +36,7 @@ struct AdministrationCalendarEditor: View {
 				}
 			}
 			.interactiveDismissDisabled()
+			.appGroupedFormStyle()
 			.appNavigationTitle(entry.kind == "term" ? "Term Date" : "Pupil Free Day", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {

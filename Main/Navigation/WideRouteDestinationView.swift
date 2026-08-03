@@ -32,7 +32,7 @@ struct WideRouteDestinationView: View {
 				case .settings(.tagSubscriptions):
 					TagSubscriptionsView()
 				case .settings(.feedback):
-					FeedbackView()
+					FeedbackView(close: close)
 				case .settings(.about):
 					AboutView()
 				case .settings(.profileAppearance):
@@ -70,6 +70,7 @@ struct WideRouteDestinationView: View {
 		.toolbar {
 			ToolbarItem(placement: .cancellationAction) {
 				Button("Close", systemImage: "xmark", action: close)
+					.labelStyle(.iconOnly)
 			}
 		}
 		.transition(.opacity)

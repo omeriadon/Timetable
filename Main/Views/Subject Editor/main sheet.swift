@@ -66,9 +66,10 @@ struct SubjectEditorSheet: View {
 			#endif
 				.toolbar {
 					ToolbarItem(placement: .cancellationAction) {
-						Button("Cancel", systemImage: "xmark") {
+						Button("Close", systemImage: "xmark") {
 							close()
 						}
+						.labelStyle(.iconOnly)
 						.keyboardShortcut(.cancelAction)
 						.disabled(isSaving)
 					}

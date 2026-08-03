@@ -104,7 +104,7 @@ struct ShareSelectionSheet: View {
 				}
 			}
 			.sheet(isPresented: $showAliasEditor) {
-				TimetableShareAliasSheet()
+				TimetableShareAliasSheet(close: { showAliasEditor = false })
 			}
 			.task {
 				await aliasService.fetchCurrentAlias()

@@ -61,7 +61,7 @@ struct AccountView: View {
 			Text("This permanently deletes your account and server data.")
 		}
 		.sheet(isPresented: $showsProfileEditor) {
-			ProfileAppearanceSheet()
+			ProfileAppearanceSheet(close: { showsProfileEditor = false })
 				.presentationDetents([.large])
 				.presentationDragIndicator(.hidden)
 		}

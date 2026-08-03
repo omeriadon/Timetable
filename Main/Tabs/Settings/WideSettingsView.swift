@@ -116,6 +116,7 @@ struct WideSettingsView: View {
 				Image(systemName: "chevron.right")
 					.foregroundStyle(isSelected ? .white : .secondary)
 			}
+			.contentShape(Rectangle())
 		}
 		.foregroundStyle(isSelected ? .white : .primary)
 		.listRowBackground(isSelected ? Color.accentColor : nil)

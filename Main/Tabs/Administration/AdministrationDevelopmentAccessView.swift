@@ -45,6 +45,7 @@ struct AdministrationDevelopmentAccessView: View {
 			}
 		}
 		.scrollEdgeEffect()
+		.appGroupedFormStyle()
 		.appNavigationTitle("Debug Testing", accent: true)
 		.task {
 			await load()

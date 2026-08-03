@@ -38,6 +38,7 @@ struct FriendsView: View {
 						router.navigate(to: .friends(.requests))
 					}
 				}
+				.labelStyle(.iconOnly)
 				.badge(incomingFriendRequests.count)
 				.accessibilityValue(incomingFriendRequests.isEmpty ? "No pending requests" : "\(incomingFriendRequests.count) pending requests")
 			}
@@ -45,6 +46,7 @@ struct FriendsView: View {
 				Button("Add friend", systemImage: "person.badge.plus") {
 					sheet = .addFriend
 				}
+				.labelStyle(.iconOnly)
 			}
 		}
 		.searchable(text: $searchText, prompt: "Search with a school email")

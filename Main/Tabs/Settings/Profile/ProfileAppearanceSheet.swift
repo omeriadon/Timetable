@@ -23,7 +23,7 @@ struct ProfileAppearanceSheet: View {
 		@State private var photoCropRequest: ProfilePhotoCropRequest?
 	#endif
 
-	init(close: @escaping () -> Void = {}) {
+	init(close: @escaping () -> Void) {
 		self.close = close
 		_draft = State(initialValue: ProfileAppearanceDraft(
 			profile: Defaults[.accountProfile],
@@ -189,12 +189,14 @@ struct ProfileAppearanceSheet: View {
 			.appNavigationTitle("Profile", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
-					Button(role: .cancel, action: close)
+					Button("Close", systemImage: "xmark", role: .cancel, action: close)
+						.labelStyle(.iconOnly)
 				}
 
 				ToolbarItem(placement: .confirmationAction) {
 					Button("Save", systemImage: "checkmark", role: .confirm, action: save)
 						.buttonStyle(.glassProminent)
+						.labelStyle(.iconOnly)
 						.disabled(isSaving || !draft.canSave)
 				}
 			}

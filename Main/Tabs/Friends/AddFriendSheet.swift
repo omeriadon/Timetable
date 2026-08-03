@@ -7,7 +7,6 @@ struct AddFriendSheet: View {
 	@State private var service = FriendService.shared
 	@State private var isSearching = false
 	@State private var completedSearchQuery = ""
-	@State private var isSearchPresented = false
 
 	private var cleanedQuery: String {
 		query.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -15,59 +14,59 @@ struct AddFriendSheet: View {
 
 	var body: some View {
 		NavigationStack {
-			ZStack {
-				if cleanedQuery.isEmpty {
-					ContentUnavailableView(
-						"Find a Friend",
-						systemImage: "person.2",
-						description: Text("Search by name or school email address.")
-					)
-					.transition(.blurReplace)
-				} else if results.isEmpty,
-				          isSearching || completedSearchQuery != cleanedQuery
-				{
-					Color.clear
+			VStack(spacing: 0) {
+				TextField("Search by name or email", text: $query)
+					.textFieldStyle(.roundedBorder)
+					.padding()
+
+				ZStack {
+					if cleanedQuery.isEmpty {
+						ContentUnavailableView(
+							"Find a Friend",
+							systemImage: "person.2",
+							description: Text("Search by name or school email address.")
+						)
 						.transition(.blurReplace)
-				} else if results.isEmpty,
-				          !isSearching,
-				          completedSearchQuery == cleanedQuery
-				{
-					ContentUnavailableView.search(text: cleanedQuery)
-						.transition(.blurReplace)
-				} else {
-					List {
-						ForEach(results) { result in
-							FriendSearchRow(result: result)
-								.listRowInsets(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
-								.listRowBackground(Image("paper").resizable().scaledToFill())
-								.transition(.blurReplace)
+					} else if results.isEmpty,
+					          isSearching || completedSearchQuery != cleanedQuery
+					{
+						Color.clear
+							.transition(.blurReplace)
+					} else if results.isEmpty,
+					          !isSearching,
+					          completedSearchQuery == cleanedQuery
+					{
+						ContentUnavailableView.search(text: cleanedQuery)
+							.transition(.blurReplace)
+					} else {
+						List {
+							ForEach(results) { result in
+								FriendSearchRow(result: result)
+									.listRowInsets(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
+									.listRowBackground(Image("paper").resizable().scaledToFill())
+									.transition(.blurReplace)
+							}
 						}
+						#if os(iOS)
+						.listStyle(.insetGrouped)
+						#endif
+						.animation(.snappy, value: results.map(\.id))
+						.scrollEdgeEffectStyle(.soft, for: .top)
+						.scrollEdgeEffectStyle(.soft, for: .bottom)
+						.transition(.blurReplace)
 					}
-					#if os(iOS)
-					.listStyle(.insetGrouped)
-					#endif
-					.animation(.snappy, value: results.map(\.id))
-					.scrollEdgeEffectStyle(.soft, for: .top)
-					.scrollEdgeEffectStyle(.soft, for: .bottom)
-					.transition(.blurReplace)
 				}
 			}
 			.animation(.easeOut(duration: 0.25), value: "\(cleanedQuery)\(results.isEmpty)\(isSearching)")
 			.appNavigationTitle("Add a Friend")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
-					Button(role: .cancel) {
+					Button("Close", systemImage: "xmark", role: .cancel) {
 						close()
-					} label: {
-						Image(systemName: "xmark")
 					}
+					.labelStyle(.iconOnly)
 				}
 			}
-			.searchable(
-				text: $query,
-				isPresented: $isSearchPresented,
-				prompt: "Search by name or email"
-			)
 			.task(id: query) {
 				completedSearchQuery = ""
 				await search(for: cleanedQuery)

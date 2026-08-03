@@ -41,11 +41,10 @@ struct FriendRequestsSheet: View {
 			.appNavigationTitle("Friend Requests")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
-					Button(role: .cancel) {
+					Button("Close", systemImage: "xmark", role: .cancel) {
 						close()
-					} label: {
-						Image(systemName: "xmark")
 					}
+					.labelStyle(.iconOnly)
 				}
 			}
 			.task {

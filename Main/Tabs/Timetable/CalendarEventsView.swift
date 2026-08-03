@@ -1,9 +1,6 @@
 import Defaults
+import SFSymbolsPicker
 import SwiftUI
-
-#if os(iOS)
-	import SFSymbolsPicker
-#endif
 
 struct DatesView: View {
 	@Default(.schoolCalendar) private var schoolCalendar
@@ -577,15 +574,7 @@ private struct CalendarEventEditor: View {
 private struct CalendarEventSymbolPicker: View {
 	@Binding var symbol: String
 	var body: some View {
-		#if os(iOS)
-			SymbolsPicker(selection: $symbol, title: "", searchLabel: "Search symbols...", autoDismiss: true)
-		#else
-			ContentUnavailableView(
-				"Symbol Picker Unavailable",
-				systemImage: symbol,
-				description: Text("SF Symbols can be selected on iPhone and iPad.")
-			)
-		#endif
+		SymbolsPicker(selection: $symbol, title: "", searchLabel: "Search symbols...", autoDismiss: true)
 	}
 }
 

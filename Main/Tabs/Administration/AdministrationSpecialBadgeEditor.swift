@@ -70,6 +70,7 @@ struct AdministrationSpecialBadgeEditor: View {
 					}
 				}
 			}
+			.appGroupedFormStyle()
 			.appNavigationTitle(target.badge == nil ? "New Badge" : "Edit Badge", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {

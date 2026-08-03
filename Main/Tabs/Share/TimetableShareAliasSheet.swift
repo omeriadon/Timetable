@@ -14,7 +14,7 @@ struct TimetableShareAliasSheet: View {
 	@State private var editRevision = 0
 	@State private var colors = [Color.clear, .clear, .mint, .clear, .clear, .clear, .mint]
 
-	init(close: @escaping () -> Void = {}) {
+	init(close: @escaping () -> Void) {
 		self.close = close
 	}
 

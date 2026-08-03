@@ -15,6 +15,7 @@ struct AdministrationBroadcastNotificationView: View {
 			TextField("Message", text: $notifBody, axis: .vertical)
 				.lineLimit(4 ... 8)
 		}
+		.appGroupedFormStyle()
 		.appNavigationTitle("Broadcast Notification", accent: true)
 		.toolbar {
 			ToolbarItem(placement: .confirmationAction) {

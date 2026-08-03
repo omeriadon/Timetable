@@ -108,9 +108,10 @@ private struct CreatedTimetableCreateView: View {
 				}
 
 				ToolbarItem(placement: .cancellationAction) {
-					Button("Cancel", systemImage: "xmark", role: .cancel) {
+					Button("Close", systemImage: "xmark", role: .cancel) {
 						close()
 					}
+					.labelStyle(.iconOnly)
 					.disabled(isSaving)
 				}
 
@@ -121,6 +122,7 @@ private struct CreatedTimetableCreateView: View {
 						}
 					}
 					.buttonStyle(.glassProminent)
+					.labelStyle(.iconOnly)
 					.disabled(isSaving || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 				}
 			}

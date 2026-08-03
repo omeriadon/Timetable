@@ -97,15 +97,17 @@ struct AdministrationUserEditor: View {
 					}
 				}
 			}
+			.appGroupedFormStyle()
 			.appNavigationTitle(target.user == nil ? "New User" : "User", accent: true)
 			.refreshable {
 				await loadAccountData()
 			}
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
-					Button(role: .cancel) {
+					Button("Close", systemImage: "xmark", role: .cancel) {
 						close()
 					}
+					.labelStyle(.iconOnly)
 				}
 
 				ToolbarItem(placement: .confirmationAction) {
@@ -118,6 +120,7 @@ struct AdministrationUserEditor: View {
 							|| (target.user == nil && password.count < 8)
 					)
 					.buttonStyle(.glassProminent)
+					.labelStyle(.iconOnly)
 				}
 			}
 			.safeAreaBar(edge: .bottom) {

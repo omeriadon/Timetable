@@ -265,7 +265,7 @@ import WidgetKit
 				}
 				.disabled(!networkManager.isOnline)
 				.sheet(isPresented: $showFeedbackSheet) {
-					FeedbackView()
+					FeedbackView(close: { showFeedbackSheet = false })
 						.presentationDetents([.fraction(0.7)])
 				}
 

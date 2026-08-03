@@ -45,6 +45,7 @@ struct AdministrationEventTagSectionEditor: View {
 				}
 			}
 			.scrollEdgeEffect()
+			.appGroupedFormStyle()
 			.appNavigationTitle("Edit Section", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {

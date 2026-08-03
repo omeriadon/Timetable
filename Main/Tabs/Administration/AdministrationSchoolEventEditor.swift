@@ -66,6 +66,7 @@ struct AdministrationSchoolEventEditor: View {
 					}
 				}
 			}
+			.appGroupedFormStyle()
 			.appNavigationTitle(target.event == nil ? "School Event" : "Edit School Event", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {

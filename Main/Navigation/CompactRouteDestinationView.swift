@@ -45,11 +45,11 @@
 				case .settings(.receivedTimetables):
 					ReceivedTimetablesView()
 				case .settings(.feedback):
-					FeedbackView()
+					FeedbackView(close: router.popCurrentRoute)
 				case .settings(.about):
 					AboutView()
 				case .settings(.profileAppearance):
-					ProfileAppearanceSheet()
+					ProfileAppearanceSheet(close: router.popCurrentRoute)
 				case .settings(.navigationPersistence):
 					NavigationPersistenceSettingsView()
 				case .administration(.root):

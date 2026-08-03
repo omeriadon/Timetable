@@ -11,27 +11,18 @@ struct AdministrationView: View {
 	var body: some View {
 		Group {
 			if isAdmin {
-				List {
-					Section {
-						administrationLink("School Events", systemImage: "calendar", route: .administration(.schoolEvents)) { AdministrationSchoolEventsView() }
-						administrationLink("Event Tags", systemImage: "tag", route: .administration(.eventTags)) { AdministrationEventTagsView() }
-						administrationLink("Term Dates", systemImage: "calendar", route: .administration(.calendarEntries(kind: "term"))) { AdministrationCalendarEntriesView(kind: "term") }
-						administrationLink("Pupil Free Days", systemImage: "calendar.badge.exclamationmark", route: .administration(.calendarEntries(kind: "noSchool"))) { AdministrationCalendarEntriesView(kind: "noSchool") }
-						administrationLink("Users", systemImage: "person.2", route: .administration(.users)) { AdministrationUsersView() }
-						administrationLink("Broadcast Notification", systemImage: "megaphone", route: .administration(.broadcastNotification)) { AdministrationBroadcastNotificationView() }
-						administrationLink("Broadcast History", systemImage: "clock.arrow.circlepath", route: .administration(.broadcastHistory)) { AdministrationBroadcastHistoryView() }
+				#if os(macOS)
+					Form {
+						administrationSections
 					}
-
-					if authority == .systemOwner {
-						Section("System Administration") {
-							administrationLink("Administrators", systemImage: "person.badge.shield.checkmark", route: .administration(.administrators)) { AdministrationAdministratorsView() }
-							administrationLink("Debug Testing", systemImage: "testtube.2", route: .administration(.serverAccess)) { AdministrationDevelopmentAccessView() }
-							administrationLink("Profile Storage", systemImage: "externaldrive.fill", route: .administration(.profileStorage)) { AdministrationProfileStorageView() }
-							administrationLink("Badges", systemImage: "rosette", route: .administration(.specialBadges)) { AdministrationSpecialBadgesView() }
-						}
+					.formStyle(.grouped)
+					.scrollContentBackground(.hidden)
+				#else
+					List {
+						administrationSections
 					}
-				}
-				.scrollEdgeEffect()
+					.scrollEdgeEffect()
+				#endif
 			} else {
 				ContentUnavailableView(
 					"Administration Unavailable",
@@ -51,6 +42,28 @@ struct AdministrationView: View {
 		.onReceive(NotificationCenter.default.publisher(for: .administrationDashboardRefreshRequested)) { _ in
 			Task {
 				await load()
+			}
+		}
+	}
+
+	@ViewBuilder
+	private var administrationSections: some View {
+		Section {
+			administrationLink("School Events", systemImage: "calendar", route: .administration(.schoolEvents)) { AdministrationSchoolEventsView() }
+			administrationLink("Event Tags", systemImage: "tag", route: .administration(.eventTags)) { AdministrationEventTagsView() }
+			administrationLink("Term Dates", systemImage: "calendar", route: .administration(.calendarEntries(kind: "term"))) { AdministrationCalendarEntriesView(kind: "term") }
+			administrationLink("Pupil Free Days", systemImage: "calendar.badge.exclamationmark", route: .administration(.calendarEntries(kind: "noSchool"))) { AdministrationCalendarEntriesView(kind: "noSchool") }
+			administrationLink("Users", systemImage: "person.2", route: .administration(.users)) { AdministrationUsersView() }
+			administrationLink("Broadcast Notification", systemImage: "megaphone", route: .administration(.broadcastNotification)) { AdministrationBroadcastNotificationView() }
+			administrationLink("Broadcast History", systemImage: "clock.arrow.circlepath", route: .administration(.broadcastHistory)) { AdministrationBroadcastHistoryView() }
+		}
+
+		if authority == .systemOwner {
+			Section("System Administration") {
+				administrationLink("Administrators", systemImage: "person.badge.shield.checkmark", route: .administration(.administrators)) { AdministrationAdministratorsView() }
+				administrationLink("Debug Testing", systemImage: "testtube.2", route: .administration(.serverAccess)) { AdministrationDevelopmentAccessView() }
+				administrationLink("Profile Storage", systemImage: "externaldrive.fill", route: .administration(.profileStorage)) { AdministrationProfileStorageView() }
+				administrationLink("Badges", systemImage: "rosette", route: .administration(.specialBadges)) { AdministrationSpecialBadgesView() }
 			}
 		}
 	}
@@ -84,6 +97,7 @@ struct AdministrationView: View {
 					Image(systemName: "chevron.right")
 						.foregroundStyle(isSelected ? .white : .secondary)
 				}
+				.contentShape(Rectangle())
 			}
 			.foregroundStyle(isSelected ? .white : .primary)
 			.listRowBackground(isSelected ? Color.accentColor : nil)

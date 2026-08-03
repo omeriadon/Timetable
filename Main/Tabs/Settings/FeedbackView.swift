@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct FeedbackView: View {
-	let close: () -> Void = {}
+	let close: () -> Void
 	@Environment(\.statusBadgeManager) private var badges
 	@State private var category = "Feedback"
 	@State private var message = ""
