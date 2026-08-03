@@ -65,9 +65,19 @@ struct WideRouteDestinationView: View {
 			case let .onboarding(.page(id)):
 				MainPlatformAuthenticationView(initialPageID: id)
 		}
+		.toolbar {
+			ToolbarItem(placement: .cancellationAction) {
+				Button("Close", systemImage: "xmark", action: close)
+			}
+		}
+		.transition(.opacity)
 	}
 
 	private func close() {
-		router.inspectorRoute = nil
+		if router.inspectorRoute != nil {
+			router.inspectorRoute = nil
+		} else if !router.sidebarPath.isEmpty {
+			router.sidebarPath.removeLast()
+		}
 	}
 }

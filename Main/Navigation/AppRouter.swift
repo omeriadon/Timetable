@@ -33,9 +33,7 @@ final class AppRouter {
 		didSet { persistIfNeeded() }
 	}
 
-	var sidebarVisibility: AppSidebarVisibility {
-		didSet { persistIfNeeded() }
-	}
+	var sidebarVisibility: AppSidebarVisibility
 
 	var inspectorRoute: AppRoute?
 	var pendingExternalRoute: AppRoute?
@@ -72,7 +70,7 @@ final class AppRouter {
 		administrationPath = snapshot?.administrationPath ?? []
 		selectedSidebarDestination = snapshot?.selectedSidebarDestination ?? .timetable
 		sidebarPath = snapshot?.sidebarPath ?? []
-		sidebarVisibility = snapshot?.sidebarVisibility ?? .automatic
+		sidebarVisibility = .automatic
 		inspectorRoute = nil
 		pendingExternalRoute = nil
 		presentation = .iOS
@@ -87,7 +85,6 @@ final class AppRouter {
 		self.presentation = presentation
 		translateCurrentRoute(to: presentation)
 		isTranslatingPresentation = false
-		persistIfNeeded()
 	}
 
 	func selectRoot(_ destination: AppRootDestination) {
@@ -241,8 +238,7 @@ final class AppRouter {
 			settingsPath: settingsPath,
 			administrationPath: administrationPath,
 			selectedSidebarDestination: selectedSidebarDestination,
-			sidebarPath: sidebarPath,
-			sidebarVisibility: sidebarVisibility
+			sidebarPath: sidebarPath
 		)
 	}
 }

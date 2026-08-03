@@ -40,7 +40,6 @@ struct AppNavigationSnapshot: Codable, Equatable, Sendable {
 	let administrationPath: [AppRoute]
 	let selectedSidebarDestination: AppRootDestination
 	let sidebarPath: [AppRoute]
-	let sidebarVisibility: AppSidebarVisibility
 
 	init(
 		selectedTab: MainTab,
@@ -49,8 +48,7 @@ struct AppNavigationSnapshot: Codable, Equatable, Sendable {
 		settingsPath: [AppRoute],
 		administrationPath: [AppRoute],
 		selectedSidebarDestination: AppRootDestination,
-		sidebarPath: [AppRoute],
-		sidebarVisibility: AppSidebarVisibility
+		sidebarPath: [AppRoute]
 	) {
 		version = Self.currentVersion
 		self.selectedTab = selectedTab
@@ -60,6 +58,5 @@ struct AppNavigationSnapshot: Codable, Equatable, Sendable {
 		self.administrationPath = administrationPath
 		self.selectedSidebarDestination = selectedSidebarDestination
 		self.sidebarPath = sidebarPath
-		self.sidebarVisibility = sidebarVisibility
 	}
 }

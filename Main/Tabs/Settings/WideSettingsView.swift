@@ -18,7 +18,6 @@ struct WideSettingsView: View {
 		Form {
 			Section("Account") {
 				routeButton("Account", systemImage: "person.crop.circle", route: .settings(.account))
-				routeButton("Edit Profile", systemImage: "person.crop.circle.badge.checkmark", route: .settings(.profileAppearance))
 			}
 
 			Section("Preferences") {
@@ -102,10 +101,23 @@ struct WideSettingsView: View {
 		systemImage: String,
 		route: AppRoute
 	) -> some View {
+		let isSelected = router.inspectorRoute == route
+
 		Button {
-			router.navigate(to: route)
+			if isSelected {
+				router.inspectorRoute = nil
+			} else {
+				router.navigate(to: route)
+			}
 		} label: {
-			Label(title, systemImage: systemImage)
+			HStack {
+				Label(title, systemImage: systemImage)
+				Spacer()
+				Image(systemName: "chevron.right")
+					.foregroundStyle(isSelected ? .white : .secondary)
+			}
 		}
+		.foregroundStyle(isSelected ? .white : .primary)
+		.listRowBackground(isSelected ? Color.accentColor : nil)
 	}
 }

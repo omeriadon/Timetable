@@ -69,11 +69,24 @@ struct AdministrationView: View {
 				Label(title, systemImage: systemImage)
 			}
 		} else {
+			let isSelected = router.inspectorRoute == route
+
 			Button {
-				router.navigate(to: route)
+				if isSelected {
+					router.inspectorRoute = nil
+				} else {
+					router.navigate(to: route)
+				}
 			} label: {
-				Label(title, systemImage: systemImage)
+				HStack {
+					Label(title, systemImage: systemImage)
+					Spacer()
+					Image(systemName: "chevron.right")
+						.foregroundStyle(isSelected ? .white : .secondary)
+				}
 			}
+			.foregroundStyle(isSelected ? .white : .primary)
+			.listRowBackground(isSelected ? Color.accentColor : nil)
 		}
 	}
 

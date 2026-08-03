@@ -11,36 +11,31 @@ struct WideAppShell: View {
 
 		NavigationSplitView(columnVisibility: sidebarVisibility) {
 			List(selection: sidebarSelection) {
-				Section("Timetable") {
-					sidebarRoot("Timetable", systemImage: "calendar.day.timeline.left", destination: .timetable)
-					sidebarRoot("Friends", systemImage: "person.2", destination: .friends)
-				}
-
-				Section("Personal") {
-					sidebarRoute("Account", systemImage: "person.crop.circle", route: .settings(.account))
-					sidebarRoute("Updates & Notifications", systemImage: "switch.2", route: .settings(.updatesAndNotifications))
-					sidebarRoute("Event Tags", systemImage: "tag", route: .settings(.tagSubscriptions))
-					sidebarRoot("Settings", systemImage: "gear", destination: .settings)
-				}
+				sidebarRoot("Timetable", systemImage: "calendar.day.timeline.left", destination: .timetable)
+				sidebarRoot("Friends", systemImage: "person.2", destination: .friends)
+				sidebarRoot("Settings", systemImage: "gear", destination: .settings)
 
 				if accountProfile?.authority.isAdministrator == true {
-					Section("Administration") {
-						sidebarRoot("Administration", systemImage: "calendar.badge.lock", destination: .administration)
-						sidebarRoute("School Events", systemImage: "calendar", route: .administration(.schoolEvents))
-						sidebarRoute("Users", systemImage: "person.2", route: .administration(.users))
-					}
+					sidebarRoot("Administration", systemImage: "calendar.badge.lock", destination: .administration)
 				}
 			}
-			.navigationTitle("Timetable")
+			.appNavigationTitle("Timetable")
 			.listStyle(.sidebar)
+			.scrollEdgeEffectStyle(.soft, for: .all)
 		} detail: {
 			NavigationStack(path: $router.sidebarPath) {
-				WideRootDestinationView(
-					destination: router.selectedSidebarDestination,
-					expanded: $expanded
-				)
+				ZStack {
+					WideRootDestinationView(
+						destination: router.selectedSidebarDestination,
+						expanded: $expanded
+					)
+					.id(router.selectedSidebarDestination)
+					.transition(.opacity)
+				}
+				.animation(.easeInOut, value: router.selectedSidebarDestination)
 				.navigationDestination(for: AppRoute.self) { route in
 					WideRouteDestinationView(route: route)
+						.transition(.opacity)
 				}
 			}
 		}
@@ -48,8 +43,10 @@ struct WideAppShell: View {
 			if let route = router.inspectorRoute {
 				WideRouteDestinationView(route: route)
 					.inspectorColumnWidth(min: 360, ideal: 480, max: 680)
+					.transition(.opacity)
 			}
 		}
+		.animation(.easeInOut, value: router.inspectorRoute)
 		.onReceive(NotificationCenter.default.publisher(for: .openTimetableTab)) { _ in
 			router.selectRoot(.timetable)
 		}
@@ -101,18 +98,5 @@ struct WideAppShell: View {
 	) -> some View {
 		Label(title, systemImage: systemImage)
 			.tag(destination)
-	}
-
-	private func sidebarRoute(
-		_ title: String,
-		systemImage: String,
-		route: AppRoute
-	) -> some View {
-		Button {
-			router.navigate(to: route)
-		} label: {
-			Label(title, systemImage: systemImage)
-		}
-		.buttonStyle(.plain)
 	}
 }
