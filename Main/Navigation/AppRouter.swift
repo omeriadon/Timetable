@@ -54,6 +54,8 @@ final class AppRouter {
 
 	@ObservationIgnored
 	private let persistenceStore: AppNavigationPersistenceStore
+	@ObservationIgnored
+	private var isTranslatingPresentation = false
 
 	init(
 		persistenceStore: AppNavigationPersistenceStore? = nil
@@ -81,8 +83,11 @@ final class AppRouter {
 		guard self.presentation != presentation else {
 			return
 		}
+		isTranslatingPresentation = true
 		self.presentation = presentation
 		translateCurrentRoute(to: presentation)
+		isTranslatingPresentation = false
+		persistIfNeeded()
 	}
 
 	func selectRoot(_ destination: AppRootDestination) {
@@ -222,7 +227,7 @@ final class AppRouter {
 	}
 
 	private func persistIfNeeded() {
-		guard persistsNavigationState else {
+		guard persistsNavigationState, !isTranslatingPresentation else {
 			return
 		}
 		persistenceStore.save(snapshot)
