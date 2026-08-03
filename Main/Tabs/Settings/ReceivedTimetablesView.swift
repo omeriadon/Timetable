@@ -1,15 +1,11 @@
 import Defaults
 import SwiftUI
 import UniformTypeIdentifiers
-#if os(iOS)
-	import UIKit
-#endif
 
 struct ReceivedTimetablesView: View {
 	@Default(.receivedTimetables) private var receivedTimetables
 	@State private var timetableToDelete: ReceivedTimetable?
 	@State private var showDeleteConfirmation = false
-	@State private var shareURL: ShareableTimetableURL?
 	@State private var exportDocument: TimetableShareDocument?
 	@State private var showsFileExporter = false
 	@State private var showsFileImporter = false
@@ -43,9 +39,6 @@ struct ReceivedTimetablesView: View {
 			} message: { timetable in
 				Text("Delete \(timetable.sender)'s timetable from every signed-in device?")
 			}
-			#if os(iOS)
-			.sheet(item: $shareURL) { ShareSheet(items: [$0.url]) }
-			#endif
 			.fileExporter(
 				isPresented: $showsFileExporter,
 				document: exportDocument,
@@ -84,8 +77,8 @@ struct ReceivedTimetablesView: View {
 		if let id = UUID(uuidString: timetable.id),
 		   let url = URL(string: "https://timetable.adonis.pt/share/\(id.uuidString)")
 		{
-			Button("Share Link", systemImage: "square.and.arrow.up") {
-				shareURL = ShareableTimetableURL(url: url)
+			ShareLink(item: url) {
+				Label("Share Link", systemImage: "square.and.arrow.up")
 			}
 		}
 		Button("Export File", systemImage: "square.and.arrow.up") {
@@ -136,19 +129,3 @@ struct ReceivedTimetablesView: View {
 		}
 	}
 }
-
-private struct ShareableTimetableURL: Identifiable {
-	let id = UUID()
-	let url: URL
-}
-
-#if os(iOS)
-	private struct ShareSheet: UIViewControllerRepresentable {
-		let items: [Any]
-		func makeUIViewController(context _: Context) -> UIActivityViewController {
-			UIActivityViewController(activityItems: items, applicationActivities: nil)
-		}
-
-		func updateUIViewController(_: UIActivityViewController, context _: Context) {}
-	}
-#endif

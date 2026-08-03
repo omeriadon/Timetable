@@ -38,8 +38,10 @@ struct WideRouteDestinationView: View {
 				ProfileAppearanceSheet(close: close)
 			case .settings(.navigationPersistence):
 				NavigationPersistenceSettingsView()
-			case .settings(.createdTimetables), .settings(.createdTimetable(id: _)), .settings(.receivedTimetables):
-				ContentUnavailableView("Timetable Management", systemImage: "calendar.badge.clock")
+			case .settings(.createdTimetables), .settings(.createdTimetable(id: _)):
+				CreatedTimetablesSettingsView()
+			case .settings(.receivedTimetables):
+				ReceivedTimetablesView()
 			case .administration(.schoolEvents), .administration(.schoolEvent(id: _)):
 				AdministrationSchoolEventsView()
 			case .administration(.eventTags), .administration(.eventTag(id: _)), .administration(.eventTagSection(id: _)):

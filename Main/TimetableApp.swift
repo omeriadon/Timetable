@@ -187,39 +187,59 @@ struct TimetableApp: App {
 				.environment(\.statusBadgeManager, statusBadgeManager)
 				.buttonStyle(.haptic)
 				#if os(macOS)
-					.onChange(of: expanded) { _, newValue in
-						resizeWindow(expanded: newValue)
-					}
-					.frame(width: 700)
-					.frame(minHeight: 475, idealHeight: 475, maxHeight: 750)
-					.background {
-						CustomMaterialView()
-							.ignoresSafeArea()
-					}
+					.frame(minWidth: 800, minHeight: 600)
 				#else
 					.overlay {
-							if launchIllusionVisible {
-								LaunchIllusionView {
-									launchIllusionVisible = false
-								}
-								.ignoresSafeArea()
-								.allowsHitTesting(false)
+						if launchIllusionVisible {
+							LaunchIllusionView {
+								launchIllusionVisible = false
 							}
+							.ignoresSafeArea()
+							.allowsHitTesting(false)
 						}
+					}
 				#endif
-						.preferredColorScheme(.dark)
+					.preferredColorScheme(.dark)
 			}
 		}
-		.windowResizability(.contentSize)
+		#if os(macOS)
+		.defaultSize(width: 1100, height: 720)
+		#endif
 
 		#if os(macOS)
-			.commands {
-				CommandGroup(after: .appSettings) {
-					Button("Settings…") { NotificationCenter.default.post(name: .openSettingsTab, object: nil) }
-						.keyboardShortcut(",", modifiers: .command)
+		.commands {
+			CommandMenu("Navigate") {
+				Button("Timetable", systemImage: "calendar.day.timeline.left") {
+					selectRoot(.timetable)
 				}
+				.keyboardShortcut("1", modifiers: .command)
+
+				Button("Friends", systemImage: "person.2") {
+					selectRoot(.friends)
+				}
+				.keyboardShortcut("2", modifiers: .command)
+
+				Button("Settings", systemImage: "gear") {
+					selectRoot(.settings)
+				}
+				.keyboardShortcut("3", modifiers: .command)
+
+				Button("Administration", systemImage: "calendar.badge.lock") {
+					selectRoot(.administration)
+				}
+				.keyboardShortcut("4", modifiers: .command)
 			}
+
+			CommandGroup(after: .appSettings) {
+				Button("Settings…") { NotificationCenter.default.post(name: .openSettingsTab, object: nil) }
+					.keyboardShortcut(",", modifiers: .command)
+			}
+		}
 		#endif
+	}
+
+	private func selectRoot(_ destination: AppRootDestination) {
+		NotificationCenter.default.post(name: .selectAppRoot, object: destination)
 	}
 
 	@MainActor
@@ -335,46 +355,4 @@ struct TimetableApp: App {
 		Defaults[.pendingMessageTimetableLocators] = locators
 		pendingSharedTimetableLocator = nil
 	}
-
-	#if os(macOS)
-		private func resizeWindow(expanded: WindowMode) {
-			guard let window = NSApplication.shared.windows.first else { return }
-
-			var newSize: NSSize {
-				switch expanded {
-					case .none:
-						NSSize(width: 700, height: 528)
-					case .comparison:
-						NSSize(width: 700, height: 750)
-					case .settings:
-						NSSize(width: 700, height: 650)
-				}
-			}
-
-			let currentFrame = window.frame
-
-			let deltaHeight = newSize.height - currentFrame.height
-			let newOrigin = NSPoint(
-				x: currentFrame.origin.x,
-				y: currentFrame.origin.y - deltaHeight
-			)
-
-			let newFrame = NSRect(
-				origin: newOrigin,
-				size: newSize
-			)
-
-			window.styleMask.remove(.resizable)
-			window.styleMask.remove(.fullScreen)
-
-			window.collectionBehavior.remove(.fullScreenPrimary)
-			window.collectionBehavior.remove(.fullScreenAuxiliary)
-			window.collectionBehavior.insert(.fullScreenNone)
-
-			NSAnimationContext.runAnimationGroup { context in
-				context.duration = 0.25
-				window.animator().setFrame(newFrame, display: true)
-			}
-		}
-	#endif // os(macOS)
 }

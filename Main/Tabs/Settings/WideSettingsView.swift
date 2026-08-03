@@ -11,6 +11,9 @@ struct WideSettingsView: View {
 	@State private var saveGeneration = 0
 	@Default(.lastServerSync) private var lastServerSync
 	@Default(.hapticsEnabled) private var hapticsEnabled
+	@Default(.ownerTimetableShareAlias) private var ownerTimetableShareAlias
+	@State private var showsShareAliasEditor = false
+	@Namespace private var presentationNamespace
 
 	var body: some View {
 		Form {
@@ -27,6 +30,20 @@ struct WideSettingsView: View {
 				routeButton("Restore Navigation", systemImage: "arrow.counterclockwise.circle", route: .settings(.navigationPersistence))
 			}
 
+			Section("Timetable Management") {
+				routeButton("Created Timetables", systemImage: "person.2.crop.square.stack", route: .settings(.createdTimetables))
+				routeButton("Received Timetables", systemImage: "square.and.arrow.down", route: .settings(.receivedTimetables))
+				if let ownerShareURL {
+					ShareLink(item: ownerShareURL) {
+						Label("Share My Timetable", systemImage: "square.and.arrow.up")
+					}
+				}
+				Button("Customize Share Link", systemImage: "link.badge.plus") {
+					showsShareAliasEditor = true
+				}
+				.matchedTransitionSource(id: "share-alias", in: presentationNamespace)
+			}
+
 			Section("Support") {
 				routeButton("Report Feedback or Bug", systemImage: "exclamationmark.bubble", route: .settings(.feedback))
 				routeButton("About Timetable", systemImage: "info.circle", route: .settings(.about))
@@ -40,6 +57,19 @@ struct WideSettingsView: View {
 		.formStyle(.grouped)
 		.scrollContentBackground(.hidden)
 		.appNavigationTitle("Settings", style: .main, accent: true)
+		.popover(isPresented: $showsShareAliasEditor) {
+			TimetableShareAliasSheet(close: { showsShareAliasEditor = false })
+				.frame(iOS: .init(), macOS: .init(width: 620, height: 660))
+				.navigationTransition(.zoom(sourceID: "share-alias", in: presentationNamespace))
+				.presentationCompactAdaptation(.sheet)
+		}
+	}
+
+	private var ownerShareURL: URL? {
+		guard let ownerID = UUID(uuidString: Defaults[.ownerTimetableID]) else {
+			return nil
+		}
+		return TimetableShareURL.ownerURL(id: ownerID, alias: ownerTimetableShareAlias)
 	}
 
 	private var highlightsCurrentDay: Binding<Bool> {

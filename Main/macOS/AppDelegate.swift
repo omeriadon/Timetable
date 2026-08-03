@@ -11,13 +11,7 @@ import UserNotifications
 @MainActor
 class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
 	func applicationDidFinishLaunching(_: Notification) {
-		guard let window = NSApplication.shared.windows.first else { return }
 		StatusBadgeOverlayWindowController.shared.start()
-
-		window.isOpaque = false
-		window.backgroundColor = .clear
-
-		window.titlebarAppearsTransparent = true
 		UNUserNotificationCenter.current().delegate = self
 		Task {
 			await NotificationRegistrationService.shared.uploadPendingToken()

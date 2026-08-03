@@ -1405,6 +1405,8 @@ Expected commits:
 
 ### Phase 13 — Timetable management and sharing parity
 
+Status: implemented in source; awaiting main-platform management, import/export, alias, and ShareLink review.
+
 Work:
 
 - created timetable management;
@@ -1422,6 +1424,8 @@ Expected commits:
 
 ### Phase 14 — Administration parity
 
+Status: implemented in source; awaiting administrator and system-owner inspector review.
+
 Work:
 
 - promote every administration feature;
@@ -1437,6 +1441,8 @@ Expected commits:
 - `split administration views`
 
 ### Phase 15 — macOS window and command completion
+
+Status: implemented in source; awaiting macOS window, toolbar, and command review.
 
 Work:
 
@@ -1454,6 +1460,8 @@ Expected commits:
 
 ### Phase 16 — Watch read-only cleanup
 
+Status: implemented in source; awaiting Watch build and read-only runtime review.
+
 Work:
 
 - adopt shared backend reads;
@@ -1468,6 +1476,8 @@ Expected commits:
 - `make watch settings read only`
 
 ### Phase 17 — Filesystem and resource organization
+
+Status: implemented in source. Target-owned asset catalogs now live under `Special/Assets` with explicit per-target exclusions; awaiting every resource build gate.
 
 Work:
 
@@ -1488,6 +1498,8 @@ Expected commits grouped only by safe move scope:
 
 ### Phase 18 — Remove obsolete architecture
 
+Status: implemented for confirmed-dead source; awaiting final reference and target-membership audit after builds.
+
 Delete only after full parity:
 
 - `NonAuthoritativeRootView`;
@@ -1505,6 +1517,8 @@ Expected commit:
 `remove obsolete platform architecture`
 
 ### Phase 19 — Release gate
+
+Status: blocked on the required user builds, runtime matrix, backup, migration approval, and deployment actions below.
 
 No Codex build or deployment.
 

@@ -6,13 +6,17 @@ import Defaults
 import SwiftUI
 
 struct TimetableShareAliasSheet: View {
-	let close: () -> Void = {}
+	let close: () -> Void
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	@FocusState private var isFocused: Bool
 	@State private var service = TimetableShareAliasService.shared
 	@State private var rawInput = ""
 	@State private var editRevision = 0
 	@State private var colors = [Color.clear, .clear, .mint, .clear, .clear, .clear, .mint]
+
+	init(close: @escaping () -> Void = {}) {
+		self.close = close
+	}
 
 	var body: some View {
 		NavigationStack {

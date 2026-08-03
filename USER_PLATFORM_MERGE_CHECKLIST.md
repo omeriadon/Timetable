@@ -46,6 +46,29 @@ Codex must not mark an item complete unless the user explicitly reports that it 
 - [ ] Confirm profile name, monogram, font, emoji, colour, and photo behavior on Mac.
 - [ ] Report every compiler error verbatim before Phase 13 begins.
 
+## Phase 13–19 release gate
+
+- [ ] Build `Timetable` for iPhone, iPad, and My Mac after timetable management promotion.
+- [ ] Verify created timetable create, edit, delete, and subject editing on all main platforms.
+- [ ] Verify received timetable deletion, file import, file export, and native link sharing on all main platforms.
+- [ ] Verify custom share-link creation, replacement, removal, and deep-link import.
+- [ ] Verify every Administration destination opens as a push on iPhone and an inspector on iPad/macOS.
+- [ ] Verify all administrator editors, confirmations, refreshes, and system-owner-only destinations.
+- [ ] Verify macOS windows are freely resizable with an 800×600 minimum and no translucent custom background.
+- [ ] Verify Command-1 through Command-4 select Timetable, Friends, Settings, and Administration.
+- [ ] Verify multiple macOS windows maintain independent router state.
+- [ ] Build `Watch` and confirm Settings contains no highlighting or mutation controls.
+- [ ] Verify Watch server refresh, sign-out, iPhone provisioning, timetable reads, settings reads, and friend reads.
+- [ ] Confirm no removed discovery UI or legacy tab controller remains reachable.
+- [ ] Verify each target resolves only its own catalog from `Special/Assets` and reports no duplicate asset names.
+- [ ] Build `Widget`, `Watch Widget`, `Messages`, and App Intents metadata after final target-membership changes.
+- [ ] Create and verify a recoverable PostgreSQL backup.
+- [ ] Review and run `InvalidateLegacyPlatformSessions` only during the selected release window.
+- [ ] Build and validate pmstt without deploying.
+- [ ] Deploy pmstt only after accepting forced sign-out for every client.
+- [ ] Verify forced sign-in on iPhone, iPad, Mac, and Watch reprovisioning.
+- [ ] Complete the final data-loss audit before distributing the client release.
+
 ## Phase 1–4 gate history
 
 - [ ] Build the `Timetable` scheme for an iPhone destination.

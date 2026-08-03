@@ -173,20 +173,12 @@
 				Navigation/WideAppShell.swift = (ios, macos, );
 				Navigation/WideRootDestinationView.swift = (ios, macos, );
 				Navigation/WideRouteDestinationView.swift = (ios, macos, );
-				Tabs/Search/TimetableDetailView.swift = (ios, );
-				Tabs/Search/TimetableIdentityView.swift = (ios, );
-				Tabs/Search/TimetablePortalIdentityView.swift = (ios, );
-				Tabs/Search/TimetableSearchView.swift = (ios, );
-				Tabs/Settings/CreatedTimetablesSettingsView.swift = (ios, );
 				Tabs/Settings/NavigationPersistenceSettingsView.swift = (ios, macos, );
 				Tabs/Settings/WideSettingsView.swift = (ios, macos, );
-				Tabs/Settings/ReceivedTimetablesView.swift = (ios, );
-				Tabs/Share/ShareSelectionSheet.swift = (ios, );
-				Tabs/Share/TimetableShareAliasSheet.swift = (ios, );
+				Tabs/Timetable/TimetableSubjectInspectorView.swift = (ios, macos, );
 				"Tabs/UI Effects/BlurView.swift" = (ios, );
 				"Tabs/UI Effects/VariableBlur.swift" = (ios, );
 				"Tabs/UI Effects/scrollEdgeEffect.swift" = (ios, );
-				Tabs/Timetable/TimetableSubjectInspectorView.swift = (ios, macos, );
 				Views/Account/MainPlatformAuthenticationView.swift = (ios, macos, );
 				Views/Onboarding/OnboardingPage.swift = (ios, );
 				Views/Onboarding/OnboardingPageContext.swift = (ios, );
@@ -197,10 +189,8 @@
 				Views/Onboarding/Views/SplashView.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/OnboardingAccount.swift = (ios, );
 				Views/Onboarding/Views/Tutorial/OnboardingCompletion.swift = (ios, );
-				"Views/Subject Editor/main sheet.swift" = (ios, );
 				iOS/LaunchIllusionView.swift = (ios, );
 				macOS/AppDelegate.swift = (macos, );
-				macOS/CustomMaterialView.swift = (macos, );
 				macOS/StatusBadgeOverlayWindow.swift = (macos, );
 			};
 			target = 2A02378A2F9C8EA000AB1E1F /* Timetable */;
@@ -234,6 +224,9 @@
 		2AD85A872FE8F23A004EAB2B /* Exceptions for "Special" folder in "Timetable" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				"Assets/Watch Widget.xcassets",
+				Assets/Watch.xcassets,
+				Assets/Widget.xcassets,
 				Info/Message.plist,
 				"Info/Watch Widget.plist",
 				Info/Widget.plist,
@@ -247,6 +240,9 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"/Localized: LaunchScreen.storyboard",
+				Assets/Main.xcassets,
+				Assets/Watch.xcassets,
+				Assets/Widget.xcassets,
 				Info/Message.plist,
 				"Info/Watch Widget.plist",
 				Info/Widget.plist,
@@ -257,6 +253,9 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"/Localized: LaunchScreen.storyboard",
+				Assets/Main.xcassets,
+				"Assets/Watch Widget.xcassets",
+				Assets/Watch.xcassets,
 				Info/Message.plist,
 				"Info/Watch Widget.plist",
 				Info/Widget.plist,
@@ -268,6 +267,9 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"/Localized: LaunchScreen.storyboard",
+				Assets/Main.xcassets,
+				"Assets/Watch Widget.xcassets",
+				Assets/Widget.xcassets,
 				Info/Message.plist,
 				"Info/Watch Widget.plist",
 				Info/Widget.plist,

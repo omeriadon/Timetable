@@ -5,80 +5,29 @@ struct AdministrationView: View {
 	@State private var isAdmin = false
 	@State private var authority: AccountAuthority = .user
 	@Environment(\.statusBadgeManager) private var badges
+	@Environment(\.appPresentation) private var presentation
+	@Environment(AppRouter.self) private var router
 
 	var body: some View {
 		Group {
 			if isAdmin {
 				List {
 					Section {
-						NavigationLink {
-							AdministrationSchoolEventsView()
-						} label: {
-							Label("School Events", systemImage: "calendar")
-						}
-
-						NavigationLink {
-							AdministrationEventTagsView()
-						} label: {
-							Label("Event Tags", systemImage: "tag")
-						}
-
-						NavigationLink {
-							AdministrationCalendarEntriesView(kind: "term")
-						} label: {
-							Label("Term Dates", systemImage: "calendar")
-						}
-
-						NavigationLink {
-							AdministrationCalendarEntriesView(kind: "noSchool")
-						} label: {
-							Label("Pupil Free Days", systemImage: "calendar.badge.exclamationmark")
-						}
-
-						NavigationLink {
-							AdministrationUsersView()
-						} label: {
-							Label("Users", systemImage: "person.2")
-						}
-
-						NavigationLink {
-							AdministrationBroadcastNotificationView()
-						} label: {
-							Label("Broadcast Notification", systemImage: "megaphone")
-						}
-
-						NavigationLink {
-							AdministrationBroadcastHistoryView()
-						} label: {
-							Label("Broadcast History", systemImage: "clock.arrow.circlepath")
-						}
+						administrationLink("School Events", systemImage: "calendar", route: .administration(.schoolEvents)) { AdministrationSchoolEventsView() }
+						administrationLink("Event Tags", systemImage: "tag", route: .administration(.eventTags)) { AdministrationEventTagsView() }
+						administrationLink("Term Dates", systemImage: "calendar", route: .administration(.calendarEntries(kind: "term"))) { AdministrationCalendarEntriesView(kind: "term") }
+						administrationLink("Pupil Free Days", systemImage: "calendar.badge.exclamationmark", route: .administration(.calendarEntries(kind: "noSchool"))) { AdministrationCalendarEntriesView(kind: "noSchool") }
+						administrationLink("Users", systemImage: "person.2", route: .administration(.users)) { AdministrationUsersView() }
+						administrationLink("Broadcast Notification", systemImage: "megaphone", route: .administration(.broadcastNotification)) { AdministrationBroadcastNotificationView() }
+						administrationLink("Broadcast History", systemImage: "clock.arrow.circlepath", route: .administration(.broadcastHistory)) { AdministrationBroadcastHistoryView() }
 					}
 
 					if authority == .systemOwner {
 						Section("System Administration") {
-							NavigationLink {
-								AdministrationAdministratorsView()
-							} label: {
-								Label("Administrators", systemImage: "person.badge.shield.checkmark")
-							}
-
-							NavigationLink {
-								AdministrationDevelopmentAccessView()
-							} label: {
-								Label("Debug Testing", systemImage: "testtube.2")
-							}
-
-							NavigationLink {
-								AdministrationProfileStorageView()
-							} label: {
-								Label("Profile Storage", systemImage: "externaldrive.fill")
-							}
-
-							NavigationLink {
-								AdministrationSpecialBadgesView()
-							} label: {
-								Label("Badges", systemImage: "rosette")
-							}
+							administrationLink("Administrators", systemImage: "person.badge.shield.checkmark", route: .administration(.administrators)) { AdministrationAdministratorsView() }
+							administrationLink("Debug Testing", systemImage: "testtube.2", route: .administration(.serverAccess)) { AdministrationDevelopmentAccessView() }
+							administrationLink("Profile Storage", systemImage: "externaldrive.fill", route: .administration(.profileStorage)) { AdministrationProfileStorageView() }
+							administrationLink("Badges", systemImage: "rosette", route: .administration(.specialBadges)) { AdministrationSpecialBadgesView() }
 						}
 					}
 				}
@@ -102,6 +51,28 @@ struct AdministrationView: View {
 		.onReceive(NotificationCenter.default.publisher(for: .administrationDashboardRefreshRequested)) { _ in
 			Task {
 				await load()
+			}
+		}
+	}
+
+	@ViewBuilder
+	private func administrationLink(
+		_ title: String,
+		systemImage: String,
+		route: AppRoute,
+		@ViewBuilder destination: () -> some View
+	) -> some View {
+		if presentation == .iOS {
+			NavigationLink {
+				destination()
+			} label: {
+				Label(title, systemImage: systemImage)
+			}
+		} else {
+			Button {
+				router.navigate(to: route)
+			} label: {
+				Label(title, systemImage: systemImage)
 			}
 		}
 	}

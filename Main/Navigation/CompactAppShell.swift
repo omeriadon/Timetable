@@ -73,6 +73,12 @@
 			.onReceive(NotificationCenter.default.publisher(for: .openSettingsTab)) { _ in
 				router.selectRoot(.settings)
 			}
+			.onReceive(NotificationCenter.default.publisher(for: .selectAppRoot)) { notification in
+				guard let destination = notification.object as? AppRootDestination else {
+					return
+				}
+				router.selectRoot(destination)
+			}
 			.onReceive(NotificationCenter.default.publisher(for: .administrationAuthorityInvalidated)) { _ in
 				if router.selectedTab == .administration {
 					router.selectRoot(.timetable)

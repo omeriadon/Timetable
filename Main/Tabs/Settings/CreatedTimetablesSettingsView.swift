@@ -29,7 +29,9 @@ struct CreatedTimetablesSettingsView: View {
 					}
 				}
 			}
+			#if os(iOS)
 			.navigationBarTitleDisplayMode(.large)
+			#endif
 			.toolbar {
 				ToolbarItem(placement: .largeTitle) {
 					Text("Created Timetables")
@@ -50,7 +52,7 @@ struct CreatedTimetablesSettingsView: View {
 				.matchedTransitionSource(id: "1", in: ns)
 			}
 			.sheet(isPresented: $showCreate) {
-				CreatedTimetableCreateView()
+				CreatedTimetableCreateView(close: { showCreate = false })
 					.presentationDetents([.medium])
 					.navigationTransition(
 						.zoom(sourceID: "1", in: ns)
@@ -86,8 +88,12 @@ private struct CreatedTimetableCreateView: View {
 	@State private var subjects: [Subject] = []
 	@State private var showSubjectEditor = false
 	@State private var isSaving = false
-	let close: () -> Void = {}
+	let close: () -> Void
 	@Environment(\.statusBadgeManager) private var badges
+
+	init(close: @escaping () -> Void) {
+		self.close = close
+	}
 
 	var body: some View {
 		NavigationStack {
@@ -95,7 +101,9 @@ private struct CreatedTimetableCreateView: View {
 				TextField("Title", text: $title)
 				Button("Edit Subjects", systemImage: "pencil") { showSubjectEditor = true }
 			}
+			#if os(iOS)
 			.navigationBarTitleDisplayMode(.large)
+			#endif
 			.toolbar {
 				ToolbarItem(placement: .largeTitle) {
 					Text("New Created Timetable")

@@ -60,24 +60,26 @@ struct SubjectEditorSheet: View {
 				}
 			}
 			#if os(iOS)
-			.navigationBarTitleDisplayMode(.inline)
+				#if os(iOS)
+					.navigationBarTitleDisplayMode(.inline)
+				#endif
 			#endif
-			.toolbar {
-				ToolbarItem(placement: .cancellationAction) {
-					Button("Cancel", systemImage: "xmark") {
-						close()
+				.toolbar {
+					ToolbarItem(placement: .cancellationAction) {
+						Button("Cancel", systemImage: "xmark") {
+							close()
+						}
+						.keyboardShortcut(.cancelAction)
+						.disabled(isSaving)
 					}
-					.keyboardShortcut(.cancelAction)
-					.disabled(isSaving)
-				}
 
-				ToolbarItem(placement: .confirmationAction) {
-					Button("Done", systemImage: "checkmark") {
-						validateAndSave()
+					ToolbarItem(placement: .confirmationAction) {
+						Button("Done", systemImage: "checkmark") {
+							validateAndSave()
+						}
+						.disabled(isSaving)
 					}
-					.disabled(isSaving)
 				}
-			}
 		}
 		.alert(
 			"Rename Subject",
