@@ -70,139 +70,152 @@ struct TimetableApp: App {
 
 	var body: some Scene {
 		WindowGroup {
-			Group {
-				#if os(macOS)
-					switch sessionStore.state {
-						case .signedOut:
-						MacSignInGateView()
-						case .restoring:
-						ProgressView("Restoring Account…")
-						case .authenticated:
-						NonAuthoritativeRootView(expanded: $expanded)
-					}
-				#else
-					ZStack {
+			AppRouterHost { router in
+				Group {
+					#if os(macOS)
 						switch sessionStore.state {
 							case .signedOut:
-								ZStack {
-									if Platform.current == .iPadOS || hasCompletedOnboarding {
-										IOSSignInGateView()
+							MacSignInGateView()
+							case .restoring:
+							ProgressView("Restoring Account…")
+							case .authenticated:
+							NonAuthoritativeRootView(expanded: $expanded)
+						}
+					#else
+						ZStack {
+							switch sessionStore.state {
+								case .signedOut:
+									ZStack {
+										if Platform.current == .iPadOS || hasCompletedOnboarding {
+											IOSSignInGateView()
+												.transition(.blurReplace)
+										} else {
+											Color.clear
+												.transition(.blurReplace)
+										}
+									}
+									.animation(.easeInOut, value: hasCompletedOnboarding)
+
+								case .restoring:
+									ProgressView("Restoring Account…")
+										.transition(.blurReplace)
+
+								case .authenticated:
+									if Platform.current == .iPadOS {
+										NonAuthoritativeRootView(expanded: $expanded)
 											.transition(.blurReplace)
 									} else {
-										Color.clear
+										ContentView(expanded: $expanded)
 											.transition(.blurReplace)
 									}
-								}
-								.animation(.easeInOut, value: hasCompletedOnboarding)
-
-							case .restoring:
-								ProgressView("Restoring Account…")
-									.transition(.blurReplace)
-
-							case .authenticated:
-								if Platform.current == .iPadOS {
-									NonAuthoritativeRootView(expanded: $expanded)
-										.transition(.blurReplace)
-								} else {
-									ContentView(expanded: $expanded)
-										.transition(.blurReplace)
-								}
+							}
 						}
-					}
-					.animation(.easeInOut, value: sessionStore.state)
-				#endif
-			}
-			.appPresentationEnvironment()
-			.onOpenURL { url in
-				handleIncomingURL(url)
-			}
-			.onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { activity in
-				guard let url = activity.webpageURL else { return }
-				handleIncomingURL(url)
-			}
-			#if os(iOS)
-			.windowOverlay(isPresented: true, disableSafeArea: false) {
-				StatusBadgeOverlay()
-					.zIndex(9_999_999)
-			}
-			#endif // os(iOS)
-			.task {
-				NetworkManager.shared.configureFeedback { StatusBadgeManager.shared.present(networkError: $0) }
-				sessionStore.configureAccountBootstrap {
-					try await AccountBootstrapService.shared.bootstrap()
+						.animation(.easeInOut, value: sessionStore.state)
+					#endif
 				}
-				sessionStore.configureDeviceLifecycle {
-					await NotificationRegistrationService.shared.uploadPendingToken()
+				.onOpenURL { url in
+					handleIncomingURL(url, router: router)
+				}
+				.onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { activity in
+					guard let url = activity.webpageURL else { return }
+					handleIncomingURL(url, router: router)
+				}
+				#if os(iOS)
+				.windowOverlay(isPresented: true, disableSafeArea: false) {
+					StatusBadgeOverlay()
+						.zIndex(9_999_999)
+				}
+				#endif // os(iOS)
+				.task {
+					NetworkManager.shared.configureFeedback { StatusBadgeManager.shared.present(networkError: $0) }
+					sessionStore.configureAccountBootstrap {
+						try await AccountBootstrapService.shared.bootstrap()
+					}
+					sessionStore.configureDeviceLifecycle {
+						await NotificationRegistrationService.shared.uploadPendingToken()
+						#if os(iOS)
+							if Platform.current == .iOS {
+								await LiveActivityRegistrationService.shared.startObserving()
+							}
+							PhoneWatchSyncBridge.shared.sendAuthenticatedStateIfPossible()
+						#endif // os(iOS)
+					} signingOut: {
+						#if os(iOS)
+							PhoneWatchSyncBridge.shared.sendSignedOutStateIfPossible()
+							await LiveActivityRegistrationService.shared.removeLiveActivityToken()
+						#endif
+						await NotificationRegistrationService.shared.removeServerRegistration()
+					}
+					_ = ClientIdentityProvider.shared.identity()
+					await indexEntities()
+					await sessionStore.restore()
+					await openSharedTimetableIfPossible(router: router)
+					await MessageImportReconciliationService.reconcile()
+
+					await NotificationRegistrationService.shared.requestRemoteRegistration()
+
 					#if os(iOS)
 						if Platform.current == .iOS {
 							await LiveActivityRegistrationService.shared.startObserving()
 						}
-						PhoneWatchSyncBridge.shared.sendAuthenticatedStateIfPossible()
-					#endif // os(iOS)
-				} signingOut: {
-					#if os(iOS)
-						PhoneWatchSyncBridge.shared.sendSignedOutStateIfPossible()
-						await LiveActivityRegistrationService.shared.removeLiveActivityToken()
+
+						try? await ShaderLibrary.compileStickerShaders()
 					#endif
-					await NotificationRegistrationService.shared.removeServerRegistration()
 				}
-				_ = ClientIdentityProvider.shared.identity()
-				await indexEntities()
-				await sessionStore.restore()
-				await openSharedTimetableIfPossible()
-				await MessageImportReconciliationService.reconcile()
-
-				await NotificationRegistrationService.shared.requestRemoteRegistration()
-
 				#if os(iOS)
-					if Platform.current == .iOS {
-						await LiveActivityRegistrationService.shared.startObserving()
+				.fullScreenCover(isPresented: .constant(
+					Platform.current == .iOS
+						&& !hasCompletedOnboarding
+				)) {
+					OnboardingView()
+						.interactiveDismissDisabled()
+				}
+				#endif // os(iOS)
+				.onChange(of: scenePhase) { _, phase in
+					guard phase == .active else { return }
+					Task {
+						await openSharedTimetableIfPossible(router: router)
+						await MessageImportReconciliationService.reconcile()
 					}
-
-					try? await ShaderLibrary.compileStickerShaders()
-				#endif
-			}
-			#if os(iOS)
-			.fullScreenCover(isPresented: .constant(
-				Platform.current == .iOS
-					&& !hasCompletedOnboarding
-			)) {
-				OnboardingView()
-					.interactiveDismissDisabled()
-			}
-			#endif // os(iOS)
-			.onChange(of: scenePhase) { _, phase in
-				guard phase == .active else { return }
-				Task {
-					await openSharedTimetableIfPossible()
-					await MessageImportReconciliationService.reconcile()
 				}
-			}
-			.monospaced()
-			.environment(\.statusBadgeManager, statusBadgeManager)
-			.buttonStyle(.haptic)
-			#if os(macOS)
-				.onChange(of: expanded) { _, newValue in
-					resizeWindow(expanded: newValue)
+				.onChange(of: sessionStore.state) { _, state in
+					guard state == .authenticated else { return }
+					if let route = router.resumePendingExternalRoute() {
+						NotificationCenter.default.post(
+							name: .openTimetableDestination,
+							object: route
+						)
+					}
+					Task {
+						await openSharedTimetableIfPossible(router: router)
+					}
 				}
-				.frame(width: 700)
-				.frame(minHeight: 475, idealHeight: 475, maxHeight: 750)
-				.background {
-					CustomMaterialView()
-						.ignoresSafeArea()
-				}
-			#else
-				.overlay {
-						if launchIllusionVisible {
-							LaunchIllusionView {
-								launchIllusionVisible = false
-							}
+				.monospaced()
+				.environment(\.statusBadgeManager, statusBadgeManager)
+				.buttonStyle(.haptic)
+				#if os(macOS)
+					.onChange(of: expanded) { _, newValue in
+						resizeWindow(expanded: newValue)
+					}
+					.frame(width: 700)
+					.frame(minHeight: 475, idealHeight: 475, maxHeight: 750)
+					.background {
+						CustomMaterialView()
 							.ignoresSafeArea()
-							.allowsHitTesting(false)
-						}
 					}
-			#endif
-					.preferredColorScheme(.dark)
+				#else
+					.overlay {
+							if launchIllusionVisible {
+								LaunchIllusionView {
+									launchIllusionVisible = false
+								}
+								.ignoresSafeArea()
+								.allowsHitTesting(false)
+							}
+						}
+				#endif
+						.preferredColorScheme(.dark)
+			}
 		}
 		.windowResizability(.contentSize)
 
@@ -217,10 +230,10 @@ struct TimetableApp: App {
 	}
 
 	@MainActor
-	private func handleIncomingURL(_ url: URL) {
+	private func handleIncomingURL(_ url: URL, router: AppRouter) {
 		if url.scheme == "https", url.host == TimetableShareURL.host {
 			if let locator = TimetableShareURL.locator(from: url) {
-				queueSharedTimetable(locator)
+				queueSharedTimetable(locator, router: router)
 			} else {
 				StatusBadgeManager.shared.addBadge(
 					id: UUID(),
@@ -233,16 +246,22 @@ struct TimetableApp: App {
 			return
 		}
 		if let locator = TimetableShareURL.locator(fromFallbackURL: url) {
-			queueSharedTimetable(locator)
+			queueSharedTimetable(locator, router: router)
 			return
 		}
 		guard let route = AppRoute(url: url) else { return }
+		if sessionStore.isAuthenticated {
+			router.navigate(to: route)
+		} else {
+			router.deferExternalRoute(route)
+		}
 		NotificationCenter.default.post(name: .openTimetableDestination, object: route)
 	}
 
 	@MainActor
-	private func queueSharedTimetable(_ locator: String) {
+	private func queueSharedTimetable(_ locator: String, router: AppRouter) {
 		if isOwnerShareLink(locator) {
+			router.navigate(to: .timetable(.root))
 			NotificationCenter.default.post(
 				name: .openTimetableDestination,
 				object: AppRoute.timetable(.root)
@@ -264,12 +283,12 @@ struct TimetableApp: App {
 		}
 
 		Task {
-			await openSharedTimetableIfPossible()
+			await openSharedTimetableIfPossible(router: router)
 		}
 	}
 
 	@MainActor
-	private func openSharedTimetableIfPossible() async {
+	private func openSharedTimetableIfPossible(router: AppRouter? = nil) async {
 		guard SessionStore.shared.isAuthenticated,
 		      let locator = pendingSharedTimetableLocator
 		else { return }
@@ -280,9 +299,11 @@ struct TimetableApp: App {
 			locators.removeAll { $0 == locator }
 			Defaults[.pendingMessageTimetableLocators] = locators
 			pendingSharedTimetableLocator = nil
+			let route = AppRoute.timetable(.received(id: timetable.id))
+			router?.navigate(to: route)
 			NotificationCenter.default.post(
 				name: .openTimetableDestination,
-				object: AppRoute.timetable(.received(id: timetable.id))
+				object: route
 			)
 			StatusBadgeManager.shared.addBadge(
 				id: UUID(),

@@ -28,25 +28,26 @@ import SwiftUI
 	struct ContentView: View {
 		@State private var networkManager = NetworkManager.shared
 		@Environment(\.statusBadgeManager) private var statusBadgeManager
+		@Environment(AppRouter.self) private var router
 
 		@State private var watchSync = PhoneWatchSyncBridge.shared
 		@State private var rootSyncStatus = SyncMode.normal
 
 		@Binding var expanded: WindowMode
-		@State private var selectedTab: MainTab = .timetable
-
 		var body: some View {
+			@Bindable var router = router
+
 			ProminentActionTabView(
-				selectedTab: $selectedTab,
+				selectedTab: $router.selectedTab,
 				watchSync: $watchSync,
 				rootSyncStatus: $rootSyncStatus
 			)
 			.ignoresSafeArea()
 			.onReceive(NotificationCenter.default.publisher(for: .openTimetableTab)) { _ in
-				selectedTab = .timetable
+				router.selectRoot(.timetable)
 			}
 			.onReceive(NotificationCenter.default.publisher(for: .openSettingsTab)) { _ in
-				selectedTab = .settings
+				router.selectRoot(.settings)
 			}
 			.onReceive(NotificationCenter.default.publisher(for: .administrationAuthorityInvalidated)) { _ in
 				Task {
@@ -218,5 +219,6 @@ extension Notification.Name {
 
 	#Preview {
 		ContentView(expanded: .constant(.none))
+			.environment(AppRouter())
 	}
 #endif // os(iOS)

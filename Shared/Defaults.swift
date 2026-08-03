@@ -18,6 +18,7 @@ enum SharedDefaultsStore {
 	static func removeAll() {
 		let defaults = UserDefaults(suiteName: suiteName)
 		let hasCompletedOnboarding = defaults?.bool(forKey: "hasCompletedOnboarding_v\(onboardingVersion)") ?? false
+		let persistsNavigationState = defaults?.bool(forKey: "persistsNavigationState") ?? false
 		let installationKeys = ["installationID", "installationID.iOS", "installationID.iPadOS", "installationID.macOS", "installationID.watchOS"]
 		let installationValues = installationKeys.reduce(into: [String: String]()) { values, key in
 			if let value = defaults?.string(forKey: key), !value.isEmpty {
@@ -28,6 +29,7 @@ enum SharedDefaultsStore {
 		if hasCompletedOnboarding {
 			defaults?.set(true, forKey: "hasCompletedOnboarding_v\(onboardingVersion)")
 		}
+		defaults?.set(persistsNavigationState, forKey: "persistsNavigationState")
 		for (key, value) in installationValues {
 			defaults?.set(value, forKey: key)
 		}
@@ -86,6 +88,7 @@ extension Defaults.Keys {
 	static let ownerTimetableID = Key<String>("ownerTimetableID", default: "", suite: sharedDefaults)
 	static let ownerTimetableShareAlias = Key<String>("ownerTimetableShareAlias", default: "", suite: sharedDefaults)
 	static let hapticsEnabled = Key<Bool>("hapticsEnabled", default: true, suite: sharedDefaults)
+	static let persistsNavigationState = Key<Bool>("persistsNavigationState", default: false, suite: sharedDefaults)
 
 	#if DEBUG
 		nonisolated static let debugOffset = Key<TimeInterval>("debugOffset", default: 87896, suite: sharedDefaults)
