@@ -16,8 +16,16 @@
 					EmptyView()
 				case .friends(.root):
 					FriendsView()
+				case .friends(.addFriend):
+					AddFriendSheet(
+						close: router.popCurrentRoute,
+						embedsInNavigation: false
+					)
 				case .friends(.requests):
-					FriendRequestsSheet(close: router.popCurrentRoute)
+					FriendRequestsSheet(
+						close: router.popCurrentRoute,
+						embedsInNavigation: false
+					)
 				case let .friends(.friend(id)):
 					if let friend = friends.first(where: { $0.id == id }) {
 						FriendDetailView(
@@ -45,7 +53,15 @@
 				case .settings(.receivedTimetables):
 					ReceivedTimetablesView()
 				case .settings(.feedback):
-					FeedbackView(close: router.popCurrentRoute)
+					FeedbackView(
+						close: router.popCurrentRoute,
+						embedsInNavigation: false
+					)
+				case .settings(.shareAlias):
+					TimetableShareAliasSheet(
+						close: router.popCurrentRoute,
+						embedsInNavigation: false
+					)
 				case .settings(.about):
 					AboutView()
 				case .settings(.profileAppearance):

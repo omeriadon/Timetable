@@ -23,7 +23,7 @@ struct WideAppShell: View {
 			.appNavigationTitle("Timetable")
 			.listStyle(.sidebar)
 			.scrollEdgeEffectStyle(.soft, for: .all)
-			.navigationSplitViewColumnWidth(min: 180, ideal: 200, max: 210)
+			.navigationSplitViewColumnWidth(min: 220, ideal: 260, max: 320)
 		} detail: {
 			NavigationStack(path: $router.sidebarPath) {
 				WideRootDestinationView(
@@ -39,7 +39,7 @@ struct WideAppShell: View {
 		.inspector(isPresented: inspectorPresented) {
 			if let route = router.inspectorRoute {
 				NavigationStack(path: $inspectorPath) {
-					WideRouteDestinationView(route: route)
+					WideRouteDestinationView(route: route, showsCloseButton: true)
 				}
 				.environment(\.closeWideNavigationDestination, closeInspectorDestination)
 				.inspectorColumnWidth(min: 400, ideal: 500, max: 700)

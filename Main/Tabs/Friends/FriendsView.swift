@@ -44,7 +44,11 @@ struct FriendsView: View {
 			}
 			ToolbarItem(placement: .primaryAction) {
 				Button("Add friend", systemImage: "person.badge.plus") {
-					sheet = .addFriend
+					if presentation == .iOS {
+						sheet = .addFriend
+					} else {
+						router.navigate(to: .friends(.addFriend))
+					}
 				}
 				.labelStyle(.iconOnly)
 			}

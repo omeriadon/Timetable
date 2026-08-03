@@ -23,6 +23,7 @@ enum TimetableRoute: Codable, Hashable, Sendable {
 
 enum FriendsRoute: Codable, Hashable, Sendable {
 	case root
+	case addFriend
 	case requests
 	case friend(id: UUID)
 }
@@ -36,6 +37,7 @@ enum SettingsRoute: Codable, Hashable, Sendable {
 	case createdTimetable(id: UUID)
 	case receivedTimetables
 	case feedback
+	case shareAlias
 	case about
 	case profileAppearance
 	case navigationPersistence

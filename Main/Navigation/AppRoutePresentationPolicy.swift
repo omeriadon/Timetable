@@ -4,7 +4,7 @@ enum AppRoutePresentationPolicy {
 
 	init(route: AppRoute) {
 		switch route {
-			case .friends(.friend(id: _)):
+			case .friends(.addFriend), .friends(.requests), .friends(.friend(id: _)):
 				self = .inspector
 			case .settings(.root):
 				self = .detail

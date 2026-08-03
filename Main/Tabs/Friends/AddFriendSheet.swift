@@ -2,64 +2,86 @@ import SwiftUI
 
 struct AddFriendSheet: View {
 	let close: () -> Void
+	let embedsInNavigation: Bool
+	let showsCloseButton: Bool
 	@State private var query = ""
 	@State private var results: [FriendSearchResult] = []
 	@State private var service = FriendService.shared
 	@State private var isSearching = false
 	@State private var completedSearchQuery = ""
 
+	init(
+		close: @escaping () -> Void,
+		embedsInNavigation: Bool = true,
+		showsCloseButton: Bool = true
+	) {
+		self.close = close
+		self.embedsInNavigation = embedsInNavigation
+		self.showsCloseButton = showsCloseButton
+	}
+
 	private var cleanedQuery: String {
 		query.trimmingCharacters(in: .whitespacesAndNewlines)
 	}
 
 	var body: some View {
-		NavigationStack {
-			VStack(spacing: 0) {
-				TextField("Search by name or email", text: $query)
-					.textFieldStyle(.roundedBorder)
-					.padding()
+		if embedsInNavigation {
+			NavigationStack {
+				content
+			}
+		} else {
+			content
+		}
+	}
 
-				ZStack {
-					if cleanedQuery.isEmpty {
-						ContentUnavailableView(
-							"Find a Friend",
-							systemImage: "person.2",
-							description: Text("Search by name or school email address.")
-						)
+	private var content: some View {
+		VStack(spacing: 0) {
+			TextField("Search by name or email", text: $query)
+				.textFieldStyle(.roundedBorder)
+				.padding()
+
+			ZStack {
+				if cleanedQuery.isEmpty {
+					ContentUnavailableView(
+						"Find a Friend",
+						systemImage: "person.2",
+						description: Text("Search by name or school email address.")
+					)
+					.transition(.blurReplace)
+				} else if results.isEmpty,
+				          isSearching || completedSearchQuery != cleanedQuery
+				{
+					Color.clear
 						.transition(.blurReplace)
-					} else if results.isEmpty,
-					          isSearching || completedSearchQuery != cleanedQuery
-					{
-						Color.clear
-							.transition(.blurReplace)
-					} else if results.isEmpty,
-					          !isSearching,
-					          completedSearchQuery == cleanedQuery
-					{
-						ContentUnavailableView.search(text: cleanedQuery)
-							.transition(.blurReplace)
-					} else {
-						List {
-							ForEach(results) { result in
-								FriendSearchRow(result: result)
-									.listRowInsets(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
-									.listRowBackground(Image("paper").resizable().scaledToFill())
-									.transition(.blurReplace)
-							}
+				} else if results.isEmpty,
+				          !isSearching,
+				          completedSearchQuery == cleanedQuery
+				{
+					ContentUnavailableView.search(text: cleanedQuery)
+						.transition(.blurReplace)
+				} else {
+					List {
+						ForEach(results) { result in
+							FriendSearchRow(result: result)
+								.listRowInsets(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
+								.listRowBackground(Image("paper").resizable().scaledToFill())
+								.transition(.blurReplace)
 						}
-						#if os(iOS)
-						.listStyle(.insetGrouped)
-						#endif
-						.animation(.snappy, value: results.map(\.id))
-						.scrollEdgeEffectStyle(.soft, for: .top)
-						.scrollEdgeEffectStyle(.soft, for: .bottom)
-						.transition(.blurReplace)
 					}
+					#if os(iOS)
+					.listStyle(.insetGrouped)
+					#endif
+					.animation(.snappy, value: results.map(\.id))
+					.scrollEdgeEffectStyle(.soft, for: .top)
+					.scrollEdgeEffectStyle(.soft, for: .bottom)
+					.transition(.blurReplace)
 				}
 			}
-			.animation(.easeOut(duration: 0.25), value: "\(cleanedQuery)\(results.isEmpty)\(isSearching)")
-			.appNavigationTitle("Add a Friend")
-			.toolbar {
+		}
+		.animation(.easeOut(duration: 0.25), value: "\(cleanedQuery)\(results.isEmpty)\(isSearching)")
+		.appNavigationTitle("Add a Friend")
+		.toolbar {
+			if showsCloseButton {
 				ToolbarItem(placement: .cancellationAction) {
 					Button("Close", systemImage: "xmark", role: .cancel) {
 						close()
@@ -67,10 +89,10 @@ struct AddFriendSheet: View {
 					.labelStyle(.iconOnly)
 				}
 			}
-			.task(id: query) {
-				completedSearchQuery = ""
-				await search(for: cleanedQuery)
-			}
+		}
+		.task(id: query) {
+			completedSearchQuery = ""
+			await search(for: cleanedQuery)
 		}
 	}
 

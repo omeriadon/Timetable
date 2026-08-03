@@ -3,8 +3,14 @@ import SwiftUI
 
 struct WideRouteDestinationView: View {
 	let route: AppRoute
+	let showsCloseButton: Bool
 	@Environment(AppRouter.self) private var router
 	@Default(.friends) private var friends
+
+	init(route: AppRoute, showsCloseButton: Bool = false) {
+		self.route = route
+		self.showsCloseButton = showsCloseButton
+	}
 
 	var body: some View {
 		Group {
@@ -15,8 +21,18 @@ struct WideRouteDestinationView: View {
 					TimetableSubjectInspectorView(timetableID: timetableID, subjectID: subjectID, slot: slot)
 				case .timetable(.planner), .timetable(.calendarEvent), .timetable(.received):
 					ContentUnavailableView("Timetable Detail", systemImage: "calendar")
+				case .friends(.addFriend):
+					AddFriendSheet(
+						close: close,
+						embedsInNavigation: false,
+						showsCloseButton: false
+					)
 				case .friends(.requests):
-					FriendRequestsSheet(close: close)
+					FriendRequestsSheet(
+						close: close,
+						embedsInNavigation: false,
+						showsCloseButton: false
+					)
 				case let .friends(.friend(id)):
 					if let friend = friends.first(where: { $0.id == id }) {
 						FriendDetailView(friend: friend, close: close)
@@ -32,7 +48,17 @@ struct WideRouteDestinationView: View {
 				case .settings(.tagSubscriptions):
 					TagSubscriptionsView()
 				case .settings(.feedback):
-					FeedbackView(close: close)
+					FeedbackView(
+						close: close,
+						embedsInNavigation: false,
+						showsCloseButton: false
+					)
+				case .settings(.shareAlias):
+					TimetableShareAliasSheet(
+						close: close,
+						embedsInNavigation: false,
+						showsCloseButton: false
+					)
 				case .settings(.about):
 					AboutView()
 				case .settings(.profileAppearance):
@@ -68,9 +94,11 @@ struct WideRouteDestinationView: View {
 			}
 		}
 		.toolbar {
-			ToolbarItem(placement: .cancellationAction) {
-				Button("Close", systemImage: "xmark", action: close)
-					.labelStyle(.iconOnly)
+			if showsCloseButton {
+				ToolbarItem(placement: .cancellationAction) {
+					Button("Close", systemImage: "xmark", action: close)
+						.labelStyle(.iconOnly)
+				}
 			}
 		}
 	}

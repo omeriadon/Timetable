@@ -3,6 +3,8 @@ import SwiftUI
 
 struct FriendRequestsSheet: View {
 	let close: () -> Void
+	let embedsInNavigation: Bool
+	let showsCloseButton: Bool
 	@State private var incomingRequests: [FriendSummary] = Defaults[.incomingFriendRequests]
 	@State private var outgoingRequests: [FriendSummary] = Defaults[.outgoingFriendRequests]
 	@State private var service = FriendService.shared
@@ -11,35 +13,55 @@ struct FriendRequestsSheet: View {
 	@State private var requestToDelete: FriendSummary?
 	@Environment(\.statusBadgeManager) private var badges
 
+	init(
+		close: @escaping () -> Void,
+		embedsInNavigation: Bool = true,
+		showsCloseButton: Bool = true
+	) {
+		self.close = close
+		self.embedsInNavigation = embedsInNavigation
+		self.showsCloseButton = showsCloseButton
+	}
+
 	var body: some View {
-		NavigationStack {
-			List {
-				if incomingRequests.isEmpty, outgoingRequests.isEmpty {
-					ContentUnavailableView("No Friend Requests", systemImage: "bell.slash")
-						.listRowBackground(Color.clear)
-				} else {
-					if !incomingRequests.isEmpty {
-						Section("Incoming") {
-							ForEach(incomingRequests) { request in
-								incomingRequestRow(request)
-							}
+		if embedsInNavigation {
+			NavigationStack {
+				content
+			}
+		} else {
+			content
+		}
+	}
+
+	private var content: some View {
+		List {
+			if incomingRequests.isEmpty, outgoingRequests.isEmpty {
+				ContentUnavailableView("No Friend Requests", systemImage: "bell.slash")
+					.listRowBackground(Color.clear)
+			} else {
+				if !incomingRequests.isEmpty {
+					Section("Incoming") {
+						ForEach(incomingRequests) { request in
+							incomingRequestRow(request)
 						}
 					}
+				}
 
-					if !outgoingRequests.isEmpty {
-						Section("Sent") {
-							ForEach(outgoingRequests) { request in
-								outgoingRequestRow(request)
-							}
+				if !outgoingRequests.isEmpty {
+					Section("Sent") {
+						ForEach(outgoingRequests) { request in
+							outgoingRequestRow(request)
 						}
 					}
 				}
 			}
-			#if os(iOS)
-			.listStyle(.insetGrouped)
-			#endif
-			.appNavigationTitle("Friend Requests")
-			.toolbar {
+		}
+		#if os(iOS)
+		.listStyle(.insetGrouped)
+		#endif
+		.appNavigationTitle("Friend Requests")
+		.toolbar {
+			if showsCloseButton {
 				ToolbarItem(placement: .cancellationAction) {
 					Button("Close", systemImage: "xmark", role: .cancel) {
 						close()
@@ -47,32 +69,32 @@ struct FriendRequestsSheet: View {
 					.labelStyle(.iconOnly)
 				}
 			}
-			.task {
-				await refreshRequests()
-			}
-			.refreshable {
-				await refreshRequests()
-			}
-			.alert(
-				"Delete Friend Request?",
-				isPresented: Binding(
-					get: { requestToDelete != nil },
-					set: { isPresented in
-						if !isPresented {
-							requestToDelete = nil
-						}
-					}
-				)
-			) {
-				if let requestToDelete {
-					Button("Delete Request", systemImage: "trash", role: .destructive) {
-						delete(requestToDelete)
+		}
+		.task {
+			await refreshRequests()
+		}
+		.refreshable {
+			await refreshRequests()
+		}
+		.alert(
+			"Delete Friend Request?",
+			isPresented: Binding(
+				get: { requestToDelete != nil },
+				set: { isPresented in
+					if !isPresented {
+						requestToDelete = nil
 					}
 				}
-				Button(role: .cancel) {}
-			} message: {
-				Text("This removes the pending friend request.")
+			)
+		) {
+			if let requestToDelete {
+				Button("Delete Request", systemImage: "trash", role: .destructive) {
+					delete(requestToDelete)
+				}
 			}
+			Button(role: .cancel) {}
+		} message: {
+			Text("This removes the pending friend request.")
 		}
 	}
 

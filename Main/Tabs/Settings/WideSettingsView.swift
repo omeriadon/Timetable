@@ -12,7 +12,6 @@ struct WideSettingsView: View {
 	@Default(.lastServerSync) private var lastServerSync
 	@Default(.hapticsEnabled) private var hapticsEnabled
 	@Default(.ownerTimetableShareAlias) private var ownerTimetableShareAlias
-	@State private var showsShareAliasEditor = false
 
 	var body: some View {
 		@Bindable var router = router
@@ -42,9 +41,7 @@ struct WideSettingsView: View {
 						Label("Share My Timetable", systemImage: "square.and.arrow.up")
 					}
 				}
-				Button("Customize Share Link", systemImage: "link.badge.plus") {
-					showsShareAliasEditor = true
-				}
+				routeButton("Customize Share Link", systemImage: "link.badge.plus", route: .settings(.shareAlias))
 			}
 
 			Section("Support") {
@@ -58,13 +55,9 @@ struct WideSettingsView: View {
 			}
 		}
 		.formStyle(.grouped)
+		.tint(.accent)
 		.scrollContentBackground(.hidden)
 		.appNavigationTitle("Settings", style: .main, accent: true)
-		.popover(isPresented: $showsShareAliasEditor) {
-			TimetableShareAliasSheet(close: { showsShareAliasEditor = false })
-				.frame(iOS: .init(), macOS: .init(width: 620, height: 660))
-				.presentationCompactAdaptation(.sheet)
-		}
 	}
 
 	private var ownerShareURL: URL? {
