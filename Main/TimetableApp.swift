@@ -70,43 +70,20 @@ struct TimetableApp: App {
 	var body: some Scene {
 		WindowGroup {
 			AppRouterHost { router in
-				Group {
-					#if os(macOS)
-						switch sessionStore.state {
-							case .signedOut:
+				ZStack {
+					switch sessionStore.state {
+						case .signedOut:
 							MainPlatformAuthenticationView()
-							case .restoring:
+								.transition(.blurReplace)
+						case .restoring:
 							ProgressView("Restoring Account…")
-							case .authenticated:
+								.transition(.blurReplace)
+						case .authenticated:
 							AdaptiveAppShell(expanded: $expanded)
-						}
-					#else
-						ZStack {
-							switch sessionStore.state {
-								case .signedOut:
-									ZStack {
-										if Platform.current == .iPadOS || hasCompletedOnboarding {
-											MainPlatformAuthenticationView()
-												.transition(.blurReplace)
-										} else {
-											Color.clear
-												.transition(.blurReplace)
-										}
-									}
-									.animation(.easeInOut, value: hasCompletedOnboarding)
-
-								case .restoring:
-									ProgressView("Restoring Account…")
-										.transition(.blurReplace)
-
-								case .authenticated:
-									AdaptiveAppShell(expanded: $expanded)
-										.transition(.blurReplace)
-							}
-						}
-						.animation(.easeInOut, value: sessionStore.state)
-					#endif
+								.transition(.blurReplace)
+					}
 				}
+				.animation(.easeInOut, value: sessionStore.state)
 				.onOpenURL { url in
 					handleIncomingURL(url, router: router)
 				}

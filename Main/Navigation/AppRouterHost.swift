@@ -14,18 +14,21 @@ struct AppRouterHost<Content: View>: View {
 	}
 
 	var body: some View {
-		let presentation = AppPresentation.resolve(
-			horizontalSizeClass: horizontalSizeClass
-		)
+		GeometryReader { proxy in
+			let presentation = AppPresentation.resolve(
+				horizontalSizeClass: horizontalSizeClass,
+				presentationWidth: proxy.size.width
+			)
 
-		content(router)
-			.environment(router)
-			.environment(\.appPresentation, presentation)
-			.onAppear {
-				router.updatePresentation(presentation)
-			}
-			.onChange(of: presentation) { _, presentation in
-				router.updatePresentation(presentation)
-			}
+			content(router)
+				.environment(router)
+				.environment(\.appPresentation, presentation)
+				.onAppear {
+					router.updatePresentation(presentation)
+				}
+				.onChange(of: presentation) { _, presentation in
+					router.updatePresentation(presentation)
+				}
+		}
 	}
 }

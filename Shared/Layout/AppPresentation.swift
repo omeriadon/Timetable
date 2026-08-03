@@ -1,10 +1,6 @@
 #if !os(watchOS)
 	import SwiftUI
 
-	#if os(iOS)
-		import UIKit
-	#endif
-
 	enum AppPresentation: String, Codable, Hashable, Sendable {
 		case iOS
 		case iPadOS
@@ -37,13 +33,14 @@
 			}
 		}
 
-		static func resolve(horizontalSizeClass: UserInterfaceSizeClass?) -> AppPresentation {
+		static func resolve(
+			horizontalSizeClass: UserInterfaceSizeClass?,
+			presentationWidth: CGFloat
+		) -> AppPresentation {
 			#if os(macOS)
 				.macOS
 			#elseif os(iOS)
-				if UIDevice.current.userInterfaceIdiom == .pad,
-				   horizontalSizeClass == .regular
-				{
+				if horizontalSizeClass == .regular || presentationWidth >= 600 {
 					.iPadOS
 				} else {
 					.iOS
@@ -69,20 +66,4 @@
 		}
 	}
 
-	private struct AppPresentationEnvironmentModifier: ViewModifier {
-		@Environment(\.horizontalSizeClass) private var horizontalSizeClass
-
-		func body(content: Content) -> some View {
-			content.environment(
-				\.appPresentation,
-				AppPresentation.resolve(horizontalSizeClass: horizontalSizeClass)
-			)
-		}
-	}
-
-	extension View {
-		func appPresentationEnvironment() -> some View {
-			modifier(AppPresentationEnvironmentModifier())
-		}
-	}
 #endif
