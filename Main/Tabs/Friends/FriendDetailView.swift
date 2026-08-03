@@ -7,6 +7,7 @@ struct FriendDetailView: View {
 	@State private var detail: FriendDetail?
 	@State private var service = FriendService.shared
 	@State private var selectedTab = FriendDetailTab.main
+	@State private var scrollPosition: Int?
 	@State private var action: FriendAction?
 	@State private var showsReportConfirmation = false
 	@State private var isLoading = true
@@ -22,26 +23,36 @@ struct FriendDetailView: View {
 
 	var body: some View {
 		NavigationStack {
-			ScrollView {
-				VStack(alignment: .leading, spacing: 20) {
-					if isLoading {
-						ProgressView()
-							.frame(maxWidth: .infinity, minHeight: 180)
-					} else if let detail {
-						switch selectedTab {
-							case .main:
+			Group {
+				if isLoading {
+					ProgressView()
+						.frame(maxWidth: .infinity, minHeight: 180)
+				} else if let detail {
+					ScrollView(.horizontal) {
+						HStack(spacing: 0) {
+							ScrollView {
 								FriendOverview(detail: detail, friendName: detail.friend.displayName)
-							case .week:
+							}
+							.containerRelativeFrame(.horizontal)
+							.id(0)
+
+							ScrollView {
 								FriendWeek(detail: detail)
+									.padding(.top, 14)
+							}
+							.containerRelativeFrame(.horizontal)
+							.id(1)
 						}
-					} else {
-						ContentUnavailableView("Friend Unavailable", systemImage: "person.crop.circle.badge.exclamationmark")
+						.scrollTargetLayout()
 					}
+					.scrollTargetBehavior(.paging)
+					.scrollIndicators(.hidden)
+					.scrollPosition(id: $scrollPosition)
+				} else {
+					ContentUnavailableView("Friend Unavailable", systemImage: "person.crop.circle.badge.exclamationmark")
 				}
-				.foregroundStyle(.black)
-				.padding(.horizontal, FriendDetailLayout.horizontalPadding)
 			}
-			.scrollBounceBehavior(.basedOnSize)
+			.foregroundStyle(.black)
 			.scrollEdgeEffectStyle(.soft, for: .top)
 			.safeAreaBar(edge: .top, alignment: .center, spacing: 0) {
 				TabsPicker(
@@ -59,6 +70,19 @@ struct FriendDetailView: View {
 				)
 				.frame(height: 40)
 				.padding(.horizontal)
+			}
+			.onChange(of: selectedTab) { _, selectedTab in
+				withAnimation {
+					scrollPosition = FriendDetailTab.allCases.firstIndex(of: selectedTab)
+				}
+			}
+			.onChange(of: scrollPosition) { _, scrollPosition in
+				guard let scrollPosition,
+				      FriendDetailTab.allCases.indices.contains(scrollPosition)
+				else {
+					return
+				}
+				selectedTab = FriendDetailTab.allCases[scrollPosition]
 			}
 			.toolbar {
 				ToolbarItem(placement: .topBarLeading) {
