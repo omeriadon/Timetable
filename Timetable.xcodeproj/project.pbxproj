@@ -228,6 +228,7 @@
 				Info/Message.plist,
 				"Info/Watch Widget.plist",
 				Info/Widget.plist,
+				Timetable-Info.plist,
 			);
 			platformFiltersByRelativePath = {
 				"/Localized: LaunchScreen.storyboard" = (ios, );
@@ -244,6 +245,7 @@
 				Info/Message.plist,
 				"Info/Watch Widget.plist",
 				Info/Widget.plist,
+				Timetable-Info.plist,
 			);
 			target = 2A25869F2FB5D6490030C8CD /* Watch Widget */;
 		};
@@ -257,6 +259,7 @@
 				Info/Message.plist,
 				"Info/Watch Widget.plist",
 				Info/Widget.plist,
+				Timetable-Info.plist,
 				Timetable.icon,
 			);
 			target = 2AA6DF132FDFAC8F00BBC70E /* Widget */;
@@ -271,6 +274,7 @@
 				Info/Message.plist,
 				"Info/Watch Widget.plist",
 				Info/Widget.plist,
+				Timetable-Info.plist,
 			);
 			target = 2A098C822F9DB842002065BE /* Watch */;
 		};
@@ -951,7 +955,8 @@
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readwrite;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Special/Timetable-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Timetable;
 				INFOPLIST_KEY_CFBundleDocumentTypes = "<array><dict><key>CFBundleTypeName</key><string>Timetable Share</string><key>CFBundleTypeRole</key><string>Editor</string><key>LSHandlerRank</key><string>Owner</string><key>LSItemContentTypes</key><array><string>pt.adonis.timetable.share</string></array></dict></array>";
 				INFOPLIST_KEY_CFBundleURLTypes = "<array><dict><key>CFBundleTypeRole</key><string>Editor</string><key>CFBundleURLName</key><string>com.omeriadon.Timetable</string><key>CFBundleURLSchemes</key><array><string>timetable</string></array></dict></array>";
@@ -1024,7 +1029,8 @@
 				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readwrite;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Special/Timetable-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Timetable;
 				INFOPLIST_KEY_CFBundleDocumentTypes = "<array><dict><key>CFBundleTypeName</key><string>Timetable Share</string><key>CFBundleTypeRole</key><string>Editor</string><key>LSHandlerRank</key><string>Owner</string><key>LSItemContentTypes</key><array><string>pt.adonis.timetable.share</string></array></dict></array>";
 				INFOPLIST_KEY_CFBundleURLTypes = "<array><dict><key>CFBundleTypeRole</key><string>Editor</string><key>CFBundleURLName</key><string>com.omeriadon.Timetable</string><key>CFBundleURLSchemes</key><array><string>timetable</string></array></dict></array>";
