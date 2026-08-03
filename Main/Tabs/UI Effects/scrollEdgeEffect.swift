@@ -14,39 +14,11 @@ public enum VariableBlurDirection {
 
 extension View {
 	func scrollEdgeEffect(
-		direction: BlackGradientDirection = .darkTopClearBottom,
-		offset: CGFloat = 0.9,
-		maxBlurRadius: CGFloat = 2,
-		maximumOpacity: CGFloat = 0.4
+		direction _: BlackGradientDirection = .darkTopClearBottom,
+		offset _: CGFloat = 0.9,
+		maxBlurRadius _: CGFloat = 2,
+		maximumOpacity _: CGFloat = 0.4
 	) -> some View {
-		#if os(iOS)
-			scrollEdgeEffectStyle(.soft, for: .all)
-				.overlay {
-					ZStack {
-						let direction2: VariableBlurDirection = switch direction {
-							case .clearTopDarkBottom:
-								.blurredBottomClearTop
-							case .darkTopClearBottom:
-								.blurredTopClearBottom
-						}
-
-						VariableBlurView(
-							maxBlurRadius: maxBlurRadius,
-							direction: direction2,
-							startOffset: offset
-						)
-
-						BlackGradientOverlay(
-							direction: direction,
-							offset: offset,
-							maximumOpacity: maximumOpacity
-						)
-					}
-					.ignoresSafeArea(.container)
-					.allowsHitTesting(false)
-				}
-		#else
-			scrollEdgeEffectStyle(.soft, for: .all)
-		#endif
+		scrollEdgeEffectStyle(.soft, for: .all)
 	}
 }
