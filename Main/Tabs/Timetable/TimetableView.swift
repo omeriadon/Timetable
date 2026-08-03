@@ -15,9 +15,9 @@ extension Notification.Name {
 struct TimetableView: View {
 	@Environment(AppRouter.self) private var router
 	@Environment(\.appPresentation) private var presentation
-	#if os(iOS)
+	#if os(iOS) && !targetEnvironment(macCatalyst)
 		@State private var watchSync = PhoneWatchSyncBridge.shared
-	#else
+	#elseif os(macOS)
 		@Binding var expanded: WindowMode
 	#endif
 
@@ -286,9 +286,11 @@ struct TimetableView: View {
 				)
 			}
 			#if os(iOS)
-			.onAppear {
-				watchSync.activateIfNeeded()
-			}
+				#if !targetEnvironment(macCatalyst)
+					.onAppear {
+						watchSync.activateIfNeeded()
+					}
+				#endif
 			#else
 			.onChange(of: selectedSlot) {
 						if selectedSlot == nil {

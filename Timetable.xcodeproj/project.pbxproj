@@ -159,35 +159,6 @@
 			platformFiltersByRelativePath = {
 				Backend/LiveActivityRegistrationService.swift = (ios, );
 				Backend/PhoneWatchSyncBridge.swift = (ios, );
-				Navigation/AdaptiveAppShell.swift = (ios, macos, );
-				Navigation/AppNavigationPersistenceStore.swift = (ios, macos, );
-				Navigation/AppNavigationSnapshot.swift = (ios, macos, );
-				Navigation/AppRoutePresentationPolicy.swift = (ios, macos, );
-				Navigation/AppRouter.swift = (ios, macos, );
-				Navigation/AppRouterHost.swift = (ios, macos, );
-				Navigation/CompactAppShell.swift = (ios, );
-				Navigation/CompactRouteDestinationView.swift = (ios, );
-				Navigation/NavigationNotifications.swift = (ios, macos, );
-				Navigation/WideAppShell.swift = (ios, macos, );
-				Navigation/WideRootDestinationView.swift = (ios, macos, );
-				Navigation/WideRouteDestinationView.swift = (ios, macos, );
-				Tabs/Settings/NavigationPersistenceSettingsView.swift = (ios, macos, );
-				Tabs/Settings/WideSettingsView.swift = (ios, macos, );
-				Tabs/Timetable/TimetableSubjectInspectorView.swift = (ios, macos, );
-				"Tabs/UI Effects/BlurView.swift" = (ios, );
-				"Tabs/UI Effects/VariableBlur.swift" = (ios, );
-				Views/Account/MainPlatformAuthenticationView.swift = (ios, macos, );
-				Views/Onboarding/OnboardingPage.swift = (ios, );
-				Views/Onboarding/OnboardingPageContext.swift = (ios, );
-				Views/Onboarding/OnboardingView.swift = (ios, );
-				Views/Onboarding/Views/CalendarImport.swift = (ios, );
-				Views/Onboarding/Views/CalendarPermission.swift = (ios, );
-				Views/Onboarding/Views/Notifications.swift = (ios, );
-				Views/Onboarding/Views/OnboardingYearGroupView.swift = (ios, );
-				Views/Onboarding/Views/SplashView.swift = (ios, );
-				Views/Onboarding/Views/Tutorial/OnboardingAccount.swift = (ios, );
-				Views/Onboarding/Views/Tutorial/OnboardingCompletion.swift = (ios, );
-				iOS/LaunchIllusionView.swift = (ios, );
 				macOS/AppDelegate.swift = (macos, );
 				macOS/StatusBadgeOverlayWindow.swift = (macos, );
 			};
@@ -211,10 +182,6 @@
 				"Watch Widget/Watch Widget Bundle.swift",
 				"Watch Widget/Watch Widget-InfoPlist.xcstrings",
 			);
-			platformFiltersByRelativePath = {
-				"Widget Shared/Live Activity/SchoolDayActivityAttributes.swift" = (ios, );
-				"Widget Shared/Live Activity/SchoolDayLiveActivityWidget.swift" = (ios, );
-			};
 			target = 2AA6DF132FDFAC8F00BBC70E /* Widget */;
 		};
 		2AD85A872FE8F23A004EAB2B /* Exceptions for "Special" folder in "Timetable" target */ = {
@@ -992,7 +959,6 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TOOLCHAINS = com.apple.dt.toolchain.XcodeDefault;
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Debug;
@@ -1067,7 +1033,6 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TOOLCHAINS = com.apple.dt.toolchain.XcodeDefault;
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Release;
@@ -1306,7 +1271,7 @@
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1365,7 +1330,7 @@
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;

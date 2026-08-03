@@ -126,7 +126,7 @@ final class AccountSettingsSyncService {
 				)
 				applyServerRevision(from: updatedSettings)
 				Defaults[.lastServerSync] = Date.now
-				#if os(iOS)
+				#if os(iOS) && !targetEnvironment(macCatalyst)
 					if mutation.settings.liveActivitiesEnabled,
 					   !mutation.previousSettings.liveActivitiesEnabled
 					{
@@ -165,7 +165,7 @@ final class AccountSettingsSyncService {
 
 	private func applyLocalSideEffects() {
 		WidgetCenter.shared.reloadAllTimelines()
-		#if os(iOS)
+		#if os(iOS) && !targetEnvironment(macCatalyst)
 			guard Platform.current == .iOS else { return }
 			Task {
 				await LiveActivityRegistrationService.shared.reconcileAuthorization()
