@@ -13,8 +13,6 @@ struct CreatedTimetablesSettingsView: View {
 	@State private var showCreate = false
 	@State private var networkManager = NetworkManager.shared
 
-	@Namespace var ns
-
 	var body: some View {
 		NavigationStack {
 			List(service.timetables) { timetable in
@@ -49,14 +47,10 @@ struct CreatedTimetablesSettingsView: View {
 					}
 					.buttonStyle(.glassProminent)
 				}
-				.matchedTransitionSource(id: "1", in: ns)
 			}
 			.sheet(isPresented: $showCreate) {
 				CreatedTimetableCreateView(close: { showCreate = false })
 					.presentationDetents([.medium])
-					.navigationTransition(
-						.zoom(sourceID: "1", in: ns)
-					)
 			}
 			.overlay {
 				if !networkManager.isOnline {

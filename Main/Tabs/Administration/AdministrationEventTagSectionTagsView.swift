@@ -8,7 +8,6 @@ struct AdministrationEventTagSectionTagsView: View {
 	@State private var tags: [AdministrationEventTag]
 	@State private var editor: AdministrationEventTagEditorTarget?
 	@State private var isReordering = false
-	@Namespace private var namespace
 
 	init(
 		section: AdministrationEventTagSection,
@@ -38,10 +37,6 @@ struct AdministrationEventTagSectionTagsView: View {
 				}
 				.buttonStyle(.plain)
 				.opacity(tag.isArchived ? 0.55 : 1)
-				.matchedTransitionSource(
-					id: AdministrationEventTagEditorTarget.tag(tag, section: section).id,
-					in: namespace
-				)
 			}
 			.onMove(perform: move)
 
@@ -49,10 +44,6 @@ struct AdministrationEventTagSectionTagsView: View {
 				Button("Add Tag", systemImage: "plus") {
 					editor = .newTag(section)
 				}
-				.matchedTransitionSource(
-					id: AdministrationEventTagEditorTarget.newTag(section).id,
-					in: namespace
-				)
 			}
 		}
 		.environment(\.editMode, .constant(isReordering ? .active : .inactive))
@@ -86,12 +77,6 @@ struct AdministrationEventTagSectionTagsView: View {
 						)
 				}
 			}
-			.navigationTransition(
-				.zoom(
-					sourceID: target.id,
-					in: namespace
-				)
-			)
 		}
 		.task {
 			await reloadFromServer()

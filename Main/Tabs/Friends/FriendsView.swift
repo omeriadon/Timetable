@@ -15,7 +15,6 @@ struct FriendsView: View {
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	@Environment(\.appPresentation) private var presentation
 	@Environment(AppRouter.self) private var router
-	@Namespace private var sheetNamespace
 
 	var body: some View {
 		ZStack {
@@ -39,7 +38,6 @@ struct FriendsView: View {
 						router.navigate(to: .friends(.requests))
 					}
 				}
-				.matchedTransitionSource(id: FriendsSheet.requests.transitionID, in: sheetNamespace)
 				.badge(incomingFriendRequests.count)
 				.accessibilityValue(incomingFriendRequests.isEmpty ? "No pending requests" : "\(incomingFriendRequests.count) pending requests")
 			}
@@ -47,7 +45,6 @@ struct FriendsView: View {
 				Button("Add friend", systemImage: "person.badge.plus") {
 					sheet = .addFriend
 				}
-				.matchedTransitionSource(id: FriendsSheet.addFriend.transitionID, in: sheetNamespace)
 			}
 		}
 		.searchable(text: $searchText, prompt: "Search with a school email")
@@ -60,13 +57,11 @@ struct FriendsView: View {
 				switch sheet {
 					case .addFriend:
 						AddFriendSheet(close: { self.sheet = nil })
-							.navigationTransition(.zoom(sourceID: sheet.transitionID, in: sheetNamespace))
 							.presentationDetents([.large])
 							.presentationDragIndicator(.hidden)
 							.frame(iOS: .init(), macOS: .init(width: 620, height: 700))
 					case .requests:
 						FriendRequestsSheet(close: { self.sheet = nil })
-							.navigationTransition(.zoom(sourceID: sheet.transitionID, in: sheetNamespace))
 							.presentationDetents([.fraction(0.6), .large])
 							.presentationDragIndicator(.hidden)
 							.frame(iOS: .init(), macOS: .init(width: 620, height: 700))
@@ -76,12 +71,6 @@ struct FriendsView: View {
 		}
 		.sheet(item: $selectedFriend) { friend in
 			FriendDetailView(friend: friend, close: { selectedFriend = nil })
-				.navigationTransition(
-					.zoom(
-						sourceID: friendTransitionID(friend),
-						in: sheetNamespace
-					)
-				)
 		}
 		.dynamicTypeSize(.medium)
 	}
@@ -119,10 +108,6 @@ struct FriendsView: View {
 							animatedScrollCard(FriendStatusCard(friend: friend))
 						}
 						.buttonStyle(.plain)
-						.matchedTransitionSource(
-							id: friendTransitionID(friend),
-							in: sheetNamespace
-						)
 						.onDrag {
 							draggedFriend = friend
 							return NSItemProvider(object: friend.id.uuidString as NSString)

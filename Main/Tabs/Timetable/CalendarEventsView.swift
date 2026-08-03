@@ -12,7 +12,6 @@ struct DatesView: View {
 	@State private var eventService = CalendarEventsSyncService.shared
 	@Environment(\.statusBadgeManager) private var badges
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
-	@Namespace private var eventEditorNamespace
 
 	private let calendar = SchoolCalendarProjection.perthCalendar
 
@@ -60,10 +59,6 @@ struct DatesView: View {
 			.labelStyle(.iconOnly)
 			.buttonBorderShape(.circle)
 			.buttonStyle(.glassProminent)
-			.matchedTransitionSource(
-				id: PlannerPresentationTarget.createEvent(.privateEvent).transitionID,
-				in: eventEditorNamespace
-			)
 			.padding(.bottom, 15)
 		}
 		.sheet(item: $presentationTarget) { target in
@@ -90,13 +85,12 @@ struct DatesView: View {
 					close: { presentationTarget = nil }
 				)
 				.presentationDetents([.fraction(0.5)])
-				.navigationTransition(.zoom(sourceID: target.transitionID, in: eventEditorNamespace))
 		}
 	}
 
 	private func calendarEventEditor(
 		target: CalendarEventEditorTarget,
-		transitionID: String
+		transitionID _: String
 	) -> some View {
 		CalendarEventEditor(
 			target: target,
@@ -123,7 +117,6 @@ struct DatesView: View {
 		}
 		.presentationDetents([.fraction(0.7)])
 		.interactiveDismissDisabled()
-		.navigationTransition(.zoom(sourceID: transitionID, in: eventEditorNamespace))
 	}
 
 	private var termDateCards: some View {
@@ -154,7 +147,6 @@ struct DatesView: View {
 			}
 			.buttonStyle(.plain)
 			.frame(maxWidth: .infinity)
-			.matchedTransitionSource(id: target.transitionID, in: eventEditorNamespace)
 			.contentShape(RoundedRectangle(cornerRadius: 20))
 		} else {
 			timelineEntryContent(entry)

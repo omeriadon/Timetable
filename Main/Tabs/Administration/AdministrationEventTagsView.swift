@@ -7,7 +7,6 @@ struct AdministrationEventTagsView: View {
 	@State private var editor: AdministrationEventTagEditorTarget?
 	@State private var isReordering = false
 	@Environment(\.statusBadgeManager) private var badges
-	@Namespace private var editorNamespace
 
 	var body: some View {
 		List {
@@ -32,10 +31,6 @@ struct AdministrationEventTagsView: View {
 					}
 					.buttonStyle(.plain)
 					.opacity(tag.isArchived ? 0.55 : 1)
-					.matchedTransitionSource(
-						id: AdministrationEventTagEditorTarget.tag(tag, section: section).id,
-						in: editorNamespace
-					)
 				}
 			}
 			.onMove(perform: move)
@@ -86,12 +81,6 @@ struct AdministrationEventTagsView: View {
 						)
 				}
 			}
-			.navigationTransition(
-				.zoom(
-					sourceID: target.id,
-					in: editorNamespace
-				)
-			)
 		}
 	}
 

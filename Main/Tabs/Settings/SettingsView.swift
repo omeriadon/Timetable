@@ -41,8 +41,6 @@ import WidgetKit
 		@State private var speed = 0.6
 		@State private var colorTransitionSpeed = 10.0
 
-		@Namespace private var ns
-
 		var body: some View {
 			Group {
 				if #available(iOS 27.0, *) {
@@ -154,7 +152,6 @@ import WidgetKit
 					}
 				}
 				.disabled(!networkManager.isOnline)
-				.matchedTransitionSource(id: "sheetMorph", in: ns)
 				.sheet(isPresented: $showEditTimetableSheet) {
 					SubjectEditorSheet(
 						subjects: $subjects,
@@ -167,7 +164,6 @@ import WidgetKit
 					.presentationContentInteraction(.scrolls)
 					.presentationDragIndicator(.hidden)
 					.interactiveDismissDisabled()
-					.navigationTransition(.zoom(sourceID: "sheetMorph", in: ns))
 				}
 			}
 
@@ -267,12 +263,10 @@ import WidgetKit
 				} label: {
 					Label("Report Feedback or Bug", systemImage: "exclamationmark.bubble")
 				}
-				.matchedTransitionSource(id: "346361347", in: ns)
 				.disabled(!networkManager.isOnline)
 				.sheet(isPresented: $showFeedbackSheet) {
 					FeedbackView()
 						.presentationDetents([.fraction(0.7)])
-						.navigationTransition(.zoom(sourceID: "346361347", in: ns))
 				}
 
 				NavigationLink {

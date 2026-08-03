@@ -77,8 +77,6 @@ public struct InlineColorPicker<T: ColorOptions>: View {
 	private let description: LocalizedStringKey?
 	private let colors: [T]
 
-	@Namespace private var colorPickerNamespace
-
 	/// Creates an inline color picker with default appearance.
 	/// - Parameter selectedColor: A binding to a `ColorOptions` value.
 	public init(selectedColor: Binding<T>) {

@@ -16,7 +16,6 @@ struct ProfileAppearanceSheet: View {
 	@State private var presentsEmojiPicker = false
 	@State private var presentsFontPicker = false
 	@State private var presentsColourPicker = false
-	@Namespace private var editorNamespace
 
 	#if os(iOS)
 		@State private var selectedPhotoItem: PhotosPickerItem?
@@ -93,7 +92,6 @@ struct ProfileAppearanceSheet: View {
 								hasCurrentPhoto: draft.photo != nil,
 								remove: removePhoto
 							)
-							.matchedTransitionSource(id: "profile-photo-crop", in: editorNamespace)
 							.transition(.blurReplace)
 						#else
 							ContentUnavailableView(
@@ -114,7 +112,6 @@ struct ProfileAppearanceSheet: View {
 							}
 						}
 						.buttonStyle(.glass)
-						.matchedTransitionSource(id: "profile-emoji", in: editorNamespace)
 						.transition(.blurReplace)
 						.buttonSizing(.flexible)
 					}
@@ -207,7 +204,6 @@ struct ProfileAppearanceSheet: View {
 				selection: $draft.emoji,
 				close: { presentsEmojiPicker = false }
 			)
-			.navigationTransition(.zoom(sourceID: "profile-emoji", in: editorNamespace))
 			.presentationDetents([.large])
 		}
 		#if os(iOS)
@@ -224,7 +220,6 @@ struct ProfileAppearanceSheet: View {
 				},
 				close: { photoCropRequest = nil }
 			)
-			.navigationTransition(.zoom(sourceID: "profile-photo-crop", in: editorNamespace))
 			.presentationDetents([.fraction(0.7)])
 		}
 		#endif

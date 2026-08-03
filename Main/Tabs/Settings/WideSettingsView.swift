@@ -13,7 +13,6 @@ struct WideSettingsView: View {
 	@Default(.hapticsEnabled) private var hapticsEnabled
 	@Default(.ownerTimetableShareAlias) private var ownerTimetableShareAlias
 	@State private var showsShareAliasEditor = false
-	@Namespace private var presentationNamespace
 
 	var body: some View {
 		Form {
@@ -41,7 +40,6 @@ struct WideSettingsView: View {
 				Button("Customize Share Link", systemImage: "link.badge.plus") {
 					showsShareAliasEditor = true
 				}
-				.matchedTransitionSource(id: "share-alias", in: presentationNamespace)
 			}
 
 			Section("Support") {
@@ -60,7 +58,6 @@ struct WideSettingsView: View {
 		.popover(isPresented: $showsShareAliasEditor) {
 			TimetableShareAliasSheet(close: { showsShareAliasEditor = false })
 				.frame(iOS: .init(), macOS: .init(width: 620, height: 660))
-				.navigationTransition(.zoom(sourceID: "share-alias", in: presentationNamespace))
 				.presentationCompactAdaptation(.sheet)
 		}
 	}

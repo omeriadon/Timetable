@@ -9,7 +9,6 @@ struct AdministrationSpecialBadgesView: View {
 	@State private var draggedBadgeID: UUID?
 	@State private var editor: AdministrationSpecialBadgeEditorTarget?
 	@Environment(\.statusBadgeManager) private var statusBadges
-	@Namespace private var namespace
 
 	var body: some View {
 		ScrollView {
@@ -39,7 +38,6 @@ struct AdministrationSpecialBadgesView: View {
 					}
 					.buttonStyle(.plain)
 					.contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-					.matchedTransitionSource(id: editorID(for: badge), in: namespace)
 					.onDrag {
 						draggedBadgeID = badge.id
 						return NSItemProvider(object: badge.id.uuidString as NSString)
@@ -65,7 +63,6 @@ struct AdministrationSpecialBadgesView: View {
 				}
 				.foregroundStyle(.white)
 				.buttonStyle(.glassProminent)
-				.matchedTransitionSource(id: "special-badge-create", in: namespace)
 			}
 		}
 		.task {
@@ -81,12 +78,6 @@ struct AdministrationSpecialBadgesView: View {
 				save: save,
 				delete: delete,
 				close: { editor = nil }
-			)
-			.navigationTransition(
-				.zoom(
-					sourceID: target.id,
-					in: namespace
-				)
 			)
 		}
 	}

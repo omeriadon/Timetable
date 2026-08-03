@@ -21,7 +21,6 @@ struct AccountView: View {
 	@State private var isLoadingYearGroups = false
 	@State private var isSavingYearGroup = false
 	@State private var yearGroupsFailedToLoad = false
-	@Namespace private var profileNamespace
 	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
@@ -63,7 +62,6 @@ struct AccountView: View {
 		}
 		.sheet(isPresented: $showsProfileEditor) {
 			ProfileAppearanceSheet()
-				.navigationTransition(.zoom(sourceID: "account-profile-editor", in: profileNamespace))
 				.presentationDetents([.large])
 				.presentationDragIndicator(.hidden)
 		}
@@ -88,7 +86,6 @@ struct AccountView: View {
 				}
 				.foregroundStyle(.accent)
 			}
-			.matchedTransitionSource(id: "account-profile-editor", in: profileNamespace)
 			LabeledContent("Name") {
 				TextField("Name", text: $displayName)
 					.multilineTextAlignment(.trailing)
