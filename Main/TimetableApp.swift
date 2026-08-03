@@ -112,6 +112,7 @@ struct TimetableApp: App {
 					.animation(.easeInOut, value: sessionStore.state)
 				#endif
 			}
+			.appPresentationEnvironment()
 			.onOpenURL { url in
 				handleIncomingURL(url)
 			}
