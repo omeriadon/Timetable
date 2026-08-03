@@ -16,63 +16,61 @@ struct FriendsView: View {
 	@Namespace private var sheetNamespace
 
 	var body: some View {
-		NavigationStack {
-			ZStack {
-				if searchText.isEmpty {
-					friendsList
-						.transition(.blurReplace)
-				} else {
-					friendSearchResults
-						.transition(.blurReplace)
-				}
+		ZStack {
+			if searchText.isEmpty {
+				friendsList
+					.transition(.blurReplace)
+			} else {
+				friendSearchResults
+					.transition(.blurReplace)
 			}
-			.animation(.easeInOut, value: searchText.isEmpty)
-			.scrollEdgeEffect()
-			.appNavigationTitle("Friends", style: .main, accent: true)
-			.toolbar {
-				ToolbarItem(placement: .topBarLeading) {
-					Button("Friend requests", systemImage: incomingFriendRequests.isEmpty ? "bell" : "bell.badge") {
-						sheet = .requests
-					}
-					.matchedTransitionSource(id: FriendsSheet.requests.transitionID, in: sheetNamespace)
-					.badge(incomingFriendRequests.count)
-					.accessibilityValue(incomingFriendRequests.isEmpty ? "No pending requests" : "\(incomingFriendRequests.count) pending requests")
+		}
+		.animation(.easeInOut, value: searchText.isEmpty)
+		.scrollEdgeEffect()
+		.appNavigationTitle("Friends", style: .main, accent: true)
+		.toolbar {
+			ToolbarItem(placement: .topBarLeading) {
+				Button("Friend requests", systemImage: incomingFriendRequests.isEmpty ? "bell" : "bell.badge") {
+					sheet = .requests
 				}
-				ToolbarItem(placement: .topBarTrailing) {
-					Button("Add friend", systemImage: "person.badge.plus") {
-						sheet = .addFriend
-					}
-					.matchedTransitionSource(id: FriendsSheet.addFriend.transitionID, in: sheetNamespace)
+				.matchedTransitionSource(id: FriendsSheet.requests.transitionID, in: sheetNamespace)
+				.badge(incomingFriendRequests.count)
+				.accessibilityValue(incomingFriendRequests.isEmpty ? "No pending requests" : "\(incomingFriendRequests.count) pending requests")
+			}
+			ToolbarItem(placement: .topBarTrailing) {
+				Button("Add friend", systemImage: "person.badge.plus") {
+					sheet = .addFriend
 				}
+				.matchedTransitionSource(id: FriendsSheet.addFriend.transitionID, in: sheetNamespace)
 			}
-			.searchable(text: $searchText, prompt: "Search with a school email")
-			.task { await refresh() }
-			.task(id: searchText) {
-				await search(for: searchText)
+		}
+		.searchable(text: $searchText, prompt: "Search with a school email")
+		.task { await refresh() }
+		.task(id: searchText) {
+			await search(for: searchText)
+		}
+		.sheet(item: $sheet) { sheet in
+			switch sheet {
+				case .addFriend:
+					AddFriendSheet(close: { self.sheet = nil })
+						.navigationTransition(.zoom(sourceID: sheet.transitionID, in: sheetNamespace))
+						.presentationDetents([.large])
+						.presentationDragIndicator(.hidden)
+				case .requests:
+					FriendRequestsSheet(close: { self.sheet = nil })
+						.navigationTransition(.zoom(sourceID: sheet.transitionID, in: sheetNamespace))
+						.presentationDetents([.fraction(0.6), .large])
+						.presentationDragIndicator(.hidden)
 			}
-			.sheet(item: $sheet) { sheet in
-				switch sheet {
-					case .addFriend:
-						AddFriendSheet(close: { self.sheet = nil })
-							.navigationTransition(.zoom(sourceID: sheet.transitionID, in: sheetNamespace))
-							.presentationDetents([.large])
-							.presentationDragIndicator(.hidden)
-					case .requests:
-						FriendRequestsSheet(close: { self.sheet = nil })
-							.navigationTransition(.zoom(sourceID: sheet.transitionID, in: sheetNamespace))
-							.presentationDetents([.fraction(0.6), .large])
-							.presentationDragIndicator(.hidden)
-				}
-			}
-			.sheet(item: $selectedFriend) { friend in
-				FriendDetailView(friend: friend, close: { selectedFriend = nil })
-					.navigationTransition(
-						.zoom(
-							sourceID: friendTransitionID(friend),
-							in: sheetNamespace
-						)
+		}
+		.sheet(item: $selectedFriend) { friend in
+			FriendDetailView(friend: friend, close: { selectedFriend = nil })
+				.navigationTransition(
+					.zoom(
+						sourceID: friendTransitionID(friend),
+						in: sheetNamespace
 					)
-			}
+				)
 		}
 		.dynamicTypeSize(.medium)
 	}

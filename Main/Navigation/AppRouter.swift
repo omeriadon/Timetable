@@ -100,6 +100,10 @@ final class AppRouter {
 			return
 		}
 
+		if case .timetable = route {
+			return
+		}
+
 		switch presentation {
 			case .iOS:
 				append(route, to: destination)
@@ -140,6 +144,27 @@ final class AppRouter {
 		inspectorRoute = nil
 		pendingExternalRoute = nil
 		persistenceStore.clear()
+	}
+
+	func popCurrentRoute() {
+		switch selectedTab {
+			case .timetable:
+				if !timetablePath.isEmpty {
+					timetablePath.removeLast()
+				}
+			case .friends:
+				if !friendsPath.isEmpty {
+					friendsPath.removeLast()
+				}
+			case .settings:
+				if !settingsPath.isEmpty {
+					settingsPath.removeLast()
+				}
+			case .administration:
+				if !administrationPath.isEmpty {
+					administrationPath.removeLast()
+				}
+		}
 	}
 
 	private func append(

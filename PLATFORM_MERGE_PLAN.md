@@ -1239,6 +1239,8 @@ Expected commit:
 
 ### Phase 5 — iPhone SwiftUI shell
 
+Status: implemented in source; awaiting the iPhone build and reference-comparison gate.
+
 Work:
 
 - replace UIKit root tab controller;
@@ -1247,6 +1249,16 @@ Work:
 - route notifications and links through router;
 - preserve iPhone feature roots;
 - remove obsolete controller bridge.
+
+Implementation:
+
+- `CompactAppShell` owns the native SwiftUI tab bar and one `NavigationStack` path per tab;
+- `AppRouter` owns selection, paths, external-route translation, and optional restoration;
+- the existing iPhone Timetable, Friends, Settings, and Administration views remain the feature roots;
+- feature roots no longer create competing outer navigation stacks;
+- `NonAuthoritativeRootView` supplies the temporary stack required by the pre-sidebar iPad/macOS shell;
+- the UIKit `ContentView` tab-controller bridge has been removed;
+- explicit synchronized-folder platform filters force Xcode to include the router and shell sources in the Timetable target.
 
 Expected commits:
 

@@ -16,11 +16,13 @@ struct NonAuthoritativeRootView: View {
 	var body: some View {
 		TabView(selection: $selectedTab) {
 			Tab("Timetable", systemImage: "calendar.day.timeline.left", value: 0) {
-				#if os(iOS)
-					TimetableView(watchSync: $watchSync, syncStatus: $syncStatus)
-				#else
-					TimetableView(expanded: $expanded)
-				#endif
+				NavigationStack {
+					#if os(iOS)
+						TimetableView(watchSync: $watchSync, syncStatus: $syncStatus)
+					#else
+						TimetableView(expanded: $expanded)
+					#endif
+				}
 			}
 			Tab("Settings", systemImage: "gear", value: 1) {
 				NonAuthoritativeSettingsView(expanded: $expanded)

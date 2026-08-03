@@ -105,7 +105,7 @@ struct TimetableApp: App {
 										NonAuthoritativeRootView(expanded: $expanded)
 											.transition(.blurReplace)
 									} else {
-										ContentView(expanded: $expanded)
+										CompactAppShell()
 											.transition(.blurReplace)
 									}
 							}

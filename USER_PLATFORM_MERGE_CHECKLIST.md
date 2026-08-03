@@ -4,7 +4,17 @@ This file contains every build, runtime, visual, signing, deployment, and produc
 
 Codex must not mark an item complete unless the user explicitly reports that it passed. Codex does not run builds or tests.
 
-## Current Phase 1–4 gate
+## Current Phase 5 gate
+
+- [ ] Close and reopen the Timetable project so Xcode regenerates the synchronized-folder build plan.
+- [ ] Build the `Timetable` scheme for an iPhone destination after the iPhone shell migration.
+- [ ] Report every compiler error verbatim.
+- [ ] Confirm the iPhone bottom tab bar contains Timetable, Friends, Settings, and conditional Admin in the existing order.
+- [ ] Confirm each tab preserves its own navigation path when switching tabs.
+- [ ] Confirm notification-driven switches to Timetable and Settings still work.
+- [ ] Confirm the navigation restoration toggle appears under the routed Navigation settings destination.
+
+## Phase 1–4 gate history
 
 - [ ] Build the `Timetable` scheme for an iPhone destination.
 - [ ] Build the `Timetable` scheme for an iPad destination.

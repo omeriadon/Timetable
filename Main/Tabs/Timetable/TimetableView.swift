@@ -64,56 +64,54 @@ struct TimetableView: View {
 	#endif
 
 	var body: some View {
-		NavigationStack {
-			ScrollView(.horizontal) {
-				HStack(spacing: 0) {
-					TodayTimetableView(
-						subjects: selectedTimetable?.subjects ?? subjects
-					)
+		ScrollView(.horizontal) {
+			HStack(spacing: 0) {
+				TodayTimetableView(
+					subjects: selectedTimetable?.subjects ?? subjects
+				)
+				.containerRelativeFrame(.horizontal)
+				.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.7)
+				.scrollEdgeEffect(offset: 0.9, maxBlurRadius: 4, maximumOpacity: 0.7)
+				.id(0)
+
+				mainView
 					.containerRelativeFrame(.horizontal)
 					.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.7)
-					.scrollEdgeEffect(offset: 0.9, maxBlurRadius: 4, maximumOpacity: 0.7)
-					.id(0)
+					.scrollEdgeEffect(offset: 0.9, maxBlurRadius: 6, maximumOpacity: 1)
+					.id(1)
 
-					mainView
-						.containerRelativeFrame(.horizontal)
-						.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.7)
-						.scrollEdgeEffect(offset: 0.9, maxBlurRadius: 6, maximumOpacity: 1)
-						.id(1)
-
-					DatesView()
-						.containerRelativeFrame(.horizontal)
-						.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.7)
-						.id(2)
-				}
-				.scrollTargetLayout()
+				DatesView()
+					.containerRelativeFrame(.horizontal)
+					.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.7)
+					.id(2)
 			}
-			.scrollTargetBehavior(.paging)
-			.scrollIndicators(.hidden)
-			.scrollPosition(id: $scrollPosition)
-			.safeAreaBar(edge: .top, alignment: .center, spacing: 0) {
-				TabsPicker(
-					items: [
-						("Today", "calendar.day.timeline.left"),
-						("Week", "7.calendar"),
-						("Planner", "pencil.and.list.clipboard"),
-					],
-					selection: $currentTab
-				)
-				.padding(.horizontal, 10)
-				.frame(height: 36)
-				.padding(.bottom, 5)
+			.scrollTargetLayout()
+		}
+		.scrollTargetBehavior(.paging)
+		.scrollIndicators(.hidden)
+		.scrollPosition(id: $scrollPosition)
+		.safeAreaBar(edge: .top, alignment: .center, spacing: 0) {
+			TabsPicker(
+				items: [
+					("Today", "calendar.day.timeline.left"),
+					("Week", "7.calendar"),
+					("Planner", "pencil.and.list.clipboard"),
+				],
+				selection: $currentTab
+			)
+			.padding(.horizontal, 10)
+			.frame(height: 36)
+			.padding(.bottom, 5)
+		}
+		.onChange(of: currentTab) { _, newValue in
+			withAnimation {
+				scrollPosition = newValue
 			}
-			.onChange(of: currentTab) { _, newValue in
-				withAnimation {
-					scrollPosition = newValue
-				}
-				refreshCalendarData()
-			}
-			.onChange(of: scrollPosition) { _, newValue in
-				if let newValue {
-					currentTab = newValue
-				}
+			refreshCalendarData()
+		}
+		.onChange(of: scrollPosition) { _, newValue in
+			if let newValue {
+				currentTab = newValue
 			}
 		}
 	}
