@@ -7,39 +7,24 @@ struct AdministrationCalendarEntriesView: View {
 	@State private var entries: [AdministrationCalendarEntry] = []
 	@State private var editor: AdministrationCalendarEntry?
 	@Environment(\.statusBadgeManager) private var badges
+	@Environment(\.appPresentation) private var presentation
+	@Environment(\.closeWideNavigationDestination) private var closeWideNavigationDestination
 
 	var body: some View {
 		List {
 			ForEach(entries) { entry in
-				Button {
-					editor = entry
-				} label: {
-					Label {
-						VStack(alignment: .leading, spacing: 4) {
-							Text(entry.label)
-								.foregroundStyle(.primary)
-							Text(dateLabel(for: entry))
-								.font(.footnote)
-								.foregroundStyle(.secondary)
+				entryLink(entry)
+					.buttonStyle(.plain)
+					.listRowInsets(.init(top: 2, leading: 20, bottom: 2, trailing: 20))
+					.swipeActions {
+						Button("Delete", systemImage: "trash", role: .destructive) {
+							delete(entry.id)
 						}
-					} icon: {
-						Image(systemName: kind == "term" ? "calendar" : "calendar.badge.exclamationmark")
 					}
-					.padding(.vertical, 6)
-				}
-				.buttonStyle(.plain)
-				.listRowInsets(.init(top: 2, leading: 20, bottom: 2, trailing: 20))
-				.swipeActions {
-					Button("Delete", systemImage: "trash", role: .destructive) {
-						delete(entry.id)
-					}
-				}
 			}
 
-			Button(addButtonTitle, systemImage: "plus") {
-				editor = newEntry()
-			}
-			.listRowInsets(.init(top: 2, leading: 20, bottom: 2, trailing: 20))
+			addEntryLink
+				.listRowInsets(.init(top: 2, leading: 20, bottom: 2, trailing: 20))
 		}
 		.appNavigationTitle(navigationTitle, accent: true)
 		.task {
@@ -55,6 +40,67 @@ struct AdministrationCalendarEntriesView: View {
 				delete: deleteFromEditor,
 				close: { editor = nil }
 			)
+		}
+	}
+
+	@ViewBuilder
+	private func entryLink(_ entry: AdministrationCalendarEntry) -> some View {
+		if presentation == .iOS {
+			Button {
+				editor = entry
+			} label: {
+				entryLabel(entry)
+			}
+		} else {
+			NavigationLink {
+				AdministrationCalendarEditor(
+					entry: entry,
+					save: save,
+					delete: deleteFromEditor,
+					close: closeWideNavigationDestination,
+					embedsInNavigation: false,
+					showsCloseButton: false
+				)
+			} label: {
+				entryLabel(entry)
+			}
+		}
+	}
+
+	private func entryLabel(_ entry: AdministrationCalendarEntry) -> some View {
+		Label {
+			VStack(alignment: .leading, spacing: 4) {
+				Text(entry.label)
+					.foregroundStyle(.primary)
+				Text(dateLabel(for: entry))
+					.font(.footnote)
+					.foregroundStyle(.secondary)
+			}
+		} icon: {
+			Image(systemName: kind == "term" ? "calendar" : "calendar.badge.exclamationmark")
+		}
+		.padding(.vertical, 6)
+	}
+
+	@ViewBuilder
+	private var addEntryLink: some View {
+		if presentation == .iOS {
+			Button(addButtonTitle, systemImage: "plus") {
+				editor = newEntry()
+			}
+		} else {
+			NavigationLink {
+				AdministrationCalendarEditor(
+					entry: newEntry(),
+					save: save,
+					delete: deleteFromEditor,
+					close: closeWideNavigationDestination,
+					embedsInNavigation: false,
+					showsCloseButton: false
+				)
+			} label: {
+				Label(addButtonTitle, systemImage: "plus")
+			}
 		}
 	}
 

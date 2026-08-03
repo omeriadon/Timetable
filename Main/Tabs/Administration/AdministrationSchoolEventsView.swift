@@ -6,40 +6,24 @@ struct AdministrationSchoolEventsView: View {
 	@State private var service = CalendarEventsSyncService.shared
 	@State private var editorTarget: AdministrationSchoolEventEditorTarget?
 	@Environment(\.statusBadgeManager) private var badges
+	@Environment(\.appPresentation) private var presentation
+	@Environment(\.closeWideNavigationDestination) private var closeWideNavigationDestination
 
 	var body: some View {
 		List {
 			ForEach(events.globalEvents) { event in
-				Button {
-					editorTarget = .edit(event)
-				} label: {
-					Label {
-						VStack(alignment: .leading, spacing: 4) {
-							Text(event.title)
-								.foregroundStyle(.primary)
-							Text(event.date.displayLabel)
-								.font(.footnote)
-								.foregroundStyle(.secondary)
-						}
-					} icon: {
-						Image(systemName: event.symbol)
-					}
-					.padding(.vertical, 6)
-				}
-				.buttonStyle(.plain)
-				.listRowInsets(.init(top: 2, leading: 20, bottom: 2, trailing: 20))
-				.swipeActions {
-					Button("Delete", systemImage: "trash", role: .destructive) {
-						Task {
-							try? await delete(event)
+				eventLink(event)
+					.listRowInsets(.init(top: 2, leading: 20, bottom: 2, trailing: 20))
+					.swipeActions {
+						Button("Delete", systemImage: "trash", role: .destructive) {
+							Task {
+								try? await delete(event)
+							}
 						}
 					}
-				}
 			}
 
-			Button("Add School Event", systemImage: "plus") {
-				editorTarget = .create
-			}
+			addEventLink
 		}
 		.appNavigationTitle("School Events", accent: true)
 		.refreshable {
@@ -54,6 +38,68 @@ struct AdministrationSchoolEventsView: View {
 			)
 			.presentationDetents([.fraction(0.6)])
 		}
+	}
+
+	@ViewBuilder
+	private func eventLink(_ event: CalendarEvent) -> some View {
+		if presentation == .iOS {
+			Button {
+				editorTarget = .edit(event)
+			} label: {
+				eventLabel(event)
+			}
+			.buttonStyle(.plain)
+		} else {
+			NavigationLink {
+				AdministrationSchoolEventEditor(
+					target: .edit(event),
+					save: save,
+					delete: delete,
+					close: closeWideNavigationDestination,
+					embedsInNavigation: false,
+					showsCloseButton: false
+				)
+			} label: {
+				eventLabel(event)
+			}
+		}
+	}
+
+	@ViewBuilder
+	private var addEventLink: some View {
+		if presentation == .iOS {
+			Button("Add School Event", systemImage: "plus") {
+				editorTarget = .create
+			}
+		} else {
+			NavigationLink {
+				AdministrationSchoolEventEditor(
+					target: .create,
+					save: save,
+					delete: delete,
+					close: closeWideNavigationDestination,
+					embedsInNavigation: false,
+					showsCloseButton: false
+				)
+			} label: {
+				Label("Add School Event", systemImage: "plus")
+			}
+		}
+	}
+
+	private func eventLabel(_ event: CalendarEvent) -> some View {
+		Label {
+			VStack(alignment: .leading, spacing: 4) {
+				Text(event.title)
+					.foregroundStyle(.primary)
+				Text(event.date.displayLabel)
+					.font(.footnote)
+					.foregroundStyle(.secondary)
+			}
+		} icon: {
+			Image(systemName: event.symbol)
+		}
+		.padding(.vertical, 6)
 	}
 
 	private func save(

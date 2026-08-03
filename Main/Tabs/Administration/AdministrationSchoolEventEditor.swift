@@ -5,6 +5,8 @@ struct AdministrationSchoolEventEditor: View {
 	let save: (CreateCalendarEventRequest, CalendarEvent?) async throws -> Void
 	let delete: (CalendarEvent) async throws -> Void
 	let close: () -> Void
+	let embedsInNavigation: Bool
+	let showsCloseButton: Bool
 
 	@State private var title: String
 	@State private var notes: String
@@ -19,12 +21,16 @@ struct AdministrationSchoolEventEditor: View {
 		target: AdministrationSchoolEventEditorTarget,
 		save: @escaping (CreateCalendarEventRequest, CalendarEvent?) async throws -> Void,
 		delete: @escaping (CalendarEvent) async throws -> Void,
-		close: @escaping () -> Void
+		close: @escaping () -> Void,
+		embedsInNavigation: Bool = true,
+		showsCloseButton: Bool = true
 	) {
 		self.target = target
 		self.save = save
 		self.delete = delete
 		self.close = close
+		self.embedsInNavigation = embedsInNavigation
+		self.showsCloseButton = showsCloseButton
 		_title = State(initialValue: target.event?.title ?? "")
 		_notes = State(initialValue: target.event?.notes ?? "")
 		_symbol = State(initialValue: target.event?.symbol ?? "calendar")
@@ -33,67 +39,77 @@ struct AdministrationSchoolEventEditor: View {
 	}
 
 	var body: some View {
-		NavigationStack {
-			Form {
-				TextField("Title", text: $title)
-				TextField("Notes", text: $notes, axis: .vertical)
-					.lineLimit(3 ... 6)
-				DatePicker("Date", selection: $date, displayedComponents: .date)
+		if embedsInNavigation {
+			NavigationStack {
+				content
+			}
+		} else {
+			content
+		}
+	}
 
-				Button {
-					showsSymbolPicker = true
-				} label: {
-					Label("Symbol", systemImage: symbol)
-				}
+	private var content: some View {
+		Form {
+			TextField("Title", text: $title)
+			TextField("Notes", text: $notes, axis: .vertical)
+				.lineLimit(3 ... 6)
+			DatePicker("Date", selection: $date, displayedComponents: .date)
 
-				ForEach(tagSections) { section in
-					Section(section.displayName) {
-						ForEach(section.tags.filter { !$0.isArchived }) { tag in
-							Toggle(
-								tag.displayName,
-								isOn: Binding(
-									get: { selectedTagIDs.contains(tag.id) },
-									set: { isSelected in
-										if isSelected {
-											selectedTagIDs.insert(tag.id)
-										} else {
-											selectedTagIDs.remove(tag.id)
-										}
+			Button {
+				showsSymbolPicker = true
+			} label: {
+				Label("Symbol", systemImage: symbol)
+			}
+
+			ForEach(tagSections) { section in
+				Section(section.displayName) {
+					ForEach(section.tags.filter { !$0.isArchived }) { tag in
+						Toggle(
+							tag.displayName,
+							isOn: Binding(
+								get: { selectedTagIDs.contains(tag.id) },
+								set: { isSelected in
+									if isSelected {
+										selectedTagIDs.insert(tag.id)
+									} else {
+										selectedTagIDs.remove(tag.id)
 									}
-								)
+								}
 							)
-						}
+						)
 					}
 				}
 			}
-			.appGroupedFormStyle()
-			.appNavigationTitle(target.event == nil ? "School Event" : "Edit School Event", accent: true)
-			.toolbar {
+		}
+		.appGroupedFormStyle()
+		.appNavigationTitle(target.event == nil ? "School Event" : "Edit School Event", accent: true)
+		.toolbar {
+			if showsCloseButton {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) {
 						close()
 					}
 				}
-
-				ToolbarItem(placement: .confirmationAction) {
-					Button(target.event == nil ? "Add" : "Save", systemImage: target.event == nil ? "plus" : "checkmark", role: .confirm) {
-						saveEvent()
-					}
-					.disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-					.buttonStyle(.glassProminent)
-				}
 			}
-			.safeAreaBar(edge: .bottom) {
-				if let event = target.event {
-					Button("Delete Event", systemImage: "trash", role: .destructive) {
-						deleteEvent(event)
-					}
-					.buttonStyle(.glassProminent)
-					.tint(.red)
+
+			ToolbarItem(placement: .confirmationAction) {
+				Button(target.event == nil ? "Add" : "Save", systemImage: target.event == nil ? "plus" : "checkmark", role: .confirm) {
+					saveEvent()
 				}
+				.disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+				.buttonStyle(.glassProminent)
 			}
 		}
-		.interactiveDismissDisabled()
+		.safeAreaBar(edge: .bottom) {
+			if let event = target.event {
+				Button("Delete Event", systemImage: "trash", role: .destructive) {
+					deleteEvent(event)
+				}
+				.buttonStyle(.glassProminent)
+				.tint(.red)
+			}
+		}
+		.interactiveDismissDisabled(embedsInNavigation)
 		.task {
 			guard let catalogue = try? await administrationService.eventTags() else {
 				return
