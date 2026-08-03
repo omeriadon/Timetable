@@ -182,7 +182,7 @@ final class SessionStore {
 
 	@discardableResult
 	func updateProfile(displayName: String? = nil, email: String? = nil) async throws -> AccountProfile {
-		try Platform.require(Platform.current.isAuthoritative)
+		try Platform.require(Platform.current.allowsEditing)
 		Print("Updating account profile", category: .account)
 		let response: UserProfileResponse = try await networkManager.send(
 			.v1ProfileUpdate,
@@ -210,7 +210,7 @@ final class SessionStore {
 	}
 
 	func deleteAccount() async throws {
-		try Platform.require(Platform.current.isAuthoritative)
+		try Platform.require(Platform.current.allowsEditing)
 		Print("Deleting account", category: .account)
 		try await networkManager.send(.v1ProfileDelete)
 		await signingOutHandler?()

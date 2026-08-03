@@ -56,12 +56,13 @@ final class AppRouter {
 	private let persistenceStore: AppNavigationPersistenceStore
 
 	init(
-		persistenceStore: AppNavigationPersistenceStore = AppNavigationPersistenceStore()
+		persistenceStore: AppNavigationPersistenceStore? = nil
 	) {
-		self.persistenceStore = persistenceStore
-		persistsNavigationState = Defaults[.persistsNavigationState]
-
+		let persistenceStore = persistenceStore ?? AppNavigationPersistenceStore()
+		let persistsNavigationState = Defaults[.persistsNavigationState]
 		let snapshot = persistsNavigationState ? persistenceStore.load() : nil
+
+		self.persistenceStore = persistenceStore
 		selectedTab = snapshot?.selectedTab ?? .timetable
 		timetablePath = snapshot?.timetablePath ?? []
 		friendsPath = snapshot?.friendsPath ?? []
@@ -73,6 +74,7 @@ final class AppRouter {
 		inspectorRoute = nil
 		pendingExternalRoute = nil
 		presentation = .iOS
+		self.persistsNavigationState = persistsNavigationState
 	}
 
 	func updatePresentation(_ presentation: AppPresentation) {

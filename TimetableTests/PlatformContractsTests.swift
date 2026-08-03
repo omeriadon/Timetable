@@ -1,16 +1,17 @@
 import XCTest
 
 final class PlatformContractsTests: XCTestCase {
-	func testAuthorityPolicy() {
-		XCTAssertTrue(Platform.iOS.isAuthoritative)
-		XCTAssertFalse(Platform.iPadOS.isAuthoritative)
-		XCTAssertFalse(Platform.macOS.isAuthoritative)
-		XCTAssertFalse(Platform.watchOS.isAuthoritative)
+	func testCapabilityPolicy() {
+		XCTAssertTrue(Platform.iOS.allowsOwnerMutation)
+		XCTAssertTrue(Platform.iPadOS.allowsOwnerMutation)
+		XCTAssertTrue(Platform.macOS.allowsOwnerMutation)
+		XCTAssertFalse(Platform.watchOS.allowsOwnerMutation)
 		XCTAssertTrue(Platform.iPadOS.allowsNotificationSettings)
 		XCTAssertTrue(Platform.iPadOS.allowsAppleAuthentication)
 		XCTAssertTrue(Platform.macOS.allowsAppleAuthentication)
 		XCTAssertFalse(Platform.watchOS.allowsAppleAuthentication)
-		XCTAssertFalse(Platform.macOS.allowsOwnerMutation)
+		XCTAssertTrue(Platform.macOS.allowsAccountCreation)
+		XCTAssertFalse(Platform.watchOS.allowsAccountCreation)
 	}
 
 	func testInstallationIDsAreStableAndPlatformScoped() throws {

@@ -56,19 +56,21 @@ struct FriendsView: View {
 			await search(for: searchText)
 		}
 		.popover(item: $sheet) { sheet in
-			switch sheet {
-				case .addFriend:
-					AddFriendSheet(close: { self.sheet = nil })
-						.navigationTransition(.zoom(sourceID: sheet.transitionID, in: sheetNamespace))
-						.presentationDetents([.large])
-						.presentationDragIndicator(.hidden)
-						.frame(iOS: .init(), macOS: .init(width: 620, height: 700))
-				case .requests:
-					FriendRequestsSheet(close: { self.sheet = nil })
-						.navigationTransition(.zoom(sourceID: sheet.transitionID, in: sheetNamespace))
-						.presentationDetents([.fraction(0.6), .large])
-						.presentationDragIndicator(.hidden)
-						.frame(iOS: .init(), macOS: .init(width: 620, height: 700))
+			Group {
+				switch sheet {
+					case .addFriend:
+						AddFriendSheet(close: { self.sheet = nil })
+							.navigationTransition(.zoom(sourceID: sheet.transitionID, in: sheetNamespace))
+							.presentationDetents([.large])
+							.presentationDragIndicator(.hidden)
+							.frame(iOS: .init(), macOS: .init(width: 620, height: 700))
+					case .requests:
+						FriendRequestsSheet(close: { self.sheet = nil })
+							.navigationTransition(.zoom(sourceID: sheet.transitionID, in: sheetNamespace))
+							.presentationDetents([.fraction(0.6), .large])
+							.presentationDragIndicator(.hidden)
+							.frame(iOS: .init(), macOS: .init(width: 620, height: 700))
+				}
 			}
 			.presentationCompactAdaptation(.sheet)
 		}
