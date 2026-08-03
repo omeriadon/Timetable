@@ -41,7 +41,11 @@ struct CreatedTimetablesSettingsView: View {
 					.buttonStyle(.glassProminent)
 				} else {
 					NavigationLink {
-						CreatedTimetableCreateView(close: closeWideNavigationDestination)
+						CreatedTimetableCreateView(
+							close: closeWideNavigationDestination,
+							embedsInNavigation: false,
+							showsCloseButton: false
+						)
 					} label: {
 						Label("Create Timetable", systemImage: "plus")
 					}
@@ -83,48 +87,67 @@ private struct CreatedTimetableCreateView: View {
 	@State private var showSubjectEditor = false
 	@State private var isSaving = false
 	let close: () -> Void
+	let embedsInNavigation: Bool
+	let showsCloseButton: Bool
 	@Environment(\.statusBadgeManager) private var badges
 
-	init(close: @escaping () -> Void) {
+	init(
+		close: @escaping () -> Void,
+		embedsInNavigation: Bool = true,
+		showsCloseButton: Bool = true
+	) {
 		self.close = close
+		self.embedsInNavigation = embedsInNavigation
+		self.showsCloseButton = showsCloseButton
 	}
 
 	var body: some View {
-		NavigationStack {
-			Form {
-				TextField("Title", text: $title)
-				Button("Edit Subjects", systemImage: "pencil") { showSubjectEditor = true }
+		if embedsInNavigation {
+			NavigationStack {
+				content
 			}
-			#if os(iOS)
-			.navigationBarTitleDisplayMode(.large)
-			#endif
-			.appNavigationTitle("New Created Timetable", accent: true)
-			.toolbar {
+		} else {
+			content
+		}
+	}
+
+	private var content: some View {
+		Form {
+			TextField("Title", text: $title)
+			Button("Edit Subjects", systemImage: "pencil") {
+				showSubjectEditor = true
+			}
+		}
+		#if os(iOS)
+		.navigationBarTitleDisplayMode(.large)
+		#endif
+		.appNavigationTitle("New Created Timetable", accent: true)
+		.toolbar {
+			if showsCloseButton {
 				ToolbarItem(placement: .cancellationAction) {
-					Button("Close", systemImage: "xmark", role: .cancel) {
+					Button(role: .cancel) {
 						close()
 					}
-					.labelStyle(.iconOnly)
 					.disabled(isSaving)
 				}
+			}
 
-				ToolbarItem(placement: .confirmationAction) {
-					Button("Create", systemImage: "checkmark", role: .confirm) {
-						Task {
-							await create()
-						}
+			ToolbarItem(placement: .confirmationAction) {
+				Button("Create", systemImage: "checkmark", role: .confirm) {
+					Task {
+						await create()
 					}
-					.buttonStyle(.glassProminent)
-					.labelStyle(.iconOnly)
-					.disabled(isSaving || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 				}
+				.buttonStyle(.glassProminent)
+				.labelStyle(.iconOnly)
+				.disabled(isSaving || title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
 			}
-			.sheet(isPresented: $showSubjectEditor) {
-				SubjectEditorSheet(subjects: $subjects, initialRequest: nil)
-					.presentationDetents([.large])
-					.presentationDragIndicator(.hidden)
-					.interactiveDismissDisabled()
-			}
+		}
+		.sheet(isPresented: $showSubjectEditor) {
+			SubjectEditorSheet(subjects: $subjects, initialRequest: nil)
+				.presentationDetents([.large])
+				.presentationDragIndicator(.hidden)
+				.interactiveDismissDisabled()
 		}
 	}
 

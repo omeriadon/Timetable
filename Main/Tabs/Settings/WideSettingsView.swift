@@ -56,6 +56,7 @@ struct WideSettingsView: View {
 		}
 		.formStyle(.grouped)
 		.tint(.accent)
+		.symbolRenderingMode(.monochrome)
 		.scrollContentBackground(.hidden)
 		.appNavigationTitle("Settings", style: .main, accent: true)
 	}
