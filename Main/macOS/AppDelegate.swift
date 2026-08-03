@@ -1,10 +1,10 @@
 #if os(macOS)
-//
+	//
 	//   AppDelegate.swift
 	//   Main
-//
+	//
 	//   Created by Adon Omeri on 16/6/2026.
-//
+	//
 
 	import AppKit
 	import SwiftUI
