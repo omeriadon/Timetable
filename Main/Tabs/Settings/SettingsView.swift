@@ -163,7 +163,6 @@ import WidgetKit
 					.presentationDetents([.large])
 					.presentationContentInteraction(.scrolls)
 					.presentationDragIndicator(.hidden)
-					.interactiveDismissDisabled()
 				}
 			}
 

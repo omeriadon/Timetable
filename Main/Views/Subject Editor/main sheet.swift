@@ -144,7 +144,6 @@ struct SubjectEditorSheet: View {
 		#if os(iOS)
 		.presentationDetents([.height(750), .large])
 		.presentationDragIndicator(.hidden)
-		.interactiveDismissDisabled()
 		#endif
 	}
 

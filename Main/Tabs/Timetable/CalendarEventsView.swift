@@ -113,7 +113,6 @@ struct DatesView: View {
 			)
 		}
 		.presentationDetents([.fraction(0.7)])
-		.interactiveDismissDisabled()
 	}
 
 	private var termDateCards: some View {
@@ -490,7 +489,6 @@ private struct CalendarEventEditor: View {
 					)
 				}
 			}
-			.interactiveDismissDisabled()
 			.appNavigationTitle(navigationTitle)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {

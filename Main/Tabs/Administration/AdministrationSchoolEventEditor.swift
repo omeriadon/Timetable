@@ -109,7 +109,6 @@ struct AdministrationSchoolEventEditor: View {
 				.tint(.red)
 			}
 		}
-		.interactiveDismissDisabled(embedsInNavigation)
 		.task {
 			guard let catalogue = try? await administrationService.eventTags() else {
 				return

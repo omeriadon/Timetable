@@ -147,7 +147,6 @@ private struct CreatedTimetableCreateView: View {
 			SubjectEditorSheet(subjects: $subjects, initialRequest: nil)
 				.presentationDetents([.large])
 				.presentationDragIndicator(.hidden)
-				.interactiveDismissDisabled()
 		}
 	}
 
@@ -221,7 +220,6 @@ private struct CreatedTimetableEditorView: View {
 			SubjectEditorSheet(subjects: $subjects, initialRequest: nil)
 				.presentationDetents([.large])
 				.presentationDragIndicator(.hidden)
-				.interactiveDismissDisabled()
 		}
 		.onChange(of: subjects) { save() }
 	}

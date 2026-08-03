@@ -1,78 +1,81 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "CFBundleDisplayName": {
-      "comment": "Bundle display name",
-      "extractionState": "extracted_with_value",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": "Timetable"
+  "sourceLanguage" : "en",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "comment" : "Bundle display name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Timetable"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Emploi du temps"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emploi du temps"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Orario"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orario"
           }
         }
       }
     },
-    "CFBundleName": {
-      "comment": "Bundle name",
-      "extractionState": "extracted_with_value",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": "Timetable"
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Timetable"
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Emploi du temps"
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emploi du temps"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Orario"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Orario"
           }
         }
       }
     },
-    "NSCalendarsFullAccessUsageDescription": {
-      "comment": "Privacy - Calendars Full Access Usage Description",
-      "extractionState": "extracted_with_value",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": "Timetable needs to read your calendar to pull Compass Events from your schedule."
+    "NSCalendarsFullAccessUsageDescription" : {
+      "comment" : "Privacy - Calendars Full Access Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Timetable needs to read your calendar to pull Compass Events from your schedule."
           }
         },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Timetable doit lire votre calendrier pour récupérer les événements Compass depuis votre emploi du temps."
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timetable doit lire votre calendrier pour récupérer les événements Compass depuis votre emploi du temps."
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Timetable deve leggere il tuo calendario per recuperare gli eventi Compass dal tuo orario."
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timetable deve leggere il tuo calendario per recuperare gli eventi Compass dal tuo orario."
           }
         }
       }
+    },
+    "Timetable Share" : {
+
     }
   },
-  "version": "1.3"
+  "version" : "1.3"
 }

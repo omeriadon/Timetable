@@ -87,7 +87,6 @@ struct AdministrationEventTagEditor: View {
 					)
 				}
 			}
-			.interactiveDismissDisabled()
 			.appGroupedFormStyle()
 			.appNavigationTitle(tag == nil ? "Add Tag" : "Edit Tag", accent: true)
 			.toolbar {
@@ -125,7 +124,6 @@ struct AdministrationEventTagEditor: View {
 				Text("Archived tags are removed from active selection and subscriptions.")
 			}
 		}
-		.interactiveDismissDisabled()
 		.presentationDetents([.large])
 		.sheet(isPresented: $showsSymbolPicker) {
 			AdministrationEventSymbolPicker(symbol: $symbol)

@@ -267,7 +267,6 @@ private struct EventNotificationScheduleSheet: View {
 				.pickerStyle(.wheel)
 				#endif
 			}
-			.interactiveDismissDisabled()
 			.presentationDetents([.medium])
 			.appNavigationTitle("Event Notification", accent: true)
 			.toolbar {

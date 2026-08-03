@@ -292,7 +292,7 @@ struct TimetableView: View {
 					}
 				#endif
 			#else
-			.onChange(of: selectedSlot) {
+					.onChange(of: selectedSlot) {
 						if selectedSlot == nil {
 							expanded = .none
 						} else {

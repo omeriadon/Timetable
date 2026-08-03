@@ -184,7 +184,6 @@ struct ProfileAppearanceSheet: View {
 				.padding(.top, 10)
 				.padding(.bottom, 12)
 			}
-			.interactiveDismissDisabled()
 			.ignoresSafeArea(.all, edges: .bottom)
 			.appNavigationTitle("Profile", accent: true)
 			.toolbar {

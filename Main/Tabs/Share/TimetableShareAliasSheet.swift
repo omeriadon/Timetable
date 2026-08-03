@@ -133,7 +133,6 @@ struct TimetableShareAliasSheet: View {
 				}
 			}
 		}
-		.interactiveDismissDisabled(true)
 		.scrollDismissesKeyboard(.never)
 		.task {
 			await service.fetchCurrentAlias()
