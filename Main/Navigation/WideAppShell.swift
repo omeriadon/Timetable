@@ -43,8 +43,13 @@ struct WideAppShell: View {
 		}
 		.inspector(isPresented: inspectorPresented) {
 			if let route = router.inspectorRoute {
-				WideRouteDestinationView(route: route)
-					.inspectorColumnWidth(min: 400, ideal: 430, max: 460)
+				ZStack {
+					WideRouteDestinationView(route: route)
+						.id(route)
+						.transition(.opacity)
+				}
+				.animation(.easeInOut(duration: 0.2), value: route)
+				.inspectorColumnWidth(min: 400, ideal: 430, max: 460)
 			}
 		}
 		.onReceive(NotificationCenter.default.publisher(for: .openTimetableTab)) { _ in
