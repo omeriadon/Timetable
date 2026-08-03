@@ -92,14 +92,19 @@ struct AdministrationView: View {
 				}
 			} label: {
 				HStack {
-					Label(title, systemImage: systemImage)
+					Label {
+						Text(title)
+							.foregroundStyle(isSelected ? .white : .primary)
+					} icon: {
+						Image(systemName: systemImage)
+							.foregroundStyle(isSelected ? .white : .accent)
+					}
 					Spacer()
 					Image(systemName: "chevron.right")
 						.foregroundStyle(isSelected ? .white : .secondary)
 				}
 				.contentShape(Rectangle())
 			}
-			.foregroundStyle(isSelected ? .white : .primary)
 			.listRowBackground(isSelected ? Color.accentColor : nil)
 		}
 	}
