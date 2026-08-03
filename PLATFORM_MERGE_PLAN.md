@@ -4,6 +4,14 @@ Status: planning complete enough to begin implementation after review.
 
 Date: 2026-08-03
 
+## Implementation progress
+
+- Phase 1 complete in source: platform, navigation, capability, target-membership, presentation, and structural boundaries are recorded in `PLATFORM_MERGE_INVENTORY.md`.
+- Phase 2 complete in source: shared presentation resolution, generic platform values, adaptive padding, and adaptive frame APIs are implemented.
+- Phase 3 complete in source: shared Codable routes, versioned route URLs, legacy timetable URL decoding, and external route producers are implemented.
+- Phase 4 complete in source: every app window owns a router with compact paths, sidebar state, inspector state, deferred external routes, presentation translation, and optional persistence.
+- User Xcode build and runtime verification remains outstanding. Source inspection does not establish compilation or behavior.
+
 Repositories:
 
 - Client: `/Users/omeriadon/Documents/Xcode_App_Library/Timetable`

@@ -4,6 +4,20 @@ This file contains every build, runtime, visual, signing, deployment, and produc
 
 Codex must not mark an item complete unless the user explicitly reports that it passed. Codex does not run builds or tests.
 
+## Current Phase 1–4 gate
+
+- [ ] Build the `Timetable` scheme for an iPhone destination.
+- [ ] Build the `Timetable` scheme for an iPad destination.
+- [ ] Build the `Timetable` scheme for My Mac.
+- [ ] Build the `Widget` scheme.
+- [ ] Build the `Watch Widget` scheme.
+- [ ] Build the `Watch` scheme.
+- [ ] Confirm the iPhone app still opens the current UIKit tab shell.
+- [ ] Confirm `timetable://timetable` still opens Timetable.
+- [ ] Confirm a current widget opens Timetable through the new route URL.
+- [ ] Confirm an App Intent timetable destination opens Timetable.
+- [ ] Report every compiler error verbatim before Phase 5 begins.
+
 ## Before implementation
 
 - [ ] Create or confirm a recoverable PostgreSQL backup before the session-authority migration is deployed.
