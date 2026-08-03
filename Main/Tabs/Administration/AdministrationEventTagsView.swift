@@ -14,23 +14,25 @@ struct AdministrationEventTagsView: View {
 		List {
 			ForEach(tags) { tag in
 				if let section = section(for: tag) {
-					if presentation == .iOS {
-						Button {
-							editor = .tag(tag, section: section)
-						} label: {
-							tagLabel(tag)
-						}
-						.buttonStyle(.plain)
-					} else {
-						NavigationLink {
-							AdministrationEventTagEditor(
-								tag: tag,
-								section: section,
-								save: saveTag,
-								close: closeWideNavigationDestination
-							)
-						} label: {
-							tagLabel(tag)
+					Group {
+						if presentation == .iOS {
+							Button {
+								editor = .tag(tag, section: section)
+							} label: {
+								tagLabel(tag)
+							}
+							.buttonStyle(.plain)
+						} else {
+							NavigationLink {
+								AdministrationEventTagEditor(
+									tag: tag,
+									section: section,
+									save: saveTag,
+									close: closeWideNavigationDestination
+								)
+							} label: {
+								tagLabel(tag)
+							}
 						}
 					}
 					.opacity(tag.isArchived ? 0.55 : 1)
