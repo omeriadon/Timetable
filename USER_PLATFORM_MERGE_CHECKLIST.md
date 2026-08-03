@@ -14,6 +14,17 @@ Codex must not mark an item complete unless the user explicitly reports that it 
 - [ ] Confirm notification-driven switches to Timetable and Settings still work.
 - [ ] Confirm the navigation restoration toggle appears under the routed Navigation settings destination.
 
+## Phase 6–7 gate
+
+- [ ] Review pmstt commits before deployment.
+- [ ] Confirm a recoverable production database backup exists before running `InvalidateLegacyPlatformSessions`.
+- [ ] Run the pmstt migration only in the intended release window because it signs out every current client and watch session.
+- [ ] Confirm registration succeeds from iPhone, iPad, and Mac after deployment.
+- [ ] Confirm iPhone, iPad, and Mac sessions can perform account, settings, timetable, sharing, and notification mutations.
+- [ ] Confirm watch sessions can read and log out but cannot mutate settings, notifications, timetables, or accounts.
+- [ ] Confirm only an authenticated iPhone session can provision a watch session.
+- [ ] Build the `Timetable` scheme for iPhone, iPad, and My Mac after the client policy change.
+
 ## Phase 1–4 gate history
 
 - [ ] Build the `Timetable` scheme for an iPhone destination.

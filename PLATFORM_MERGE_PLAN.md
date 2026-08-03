@@ -1269,6 +1269,8 @@ User gate: iPhone build and reference comparison.
 
 ### Phase 6 — Server capability contract
 
+Status: implemented in pmstt source; awaiting server validation and migration deployment approval.
+
 Work in pmstt:
 
 - give iOS/iPadOS/macOS full capabilities;
@@ -1288,12 +1290,22 @@ No deployment during implementation.
 
 ### Phase 7 — Client policy unification
 
+Status: implemented in client source; awaiting main-platform build gates.
+
 Work:
 
 - remove main-platform mutation restrictions;
 - unify bootstrap;
 - retain genuine feature capability flags;
 - prepare full features for macOS target membership.
+
+Implementation:
+
+- iOS, iPadOS, and macOS now share the same mutation policy;
+- watchOS remains read/logout only and cannot create accounts;
+- main-platform bootstrap always reconciles the owner timetable instead of selecting a read-only download path;
+- profile updates and all existing mutation services use the unified main-platform policy;
+- platform policy helpers remain available to reject watch-only unsupported mutations.
 
 Expected commit:
 

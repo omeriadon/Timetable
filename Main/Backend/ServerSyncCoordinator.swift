@@ -103,7 +103,7 @@ final class ServerSyncCoordinator {
 	}
 
 	func scheduleProfileUpdate(_ displayName: String) {
-		guard SessionStore.shared.isAuthenticated, Platform.current.isAuthoritative else { return }
+		guard SessionStore.shared.isAuthenticated, Platform.current.allowsEditing else { return }
 
 		profileTask?.cancel()
 

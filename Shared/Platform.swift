@@ -8,17 +8,9 @@ enum Platform: String, Codable, Sendable, CaseIterable {
 	static let appGroupSuiteName = "group.omeriadon.timetable"
 
 	case iOS, iPadOS, macOS, watchOS
-	enum Authority: String, Codable, Sendable { case authoritative, nonAuthoritative }
-	var authority: Authority {
-		self == .iOS ? .authoritative : .nonAuthoritative
-	}
-
-	var isAuthoritative: Bool {
-		authority == .authoritative
-	}
 
 	var allowsAccountCreation: Bool {
-		self == .iOS
+		self != .watchOS
 	}
 
 	var allowsAppleAuthentication: Bool {
@@ -26,23 +18,23 @@ enum Platform: String, Codable, Sendable, CaseIterable {
 	}
 
 	var allowsOwnerMutation: Bool {
-		self == .iOS
+		self != .watchOS
 	}
 
 	var allowsCreatedTimetableMutation: Bool {
-		self == .iOS
+		self != .watchOS
 	}
 
 	var allowsReceivedTimetableMutation: Bool {
-		self == .iOS
+		self != .watchOS
 	}
 
 	var allowsSharing: Bool {
-		self == .iOS
+		self != .watchOS
 	}
 
 	var allowsEditing: Bool {
-		self == .iOS
+		self != .watchOS
 	}
 
 	var allowsNotificationSettings: Bool {
@@ -63,6 +55,12 @@ enum Platform: String, Codable, Sendable, CaseIterable {
 		#else
 			.iOS
 		#endif
+	}
+
+	static func require(_ allowed: Bool) throws {
+		guard allowed else {
+			throw PlatformPolicyError.platformActionUnavailable
+		}
 	}
 }
 
@@ -95,10 +93,4 @@ struct ClientIdentityProvider {
 	}
 
 	static let shared = ClientIdentityProvider()
-}
-
-extension Platform {
-	static func require(_ allowed: Bool) throws {
-		guard allowed else { throw PlatformPolicyError.platformActionUnavailable }
-	}
 }
