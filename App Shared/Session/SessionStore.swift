@@ -52,10 +52,7 @@ final class SessionStore {
 	private var signingOutHandler: (() async -> Void)?
 
 	private static var initialState: AuthenticationState {
-		if let profile = Defaults[.accountProfile] {
-			return .authenticated(profile)
-		}
-		return .restoring
+		.restoring
 	}
 
 	private init(networkManager: NetworkManager) {
@@ -67,51 +64,27 @@ final class SessionStore {
 		Print("Restoring session state", category: .account)
 		configureNetworkAuthentication()
 
-		guard let profile = Defaults[.accountProfile] else {
+		guard Defaults[.accountProfile] != nil else {
 			clearSessionState()
 			return
 		}
 
-		// Keep the cached account visible while the server verifies its session.
-		state = .authenticated(profile)
-
-		if let accessToken, !accessToken.isEmpty {
-			state = .authenticated(profile)
-			await authenticatedHandler?()
-			if let accountBootstrapHandler {
-				try? await accountBootstrapHandler()
-			}
-			Print("Restored authenticated session for \(profile.id)", category: .account)
-			return
-		}
-
-		guard refreshToken != nil else {
-			// Keep the last known signed-in surface until the server proves that
-			// the session was revoked or the account was deleted.
-			state = .authenticated(profile)
+		guard accessToken != nil || refreshToken != nil else {
+			clearSessionState()
 			return
 		}
 
 		do {
-			try await refreshSilently()
-		} catch let NetworkError.server(statusCode, response)
-			where statusCode == 401 || response.code == .sessionExpired
-		{
-			clearSessionState()
-		} catch let error as NetworkError {
+			let profile = try await refreshProfile()
+			if let accountBootstrapHandler {
+				try await accountBootstrapHandler()
+			}
 			state = .authenticated(profile)
-			PrintError(
-				"Using cached authenticated session after refresh failure for \(profile.id)",
-				category: .account,
-				error: error
-			)
+			await authenticatedHandler?()
+			Print("Restored authenticated session for \(profile.id)", category: .account)
 		} catch {
-			state = .authenticated(profile)
-			PrintError(
-				"Using cached authenticated session after silent restore failure for \(profile.id)",
-				category: .account,
-				error: error
-			)
+			PrintError("Session restoration failed", category: .account, error: error)
+			clearSessionState()
 		}
 	}
 
