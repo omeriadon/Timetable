@@ -73,7 +73,6 @@ struct WideRouteDestinationView: View {
 					.labelStyle(.iconOnly)
 			}
 		}
-		.transition(.opacity)
 	}
 
 	private func close() {

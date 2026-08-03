@@ -25,31 +25,20 @@ struct WideAppShell: View {
 			.navigationSplitViewColumnWidth(min: 180, ideal: 200, max: 210)
 		} detail: {
 			NavigationStack(path: $router.sidebarPath) {
-				ZStack {
-					WideRootDestinationView(
-						destination: router.selectedSidebarDestination,
-						expanded: $expanded
-					)
-					.id(router.selectedSidebarDestination)
-					.transition(.opacity)
-				}
-				.animation(.easeInOut, value: router.selectedSidebarDestination)
+				WideRootDestinationView(
+					destination: router.selectedSidebarDestination,
+					expanded: $expanded
+				)
 				.navigationDestination(for: AppRoute.self) { route in
 					WideRouteDestinationView(route: route)
-						.transition(.opacity)
 				}
 			}
 			.navigationSplitViewColumnWidth(min: 540, ideal: 700, max: 860)
 		}
 		.inspector(isPresented: inspectorPresented) {
 			if let route = router.inspectorRoute {
-				ZStack {
-					WideRouteDestinationView(route: route)
-						.id(route)
-						.transition(.opacity)
-				}
-				.animation(.easeInOut(duration: 0.2), value: route)
-				.inspectorColumnWidth(min: 400, ideal: 430, max: 460)
+				WideRouteDestinationView(route: route)
+					.inspectorColumnWidth(min: 400, ideal: 430, max: 460)
 			}
 		}
 		.onReceive(NotificationCenter.default.publisher(for: .openTimetableTab)) { _ in
