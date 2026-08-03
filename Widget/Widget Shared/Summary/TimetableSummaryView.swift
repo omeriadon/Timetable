@@ -5,6 +5,7 @@
 //  Created by Adon Omeri on 31/7/2026.
 //
 
+import CoreGraphics
 import ImageIO
 import SwiftUI
 import WidgetKit

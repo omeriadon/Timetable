@@ -30,7 +30,7 @@ struct FriendsView: View {
 		.scrollEdgeEffect()
 		.appNavigationTitle("Friends", style: .main, accent: true)
 		.toolbar {
-			ToolbarItem(placement: .topBarLeading) {
+			ToolbarItem(placement: .secondaryAction) {
 				Button("Friend requests", systemImage: incomingFriendRequests.isEmpty ? "bell" : "bell.badge") {
 					if presentation == .iOS {
 						sheet = .requests
@@ -41,7 +41,7 @@ struct FriendsView: View {
 				.badge(incomingFriendRequests.count)
 				.accessibilityValue(incomingFriendRequests.isEmpty ? "No pending requests" : "\(incomingFriendRequests.count) pending requests")
 			}
-			ToolbarItem(placement: .topBarTrailing) {
+			ToolbarItem(placement: .primaryAction) {
 				Button("Add friend", systemImage: "person.badge.plus") {
 					sheet = .addFriend
 				}

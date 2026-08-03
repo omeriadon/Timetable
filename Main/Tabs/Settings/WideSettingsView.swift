@@ -103,7 +103,7 @@ struct WideSettingsView: View {
 	) -> some View {
 		let isSelected = router.inspectorRoute == route
 
-		Button {
+		return Button {
 			if isSelected {
 				router.inspectorRoute = nil
 			} else {
