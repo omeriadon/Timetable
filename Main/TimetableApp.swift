@@ -236,8 +236,8 @@ struct TimetableApp: App {
 			queueSharedTimetable(locator)
 			return
 		}
-		guard let destination = TimetableDeepLink(url: url) else { return }
-		NotificationCenter.default.post(name: .openTimetableDestination, object: destination)
+		guard let route = AppRoute(url: url) else { return }
+		NotificationCenter.default.post(name: .openTimetableDestination, object: route)
 	}
 
 	@MainActor
@@ -245,7 +245,7 @@ struct TimetableApp: App {
 		if isOwnerShareLink(locator) {
 			NotificationCenter.default.post(
 				name: .openTimetableDestination,
-				object: TimetableDeepLink.timetable(id: nil)
+				object: AppRoute.timetable(.root)
 			)
 			StatusBadgeManager.shared.addBadge(
 				id: UUID(),
@@ -282,7 +282,7 @@ struct TimetableApp: App {
 			pendingSharedTimetableLocator = nil
 			NotificationCenter.default.post(
 				name: .openTimetableDestination,
-				object: TimetableDeepLink.timetable(id: timetable.id)
+				object: AppRoute.timetable(.received(id: timetable.id))
 			)
 			StatusBadgeManager.shared.addBadge(
 				id: UUID(),

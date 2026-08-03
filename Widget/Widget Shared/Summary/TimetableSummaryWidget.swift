@@ -18,7 +18,7 @@ struct TimetableSummaryWidget: Widget {
 						.resizable()
 						.aspectRatio(contentMode: .fill)
 				}
-				.widgetURL(URL(string: "timetable://timetable"))
+				.widgetURL(AppRoute.timetable(.root).url)
 				.redacted(reason: entry.isPlaceholder ? .placeholder : [])
 		}
 		.configurationDisplayName("Timetable Summary")

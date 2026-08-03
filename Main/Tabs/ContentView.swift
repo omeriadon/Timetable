@@ -25,13 +25,6 @@ import SwiftUI
 		case normal, loading, success, error
 	}
 
-	enum MainTab: String, Hashable {
-		case timetable
-		case settings
-		case friends
-		case administration
-	}
-
 	struct ContentView: View {
 		@State private var networkManager = NetworkManager.shared
 		@Environment(\.statusBadgeManager) private var statusBadgeManager

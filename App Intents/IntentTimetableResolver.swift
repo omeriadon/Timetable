@@ -43,25 +43,37 @@ enum IntentTimetableResolver {
 	}
 
 	static func timetableURL(for timetable: ResolvedTimetable) -> URL {
-		if let receivedID = timetable.receivedID {
-			return URL(string: "timetable://received/\(receivedID.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? receivedID)")!
+		let route: AppRoute = if let receivedID = timetable.receivedID {
+			.timetable(.received(id: receivedID))
+		} else {
+			.timetable(.root)
 		}
-		return URL(string: "timetable://owner")!
+		guard let url = route.url else {
+			preconditionFailure("Unable to encode timetable route.")
+		}
+		return url
 	}
 
 	static func subjectURL(for timetable: ResolvedTimetable, subjectID: String, day: Int? = nil, session: Int? = nil) -> URL {
-		var components = URLComponents()
-		components.scheme = "timetable"
-		if let receivedID = timetable.receivedID {
-			components.host = "received"
-			components.path = "/\(receivedID)/subject/\(subjectID)"
+		let slot: Slot? = if let day,
+		                     let session,
+		                     (0 ..< 5).contains(day),
+		                     TimetableLayout.period(forSession: session) != nil
+		{
+			Slot(day, session)
 		} else {
-			components.host = "owner"
-			components.path = "/subject/\(subjectID)"
+			nil
 		}
-		if let day, let session, (0 ..< 5).contains(day), TimetableLayout.period(forSession: session) != nil {
-			components.queryItems = [URLQueryItem(name: "day", value: String(day)), URLQueryItem(name: "session", value: String(session))]
+		let route = AppRoute.timetable(
+			.subject(
+				timetableID: timetable.receivedID,
+				subjectID: subjectID,
+				slot: slot
+			)
+		)
+		guard let url = route.url else {
+			preconditionFailure("Unable to encode subject route.")
 		}
-		return components.url!
+		return url
 	}
 }

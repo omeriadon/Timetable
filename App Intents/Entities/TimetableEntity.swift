@@ -50,9 +50,9 @@ struct TimetableEntity: Identifiable, AppEntity, SyncableEntity {
 			searchKeywords = [sender].compactMap(\.self) + names
 			let rawReceivedID = id.hasPrefix("timetable.received.") ? String(id.dropFirst("timetable.received.".count)) : nil
 			contentURL = if let rawReceivedID {
-				URL(string: "timetable://received/\(rawReceivedID)")
+				AppRoute.timetable(.received(id: rawReceivedID)).url
 			} else {
-				URL(string: "timetable://owner")
+				AppRoute.timetable(.root).url
 			}
 		#endif
 	}

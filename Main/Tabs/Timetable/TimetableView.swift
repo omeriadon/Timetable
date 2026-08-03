@@ -248,15 +248,24 @@ struct TimetableView: View {
 				selectedSlot = nil
 			}
 			.onReceive(NotificationCenter.default.publisher(for: .openTimetableDestination)) { notification in
-				guard let destination = notification.object as? TimetableDeepLink else { return }
+				guard let route = notification.object as? AppRoute,
+				      case let .timetable(destination) = route
+				else {
+					return
+				}
 				switch destination {
-					case let .timetable(id):
-						selectedTimetable = id.flatMap { received in receivedTimetables.first { $0.id == received && !$0.isDeleted } }
+					case .root:
+						selectedTimetable = nil
+						selectedSlot = nil
+					case let .received(id):
+						selectedTimetable = receivedTimetables.first { $0.id == id && !$0.isDeleted }
 						selectedSlot = nil
 					case let .subject(timetableID, subjectID, slot):
 						selectedTimetable = timetableID.flatMap { received in receivedTimetables.first { $0.id == received && !$0.isDeleted } }
 						let subjects = selectedTimetable?.subjects ?? subjects
 						selectedSlot = slot ?? subjects.first(where: { $0.id == subjectID })?.slots.first
+					case .planner, .calendarEvent:
+						break
 				}
 			}
 			#if os(iOS)

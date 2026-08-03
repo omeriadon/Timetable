@@ -24,7 +24,7 @@ struct SchoolDayLiveActivityWidget: Widget {
 				.activityBackgroundTint(context.state.color.swiftUIColor)
 				.activitySystemActionForegroundColor(.white)
 				.contentMargins(.vertical, 0, for: .automatic)
-				.widgetURL(URL(string: "timetable://timetable"))
+				.widgetURL(AppRoute.timetable(.root).url)
 
 		} dynamicIsland: { context in
 			DynamicIsland {
@@ -145,7 +145,7 @@ struct SchoolDayLiveActivityWidget: Widget {
 				}
 			}
 			.keylineTint(context.state.color.swiftUIColor)
-			.widgetURL(URL(string: "timetable://timetable"))
+			.widgetURL(AppRoute.timetable(.root).url)
 		}
 		.supplementalActivityFamilies([.small, .medium])
 	}

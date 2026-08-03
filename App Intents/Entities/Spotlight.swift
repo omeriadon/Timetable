@@ -67,43 +67,6 @@ final class SpotlightIndexer {
 	}
 }
 
-enum TimetableDeepLink: Equatable {
-	case timetable(id: String?)
-	case subject(timetableID: String?, subjectID: String, slot: Slot?)
-
-	init?(url: URL) {
-		guard url.scheme == "timetable" else { return nil }
-		let parts = ([url.host].compactMap(\.self) + url.pathComponents.dropFirst().filter { $0 != "/" })
-		guard let first = parts.first else {
-			self = .timetable(id: nil)
-			return
-		}
-		if first == "received", parts.count >= 2 {
-			let id = String(parts[1])
-			if parts.count >= 4, parts[2] == "subject" {
-				self = .subject(timetableID: id, subjectID: String(parts[3]), slot: Self.slot(from: url))
-			} else {
-				self = .timetable(id: id)
-			}
-			return
-		}
-		if first == "owner", parts.count >= 3, parts[1] == "subject" {
-			self = .subject(timetableID: nil, subjectID: String(parts[2]), slot: Self.slot(from: url))
-			return
-		}
-		self = .timetable(id: first == "owner" ? nil : first)
-	}
-
-	private static func slot(from url: URL) -> Slot? {
-		guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-		      let query = components.queryItems,
-		      let day = query.first(where: { $0.name == "day" })?.value.flatMap(Int.init),
-		      let session = query.first(where: { $0.name == "session" })?.value.flatMap(Int.init)
-		else { return nil }
-		return Slot(day, session)
-	}
-}
-
 func indexEntities() async {
 	await SpotlightIndexer.shared.rebuildFromDefaults()
 }
