@@ -13,9 +13,10 @@ extension Notification.Name {
 }
 
 struct TimetableView: View {
+	@Environment(AppRouter.self) private var router
+	@Environment(\.appPresentation) private var presentation
 	#if os(iOS)
-		@Binding var watchSync: PhoneWatchSyncBridge
-		@Binding var syncStatus: SyncMode
+		@State private var watchSync = PhoneWatchSyncBridge.shared
 	#else
 		@Binding var expanded: WindowMode
 	#endif
@@ -38,12 +39,8 @@ struct TimetableView: View {
 
 	#if os(iOS)
 		init(
-			watchSync: Binding<PhoneWatchSyncBridge>,
-			syncStatus: Binding<SyncMode>,
 			startComparisonOpen: Bool = false
 		) {
-			_watchSync = watchSync
-			_syncStatus = syncStatus
 			_showTimetableComparison = State(initialValue: startComparisonOpen)
 		}
 	#else
@@ -265,6 +262,28 @@ struct TimetableView: View {
 					case .planner, .calendarEvent:
 						break
 				}
+			}
+			.onChange(of: selectedSlot) { _, slot in
+				guard presentation != .iOS else {
+					return
+				}
+				guard let slot,
+				      let subject = subjectLookup[slot]
+				else {
+					if case .some(.timetable) = router.inspectorRoute {
+						router.inspectorRoute = nil
+					}
+					return
+				}
+				router.navigate(
+					to: .timetable(
+						.subject(
+							timetableID: selectedTimetable?.id,
+							subjectID: subject.id,
+							slot: slot
+						)
+					)
+				)
 			}
 			#if os(iOS)
 			.onAppear {

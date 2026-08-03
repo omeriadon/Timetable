@@ -26,10 +26,6 @@ import WidgetKit
 		@State private var settingsSaveGeneration = 0
 		@Default(.debugOffset) private var debugOffset
 
-		let watchSync: PhoneWatchSyncBridge
-
-		@Binding var syncStatus: SyncMode
-
 		@State private var showCalendarImportSheet = false
 		@State private var showEditTimetableSheet = false
 		@State private var showFeedbackSheet = false
@@ -46,11 +42,6 @@ import WidgetKit
 		@State private var colorTransitionSpeed = 10.0
 
 		@Namespace private var ns
-
-		init(watchSync: PhoneWatchSyncBridge, syncStatus: Binding<SyncMode>) {
-			self.watchSync = watchSync
-			_syncStatus = syncStatus
-		}
 
 		var body: some View {
 			Group {

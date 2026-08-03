@@ -1,9 +1,32 @@
 import Foundation
+import SwiftUI
 
 enum AppSidebarVisibility: String, Codable, Hashable, Sendable {
 	case automatic
 	case all
 	case detailOnly
+
+	init(_ visibility: NavigationSplitViewVisibility) {
+		switch visibility {
+			case .all:
+				self = .all
+			case .detailOnly:
+				self = .detailOnly
+			default:
+				self = .automatic
+		}
+	}
+
+	var navigationSplitViewVisibility: NavigationSplitViewVisibility {
+		switch self {
+			case .automatic:
+				.automatic
+			case .all:
+				.all
+			case .detailOnly:
+				.detailOnly
+		}
+	}
 }
 
 struct AppNavigationSnapshot: Codable, Equatable, Sendable {

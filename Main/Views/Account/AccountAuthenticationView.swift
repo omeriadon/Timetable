@@ -39,7 +39,9 @@ struct AccountAuthenticationView: View {
 					text: $model.verificationCode,
 					problems: []
 				)
+				#if os(iOS)
 				.keyboardType(.numberPad)
+				#endif
 
 				if let verificationExpiresAt = model.verificationExpiresAt {
 					Text("Code expires \(verificationExpiresAt, style: .relative)")

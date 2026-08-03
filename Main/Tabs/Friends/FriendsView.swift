@@ -13,6 +13,8 @@ struct FriendsView: View {
 	@State private var isSearching = false
 	@State private var draggedFriend: FriendSummary?
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
+	@Environment(\.appPresentation) private var presentation
+	@Environment(AppRouter.self) private var router
 	@Namespace private var sheetNamespace
 
 	var body: some View {
@@ -31,7 +33,11 @@ struct FriendsView: View {
 		.toolbar {
 			ToolbarItem(placement: .topBarLeading) {
 				Button("Friend requests", systemImage: incomingFriendRequests.isEmpty ? "bell" : "bell.badge") {
-					sheet = .requests
+					if presentation == .iOS {
+						sheet = .requests
+					} else {
+						router.navigate(to: .friends(.requests))
+					}
 				}
 				.matchedTransitionSource(id: FriendsSheet.requests.transitionID, in: sheetNamespace)
 				.badge(incomingFriendRequests.count)
@@ -49,19 +55,22 @@ struct FriendsView: View {
 		.task(id: searchText) {
 			await search(for: searchText)
 		}
-		.sheet(item: $sheet) { sheet in
+		.popover(item: $sheet) { sheet in
 			switch sheet {
 				case .addFriend:
 					AddFriendSheet(close: { self.sheet = nil })
 						.navigationTransition(.zoom(sourceID: sheet.transitionID, in: sheetNamespace))
 						.presentationDetents([.large])
 						.presentationDragIndicator(.hidden)
+						.frame(iOS: .init(), macOS: .init(width: 620, height: 700))
 				case .requests:
 					FriendRequestsSheet(close: { self.sheet = nil })
 						.navigationTransition(.zoom(sourceID: sheet.transitionID, in: sheetNamespace))
 						.presentationDetents([.fraction(0.6), .large])
 						.presentationDragIndicator(.hidden)
+						.frame(iOS: .init(), macOS: .init(width: 620, height: 700))
 			}
+			.presentationCompactAdaptation(.sheet)
 		}
 		.sheet(item: $selectedFriend) { friend in
 			FriendDetailView(friend: friend, close: { selectedFriend = nil })
@@ -99,7 +108,11 @@ struct FriendsView: View {
 				} else {
 					ForEach(friends) { friend in
 						Button {
-							selectedFriend = friend
+							if presentation == .iOS {
+								selectedFriend = friend
+							} else {
+								router.navigate(to: .friends(.friend(id: friend.id)))
+							}
 						} label: {
 							animatedScrollCard(FriendStatusCard(friend: friend))
 						}

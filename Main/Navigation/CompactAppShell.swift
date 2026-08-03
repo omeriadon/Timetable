@@ -5,8 +5,6 @@
 	struct CompactAppShell: View {
 		@Environment(AppRouter.self) private var router
 		@State private var networkManager = NetworkManager.shared
-		@State private var watchSync = PhoneWatchSyncBridge.shared
-		@State private var rootSyncStatus = SyncMode.normal
 		@Default(.accountProfile) private var accountProfile
 
 		var body: some View {
@@ -19,13 +17,10 @@
 					value: MainTab.timetable
 				) {
 					NavigationStack(path: $router.timetablePath) {
-						TimetableView(
-							watchSync: $watchSync,
-							syncStatus: $rootSyncStatus
-						)
-						.navigationDestination(for: AppRoute.self) { route in
-							CompactRouteDestinationView(route: route)
-						}
+						TimetableView()
+							.navigationDestination(for: AppRoute.self) { route in
+								CompactRouteDestinationView(route: route)
+							}
 					}
 				}
 
@@ -48,13 +43,10 @@
 					value: MainTab.settings
 				) {
 					NavigationStack(path: $router.settingsPath) {
-						SettingsView(
-							watchSync: watchSync,
-							syncStatus: $rootSyncStatus
-						)
-						.navigationDestination(for: AppRoute.self) { route in
-							CompactRouteDestinationView(route: route)
-						}
+						SettingsView()
+							.navigationDestination(for: AppRoute.self) { route in
+								CompactRouteDestinationView(route: route)
+							}
 					}
 				}
 

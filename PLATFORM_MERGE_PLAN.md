@@ -1313,6 +1313,8 @@ Expected commit:
 
 ### Phase 8 — Sidebar shell
 
+Status: implemented in source; awaiting iPad/macOS build and width-transition review.
+
 Work:
 
 - add adaptive root selection;
@@ -1331,6 +1333,8 @@ User gate: iPad and macOS builds, then width-transition review.
 
 ### Phase 9 — Authentication parity
 
+Status: implemented in source; awaiting authentication-flow review on all main platforms.
+
 Work:
 
 - share iPhone onboarding;
@@ -1344,6 +1348,8 @@ Expected commit:
 `expand authentication to all main platforms`
 
 ### Phase 10 — Timetable parity
+
+Status: implemented in source; awaiting iPad/macOS timetable and inspector review.
 
 Work:
 
@@ -1361,6 +1367,8 @@ Expected commits:
 
 ### Phase 11 — Friends parity
 
+Status: implemented in source; awaiting wide-screen popover and inspector review.
+
 Work:
 
 - promote full Friends feature;
@@ -1375,6 +1383,8 @@ Expected commits:
 - `split friend detail components`
 
 ### Phase 12 — Settings and account parity
+
+Status: implemented in source; awaiting Settings, account, and profile review.
 
 Work:
 

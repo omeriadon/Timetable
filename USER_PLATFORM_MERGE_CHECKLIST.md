@@ -25,6 +25,27 @@ Codex must not mark an item complete unless the user explicitly reports that it 
 - [ ] Confirm only an authenticated iPhone session can provision a watch session.
 - [ ] Build the `Timetable` scheme for iPhone, iPad, and My Mac after the client policy change.
 
+## Phase 8–12 gate
+
+- [ ] Build the `Timetable` scheme for an iPhone destination and confirm the bottom tab bar is unchanged.
+- [ ] Build the `Timetable` scheme for an iPad destination in compact and regular widths.
+- [ ] Build the `Timetable` scheme for My Mac.
+- [ ] Confirm iPad compact width uses the iPhone tab shell and regular width uses the two-column sidebar.
+- [ ] Confirm switching between compact and regular widths preserves the selected root and translates the active route.
+- [ ] Confirm sidebar selection and visibility restore only when Restore Navigation is enabled.
+- [ ] Confirm the sidebar has Timetable, Personal, and separate Administration sections.
+- [ ] Confirm iPhone, iPad, and Mac can sign in and create an account.
+- [ ] Confirm the full onboarding appears on iPhone and iPad when onboarding is incomplete.
+- [ ] Confirm watch authentication remains paired-iPhone provisioned.
+- [ ] Confirm the full timetable renders on iPad and Mac without changing the iPhone layout.
+- [ ] Confirm selecting a timetable subject opens the inspector on iPad and Mac.
+- [ ] Confirm Friends search, requests, ordering, add-friend presentation, and friend details work on iPad and Mac.
+- [ ] Confirm friend detail opens in the inspector on wide layouts and remains a sheet on iPhone.
+- [ ] Confirm wide Settings exposes Account, profile editing, notifications, tags, navigation restoration, feedback, and About.
+- [ ] Confirm Settings secondary destinations open in the inspector on iPad and Mac.
+- [ ] Confirm profile name, monogram, font, emoji, colour, and photo behavior on Mac.
+- [ ] Report every compiler error verbatim before Phase 13 begins.
+
 ## Phase 1–4 gate history
 
 - [ ] Build the `Timetable` scheme for an iPhone destination.

@@ -89,16 +89,16 @@ struct AccountView: View {
 				.foregroundStyle(.accent)
 			}
 			.matchedTransitionSource(id: "account-profile-editor", in: profileNamespace)
-			#if os(iOS)
-				LabeledContent("Name") {
-					TextField("Name", text: $displayName)
-						.multilineTextAlignment(.trailing)
-						.submitLabel(.done)
-				}
-				.onChange(of: displayName) { _, value in ServerSyncCoordinator.shared.scheduleProfileUpdate(value) }
-			#else
-				LabeledContent("Name", value: profile.displayName)
-			#endif
+			LabeledContent("Name") {
+				TextField("Name", text: $displayName)
+					.multilineTextAlignment(.trailing)
+				#if os(iOS)
+					.submitLabel(.done)
+				#endif
+			}
+			.onChange(of: displayName) { _, value in
+				ServerSyncCoordinator.shared.scheduleProfileUpdate(value)
+			}
 			if let email = profile.email {
 				LabeledContent("Email", value: email)
 			}

@@ -7,7 +7,7 @@ import SwiftUI
 #endif
 
 struct ProfileAppearanceSheet: View {
-	let close: () -> Void = {}
+	let close: () -> Void
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	@Environment(\.statusBadgeManager) private var statusBadges
 	@State private var service = FriendService.shared
@@ -24,7 +24,8 @@ struct ProfileAppearanceSheet: View {
 		@State private var photoCropRequest: ProfilePhotoCropRequest?
 	#endif
 
-	init() {
+	init(close: @escaping () -> Void = {}) {
+		self.close = close
 		_draft = State(initialValue: ProfileAppearanceDraft(
 			profile: Defaults[.accountProfile],
 			fallbackAppearance: Defaults[.profileAppearance]

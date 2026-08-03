@@ -11,7 +11,6 @@
 	import Sticker
 	import WindowOverlay
 #endif
-import ColorfulX
 import Defaults
 import Foundation
 import SwiftUI
@@ -75,11 +74,11 @@ struct TimetableApp: App {
 					#if os(macOS)
 						switch sessionStore.state {
 							case .signedOut:
-							MacSignInGateView()
+							MainPlatformAuthenticationView()
 							case .restoring:
 							ProgressView("Restoring Account…")
 							case .authenticated:
-							NonAuthoritativeRootView(expanded: $expanded)
+							AdaptiveAppShell(expanded: $expanded)
 						}
 					#else
 						ZStack {
@@ -87,7 +86,7 @@ struct TimetableApp: App {
 								case .signedOut:
 									ZStack {
 										if Platform.current == .iPadOS || hasCompletedOnboarding {
-											IOSSignInGateView()
+											MainPlatformAuthenticationView()
 												.transition(.blurReplace)
 										} else {
 											Color.clear
@@ -101,13 +100,8 @@ struct TimetableApp: App {
 										.transition(.blurReplace)
 
 								case .authenticated:
-									if Platform.current == .iPadOS {
-										NonAuthoritativeRootView(expanded: $expanded)
-											.transition(.blurReplace)
-									} else {
-										CompactAppShell()
-											.transition(.blurReplace)
-									}
+									AdaptiveAppShell(expanded: $expanded)
+										.transition(.blurReplace)
 							}
 						}
 						.animation(.easeInOut, value: sessionStore.state)
@@ -164,8 +158,7 @@ struct TimetableApp: App {
 				}
 				#if os(iOS)
 				.fullScreenCover(isPresented: .constant(
-					Platform.current == .iOS
-						&& !hasCompletedOnboarding
+					!hasCompletedOnboarding
 				)) {
 					OnboardingView()
 						.interactiveDismissDisabled()
@@ -385,90 +378,3 @@ struct TimetableApp: App {
 		}
 	#endif // os(macOS)
 }
-
-#if os(macOS)
-	private struct MacSignInGateView: View {
-		@State private var colors = ColorfulPreset.aurora
-		@State private var speed = 1.2
-		@State private var colorTransitionSpeed = 10.0
-
-		var body: some View {
-			Color.clear
-				.sheet(isPresented: .constant(true)) {
-					VStack(spacing: 20) {
-						Image("Icon")
-							.resizable()
-							.frame(width: 150, height: 150)
-							.shadow(color: .black, radius: 15)
-
-						Text("Sign in to use Timetable").font(.title2.bold())
-						Text("Don't have an account? Sign in / sign up on iPhone then come back here.")
-
-						AccountAuthenticationView(allowsSignUp: false)
-					}
-					.padding(30)
-					.interactiveDismissDisabled()
-					.presentationBackground {
-						ColorfulView(
-							color: $colors,
-							speed: $speed,
-							bias: .constant(0.00001),
-							noise: .constant(200),
-							transitionSpeed: $colorTransitionSpeed,
-							frameLimit: .constant(60),
-							renderScale: .constant(1)
-						)
-						.opacity(0.8)
-					}
-					.presentationSizing(.fitted)
-				}
-		}
-	}
-#endif // os(macOS)
-
-#if os(iOS)
-	private struct IOSSignInGateView: View {
-		@Default(.hasCompletedOnboarding) private var hasCompletedOnboarding
-		@Default(.onboardingPageID) private var onboardingPageID
-
-		var body: some View {
-			NavigationStack {
-				ZStack {
-					OnboardingBackground(currentPageID: "splash")
-
-					ScrollView {
-						AccountAuthenticationView(allowsSignUp: false)
-					}
-					.scrollBounceBehavior(.basedOnSize)
-					.scrollEdgeEffectStyle(.none, for: .vertical)
-				}
-				.scrollEdgeEffect(offset: 0.8)
-				.safeAreaBar(edge: .top, alignment: .center, spacing: 10) {
-					VStack {
-						Text("Sign in to use Timetable")
-							.font(.title)
-							.bold()
-							.lineLimit(3)
-						if Device.isIPad {
-							Text("Don't have an account? Sign in / sign up on iPhone then come back here.")
-						}
-					}
-				}
-				.safeAreaBar(edge: .bottom) {
-					if Platform.current.allowsAccountCreation {
-						Button {
-							onboardingPageID = "account"
-							hasCompletedOnboarding = false
-						} label: {
-							Label("Create an Account", systemImage: "person.badge.plus")
-						}
-						.buttonStyle(.glassProminent)
-						.controlSize(.large)
-						.buttonSizing(.flexible)
-						.padding(.horizontal, 20)
-					}
-				}
-			}
-		}
-	}
-#endif // os(iOS)
