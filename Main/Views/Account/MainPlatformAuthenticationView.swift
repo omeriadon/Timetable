@@ -12,8 +12,8 @@ struct MainPlatformAuthenticationView: View {
 	}
 
 	var body: some View {
-		#if os(iOS)
-			NavigationStack {
+		NavigationStack {
+			#if os(iOS)
 				ZStack {
 					OnboardingBackground(currentPageID: "splash")
 
@@ -42,9 +42,9 @@ struct MainPlatformAuthenticationView: View {
 					.buttonSizing(.flexible)
 					.padding(.horizontal, 20)
 				}
-			}
-		#else
-			NavigationStack {
+
+			#else
+
 				ZStack {
 					OnboardingBackground(currentPageID: "splash")
 						.ignoresSafeArea()
@@ -74,34 +74,35 @@ struct MainPlatformAuthenticationView: View {
 					}
 					.scrollBounceBehavior(.basedOnSize)
 				}
-			}
-			.sheet(isPresented: $presentsMacOnboarding) {
-				NavigationStack {
-					ZStack {
-						OnboardingBackground(currentPageID: "account")
-							.ignoresSafeArea()
 
-						ScrollView {
-							AccountAuthenticationView(allowsSignUp: true)
-								.frame(maxWidth: 560)
-								.padding(30)
+				.sheet(isPresented: $presentsMacOnboarding) {
+					NavigationStack {
+						ZStack {
+							OnboardingBackground(currentPageID: "account")
+								.ignoresSafeArea()
+
+							ScrollView {
+								AccountAuthenticationView(allowsSignUp: true)
+									.frame(maxWidth: 560)
+									.padding(30)
+							}
 						}
-					}
-					.toolbar {
-						ToolbarItem(placement: .cancellationAction) {
-							Button(role: .cancel) {
-								presentsMacOnboarding = false
+						.toolbar {
+							ToolbarItem(placement: .cancellationAction) {
+								Button(role: .cancel) {
+									presentsMacOnboarding = false
+								}
 							}
 						}
 					}
+					.frame(minWidth: 680, minHeight: 620)
 				}
-				.frame(minWidth: 680, minHeight: 620)
+			#endif
+		}
+		.onAppear {
+			if let initialPageID {
+				onboardingPageID = initialPageID
 			}
-		#endif
-			.onAppear {
-				if let initialPageID {
-					onboardingPageID = initialPageID
-				}
-			}
+		}
 	}
 }

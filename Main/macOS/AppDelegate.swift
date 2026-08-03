@@ -29,7 +29,7 @@
 				if editMenuIndex <= 0 {
 					mainMenu.removeItem(at: editMenuIndex)
 				}
-
+				s
 				let fileMenuIndex = mainMenu.indexOfItem(withTitle: "File")
 
 				if fileMenuIndex <= 0 {
