@@ -179,7 +179,7 @@ struct TimetableApp: App {
 					}
 				}
 				.onChange(of: sessionStore.state) { _, state in
-					guard state == .authenticated else { return }
+					guard case .authenticated = state else { return }
 					if let route = router.resumePendingExternalRoute() {
 						NotificationCenter.default.post(
 							name: .openTimetableDestination,
