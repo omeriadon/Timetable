@@ -12,7 +12,7 @@ import WidgetKit
 struct TimetableWidgetBundle: WidgetBundle {
 	var body: some Widget {
 		SharedWidgetBundle()
-		#if os(iOS)
+		#if os(iOS) && !targetEnvironment(macCatalyst)
 			SchoolDayLiveActivityWidget()
 		#endif
 		TimetableSummaryWidget()

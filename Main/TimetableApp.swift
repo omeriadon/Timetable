@@ -9,7 +9,6 @@
 	import AppKit
 #else
 	import Sticker
-	import WindowOverlay
 #endif
 import Defaults
 import Foundation
@@ -82,6 +81,11 @@ struct TimetableApp: App {
 							AdaptiveAppShell(expanded: $expanded)
 								.transition(.blurReplace)
 					}
+
+					#if os(iOS)
+						StatusBadgeOverlay()
+							.zIndex(9_999_999)
+					#endif
 				}
 				.animation(.easeInOut, value: sessionStore.state)
 				.onOpenURL { url in
@@ -91,12 +95,6 @@ struct TimetableApp: App {
 					guard let url = activity.webpageURL else { return }
 					handleIncomingURL(url, router: router)
 				}
-				#if os(iOS)
-				.windowOverlay(isPresented: true, disableSafeArea: false) {
-					StatusBadgeOverlay()
-						.zIndex(9_999_999)
-				}
-				#endif // os(iOS)
 				.task {
 					NetworkManager.shared.configureFeedback { StatusBadgeManager.shared.present(networkError: $0) }
 					sessionStore.configureAccountBootstrap {
@@ -104,14 +102,14 @@ struct TimetableApp: App {
 					}
 					sessionStore.configureDeviceLifecycle {
 						await NotificationRegistrationService.shared.uploadPendingToken()
-						#if os(iOS)
+						#if os(iOS) && !targetEnvironment(macCatalyst)
 							if Platform.current == .iOS {
 								await LiveActivityRegistrationService.shared.startObserving()
 							}
 							PhoneWatchSyncBridge.shared.sendAuthenticatedStateIfPossible()
-						#endif // os(iOS)
+						#endif
 					} signingOut: {
-						#if os(iOS)
+						#if os(iOS) && !targetEnvironment(macCatalyst)
 							PhoneWatchSyncBridge.shared.sendSignedOutStateIfPossible()
 							await LiveActivityRegistrationService.shared.removeLiveActivityToken()
 						#endif
@@ -125,7 +123,7 @@ struct TimetableApp: App {
 
 					await NotificationRegistrationService.shared.requestRemoteRegistration()
 
-					#if os(iOS)
+					#if os(iOS) && !targetEnvironment(macCatalyst)
 						if Platform.current == .iOS {
 							await LiveActivityRegistrationService.shared.startObserving()
 						}

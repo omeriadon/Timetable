@@ -18,16 +18,14 @@
 		2A5F91F12FE650FE007302CF /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A5F91F02FE650FE007302CF /* IrregularGradient */; };
 		2A79F3B030138FAB003CA797 /* Sticker in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2A79F3AF30138FAB003CA797 /* Sticker */; };
 		2A79F3B330138FD2003CA797 /* SFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 2A79F3B230138FD2003CA797 /* SFSymbolsPicker */; };
-		2A79F3B630138FFC003CA797 /* WindowOverlay in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2A79F3B530138FFC003CA797 /* WindowOverlay */; };
 		2A79F3B93013924E003CA797 /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A79F3B83013924E003CA797 /* IrregularGradient */; };
 		2A99A535301C3525005E48F7 /* SwiftEmoji in Frameworks */ = {isa = PBXBuildFile; productRef = 2A99A534301C3525005E48F7 /* SwiftEmoji */; };
-		2AA6DF242FDFAC9000BBC70E /* Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2AA6DF142FDFAC8F00BBC70E /* Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2AA6DF242FDFAC9000BBC70E /* Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2AA6DF142FDFAC8F00BBC70E /* Widget.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2AA6DF2C2FDFADAE00BBC70E /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AA6DF2B2FDFADAE00BBC70E /* Defaults */; };
 		2AB674D7300E387100A6815A /* Sticker in Frameworks */ = {isa = PBXBuildFile; productRef = 2AB674D6300E387100A6815A /* Sticker */; };
 		2ABBBA042FF4AD3A00878A9D /* PortalHeaders in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2ABBBA032FF4AD3A00878A9D /* PortalHeaders */; };
 		2ABBBA062FF4AD3A00878A9D /* PortalTransitions in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2ABBBA052FF4AD3A00878A9D /* PortalTransitions */; };
 		2AC5F7ED2FD8435700B813EA /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AC5F7EC2FD8435700B813EA /* Defaults */; };
-		2ADFCA8F2FF66F1A00B4301E /* WindowOverlay in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2ADFCA8E2FF66F1A00B4301E /* WindowOverlay */; };
 		2AE0586F300B591D00473DBD /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2A02379A2F9C907000AB1E1F /* Defaults */; };
 		2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */ = {isa = PBXBuildFile; platformFilters = (macos, ); productRef = 2AE0F13A2FE03989002B5D9D /* MaterialView */; };
 		2B0000013000000000000001 /* Timetable Messages.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2B0000023000000000000002 /* Timetable Messages.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -228,7 +226,7 @@
 				Info/Message.plist,
 				"Info/Watch Widget.plist",
 				Info/Widget.plist,
-				Timetable-Info.plist,
+				"Timetable-Info.plist",
 			);
 			platformFiltersByRelativePath = {
 				"/Localized: LaunchScreen.storyboard" = (ios, );
@@ -245,7 +243,7 @@
 				Info/Message.plist,
 				"Info/Watch Widget.plist",
 				Info/Widget.plist,
-				Timetable-Info.plist,
+				"Timetable-Info.plist",
 			);
 			target = 2A25869F2FB5D6490030C8CD /* Watch Widget */;
 		};
@@ -259,7 +257,7 @@
 				Info/Message.plist,
 				"Info/Watch Widget.plist",
 				Info/Widget.plist,
-				Timetable-Info.plist,
+				"Timetable-Info.plist",
 				Timetable.icon,
 			);
 			target = 2AA6DF132FDFAC8F00BBC70E /* Widget */;
@@ -274,7 +272,7 @@
 				Info/Message.plist,
 				"Info/Watch Widget.plist",
 				Info/Widget.plist,
-				Timetable-Info.plist,
+				"Timetable-Info.plist",
 			);
 			target = 2A098C822F9DB842002065BE /* Watch */;
 		};
@@ -389,8 +387,6 @@
 				2A324C082FF2980C00E6A3D5 /* FocusOnAppear in Frameworks */,
 				2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */,
 				2A02379B2F9C907000AB1E1F /* Defaults in Frameworks */,
-				2A79F3B630138FFC003CA797 /* WindowOverlay in Frameworks */,
-				2ADFCA8F2FF66F1A00B4301E /* WindowOverlay in Frameworks */,
 				2ABBBA042FF4AD3A00878A9D /* PortalHeaders in Frameworks */,
 				2A79F3B330138FD2003CA797 /* SFSymbolsPicker in Frameworks */,
 				2ABBBA062FF4AD3A00878A9D /* PortalTransitions in Frameworks */,
@@ -504,11 +500,9 @@
 				2A324C092FF2980C00E6A3D5 /* FocusOnAppear */,
 				2ABBBA032FF4AD3A00878A9D /* PortalHeaders */,
 				2ABBBA052FF4AD3A00878A9D /* PortalTransitions */,
-				2ADFCA8E2FF66F1A00B4301E /* WindowOverlay */,
 				2AB674D6300E387100A6815A /* Sticker */,
 				2A79F3AF30138FAB003CA797 /* Sticker */,
 				2A79F3B230138FD2003CA797 /* SFSymbolsPicker */,
-				2A79F3B530138FFC003CA797 /* WindowOverlay */,
 				2A79F3B83013924E003CA797 /* IrregularGradient */,
 				2A99A534301C3525005E48F7 /* SwiftEmoji */,
 			);
@@ -786,6 +780,7 @@
 		};
 		2AA6DF232FDFAC9000BBC70E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilter = ios;
 			target = 2AA6DF132FDFAC8F00BBC70E /* Widget */;
 			targetProxy = 2AA6DF222FDFAC9000BBC70E /* PBXContainerItemProxy */;
 		};
@@ -987,8 +982,8 @@
 				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
 				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
-				SUPPORTS_MACCATALYST = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -997,6 +992,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TOOLCHAINS = com.apple.dt.toolchain.XcodeDefault;
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Debug;
@@ -1061,8 +1057,8 @@
 				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
 				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
-				SUPPORTS_MACCATALYST = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -1071,6 +1067,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				TOOLCHAINS = com.apple.dt.toolchain.XcodeDefault;
 				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Release;
@@ -1646,10 +1643,6 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = SFSymbolsPicker;
 		};
-		2A79F3B530138FFC003CA797 /* WindowOverlay */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = WindowOverlay;
-		};
 		2A79F3B83013924E003CA797 /* IrregularGradient */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */;
@@ -1683,10 +1676,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = Defaults;
-		};
-		2ADFCA8E2FF66F1A00B4301E /* WindowOverlay */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = WindowOverlay;
 		};
 		2AE0F13A2FE03989002B5D9D /* MaterialView */ = {
 			isa = XCSwiftPackageProductDependency;
