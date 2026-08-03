@@ -51,14 +51,8 @@ struct FeedbackView: View {
 			.formStyle(.grouped)
 			.scrollContentBackground(.hidden)
 			.scrollEdgeEffectStyle(.soft, for: .all)
+			.appNavigationTitle("Report Feedback or Bug", accent: true)
 			.toolbar {
-				ToolbarItem(placement: .principal) {
-					Text("Report Feedback or Bug")
-						.font(.title)
-						.multilineTextAlignment(.leading)
-						.bold()
-				}
-
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel) { close() }
 				}

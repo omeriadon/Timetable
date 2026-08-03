@@ -15,6 +15,8 @@ struct WideSettingsView: View {
 	@State private var showsShareAliasEditor = false
 
 	var body: some View {
+		@Bindable var router = router
+
 		Form {
 			Section("Account") {
 				routeButton("Account", systemImage: "person.crop.circle", route: .settings(.account))
@@ -25,7 +27,11 @@ struct WideSettingsView: View {
 				routeButton("Subscribed Event Tags", systemImage: "tag", route: .settings(.tagSubscriptions))
 				Toggle("Highlight Current Day in timetables", systemImage: "inset.filled.lefthalf.righthalf.rectangle", isOn: highlightsCurrentDay)
 				Toggle("Haptic Feedback", systemImage: "iphone.radiowaves.left.and.right", isOn: $hapticsEnabled)
-				routeButton("Restore Navigation", systemImage: "arrow.counterclockwise.circle", route: .settings(.navigationPersistence))
+				Toggle(
+					"Restore Navigation",
+					systemImage: "arrow.counterclockwise.circle",
+					isOn: $router.persistsNavigationState
+				)
 			}
 
 			Section("Timetable Management") {

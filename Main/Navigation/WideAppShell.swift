@@ -22,6 +22,7 @@ struct WideAppShell: View {
 			.appNavigationTitle("Timetable")
 			.listStyle(.sidebar)
 			.scrollEdgeEffectStyle(.soft, for: .all)
+			.navigationSplitViewColumnWidth(min: 180, ideal: 200, max: 210)
 		} detail: {
 			NavigationStack(path: $router.sidebarPath) {
 				ZStack {
@@ -38,11 +39,12 @@ struct WideAppShell: View {
 						.transition(.opacity)
 				}
 			}
+			.navigationSplitViewColumnWidth(min: 540, ideal: 700, max: 860)
 		}
 		.inspector(isPresented: inspectorPresented) {
 			if let route = router.inspectorRoute {
 				WideRouteDestinationView(route: route)
-					.inspectorColumnWidth(min: 360, ideal: 480, max: 680)
+					.inspectorColumnWidth(min: 400, ideal: 430, max: 460)
 			}
 		}
 		.onReceive(NotificationCenter.default.publisher(for: .openTimetableTab)) { _ in

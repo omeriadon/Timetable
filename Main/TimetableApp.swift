@@ -165,18 +165,22 @@ struct TimetableApp: App {
 				.buttonStyle(.haptic)
 				#if os(macOS)
 					.frame(minWidth: 800, minHeight: 600)
+					.background {
+						CustomMaterialView()
+							.ignoresSafeArea()
+					}
 				#else
 					.overlay {
-						if launchIllusionVisible {
-							LaunchIllusionView {
-								launchIllusionVisible = false
+							if launchIllusionVisible {
+								LaunchIllusionView {
+									launchIllusionVisible = false
+								}
+								.ignoresSafeArea()
+								.allowsHitTesting(false)
 							}
-							.ignoresSafeArea()
-							.allowsHitTesting(false)
 						}
-					}
 				#endif
-					.preferredColorScheme(.dark)
+						.preferredColorScheme(.dark)
 			}
 		}
 		#if os(macOS)

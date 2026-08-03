@@ -9,7 +9,7 @@ struct TagSubscriptionsView: View {
 	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
-		List {
+		Form {
 			ForEach(tags) { tag in
 				Toggle(isOn:
 					Binding(
@@ -23,7 +23,8 @@ struct TagSubscriptionsView: View {
 					}
 			}
 		}
-		.scrollEdgeEffect()
+		.formStyle(.grouped)
+		.scrollContentBackground(.hidden)
 		.appNavigationTitle("Event Tags", accent: true)
 		.task {
 			await load()

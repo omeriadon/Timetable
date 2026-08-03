@@ -28,22 +28,19 @@ import SwiftUI
 		}
 	}
 #else
-	struct TabsPicker: NSViewRepresentable {
+	struct TabsPicker: View {
 		let items: [(title: String, icon: String)]
 		@Binding var selection: Int
 
-		func makeNSView(context _: Context) -> TabsView {
-			let view = TabsView()
-			view.items = items
-			view.onSelectionChange = { selection = $0 }
-			view.selectInitialTagIndex(selection)
-			return view
-		}
-
-		func updateNSView(_ nsView: TabsView, context _: Context) {
-			if nsView.selectedTagIndex != selection {
-				nsView.selectedTagIndex = selection
+		var body: some View {
+			Picker("Selection", selection: $selection) {
+				ForEach(items.indices, id: \.self) { index in
+					Label(items[index].title, systemImage: items[index].icon)
+						.tag(index)
+				}
 			}
+			.pickerStyle(.segmented)
+			.labelsHidden()
 		}
 	}
 #endif

@@ -12,6 +12,7 @@ struct FriendDetailView: View {
 	@State private var showsReportConfirmation = false
 	@State private var isLoading = true
 	@Environment(\.statusBadgeManager) private var badges
+	@Environment(\.appPresentation) private var presentation
 
 	private var displayedFriendName: String {
 		detail?.friend.displayName ?? friend.friend.displayName
@@ -85,11 +86,13 @@ struct FriendDetailView: View {
 				selectedTab = FriendDetailTab.allCases[scrollPosition]
 			}
 			.toolbar {
-				ToolbarItem(placement: .cancellationAction) {
-					Button("Close", systemImage: "xmark", role: .cancel) {
-						close()
+				if presentation == .iOS {
+					ToolbarItem(placement: .cancellationAction) {
+						Button("Close", systemImage: "xmark", role: .cancel) {
+							close()
+						}
+						.labelStyle(.iconOnly)
 					}
-					.labelStyle(.iconOnly)
 				}
 
 				let view = ToolbarItem(placement: .principal) {

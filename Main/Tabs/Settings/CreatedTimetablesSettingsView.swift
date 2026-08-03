@@ -30,16 +30,7 @@ struct CreatedTimetablesSettingsView: View {
 			#if os(iOS)
 			.navigationBarTitleDisplayMode(.large)
 			#endif
-			.toolbar {
-				ToolbarItem(placement: .principal) {
-					Text("Created Timetables")
-						.bold()
-						.font(.largeTitle)
-						.lineLimit(3)
-						.foregroundStyle(.accent)
-						.frame(maxWidth: .infinity, alignment: .leading)
-				}
-			}
+			.appNavigationTitle("Created Timetables", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .primaryAction) {
 					Button("Create Timetable", systemImage: "plus") {
@@ -98,15 +89,8 @@ private struct CreatedTimetableCreateView: View {
 			#if os(iOS)
 			.navigationBarTitleDisplayMode(.large)
 			#endif
+			.appNavigationTitle("New Created Timetable", accent: true)
 			.toolbar {
-				ToolbarItem(placement: .principal) {
-					Text("New Created Timetable")
-						.bold()
-						.font(.title)
-						.lineLimit(3)
-						.frame(maxWidth: .infinity, alignment: .leading)
-				}
-
 				ToolbarItem(placement: .cancellationAction) {
 					Button("Close", systemImage: "xmark", role: .cancel) {
 						close()
