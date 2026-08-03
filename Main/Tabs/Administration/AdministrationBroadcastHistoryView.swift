@@ -6,23 +6,21 @@ struct AdministrationBroadcastHistoryView: View {
 	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
-		NavigationStack {
-			List(records) { record in
-				NavigationLink {
-					AdministrationBroadcastHistoryDetailView(
-						record: record
-					)
-				} label: {
-					Label {
-						VStack(alignment: .leading, spacing: 3) {
-							Text(record.title)
-							Text(record.createdAt?.formatted(date: .abbreviated, time: .shortened) ?? "Unknown date")
-								.font(.footnote)
-								.foregroundStyle(.secondary)
-						}
-					} icon: {
-						Image(systemName: record.isDeleted ? "trash" : record.deliveryState == .failed ? "exclamationmark.triangle" : "megaphone")
+		List(records) { record in
+			NavigationLink {
+				AdministrationBroadcastHistoryDetailView(
+					record: record
+				)
+			} label: {
+				Label {
+					VStack(alignment: .leading, spacing: 3) {
+						Text(record.title)
+						Text(record.createdAt?.formatted(date: .abbreviated, time: .shortened) ?? "Unknown date")
+							.font(.footnote)
+							.foregroundStyle(.secondary)
 					}
+				} icon: {
+					Image(systemName: record.isDeleted ? "trash" : record.deliveryState == .failed ? "exclamationmark.triangle" : "megaphone")
 				}
 			}
 		}
@@ -85,7 +83,8 @@ private struct AdministrationBroadcastHistoryDetailView: View {
 				}
 				.buttonStyle(.glassProminent)
 				.tint(.red)
-				.confirmationDialog("Delete Notification?", isPresented: $showsDeleteConfirmation, titleVisibility: .visible) {
+				.foregroundStyle(.red)
+				.alert("Delete Notification?", isPresented: $showsDeleteConfirmation) {
 					Button("Delete Notification", systemImage: "trash", role: .destructive) {
 						Task {
 							do {

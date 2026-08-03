@@ -5,6 +5,7 @@ struct WideAppShell: View {
 	@Environment(AppRouter.self) private var router
 	@Binding var expanded: WindowMode
 	@Default(.accountProfile) private var accountProfile
+	@State private var inspectorPath = NavigationPath()
 
 	var body: some View {
 		@Bindable var router = router
@@ -37,8 +38,11 @@ struct WideAppShell: View {
 		}
 		.inspector(isPresented: inspectorPresented) {
 			if let route = router.inspectorRoute {
-				WideRouteDestinationView(route: route)
-					.inspectorColumnWidth(min: 400, ideal: 430, max: 460)
+				NavigationStack(path: $inspectorPath) {
+					WideRouteDestinationView(route: route)
+				}
+				.environment(\.closeWideNavigationDestination, closeInspectorDestination)
+				.inspectorColumnWidth(min: 400, ideal: 500, max: 700)
 			}
 		}
 		.onReceive(NotificationCenter.default.publisher(for: .openTimetableTab)) { _ in
@@ -53,6 +57,16 @@ struct WideAppShell: View {
 			}
 			router.selectRoot(destination)
 		}
+		.onChange(of: router.inspectorRoute) {
+			inspectorPath = NavigationPath()
+		}
+	}
+
+	private func closeInspectorDestination() {
+		guard !inspectorPath.isEmpty else {
+			return
+		}
+		inspectorPath.removeLast()
 	}
 
 	private var sidebarSelection: Binding<AppRootDestination?> {

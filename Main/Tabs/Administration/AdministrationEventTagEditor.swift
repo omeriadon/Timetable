@@ -18,6 +18,7 @@ struct AdministrationEventTagEditor: View {
 	@State private var isSaving = false
 	@State private var showsArchiveConfirmation = false
 	@State private var showsSymbolPicker = false
+	@Environment(\.appPresentation) private var presentation
 
 	private var isCanonicalYearGroup: Bool {
 		tag?.category == .yearGroup
@@ -54,10 +55,18 @@ struct AdministrationEventTagEditor: View {
 					#endif
 						.autocorrectionDisabled()
 						.disabled(isCanonicalYearGroup)
-					Button {
-						showsSymbolPicker = true
-					} label: {
-						Label("Symbol", systemImage: symbol)
+					if presentation == .iOS {
+						Button {
+							showsSymbolPicker = true
+						} label: {
+							Label("Symbol", systemImage: symbol)
+						}
+					} else {
+						NavigationLink {
+							AdministrationEventSymbolPicker(symbol: $symbol)
+						} label: {
+							Label("Symbol", systemImage: symbol)
+						}
 					}
 					ColorPicker("Colour", selection: $colour, supportsOpacity: false)
 					Toggle("Archive Tag", isOn: $isArchived)

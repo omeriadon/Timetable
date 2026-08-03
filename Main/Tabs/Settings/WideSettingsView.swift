@@ -131,5 +131,7 @@ struct WideSettingsView: View {
 			.contentShape(Rectangle())
 		}
 		.listRowBackground(isSelected ? Color.accentColor : nil)
+		.buttonStyle(.plain)
+		.tint(.accentColor)
 	}
 }

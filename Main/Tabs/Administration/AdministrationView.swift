@@ -11,18 +11,17 @@ struct AdministrationView: View {
 	var body: some View {
 		Group {
 			if isAdmin {
-				#if os(macOS)
-					Form {
-						administrationSections
-					}
-					.formStyle(.grouped)
-					.scrollContentBackground(.hidden)
-				#else
+				if presentation == .iOS {
 					List {
 						administrationSections
 					}
 					.scrollEdgeEffect()
-				#endif
+				} else {
+					Form {
+						administrationSections
+					}
+					.appGroupedFormStyle()
+				}
 			} else {
 				ContentUnavailableView(
 					"Administration Unavailable",
@@ -106,6 +105,8 @@ struct AdministrationView: View {
 				.contentShape(Rectangle())
 			}
 			.listRowBackground(isSelected ? Color.accentColor : nil)
+			.buttonStyle(.plain)
+			.tint(.accentColor)
 		}
 	}
 

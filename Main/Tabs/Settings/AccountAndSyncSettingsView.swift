@@ -62,12 +62,8 @@ struct AccountAndSyncSettingsView: View {
 			}
 		}
 		.animation(.easeInOut, value: notificationRegistration.registrationState)
-		#if os(macOS)
-			.formStyle(.grouped)
-			.scrollContentBackground(.hidden)
-			.frame(maxWidth: 560)
-		#endif
-			.appNavigationTitle("Updates", accent: true)
+		.appGroupedFormStyle()
+		.appNavigationTitle("Updates", accent: true)
 	}
 
 	private func preferenceBinding(_ keyPath: WritableKeyPath<AccountSettings, Bool>) -> Binding<Bool> {

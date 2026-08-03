@@ -7,29 +7,32 @@ struct AdministrationEventTagsView: View {
 	@State private var editor: AdministrationEventTagEditorTarget?
 	@State private var isReordering = false
 	@Environment(\.statusBadgeManager) private var badges
+	@Environment(\.appPresentation) private var presentation
+	@Environment(\.closeWideNavigationDestination) private var closeWideNavigationDestination
 
 	var body: some View {
 		List {
 			ForEach(tags) { tag in
 				if let section = section(for: tag) {
-					Button {
-						editor = .tag(tag, section: section)
-					} label: {
-						Label {
-							VStack(alignment: .leading, spacing: 3) {
-								Text(tag.displayName)
-								Text(tag.category.displayName)
-									.font(.footnote)
-									.foregroundStyle(.secondary)
-							}
-						} icon: {
-							Image(systemName: tag.symbol ?? "tag")
-								.foregroundStyle(
-									RGBAColor(hexString: tag.colorHex ?? "#6AA7FF").swiftUIColor
-								)
+					if presentation == .iOS {
+						Button {
+							editor = .tag(tag, section: section)
+						} label: {
+							tagLabel(tag)
+						}
+						.buttonStyle(.plain)
+					} else {
+						NavigationLink {
+							AdministrationEventTagEditor(
+								tag: tag,
+								section: section,
+								save: saveTag,
+								close: closeWideNavigationDestination
+							)
+						} label: {
+							tagLabel(tag)
 						}
 					}
-					.buttonStyle(.plain)
 					.opacity(tag.isArchived ? 0.55 : 1)
 				}
 			}
@@ -41,12 +44,25 @@ struct AdministrationEventTagsView: View {
 		.appNavigationTitle("Event Tags", accent: true)
 		.toolbar {
 			ToolbarItem(placement: .primaryAction) {
-				Button("Add Tag", systemImage: "plus") {
-					if let addableSection {
-						editor = .newTag(addableSection)
+				if presentation == .iOS {
+					Button("Add Tag", systemImage: "plus") {
+						if let addableSection {
+							editor = .newTag(addableSection)
+						}
+					}
+					.disabled(addableSection == nil)
+				} else if let addableSection {
+					NavigationLink {
+						AdministrationEventTagEditor(
+							tag: nil,
+							section: addableSection,
+							save: saveTag,
+							close: closeWideNavigationDestination
+						)
+					} label: {
+						Label("Add Tag", systemImage: "plus")
 					}
 				}
-				.disabled(addableSection == nil)
 			}
 
 			ToolbarItem(placement: .confirmationAction) {
@@ -83,6 +99,22 @@ struct AdministrationEventTagsView: View {
 						)
 				}
 			}
+		}
+	}
+
+	private func tagLabel(_ tag: AdministrationEventTag) -> some View {
+		Label {
+			VStack(alignment: .leading, spacing: 3) {
+				Text(tag.displayName)
+				Text(tag.category.displayName)
+					.font(.footnote)
+					.foregroundStyle(.secondary)
+			}
+		} icon: {
+			Image(systemName: tag.symbol ?? "tag")
+				.foregroundStyle(
+					RGBAColor(hexString: tag.colorHex ?? "#6AA7FF").swiftUIColor
+				)
 		}
 	}
 

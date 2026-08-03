@@ -12,51 +12,60 @@ struct CreatedTimetablesSettingsView: View {
 	@Environment(\.statusBadgeManager) private var badges
 	@State private var showCreate = false
 	@State private var networkManager = NetworkManager.shared
+	@Environment(\.appPresentation) private var presentation
+	@Environment(\.closeWideNavigationDestination) private var closeWideNavigationDestination
 
 	var body: some View {
-		NavigationStack {
-			List(service.timetables) { timetable in
-				NavigationLink {
-					CreatedTimetableEditorView(timetable: timetable)
-				} label: {
-					VStack(alignment: .leading) {
-						Text(timetable.title)
-						Text("Private")
-							.font(.caption)
-							.foregroundStyle(.secondary)
-					}
+		List(service.timetables) { timetable in
+			NavigationLink {
+				CreatedTimetableEditorView(timetable: timetable)
+			} label: {
+				VStack(alignment: .leading) {
+					Text(timetable.title)
+					Text("Private")
+						.font(.caption)
+						.foregroundStyle(.secondary)
 				}
 			}
-			#if os(iOS)
-			.navigationBarTitleDisplayMode(.large)
-			#endif
-			.appNavigationTitle("Created Timetables", accent: true)
-			.toolbar {
-				ToolbarItem(placement: .primaryAction) {
+		}
+		#if os(iOS)
+		.navigationBarTitleDisplayMode(.large)
+		#endif
+		.appNavigationTitle("Created Timetables", accent: true)
+		.toolbar {
+			ToolbarItem(placement: .primaryAction) {
+				if presentation == .iOS {
 					Button("Create Timetable", systemImage: "plus") {
 						showCreate = true
 					}
 					.buttonStyle(.glassProminent)
+				} else {
+					NavigationLink {
+						CreatedTimetableCreateView(close: closeWideNavigationDestination)
+					} label: {
+						Label("Create Timetable", systemImage: "plus")
+					}
+					.buttonStyle(.glassProminent)
 				}
 			}
-			.sheet(isPresented: $showCreate) {
-				CreatedTimetableCreateView(close: { showCreate = false })
-					.presentationDetents([.medium])
+		}
+		.sheet(isPresented: $showCreate) {
+			CreatedTimetableCreateView(close: { showCreate = false })
+				.presentationDetents([.medium])
+		}
+		.overlay {
+			if !networkManager.isOnline {
+				ContentUnavailableView("Offline", systemImage: "wifi.slash", description: Text("Created timetables are unavailable until a connection is restored."))
+			} else if service.timetables.isEmpty {
+				ContentUnavailableView("No Created Timetables", systemImage: "person.2.crop.square.stack")
+					.fontWeight(.regular)
+					.foregroundStyle(.secondary)
 			}
-			.overlay {
-				if !networkManager.isOnline {
-					ContentUnavailableView("Offline", systemImage: "wifi.slash", description: Text("Created timetables are unavailable until a connection is restored."))
-				} else if service.timetables.isEmpty {
-					ContentUnavailableView("No Created Timetables", systemImage: "person.2.crop.square.stack")
-						.fontWeight(.regular)
-						.foregroundStyle(.secondary)
-				}
-			}
-			.refreshable { await refresh() }
-			.task {
-				if networkManager.isOnline {
-					await refresh()
-				}
+		}
+		.refreshable { await refresh() }
+		.task {
+			if networkManager.isOnline {
+				await refresh()
 			}
 		}
 	}

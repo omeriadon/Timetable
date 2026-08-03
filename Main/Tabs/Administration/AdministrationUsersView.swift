@@ -6,34 +6,27 @@ struct AdministrationUsersView: View {
 	@State private var searchText = ""
 	@State private var editor: AdministrationUserEditorTarget?
 	@Environment(\.statusBadgeManager) private var badges
+	@Environment(\.appPresentation) private var presentation
+	@Environment(\.closeWideNavigationDestination) private var closeWideNavigationDestination
 
 	var body: some View {
 		List(filteredUsers) { user in
-			Button {
-				editor = .edit(user)
-			} label: {
-				HStack(spacing: 12) {
-					ProfilePicture(
-						appearance: user.appearance,
-						photo: user.photo,
-						size: 44,
-						badges: user.badges,
-						accessibilityName: user.displayName,
-						animatesBackground: true
+			if presentation == .iOS {
+				Button {
+					editor = .edit(user)
+				} label: {
+					userLabel(user)
+				}
+			} else {
+				NavigationLink {
+					AdministrationUserEditor(
+						target: .edit(user),
+						didSave: save,
+						didDelete: delete,
+						close: closeWideNavigationDestination
 					)
-
-					VStack(alignment: .leading) {
-						Text(user.displayName)
-						Text(user.authority.displayName)
-							.font(.caption)
-							.foregroundStyle(authorityColor(for: user.authority))
-
-						if let email = user.email {
-							Text(email)
-								.font(.footnote)
-								.foregroundStyle(.secondary)
-						}
-					}
+				} label: {
+					userLabel(user)
 				}
 			}
 		}
@@ -41,13 +34,28 @@ struct AdministrationUsersView: View {
 		.appNavigationTitle("Users", accent: true)
 		.toolbar {
 			ToolbarItem(placement: .confirmationAction) {
-				Button(role: .confirm) {
-					editor = .create
-				} label: {
-					Label("Add User", systemImage: "plus")
-						.foregroundStyle(.white)
+				if presentation == .iOS {
+					Button(role: .confirm) {
+						editor = .create
+					} label: {
+						Label("Add User", systemImage: "plus")
+							.foregroundStyle(.white)
+					}
+					.buttonStyle(.glassProminent)
+				} else {
+					NavigationLink {
+						AdministrationUserEditor(
+							target: .create,
+							didSave: save,
+							didDelete: delete,
+							close: closeWideNavigationDestination
+						)
+					} label: {
+						Label("Add User", systemImage: "plus")
+							.foregroundStyle(.white)
+					}
+					.buttonStyle(.glassProminent)
 				}
-				.buttonStyle(.glassProminent)
 			}
 		}
 		.task {
@@ -64,6 +72,32 @@ struct AdministrationUsersView: View {
 				close: { editor = nil }
 			)
 			.presentationDetents(editor == .create ? [.fraction(0.6)] : [.large])
+		}
+	}
+
+	private func userLabel(_ user: AdministrationUserResponse) -> some View {
+		HStack(spacing: 12) {
+			ProfilePicture(
+				appearance: user.appearance,
+				photo: user.photo,
+				size: 44,
+				badges: user.badges,
+				accessibilityName: user.displayName,
+				animatesBackground: true
+			)
+
+			VStack(alignment: .leading) {
+				Text(user.displayName)
+				Text(user.authority.displayName)
+					.font(.caption)
+					.foregroundStyle(authorityColor(for: user.authority))
+
+				if let email = user.email {
+					Text(email)
+						.font(.footnote)
+						.foregroundStyle(.secondary)
+				}
+			}
 		}
 	}
 
