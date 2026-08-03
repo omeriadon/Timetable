@@ -43,10 +43,8 @@ struct WideAppShell: View {
 			if let route = router.inspectorRoute {
 				WideRouteDestinationView(route: route)
 					.inspectorColumnWidth(min: 360, ideal: 480, max: 680)
-					.transition(.opacity)
 			}
 		}
-		.animation(.easeInOut, value: router.inspectorRoute)
 		.onReceive(NotificationCenter.default.publisher(for: .openTimetableTab)) { _ in
 			router.selectRoot(.timetable)
 		}
