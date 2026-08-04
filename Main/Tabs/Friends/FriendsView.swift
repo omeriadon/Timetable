@@ -1,6 +1,5 @@
 import Defaults
 import SwiftUI
-import UniformTypeIdentifiers
 
 struct FriendsView: View {
 	@Default(.friends) private var friends
@@ -11,7 +10,6 @@ struct FriendsView: View {
 	@State private var sheet: FriendsSheet?
 	@State private var selectedFriend: FriendSummary?
 	@State private var isSearching = false
-	@State private var draggedFriend: FriendSummary?
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	@Environment(\.appPresentation) private var presentation
 	@Environment(AppRouter.self) private var router
@@ -114,23 +112,15 @@ struct FriendsView: View {
 							animatedScrollCard(FriendStatusCard(friend: friend))
 						}
 						.buttonStyle(.plain)
-						.onDrag {
-							draggedFriend = friend
-							return NSItemProvider(object: friend.id.uuidString as NSString)
-						}
-						.onDrop(
-							of: [.text],
-							delegate: FriendOrderDropDelegate(
-								target: friend,
-								draggedFriend: $draggedFriend,
-								friends: $friends,
-								save: saveFriendOrder
-							)
-						)
 					}
+					.reorderable()
 				}
 			}
 			.padding()
+		}
+		.reorderContainer(for: FriendSummary.self) { difference in
+			difference.apply(to: &friends)
+			saveFriendOrder(friends)
 		}
 		.refreshable { await refresh() }
 	}
@@ -209,34 +199,34 @@ struct FriendsView: View {
 	}
 }
 
-private struct FriendOrderDropDelegate: DropDelegate {
-	let target: FriendSummary
-	@Binding var draggedFriend: FriendSummary?
-	@Binding var friends: [FriendSummary]
-	let save: ([FriendSummary]) -> Void
-
-	func dropEntered(info _: DropInfo) {
-		guard let draggedFriend, draggedFriend != target,
-		      let from = friends.firstIndex(of: draggedFriend),
-		      let to = friends.firstIndex(of: target)
-		else {
+private extension ReorderDifference where CollectionID == ReorderableSingleCollectionIdentifier {
+	func apply<C: RangeReplaceableCollection>(to collection: inout C)
+		where C.Element: Identifiable,
+		C.Element.ID == ItemID
+	{
+		let moving = Set(sources)
+		guard !moving.isEmpty else {
 			return
 		}
 
-		withAnimation(.snappy) {
-			friends.move(
-				fromOffsets: IndexSet(integer: from),
-				toOffset: to > from ? to + 1 : to
-			)
-		}
-	}
+		var moved: [C.Element] = []
+		moved.reserveCapacity(moving.count)
+		collection.removeAll { element in
+			guard moving.contains(element.id) else {
+				return false
+			}
 
-	func performDrop(info _: DropInfo) -> Bool {
-		defer {
-			draggedFriend = nil
+			moved.append(element)
+			return true
 		}
-		save(friends)
-		return true
+
+		switch destination.position {
+			case let .before(id):
+				let index = collection.firstIndex { $0.id == id } ?? collection.endIndex
+				collection.insert(contentsOf: moved, at: index)
+			case .end:
+				collection.append(contentsOf: moved)
+		}
 	}
 }
 
