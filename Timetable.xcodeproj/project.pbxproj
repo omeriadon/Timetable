@@ -277,8 +277,8 @@
 		2A02379F2F9C908300AB1E1F /* Shared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				2A0DF9533001EBD400AA3439 /* Exceptions for "Shared" folder in "Watch Widget" target */,
 				2A0DF9543001EBD400AA3439 /* Exceptions for "Shared" folder in "Widget" target */,
+				2A0DF9533001EBD400AA3439 /* Exceptions for "Shared" folder in "Watch Widget" target */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -291,9 +291,9 @@
 		2A5F92192FE66817007302CF /* App Intents */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				2AF9CBFB2FE6D56C00885431 /* Exceptions for "App Intents" folder in "Watch Widget" target */,
 				2AF9CBFC2FE6D56C00885431 /* Exceptions for "App Intents" folder in "Widget" target */,
 				2AF9CBFE2FE6D56C00885431 /* Exceptions for "App Intents" folder in "Watch" target */,
+				2AF9CBFB2FE6D56C00885431 /* Exceptions for "App Intents" folder in "Watch Widget" target */,
 			);
 			path = "App Intents";
 			sourceTree = "<group>";
@@ -315,9 +315,9 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				2AA9C7BD2FEE72DC00AD87A8 /* Exceptions for "Widget" folder in "Timetable" target */,
-				2AD85A6F2FE8F219004EAB2B /* Exceptions for "Widget" folder in "Watch Widget" target */,
 				2AD85A702FE8F219004EAB2B /* Exceptions for "Widget" folder in "Widget" target */,
 				2AA9C7C22FEE7C5400AD87A8 /* Exceptions for "Widget" folder in "Watch" target */,
+				2AD85A6F2FE8F219004EAB2B /* Exceptions for "Widget" folder in "Watch Widget" target */,
 			);
 			path = Widget;
 			sourceTree = "<group>";
@@ -326,9 +326,9 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				2AD85A872FE8F23A004EAB2B /* Exceptions for "Special" folder in "Timetable" target */,
-				2AD85A882FE8F23A004EAB2B /* Exceptions for "Special" folder in "Watch Widget" target */,
 				2AD85A892FE8F23A004EAB2B /* Exceptions for "Special" folder in "Widget" target */,
 				2AD85A8B2FE8F23A004EAB2B /* Exceptions for "Special" folder in "Watch" target */,
+				2AD85A882FE8F23A004EAB2B /* Exceptions for "Special" folder in "Watch Widget" target */,
 			);
 			path = Special;
 			sourceTree = "<group>";
@@ -658,10 +658,10 @@
 			projectRoot = "";
 			targets = (
 				2A02378A2F9C8EA000AB1E1F /* Timetable */,
-				2A25869F2FB5D6490030C8CD /* Watch Widget */,
 				2AA6DF132FDFAC8F00BBC70E /* Widget */,
-				2A098C822F9DB842002065BE /* Watch */,
 				2B0000043000000000000004 /* Messages */,
+				2A098C822F9DB842002065BE /* Watch */,
+				2A25869F2FB5D6490030C8CD /* Watch Widget */,
 				2AF3B0023000000000000002 /* TimetableTests */,
 			);
 		};
@@ -931,7 +931,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				"INFOPLIST_KEY_UISupportedInterfaceOrientations~ipad" = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UTExportedTypeDeclarations = "<array><dict><key>UTTypeConformsTo</key><array><string>public.data</string></array><key>UTTypeDescription</key><string>Timetable Share</string><key>UTTypeIdentifier</key><string>pt.adonis.timetable.share</string><key>UTTypeTagSpecification</key><dict><key>public.filename-extension</key><array><string>timetable</string></array><key>public.mime-type</key><string>application/x-timetable</string></dict></dict></array>";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1005,7 +1005,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				"INFOPLIST_KEY_UISupportedInterfaceOrientations~ipad" = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UTExportedTypeDeclarations = "<array><dict><key>UTTypeConformsTo</key><array><string>public.data</string></array><key>UTTypeDescription</key><string>Timetable Share</string><key>UTTypeIdentifier</key><string>pt.adonis.timetable.share</string><key>UTTypeTagSpecification</key><dict><key>public.filename-extension</key><array><string>timetable</string></array><key>public.mime-type</key><string>application/x-timetable</string></dict></dict></array>";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1247,7 +1247,7 @@
 				INFOPLIST_FILE = Special/Info/Widget.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Timetable Widgets";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1306,7 +1306,7 @@
 				INFOPLIST_FILE = Special/Info/Widget.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Timetable Widgets";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1379,7 +1379,7 @@
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Messages/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Timetable Messages";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1410,7 +1410,7 @@
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Messages/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Timetable Messages";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

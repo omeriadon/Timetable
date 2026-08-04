@@ -42,21 +42,14 @@ import WidgetKit
 		@State private var colorTransitionSpeed = 10.0
 
 		var body: some View {
-			Group {
-				if #available(iOS 27.0, *) {
-					List { list }
-						.toolbarMinimizationBehavior(.onScrollDown, for: .navigationBar)
-						.toolbarMinimizationSafeAreaAdjustment(.disabled, for: .navigationBar)
-						.listStyle(.sidebar)
-				} else {
-					List { list }
-						.listStyle(.sidebar)
-				}
-			}
-			.scrollEdgeEffect(offset: 0.95, maxBlurRadius: 1, maximumOpacity: 0.2)
-			.scrollEdgeEffectStyle(.soft, for: .top)
-			.scrollContentBackground(.hidden)
-			.appNavigationTitle("Settings", style: .main, accent: true)
+			List { list }
+				.toolbarMinimizationBehavior(.onScrollDown, for: .navigationBar)
+				.toolbarMinimizationSafeAreaAdjustment(.disabled, for: .navigationBar)
+				.listStyle(.sidebar)
+				.scrollEdgeEffect(offset: 0.95, maxBlurRadius: 1, maximumOpacity: 0.2)
+				.scrollEdgeEffectStyle(.soft, for: .top)
+				.scrollContentBackground(.hidden)
+				.appNavigationTitle("Settings", style: .main, accent: true)
 		}
 
 		private var accountBackground: some View {
