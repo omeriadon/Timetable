@@ -49,10 +49,8 @@ private struct EventTagSelectionView: View {
 				}
 				.buttonStyle(.plain)
 				.listRowBackground(
-					RoundedRectangle(cornerRadius: 12, style: .continuous)
+					Rectangle()
 						.fill(isSelected ? Color.accentColor : .clear)
-						.padding(.horizontal, 8)
-						.padding(.vertical, 2)
 						.animation(.snappy, value: isSelected)
 				)
 				.accessibilityAddTraits(isSelected ? .isSelected : [])
