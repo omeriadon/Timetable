@@ -146,26 +146,37 @@ private struct TodayEventSnapshot: Equatable {
 	let upcomingEvents: [CalendarEvent]
 	let noSchoolDay: SchoolCalendarNamedDate?
 
-	static let empty = TodayEventSnapshot(
-		schoolEvents: [],
-		personalEvents: [],
-		upcomingEvents: [],
-		noSchoolDay: nil
-	)
-
 	var isEmpty: Bool {
 		schoolEvents.isEmpty && personalEvents.isEmpty && upcomingEvents.isEmpty && noSchoolDay == nil
 	}
 
+	private init(
+		schoolEvents: [CalendarEvent] = [],
+		personalEvents: [CalendarEvent] = [],
+		upcomingEvents: [CalendarEvent] = [],
+		noSchoolDay: SchoolCalendarNamedDate? = nil
+	) {
+		self.schoolEvents = schoolEvents
+		self.personalEvents = personalEvents
+		self.upcomingEvents = upcomingEvents
+		self.noSchoolDay = noSchoolDay
+	}
+
+	/// 2. Static empty instance using the memberwise init
+	static let empty = TodayEventSnapshot()
+
+	/// 3. Your main domain initializer
 	init(
 		calendarEvents: CalendarEventsProjection,
 		schoolCalendar: SchoolCalendarProjection,
 		day: SchoolCalendarDate
 	) {
-		schoolEvents = Self.events(on: day, in: calendarEvents.globalEvents)
-		personalEvents = Self.events(on: day, in: calendarEvents.privateEvents)
-		upcomingEvents = Self.upcomingEvents(after: day, events: calendarEvents)
-		noSchoolDay = schoolCalendar.skippedDates.first { $0.date == day }
+		self.init(
+			schoolEvents: Self.events(on: day, in: calendarEvents.globalEvents),
+			personalEvents: Self.events(on: day, in: calendarEvents.privateEvents),
+			upcomingEvents: Self.upcomingEvents(after: day, events: calendarEvents),
+			noSchoolDay: schoolCalendar.skippedDates.first { $0.date == day }
+		)
 	}
 
 	private static func events(on day: SchoolCalendarDate, in events: [CalendarEvent]) -> [CalendarEvent] {

@@ -253,21 +253,33 @@ struct OnboardingView: View {
 	) -> [OnboardingPage] {
 		[
 			OnboardingPage(id: "splash", title: "    ", kind: .splash),
-			OnboardingPage(id: "calendar", title: "Calendar Access", kind: .calendarPermission, isVisible:
-				#if DEBUG
-					true
-				#else
-					!calendarGranted
-				#endif),
+			OnboardingPage(
+				id: "calendar",
+				title: "Calendar Access",
+				kind: .calendarPermission,
+				isVisible: {
+					#if DEBUG
+						return true
+					#else
+						return !calendarGranted
+					#endif
+				}()
+			),
 			OnboardingPage(id: "account", title: "Your Account", kind: .account),
 			OnboardingPage(id: "year-group", title: "Your Year Group", kind: .yearGroup, isVisible: isAuthenticated),
 			OnboardingPage(id: "calendar-import", title: "Import Your Timetable", kind: .calendarImport, isVisible: !hasServerTimetable),
-			OnboardingPage(id: "notifications", title: "Notifications", kind: .notifications, isVisible:
-				#if DEBUG
-					true
-				#else
-					!notificationGranted
-				#endif),
+			OnboardingPage(
+				id: "notifications",
+				title: "Notifications",
+				kind: .notifications,
+				isVisible: {
+					#if DEBUG
+						return true
+					#else
+						return !notificationGranted
+					#endif
+				}()
+			),
 			OnboardingPage(id: "actualFinished", title: "Ready to use Timetable!", kind: .completion),
 		]
 	}

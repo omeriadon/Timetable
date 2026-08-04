@@ -32,20 +32,21 @@ nonisolated struct SchoolCalendarDate: Comparable, Codable, Hashable, Sendable {
 	}
 
 	var date: Date? {
-		Calendar.current.date(from: components)
+		SchoolCalendarProjection.perthCalendar.date(from: components)
 	}
 
 	var displayLabel: String {
-		guard let date = Calendar.current.date(from: components) else {
+		let calendar = SchoolCalendarProjection.perthCalendar
+		guard let date = calendar.date(from: components) else {
 			return "\(day)/\(month)/\(year)"
 		}
 
-		return date.formatted(
-			.dateTime
-				.weekday(.abbreviated)
-				.day()
-				.month(.abbreviated)
-		)
+		let style = Date.FormatStyle(calendar: calendar)
+			.weekday(.abbreviated)
+			.day()
+			.month(.abbreviated)
+
+		return date.formatted(style)
 	}
 
 	nonisolated static func < (lhs: Self, rhs: Self) -> Bool {
