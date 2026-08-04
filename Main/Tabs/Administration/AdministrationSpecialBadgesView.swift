@@ -1,12 +1,10 @@
 import SwiftUI
-import UniformTypeIdentifiers
 
 struct AdministrationSpecialBadgesView: View {
 	@State private var service = AdministrationService.shared
 	@State private var badges: [AdministrationSpecialBadgeResponse] = []
 	@State private var users: [AdministrationUserResponse] = []
 	@State private var badgeOrder: [UUID] = []
-	@State private var draggedBadgeID: UUID?
 	@State private var editor: AdministrationSpecialBadgeEditorTarget?
 	@Environment(\.statusBadgeManager) private var statusBadges
 
@@ -38,20 +36,14 @@ struct AdministrationSpecialBadgesView: View {
 					}
 					.buttonStyle(.plain)
 					.contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-					.onDrag {
-						draggedBadgeID = badge.id
-						return NSItemProvider(object: badge.id.uuidString as NSString)
-					}
-					.onDrop(
-						of: [.text],
-						delegate: SpecialBadgeOrderDropDelegate(
-							targetID: badge.id,
-							draggedBadgeID: $draggedBadgeID,
-							badgeOrder: $badgeOrder,
-							save: saveBadgeOrder
-						)
-					)
 				}
+				.reorderable()
+			}
+			.reorderContainer(for: AdministrationSpecialBadgeResponse.self) { difference in
+				var reorderedBadges = displayedBadges
+				difference.apply(to: &reorderedBadges)
+				badgeOrder = reorderedBadges.map(\.id)
+				saveBadgeOrder(badgeOrder)
 			}
 			.padding()
 		}
@@ -92,10 +84,6 @@ struct AdministrationSpecialBadgesView: View {
 				Circle()
 					.stroke(.white, lineWidth: 0.5)
 			}
-	}
-
-	private func editorID(for badge: AdministrationSpecialBadgeResponse) -> String {
-		"special-badge-\(badge.id.uuidString)"
 	}
 
 	private var displayedBadges: [AdministrationSpecialBadgeResponse] {
@@ -238,35 +226,34 @@ struct AdministrationSpecialBadgesView: View {
 	}
 }
 
-private struct SpecialBadgeOrderDropDelegate: DropDelegate {
-	let targetID: UUID
-	@Binding var draggedBadgeID: UUID?
-	@Binding var badgeOrder: [UUID]
-	let save: ([UUID]) -> Void
-
-	func dropEntered(info _: DropInfo) {
-		guard let draggedBadgeID,
-		      draggedBadgeID != targetID,
-		      let from = badgeOrder.firstIndex(of: draggedBadgeID),
-		      let to = badgeOrder.firstIndex(of: targetID)
-		else {
+private extension ReorderDifference where CollectionID == ReorderableSingleCollectionIdentifier {
+	func apply<C: RangeReplaceableCollection>(to collection: inout C)
+		where C.Element: Identifiable,
+		C.Element.ID == ItemID
+	{
+		let moving = Set(sources)
+		guard !moving.isEmpty else {
 			return
 		}
 
-		withAnimation(.snappy) {
-			badgeOrder.move(
-				fromOffsets: IndexSet(integer: from),
-				toOffset: to > from ? to + 1 : to
-			)
-		}
-	}
+		var moved: [C.Element] = []
+		moved.reserveCapacity(moving.count)
+		collection.removeAll { element in
+			guard moving.contains(element.id) else {
+				return false
+			}
 
-	func performDrop(info _: DropInfo) -> Bool {
-		defer {
-			draggedBadgeID = nil
+			moved.append(element)
+			return true
 		}
-		save(badgeOrder)
-		return true
+
+		switch destination.position {
+			case let .before(id):
+				let index = collection.firstIndex { $0.id == id } ?? collection.endIndex
+				collection.insert(contentsOf: moved, at: index)
+			case .end:
+				collection.append(contentsOf: moved)
+		}
 	}
 }
 

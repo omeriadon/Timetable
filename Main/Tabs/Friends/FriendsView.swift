@@ -116,11 +116,11 @@ struct FriendsView: View {
 					.reorderable()
 				}
 			}
+			.reorderContainer(for: FriendSummary.self) { difference in
+				difference.apply(to: &friends)
+				saveFriendOrder(friends)
+			}
 			.padding()
-		}
-		.reorderContainer(for: FriendSummary.self) { difference in
-			difference.apply(to: &friends)
-			saveFriendOrder(friends)
 		}
 		.refreshable { await refresh() }
 	}
