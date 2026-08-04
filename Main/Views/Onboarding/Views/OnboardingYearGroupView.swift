@@ -2,7 +2,7 @@ import SwiftUI
 
 #if os(iOS)
 	struct OnboardingYearGroupView: View {
-		@Environment(\.onboardingPageContext) private var context
+		let context: OnboardingPageContext
 		@State private var service = AdministrationService.shared
 		@State private var yearGroupTags: [EventTagCatalogueTag] = []
 		@State private var subscriptions: Set<UUID> = []

@@ -2,12 +2,12 @@ import Defaults
 import SwiftUI
 
 struct AdministrationSchoolEventsView: View {
+	let closeWideDestination: (() -> Void)?
 	@Default(.calendarEvents) private var events
 	@State private var service = CalendarEventsSyncService.shared
 	@State private var editorTarget: AdministrationSchoolEventEditorTarget?
 	@Environment(\.statusBadgeManager) private var badges
 	@Environment(\.appPresentation) private var presentation
-	@Environment(\.closeWideNavigationDestination) private var closeWideNavigationDestination
 
 	var body: some View {
 		List {
@@ -55,7 +55,7 @@ struct AdministrationSchoolEventsView: View {
 					target: .edit(event),
 					save: save,
 					delete: delete,
-					close: closeWideNavigationDestination,
+					close: closeWideEditor,
 					embedsInNavigation: false,
 					showsCloseButton: false
 				)
@@ -77,7 +77,7 @@ struct AdministrationSchoolEventsView: View {
 					target: .create,
 					save: save,
 					delete: delete,
-					close: closeWideNavigationDestination,
+					close: closeWideEditor,
 					embedsInNavigation: false,
 					showsCloseButton: false
 				)
@@ -85,6 +85,10 @@ struct AdministrationSchoolEventsView: View {
 				Label("Add School Event", systemImage: "plus")
 			}
 		}
+	}
+
+	private func closeWideEditor() {
+		closeWideDestination?()
 	}
 
 	private func eventLabel(_ event: CalendarEvent) -> some View {

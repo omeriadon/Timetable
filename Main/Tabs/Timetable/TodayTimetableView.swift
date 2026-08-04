@@ -6,14 +6,11 @@ struct TodayTimetableView: View {
 	@Default(.schoolCalendar) private var schoolCalendar
 	@Default(.calendarEvents) private var calendarEvents
 	@State private var expandedPeriodNumber: Int?
+	@State private var eventSnapshot = TodayEventSnapshot.empty
 
 	var body: some View {
 		TimelineView(.periodic(from: .now, by: 1)) { context in
 			let now = TimetableClock.adjusted(context.date)
-			let schoolEvents = todayEvents(in: calendarEvents.globalEvents, at: now)
-			let personalEvents = todayEvents(in: calendarEvents.privateEvents, at: now)
-			let upcomingEvents = upcomingEvents(at: now)
-			let noSchoolDay = schoolCalendar.skippedDates.first { $0.date == SchoolCalendarDate(now) }
 			ScrollView {
 				VStack(alignment: .leading, spacing: 16) {
 					Text(now.formatted(.dateTime.weekday(.wide).day().month(.wide).hour(.defaultDigits(amPM: .wide)).minute(.defaultDigits).second(.defaultDigits)))
@@ -26,26 +23,26 @@ struct TodayTimetableView: View {
 						.minimumScaleFactor(0.01)
 						.foregroundStyle(.white)
 
-					if let noSchoolDay {
+					if let noSchoolDay = eventSnapshot.noSchoolDay {
 						TodayNoSchoolDayCard(noSchoolDay: noSchoolDay)
 					}
 
-					if !schoolEvents.isEmpty || !personalEvents.isEmpty || !upcomingEvents.isEmpty {
+					if !eventSnapshot.schoolEvents.isEmpty || !eventSnapshot.personalEvents.isEmpty || !eventSnapshot.upcomingEvents.isEmpty {
 						VStack(alignment: .leading) {
 							Text("Events Today")
 								.font(.title)
 								.bold()
 
-							if !schoolEvents.isEmpty {
-								eventSection("School Events", events: schoolEvents)
+							if !eventSnapshot.schoolEvents.isEmpty {
+								eventSection("School Events", events: eventSnapshot.schoolEvents)
 							}
 
-							if !personalEvents.isEmpty {
-								eventSection("Your Events", events: personalEvents)
+							if !eventSnapshot.personalEvents.isEmpty {
+								eventSection("Your Events", events: eventSnapshot.personalEvents)
 							}
 
-							if !upcomingEvents.isEmpty {
-								eventSection("Upcoming Events", events: upcomingEvents, showsDate: true)
+							if !eventSnapshot.upcomingEvents.isEmpty {
+								eventSection("Upcoming Events", events: eventSnapshot.upcomingEvents, showsDate: true)
 							}
 						}
 						.frame(maxWidth: .infinity, alignment: .leading)
@@ -72,7 +69,7 @@ struct TodayTimetableView: View {
 							now: now,
 							expandedPeriodNumber: $expandedPeriodNumber
 						)
-					} else if schoolEvents.isEmpty, personalEvents.isEmpty, upcomingEvents.isEmpty, noSchoolDay == nil {
+					} else if eventSnapshot.isEmpty {
 						TodayCountdown(subjects: subjects, schoolCalendar: schoolCalendar, now: now)
 					}
 				}
@@ -80,6 +77,17 @@ struct TodayTimetableView: View {
 				.padding(.vertical)
 				.padding(.horizontal, 10)
 				.frame(maxWidth: .infinity, alignment: .center)
+			}
+			.task(id: TodayEventSnapshotInput(
+				calendarEvents: calendarEvents,
+				schoolCalendar: schoolCalendar,
+				day: SchoolCalendarDate(now)
+			)) {
+				eventSnapshot = TodayEventSnapshot(
+					calendarEvents: calendarEvents,
+					schoolCalendar: schoolCalendar,
+					day: SchoolCalendarDate(now)
+				)
 			}
 		}
 	}
@@ -124,21 +132,59 @@ struct TodayTimetableView: View {
 			.glassEffect(title == "Upcoming Events" ? .identity : .clear.interactive(), in: RoundedRectangle(cornerRadius: TodayCardLayout.innerCornerRadius))
 		}
 	}
+}
 
-	private func todayEvents(in events: [CalendarEvent], at date: Date) -> [CalendarEvent] {
-		let today = SchoolCalendarDate(date)
-		return events
-			.filter { $0.date == today }
+private struct TodayEventSnapshotInput: Hashable {
+	let calendarEvents: CalendarEventsProjection
+	let schoolCalendar: SchoolCalendarProjection
+	let day: SchoolCalendarDate
+}
+
+private struct TodayEventSnapshot: Equatable {
+	let schoolEvents: [CalendarEvent]
+	let personalEvents: [CalendarEvent]
+	let upcomingEvents: [CalendarEvent]
+	let noSchoolDay: SchoolCalendarNamedDate?
+
+	static let empty = TodayEventSnapshot(
+		schoolEvents: [],
+		personalEvents: [],
+		upcomingEvents: [],
+		noSchoolDay: nil
+	)
+
+	var isEmpty: Bool {
+		schoolEvents.isEmpty && personalEvents.isEmpty && upcomingEvents.isEmpty && noSchoolDay == nil
+	}
+
+	init(
+		calendarEvents: CalendarEventsProjection,
+		schoolCalendar: SchoolCalendarProjection,
+		day: SchoolCalendarDate
+	) {
+		schoolEvents = Self.events(on: day, in: calendarEvents.globalEvents)
+		personalEvents = Self.events(on: day, in: calendarEvents.privateEvents)
+		upcomingEvents = Self.upcomingEvents(after: day, events: calendarEvents)
+		noSchoolDay = schoolCalendar.skippedDates.first { $0.date == day }
+	}
+
+	private static func events(on day: SchoolCalendarDate, in events: [CalendarEvent]) -> [CalendarEvent] {
+		events
+			.filter { $0.date == day }
 			.sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
 	}
 
-	private func upcomingEvents(at date: Date) -> [CalendarEvent] {
+	private static func upcomingEvents(
+		after day: SchoolCalendarDate,
+		events: CalendarEventsProjection
+	) -> [CalendarEvent] {
 		let calendar = SchoolCalendarProjection.perthCalendar
-		let tomorrow = calendar.date(byAdding: .day, value: 1, to: date) ?? date
-		let nextWeek = calendar.date(byAdding: .day, value: 7, to: date) ?? date
-		let dateWindow = SchoolCalendarDate(tomorrow, calendar: calendar) ... SchoolCalendarDate(nextWeek, calendar: calendar)
+		let referenceDate = day.startOfDay(calendar: calendar) ?? .now
+		let start = calendar.date(byAdding: .day, value: 1, to: referenceDate) ?? referenceDate
+		let end = calendar.date(byAdding: .day, value: 7, to: referenceDate) ?? referenceDate
+		let dateWindow = SchoolCalendarDate(start, calendar: calendar) ... SchoolCalendarDate(end, calendar: calendar)
 
-		return (calendarEvents.globalEvents + calendarEvents.privateEvents)
+		return (events.globalEvents + events.privateEvents)
 			.filter { dateWindow.contains($0.date) }
 			.sorted {
 				if $0.date == $1.date {

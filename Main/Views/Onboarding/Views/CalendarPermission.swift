@@ -12,7 +12,7 @@ import UIKit
 import UserNotifications
 
 struct OnboardingCalendarPermissionView: View {
-	@Environment(\.onboardingPageContext) private var context
+	let context: OnboardingPageContext
 	@Environment(\.scenePhase) private var scenePhase
 	@State private var eventStore = EKEventStore()
 

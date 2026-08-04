@@ -12,7 +12,7 @@ import UIKit
 import UserNotifications
 
 struct OnboardingCalendarImportView: View {
-	@Environment(\.onboardingPageContext) private var context
+	let context: OnboardingPageContext
 
 	@State private var clickedImport = false
 	@State private var errorResetTask: Task<Void, Never>?

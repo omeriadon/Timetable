@@ -8,20 +8,30 @@
 import SwiftUI
 
 struct OnboardingPage: Identifiable {
+	enum Kind: String, Hashable, Sendable {
+		case splash
+		case calendarPermission
+		case account
+		case yearGroup
+		case calendarImport
+		case notifications
+		case completion
+	}
+
 	let id: String
 	let title: String
-	let content: @MainActor () -> AnyView
-	let isVisible: @MainActor () -> Bool
+	let kind: Kind
+	let isVisible: Bool
 
 	init(
 		id: String,
 		title: String,
-		isVisible: @escaping @MainActor () -> Bool = { true },
-		@ViewBuilder content: @escaping @MainActor () -> some View
+		kind: Kind,
+		isVisible: Bool = true
 	) {
 		self.id = id
 		self.title = title
+		self.kind = kind
 		self.isVisible = isVisible
-		self.content = { AnyView(content()) }
 	}
 }

@@ -2,13 +2,13 @@ import SwiftUI
 
 struct AdministrationCalendarEntriesView: View {
 	let kind: String
+	let closeWideDestination: (() -> Void)?
 
 	@State private var service = AdministrationService.shared
 	@State private var entries: [AdministrationCalendarEntry] = []
 	@State private var editor: AdministrationCalendarEntry?
 	@Environment(\.statusBadgeManager) private var badges
 	@Environment(\.appPresentation) private var presentation
-	@Environment(\.closeWideNavigationDestination) private var closeWideNavigationDestination
 
 	var body: some View {
 		List {
@@ -57,7 +57,7 @@ struct AdministrationCalendarEntriesView: View {
 					entry: entry,
 					save: save,
 					delete: deleteFromEditor,
-					close: closeWideNavigationDestination,
+					close: closeWideEditor,
 					embedsInNavigation: false,
 					showsCloseButton: false
 				)
@@ -94,7 +94,7 @@ struct AdministrationCalendarEntriesView: View {
 					entry: newEntry(),
 					save: save,
 					delete: deleteFromEditor,
-					close: closeWideNavigationDestination,
+					close: closeWideEditor,
 					embedsInNavigation: false,
 					showsCloseButton: false
 				)
@@ -102,6 +102,10 @@ struct AdministrationCalendarEntriesView: View {
 				Label(addButtonTitle, systemImage: "plus")
 			}
 		}
+	}
+
+	private func closeWideEditor() {
+		closeWideDestination?()
 	}
 
 	private func load() async {

@@ -35,7 +35,15 @@ final class AppRouter {
 
 	var sidebarVisibility: AppSidebarVisibility
 
-	var inspectorRoute: AppRoute?
+	var inspectorRoute: AppRoute? {
+		didSet {
+			if inspectorRoute == nil {
+				inspectorPath = []
+			}
+		}
+	}
+
+	var inspectorPath: [AppRoute]
 	var pendingExternalRoute: AppRoute?
 	var presentation: AppPresentation
 
@@ -72,6 +80,7 @@ final class AppRouter {
 		sidebarPath = snapshot?.sidebarPath ?? []
 		sidebarVisibility = .automatic
 		inspectorRoute = nil
+		inspectorPath = []
 		pendingExternalRoute = nil
 		presentation = .iOS
 		self.persistsNavigationState = persistsNavigationState
@@ -92,6 +101,7 @@ final class AppRouter {
 		selectedSidebarDestination = destination
 		sidebarPath = []
 		inspectorRoute = nil
+		inspectorPath = []
 	}
 
 	func navigate(to route: AppRoute) {
@@ -116,8 +126,9 @@ final class AppRouter {
 					case .detail:
 						sidebarPath.append(route)
 						inspectorRoute = nil
+						inspectorPath = []
 					case .inspector:
-						inspectorRoute = route
+						showInspector(route)
 				}
 		}
 	}
@@ -146,6 +157,7 @@ final class AppRouter {
 		sidebarPath = []
 		sidebarVisibility = .automatic
 		inspectorRoute = nil
+		inspectorPath = []
 		pendingExternalRoute = nil
 		persistenceStore.clear()
 	}
@@ -192,21 +204,58 @@ final class AppRouter {
 			case .iOS:
 				if let inspectorRoute {
 					append(inspectorRoute, to: inspectorRoute.rootDestination)
+					for route in inspectorPath {
+						append(route, to: inspectorRoute.rootDestination)
+					}
 					self.inspectorRoute = nil
-				} else if let route = sidebarPath.last {
-					append(route, to: route.rootDestination)
+					inspectorPath = []
+					sidebarPath = []
+				} else if !sidebarPath.isEmpty {
+					for route in sidebarPath {
+						append(route, to: route.rootDestination)
+					}
+					sidebarPath = []
 				}
 			case .iPadOS, .macOS:
 				let compactPath = path(for: selectedTab)
-				guard let route = compactPath.last else {
+				guard !compactPath.isEmpty else {
 					return
 				}
-				switch AppRoutePresentationPolicy(route: route) {
-					case .detail:
-						sidebarPath = [route]
-					case .inspector:
-						inspectorRoute = route
+
+				if let inspectorIndex = compactPath.firstIndex(where: {
+					AppRoutePresentationPolicy(route: $0) == .inspector
+				}) {
+					sidebarPath = Array(compactPath[..<inspectorIndex])
+					inspectorRoute = compactPath[inspectorIndex]
+					inspectorPath = Array(compactPath.dropFirst(inspectorIndex + 1))
+				} else {
+					sidebarPath = compactPath
+					inspectorRoute = nil
+					inspectorPath = []
 				}
+				clearPath(for: selectedTab)
+		}
+	}
+
+	private func showInspector(_ route: AppRoute) {
+		if inspectorRoute == nil {
+			inspectorRoute = route
+			inspectorPath = []
+		} else {
+			inspectorPath.append(route)
+		}
+	}
+
+	private func clearPath(for destination: AppRootDestination) {
+		switch destination {
+			case .timetable:
+				timetablePath = []
+			case .friends:
+				friendsPath = []
+			case .settings:
+				settingsPath = []
+			case .administration:
+				administrationPath = []
 		}
 	}
 

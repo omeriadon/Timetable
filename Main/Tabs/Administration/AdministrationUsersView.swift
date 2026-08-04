@@ -1,13 +1,13 @@
 import SwiftUI
 
 struct AdministrationUsersView: View {
+	let closeWideDestination: (() -> Void)?
 	@State private var service = AdministrationService.shared
 	@State private var users: [AdministrationUserResponse] = []
 	@State private var searchText = ""
 	@State private var editor: AdministrationUserEditorTarget?
 	@Environment(\.statusBadgeManager) private var badges
 	@Environment(\.appPresentation) private var presentation
-	@Environment(\.closeWideNavigationDestination) private var closeWideNavigationDestination
 
 	var body: some View {
 		List(filteredUsers) { user in
@@ -23,7 +23,7 @@ struct AdministrationUsersView: View {
 						target: .edit(user),
 						didSave: save,
 						didDelete: delete,
-						close: closeWideNavigationDestination
+						close: closeWideEditor
 					)
 				} label: {
 					userLabel(user)
@@ -48,7 +48,7 @@ struct AdministrationUsersView: View {
 							target: .create,
 							didSave: save,
 							didDelete: delete,
-							close: closeWideNavigationDestination
+							close: closeWideEditor
 						)
 					} label: {
 						Label("Add User", systemImage: "plus")
@@ -73,6 +73,10 @@ struct AdministrationUsersView: View {
 			)
 			.presentationDetents(editor == .create ? [.fraction(0.6)] : [.large])
 		}
+	}
+
+	private func closeWideEditor() {
+		closeWideDestination?()
 	}
 
 	private func userLabel(_ user: AdministrationUserResponse) -> some View {

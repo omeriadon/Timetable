@@ -6,6 +6,7 @@
 //
 
 import CoreGraphics
+import Foundation
 import ImageIO
 import SwiftUI
 import WidgetKit
@@ -15,27 +16,39 @@ struct TimetableSummaryView: View {
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 12) {
-			header
+			TimetableSummaryHeader(
+				entry: entry,
+				countdownTarget: countdownTarget,
+				ownerTitle: ownerTitle,
+				ownerSymbol: ownerSymbol
+			)
 
 			Spacer(minLength: 1)
 
 			Divider()
 
-			friendSection
+			TimetableSummaryFriendsSection(schedules: entry.friendSchedules)
 
 			Spacer(minLength: 1)
 
 			if !entry.upcomingEvents.isEmpty {
 				Divider()
-				eventSection
+				TimetableSummaryEventsSection(events: entry.upcomingEvents)
 			}
 		}
 		.foregroundStyle(.white)
 		.dynamicTypeSize(.medium)
 		.monospaced()
 	}
+}
 
-	private var header: some View {
+private struct TimetableSummaryHeader: View {
+	let entry: TimetableEntry
+	let countdownTarget: Date?
+	let ownerTitle: String
+	let ownerSymbol: String
+
+	var body: some View {
 		HStack(alignment: .center, spacing: 10) {
 			if let countdown = countdownTarget {
 				Text(timerInterval: TimetableClock.adjusted(entry.date) ... countdown, countsDown: true, showsHours: true)
@@ -56,39 +69,47 @@ struct TimetableSummaryView: View {
 				.lineLimit(1)
 		}
 	}
+}
 
-	private var friendSection: some View {
+private struct TimetableSummaryFriendsSection: View {
+	let schedules: [ScheduleItem]
+
+	var body: some View {
 		VStack(alignment: .leading, spacing: 8) {
 			Label("Friends", systemImage: "person.2.fill")
 				.font(.caption)
 				.foregroundStyle(.tertiary)
 
-			ForEach(entry.friendSchedules.prefix(3)) { schedule in
+			ForEach(schedules.prefix(3)) { schedule in
 				HStack(spacing: 8) {
 					WidgetProfilePicture(
 						profile: schedule.profile,
-						fallbackSymbol: symbol(for: schedule.currentState),
+						fallbackSymbol: TimetableSummaryStatePresentation.symbol(for: schedule.currentState),
 						size: 28
 					)
 					Text(schedule.name)
 						.font(.subheadline.monospaced())
 						.lineLimit(1)
 					Spacer()
-					Text(title(for: schedule.currentState))
+					Text(TimetableSummaryStatePresentation.title(for: schedule.currentState))
 						.font(.caption)
 						.lineLimit(1)
 				}
 			}
 		}
 	}
+}
 
-	private var eventSection: some View {
+private struct TimetableSummaryEventsSection: View {
+	let events: [CalendarEvent]
+
+	var body: some View {
 		VStack(alignment: .leading, spacing: 8) {
 			Label("Upcoming Events", systemImage: "calendar")
 				.font(.caption)
 				.foregroundStyle(.tertiary)
 
-			ForEach(entry.upcomingEvents.prefix(3)) { event in
+			ForEach(events.prefix(3)) { event in
 				HStack(spacing: 8) {
 					Image(systemName: event.symbol)
 						.frame(width: 18)
@@ -107,21 +128,9 @@ struct TimetableSummaryView: View {
 			}
 		}
 	}
+}
 
-	private var ownerTitle: String {
-		guard let schedule = entry.ownerSchedule else {
-			return "No Timetable"
-		}
-		return title(for: schedule.currentState)
-	}
-
-	private var ownerSymbol: String {
-		guard let schedule = entry.ownerSchedule else {
-			return "calendar.badge.exclamationmark"
-		}
-		return symbol(for: schedule.currentState)
-	}
-
+private extension TimetableSummaryView {
 	private var countdownTarget: Date? {
 		guard let schedule = entry.ownerSchedule else {
 			return nil
@@ -143,7 +152,23 @@ struct TimetableSummaryView: View {
 		}
 	}
 
-	private func title(for state: SchoolState) -> String {
+	private var ownerTitle: String {
+		guard let schedule = entry.ownerSchedule else {
+			return "No Timetable"
+		}
+		return TimetableSummaryStatePresentation.title(for: schedule.currentState)
+	}
+
+	private var ownerSymbol: String {
+		guard let schedule = entry.ownerSchedule else {
+			return "calendar.badge.exclamationmark"
+		}
+		return TimetableSummaryStatePresentation.symbol(for: schedule.currentState)
+	}
+}
+
+private enum TimetableSummaryStatePresentation {
+	static func title(for state: SchoolState) -> String {
 		switch state {
 			case let .beforeSchool(next):
 				next.subject.id
@@ -162,7 +187,7 @@ struct TimetableSummaryView: View {
 		}
 	}
 
-	private func symbol(for state: SchoolState) -> String {
+	static func symbol(for state: SchoolState) -> String {
 		switch state {
 			case let .beforeSchool(next):
 				next.subject.symbol
@@ -248,7 +273,20 @@ private struct WidgetProfilePicture: View {
 }
 
 enum WidgetProfilePhotoCache {
+	private static let capacity = 24
+	private static let lock = NSLock()
+	private static var images: [String: CGImage] = [:]
+	private static var insertionOrder: [String] = []
+
 	static func image(for metadata: ProfilePhotoMetadata) -> CGImage? {
+		let key = "\(metadata.checksum)-\(metadata.revision)"
+		lock.lock()
+		defer { lock.unlock() }
+
+		if let image = images[key] {
+			return image
+		}
+
 		guard let directory = FileManager.default.containerURL(
 			forSecurityApplicationGroupIdentifier: SharedDefaultsStore.suiteName
 		)?.appending(path: "ProfileImages", directoryHint: .isDirectory),
@@ -265,9 +303,21 @@ enum WidgetProfilePhotoCache {
 		else {
 			return nil
 		}
-		guard let source = CGImageSourceCreateWithData(data as CFData, nil) else {
+		guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+		      let image = CGImageSourceCreateImageAtIndex(source, 0, nil)
+		else {
 			return nil
 		}
-		return CGImageSourceCreateImageAtIndex(source, 0, nil)
+
+		if images[key] == nil {
+			insertionOrder.append(key)
+			if insertionOrder.count > capacity {
+				let oldestKey = insertionOrder.removeFirst()
+				images[oldestKey] = nil
+			}
+		}
+
+		images[key] = image
+		return image
 	}
 }

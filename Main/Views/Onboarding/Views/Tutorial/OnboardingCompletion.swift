@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct OnboardingCompletion: View {
-	@Environment(\.onboardingPageContext) private var context: OnboardingPageContext
+	let context: OnboardingPageContext
 
 	var body: some View {
 		VStack(spacing: 24) {

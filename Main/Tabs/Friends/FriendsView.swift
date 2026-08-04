@@ -169,6 +169,15 @@ struct FriendsView: View {
 			isSearching = false
 			return
 		}
+		do {
+			try await Task.sleep(for: .milliseconds(300))
+		} catch {
+			return
+		}
+		guard !Task.isCancelled else {
+			return
+		}
+
 		isSearching = true
 		defer {
 			if !Task.isCancelled {

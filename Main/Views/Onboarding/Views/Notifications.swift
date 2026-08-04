@@ -12,7 +12,7 @@ import UIKit
 import UserNotifications
 
 struct OnboardingNotificationPermissionView: View {
-	@Environment(\.onboardingPageContext) private var context
+	let context: OnboardingPageContext
 
 	var body: some View {
 		VStack(spacing: 40) {

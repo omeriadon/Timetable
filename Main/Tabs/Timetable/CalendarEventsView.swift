@@ -116,7 +116,7 @@ struct DatesView: View {
 	}
 
 	private var termDateCards: some View {
-		ForEach(Array(schoolCalendar.termRanges.enumerated()), id: \.offset) { _, range in
+		ForEach(schoolCalendar.termRanges, id: \.self) { range in
 			if range.intersects(dateWindow) {
 				animatedScrollCard(
 					timelineEntryContent(PlannerTimelineEntry(termRange: range))

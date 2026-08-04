@@ -8,17 +8,20 @@
 import SwiftUI
 
 struct CreatedTimetablesSettingsView: View {
+	let closeWideDestination: (() -> Void)?
 	@State private var service = CreatedTimetableService.shared
 	@Environment(\.statusBadgeManager) private var badges
 	@State private var showCreate = false
 	@State private var networkManager = NetworkManager.shared
 	@Environment(\.appPresentation) private var presentation
-	@Environment(\.closeWideNavigationDestination) private var closeWideNavigationDestination
 
 	var body: some View {
 		List(service.timetables) { timetable in
 			NavigationLink {
-				CreatedTimetableEditorView(timetable: timetable)
+				CreatedTimetableEditorView(
+					timetable: timetable,
+					close: closeWideEditor
+				)
 			} label: {
 				VStack(alignment: .leading) {
 					Text(timetable.title)
@@ -42,7 +45,7 @@ struct CreatedTimetablesSettingsView: View {
 				} else {
 					NavigationLink {
 						CreatedTimetableCreateView(
-							close: closeWideNavigationDestination,
+							close: closeWideEditor,
 							embedsInNavigation: false,
 							showsCloseButton: false
 						)
@@ -72,6 +75,10 @@ struct CreatedTimetablesSettingsView: View {
 				await refresh()
 			}
 		}
+	}
+
+	private func closeWideEditor() {
+		closeWideDestination?()
 	}
 
 	private func refresh() async {
@@ -168,11 +175,16 @@ private struct CreatedTimetableEditorView: View {
 	@State private var subjects: [Subject]
 	@State private var showEditor = false
 	@State private var confirmDelete = false
-	let close: () -> Void = {}
+	@State private var saveTask: Task<Void, Never>?
+	let close: () -> Void
 	@Environment(\.statusBadgeManager) private var badges
 
-	init(timetable: TimetableDetailResponse) {
+	init(
+		timetable: TimetableDetailResponse,
+		close: @escaping () -> Void
+	) {
 		self.timetable = timetable
+		self.close = close
 		_title = State(initialValue: timetable.title)
 		_subjects = State(initialValue: timetable.subjects)
 	}
@@ -181,7 +193,7 @@ private struct CreatedTimetableEditorView: View {
 		Form {
 			Section("Details") {
 				TextField("Title", text: $title)
-					.onSubmit { save() }
+					.onSubmit { scheduleSave(immediately: true) }
 			}
 			Section("Timetable") {
 				TimetablePreviewGrid(subjects: subjects)
@@ -221,15 +233,42 @@ private struct CreatedTimetableEditorView: View {
 				.presentationDetents([.large])
 				.presentationDragIndicator(.hidden)
 		}
-		.onChange(of: subjects) { save() }
+		.onChange(of: subjects) {
+			scheduleSave()
+		}
+		.onChange(of: title) {
+			scheduleSave()
+		}
+		.onDisappear {
+			saveTask?.cancel()
+		}
 	}
 
-	private func save() {
-		Task {
+	private func scheduleSave(immediately: Bool = false) {
+		saveTask?.cancel()
+		let title = title
+		let subjects = subjects
+
+		saveTask = Task {
+			if !immediately {
+				do {
+					try await Task.sleep(for: .milliseconds(300))
+				} catch {
+					return
+				}
+			}
+
+			guard !Task.isCancelled else {
+				return
+			}
+
 			do {
 				try await CreatedTimetableService.shared.update(id: timetable.id, title: title, subjects: subjects)
-
 			} catch {
+				guard !Task.isCancelled else {
+					return
+				}
+
 				badges.addBadge(
 					id: UUID(),
 					title: "Unable to save timetable",

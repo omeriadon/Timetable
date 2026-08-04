@@ -49,7 +49,7 @@
 				case .settings(.tagSubscriptions):
 					TagSubscriptionsView()
 				case .settings(.createdTimetables), .settings(.createdTimetable(id: _)):
-					CreatedTimetablesSettingsView()
+					CreatedTimetablesSettingsView(closeWideDestination: nil)
 				case .settings(.receivedTimetables):
 					ReceivedTimetablesView()
 				case .settings(.feedback):
@@ -71,16 +71,16 @@
 				case .administration(.root):
 					AdministrationView()
 				case .administration(.schoolEvents), .administration(.schoolEvent(id: _)):
-					AdministrationSchoolEventsView()
+					AdministrationSchoolEventsView(closeWideDestination: nil)
 				case .administration(.eventTags),
 				     .administration(.eventTag(id: _)),
 				     .administration(.eventTagSection(id: _)):
-					AdministrationEventTagsView()
+					AdministrationEventTagsView(closeWideDestination: nil)
 				case let .administration(.calendarEntries(kind)),
 				     let .administration(.calendarEntry(kind, _)):
-					AdministrationCalendarEntriesView(kind: kind)
+					AdministrationCalendarEntriesView(kind: kind, closeWideDestination: nil)
 				case .administration(.users), .administration(.user(id: _)):
-					AdministrationUsersView()
+					AdministrationUsersView(closeWideDestination: nil)
 				case .administration(.broadcastNotification):
 					AdministrationBroadcastNotificationView()
 				case .administration(.broadcastHistory), .administration(.broadcastRecord(id: _)):

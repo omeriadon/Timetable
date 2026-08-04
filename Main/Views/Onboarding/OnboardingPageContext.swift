@@ -6,7 +6,6 @@
 //
 
 import Observation
-import SwiftUI
 
 @MainActor
 @Observable
@@ -26,10 +25,4 @@ final class OnboardingPageContext {
 		self.isWorking = isWorking
 		self.statusMessage = statusMessage
 	}
-}
-
-extension EnvironmentValues {
-	static var context = OnboardingPageContext()
-
-	@Entry var onboardingPageContext = context
 }

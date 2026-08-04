@@ -154,10 +154,6 @@ final class OwnerTimetableSyncService {
 					task.cancel()
 				}
 
-				if T.self == Void.self {
-					return () as! T
-				}
-
 				guard let value = result.value as? T else {
 					throw OperationRunError.mismatchedResult(kind)
 				}
@@ -203,10 +199,6 @@ final class OwnerTimetableSyncService {
 			try await task.value
 		} onCancel: {
 			task.cancel()
-		}
-
-		if T.self == Void.self {
-			return () as! T
 		}
 
 		guard let value = result.value as? T else {

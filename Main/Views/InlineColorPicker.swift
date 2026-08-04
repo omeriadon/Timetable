@@ -151,7 +151,7 @@ public struct InlineColorPicker<T: ColorOptions>: View {
 					Label(description, systemImage: systemImage)
 					Spacer()
 					Text(selectedColor.wrappedValue.SwiftUIColor.description.capitalized)
-						.foregroundColor(selectedColor.wrappedValue.SwiftUIColor)
+						.foregroundStyle(selectedColor.wrappedValue.SwiftUIColor)
 				}
 				pickerBody
 			}

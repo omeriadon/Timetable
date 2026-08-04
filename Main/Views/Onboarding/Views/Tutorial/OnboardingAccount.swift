@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct OnboardingAccountView: View {
-	@Environment(\.onboardingPageContext) private var context
+	let context: OnboardingPageContext
 	@State private var sessionStore = SessionStore.shared
 
 	var body: some View {

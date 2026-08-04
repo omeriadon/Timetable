@@ -13,6 +13,7 @@ struct ProfilePicture: View {
 	private let photoSource: PhotoSource?
 	let size: CGFloat?
 	let badges: [ProfileBadge]
+	private let visibleBadges: [ProfileBadge]
 	let accessibilityName: String
 	let animatesBackground: Bool
 
@@ -28,6 +29,7 @@ struct ProfilePicture: View {
 		photoSource = photo.map(PhotoSource.remote)
 		self.size = size
 		self.badges = badges
+		visibleBadges = Self.visibleBadges(from: badges)
 		self.accessibilityName = accessibilityName
 		self.animatesBackground = animatesBackground
 	}
@@ -42,6 +44,7 @@ struct ProfilePicture: View {
 		photoSource = profile?.photo.map(PhotoSource.remote)
 		self.size = size
 		badges = profile?.badges ?? []
+		visibleBadges = Self.visibleBadges(from: profile?.badges ?? [])
 		self.accessibilityName = accessibilityName
 		self.animatesBackground = animatesBackground
 	}
@@ -58,6 +61,7 @@ struct ProfilePicture: View {
 		photoSource = .local(localImage)
 		self.size = size
 		self.badges = badges
+		visibleBadges = Self.visibleBadges(from: badges)
 		self.accessibilityName = accessibilityName
 		self.animatesBackground = animatesBackground
 	}
@@ -154,9 +158,6 @@ struct ProfilePicture: View {
 
 	@ViewBuilder
 	private func badgeStack(size: CGFloat) -> some View {
-		let visibleBadges = badges
-			.sorted { $0.priority > $1.priority }
-			.prefix(3)
 		let badgeSize = size * 0.30
 
 		if !visibleBadges.isEmpty {
@@ -179,11 +180,12 @@ struct ProfilePicture: View {
 	}
 
 	private var badgeAccessibilityValue: String? {
-		let labels = badges
-			.sorted { $0.priority > $1.priority }
-			.prefix(3)
-			.map(\.accessibilityLabel)
+		let labels = visibleBadges.map(\.accessibilityLabel)
 		return labels.isEmpty ? nil : labels.joined(separator: ", ")
+	}
+
+	private static func visibleBadges(from badges: [ProfileBadge]) -> [ProfileBadge] {
+		Array(badges.sorted { $0.priority > $1.priority }.prefix(3))
 	}
 }
 

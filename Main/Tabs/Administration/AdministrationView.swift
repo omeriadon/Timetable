@@ -48,11 +48,21 @@ struct AdministrationView: View {
 	@ViewBuilder
 	private var administrationSections: some View {
 		Section {
-			administrationLink("School Events", systemImage: "calendar", route: .administration(.schoolEvents)) { AdministrationSchoolEventsView() }
-			administrationLink("Event Tags", systemImage: "tag", route: .administration(.eventTags)) { AdministrationEventTagsView() }
-			administrationLink("Term Dates", systemImage: "calendar", route: .administration(.calendarEntries(kind: "term"))) { AdministrationCalendarEntriesView(kind: "term") }
-			administrationLink("Pupil Free Days", systemImage: "calendar.badge.exclamationmark", route: .administration(.calendarEntries(kind: "noSchool"))) { AdministrationCalendarEntriesView(kind: "noSchool") }
-			administrationLink("Users", systemImage: "person.2", route: .administration(.users)) { AdministrationUsersView() }
+			administrationLink("School Events", systemImage: "calendar", route: .administration(.schoolEvents)) {
+				AdministrationSchoolEventsView(closeWideDestination: nil)
+			}
+			administrationLink("Event Tags", systemImage: "tag", route: .administration(.eventTags)) {
+				AdministrationEventTagsView(closeWideDestination: nil)
+			}
+			administrationLink("Term Dates", systemImage: "calendar", route: .administration(.calendarEntries(kind: "term"))) {
+				AdministrationCalendarEntriesView(kind: "term", closeWideDestination: nil)
+			}
+			administrationLink("Pupil Free Days", systemImage: "calendar.badge.exclamationmark", route: .administration(.calendarEntries(kind: "noSchool"))) {
+				AdministrationCalendarEntriesView(kind: "noSchool", closeWideDestination: nil)
+			}
+			administrationLink("Users", systemImage: "person.2", route: .administration(.users)) {
+				AdministrationUsersView(closeWideDestination: nil)
+			}
 			administrationLink("Broadcast Notification", systemImage: "megaphone", route: .administration(.broadcastNotification)) { AdministrationBroadcastNotificationView() }
 			administrationLink("Broadcast History", systemImage: "clock.arrow.circlepath", route: .administration(.broadcastHistory)) { AdministrationBroadcastHistoryView() }
 		}

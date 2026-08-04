@@ -209,13 +209,9 @@ private struct FriendOverview: View {
 	let friendName: String
 	@Default(.timetable) private var ownerSubjects
 	@Default(.schoolCalendar) private var schoolCalendar
+	@State private var comparison = FriendTimetableComparison.empty
 
 	var body: some View {
-		let comparison = FriendTimetableComparison(
-			ownerSubjects: ownerSubjects,
-			friendSubjects: detail.timetable?.subjects ?? []
-		)
-
 		VStack(alignment: .leading, spacing: 14) {
 			currentAndNextClasses
 
@@ -247,6 +243,15 @@ private struct FriendOverview: View {
 		.padding(.vertical, 14)
 		.padding(.horizontal, FriendDetailLayout.horizontalPadding)
 		.frame(maxWidth: .infinity, alignment: .leading)
+		.task(id: FriendTimetableComparisonInput(
+			ownerSubjects: ownerSubjects,
+			friendSubjects: detail.timetable?.subjects ?? []
+		)) {
+			comparison = FriendTimetableComparison(
+				ownerSubjects: ownerSubjects,
+				friendSubjects: detail.timetable?.subjects ?? []
+			)
+		}
 	}
 
 	private func sharedClassesCard(_ classes: [SharedClass]) -> some View {
@@ -486,6 +491,11 @@ private struct FriendTimetableComparison {
 	let sharedClasses: [SharedClass]
 	let sharedSubjects: [SharedSubject]
 
+	static let empty = FriendTimetableComparison(
+		ownerSubjects: [],
+		friendSubjects: []
+	)
+
 	init(ownerSubjects: [Subject], friendSubjects: [Subject]) {
 		var classes: [SharedClass] = []
 		var subjects: [SharedSubject] = []
@@ -550,6 +560,11 @@ private struct FriendTimetableComparison {
 			.split(whereSeparator: \.isWhitespace)
 			.joined(separator: " ")
 	}
+}
+
+private struct FriendTimetableComparisonInput: Hashable {
+	let ownerSubjects: [Subject]
+	let friendSubjects: [Subject]
 }
 
 private struct SharedClass: Identifiable {

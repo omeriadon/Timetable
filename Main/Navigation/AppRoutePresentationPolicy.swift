@@ -1,4 +1,4 @@
-enum AppRoutePresentationPolicy {
+enum AppRoutePresentationPolicy: Equatable {
 	case detail
 	case inspector
 

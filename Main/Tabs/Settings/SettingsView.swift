@@ -188,7 +188,11 @@ import WidgetKit
 
 			Section("Created Timetables") {
 				if sessionStore.isAuthenticated {
-					NavigationLink { CreatedTimetablesSettingsView() } label: { Label("Manage Created Timetables", systemImage: "person.2.crop.square.stack") }
+					NavigationLink {
+						CreatedTimetablesSettingsView(closeWideDestination: nil)
+					} label: {
+						Label("Manage Created Timetables", systemImage: "person.2.crop.square.stack")
+					}
 				} else {
 					Button { showSignInRequired() } label: { Label("Manage Created Timetables", systemImage: "person.2.crop.square.stack") }
 				}

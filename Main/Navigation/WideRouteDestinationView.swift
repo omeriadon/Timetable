@@ -4,12 +4,20 @@ import SwiftUI
 struct WideRouteDestinationView: View {
 	let route: AppRoute
 	let showsCloseButton: Bool
-	@Environment(AppRouter.self) private var router
+	let close: () -> Void
+	let closeWideDestination: () -> Void
 	@Default(.friends) private var friends
 
-	init(route: AppRoute, showsCloseButton: Bool = false) {
+	init(
+		route: AppRoute,
+		showsCloseButton: Bool = false,
+		close: @escaping () -> Void,
+		closeWideDestination: @escaping () -> Void
+	) {
 		self.route = route
 		self.showsCloseButton = showsCloseButton
+		self.close = close
+		self.closeWideDestination = closeWideDestination
 	}
 
 	var body: some View {
@@ -66,17 +74,17 @@ struct WideRouteDestinationView: View {
 				case .settings(.navigationPersistence):
 					NavigationPersistenceSettingsView()
 				case .settings(.createdTimetables), .settings(.createdTimetable(id: _)):
-					CreatedTimetablesSettingsView()
+					CreatedTimetablesSettingsView(closeWideDestination: closeWideDestination)
 				case .settings(.receivedTimetables):
 					ReceivedTimetablesView()
 				case .administration(.schoolEvents), .administration(.schoolEvent(id: _)):
-					AdministrationSchoolEventsView()
+					AdministrationSchoolEventsView(closeWideDestination: closeWideDestination)
 				case .administration(.eventTags), .administration(.eventTag(id: _)), .administration(.eventTagSection(id: _)):
-					AdministrationEventTagsView()
+					AdministrationEventTagsView(closeWideDestination: closeWideDestination)
 				case let .administration(.calendarEntries(kind)), let .administration(.calendarEntry(kind, _)):
-					AdministrationCalendarEntriesView(kind: kind)
+					AdministrationCalendarEntriesView(kind: kind, closeWideDestination: closeWideDestination)
 				case .administration(.users), .administration(.user(id: _)):
-					AdministrationUsersView()
+					AdministrationUsersView(closeWideDestination: closeWideDestination)
 				case .administration(.broadcastNotification):
 					AdministrationBroadcastNotificationView()
 				case .administration(.broadcastHistory), .administration(.broadcastRecord(id: _)):
@@ -100,14 +108,6 @@ struct WideRouteDestinationView: View {
 						.labelStyle(.iconOnly)
 				}
 			}
-		}
-	}
-
-	private func close() {
-		if router.inspectorRoute != nil {
-			router.inspectorRoute = nil
-		} else if !router.sidebarPath.isEmpty {
-			router.sidebarPath.removeLast()
 		}
 	}
 }

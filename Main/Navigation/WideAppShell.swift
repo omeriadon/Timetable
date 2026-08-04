@@ -5,7 +5,6 @@ struct WideAppShell: View {
 	@Environment(AppRouter.self) private var router
 	@Binding var expanded: WindowMode
 	@Default(.accountProfile) private var accountProfile
-	@State private var inspectorPath = NavigationPath()
 
 	var body: some View {
 		@Bindable var router = router
@@ -31,17 +30,32 @@ struct WideAppShell: View {
 					expanded: $expanded
 				)
 				.navigationDestination(for: AppRoute.self) { route in
-					WideRouteDestinationView(route: route)
+					WideRouteDestinationView(
+						route: route,
+						close: closeDetailDestination,
+						closeWideDestination: closeDetailDestination
+					)
 				}
 			}
 			.navigationSplitViewColumnWidth(min: 540, ideal: 700, max: 860)
 		}
 		.inspector(isPresented: inspectorPresented) {
 			if let route = router.inspectorRoute {
-				NavigationStack(path: $inspectorPath) {
-					WideRouteDestinationView(route: route, showsCloseButton: true)
+				NavigationStack(path: $router.inspectorPath) {
+					WideRouteDestinationView(
+						route: route,
+						showsCloseButton: true,
+						close: dismissInspector,
+						closeWideDestination: closeInspectorDestination
+					)
+					.navigationDestination(for: AppRoute.self) { destination in
+						WideRouteDestinationView(
+							route: destination,
+							close: dismissInspector,
+							closeWideDestination: closeInspectorDestination
+						)
+					}
 				}
-				.environment(\.closeWideNavigationDestination, closeInspectorDestination)
 				.inspectorColumnWidth(min: 400, ideal: 500, max: 700)
 			}
 		}
@@ -57,16 +71,27 @@ struct WideAppShell: View {
 			}
 			router.selectRoot(destination)
 		}
-		.onChange(of: router.inspectorRoute) {
-			inspectorPath = NavigationPath()
-		}
 	}
 
 	private func closeInspectorDestination() {
-		guard !inspectorPath.isEmpty else {
+		if !router.inspectorPath.isEmpty {
+			router.inspectorPath.removeLast()
+		} else {
+			dismissInspector()
+		}
+	}
+
+	private func dismissInspector() {
+		router.inspectorRoute = nil
+		router.inspectorPath = []
+	}
+
+	private func closeDetailDestination() {
+		guard !router.sidebarPath.isEmpty else {
 			return
 		}
-		inspectorPath.removeLast()
+
+		router.sidebarPath.removeLast()
 	}
 
 	private var sidebarSelection: Binding<AppRootDestination?> {
@@ -93,7 +118,7 @@ struct WideAppShell: View {
 			get: { router.inspectorRoute != nil },
 			set: { presented in
 				if !presented {
-					router.inspectorRoute = nil
+					dismissInspector()
 				}
 			}
 		)

@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct AdministrationEventTagsView: View {
+	let closeWideDestination: (() -> Void)?
 	@State private var service = AdministrationService.shared
 	@State private var catalogue = AdministrationEventTagCatalogueResponse(sections: [])
 	@State private var tags: [AdministrationEventTag] = []
@@ -8,7 +9,6 @@ struct AdministrationEventTagsView: View {
 	@State private var isReordering = false
 	@Environment(\.statusBadgeManager) private var badges
 	@Environment(\.appPresentation) private var presentation
-	@Environment(\.closeWideNavigationDestination) private var closeWideNavigationDestination
 
 	var body: some View {
 		List {
@@ -28,7 +28,7 @@ struct AdministrationEventTagsView: View {
 									tag: tag,
 									section: section,
 									save: saveTag,
-									close: closeWideNavigationDestination
+									close: closeWideEditor
 								)
 							} label: {
 								tagLabel(tag)
@@ -59,7 +59,7 @@ struct AdministrationEventTagsView: View {
 							tag: nil,
 							section: addableSection,
 							save: saveTag,
-							close: closeWideNavigationDestination
+							close: closeWideEditor
 						)
 					} label: {
 						Label("Add Tag", systemImage: "plus")
@@ -102,6 +102,10 @@ struct AdministrationEventTagsView: View {
 				}
 			}
 		}
+	}
+
+	private func closeWideEditor() {
+		closeWideDestination?()
 	}
 
 	private func tagLabel(_ tag: AdministrationEventTag) -> some View {
