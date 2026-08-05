@@ -11,17 +11,20 @@
 
 > [!Note]
 > Only available for OS27 and later on iOS, macOS, and iPadOS, and OS26 and later on watchOS.
+> This is due to too many APIs requiring the new OS.
+> I apologise if you are on an earlier version.
 
 > [!Note]
-> The structure of this app is heavily centered around the timetable structure my school has, so it won't work with other schools. This is so that I can optimise features and backend code to only need to handle one type of school.
+> The structure of this app is heavily centred around the timetable structure my specific school has, so it (probably?) won't work with other schools. This is so that I can optimise features and backend code to only need to handle one type of school.
 
 <br>
 
-- Imports your calendar from Apple Calendar
+- Import your calendar from Apple Calendar
+- Check all of your classes, and your friends' classes
 - Fully integrated with Siri and Apple Intelligence
-- Share and import timetables through Messages, links, and in-app search
-- Live Activities throught the school day showing next subject, etc
+- Live Activities throughout the school day showing next subject, etc
 - Notifications for each period
+- Events, like carnivals, pupil free days, etc
 - iOS, macOS, watchOS widgets
 
 #### Try it from TestFlight: https://testflight.apple.com/join/DDUXPSq3
@@ -29,6 +32,11 @@
 <br>
 
 This project also has a server, the source code for which is at [omeriadon/pmstt](https://github.com/omeriadon/pmstt).
+It runs on Swift Vapor, using the same language as the client app, to allow for faster features.
+
+The macOS app is actually Mac Catalyst, which means it runs an iPad app optimised for Mac. This makes development much faster, since the iPad version is also the iPhone version.
+
+Watch uses its own target, because it's screen is much smaller and its not authoritative (It can't delete accounts or change settings, etc. It just shows the user fast info). It depends on the iPhone app being installed
 
 <br>
 
