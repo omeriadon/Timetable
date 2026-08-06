@@ -1,6 +1,6 @@
 import Foundation
 
-enum ModerationAction: String, Codable, Hashable {
+nonisolated enum ModerationAction: String, Codable, Hashable, Sendable {
 	case pending
 	case noAction
 	case accountDeleted
@@ -8,15 +8,15 @@ enum ModerationAction: String, Codable, Hashable {
 	case rejected
 }
 
-struct FriendshipDateChangeRequest: Codable {
+nonisolated struct FriendshipDateChangeRequest: Codable, Sendable {
 	let requestedDate: Date
 }
 
-struct AdministrationModerationResolutionRequest: Codable {
+nonisolated struct AdministrationModerationResolutionRequest: Codable, Sendable {
 	let action: ModerationAction
 }
 
-struct AdministrationFriendshipDateChangeRequest: Codable, Identifiable {
+nonisolated struct AdministrationFriendshipDateChangeRequest: Codable, Identifiable, Sendable {
 	let id: UUID
 	let requesterID: UUID
 	let requesterDisplayName: String?
@@ -25,7 +25,7 @@ struct AdministrationFriendshipDateChangeRequest: Codable, Identifiable {
 	let createdAt: Date?
 }
 
-struct AdministrationUserReport: Codable, Identifiable {
+nonisolated struct AdministrationUserReport: Codable, Identifiable, Sendable {
 	let id: UUID
 	let reporterID: UUID
 	let reporterDisplayName: String?
