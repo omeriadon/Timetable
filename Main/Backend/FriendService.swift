@@ -75,11 +75,11 @@ final class FriendService {
 		return FriendRequestSnapshot(incoming: result.0, outgoing: result.1)
 	}
 
-	func sendRequest(to schoolEmail: String) async throws -> FriendSummary {
+	func sendRequest(to userID: UUID) async throws -> FriendSummary {
 		Print("Sending friend request API request", category: .network)
 		let result: FriendSummary = try await networkManager.send(
 			.v1FriendRequests,
-			body: CreateFriendRequest(schoolEmail: schoolEmail),
+			body: CreateFriendRequest(userID: userID),
 			context: .userInitiated
 		)
 		await refreshAfterMutation()

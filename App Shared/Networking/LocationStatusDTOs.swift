@@ -13,3 +13,8 @@ nonisolated struct LocationStatusUpdateRequest: Codable, Sendable {
 nonisolated struct LocationArrivalStatisticsResponse: Codable, Sendable {
 	let averageArrivalSecondsSinceMidnight: Double?
 }
+
+nonisolated struct AdministrationStatisticsResponse: Codable, Sendable {
+	let totalUsers: Int
+	let averageArrivalSecondsSinceMidnight: Double?
+}

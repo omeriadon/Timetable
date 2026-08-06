@@ -36,7 +36,7 @@ struct AddFriendSheet: View {
 
 	private var content: some View {
 		VStack(spacing: 0) {
-			TextField("Search by name or email", text: $query)
+			TextField("Search by name", text: $query)
 				.textFieldStyle(.roundedBorder)
 				.padding()
 
@@ -45,7 +45,7 @@ struct AddFriendSheet: View {
 					ContentUnavailableView(
 						"Find a Friend",
 						systemImage: "person.2",
-						description: Text("Search by name or school email address.")
+						description: Text("Search by name to find friends.")
 					)
 					.transition(.blurReplace)
 				} else if results.isEmpty,

@@ -14,7 +14,7 @@ struct AdministrationView: View {
 				if presentation == .iOS {
 					List {
 						administrationSections
-					}
+		}
 					.scrollEdgeEffect()
 				} else {
 					Form {
@@ -47,10 +47,16 @@ struct AdministrationView: View {
 
 	@ViewBuilder
 	private var administrationSections: some View {
-		Section {
+		Section("Overview") {
 			administrationLink("Statistics", systemImage: "chart.bar", route: .administration(.statistics)) {
 				AdministrationStatisticsView()
 			}
+			administrationLink("Users", systemImage: "person.2", route: .administration(.users)) {
+				AdministrationUsersView(closeWideDestination: nil)
+			}
+		}
+
+		Section("School Content") {
 			administrationLink("School Events", systemImage: "calendar", route: .administration(.schoolEvents)) {
 				AdministrationSchoolEventsView(closeWideDestination: nil)
 			}
@@ -63,9 +69,9 @@ struct AdministrationView: View {
 			administrationLink("Pupil Free Days", systemImage: "calendar.badge.exclamationmark", route: .administration(.calendarEntries(kind: "noSchool"))) {
 				AdministrationCalendarEntriesView(kind: "noSchool", closeWideDestination: nil)
 			}
-			administrationLink("Users", systemImage: "person.2", route: .administration(.users)) {
-				AdministrationUsersView(closeWideDestination: nil)
-			}
+		}
+
+		Section("Notifications") {
 			administrationLink("Broadcast Notification", systemImage: "megaphone", route: .administration(.broadcastNotification)) { AdministrationBroadcastNotificationView() }
 			administrationLink("Broadcast History", systemImage: "clock.arrow.circlepath", route: .administration(.broadcastHistory)) { AdministrationBroadcastHistoryView() }
 		}

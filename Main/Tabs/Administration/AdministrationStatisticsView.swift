@@ -7,12 +7,18 @@ import SwiftUI
 
 struct AdministrationStatisticsView: View {
 	@State private var service = LocationStatusStatisticsService.shared
-	@State private var statistics: LocationArrivalStatisticsResponse?
+	@State private var statistics: AdministrationStatisticsResponse?
 	@Environment(\.statusBadgeManager) private var statusBadges
 
 	var body: some View {
 		List {
-			Section {
+			Section("Users") {
+				LabeledContent("Total users") {
+					Text(statistics?.totalUsers.formatted() ?? "No data")
+				}
+			}
+
+			Section("Status") {
 				LabeledContent("Average arrival") {
 					Text(formattedAverageArrival)
 				}
@@ -38,7 +44,7 @@ struct AdministrationStatisticsView: View {
 
 	private func load() async {
 		do {
-			statistics = try await service.globalArrivalStatistics()
+			statistics = try await service.administrationStatistics()
 		} catch {
 			statusBadges.present(error: error, title: "Unable to load statistics")
 		}

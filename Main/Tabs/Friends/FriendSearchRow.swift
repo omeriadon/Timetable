@@ -19,11 +19,6 @@ struct FriendSearchRow: View {
 			VStack(alignment: .leading, spacing: 3) {
 				Text(result.profile.displayName)
 					.font(.headline)
-				if let email = result.profile.email {
-					Text(email)
-						.font(.caption.monospaced())
-						.foregroundStyle(.secondary)
-				}
 			}
 
 			Spacer(minLength: 1)
@@ -62,16 +57,12 @@ struct FriendSearchRow: View {
 	}
 
 	private func sendRequest() {
-		guard let email = result.profile.email else {
-			PrintError("Friend search result has no email address", category: .network)
-			return
-		}
 		isSending = true
 		Print("Sending friend request", category: .network)
 		Task {
 			defer { isSending = false }
 			do {
-				let summary = try await service.sendRequest(to: email)
+				let summary = try await service.sendRequest(to: result.profile.id)
 				relationship = summary.state
 				Print("Friend request sent", category: .network)
 			} catch {

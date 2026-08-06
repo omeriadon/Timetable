@@ -19,7 +19,7 @@ final class LocationStatusStatisticsService {
 		try await networkManager.send(.v1LocationStatusPersonalStatistics)
 	}
 
-	func globalArrivalStatistics() async throws -> LocationArrivalStatisticsResponse {
+	func administrationStatistics() async throws -> AdministrationStatisticsResponse {
 		try await networkManager.send(.v1AdministrationLocationStatusStatistics)
 	}
 }

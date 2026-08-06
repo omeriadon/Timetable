@@ -51,7 +51,7 @@ struct FriendsView: View {
 				.labelStyle(.iconOnly)
 			}
 		}
-		.searchable(text: $searchText, prompt: "Search with a school email")
+		.searchable(text: $searchText, prompt: "Search by name")
 		.task { await refresh() }
 		.task(id: searchText) {
 			await search(for: searchText)
@@ -100,7 +100,7 @@ struct FriendsView: View {
 					ContentUnavailableView(
 						"No Friends Yet",
 						systemImage: "person.2.slash",
-						description: Text("Add friends using their school email address.")
+						description: Text("Search by name to find friends.")
 					)
 					.padding(.top, 72)
 				} else {

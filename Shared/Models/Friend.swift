@@ -106,7 +106,7 @@ nonisolated struct FriendSearchResult: Codable, Identifiable, Hashable, Sendable
 }
 
 nonisolated struct CreateFriendRequest: Codable, Sendable {
-	let schoolEmail: String
+	let userID: UUID
 }
 
 nonisolated struct FriendOrderUpdateRequest: Codable, Sendable {
