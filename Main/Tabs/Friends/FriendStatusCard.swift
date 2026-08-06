@@ -17,8 +17,7 @@ struct FriendStatusCard: View {
 				schoolCalendar: schoolCalendar
 			)
 			let locationStatus = FriendLocationStatus(
-				item: friend.locationStatus,
-				at: context.date
+				item: friend.locationStatus
 			)
 			HStack(alignment: .center, spacing: 14) {
 				FriendAvatar(profile: friend.friend)
@@ -31,9 +30,11 @@ struct FriendStatusCard: View {
 						Spacer()
 
 						HStack(spacing: 6) {
-							Circle()
-								.fill(locationStatus.tint)
-								.frame(width: 8, height: 8)
+							if let tint = locationStatus.tint {
+								Circle()
+									.fill(tint)
+									.frame(width: 8, height: 8)
+							}
 							Text(locationStatus.title)
 						}
 						.fontWeight(.medium)
@@ -80,18 +81,12 @@ struct FriendStatusCard: View {
 
 private struct FriendLocationStatus {
 	let title: String
-	let tint: Color
+	let tint: Color?
 
-	init(item: LocationStatusItem?, at date: Date) {
+	init(item: LocationStatusItem?) {
 		guard let item else {
 			title = "Status unavailable"
-			tint = .gray
-			return
-		}
-
-		if date.timeIntervalSince(item.updatedAt) > 2 * 60 * 60 {
-			title = item.state == .onCampus ? "On Campus" : "Off Campus"
-			tint = .gray
+			tint = nil
 			return
 		}
 
