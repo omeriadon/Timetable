@@ -55,6 +55,7 @@ struct TimetableApp: App {
 		#endif
 		try? Tips.configure([
 			.datastoreLocation(.applicationDefault),
+			.displayFrequency(.hourly),
 		])
 
 		#if os(macOS)

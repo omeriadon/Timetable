@@ -122,14 +122,14 @@
 		2A0DF9533001EBD400AA3439 /* Exceptions for "Shared" folder in "Watch Widget" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				HapticManager.swift,
+				Everything/HapticManager.swift,
 			);
 			target = 2A25869F2FB5D6490030C8CD /* Watch Widget */;
 		};
 		2A0DF9543001EBD400AA3439 /* Exceptions for "Shared" folder in "Widget" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				HapticManager.swift,
+				Everything/HapticManager.swift,
 			);
 			target = 2AA6DF132FDFAC8F00BBC70E /* Widget */;
 		};

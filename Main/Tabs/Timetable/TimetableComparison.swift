@@ -7,6 +7,7 @@
 
 import Defaults
 import SwiftUI
+import TipKit
 
 struct TimetableComparison: View {
 	@Default(.friends) private var friends
@@ -15,6 +16,8 @@ struct TimetableComparison: View {
 	let subject: Subject?
 
 	@State private var presentedSubject: PresentedSubject?
+
+	let tip = WeekTapFriendTip()
 
 	var body: some View {
 		VStack(spacing: 14) {
@@ -46,6 +49,7 @@ struct TimetableComparison: View {
 										owner: friend.friend.displayName,
 										subject: theirSubject
 									)
+									tip.invalidate(reason: .actionPerformed)
 								} label: {
 									item(
 										left: Text(friend.friend.displayName),
@@ -65,6 +69,7 @@ struct TimetableComparison: View {
 						}
 					}
 				}
+				.popoverTip(tip, attachmentAnchor: .point(.bottom), arrowEdges: .bottom)
 			}
 
 			Spacer()

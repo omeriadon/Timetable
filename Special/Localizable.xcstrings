@@ -6520,6 +6520,30 @@
         }
       }
     },
+    "Tap a Class To See Details" : {
+
+    },
+    "Tap a class to see your shared teacher and other details." : {
+
+    },
+    "Tap a Friend To See Details" : {
+
+    },
+    "Tap a Slot To See Friends" : {
+
+    },
+    "Tap a Subject To See Details" : {
+
+    },
+    "Tap a subject to see your teacher and classroom." : {
+
+    },
+    "Tap each friend to show their classroom and teacher." : {
+
+    },
+    "Tap each slot in the week view to show your classroom, teacher, and what your friends have now." : {
+
+    },
     "Term Dates" : {
       "localizations" : {
         "fr" : {
