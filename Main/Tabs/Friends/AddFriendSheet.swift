@@ -35,52 +35,49 @@ struct AddFriendSheet: View {
 	}
 
 	private var content: some View {
-		VStack(spacing: 0) {
-			TextField("Search by name", text: $query)
-				.textFieldStyle(.roundedBorder)
-				.padding()
-
-			ZStack {
-				if cleanedQuery.isEmpty {
-					ContentUnavailableView(
-						"Find a Friend",
-						systemImage: "person.2",
-						description: Text("Search by name to find friends.")
-					)
+		ZStack {
+			if cleanedQuery.isEmpty {
+				ContentUnavailableView(
+					"Find a Friend",
+					systemImage: "person.2",
+					description: Text("Search by name to find friends.")
+				)
+				.transition(.blurReplace)
+			} else if results.isEmpty,
+			          isSearching || completedSearchQuery != cleanedQuery
+			{
+				Color.clear
 					.transition(.blurReplace)
-				} else if results.isEmpty,
-				          isSearching || completedSearchQuery != cleanedQuery
-				{
-					Color.clear
-						.transition(.blurReplace)
-				} else if results.isEmpty,
-				          !isSearching,
-				          completedSearchQuery == cleanedQuery
-				{
-					ContentUnavailableView.search(text: cleanedQuery)
-						.transition(.blurReplace)
-				} else {
-					List {
-						ForEach(results) { result in
-							FriendSearchRow(result: result)
-								.listRowInsets(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
-								.listRowBackground(Image("paper").resizable().scaledToFill())
-								.transition(.blurReplace)
-						}
+			} else if results.isEmpty,
+			          !isSearching,
+			          completedSearchQuery == cleanedQuery
+			{
+				ContentUnavailableView.search(text: cleanedQuery)
+					.transition(.blurReplace)
+			} else {
+				List {
+					ForEach(results) { result in
+						FriendSearchRow(result: result)
+							.listRowInsets(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
+							.listRowBackground(Image("paper").resizable().scaledToFill())
+							.transition(.blurReplace)
 					}
-					#if os(iOS)
-					.listStyle(.insetGrouped)
-					#endif
-					.animation(.snappy, value: results.map(\.id))
-					.scrollEdgeEffectStyle(.soft, for: .top)
-					.scrollEdgeEffectStyle(.soft, for: .bottom)
-					.transition(.blurReplace)
 				}
+				#if os(iOS)
+				.listStyle(.insetGrouped)
+				#endif
+				.animation(.snappy, value: results.map(\.id))
+				.scrollEdgeEffectStyle(.soft, for: .top)
+				.scrollEdgeEffectStyle(.soft, for: .bottom)
+				.transition(.blurReplace)
 			}
 		}
+		.searchable(text: $query, prompt: Text("Search by name"))
 		.animation(.easeOut(duration: 0.25), value: "\(cleanedQuery)\(results.isEmpty)\(isSearching)")
 		.appNavigationTitle("Add a Friend")
 		.toolbar {
+			DefaultToolbarItem(kind: .search, placement: .bottomBar)
+
 			if showsCloseButton {
 				ToolbarItem(placement: .cancellationAction) {
 					Button("Close", systemImage: "xmark", role: .cancel) {

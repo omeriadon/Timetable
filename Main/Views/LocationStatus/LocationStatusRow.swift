@@ -39,6 +39,6 @@ struct LocationStatusRow: View {
 
 			Spacer()
 		}
-		.padding(.vertical, 8)
+		.padding(8)
 	}
 }

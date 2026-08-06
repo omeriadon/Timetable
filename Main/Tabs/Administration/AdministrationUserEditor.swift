@@ -170,7 +170,6 @@ struct AdministrationUserEditor: View {
 			close()
 		}
 	}
-
 }
 
 private struct AdministrationJSONNode: View {

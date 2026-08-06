@@ -28,7 +28,7 @@ struct FriendsView: View {
 		.scrollEdgeEffect()
 		.appNavigationTitle("Friends", style: .main, accent: true)
 		.toolbar {
-			ToolbarItem(placement: .secondaryAction) {
+			ToolbarItem(placement: .topBarLeading) {
 				Button("Friend requests", systemImage: incomingFriendRequests.isEmpty ? "bell" : "bell.badge") {
 					if presentation == .iOS {
 						sheet = .requests
@@ -40,7 +40,7 @@ struct FriendsView: View {
 				.badge(incomingFriendRequests.count)
 				.accessibilityValue(incomingFriendRequests.isEmpty ? "No pending requests" : "\(incomingFriendRequests.count) pending requests")
 			}
-			ToolbarItem(placement: .primaryAction) {
+			ToolbarItem(placement: .topBarTrailing) {
 				Button("Add friend", systemImage: "person.badge.plus") {
 					if presentation == .iOS {
 						sheet = .addFriend
@@ -79,14 +79,18 @@ struct FriendsView: View {
 		.dynamicTypeSize(.medium)
 	}
 
+	let isPad = UIDevice.current.userInterfaceIdiom == .pad
+
 	private func animatedScrollCard(_ content: some View) -> some View {
 		let shouldReduceMotion = reduceMotion
 
 		return content
 			.scrollTransition(.animated(.snappy(duration: 0.3))) { card, phase in
-				card
-					.opacity(shouldReduceMotion || phase.isIdentity ? 1 : 0.65)
-					.scaleEffect(shouldReduceMotion || phase.isIdentity ? 1 : 0.96)
+				let useFullEffect = shouldReduceMotion || phase.isIdentity || isPad
+
+				return card
+					.opacity(useFullEffect ? 1 : 0.65)
+					.scaleEffect(useFullEffect ? 1 : 0.96)
 			}
 	}
 

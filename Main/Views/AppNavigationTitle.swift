@@ -6,26 +6,20 @@ private struct AppNavigationTitleModifier: ViewModifier {
 	let usesAccentColor: Bool
 
 	func body(content: Content) -> some View {
-		#if os(iOS)
-			content
-				.navigationTitle(title)
-				.navigationBarTitleDisplayMode(.inline)
-				.toolbar {
-					ToolbarItem(placement: .principal) {
-						Text(title)
-							.font(style == .main ? .largeTitle : .title2)
-							.bold()
-							.monospaced()
-							.foregroundStyle(usesAccentColor ? .accent : .primary)
-					}
+		content
+			.navigationBarTitleDisplayMode(.inline)
+			.toolbar {
+				ToolbarItem(placement: .principal) {
+					Text(title)
+						.font(style == .main ? .largeTitle : .title2)
+						.bold()
+						.monospaced()
+						.foregroundStyle(usesAccentColor ? .accent : .primary)
+						.lineLimit(2)
 				}
-				.scrollEdgeEffectStyle(.soft, for: .top)
-				.scrollEdgeEffectStyle(.soft, for: .bottom)
-		#elseif os(macOS)
-			content.navigationTitle(title)
-		#else
-			content.navigationTitle(title)
-		#endif
+			}
+			.scrollEdgeEffectStyle(.soft, for: .top)
+			.scrollEdgeEffectStyle(.soft, for: .bottom)
 	}
 }
 

@@ -14,7 +14,7 @@ struct AdministrationView: View {
 				if presentation == .iOS {
 					List {
 						administrationSections
-		}
+					}
 					.scrollEdgeEffect()
 				} else {
 					Form {
