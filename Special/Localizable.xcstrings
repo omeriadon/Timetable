@@ -822,6 +822,9 @@
         }
       }
     },
+    "Allow Always location access in Settings to use Status." : {
+
+    },
     "Allow Calendar Access" : {
       "localizations" : {
         "fr" : {
@@ -1000,6 +1003,9 @@
           }
         }
       }
+    },
+    "Average arrival" : {
+
     },
     "Background" : {
       "localizations" : {
@@ -1608,6 +1614,9 @@
           }
         }
       }
+    },
+    "Continue" : {
+
     },
     "Create" : {
       "localizations" : {
@@ -2465,6 +2474,9 @@
           }
         }
       }
+    },
+    "Enable Status" : {
+
     },
     "End" : {
       "localizations" : {
@@ -3682,6 +3694,9 @@
         }
       }
     },
+    "Location access enabled" : {
+
+    },
     "Manage Created Timetables" : {
       "localizations" : {
         "fr" : {
@@ -4323,6 +4338,9 @@
         }
       }
     },
+    "Off campus" : {
+
+    },
     "Offline" : {
       "localizations" : {
         "fr" : {
@@ -4338,6 +4356,9 @@
           }
         }
       }
+    },
+    "On campus" : {
+
     },
     "On the day" : {
       "localizations" : {
@@ -4420,6 +4441,9 @@
           }
         }
       }
+    },
+    "Open Location Settings" : {
+
     },
     "Open Settings" : {
       "localizations" : {
@@ -6193,6 +6217,9 @@
         }
       }
     },
+    "Status unavailable" : {
+
+    },
     "Storage" : {
       "localizations" : {
         "fr" : {
@@ -6933,6 +6960,9 @@
           }
         }
       }
+    },
+    "Timetable can record when you arrive on or leave campus. It stores only on-campus or off-campus status and the time it changed." : {
+
     },
     "Timetable Comparison" : {
       "comment" : "Display name for the timetable comparison entity type.",

@@ -62,7 +62,7 @@ struct OnboardingBackground: View {
 	let currentPageID: String
 
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
-	@State private var colors = OnboardingBackgroundStyle.style(for: "splash").colors
+	@State private var colors = OnboardingBackgroundStyle.style(for: "actualFinished").colors
 	@State private var speed = 0.6
 	@State private var colorTransitionSpeed = 10.0
 
