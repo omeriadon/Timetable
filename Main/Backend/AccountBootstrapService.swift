@@ -63,6 +63,12 @@ final class AccountBootstrapService {
 			async let friends: Void = self.runBootstrapStage("Friends") {
 				try await self.friendService.refresh()
 			}
+			async let locationStatus: Void = self.runBootstrapStage("Location status") {
+				let response: LocationStatusCurrentResponse = try await NetworkManager.shared.send(
+					Endpoint("/v1/account/status")
+				)
+				Defaults[.locationStatus] = response.item
+			}
 			async let created: Void = self.runBootstrapStage("Created timetables") {
 				try await CreatedTimetableService.shared.refresh()
 			}
@@ -72,7 +78,16 @@ final class AccountBootstrapService {
 			async let calendarEvents: Void = self.runBootstrapStage("Calendar events") {
 				try await self.calendarEventsSync.downloadEvents()
 			}
-			_ = await (account, timetable, settings, friends, created, schoolCalendar, calendarEvents)
+			_ = await (
+				account,
+				timetable,
+				settings,
+				friends,
+				locationStatus,
+				created,
+				schoolCalendar,
+				calendarEvents
+			)
 		}
 		bootstrapTask = task
 		isBootstrapping = true
