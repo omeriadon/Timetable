@@ -51,10 +51,16 @@
 				case .authorizedWhenInUse where service.hasRequestedAlwaysAuthorization:
 					settingsRecovery
 				case .notDetermined, .authorizedWhenInUse:
-					Button("Enable Status", systemImage: "location.fill", role: .confirm) {
-						service.requestAuthorization()
+					VStack(spacing: 16) {
+						Button("Enable Status", systemImage: "location.fill", role: .confirm) {
+							service.requestAuthorization()
+						}
+						.buttonStyle(.glassProminent)
+
+						Button(role: .cancel) {
+							close()
+						}
 					}
-					.buttonStyle(.glassProminent)
 				@unknown default:
 					Button(role: .cancel) {
 						close()
