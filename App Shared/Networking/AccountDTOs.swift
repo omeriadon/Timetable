@@ -186,16 +186,19 @@ nonisolated struct EventTagSubscriptionUpdateRequest: Codable, Sendable {
 nonisolated struct AdministrationDashboardResponse: Codable, Sendable {
 	let isAdmin: Bool
 	let authority: AccountAuthority
+	let pendingModerationCount: Int
 
 	private enum CodingKeys: String, CodingKey {
 		case isAdmin
 		case authority
+		case pendingModerationCount
 	}
 
 	init(from decoder: any Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		isAdmin = try container.decode(Bool.self, forKey: .isAdmin)
 		authority = try container.decodeIfPresent(AccountAuthority.self, forKey: .authority) ?? .user
+		pendingModerationCount = try container.decodeIfPresent(Int.self, forKey: .pendingModerationCount) ?? 0
 	}
 }
 

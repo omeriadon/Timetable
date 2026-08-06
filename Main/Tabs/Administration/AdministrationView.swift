@@ -4,6 +4,7 @@ struct AdministrationView: View {
 	@State private var service = AdministrationService.shared
 	@State private var isAdmin = false
 	@State private var authority: AccountAuthority = .user
+	@State private var pendingModerationCount = 0
 	@Environment(\.statusBadgeManager) private var badges
 	@Environment(\.appPresentation) private var presentation
 	@Environment(AppRouter.self) private var router
@@ -56,12 +57,20 @@ struct AdministrationView: View {
 			}
 		}
 
-		Section("Moderation") {
+		Section {
 			administrationLink("Friends-Since Requests", systemImage: "person.2.badge.gearshape", route: .administration(.friendshipDateChangeRequests)) {
 				AdministrationFriendshipDateChangeRequestsView()
 			}
 			administrationLink("User Reports", systemImage: "exclamationmark.bubble", route: .administration(.userReports)) {
 				AdministrationUserReportsView()
+			}
+		} header: {
+			HStack {
+				Text("Moderation")
+				Spacer()
+				if pendingModerationCount > 0 {
+					Text("\(pendingModerationCount)")
+				}
 			}
 		}
 
@@ -143,9 +152,11 @@ struct AdministrationView: View {
 			let dashboard = try await service.dashboard()
 			isAdmin = dashboard.isAdmin
 			authority = dashboard.authority
+			pendingModerationCount = dashboard.pendingModerationCount
 		} catch {
 			isAdmin = false
 			authority = .user
+			pendingModerationCount = 0
 			badges.present(error: error, title: "Unable to refresh administration")
 		}
 	}
