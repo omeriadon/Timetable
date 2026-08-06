@@ -165,7 +165,8 @@ struct FriendsTimetablesView: View {
 			state: .friends,
 			requestedAt: .now,
 			acceptedAt: .now,
-			timetable: nil
+			timetable: nil,
+			locationStatus: nil
 		),
 		timetable: FriendTimetable(title: "Adon's Timetable", subjects: debugTimetable, updatedAt: .now)
 	)

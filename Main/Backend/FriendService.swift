@@ -133,7 +133,8 @@ final class FriendService {
 				state: .friends,
 				requestedAt: current.requestedAt,
 				acceptedAt: detail.acceptedAt,
-				timetable: detail.timetable
+				timetable: detail.timetable,
+				locationStatus: current.locationStatus
 			)
 			Defaults[.friends] = friends
 		}

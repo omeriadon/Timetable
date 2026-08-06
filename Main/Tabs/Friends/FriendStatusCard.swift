@@ -11,7 +11,15 @@ struct FriendStatusCard: View {
 
 	var body: some View {
 		TimelineView(.periodic(from: .now, by: 30)) { context in
-			let status = FriendScheduleStatus(subjects: friend.timetable?.subjects ?? [], at: TimetableClock.adjusted(context.date), schoolCalendar: schoolCalendar)
+			let scheduleStatus = FriendScheduleStatus(
+				subjects: friend.timetable?.subjects ?? [],
+				at: TimetableClock.adjusted(context.date),
+				schoolCalendar: schoolCalendar
+			)
+			let locationStatus = FriendLocationStatus(
+				item: friend.locationStatus,
+				at: context.date
+			)
 			HStack(alignment: .center, spacing: 14) {
 				FriendAvatar(profile: friend.friend)
 
@@ -22,19 +30,30 @@ struct FriendStatusCard: View {
 
 						Spacer()
 
-						Label(status.availability, systemImage: status.symbol)
-							.fontWeight(.medium)
-							.font(.caption)
-							.padding(5)
-							.glassEffect(.regular.tint(status.tint).interactive(), in: RoundedRectangle(cornerRadius: 10))
-							.foregroundStyle(.white)
-							.frame(maxHeight: .infinity, alignment: .topTrailing)
+						HStack(spacing: 6) {
+							Circle()
+								.fill(locationStatus.tint)
+								.frame(width: 8, height: 8)
+							Text(locationStatus.title)
+						}
+						.fontWeight(.medium)
+						.font(.caption)
+						.padding(5)
+						.glassEffect(
+							.regular.interactive(),
+							in: RoundedRectangle(cornerRadius: 10)
+						)
+						.frame(maxHeight: .infinity, alignment: .topTrailing)
 					}
 
-					Text(status.title)
-						.font(.body)
-						.contentTransition(.numericText())
-					Text(nextClassTitle(for: status))
+					HStack(spacing: 6) {
+						Image(systemName: scheduleStatus.symbol)
+							.foregroundStyle(scheduleStatus.tint)
+						Text(scheduleStatus.title)
+					}
+					.font(.body)
+					.contentTransition(.numericText())
+					Text(nextClassTitle(for: scheduleStatus))
 						.font(.callout)
 						.foregroundStyle(.secondary)
 				}
@@ -46,7 +65,7 @@ struct FriendStatusCard: View {
 			}
 			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
 			.contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-			.animation(.bouncy, value: status.title)
+			.animation(.bouncy, value: scheduleStatus.title)
 		}
 	}
 
@@ -55,6 +74,34 @@ struct FriendStatusCard: View {
 			status.nextTitle
 		} else {
 			"Next: \(status.nextTitle)"
+		}
+	}
+}
+
+private struct FriendLocationStatus {
+	let title: String
+	let tint: Color
+
+	init(item: LocationStatusItem?, at date: Date) {
+		guard let item else {
+			title = "Status unavailable"
+			tint = .gray
+			return
+		}
+
+		if date.timeIntervalSince(item.updatedAt) > 2 * 60 * 60 {
+			title = item.state == .onCampus ? "On Campus" : "Off Campus"
+			tint = .gray
+			return
+		}
+
+		switch item.state {
+			case .onCampus:
+				title = "On Campus"
+				tint = .green
+			case .offCampus:
+				title = "Off Campus"
+				tint = .blue
 		}
 	}
 }
@@ -105,12 +152,9 @@ private struct FriendScheduleStatus {
 	let title: String
 	let nextTitle: String
 	let symbol: String
-	let availability: String
 	let tint: Color
 
 	init(subjects: [Subject], at date: Date, schoolCalendar: SchoolCalendarProjection) {
-		// Stub out anything related to user location because this feature has not been built yet.
-
 		let state = SchoolStateEngine.calculate(
 			at: date,
 			subjects: subjects,
@@ -123,42 +167,27 @@ private struct FriendScheduleStatus {
 				title = "Before School"
 				nextTitle = "Next: \(next.subject.id)"
 				symbol = "clock"
-//				availability = "Before school"
-				availability = "Coming Soon"
-//				tint = .blue
-				tint = .black
+				tint = .blue
 			case let .lesson(lesson):
 				title = lesson.subject.id
 				nextTitle = lesson.next.title
 				symbol = lesson.subject.symbol
-//				availability = "In class"
-				availability = "Coming Soon"
-//				tint = lesson.subject.colour.swiftUIColor
-				tint = .black
+				tint = lesson.subject.colour.swiftUIColor
 			case let .freePeriod(period):
 				title = "Free Period"
 				nextTitle = period.next.title
 				symbol = "studentdesk"
-//				availability = "Free"
-				availability = "Coming Soon"
-//				tint = .mint
-				tint = .black
+				tint = .mint
 			case let .recess(state):
 				title = BreakType.recess.description
 				nextTitle = state.next.title
 				symbol = BreakType.recess.symbol
-//				availability = "On break"
-				availability = "Coming Soon"
-//				tint = .orange
-				tint = .black
+				tint = .orange
 			case let .lunch(state):
 				title = BreakType.lunch.description
 				nextTitle = state.next.title
 				symbol = BreakType.lunch.symbol
-//				availability = "On break"
-				availability = "Coming Soon"
-//				tint = .orange
-				tint = .black
+				tint = .orange
 			case .afterSchool, .weekend:
 				title = "School's Out"
 				if let next = SchoolStateEngine.nextScheduledSubject(
@@ -172,18 +201,12 @@ private struct FriendScheduleStatus {
 					nextTitle = "No upcoming classes"
 				}
 				symbol = "house.fill"
-//				availability = "Offline"
-				availability = "Coming Soon"
-//				tint = .secondary
-				tint = .black
+				tint = .secondary
 			case .noTimetable:
 				title = "No Timetable"
 				nextTitle = "This friend has not uploaded a timetable."
 				symbol = "calendar.badge.exclamationmark"
-//				availability = "Unavailable"
-				availability = "Coming Soon"
-//				tint = .secondary
-				tint = .black
+				tint = .secondary
 		}
 	}
 }

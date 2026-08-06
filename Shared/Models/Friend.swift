@@ -78,9 +78,49 @@ nonisolated struct FriendSummary: Codable, Defaults.Serializable, Identifiable, 
 	let requestedAt: Date
 	let acceptedAt: Date?
 	let timetable: FriendTimetable?
+	let locationStatus: LocationStatusItem?
 
 	var id: UUID {
 		relationshipID
+	}
+
+	private enum CodingKeys: String, CodingKey {
+		case relationshipID
+		case friend
+		case state
+		case requestedAt
+		case acceptedAt
+		case timetable
+		case locationStatus
+	}
+
+	init(
+		relationshipID: UUID,
+		friend: FriendProfile,
+		state: FriendRelationshipState,
+		requestedAt: Date,
+		acceptedAt: Date?,
+		timetable: FriendTimetable?,
+		locationStatus: LocationStatusItem?
+	) {
+		self.relationshipID = relationshipID
+		self.friend = friend
+		self.state = state
+		self.requestedAt = requestedAt
+		self.acceptedAt = acceptedAt
+		self.timetable = timetable
+		self.locationStatus = locationStatus
+	}
+
+	init(from decoder: any Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		relationshipID = try container.decode(UUID.self, forKey: .relationshipID)
+		friend = try container.decode(FriendProfile.self, forKey: .friend)
+		state = try container.decode(FriendRelationshipState.self, forKey: .state)
+		requestedAt = try container.decode(Date.self, forKey: .requestedAt)
+		acceptedAt = try container.decodeIfPresent(Date.self, forKey: .acceptedAt)
+		timetable = try container.decodeIfPresent(FriendTimetable.self, forKey: .timetable)
+		locationStatus = try container.decodeIfPresent(LocationStatusItem.self, forKey: .locationStatus)
 	}
 }
 
