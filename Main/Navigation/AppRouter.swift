@@ -9,6 +9,10 @@ final class AppRouter {
 		didSet { persistIfNeeded() }
 	}
 
+	var timetableSubtab: TimetableSubtab {
+		didSet { persistIfNeeded() }
+	}
+
 	var timetablePath: [AppRoute] {
 		didSet { persistIfNeeded() }
 	}
@@ -72,6 +76,7 @@ final class AppRouter {
 
 		self.persistenceStore = persistenceStore
 		selectedTab = snapshot?.selectedTab ?? .timetable
+		timetableSubtab = snapshot?.timetableSubtab ?? .today
 		timetablePath = snapshot?.timetablePath ?? []
 		friendsPath = snapshot?.friendsPath ?? []
 		settingsPath = snapshot?.settingsPath ?? []
@@ -149,6 +154,7 @@ final class AppRouter {
 
 	func clearNavigation() {
 		selectedTab = .timetable
+		timetableSubtab = .today
 		timetablePath = []
 		friendsPath = []
 		settingsPath = []
@@ -282,6 +288,7 @@ final class AppRouter {
 	private var snapshot: AppNavigationSnapshot {
 		AppNavigationSnapshot(
 			selectedTab: selectedTab,
+			timetableSubtab: timetableSubtab,
 			timetablePath: timetablePath,
 			friendsPath: friendsPath,
 			settingsPath: settingsPath,

@@ -72,6 +72,10 @@
 					AdministrationView()
 				case .administration(.statistics):
 					AdministrationStatisticsView()
+				case .administration(.friendshipDateChangeRequests):
+					AdministrationFriendshipDateChangeRequestsView()
+				case .administration(.userReports):
+					AdministrationUserReportsView()
 				case .administration(.schoolEvents), .administration(.schoolEvent(id: _)):
 					AdministrationSchoolEventsView(closeWideDestination: nil)
 				case .administration(.eventTags),

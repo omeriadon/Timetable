@@ -10,6 +10,10 @@ nonisolated struct LocationStatusUpdateRequest: Codable, Sendable {
 	let updatedAt: Date
 }
 
+nonisolated struct LocationStatusCurrentResponse: Codable, Sendable {
+	let item: LocationStatusItem?
+}
+
 nonisolated struct LocationArrivalStatisticsResponse: Codable, Sendable {
 	let averageArrivalSecondsSinceMidnight: Double?
 }

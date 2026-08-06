@@ -56,6 +56,15 @@ struct AdministrationView: View {
 			}
 		}
 
+		Section("Moderation") {
+			administrationLink("Friends-Since Requests", systemImage: "person.2.badge.gearshape", route: .administration(.friendshipDateChangeRequests)) {
+				AdministrationFriendshipDateChangeRequestsView()
+			}
+			administrationLink("User Reports", systemImage: "exclamationmark.bubble", route: .administration(.userReports)) {
+				AdministrationUserReportsView()
+			}
+		}
+
 		Section("School Content") {
 			administrationLink("School Events", systemImage: "calendar", route: .administration(.schoolEvents)) {
 				AdministrationSchoolEventsView(closeWideDestination: nil)

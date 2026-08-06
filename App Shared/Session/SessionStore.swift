@@ -52,7 +52,11 @@ final class SessionStore {
 	private var signingOutHandler: (() async -> Void)?
 
 	private static var initialState: AuthenticationState {
-		.restoring
+		if let profile = Defaults[.accountProfile] {
+			return .authenticated(profile)
+		}
+
+		return .restoring
 	}
 
 	private init(networkManager: NetworkManager) {
@@ -64,13 +68,17 @@ final class SessionStore {
 		Print("Restoring session state", category: .account)
 		configureNetworkAuthentication()
 
-		guard Defaults[.accountProfile] != nil else {
-			clearSessionState()
+		guard let cachedProfile = Defaults[.accountProfile] else {
+			state = .signedOut
 			return
 		}
 
+		// Startup must retain the cached account surface. Offline launch and any
+		// transient refresh failure are not evidence that the account signed out.
+		// Only an explicit server authentication invalidation may clear this state.
+		state = .authenticated(cachedProfile)
+
 		guard accessToken != nil || refreshToken != nil else {
-			clearSessionState()
 			return
 		}
 
@@ -84,7 +92,9 @@ final class SessionStore {
 			Print("Restored authenticated session for \(profile.id)", category: .account)
 		} catch {
 			PrintError("Session restoration failed", category: .account, error: error)
-			clearSessionState()
+			if isExplicitServerSignOut(error) {
+				clearSessionState()
+			}
 		}
 	}
 
@@ -272,6 +282,16 @@ final class SessionStore {
 		networkManager.clearAuthentication()
 		configureNetworkAuthentication()
 		Print("Cleared local session state", category: .account)
+	}
+
+	private func isExplicitServerSignOut(_ error: Error) -> Bool {
+		guard case let NetworkError.server(statusCode, response) = error else {
+			return false
+		}
+
+		return statusCode == 401
+			|| response.code == .sessionExpired
+			|| response.code == .accountNotFound
 	}
 }
 

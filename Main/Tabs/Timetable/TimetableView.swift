@@ -101,6 +101,7 @@ struct TimetableView: View {
 			.padding(.bottom, 5)
 		}
 		.onChange(of: currentTab) { _, newValue in
+			router.timetableSubtab = TimetableSubtab(rawValue: newValue) ?? .today
 			withAnimation {
 				scrollPosition = newValue
 			}
@@ -110,6 +111,10 @@ struct TimetableView: View {
 			if let newValue {
 				currentTab = newValue
 			}
+		}
+		.onAppear {
+			currentTab = router.timetableSubtab.rawValue
+			scrollPosition = router.timetableSubtab.rawValue
 		}
 	}
 
@@ -198,6 +203,9 @@ struct TimetableView: View {
 							.padding(.horizontal, Device.isIPad ? 10 : 0)
 					}
 				}
+				.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.7)
+				.scrollEdgeEffect(offset: 0.9, maxBlurRadius: 6, maximumOpacity: 1)
+				.scrollEdgeEffectStyle(.soft, for: .vertical)
 				.scrollIndicators(.visible)
 				#if os(macOS)
 					.opacity(selectedSlot != nil ? 1 : 0)
@@ -259,7 +267,9 @@ struct TimetableView: View {
 						selectedTimetable = timetableID.flatMap { received in receivedTimetables.first { $0.id == received && !$0.isDeleted } }
 						let subjects = selectedTimetable?.subjects ?? subjects
 						selectedSlot = slot ?? subjects.first(where: { $0.id == subjectID })?.slots.first
-					case .planner, .calendarEvent:
+					case .planner:
+						currentTab = TimetableSubtab.planner.rawValue
+					case .calendarEvent:
 						break
 				}
 			}

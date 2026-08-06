@@ -21,6 +21,12 @@ enum TimetableRoute: Codable, Hashable, Sendable {
 	case calendarEvent(id: UUID)
 }
 
+enum TimetableSubtab: Int, Codable, CaseIterable, Hashable, Sendable {
+	case today
+	case week
+	case planner
+}
+
 enum FriendsRoute: Codable, Hashable, Sendable {
 	case root
 	case addFriend
@@ -46,6 +52,8 @@ enum SettingsRoute: Codable, Hashable, Sendable {
 enum AdministrationRoute: Codable, Hashable, Sendable {
 	case root
 	case statistics
+	case friendshipDateChangeRequests
+	case userReports
 	case schoolEvents
 	case schoolEvent(id: UUID?)
 	case eventTags

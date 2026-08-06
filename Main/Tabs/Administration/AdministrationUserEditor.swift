@@ -59,37 +59,10 @@ struct AdministrationUserEditor: View {
 							Text("Loading...")
 						} else if let rows = AdministrationJSONFormatter.rootRows(from: rawData) {
 							ForEach(rows) { row in
-								DisclosureGroup(isExpanded: accountDataExpansion(for: row.id)) {
-									EmptyView()
-								} label: {
-									Text(row.label)
-										.font(.system(.caption, design: .monospaced).weight(.semibold))
-								}
-
-								if expandedAccountDataNodeIDs.contains(row.id) {
-									if let secondLevelRows = AdministrationJSONFormatter.childRows(
-										from: row.value,
-										parentID: row.id
-									), !secondLevelRows.isEmpty {
-										ForEach(secondLevelRows) { secondLevelRow in
-											DisclosureGroup(isExpanded: accountDataExpansion(for: secondLevelRow.id)) {
-												EmptyView()
-											} label: {
-												Text(secondLevelRow.label)
-													.font(.system(.caption, design: .monospaced).weight(.semibold))
-											}
-											.listRowInsets(.init(top: 8, leading: 32, bottom: 8, trailing: 16))
-
-											if expandedAccountDataNodeIDs.contains(secondLevelRow.id) {
-												AdministrationJSONFormattedValue(value: secondLevelRow.value)
-													.listRowInsets(.init(top: 8, leading: 52, bottom: 8, trailing: 16))
-											}
-										}
-									} else {
-										AdministrationJSONFormattedValue(value: row.value)
-											.listRowInsets(.init(top: 8, leading: 32, bottom: 8, trailing: 16))
-									}
-								}
+								AdministrationJSONNode(
+									row: row,
+									expandedNodeIDs: $expandedAccountDataNodeIDs
+								)
 							}
 						} else {
 							AdministrationJSONText(value: rawData)
@@ -198,16 +171,37 @@ struct AdministrationUserEditor: View {
 		}
 	}
 
-	private func accountDataExpansion(for nodeID: String) -> Binding<Bool> {
+}
+
+private struct AdministrationJSONNode: View {
+	let row: AdministrationJSONRow
+	@Binding var expandedNodeIDs: Set<String>
+
+	var body: some View {
+		if let children = AdministrationJSONFormatter.childRows(from: row.value, parentID: row.id), !children.isEmpty {
+			DisclosureGroup(isExpanded: expansion) {
+				ForEach(children) { child in
+					AdministrationJSONNode(row: child, expandedNodeIDs: $expandedNodeIDs)
+				}
+			} label: {
+				Text(row.label)
+					.font(.system(.caption, design: .monospaced).weight(.semibold))
+			}
+		} else {
+			LabeledContent(row.label) {
+				AdministrationJSONFormattedValue(value: row.value)
+			}
+		}
+	}
+
+	private var expansion: Binding<Bool> {
 		Binding(
-			get: {
-				expandedAccountDataNodeIDs.contains(nodeID)
-			},
+			get: { expandedNodeIDs.contains(row.id) },
 			set: { isExpanded in
 				if isExpanded {
-					expandedAccountDataNodeIDs.insert(nodeID)
+					expandedNodeIDs.insert(row.id)
 				} else {
-					expandedAccountDataNodeIDs.remove(nodeID)
+					expandedNodeIDs.remove(row.id)
 				}
 			}
 		)

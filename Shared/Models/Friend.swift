@@ -94,6 +94,7 @@ nonisolated struct FriendDetail: Codable, Hashable, Sendable {
 	let friend: FriendProfile
 	let acceptedAt: Date
 	let timetable: FriendTimetable?
+	let averageArrivalSecondsSinceMidnight: Double?
 }
 
 nonisolated struct FriendSearchResult: Codable, Identifiable, Hashable, Sendable {

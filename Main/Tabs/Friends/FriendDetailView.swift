@@ -10,6 +10,7 @@ struct FriendDetailView: View {
 	@State private var scrollPosition: Int?
 	@State private var action: FriendAction?
 	@State private var showsReportConfirmation = false
+	@State private var showsFriendsSinceRequest = false
 	@State private var isLoading = true
 	@Environment(\.statusBadgeManager) private var badges
 	@Environment(\.appPresentation) private var presentation
@@ -32,7 +33,11 @@ struct FriendDetailView: View {
 					ScrollView(.horizontal) {
 						HStack(spacing: 0) {
 							ScrollView {
-								FriendOverview(detail: detail, friendName: detail.friend.displayName)
+								FriendOverview(
+									detail: detail,
+									friendName: detail.friend.displayName,
+									requestFriendsSinceDate: { showsFriendsSinceRequest = true }
+								)
 							}
 							.containerRelativeFrame(.horizontal)
 							.id(0)
@@ -144,6 +149,16 @@ struct FriendDetailView: View {
 			} message: {
 				Text("This sends a report for review. The friend remains visible in your account.")
 			}
+			.sheet(isPresented: $showsFriendsSinceRequest) {
+				if let detail {
+					FriendshipDateChangeRequestSheet(
+						friendID: detail.friend.id,
+						currentDate: detail.acceptedAt,
+						close: { showsFriendsSinceRequest = false }
+					)
+					.presentationDetents([.fraction(0.5)])
+				}
+			}
 			.task { await load() }
 		}
 	}
@@ -202,6 +217,7 @@ private struct FriendDetailHeader: View {
 private struct FriendOverview: View {
 	let detail: FriendDetail
 	let friendName: String
+	let requestFriendsSinceDate: () -> Void
 	@Default(.timetable) private var ownerSubjects
 	@Default(.schoolCalendar) private var schoolCalendar
 	@State private var comparison = FriendTimetableComparison.empty
@@ -215,17 +231,30 @@ private struct FriendOverview: View {
 			sharedSubjectsCard(comparison.sharedSubjects)
 
 			VStack(alignment: .leading, spacing: 6) {
-				Text("Friends since")
+				Text("Average arrival")
 					.font(.headline)
-				Text(detail.acceptedAt, format: .dateTime.month().day().year())
+				Text(averageArrival)
 					.foregroundStyle(.secondary)
 			}
 			.padding(14)
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.background {
-				FriendPaperBackground(
-					cornerRadius: FriendDetailLayout.cardCornerRadius
-				)
+				FriendPaperBackground(cornerRadius: FriendDetailLayout.cardCornerRadius)
+			}
+
+			Button(action: requestFriendsSinceDate) {
+				VStack(alignment: .leading, spacing: 6) {
+					Text("Friends since")
+						.font(.headline)
+					Text(detail.acceptedAt, format: .dateTime.month().day().year())
+						.foregroundStyle(.secondary)
+				}
+				.padding(14)
+				.frame(maxWidth: .infinity, alignment: .leading)
+			}
+			.buttonStyle(.plain)
+			.background {
+				FriendPaperBackground(cornerRadius: FriendDetailLayout.cardCornerRadius)
 			}
 			.glassEffect(
 				.clear.interactive(),
@@ -247,6 +276,14 @@ private struct FriendOverview: View {
 				friendSubjects: detail.timetable?.subjects ?? []
 			)
 		}
+	}
+
+	private var averageArrival: String {
+		guard let seconds = detail.averageArrivalSecondsSinceMidnight else {
+			return "No data"
+		}
+
+		return LocationArrivalTimeFormatter.string(for: seconds)
 	}
 
 	private func sharedClassesCard(_ classes: [SharedClass]) -> some View {
@@ -425,6 +462,60 @@ private struct FriendOverview: View {
 		LabeledContent(title) {
 			Label(subject.id, systemImage: subject.symbol)
 				.foregroundStyle(subject.colour.swiftUIColor)
+		}
+	}
+}
+
+private struct FriendshipDateChangeRequestSheet: View {
+	let friendID: UUID
+	let currentDate: Date
+	let close: () -> Void
+	@State private var requestedDate: Date
+	@State private var service = FriendService.shared
+	@State private var isSending = false
+	@Environment(\.statusBadgeManager) private var badges
+
+	init(friendID: UUID, currentDate: Date, close: @escaping () -> Void) {
+		self.friendID = friendID
+		self.currentDate = currentDate
+		self.close = close
+		_requestedDate = State(initialValue: currentDate)
+	}
+
+	var body: some View {
+		NavigationStack {
+			Form {
+				DatePicker("Friends since", selection: $requestedDate, displayedComponents: .date)
+			}
+			.navigationTitle("Change Friends Since")
+			.toolbar {
+				ToolbarItem(placement: .cancellationAction) {
+					Button(role: .cancel, action: close)
+				}
+				ToolbarItem(placement: .confirmationAction) {
+					Button("Request", systemImage: "paperplane.fill", role: .confirm) {
+						send()
+					}
+					.disabled(isSending)
+					.buttonStyle(.glassProminent)
+				}
+			}
+		}
+	}
+
+	private func send() {
+		isSending = true
+		Task {
+			defer { isSending = false }
+			do {
+				try await service.requestFriendsSinceDate(
+					friendID: friendID,
+					requestedDate: requestedDate
+				)
+				close()
+			} catch {
+				badges.present(error: error, title: "Unable to request date change")
+			}
 		}
 	}
 }

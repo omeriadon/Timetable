@@ -79,6 +79,10 @@ struct WideRouteDestinationView: View {
 					ReceivedTimetablesView()
 				case .administration(.statistics):
 					AdministrationStatisticsView()
+				case .administration(.friendshipDateChangeRequests):
+					AdministrationFriendshipDateChangeRequestsView()
+				case .administration(.userReports):
+					AdministrationUserReportsView()
 				case .administration(.schoolEvents), .administration(.schoolEvent(id: _)):
 					AdministrationSchoolEventsView(closeWideDestination: closeWideDestination)
 				case .administration(.eventTags), .administration(.eventTag(id: _)), .administration(.eventTagSection(id: _)):

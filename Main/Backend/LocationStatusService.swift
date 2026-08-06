@@ -35,6 +35,7 @@
 			}
 
 			await flushPendingUpdates()
+			await refreshCurrentStatus()
 			startMonitoringIfAuthorized()
 		}
 
@@ -166,6 +167,23 @@
 					PrintError("Location status upload failed", category: .network, error: error)
 					return
 				}
+			}
+		}
+
+		private func refreshCurrentStatus() async {
+			guard SessionStore.shared.isAuthenticated else {
+				return
+			}
+
+			do {
+				let response: LocationStatusCurrentResponse = try await networkManager.send(
+					Endpoint("/v1/account/status")
+				)
+				if let item = response.item {
+					Defaults[.locationStatus] = item
+				}
+			} catch {
+				PrintError("Location status refresh failed", category: .network, error: error)
 			}
 		}
 
