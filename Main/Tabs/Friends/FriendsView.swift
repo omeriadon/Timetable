@@ -93,6 +93,9 @@ struct FriendsView: View {
 	private var friendsList: some View {
 		ScrollView {
 			LazyVStack(spacing: 14) {
+				LocationStatusRow()
+					.padding(.bottom, 10)
+
 				if friends.isEmpty {
 					ContentUnavailableView(
 						"No Friends Yet",

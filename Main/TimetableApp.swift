@@ -38,6 +38,7 @@ struct TimetableApp: App {
 	@Default(.hasCompletedOnboarding) private var hasCompletedOnboarding
 	#if os(iOS)
 		@State private var launchIllusionVisible = true
+		@Default(.hasSeenLocationStatusWhatsNew) private var hasSeenLocationStatusWhatsNew
 	#endif
 
 	@State private var sessionStore = SessionStore.shared
@@ -106,6 +107,7 @@ struct TimetableApp: App {
 						#if os(iOS) && !targetEnvironment(macCatalyst)
 							if Platform.current == .iOS {
 								await LiveActivityRegistrationService.shared.startObserving()
+								await LocationStatusService.shared.start()
 							}
 							PhoneWatchSyncBridge.shared.sendAuthenticatedStateIfPossible()
 						#endif
@@ -127,6 +129,7 @@ struct TimetableApp: App {
 					#if os(iOS) && !targetEnvironment(macCatalyst)
 						if Platform.current == .iOS {
 							await LiveActivityRegistrationService.shared.startObserving()
+							await LocationStatusService.shared.start()
 						}
 
 						try? await ShaderLibrary.compileStickerShaders()
@@ -138,6 +141,24 @@ struct TimetableApp: App {
 				)) {
 					OnboardingView()
 						.interactiveDismissDisabled()
+				}
+				.sheet(isPresented: Binding(
+					get: {
+						Platform.current == .iOS
+							&& hasCompletedOnboarding
+							&& !hasSeenLocationStatusWhatsNew
+					},
+					set: { isPresented in
+						if !isPresented {
+							hasSeenLocationStatusWhatsNew = true
+						}
+					}
+				)) {
+					LocationStatusWhatsNewSheet {
+						hasSeenLocationStatusWhatsNew = true
+					}
+					.presentationDetents([.large])
+					.presentationDragIndicator(.hidden)
 				}
 				#endif // os(iOS)
 				.onChange(of: scenePhase) { _, phase in

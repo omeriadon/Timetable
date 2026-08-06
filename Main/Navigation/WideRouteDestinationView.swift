@@ -77,6 +77,8 @@ struct WideRouteDestinationView: View {
 					CreatedTimetablesSettingsView(closeWideDestination: closeWideDestination)
 				case .settings(.receivedTimetables):
 					ReceivedTimetablesView()
+				case .administration(.statistics):
+					AdministrationStatisticsView()
 				case .administration(.schoolEvents), .administration(.schoolEvent(id: _)):
 					AdministrationSchoolEventsView(closeWideDestination: closeWideDestination)
 				case .administration(.eventTags), .administration(.eventTag(id: _)), .administration(.eventTagSection(id: _)):

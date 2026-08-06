@@ -54,6 +54,10 @@
 	<true/>
 	<key>NSCalendarsFullAccessUsageDescription</key>
 	<string>Timetable needs to read your calendar to pull Compass Events from your schedule.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Timetable uses your location to record when you enter or leave campus.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Timetable uses your location to record when you enter or leave campus.</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
 	<key>NSSupportsLiveActivitiesFrequentUpdates</key>
@@ -62,6 +66,10 @@
 	<string>LaunchScreen</string>
 	<key>UIStatusBarStyle</key>
 	<string>UIStatusBarStyleDarkContent</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationLandscapeLeft</string>

@@ -18,6 +18,7 @@ enum SharedDefaultsStore {
 	static func removeAll() {
 		let defaults = UserDefaults(suiteName: suiteName)
 		let hasCompletedOnboarding = defaults?.bool(forKey: "hasCompletedOnboarding_v\(onboardingVersion)") ?? false
+		let hasSeenLocationStatusWhatsNew = defaults?.bool(forKey: "hasSeenLocationStatusWhatsNew_v1") ?? false
 		let persistsNavigationState = defaults?.bool(forKey: "persistsNavigationState") ?? false
 		let installationKeys = ["installationID", "installationID.iOS", "installationID.iPadOS", "installationID.macOS", "installationID.watchOS"]
 		let installationValues = installationKeys.reduce(into: [String: String]()) { values, key in
@@ -28,6 +29,9 @@ enum SharedDefaultsStore {
 		defaults?.removePersistentDomain(forName: suiteName)
 		if hasCompletedOnboarding {
 			defaults?.set(true, forKey: "hasCompletedOnboarding_v\(onboardingVersion)")
+		}
+		if hasSeenLocationStatusWhatsNew {
+			defaults?.set(true, forKey: "hasSeenLocationStatusWhatsNew_v1")
 		}
 		defaults?.set(persistsNavigationState, forKey: "persistsNavigationState")
 		for (key, value) in installationValues {
@@ -79,6 +83,9 @@ extension Defaults.Keys {
 	static let friends = Key<[FriendSummary]>("friends", default: [], suite: sharedDefaults)
 	static let incomingFriendRequests = Key<[FriendSummary]>("incomingFriendRequests", default: [], suite: sharedDefaults)
 	static let outgoingFriendRequests = Key<[FriendSummary]>("outgoingFriendRequests", default: [], suite: sharedDefaults)
+	static let locationStatus = Key<LocationStatusItem?>("locationStatus", default: nil, suite: sharedDefaults)
+	static let pendingLocationStatusUpdates = Key<[LocationStatusItem]>("pendingLocationStatusUpdates", default: [], suite: sharedDefaults)
+	static let hasSeenLocationStatusWhatsNew = Key<Bool>("hasSeenLocationStatusWhatsNew_v1", default: false, suite: sharedDefaults)
 	static let profileAppearance = Key<ProfileAppearance>("profileAppearance", default: .default, suite: sharedDefaults)
 	static let createdTimetables = Key<[TimetableDetailResponse]>("createdTimetables", default: [], suite: sharedDefaults)
 	static let pendingMessageTimetableIDs = Key<[String]>("pendingMessageTimetableIDs", default: [], suite: sharedDefaults)

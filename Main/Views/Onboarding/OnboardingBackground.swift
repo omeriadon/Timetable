@@ -26,6 +26,8 @@ enum OnboardingBackgroundStyle: Equatable {
 				.colorful(.watermelon, opacity: 0.8, speed: 0.6)
 			case "notifications":
 				.colorful(.dandelion, opacity: 0.6, speed: 0.6)
+			case "location-status":
+				.colorful(.winter, opacity: 0.8, speed: 0.6)
 			case "calendar-import":
 				.colorful(.winter, opacity: 0.8, speed: 0.6)
 			case "account":

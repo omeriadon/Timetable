@@ -21,6 +21,7 @@ struct AccountView: View {
 	@State private var isLoadingYearGroups = false
 	@State private var isSavingYearGroup = false
 	@State private var yearGroupsFailedToLoad = false
+	@State private var locationStatistics: LocationArrivalStatisticsResponse?
 	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
@@ -39,6 +40,7 @@ struct AccountView: View {
 					}
 					.task(id: profile.id) {
 						await loadYearGroups()
+						await loadLocationStatistics()
 					}
 					.appNavigationTitle("Account")
 					.transition(.blurReplace)
@@ -140,6 +142,16 @@ struct AccountView: View {
 			}
 		}
 
+		Section("Status") {
+			LabeledContent("Average arrival") {
+				Text(formattedAverageArrival)
+			}
+
+			#if os(iOS) && !targetEnvironment(macCatalyst)
+				LocationStatusPermissionRecoveryRow()
+			#endif
+		}
+
 		Section {
 			Button("Sign Out", systemImage: "door.right.hand.open", role: .destructive, action: signOut)
 			#if os(iOS)
@@ -150,9 +162,26 @@ struct AccountView: View {
 		}
 	}
 
+	private var formattedAverageArrival: String {
+		guard let seconds = locationStatistics?.averageArrivalSecondsSinceMidnight else {
+			return "No data"
+		}
+
+		return LocationArrivalTimeFormatter.string(for: seconds)
+	}
+
 	private func signOut() {
 		Task {
 			await sessionStore.signOut()
+		}
+	}
+
+	@MainActor
+	private func loadLocationStatistics() async {
+		do {
+			locationStatistics = try await LocationStatusStatisticsService.shared.personalArrivalStatistics()
+		} catch {
+			locationStatistics = nil
 		}
 	}
 

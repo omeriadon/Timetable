@@ -45,6 +45,7 @@ enum SettingsRoute: Codable, Hashable, Sendable {
 
 enum AdministrationRoute: Codable, Hashable, Sendable {
 	case root
+	case statistics
 	case schoolEvents
 	case schoolEvent(id: UUID?)
 	case eventTags

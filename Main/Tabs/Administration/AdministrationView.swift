@@ -48,6 +48,9 @@ struct AdministrationView: View {
 	@ViewBuilder
 	private var administrationSections: some View {
 		Section {
+			administrationLink("Statistics", systemImage: "chart.bar", route: .administration(.statistics)) {
+				AdministrationStatisticsView()
+			}
 			administrationLink("School Events", systemImage: "calendar", route: .administration(.schoolEvents)) {
 				AdministrationSchoolEventsView(closeWideDestination: nil)
 			}

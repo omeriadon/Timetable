@@ -70,6 +70,8 @@
 					NavigationPersistenceSettingsView()
 				case .administration(.root):
 					AdministrationView()
+				case .administration(.statistics):
+					AdministrationStatisticsView()
 				case .administration(.schoolEvents), .administration(.schoolEvent(id: _)):
 					AdministrationSchoolEventsView(closeWideDestination: nil)
 				case .administration(.eventTags),
