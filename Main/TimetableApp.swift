@@ -130,7 +130,7 @@ struct TimetableApp: App {
 						}
 
 						try? await ShaderLibrary.compileStickerShaders()
-					#endif
+					#endif // os(iOS) && !targetEnvironment(macCatalyst)
 				}
 				#if os(iOS)
 				.fullScreenCover(isPresented: .constant(
