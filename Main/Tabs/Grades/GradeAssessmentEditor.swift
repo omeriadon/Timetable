@@ -20,6 +20,7 @@ struct GradeAssessmentEditor: View {
 	@State var weighting: Double
 	@State var location: GradeAssessmentLocation
 	@State var isSaving = false
+	@State private var showsDeleteConfirmation = false
 	@Environment(\.dismiss) var dismiss
 
 	init(
@@ -59,17 +60,18 @@ struct GradeAssessmentEditor: View {
 
 						Menu {
 							ForEach(locationOptions, id: \.self) { option in
-								Button {
-									location = option
-								} label: {
-									Label {
-										Text(option.title(for: subject))
-										Text(option.subtitle)
-									} icon: {
-										Image(systemName: "checkmark")
-											.opacity(location == option ? 1 : 0)
-											.foregroundStyle(location == option ? Color.primary : Color.clear)
-									}
+								Toggle(
+									isOn: Binding(
+										get: { location == option },
+										set: { isSelected in
+											if isSelected {
+												location = option
+											}
+										}
+									)
+								) {
+									Text(option.title(for: subject))
+									Text(option.subtitle)
 								}
 							}
 						} label: {
@@ -121,14 +123,25 @@ struct GradeAssessmentEditor: View {
 			.safeAreaBar(edge: .bottom) {
 				if let assessment {
 					Button("Delete Assessment", systemImage: "trash", role: .destructive) {
-						Task {
-							isSaving = true
-							await delete(assessment)
-							isSaving = false
-						}
+						showsDeleteConfirmation = true
 					}
 					.buttonStyle(.glassProminent)
 					.tint(.red)
+					.disabled(isSaving)
+					.confirmationDialog(
+						"Delete Assessment?",
+						isPresented: $showsDeleteConfirmation,
+						titleVisibility: .visible
+					) {
+						Button("Delete Assessment", systemImage: "trash", role: .destructive) {
+							Task {
+								isSaving = true
+								await delete(assessment)
+								isSaving = false
+							}
+						}
+						Button(role: .cancel) {}
+					}
 				}
 			}
 			.onChange(of: date) { _, value in

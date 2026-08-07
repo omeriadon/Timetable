@@ -93,6 +93,7 @@ struct GradeTrackerView: View {
 	var averageCard: some View {
 		GradeAverageCard(
 			average: overallAverage,
+			topFourAverage: topFourAverage,
 			predictedATAR: document.predictedATAR,
 			goalATAR: document.goalATAR,
 			showsATAR: isSenior
@@ -101,6 +102,17 @@ struct GradeTrackerView: View {
 
 	var overallAverage: Double? {
 		let averages = subjects.compactMap { subjectAverage(for: $0.id) }
+		guard !averages.isEmpty else {
+			return nil
+		}
+		return averages.reduce(0, +) / Double(averages.count)
+	}
+
+	var topFourAverage: Double? {
+		let averages = subjects
+			.compactMap { subjectAverage(for: $0.id) }
+			.sorted(by: >)
+			.prefix(4)
 		guard !averages.isEmpty else {
 			return nil
 		}
@@ -119,29 +131,31 @@ struct GradeTrackerView: View {
 
 struct GradeAverageCard: View {
 	let average: Double?
+	let topFourAverage: Double?
 	let predictedATAR: Double?
 	let goalATAR: Double?
 	let showsATAR: Bool
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 14) {
-			HStack(alignment: .center, spacing: 18) {
-				GradeGauge(value: average, tint: .black)
+			if showsATAR {
+				GeometryReader { proxy in
+					HStack(spacing: 0) {
+						averageSummary(title: "Average", value: average)
+							.frame(width: proxy.size.width / 2, alignment: .leading)
 
-				VStack(alignment: .leading, spacing: 4) {
-					Text("Overall Average")
-						.font(.headline.weight(.semibold))
-						.foregroundStyle(.secondary)
-
-					if let average {
-						Text(average, format: .percent.precision(.fractionLength(1)))
-							.bold()
-							.font(.title)
-					} else {
-						Text("No assessments yet")
-							.font(.title)
+						averageSummary(title: "Top 4", value: topFourAverage)
+							.frame(width: proxy.size.width / 2, alignment: .leading)
+					}
+					.overlay {
+						Rectangle()
+							.fill(.black.opacity(0.18))
+							.frame(width: 1, height: 72)
 					}
 				}
+				.frame(height: 86)
+			} else {
+				averageSummary(title: "Average", value: average)
 			}
 
 			if showsATAR {
@@ -179,6 +193,29 @@ struct GradeAverageCard: View {
 		.background(FriendPaperBackground(cornerRadius: 28))
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
 		.foregroundStyle(.black)
+	}
+
+	@ViewBuilder
+	private func averageSummary(title: String, value: Double?) -> some View {
+		HStack(alignment: .center, spacing: 8) {
+			GradeGauge(value: value, tint: .black)
+
+			VStack(alignment: .leading, spacing: 4) {
+				Text(title)
+					.font(.headline.weight(.semibold))
+					.foregroundStyle(.secondary)
+
+				if let value {
+					Text(value, format: .percent.precision(.fractionLength(1)))
+						.bold()
+						.font(.title)
+				} else {
+					Text("No assessments yet")
+						.font(.title)
+				}
+			}
+		}
+		.frame(maxWidth: .infinity, alignment: .leading)
 	}
 }
 
