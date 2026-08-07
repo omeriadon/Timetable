@@ -170,7 +170,7 @@ struct GradeAssessmentEditor: View {
 			semester: semester,
 			name: name.trimmingCharacters(in: .whitespacesAndNewlines),
 			date: SchoolCalendarDate(date),
-			score: min(max(score, 0), 100),
+			score: min(max(score, 0), 1),
 			weighting: weighting,
 			location: location
 		)

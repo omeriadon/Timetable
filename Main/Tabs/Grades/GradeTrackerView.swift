@@ -134,9 +134,15 @@ struct GradeAverageCard: View {
 				VStack(alignment: .leading, spacing: 4) {
 					Text("Overall Average")
 						.font(.title2.weight(.semibold))
-					Text(average.map { "\($0, specifier: "%.1f")%" } ?? "No assessments yet")
-						.font(.title3)
-						.foregroundStyle(.secondary)
+					if let average {
+						Text(average, format: .percent.precision(.fractionLength(1)))
+							.font(.title3)
+							.foregroundStyle(.secondary)
+					} else {
+						Text("No assessments yet")
+							.font(.title3)
+							.foregroundStyle(.secondary)
+					}
 				}
 			}
 
@@ -166,7 +172,12 @@ struct GradeSubjectCard: View {
 			VStack(alignment: .leading, spacing: 5) {
 				Text(subject.id)
 					.font(.title3.weight(.semibold))
-				Text(average.map { "\($0, specifier: "%.1f")% average" } ?? "No assessments yet")
+				if let average {
+					Text(average, format: .percent.precision(.fractionLength(1)))
+						+ Text(" average")
+				} else {
+					Text("No assessments yet")
+				}
 					.foregroundStyle(.secondary)
 			}
 
@@ -186,10 +197,14 @@ struct GradeGauge: View {
 	var tint: Color = .brown
 
 	var body: some View {
-		Gauge(value: value ?? 0, in: 0 ... 100) {
+		Gauge(value: value ?? 0, in: 0 ... 1) {
 			Image(systemName: "chart.line.uptrend.xyaxis")
 		} currentValueLabel: {
-			Text(value.map { "\($0, specifier: "%.0f")%" } ?? "—")
+			if let value {
+				Text(value, format: .percent.precision(.fractionLength(0)))
+			} else {
+				Text("—")
+			}
 				.font(.caption.bold())
 		} minimumValueLabel: {
 			EmptyView()
