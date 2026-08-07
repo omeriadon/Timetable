@@ -22,12 +22,10 @@ struct AccountAndSyncSettingsView: View {
 
 	var body: some View {
 		Form {
-			#if os(iOS)
-				Toggle(isOn: preferenceBinding(\.liveActivitiesEnabled)) {
-					Text("Live Activities")
-					Text("Show live countdowns and details for your subjects and breaks throughout the school day, including on your Watch.")
-				}
-			#endif
+			Toggle(isOn: preferenceBinding(\.liveActivitiesEnabled)) {
+				Text("Live Activities")
+				Text("Show live countdowns and details for your subjects and breaks throughout the school day, including on your Watch.")
+			}
 
 			Section {
 				Toggle(isOn: preferenceBinding(\.notificationsEnabled)) {
@@ -134,35 +132,22 @@ struct BreakToPeriodNotificationLeadTimesEditor: View {
 	@Binding var selection: Set<NotificationLeadTime>
 
 	var body: some View {
-		#if os(macOS)
-			VStack(alignment: .leading) {
-				Text("Before Class or From a Break")
-				Text("Applies before first period and after recess or lunch.")
-					.font(.footnote)
-					.foregroundStyle(.secondary)
-				ForEach(NotificationLeadTime.allCases, id: \.self) { leadTime in
-					Toggle(leadTime.label, isOn: containsBinding(leadTime))
-						.toggleStyle(.checkbox)
-				}
-			}
-		#else
-			NavigationLink {
-				NotificationLeadTimesSelectionView(
-					title: "Notify Me",
-					description: "Applies before first period and after recess or lunch.",
-					selection: $selection
-				)
-			} label: {
-				LabeledContent("Before Class or From a Break") {
-					VStack(alignment: .leading) {
-						ForEach(summary, id: \.self) { i in
-							Text(i)
-						}
+		NavigationLink {
+			NotificationLeadTimesSelectionView(
+				title: "Notify Me",
+				description: "Applies before first period and after recess or lunch.",
+				selection: $selection
+			)
+		} label: {
+			LabeledContent("Before Class or From a Break") {
+				VStack(alignment: .leading) {
+					ForEach(summary, id: \.self) { i in
+						Text(i)
 					}
-					.foregroundStyle(.secondary)
 				}
+				.foregroundStyle(.secondary)
 			}
-		#endif
+		}
 	}
 
 	private var summary: [String] {
@@ -258,9 +243,8 @@ private struct EventNotificationScheduleSheet: View {
 						Text(timeLabel(minutes)).tag(minutes)
 					}
 				}
-				#if os(iOS)
+
 				.pickerStyle(.wheel)
-				#endif
 			}
 			.presentationDetents([.medium])
 			.appNavigationTitle("Event Notification", accent: true)
@@ -340,50 +324,48 @@ struct NotificationLeadTimesEditor: View {
 	}
 }
 
-#if os(iOS)
-	struct NotificationLeadTimesSelectionView: View {
-		let title: String
-		let description: String?
-		@Binding var selection: Set<NotificationLeadTime>
+struct NotificationLeadTimesSelectionView: View {
+	let title: String
+	let description: String?
+	@Binding var selection: Set<NotificationLeadTime>
 
-		init(title: String = "Notify Me", description: String? = nil, selection: Binding<Set<NotificationLeadTime>>) {
-			self.title = title
-			self.description = description
-			_selection = selection
-		}
-
-		var body: some View {
-			List(NotificationLeadTime.allCases, id: \.self) { leadTime in
-				Button {
-					if selection.contains(leadTime) {
-						selection.remove(leadTime)
-					} else {
-						selection.insert(leadTime)
-					}
-				} label: {
-					HStack {
-						Text(leadTime.label)
-						Spacer()
-						if selection.contains(leadTime) {
-							Image(systemName: "checkmark")
-								.foregroundStyle(.accent)
-						}
-					}
-					.frame(maxWidth: .infinity, alignment: .leading)
-					.contentShape(Rectangle())
-				}
-				.buttonSizing(.flexible)
-				.buttonStyle(.plain)
-			}
-			.safeAreaBar(edge: .top, alignment: .center, spacing: 5) {
-				if let description {
-					Text(description)
-				}
-			}
-			.appNavigationTitle(title, accent: true)
-		}
+	init(title: String = "Notify Me", description: String? = nil, selection: Binding<Set<NotificationLeadTime>>) {
+		self.title = title
+		self.description = description
+		_selection = selection
 	}
-#endif // os(iOS)
+
+	var body: some View {
+		List(NotificationLeadTime.allCases, id: \.self) { leadTime in
+			Button {
+				if selection.contains(leadTime) {
+					selection.remove(leadTime)
+				} else {
+					selection.insert(leadTime)
+				}
+			} label: {
+				HStack {
+					Text(leadTime.label)
+					Spacer()
+					if selection.contains(leadTime) {
+						Image(systemName: "checkmark")
+							.foregroundStyle(.accent)
+					}
+				}
+				.frame(maxWidth: .infinity, alignment: .leading)
+				.contentShape(Rectangle())
+			}
+			.buttonSizing(.flexible)
+			.buttonStyle(.plain)
+		}
+		.safeAreaBar(edge: .top, alignment: .center, spacing: 5) {
+			if let description {
+				Text(description)
+			}
+		}
+		.appNavigationTitle(title, accent: true)
+	}
+}
 
 private extension NotificationLeadTime {
 	var label: String {

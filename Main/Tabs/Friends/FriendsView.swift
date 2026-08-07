@@ -92,11 +92,9 @@ struct FriendsView: View {
 			.presentationDragIndicator(.hidden)
 		}
 		.onAppear {
-			#if os(iOS) && !targetEnvironment(macCatalyst)
-				if !hasSeenLocationStatusWhatsNew {
-					showsLocationStatusSheet = true
-				}
-			#endif
+			if !hasSeenLocationStatusWhatsNew {
+				showsLocationStatusSheet = true
+			}
 		}
 		.dynamicTypeSize(.medium)
 	}

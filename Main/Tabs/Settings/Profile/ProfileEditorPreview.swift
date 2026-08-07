@@ -22,26 +22,24 @@ struct ProfileEditorPreview: View {
 	private var profilePicture: some View {
 		switch draft.contentKind {
 			case .photo:
-				#if os(iOS)
-					if let pendingPhotoData = draft.pendingPhotoData,
-					   let uiImage = UIImage(data: pendingPhotoData)
-					{
-						ProfilePicture(
-							appearance: draft.appearance,
-							localImage: Image(uiImage: uiImage),
-							accessibilityName: "Profile preview",
-							animatesBackground: true
-						)
-						.id(ProfileContentKind.photo.rawValue)
-						.transition(.blurReplace)
-					} else {
-						remoteProfilePicture(for: .photo)
-					}
-				#else
+				if let pendingPhotoData = draft.pendingPhotoData,
+				   let uiImage = UIImage(data: pendingPhotoData)
+				{
+					ProfilePicture(
+						appearance: draft.appearance,
+						localImage: Image(uiImage: uiImage),
+						accessibilityName: "Profile preview",
+						animatesBackground: true
+					)
+					.id(ProfileContentKind.photo.rawValue)
+					.transition(.blurReplace)
+				} else {
 					remoteProfilePicture(for: .photo)
-				#endif
+				}
+
 			case .monogram:
 				remoteProfilePicture(for: .monogram)
+
 			case .emoji:
 				remoteProfilePicture(for: .emoji)
 		}

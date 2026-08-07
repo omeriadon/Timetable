@@ -3,14 +3,10 @@
 //   Main
 //
 
-#if os(iOS)
-	import UIKit
-#elseif os(macOS)
-	import AppKit
-#endif
 import Defaults
 import Foundation
 import Observation
+import UIKit
 import UserNotifications
 
 @MainActor
@@ -58,15 +54,7 @@ final class NotificationRegistrationService {
 			badgeID = UUID()
 			registrationState = .registering
 
-			#if os(iOS)
-				UIApplication.shared.registerForRemoteNotifications()
-
-			#elseif os(macOS)
-				NSApplication.shared.registerForRemoteNotifications(matching: [.alert, .badge, .sound])
-
-			#else
-				registrationFailed()
-			#endif
+			UIApplication.shared.registerForRemoteNotifications()
 
 		} catch {
 			registrationFailed(error)

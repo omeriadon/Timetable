@@ -40,12 +40,8 @@ struct AdministrationUserEditor: View {
 
 				TextField("Name", text: $displayName)
 				TextField("Email", text: $email)
-				#if os(iOS)
 					.textInputAutocapitalization(.never)
-				#endif
-				#if os(iOS)
-				.keyboardType(.emailAddress)
-				#endif
+					.keyboardType(.emailAddress)
 
 				Section {
 					SecureField(target.user == nil ? "Password" : "New Password", text: $password)

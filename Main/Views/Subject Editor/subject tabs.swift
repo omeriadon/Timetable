@@ -52,11 +52,8 @@ struct SubjectEditorPager: View {
 				)
 			}
 		}
-		#if os(iOS)
+
 		.tabViewStyle(.page(indexDisplayMode: .always))
-		#else
-		.tabViewStyle(.sidebarAdaptable)
-		#endif
 		.animation(.snappy, value: draftSubjects.count)
 	}
 }

@@ -37,7 +37,6 @@ struct TimetableApp: App {
 
 	#if os(macOS)
 		@NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-
 	#endif
 
 	init() {
@@ -54,9 +53,7 @@ struct TimetableApp: App {
 		#endif
 	}
 
-	#if os(iOS)
-		@UIApplicationDelegateAdaptor(MobileAppDelegate.self) private var mobileAppDelegate
-	#endif
+	@UIApplicationDelegateAdaptor(MobileAppDelegate.self) private var mobileAppDelegate
 
 	var body: some Scene {
 		WindowGroup {

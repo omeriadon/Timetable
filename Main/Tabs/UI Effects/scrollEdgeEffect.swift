@@ -19,34 +19,30 @@ extension View {
 		maxBlurRadius: CGFloat = 2,
 		maximumOpacity: CGFloat = 0.4
 	) -> some View {
-		#if os(iOS)
-			scrollEdgeEffectStyle(.soft, for: .all)
-				.overlay {
-					ZStack {
-						let direction2: VariableBlurDirection = switch direction {
-							case .clearTopDarkBottom:
-								.blurredBottomClearTop
-							case .darkTopClearBottom:
-								.blurredTopClearBottom
-						}
-
-						VariableBlurView(
-							maxBlurRadius: maxBlurRadius,
-							direction: direction2,
-							startOffset: offset
-						)
-
-						BlackGradientOverlay(
-							direction: direction,
-							offset: offset,
-							maximumOpacity: maximumOpacity
-						)
+		scrollEdgeEffectStyle(.soft, for: .all)
+			.overlay {
+				ZStack {
+					let direction2: VariableBlurDirection = switch direction {
+						case .clearTopDarkBottom:
+							.blurredBottomClearTop
+						case .darkTopClearBottom:
+							.blurredTopClearBottom
 					}
-					.ignoresSafeArea(.container)
-					.allowsHitTesting(false)
+
+					VariableBlurView(
+						maxBlurRadius: maxBlurRadius,
+						direction: direction2,
+						startOffset: offset
+					)
+
+					BlackGradientOverlay(
+						direction: direction,
+						offset: offset,
+						maximumOpacity: maximumOpacity
+					)
 				}
-		#else
-			scrollEdgeEffectStyle(.soft, for: .all)
-		#endif
+				.ignoresSafeArea(.container)
+				.allowsHitTesting(false)
+			}
 	}
 }

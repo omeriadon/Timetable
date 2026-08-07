@@ -92,9 +92,7 @@ struct AccountView: View {
 			LabeledContent("Name") {
 				TextField("Name", text: $displayName)
 					.multilineTextAlignment(.trailing)
-				#if os(iOS)
 					.submitLabel(.done)
-				#endif
 			}
 			.onChange(of: displayName) { _, value in
 				ServerSyncCoordinator.shared.scheduleProfileUpdate(value)
@@ -144,18 +142,15 @@ struct AccountView: View {
 		}
 
 		Section("Status") {
-			#if os(iOS) && !targetEnvironment(macCatalyst)
-				LocationStatusPermissionRecoveryRow()
-			#endif
+			LocationStatusPermissionRecoveryRow()
 		}
 
 		Section {
 			Button("Sign Out", systemImage: "door.right.hand.open", role: .destructive, action: signOut)
-			#if os(iOS)
-				Button("Delete Account", systemImage: "trash", role: .destructive) { showDeleteConfirmation = true }
-					.disabled(isDeleting)
-					.foregroundStyle(.red)
-			#endif
+
+			Button("Delete Account", systemImage: "trash", role: .destructive) { showDeleteConfirmation = true }
+				.disabled(isDeleting)
+				.foregroundStyle(.red)
 		}
 	}
 

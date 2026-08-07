@@ -22,21 +22,20 @@ struct TimetableComparison: View {
 	var body: some View {
 		VStack(spacing: 14) {
 			if friends.isEmpty {
-				#if os(iOS)
-					ContentUnavailableView {
-						Label {
-							Text("No Friend Timetables")
-						} icon: {
-							Image(systemName: "person.2")
-						}
-						.font(.callout)
-						.foregroundStyle(.secondary)
-					} description: {
-						Text("Add a friend to compare their timetable with yours here.")
-							.font(.caption)
+				ContentUnavailableView {
+					Label {
+						Text("No Friend Timetables")
+					} icon: {
+						Image(systemName: "person.2")
 					}
-					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-				#endif // os(iOS)
+					.font(.callout)
+					.foregroundStyle(.secondary)
+				} description: {
+					Text("Add a friend to compare their timetable with yours here.")
+						.font(.caption)
+				}
+				.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+
 			} else {
 				ForEach(friends) { friend in
 					if let timetable = friend.timetable {

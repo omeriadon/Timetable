@@ -11,357 +11,353 @@ import SwiftUI
 import TipKit
 import WidgetKit
 
-#if os(iOS)
+struct SettingsView: View {
+	@Default(.timetable) var subjects
+	@Default(.lastServerSync) var lastServerSync
+	@Default(.userDisplayName) var userDisplayName
 
-	struct SettingsView: View {
-		@Default(.timetable) var subjects
-		@Default(.lastServerSync) var lastServerSync
-		@Default(.userDisplayName) var userDisplayName
+	@Environment(\.statusBadgeManager) private var statusBadgeManager
+	@State private var sessionStore = SessionStore.shared
+	@State private var networkManager = NetworkManager.shared
+	@State private var settings = Defaults[.accountSettings]
+	@State private var committedSettings = Defaults[.accountSettings]
+	@State private var settingsSync = AccountSettingsSyncService.shared
+	@State private var settingsSaveGeneration = 0
+	@Default(.debugOffset) private var debugOffset
 
-		@Environment(\.statusBadgeManager) private var statusBadgeManager
-		@State private var sessionStore = SessionStore.shared
-		@State private var networkManager = NetworkManager.shared
-		@State private var settings = Defaults[.accountSettings]
-		@State private var committedSettings = Defaults[.accountSettings]
-		@State private var settingsSync = AccountSettingsSyncService.shared
-		@State private var settingsSaveGeneration = 0
-		@Default(.debugOffset) private var debugOffset
+	@State private var showCalendarImportSheet = false
+	@State private var showEditTimetableSheet = false
+	@State private var showFeedbackSheet = false
+	@State private var showImportConfirmation = false
 
-		@State private var showCalendarImportSheet = false
-		@State private var showEditTimetableSheet = false
-		@State private var showFeedbackSheet = false
-		@State private var showImportConfirmation = false
+	@State private var colors = [
+		Color.brown,
+		Color(uiColor: .secondarySystemGroupedBackground),
+		Color(uiColor: .secondarySystemGroupedBackground),
+		Color(uiColor: .secondarySystemGroupedBackground),
+		Color(uiColor: .secondarySystemGroupedBackground),
+	]
+	@State private var speed = 0.6
+	@State private var colorTransitionSpeed = 10.0
 
-		@State private var colors = [
-			Color.brown,
-			Color(uiColor: .secondarySystemGroupedBackground),
-			Color(uiColor: .secondarySystemGroupedBackground),
-			Color(uiColor: .secondarySystemGroupedBackground),
-			Color(uiColor: .secondarySystemGroupedBackground),
-		]
-		@State private var speed = 0.6
-		@State private var colorTransitionSpeed = 10.0
+	var body: some View {
+		List { list }
+			.toolbarMinimizationBehavior(.onScrollDown, for: .navigationBar)
+			.toolbarMinimizationSafeAreaAdjustment(.disabled, for: .navigationBar)
+			.listStyle(.sidebar)
+			.scrollEdgeEffect(offset: 0.95, maxBlurRadius: 1, maximumOpacity: 0.2)
+			.scrollEdgeEffectStyle(.soft, for: .top)
+			.scrollContentBackground(.hidden)
+			.appNavigationTitle("Settings", style: .main, accent: true)
+	}
 
-		var body: some View {
-			List { list }
-				.toolbarMinimizationBehavior(.onScrollDown, for: .navigationBar)
-				.toolbarMinimizationSafeAreaAdjustment(.disabled, for: .navigationBar)
-				.listStyle(.sidebar)
-				.scrollEdgeEffect(offset: 0.95, maxBlurRadius: 1, maximumOpacity: 0.2)
-				.scrollEdgeEffectStyle(.soft, for: .top)
-				.scrollContentBackground(.hidden)
-				.appNavigationTitle("Settings", style: .main, accent: true)
-		}
+	private var accountBackground: some View {
+		AccountBackgroundView(profile: Defaults[.accountProfile])
+			.opacity(0.5)
+	}
 
-		private var accountBackground: some View {
-			AccountBackgroundView(profile: Defaults[.accountProfile])
-				.opacity(0.5)
-		}
-
-		@ContentBuilder
-		private var list: some View {
-			Section {
-				NavigationLink {
-					AccountView()
-				} label: {
-					Label {
-						Text(userDisplayName)
-							.font(.title)
-					} icon: {
-						ProfilePicture(size: 50, accessibilityName: "Profile Picture")
-							.padding(.trailing)
-					}
-					.padding(.leading, 10)
-				}
-				.listRowBackground(accountBackground)
-			}
-
-			Section("My Timetable") {
-				Button {
-					showImportConfirmation = true
-				} label: {
-					HStack(alignment: .center) {
-						Image(systemName: "calendar")
-							.foregroundStyle(.tint)
-							.imageScale(.large)
-							.padding(.trailing, 10)
-
-						VStack(alignment: .leading) {
-							Text("Re-import from Calendar")
-								.foregroundStyle(.accent)
-							Text("Subscribe to Compass Schedule in Calendar first.")
-								.foregroundStyle(.secondary)
-								.font(.callout)
-						}
-					}
-				}
-				.confirmationDialog(Text("Import timetable from Calendar again?"), isPresented: $showImportConfirmation, titleVisibility: .visible, actions: {
-					Button("Yes", role: .confirm) {
-						showCalendarImportSheet = true
-					}
-					Button("No", role: .cancel) {}
-
-				}, message: {
-					Text("This will delete your current timetable and reimport. Anyone you shared this timetable with will be able to access the updated one.")
-				})
-				.sheet(isPresented: $showCalendarImportSheet) {
-					CalendarImportView()
-						.presentationDetents([.fraction(1 / 3)])
-						.presentationDragIndicator(.hidden)
-				}
-
-				Button {
-					showEditTimetableSheet = true
-				} label: {
-					Label {
-						Text("Edit")
-					} icon: {
-						Image(systemName: "pencil")
-							.foregroundStyle(.tint)
-					}
-				}
-				.disabled(!networkManager.isOnline)
-				.sheet(isPresented: $showEditTimetableSheet) {
-					SubjectEditorSheet(
-						subjects: $subjects,
-						initialRequest: nil,
-						onSave: { proposedSubjects in
-							try await ServerSyncCoordinator.shared.saveOwnerTimetable(proposedSubjects)
-						}
-					)
-					.presentationDetents([.large])
-					.presentationContentInteraction(.scrolls)
-					.presentationDragIndicator(.hidden)
-				}
-			}
-
-			Section("Preferences") {
-				if sessionStore.isAuthenticated {
-					NavigationLink {
-						TagSubscriptionsView()
-					} label: {
-						Label("Subscribed Event Tags", systemImage: "tag")
-					}
-				}
-
-				if sessionStore.isAuthenticated {
-					NavigationLink { AccountAndSyncSettingsView() } label: { Label("Updates & Notifications", systemImage: "switch.2") }
-				} else {
-					Button { showSignInRequired() } label: { Label("Updates", systemImage: "switch.2") }
-				}
-
-				Toggle("Highlight Current Day in timetables", systemImage: "inset.filled.lefthalf.righthalf.rectangle", isOn: highlightsCurrentDayBinding)
-
-				Toggle("Haptic Feedback", systemImage: "iphone.radiowaves.left.and.right", isOn: hapticsBinding)
-
-				Picker("Delete Past Events", selection: archivePolicyBinding) {
-					ForEach(CalendarEventArchivePolicy.allCases, id: \.self) { policy in
-						Text(policy.title).tag(policy)
-					}
-				}
-				.pickerStyle(.menu)
-			}
-
-			Section("Created Timetables") {
-				if sessionStore.isAuthenticated {
-					NavigationLink {
-						CreatedTimetablesSettingsView(closeWideDestination: nil)
-					} label: {
-						Label("Manage Created Timetables", systemImage: "person.2.crop.square.stack")
-					}
-				} else {
-					Button { showSignInRequired() } label: { Label("Manage Created Timetables", systemImage: "person.2.crop.square.stack") }
-				}
-			}
-
-			Section("Developer") {
-				if _isDebugAssertConfiguration() || Defaults[.userDisplayName].contains("Adon") || Defaults[.calendarEvents].canManageGlobalEvents {
-					LabeledContent {
-						TextField("Seconds", value: $debugOffset, format: .number)
-							.multilineTextAlignment(.trailing)
-							.keyboardType(.numbersAndPunctuation)
-					} label: {
-						Label("Debug Offset", systemImage: "clock.arrow.trianglehead.counterclockwise.rotate.90")
-					}
-
-					Button("Test progress badge", systemImage: "progress.indicator") {
-						addDebugStatusBadge(title: "Syncing account", secondaryText: "Working", view: .progressView)
-					}
-					Button("Test success badge", systemImage: "checkmark.circle") {
-						addDebugStatusBadge(title: "Saving timetable", view: .success)
-					}
-					Button("Test info badge", systemImage: "info.circle") {
-						addDebugStatusBadge(title: "Info here", view: .info)
-					}
-					Button("Test error badge", systemImage: "xmark.circle") {
-						addDebugStatusBadge(title: "Contacting server", view: .error)
-					}
-					Button("Test warning badge", systemImage: "exclamationmark.triangle") {
-						addDebugStatusBadge(title: "Checking timetable", view: .warning)
-					}
-					Button("Test progress and gauge badge", systemImage: "arrow.trianglehead.2.clockwise.rotate.90") {
-						Task {
-							let id = UUID()
-							statusBadgeManager.addBadge(id: id, title: "Preparing timetable", priority: 3, view: .progressViewAndGauge(currentStep: 1, totalSteps: 3))
-
-							try? await Task.sleep(for: .seconds(1))
-
-							statusBadgeManager.updateBadge(id: id, title: "Preparing timetable", view: .progressViewAndGauge(currentStep: 2, totalSteps: 3))
-
-							try? await Task.sleep(for: .seconds(1))
-
-							statusBadgeManager.updateBadge(id: id, title: "Preparing timetable", view: .progressViewAndGauge(currentStep: 3, totalSteps: 3))
-
-							try? await Task.sleep(for: .seconds(1))
-
-							statusBadgeManager.updateBadge(id: id, title: "Prepared timetable", view: .success)
-						}
-					}
-				}
-
-				Button {
-					guard sessionStore.isAuthenticated else {
-						showSignInRequired()
-						return
-					}
-					WidgetCenter.shared.reloadAllTimelines()
-					statusBadgeManager.addBadge(id: UUID(), title: "Widgets reloaded", priority: 3, view: .success)
-				} label: {
-					Label("Reload widgets now", systemImage: "widget.large")
-						.foregroundStyle(.accent)
-				}
-			}
-
-			Section("Support") {
-				Button {
-					guard sessionStore.isAuthenticated else {
-						showSignInRequired()
-						return
-					}
-					showFeedbackSheet = true
-				} label: {
-					Label("Report Feedback or Bug", systemImage: "exclamationmark.bubble")
-				}
-				.disabled(!networkManager.isOnline)
-				.sheet(isPresented: $showFeedbackSheet) {
-					FeedbackView(close: { showFeedbackSheet = false })
-						.presentationDetents([.fraction(0.7)])
-				}
-
-				Button("Reset Tips", systemImage: "lightbulb") {
-					try? Tips.resetDatastore()
-				}
-				Text("After you restart the app, tips will show again, highlighting features of the app.")
-					.font(.footnote)
-					.foregroundStyle(.secondary)
-
-				NavigationLink {
-					AboutView()
-				} label: {
-					Label("About Timetable", systemImage: "info.circle")
-				}
-				.listRowBackground(
-					ColorfulView(
-						color: $colors,
-						speed: $speed,
-						bias: .constant(0.00001),
-						noise: .constant(64),
-						transitionSpeed: $colorTransitionSpeed,
-						frameLimit: .constant(60),
-						renderScale: .constant(1)
-					)
-				)
-
+	@ContentBuilder
+	private var list: some View {
+		Section {
+			NavigationLink {
+				AccountView()
+			} label: {
 				Label {
-					Text("Last Server Sync")
-
-					Text(lastServerSync?.formatted(date: .complete, time: .complete) ?? "Never")
-						.foregroundStyle(.secondary)
+					Text(userDisplayName)
+						.font(.title)
 				} icon: {
-					Image(systemName: "checkmark.icloud")
+					ProfilePicture(size: 50, accessibilityName: "Profile Picture")
+						.padding(.trailing)
 				}
+				.padding(.leading, 10)
+			}
+			.listRowBackground(accountBackground)
+		}
 
-				Label {
-					HStack {
-						Text("\(Bundle.main.appVersion)")
-						Text("(\(Bundle.main.buildNumber))")
+		Section("My Timetable") {
+			Button {
+				showImportConfirmation = true
+			} label: {
+				HStack(alignment: .center) {
+					Image(systemName: "calendar")
+						.foregroundStyle(.tint)
+						.imageScale(.large)
+						.padding(.trailing, 10)
+
+					VStack(alignment: .leading) {
+						Text("Re-import from Calendar")
+							.foregroundStyle(.accent)
+						Text("Subscribe to Compass Schedule in Calendar first.")
 							.foregroundStyle(.secondary)
+							.font(.callout)
 					}
+				}
+			}
+			.confirmationDialog(Text("Import timetable from Calendar again?"), isPresented: $showImportConfirmation, titleVisibility: .visible, actions: {
+				Button("Yes", role: .confirm) {
+					showCalendarImportSheet = true
+				}
+				Button("No", role: .cancel) {}
+
+			}, message: {
+				Text("This will delete your current timetable and reimport. Anyone you shared this timetable with will be able to access the updated one.")
+			})
+			.sheet(isPresented: $showCalendarImportSheet) {
+				CalendarImportView()
+					.presentationDetents([.fraction(1 / 3)])
+					.presentationDragIndicator(.hidden)
+			}
+
+			Button {
+				showEditTimetableSheet = true
+			} label: {
+				Label {
+					Text("Edit")
 				} icon: {
-					Image(systemName: "hammer")
+					Image(systemName: "pencil")
+						.foregroundStyle(.tint)
 				}
+			}
+			.disabled(!networkManager.isOnline)
+			.sheet(isPresented: $showEditTimetableSheet) {
+				SubjectEditorSheet(
+					subjects: $subjects,
+					initialRequest: nil,
+					onSave: { proposedSubjects in
+						try await ServerSyncCoordinator.shared.saveOwnerTimetable(proposedSubjects)
+					}
+				)
+				.presentationDetents([.large])
+				.presentationContentInteraction(.scrolls)
+				.presentationDragIndicator(.hidden)
 			}
 		}
 
-		@Default(.hapticsEnabled) private var hapticsEnabled
-
-		private var highlightsCurrentDayBinding: Binding<Bool> {
-			Binding(
-				get: { settings.highlightsCurrentDay },
-				set: { value in
-					settingsSaveGeneration += 1
-					let generation = settingsSaveGeneration
-					let previous = committedSettings
-					settings.highlightsCurrentDay = value
-					let proposed = settings
-					Task {
-						do {
-							try await settingsSync.updateSettings(proposed)
-							guard generation == settingsSaveGeneration else { return }
-							committedSettings = proposed
-						} catch {
-							guard generation == settingsSaveGeneration else { return }
-							settings = previous
-							statusBadgeManager.addBadge(id: UUID(), title: "Unable to save preferences", secondaryText: error.localizedDescription, priority: 4, view: .error)
-						}
-					}
+		Section("Preferences") {
+			if sessionStore.isAuthenticated {
+				NavigationLink {
+					TagSubscriptionsView()
+				} label: {
+					Label("Subscribed Event Tags", systemImage: "tag")
 				}
-			)
-		}
+			}
 
-		private var archivePolicyBinding: Binding<CalendarEventArchivePolicy> {
-			Binding(
-				get: {
-					CalendarEventArchivePolicy(rawValue: settings.calendarEventAutoDeleteDays) ?? .never
-				},
-				set: { policy in
-					settingsSaveGeneration += 1
-					let generation = settingsSaveGeneration
-					let previous = committedSettings
-					settings.calendarEventAutoDeleteDays = policy.rawValue
-					let proposed = settings
-					Task {
-						do {
-							try await settingsSync.updateSettings(proposed)
-							guard generation == settingsSaveGeneration else { return }
-							committedSettings = proposed
-						} catch {
-							guard generation == settingsSaveGeneration else { return }
-							settings = previous
-							statusBadgeManager.addBadge(id: UUID(), title: "Unable to save preferences", secondaryText: error.localizedDescription, priority: 4, view: .error)
-						}
-					}
+			if sessionStore.isAuthenticated {
+				NavigationLink { AccountAndSyncSettingsView() } label: { Label("Updates & Notifications", systemImage: "switch.2") }
+			} else {
+				Button { showSignInRequired() } label: { Label("Updates", systemImage: "switch.2") }
+			}
+
+			Toggle("Highlight Current Day in timetables", systemImage: "inset.filled.lefthalf.righthalf.rectangle", isOn: highlightsCurrentDayBinding)
+
+			Toggle("Haptic Feedback", systemImage: "iphone.radiowaves.left.and.right", isOn: hapticsBinding)
+
+			Picker("Delete Past Events", selection: archivePolicyBinding) {
+				ForEach(CalendarEventArchivePolicy.allCases, id: \.self) { policy in
+					Text(policy.title).tag(policy)
 				}
-			)
+			}
+			.pickerStyle(.menu)
 		}
 
-		private var hapticsBinding: Binding<Bool> {
-			Binding(get: { hapticsEnabled }, set: { hapticsEnabled = $0 })
-		}
-
-		private func addDebugStatusBadge(title: String, secondaryText: String? = nil, view: StatusBadgeView) {
-			let id = UUID()
-			statusBadgeManager.addBadge(id: id, title: title, secondaryText: secondaryText, priority: 3, view: view)
-
-			Task {
-				try? await Task.sleep(for: .seconds(4))
-				statusBadgeManager.updateBadge(id: id, title: "Done", view: .success)
+		Section("Created Timetables") {
+			if sessionStore.isAuthenticated {
+				NavigationLink {
+					CreatedTimetablesSettingsView(closeWideDestination: nil)
+				} label: {
+					Label("Manage Created Timetables", systemImage: "person.2.crop.square.stack")
+				}
+			} else {
+				Button { showSignInRequired() } label: { Label("Manage Created Timetables", systemImage: "person.2.crop.square.stack") }
 			}
 		}
 
-		private func showSignInRequired() {
-			statusBadgeManager.signInRequired()
+		Section("Developer") {
+			if _isDebugAssertConfiguration() || Defaults[.userDisplayName].contains("Adon") || Defaults[.calendarEvents].canManageGlobalEvents {
+				LabeledContent {
+					TextField("Seconds", value: $debugOffset, format: .number)
+						.multilineTextAlignment(.trailing)
+						.keyboardType(.numbersAndPunctuation)
+				} label: {
+					Label("Debug Offset", systemImage: "clock.arrow.trianglehead.counterclockwise.rotate.90")
+				}
+
+				Button("Test progress badge", systemImage: "progress.indicator") {
+					addDebugStatusBadge(title: "Syncing account", secondaryText: "Working", view: .progressView)
+				}
+				Button("Test success badge", systemImage: "checkmark.circle") {
+					addDebugStatusBadge(title: "Saving timetable", view: .success)
+				}
+				Button("Test info badge", systemImage: "info.circle") {
+					addDebugStatusBadge(title: "Info here", view: .info)
+				}
+				Button("Test error badge", systemImage: "xmark.circle") {
+					addDebugStatusBadge(title: "Contacting server", view: .error)
+				}
+				Button("Test warning badge", systemImage: "exclamationmark.triangle") {
+					addDebugStatusBadge(title: "Checking timetable", view: .warning)
+				}
+				Button("Test progress and gauge badge", systemImage: "arrow.trianglehead.2.clockwise.rotate.90") {
+					Task {
+						let id = UUID()
+						statusBadgeManager.addBadge(id: id, title: "Preparing timetable", priority: 3, view: .progressViewAndGauge(currentStep: 1, totalSteps: 3))
+
+						try? await Task.sleep(for: .seconds(1))
+
+						statusBadgeManager.updateBadge(id: id, title: "Preparing timetable", view: .progressViewAndGauge(currentStep: 2, totalSteps: 3))
+
+						try? await Task.sleep(for: .seconds(1))
+
+						statusBadgeManager.updateBadge(id: id, title: "Preparing timetable", view: .progressViewAndGauge(currentStep: 3, totalSteps: 3))
+
+						try? await Task.sleep(for: .seconds(1))
+
+						statusBadgeManager.updateBadge(id: id, title: "Prepared timetable", view: .success)
+					}
+				}
+			}
+
+			Button {
+				guard sessionStore.isAuthenticated else {
+					showSignInRequired()
+					return
+				}
+				WidgetCenter.shared.reloadAllTimelines()
+				statusBadgeManager.addBadge(id: UUID(), title: "Widgets reloaded", priority: 3, view: .success)
+			} label: {
+				Label("Reload widgets now", systemImage: "widget.large")
+					.foregroundStyle(.accent)
+			}
+		}
+
+		Section("Support") {
+			Button {
+				guard sessionStore.isAuthenticated else {
+					showSignInRequired()
+					return
+				}
+				showFeedbackSheet = true
+			} label: {
+				Label("Report Feedback or Bug", systemImage: "exclamationmark.bubble")
+			}
+			.disabled(!networkManager.isOnline)
+			.sheet(isPresented: $showFeedbackSheet) {
+				FeedbackView(close: { showFeedbackSheet = false })
+					.presentationDetents([.fraction(0.7)])
+			}
+
+			Button("Reset Tips", systemImage: "lightbulb") {
+				try? Tips.resetDatastore()
+			}
+			Text("After you restart the app, tips will show again, highlighting features of the app.")
+				.font(.footnote)
+				.foregroundStyle(.secondary)
+
+			NavigationLink {
+				AboutView()
+			} label: {
+				Label("About Timetable", systemImage: "info.circle")
+			}
+			.listRowBackground(
+				ColorfulView(
+					color: $colors,
+					speed: $speed,
+					bias: .constant(0.00001),
+					noise: .constant(64),
+					transitionSpeed: $colorTransitionSpeed,
+					frameLimit: .constant(60),
+					renderScale: .constant(1)
+				)
+			)
+
+			Label {
+				Text("Last Server Sync")
+
+				Text(lastServerSync?.formatted(date: .complete, time: .complete) ?? "Never")
+					.foregroundStyle(.secondary)
+			} icon: {
+				Image(systemName: "checkmark.icloud")
+			}
+
+			Label {
+				HStack {
+					Text("\(Bundle.main.appVersion)")
+					Text("(\(Bundle.main.buildNumber))")
+						.foregroundStyle(.secondary)
+				}
+			} icon: {
+				Image(systemName: "hammer")
+			}
 		}
 	}
 
-#endif // os(iOS)
+	@Default(.hapticsEnabled) private var hapticsEnabled
+
+	private var highlightsCurrentDayBinding: Binding<Bool> {
+		Binding(
+			get: { settings.highlightsCurrentDay },
+			set: { value in
+				settingsSaveGeneration += 1
+				let generation = settingsSaveGeneration
+				let previous = committedSettings
+				settings.highlightsCurrentDay = value
+				let proposed = settings
+				Task {
+					do {
+						try await settingsSync.updateSettings(proposed)
+						guard generation == settingsSaveGeneration else { return }
+						committedSettings = proposed
+					} catch {
+						guard generation == settingsSaveGeneration else { return }
+						settings = previous
+						statusBadgeManager.addBadge(id: UUID(), title: "Unable to save preferences", secondaryText: error.localizedDescription, priority: 4, view: .error)
+					}
+				}
+			}
+		)
+	}
+
+	private var archivePolicyBinding: Binding<CalendarEventArchivePolicy> {
+		Binding(
+			get: {
+				CalendarEventArchivePolicy(rawValue: settings.calendarEventAutoDeleteDays) ?? .never
+			},
+			set: { policy in
+				settingsSaveGeneration += 1
+				let generation = settingsSaveGeneration
+				let previous = committedSettings
+				settings.calendarEventAutoDeleteDays = policy.rawValue
+				let proposed = settings
+				Task {
+					do {
+						try await settingsSync.updateSettings(proposed)
+						guard generation == settingsSaveGeneration else { return }
+						committedSettings = proposed
+					} catch {
+						guard generation == settingsSaveGeneration else { return }
+						settings = previous
+						statusBadgeManager.addBadge(id: UUID(), title: "Unable to save preferences", secondaryText: error.localizedDescription, priority: 4, view: .error)
+					}
+				}
+			}
+		)
+	}
+
+	private var hapticsBinding: Binding<Bool> {
+		Binding(get: { hapticsEnabled }, set: { hapticsEnabled = $0 })
+	}
+
+	private func addDebugStatusBadge(title: String, secondaryText: String? = nil, view: StatusBadgeView) {
+		let id = UUID()
+		statusBadgeManager.addBadge(id: id, title: title, secondaryText: secondaryText, priority: 3, view: view)
+
+		Task {
+			try? await Task.sleep(for: .seconds(4))
+			statusBadgeManager.updateBadge(id: id, title: "Done", view: .success)
+		}
+	}
+
+	private func showSignInRequired() {
+		statusBadgeManager.signInRequired()
+	}
+}

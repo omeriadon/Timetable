@@ -40,9 +40,8 @@ struct AdministrationEventTagsView: View {
 			}
 			.onMove(perform: move)
 		}
-		#if os(iOS)
+
 		.environment(\.editMode, .constant(isReordering ? .active : .inactive))
-		#endif
 		.appNavigationTitle("Event Tags", accent: true)
 		.toolbar {
 			ToolbarItem(placement: .primaryAction) {

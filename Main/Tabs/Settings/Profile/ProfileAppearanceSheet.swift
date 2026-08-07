@@ -1,10 +1,7 @@
 import Defaults
+import PhotosUI
+import SwiftEmojiIndex
 import SwiftUI
-
-#if os(iOS)
-	import PhotosUI
-	import SwiftEmojiIndex
-#endif
 
 struct ProfileAppearanceSheet: View {
 	let close: () -> Void
@@ -17,11 +14,9 @@ struct ProfileAppearanceSheet: View {
 	@State private var presentsFontPicker = false
 	@State private var presentsColourPicker = false
 
-	#if os(iOS)
-		@State private var selectedPhotoItem: PhotosPickerItem?
-		@State private var photoSelectionState = ProfilePhotoSelectionState.idle
-		@State private var photoCropRequest: ProfilePhotoCropRequest?
-	#endif
+	@State private var selectedPhotoItem: PhotosPickerItem?
+	@State private var photoSelectionState = ProfilePhotoSelectionState.idle
+	@State private var photoCropRequest: ProfilePhotoCropRequest?
 
 	init(close: @escaping () -> Void) {
 		self.close = close
@@ -85,22 +80,14 @@ struct ProfileAppearanceSheet: View {
 					}
 
 					if draft.contentKind == .photo {
-						#if os(iOS)
-							ProfilePhotoControls(
-								selection: $selectedPhotoItem,
-								state: photoSelectionState,
-								hasCurrentPhoto: draft.photo != nil,
-								remove: removePhoto
-							)
-							.transition(.blurReplace)
-						#else
-							ContentUnavailableView(
-								"Photo Editing Unavailable",
-								systemImage: "photo.badge.exclamationmark",
-								description: Text("Edit the profile photo on iPhone.")
-							)
-							.transition(.blurReplace)
-						#endif
+						ProfilePhotoControls(
+							selection: $selectedPhotoItem,
+							state: photoSelectionState,
+							hasCurrentPhoto: draft.photo != nil,
+							remove: removePhoto
+						)
+						.transition(.blurReplace)
+
 					} else if draft.contentKind == .emoji {
 						Button(action: showEmojiPicker) {
 							Label {
@@ -207,7 +194,7 @@ struct ProfileAppearanceSheet: View {
 			)
 			.presentationDetents([.large])
 		}
-		#if os(iOS)
+
 		.onChange(of: selectedPhotoItem) { _, item in
 			loadPhoto(item)
 		}
@@ -223,7 +210,6 @@ struct ProfileAppearanceSheet: View {
 			)
 			.presentationDetents([.fraction(0.7)])
 		}
-		#endif
 	}
 
 	private func showEmojiPicker() {
@@ -238,51 +224,49 @@ struct ProfileAppearanceSheet: View {
 		presentsColourPicker = true
 	}
 
-	#if os(iOS)
-		private func loadPhoto(_ item: PhotosPickerItem?) {
-			guard let item else {
+	private func loadPhoto(_ item: PhotosPickerItem?) {
+		guard let item else {
+			return
+		}
+		photoSelectionState = .loading
+		Task {
+			do {
+				guard let data = try await item.loadTransferable(type: Data.self) else {
+					throw ProfilePhotoSelectionError.unreadableImage
+				}
+				let preparedSource = try await ProfilePhotoProcessor.prepareSource(data)
+				photoCropRequest = ProfilePhotoCropRequest(sourceData: preparedSource)
+			} catch {
+				photoSelectionState = .failed(error.localizedDescription)
+			}
+		}
+	}
+
+	private func reopenPhotoCrop() {
+		if let pendingPhotoData = draft.pendingPhotoData {
+			photoCropRequest = ProfilePhotoCropRequest(sourceData: pendingPhotoData)
+			return
+		}
+
+		guard let photo = draft.photo else { return }
+		Task {
+			guard let data = await ProfileImageCache.shared.imageData(for: photo, displaySize: 300) else {
 				return
 			}
-			photoSelectionState = .loading
-			Task {
-				do {
-					guard let data = try await item.loadTransferable(type: Data.self) else {
-						throw ProfilePhotoSelectionError.unreadableImage
-					}
-					let preparedSource = try await ProfilePhotoProcessor.prepareSource(data)
-					photoCropRequest = ProfilePhotoCropRequest(sourceData: preparedSource)
-				} catch {
-					photoSelectionState = .failed(error.localizedDescription)
-				}
-			}
+			photoCropRequest = ProfilePhotoCropRequest(sourceData: data)
 		}
+	}
 
-		private func reopenPhotoCrop() {
-			if let pendingPhotoData = draft.pendingPhotoData {
-				photoCropRequest = ProfilePhotoCropRequest(sourceData: pendingPhotoData)
-				return
-			}
-
-			guard let photo = draft.photo else { return }
-			Task {
-				guard let data = await ProfileImageCache.shared.imageData(for: photo, displaySize: 300) else {
-					return
-				}
-				photoCropRequest = ProfilePhotoCropRequest(sourceData: data)
-			}
+	private func removePhoto() {
+		withAnimation(reduceMotion ? .none : .smooth(duration: 0.35)) {
+			draft.pendingPhotoData = nil
+			draft.removesPhoto = true
+			draft.contentKind = .emoji
 		}
-
-		private func removePhoto() {
-			withAnimation(reduceMotion ? .none : .smooth(duration: 0.35)) {
-				draft.pendingPhotoData = nil
-				draft.removesPhoto = true
-				draft.contentKind = .emoji
-			}
-			selectedPhotoItem = nil
-			photoSelectionState = .idle
-			photoCropRequest = nil
-		}
-	#endif
+		selectedPhotoItem = nil
+		photoSelectionState = .idle
+		photoCropRequest = nil
+	}
 
 	private func setContentKind(_ contentKind: ProfileContentKind) {
 		withAnimation(reduceMotion ? .none : .smooth(duration: 0.35)) {

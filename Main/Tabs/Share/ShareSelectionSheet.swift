@@ -7,14 +7,7 @@
 
 import Defaults
 import SwiftUI
-
-#if os(iOS)
-	import UIKit
-#endif
-
-#if os(macOS)
-	import AppKit
-#endif
+import UIKit
 
 enum SelectedShareItem: Identifiable, Hashable {
 	case owner(id: UUID)

@@ -1,39 +1,38 @@
-#if os(iOS)
-	import PhotosUI
-	import SwiftUI
 
-	struct ProfilePhotoControls: View {
-		@Binding var selection: PhotosPickerItem?
-		let state: ProfilePhotoSelectionState
-		let hasCurrentPhoto: Bool
-		let remove: () -> Void
+import PhotosUI
+import SwiftUI
 
-		var body: some View {
-			VStack(spacing: 25) {
-				PhotosPicker(selection: $selection, matching: .images) {
-					Label(hasCurrentPhoto ? "Replace Photo" : "Choose Photo", systemImage: "photo.on.rectangle")
-				}
-				.buttonStyle(.glass)
-				.buttonSizing(.flexible)
+struct ProfilePhotoControls: View {
+	@Binding var selection: PhotosPickerItem?
+	let state: ProfilePhotoSelectionState
+	let hasCurrentPhoto: Bool
+	let remove: () -> Void
 
-				if hasCurrentPhoto {
-					Button("Remove Photo", systemImage: "trash", role: .destructive, action: remove)
-						.buttonStyle(.glass)
-						.tint(.red)
-						.buttonSizing(.flexible)
-				}
-
-				switch state {
-					case .loading:
-						ProgressView("Preparing photo…")
-					case let .failed(message):
-						Label(message, systemImage: "exclamationmark.triangle")
-							.foregroundStyle(.red)
-					case .idle, .ready:
-						EmptyView()
-				}
+	var body: some View {
+		VStack(spacing: 25) {
+			PhotosPicker(selection: $selection, matching: .images) {
+				Label(hasCurrentPhoto ? "Replace Photo" : "Choose Photo", systemImage: "photo.on.rectangle")
 			}
-			.padding(.horizontal, 8)
+			.buttonStyle(.glass)
+			.buttonSizing(.flexible)
+
+			if hasCurrentPhoto {
+				Button("Remove Photo", systemImage: "trash", role: .destructive, action: remove)
+					.buttonStyle(.glass)
+					.tint(.red)
+					.buttonSizing(.flexible)
+			}
+
+			switch state {
+				case .loading:
+					ProgressView("Preparing photo…")
+				case let .failed(message):
+					Label(message, systemImage: "exclamationmark.triangle")
+						.foregroundStyle(.red)
+				case .idle, .ready:
+					EmptyView()
+			}
 		}
+		.padding(.horizontal, 8)
 	}
-#endif
+}

@@ -286,11 +286,7 @@ public protocol ColorOptions: CaseIterable, Hashable {
 }
 
 func closestColor(to color: Color) -> AvailableColors {
-	#if os(iOS)
-		let uiColor = UIColor(color)
-	#else
-		let uiColor = NSColor(color)
-	#endif
+	let uiColor = UIColor(color)
 
 	var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
 	uiColor.getRed(&r, green: &g, blue: &b, alpha: &a)

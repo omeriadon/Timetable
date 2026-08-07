@@ -232,11 +232,8 @@ struct TimetableView: View {
 							.background {
 								ZStack {
 									Color.black.opacity(0.5)
-									#if os(iOS)
-										BlurView(blurRadius: 10)
-									#else
-										Color.clear
-									#endif
+
+									BlurView(blurRadius: 10)
 								}
 							}
 					}
@@ -292,12 +289,10 @@ struct TimetableView: View {
 					)
 				)
 			}
-			#if os(iOS)
-				#if !targetEnvironment(macCatalyst)
-					.onAppear {
-						watchSync.activateIfNeeded()
-					}
-				#endif
+			#if os(iOS) && !targetEnvironment(macCatalyst)
+			.onAppear {
+				watchSync.activateIfNeeded()
+			}
 			#endif
 		}
 	}

@@ -59,28 +59,24 @@ struct SubjectEditorSheet: View {
 						.frame(maxWidth: .infinity, maxHeight: .infinity)
 				}
 			}
-			#if os(iOS)
-				#if os(iOS)
-					.navigationBarTitleDisplayMode(.inline)
-				#endif
-			#endif
-				.toolbar {
-					ToolbarItem(placement: .cancellationAction) {
-						Button("Close", systemImage: "xmark") {
-							close()
-						}
-						.labelStyle(.iconOnly)
-						.keyboardShortcut(.cancelAction)
-						.disabled(isSaving)
+			.navigationBarTitleDisplayMode(.inline)
+			.toolbar {
+				ToolbarItem(placement: .cancellationAction) {
+					Button("Close", systemImage: "xmark") {
+						close()
 					}
-
-					ToolbarItem(placement: .confirmationAction) {
-						Button("Done", systemImage: "checkmark") {
-							validateAndSave()
-						}
-						.disabled(isSaving)
-					}
+					.labelStyle(.iconOnly)
+					.keyboardShortcut(.cancelAction)
+					.disabled(isSaving)
 				}
+
+				ToolbarItem(placement: .confirmationAction) {
+					Button("Done", systemImage: "checkmark") {
+						validateAndSave()
+					}
+					.disabled(isSaving)
+				}
+			}
 		}
 		.alert(
 			"Rename Subject",
@@ -141,10 +137,9 @@ struct SubjectEditorSheet: View {
 				)
 			}
 		}
-		#if os(iOS)
+
 		.presentationDetents([.height(750), .large])
 		.presentationDragIndicator(.hidden)
-		#endif
 	}
 
 	private var renameAlertPresented: Binding<Bool> {

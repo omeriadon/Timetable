@@ -31,9 +31,8 @@ struct CreatedTimetablesSettingsView: View {
 				}
 			}
 		}
-		#if os(iOS)
+
 		.navigationBarTitleDisplayMode(.large)
-		#endif
 		.appNavigationTitle("Created Timetables", accent: true)
 		.toolbar {
 			ToolbarItem(placement: .primaryAction) {
@@ -123,9 +122,8 @@ private struct CreatedTimetableCreateView: View {
 				showSubjectEditor = true
 			}
 		}
-		#if os(iOS)
+
 		.navigationBarTitleDisplayMode(.large)
-		#endif
 		.appNavigationTitle("New Created Timetable", accent: true)
 		.toolbar {
 			if showsCloseButton {
