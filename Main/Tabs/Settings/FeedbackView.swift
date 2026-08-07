@@ -41,9 +41,6 @@ struct FeedbackView: View {
 						.foregroundStyle(.white)
 						.tag("Bug Report")
 				}
-				#if os(macOS)
-				.pickerStyle(.radioGroup)
-				#endif
 			}
 
 			TextField(
@@ -55,20 +52,9 @@ struct FeedbackView: View {
 				}
 			)
 			.lineLimit(5 ... 12)
-			#if os(macOS)
-				.labelsHidden()
-				.frame(maxWidth: .infinity, alignment: .leading)
-				.padding(.horizontal, 4)
-				.padding(.bottom, 3)
-				.background {
-					RoundedRectangle(cornerRadius: 3)
-						.fill(Color(red: 0.13, green: 0.14, blue: 0.15))
-				}
-			#endif // os(macOS)
 		}
-		#if os(iOS)
+
 		.navigationBarTitleDisplayMode(.large)
-		#endif
 		.formStyle(.grouped)
 		.scrollContentBackground(.hidden)
 		.scrollEdgeEffectStyle(.soft, for: .all)

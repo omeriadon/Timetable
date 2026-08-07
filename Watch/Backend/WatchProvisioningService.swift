@@ -130,9 +130,7 @@ final class WatchProvisioningService: NSObject, WCSessionDelegate {
 		_: WCSession,
 		activationDidCompleteWith _: WCSessionActivationState,
 		error _: Error?
-	) {
-		// Nothing required here if requestSessionIfPossible only sends when already activated.
-	}
+	) {}
 
 	nonisolated func session(_: WCSession, didReceiveMessage message: [String: Any]) {
 		guard let action = message[WatchSessionMessage.actionKey] as? String else { return }

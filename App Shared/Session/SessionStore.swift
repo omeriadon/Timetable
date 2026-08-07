@@ -73,9 +73,6 @@ final class SessionStore {
 			return
 		}
 
-		// Startup must retain the cached account surface. Offline launch and any
-		// transient refresh failure are not evidence that the account signed out.
-		// Only an explicit server authentication invalidation may clear this state.
 		state = .authenticated(cachedProfile)
 
 		guard accessToken != nil || refreshToken != nil else {
@@ -242,10 +239,6 @@ final class SessionStore {
 		}
 		let profile = persist(response.user)
 
-		// The watch's authenticated root contains nested TabViews whose page
-		// structure is driven by the bootstrap Defaults. Mount it only after
-		// those values have been written, rather than changing its pages while
-		// it is being inserted into the view graph.
 		if Platform.current == .watchOS, bootstrap, let accountBootstrapHandler {
 			try await accountBootstrapHandler()
 			state = .authenticated(profile)

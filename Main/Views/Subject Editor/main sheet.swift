@@ -396,8 +396,7 @@ struct SubjectEditorSheet: View {
 				commitToLocalModel(savedSubjects)
 				close()
 			} catch {
-				// ServerSyncCoordinator already displays the sync errors.
-				// Keep the sheet open and do not commit local Defaults.
+				// keep the sheet open and dont save local defaults
 			}
 			saveTask = nil
 		}

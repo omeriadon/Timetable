@@ -102,18 +102,15 @@ class DeviceIDProvider {
 	static let shared = DeviceIDProvider()
 	private let keychainKey = "com.omeriadon.Timetable.uniqueDeviceID"
 
-	/// Fetches the persistent device ID from the Keychain, creating it if it doesn't exist.
 	func getDeviceID() -> String {
 		if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
 			return "1"
 		}
 
-		// Look for an existing ID
 		if let existingID = KeychainManager.read(forKey: keychainKey) {
 			return existingID
 		}
 
-		// Generate a fresh UUID if one wasn't found
 		let newID = UUID().uuidString
 		KeychainManager.save(string: newID, forKey: keychainKey)
 		return newID

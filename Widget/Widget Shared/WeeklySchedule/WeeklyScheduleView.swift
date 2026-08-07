@@ -13,8 +13,6 @@ struct WeeklyScheduleView: View {
 
 	@Environment(\.widgetRenderingMode) var widgetRenderingMode
 
-	// MARK: - body
-
 	var body: some View {
 		let subjects = entry.subjects
 		let subjectLookup = TimetableLayout.subjectLookup(for: subjects)
@@ -100,8 +98,6 @@ struct WeeklyScheduleView: View {
 		}
 	}
 
-	// MARK: - sessionCell
-
 	@ViewBuilder
 	func sessionCell(_ day: Int, _ session: Int, subjectLookup: [Slot: Subject]) -> some View {
 		let leadingPadding: CGFloat =
@@ -182,8 +178,6 @@ struct WeeklyScheduleView: View {
 		.padding(Device.isNotWatchOS ? 1 : 0)
 		.foregroundStyle(.white)
 	}
-
-	// MARK: - currentWeekdayIndex
 
 	private var currentWeekdayIndex: Int {
 		let weekday = Calendar.current.component(.weekday, from: TimetableClock.adjusted(entry.date))

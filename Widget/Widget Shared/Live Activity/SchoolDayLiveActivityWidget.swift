@@ -271,8 +271,6 @@ private struct SchoolDayLiveActivityView: View {
 	}
 }
 
-// MARK: - Previews
-
 extension SchoolDayActivityAttributes {
 	static let preview = SchoolDayActivityAttributes(
 		activityKey: "preview-school-day",

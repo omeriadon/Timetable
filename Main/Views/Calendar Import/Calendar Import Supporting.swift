@@ -94,15 +94,10 @@ func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Subject] {
 
 	let calendar = Calendar.current
 
-	// Track frequency of normalized title claims on unique slots across the
-	// six-week window. The first original title remains the display value.
-	// Key: "day,session" -> Value: [NormalizedSubjectTitle : OccurrencesCount]
 	var slotScoreboard: [String: [String: Int]] = [:]
 
-	// Track overall metadata for subjects we discover
 	var subjectMeta: [String: (displayName: String, color: RGBAColor, symbol: String, classroom: Classroom, teacher: Teacher)] = [:]
 
-	// 1. First Pass: Parse events and score frequencies across the 6 weeks
 	for event in events {
 		guard
 			let title = event.title?.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -112,7 +107,7 @@ func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Subject] {
 		let weekday = calendar.component(.weekday, from: event.startDate)
 		guard (2 ... 6).contains(weekday) else { continue } // Mon...Fri
 
-		let day = weekday - 2 // Mon = 0, Tue = 1, ..., Fri = 4
+		let day = weekday - 2
 		let dayStart = calendar.startOfDay(for: event.startDate)
 		let normalizedTitle = normalizedImportedSubjectName(title)
 		guard !normalizedTitle.isEmpty else {
@@ -130,7 +125,6 @@ func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Subject] {
 			continue
 		}
 
-		// Store metadata if it's the first time seeing this item
 		if subjectMeta[normalizedTitle] == nil {
 			subjectMeta[normalizedTitle] = (
 				displayName: title,
@@ -148,17 +142,14 @@ func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Subject] {
 		slotScoreboard[slotKey] = scores
 	}
 
-	// 2. Second Pass: Rebuild cleanly by assigning slots strictly to the highest scoring title
 	var subjectSlotsMap: [String: [Slot]] = [:]
 
 	for (slotKey, scores) in slotScoreboard {
-		// Split our dictionary key back into structural data
 		let components = slotKey.split(separator: ",").compactMap { Int($0) }
 		guard components.count == 2 else { continue }
 		let day = components[0]
 		let session = components[1]
 
-		// Find the absolute highest recurring title for this exact slot
 		if let winningTitle = scores.max(by: { $0.value < $1.value })?.key {
 			if subjectSlotsMap[winningTitle] == nil {
 				subjectSlotsMap[winningTitle] = []
@@ -167,7 +158,6 @@ func matchEventsToTimeSlots(_ events: [EKEvent]) async throws -> [Subject] {
 		}
 	}
 
-	// 3. Map directly to clean structural models, strictly dropping items that lost all their slots
 	return subjectSlotsMap
 		.filter { !$0.value.isEmpty } // Drop 0-slot items immediately before mapping
 		.compactMap { normalizedName, slots in

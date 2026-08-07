@@ -263,8 +263,6 @@ final class OwnerTimetableSyncService {
 
 		let localTimetable = Defaults[.timetable]
 
-		// Once the server has timetable content it is authoritative for every
-		// device. A non-empty local timetable only seeds a freshly empty server.
 		if localTimetable.isEmpty || !response.subjects.isEmpty {
 			cache(response)
 			return

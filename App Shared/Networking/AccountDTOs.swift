@@ -629,7 +629,7 @@ nonisolated struct RegisterUserDeviceRequest: Codable {
 	let installationID: String
 	let platform: String
 	let apnsToken: String
-	/// `true` when the token is from a debug/sandbox build.
+	/// true when the token is from a debug/sandbox build.
 	let isDebug: Bool
 }
 

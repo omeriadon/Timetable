@@ -162,10 +162,8 @@ private struct TodayEventSnapshot: Equatable {
 		self.noSchoolDay = noSchoolDay
 	}
 
-	/// 2. Static empty instance using the memberwise init
 	static let empty = TodayEventSnapshot()
 
-	/// 3. Your main domain initializer
 	init(
 		calendarEvents: CalendarEventsProjection,
 		schoolCalendar: SchoolCalendarProjection,
@@ -301,9 +299,6 @@ private struct TodaySchoolTimeline: View {
 	private let periodHorizontalInset = TodayCardLayout.contentInset
 	private let expandedContentHeight: CGFloat = 48
 
-	/// Pulled these out of `body` into computed properties so both `body`
-	/// and `periodsLayer` can reference them without re-deriving anything
-	/// or capturing local `let`s across a view boundary.
 	private var periods: [SchoolPeriod] {
 		SchoolStateEngine.activePeriods(for: dayIndex)
 	}
@@ -328,12 +323,6 @@ private struct TodaySchoolTimeline: View {
 				.bold()
 				.padding(.horizontal, periodHorizontalInset - timelineHorizontalPadding)
 
-			// A bare GeometryReader always greedily expands to fill all
-			// available space before any downstream .frame() applies —
-			// that's what was making this section balloon. Fixing the
-			// size first with Color.clear, then handing the
-			// GeometryReader that resolved size via .overlay, keeps it
-			// pinned to `height` instead of expanding.
 			Color.clear
 				.frame(height: height)
 				.overlay(alignment: .topLeading) { periodsLayer }
