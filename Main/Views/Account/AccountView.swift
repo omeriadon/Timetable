@@ -22,10 +22,12 @@ struct AccountView: View {
 	@State private var isSavingYearGroup = false
 	@State private var yearGroupsFailedToLoad = false
 	@Environment(\.statusBadgeManager) private var badges
+	@State private var service = LocationStatusService.shared
 
 	var body: some View {
 		ZStack {
 			AccountBackgroundView(profile: Defaults[.accountProfile])
+				.ignoresSafeArea()
 
 			switch sessionStore.state {
 				case let .authenticated(profile):
@@ -101,6 +103,7 @@ struct AccountView: View {
 				LabeledContent("Email", value: email)
 			}
 		}
+		.listRowBackground(Rectangle().fill(.thinMaterial))
 
 		Section("Year Group") {
 			if isLoadingYearGroups, yearGroupTags.isEmpty {
@@ -140,9 +143,17 @@ struct AccountView: View {
 				}
 			}
 		}
+		.listRowBackground(Rectangle().fill(.thinMaterial))
 
-		Section("Status") {
-			LocationStatusPermissionRecoveryRow()
+		if service.authorizationStatus != .authorizedAlways {
+			Section("Status") {
+				Button("Open Location Settings", systemImage: "location.fill") {
+					if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+						UIApplication.shared.open(settingsURL)
+					}
+				}
+			}
+			.listRowBackground(Rectangle().fill(.thinMaterial))
 		}
 
 		Section {
@@ -152,6 +163,7 @@ struct AccountView: View {
 				.disabled(isDeleting)
 				.foregroundStyle(.red)
 		}
+		.listRowBackground(Rectangle().fill(.thinMaterial))
 	}
 
 	private func signOut() {

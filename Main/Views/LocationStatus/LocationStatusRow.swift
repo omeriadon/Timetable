@@ -49,7 +49,7 @@ struct LocationStatusRow: View {
 			}
 		}
 		.padding(8)
-		.foregroundStyle(.black)
+		.foregroundStyle(.white)
 		.padding(18)
 		.background {
 			GeometryReader { proxy in

@@ -54,6 +54,7 @@ struct FriendsView: View {
 				.labelStyle(.iconOnly)
 			}
 		}
+		.refreshable { await refresh() }
 		.searchable(text: $searchText, prompt: "Search by name")
 		.task { await refresh() }
 		.task(id: searchText) {
@@ -149,7 +150,6 @@ struct FriendsView: View {
 			}
 			.padding()
 		}
-		.refreshable { await refresh() }
 	}
 
 	private var friendSearchResults: some View {

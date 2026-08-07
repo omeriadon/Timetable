@@ -250,10 +250,20 @@ struct SettingsView: View {
 				try? Tips.resetDatastore()
 
 			} label: {
-				Label("Reset Tips", systemImage: "lightbulb")
-				Text("After you restart the app, tips will show again, highlighting features of the app.")
-					.font(.footnote)
-					.foregroundStyle(.secondary)
+				HStack(alignment: .center) {
+					Image(systemName: "lightbulb")
+						.foregroundStyle(.tint)
+						.imageScale(.large)
+						.padding(.trailing, 10)
+
+					VStack(alignment: .leading) {
+						Text("Reset Tips")
+							.foregroundStyle(.accent)
+						Text("After you restart the app, tips will show again, highlighting features of the app.")
+							.foregroundStyle(.secondary)
+							.font(.callout)
+					}
+				}
 			}
 
 			NavigationLink {

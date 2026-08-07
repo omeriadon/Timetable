@@ -37,6 +37,8 @@ struct FriendStatusCard: View {
 								.regular.tint(locationStatus.tint ?? nil).interactive(),
 								in: Capsule()
 							)
+							.padding(7)
+							.foregroundStyle(.white)
 							.frame(maxHeight: .infinity, alignment: .topTrailing)
 					}
 
