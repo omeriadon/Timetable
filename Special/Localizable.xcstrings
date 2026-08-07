@@ -105,9 +105,6 @@
         }
       }
     },
-    "%@ average" : {
-
-    },
     "%@ used" : {
       "localizations" : {
         "fr" : {
@@ -7593,9 +7590,6 @@
       }
     },
     "Weighting" : {
-
-    },
-    "Weighting applies across the academic year." : {
 
     },
     "Weighting: %@" : {

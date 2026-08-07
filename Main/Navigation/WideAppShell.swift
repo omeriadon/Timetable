@@ -26,24 +26,16 @@ struct WideAppShell: View {
 					sidebarRoot("Grades", systemImage: "chart.bar.xaxis", destination: .grades)
 				}
 			}
-			.scrollBounceBehavior(.basedOnSize)
-			.safeAreaInset(edge: .bottom, spacing: 0) {
-				VStack(spacing: 2) {
-					Divider()
+			.safeAreaBar(edge: .bottom, spacing: 0) {
+				sidebarUtilityItem("Settings", systemImage: "gear", destination: .settings)
 
-					sidebarUtilityItem("Settings", systemImage: "gear", destination: .settings)
-
-					if accountProfile?.authority.isAdministrator == true {
-						sidebarUtilityItem(
-							"Administration",
-							systemImage: "calendar.badge.lock",
-							destination: .administration
-						)
-					}
+				if accountProfile?.authority.isAdministrator == true {
+					sidebarUtilityItem(
+						"Administration",
+						systemImage: "calendar.badge.lock",
+						destination: .administration
+					)
 				}
-				.padding(.horizontal, 8)
-				.padding(.vertical, 6)
-				.background(.bar)
 			}
 			.appNavigationTitle(router.presentation == .iOS ? "Timetable" : "")
 			.listStyle(.sidebar)
