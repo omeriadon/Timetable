@@ -28,11 +28,6 @@ struct ReceivedTimetablesView: View {
 				}
 			}
 			.disabled(!networkManager.isOnline)
-			.overlay {
-				if !networkManager.isOnline {
-					ContentUnavailableView("Offline", systemImage: "wifi.slash", description: Text("Received timetable changes are unavailable until the connection returns."))
-				}
-			}
 			.alert("Delete Timetable?", isPresented: $showDeleteConfirmation, presenting: timetableToDelete) { timetable in
 				Button("Cancel", role: .cancel) {}
 				Button("Delete", role: .destructive) { delete(timetable) }

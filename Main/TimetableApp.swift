@@ -20,19 +20,8 @@ struct ImportResult: Equatable {
 	let message: String
 }
 
-enum WindowMode: Int, Equatable, Identifiable {
-	var id: Int {
-		rawValue
-	}
-
-	case none = 1
-	case comparison = 2
-	case settings = 3
-}
-
 @main
 struct TimetableApp: App {
-	@State var expanded: WindowMode = .none
 	@Environment(\.scenePhase) private var scenePhase
 
 	@Default(.hasCompletedOnboarding) private var hasCompletedOnboarding
@@ -40,6 +29,8 @@ struct TimetableApp: App {
 		@State private var launchIllusionVisible = true
 		@Default(.hasSeenLocationStatusWhatsNew) private var hasSeenLocationStatusWhatsNew
 	#endif
+
+	@Default(.incomingFriendRequests) private var incomingFriendRequests
 
 	@State private var sessionStore = SessionStore.shared
 	@State private var statusBadgeManager = StatusBadgeManager.shared
@@ -80,7 +71,7 @@ struct TimetableApp: App {
 							ProgressView("Restoring Account…")
 								.transition(.blurReplace)
 						case .authenticated:
-							AdaptiveAppShell(expanded: $expanded)
+							AdaptiveAppShell()
 								.transition(.blurReplace)
 					}
 
@@ -206,8 +197,6 @@ struct TimetableApp: App {
 		#if os(macOS)
 		.defaultSize(width: 1100, height: 720)
 		#endif
-
-		#if os(macOS)
 		.commands {
 			CommandMenu("Navigate") {
 				Button("Timetable", systemImage: "calendar.day.timeline.left") {
@@ -218,6 +207,7 @@ struct TimetableApp: App {
 				Button("Friends", systemImage: "person.2") {
 					selectRoot(.friends)
 				}
+				.badge(incomingFriendRequests.count)
 				.keyboardShortcut("2", modifiers: .command)
 
 				Button("Settings", systemImage: "gear") {
@@ -236,7 +226,6 @@ struct TimetableApp: App {
 					.keyboardShortcut(",", modifiers: .command)
 			}
 		}
-		#endif
 	}
 
 	private func selectRoot(_ destination: AppRootDestination) {

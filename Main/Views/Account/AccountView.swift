@@ -26,17 +26,14 @@ struct AccountView: View {
 
 	var body: some View {
 		ZStack {
+			AccountBackgroundView(profile: Defaults[.accountProfile])
+
 			switch sessionStore.state {
 				case let .authenticated(profile):
 					Group {
-						#if os(macOS)
-							Form { accountRows(profile: profile) }
-								.formStyle(.grouped)
-								.scrollContentBackground(.hidden)
-						#else
-							List { accountRows(profile: profile) }
-								.listStyle(.insetGrouped)
-						#endif
+						List { accountRows(profile: profile) }
+							.listStyle(.insetGrouped)
+							.scrollContentBackground(.hidden)
 					}
 					.task(id: profile.id) {
 						await loadYearGroups()

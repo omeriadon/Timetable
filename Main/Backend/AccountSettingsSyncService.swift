@@ -126,13 +126,11 @@ final class AccountSettingsSyncService {
 				)
 				applyServerRevision(from: updatedSettings)
 				Defaults[.lastServerSync] = Date.now
-				#if os(iOS) && !targetEnvironment(macCatalyst)
-					if mutation.settings.liveActivitiesEnabled,
-					   !mutation.previousSettings.liveActivitiesEnabled
-					{
-						await LiveActivityRegistrationService.shared.reconcileAuthorization(requestStartIfNeeded: true)
-					}
-				#endif
+				if mutation.settings.liveActivitiesEnabled,
+				   !mutation.previousSettings.liveActivitiesEnabled
+				{
+					await LiveActivityRegistrationService.shared.reconcileAuthorization(requestStartIfNeeded: true)
+				}
 			} catch let NetworkError.server(_, response) where response.code == .invalidRequest {
 				if syncGeneration == mutation.generation {
 					Defaults[.accountSettings] = mutation.previousSettings
@@ -165,12 +163,9 @@ final class AccountSettingsSyncService {
 
 	private func applyLocalSideEffects() {
 		WidgetCenter.shared.reloadAllTimelines()
-		#if os(iOS) && !targetEnvironment(macCatalyst)
-			guard Platform.current == .iOS else { return }
-			Task {
-				await LiveActivityRegistrationService.shared.reconcileAuthorization()
-			}
-		#endif
+		Task {
+			await LiveActivityRegistrationService.shared.reconcileAuthorization()
+		}
 	}
 }
 

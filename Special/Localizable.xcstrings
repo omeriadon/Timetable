@@ -3461,6 +3461,7 @@
       }
     },
     "Item %lld" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -4779,6 +4780,7 @@
       }
     },
     "Profile photo crop preview" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -4793,6 +4795,9 @@
           }
         }
       }
+    },
+    "Profile photo crop previexsw" : {
+
     },
     "Profile Storage" : {
       "localizations" : {
@@ -5125,6 +5130,9 @@
       }
     },
     "Reported by" : {
+
+    },
+    "Reported date" : {
 
     },
     "Reported Storage" : {

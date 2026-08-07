@@ -29,38 +29,31 @@ struct FriendStatusCard: View {
 
 						Spacer()
 
-						HStack(spacing: 6) {
-							if let tint = locationStatus.tint {
-								Circle()
-									.fill(tint)
-									.frame(width: 8, height: 8)
-							}
-							Text(locationStatus.title)
-						}
-						.fontWeight(.medium)
-						.font(.caption)
-						.padding(5)
-						.glassEffect(
-							.regular.interactive(),
-							in: RoundedRectangle(cornerRadius: 10)
-						)
-						.frame(maxHeight: .infinity, alignment: .topTrailing)
+						Text(locationStatus.title)
+							.fontWeight(.medium)
+							.font(.caption)
+							.padding(5)
+							.glassEffect(
+								.regular.tint(locationStatus.tint ?? nil).interactive(),
+								in: Capsule()
+							)
+							.frame(maxHeight: .infinity, alignment: .topTrailing)
 					}
 
 					HStack(spacing: 6) {
 						Image(systemName: scheduleStatus.symbol)
-							.foregroundStyle(scheduleStatus.tint)
 						Text(scheduleStatus.title)
 					}
 					.font(.body)
 					.contentTransition(.numericText())
+
 					Text(nextClassTitle(for: scheduleStatus))
-						.font(.callout)
+						.font(.caption)
 						.foregroundStyle(.secondary)
 				}
 			}
 			.foregroundStyle(.black)
-			.padding(18)
+			.padding(10)
 			.background {
 				FriendPaperBackground(cornerRadius: 28)
 			}

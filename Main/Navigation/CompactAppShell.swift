@@ -7,6 +7,8 @@
 		@State private var networkManager = NetworkManager.shared
 		@Default(.accountProfile) private var accountProfile
 
+		@Default(.incomingFriendRequests) private var incomingFriendRequests
+
 		var body: some View {
 			@Bindable var router = router
 
@@ -36,6 +38,7 @@
 							}
 					}
 				}
+				.badge(incomingFriendRequests.count)
 
 				Tab(
 					"Settings",

@@ -58,14 +58,12 @@ struct AddFriendSheet: View {
 				List {
 					ForEach(results) { result in
 						FriendSearchRow(result: result)
-							.listRowInsets(.init(top: 8, leading: 16, bottom: 8, trailing: 16))
 							.listRowBackground(Image("paper").resizable().scaledToFill())
+							.listRowSeparator(.hidden)
+							.id(result.id)
 							.transition(.blurReplace)
 					}
 				}
-				#if os(iOS)
-				.listStyle(.insetGrouped)
-				#endif
 				.animation(.snappy, value: results.map(\.id))
 				.scrollEdgeEffectStyle(.soft, for: .top)
 				.scrollEdgeEffectStyle(.soft, for: .bottom)

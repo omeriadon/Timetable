@@ -157,7 +157,6 @@
 		2AC5F7EA2FD842F000B813EA /* Exceptions for "Main" folder in "Timetable" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			platformFiltersByRelativePath = {
-				Backend/LiveActivityRegistrationService.swift = (ios, );
 				Backend/PhoneWatchSyncBridge.swift = (ios, );
 				macOS/AppDelegate.swift = (macos, );
 				macOS/StatusBadgeOverlayWindow.swift = (macos, );

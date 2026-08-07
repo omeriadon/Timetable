@@ -46,9 +46,7 @@ enum Platform: String, Codable, Sendable, CaseIterable {
 	}
 
 	static var current: Platform {
-		#if os(macOS)
-			.macOS
-		#elseif os(watchOS)
+		#if os(watchOS)
 			.watchOS
 		#elseif targetEnvironment(macCatalyst)
 			.macOS

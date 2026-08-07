@@ -16,7 +16,7 @@ struct LocationStatusRow: View {
 				ProfilePicture(
 					appearance: profile.appearance,
 					photo: profile.photo,
-					size: 40,
+					size: 60,
 					badges: profile.badges,
 					accessibilityName: profile.displayName
 				)
@@ -27,10 +27,14 @@ struct LocationStatusRow: View {
 					.font(.headline)
 
 				if let status {
-					Text(status.state == .onCampus ? "On campus" : "Off campus")
-					Text(status.updatedAt, format: .relative(presentation: .named))
-						.font(.caption)
-						.foregroundStyle(.secondary)
+					HStack {
+						Text(status.state == .onCampus ? "On campus" : "Off campus")
+
+						Spacer()
+
+						Text(status.updatedAt, format: .dateTime.hour().minute())
+							.foregroundStyle(.secondary)
+					}
 				} else {
 					Text("Status unavailable")
 						.foregroundStyle(.secondary)
@@ -40,5 +44,27 @@ struct LocationStatusRow: View {
 			Spacer()
 		}
 		.padding(8)
+		.foregroundStyle(.black)
+		.padding(18)
+		.background {
+			GeometryReader { proxy in
+				Image("paperBlack")
+					.resizable()
+					.scaledToFill()
+					.frame(
+						width: proxy.size.width,
+						height: proxy.size.height
+					)
+					.clipped()
+			}
+			.clipShape(
+				RoundedRectangle(
+					cornerRadius: 28,
+					style: .continuous
+				)
+			)
+		}
+		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+		.contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
 	}
 }

@@ -3,8 +3,8 @@ import SwiftUI
 
 struct WideAppShell: View {
 	@Environment(AppRouter.self) private var router
-	@Binding var expanded: WindowMode
 	@Default(.accountProfile) private var accountProfile
+	@Default(.incomingFriendRequests) private var incomingFriendRequests
 
 	var body: some View {
 		@Bindable var router = router
@@ -13,29 +13,27 @@ struct WideAppShell: View {
 			List(selection: sidebarSelection) {
 				sidebarRoot("Timetable", systemImage: "calendar.day.timeline.left", destination: .timetable)
 				sidebarRoot("Friends", systemImage: "person.2", destination: .friends)
+					.badge(incomingFriendRequests.count)
 				sidebarRoot("Settings", systemImage: "gear", destination: .settings)
 
 				if accountProfile?.authority.isAdministrator == true {
 					sidebarRoot("Administration", systemImage: "calendar.badge.lock", destination: .administration)
 				}
 			}
-			.appNavigationTitle("Timetable")
+			.appNavigationTitle(router.presentation == .iOS ? "Timetable" : "")
 			.listStyle(.sidebar)
 			.scrollEdgeEffectStyle(.soft, for: .all)
 			.navigationSplitViewColumnWidth(min: 220, ideal: 260, max: 320)
 		} detail: {
 			NavigationStack(path: $router.sidebarPath) {
-				WideRootDestinationView(
-					destination: router.selectedSidebarDestination,
-					expanded: $expanded
-				)
-				.navigationDestination(for: AppRoute.self) { route in
-					WideRouteDestinationView(
-						route: route,
-						close: closeDetailDestination,
-						closeWideDestination: closeDetailDestination
-					)
-				}
+				WideRootDestinationView(destination: router.selectedSidebarDestination)
+					.navigationDestination(for: AppRoute.self) { route in
+						WideRouteDestinationView(
+							route: route,
+							close: closeDetailDestination,
+							closeWideDestination: closeDetailDestination
+						)
+					}
 			}
 			.navigationSplitViewColumnWidth(min: 540, ideal: 700, max: 860)
 		}

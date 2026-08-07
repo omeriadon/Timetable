@@ -252,17 +252,13 @@ private struct FriendOverview: View {
 				.padding(14)
 				.frame(maxWidth: .infinity, alignment: .leading)
 			}
+			.contentShape(Rectangle())
+			.buttonSizing(.flexible)
 			.buttonStyle(.plain)
 			.background {
 				FriendPaperBackground(cornerRadius: FriendDetailLayout.cardCornerRadius)
 			}
-			.glassEffect(
-				.clear.interactive(),
-				in: RoundedRectangle(
-					cornerRadius: FriendDetailLayout.cardCornerRadius,
-					style: .continuous
-				)
-			)
+			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: FriendDetailLayout.cardCornerRadius))
 		}
 		.padding(.vertical, 14)
 		.padding(.horizontal, FriendDetailLayout.horizontalPadding)
@@ -487,7 +483,7 @@ private struct FriendshipDateChangeRequestSheet: View {
 			Form {
 				DatePicker("Friends since", selection: $requestedDate, displayedComponents: .date)
 			}
-			.navigationTitle("Change Friends Since")
+			.appNavigationTitle("Change Friends Since")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel, action: close)

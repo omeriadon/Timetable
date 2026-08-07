@@ -73,6 +73,14 @@ nonisolated struct RGBAColor: Codable, Hashable, Defaults.Serializable, Sendable
 		)
 	}
 
+	func normalizedComponent(_ value: Double) -> Double {
+		guard value.isFinite else {
+			return 0
+		}
+
+		return min(max(value, 0), 1)
+	}
+
 	init(hexString: String) {
 		let hex = hexString.trimmingCharacters(in: CharacterSet(charactersIn: "#"))
 		let scanner = Scanner(string: hex)
@@ -85,14 +93,6 @@ nonisolated struct RGBAColor: Codable, Hashable, Defaults.Serializable, Sendable
 
 		self.init(r: r, g: g, b: b, a: 1.0)
 	}
-}
-
-private func normalizedComponent(_ value: Double) -> Double {
-	guard value.isFinite else {
-		return 0
-	}
-
-	return min(max(value, 0), 1)
 }
 
 extension Color {

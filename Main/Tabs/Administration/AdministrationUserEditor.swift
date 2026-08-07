@@ -61,6 +61,7 @@ struct AdministrationUserEditor: View {
 							ForEach(rows) { row in
 								AdministrationJSONNode(
 									row: row,
+									depth: 0,
 									expandedNodeIDs: $expandedAccountDataNodeIDs
 								)
 							}
@@ -174,22 +175,32 @@ struct AdministrationUserEditor: View {
 
 private struct AdministrationJSONNode: View {
 	let row: AdministrationJSONRow
+	let depth: Int
 	@Binding var expandedNodeIDs: Set<String>
 
 	var body: some View {
 		if let children = AdministrationJSONFormatter.childRows(from: row.value, parentID: row.id), !children.isEmpty {
 			DisclosureGroup(isExpanded: expansion) {
 				ForEach(children) { child in
-					AdministrationJSONNode(row: child, expandedNodeIDs: $expandedNodeIDs)
+					AdministrationJSONNode(row: child, depth: depth + 1, expandedNodeIDs: $expandedNodeIDs)
 				}
 			} label: {
 				Text(row.label)
-					.font(.system(.caption, design: .monospaced).weight(.semibold))
 			}
+			.listRowBackground(rowBackground)
 		} else {
 			LabeledContent(row.label) {
 				AdministrationJSONFormattedValue(value: row.value)
 			}
+			.listRowBackground(rowBackground)
+		}
+	}
+
+	private var rowBackground: Color? {
+		switch depth {
+			case 0: Color.white.opacity(0.08)
+			case 1: Color.white.opacity(0.04)
+			default: Color.white.opacity(0)
 		}
 	}
 
@@ -213,13 +224,11 @@ private struct AdministrationJSONFormattedValue: View {
 	var body: some View {
 		ScrollView(.horizontal, showsIndicators: false) {
 			Text(AdministrationJSONFormatter.formattedDescription(value))
-				.font(.system(.caption, design: .monospaced))
 				.textSelection(.enabled)
 				.fixedSize(horizontal: true, vertical: true)
 				.frame(maxWidth: .infinity, alignment: .topLeading)
 		}
 		.scrollBounceBehavior(.basedOnSize, axes: .horizontal)
-		.frame(maxWidth: .infinity, alignment: .leading)
 	}
 }
 
@@ -229,7 +238,6 @@ private struct AdministrationJSONText: View {
 	var body: some View {
 		ScrollView(.horizontal) {
 			Text(value)
-				.font(.system(.caption, design: .monospaced))
 				.textSelection(.enabled)
 				.fixedSize(horizontal: false, vertical: true)
 				.frame(maxWidth: .infinity, alignment: .topLeading)
@@ -266,7 +274,7 @@ private enum AdministrationJSONFormatter {
 				array.enumerated().map { index, value in
 					AdministrationJSONRow(
 						id: "\(parentID).array-\(index)",
-						label: "Item \(index + 1)",
+						label: "\(index + 1)",
 						value: value
 					)
 				}

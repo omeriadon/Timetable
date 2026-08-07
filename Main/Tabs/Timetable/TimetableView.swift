@@ -17,8 +17,6 @@ struct TimetableView: View {
 	@Environment(\.appPresentation) private var presentation
 	#if os(iOS) && !targetEnvironment(macCatalyst)
 		@State private var watchSync = PhoneWatchSyncBridge.shared
-	#elseif os(macOS)
-		@Binding var expanded: WindowMode
 	#endif
 
 	@Default(.timetable) var subjects
@@ -45,10 +43,8 @@ struct TimetableView: View {
 		}
 	#else
 		init(
-			expanded: Binding<WindowMode>,
 			startComparisonOpen: Bool = false
 		) {
-			_expanded = expanded
 			_showTimetableComparison = State(initialValue: startComparisonOpen)
 		}
 
@@ -79,6 +75,7 @@ struct TimetableView: View {
 
 				DatesView()
 					.containerRelativeFrame(.horizontal)
+					.scrollEdgeEffect(offset: 0.9, maxBlurRadius: 6, maximumOpacity: 1)
 					.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.7)
 					.id(2)
 			}
@@ -301,19 +298,6 @@ struct TimetableView: View {
 						watchSync.activateIfNeeded()
 					}
 				#endif
-			#else
-					.onChange(of: selectedSlot) {
-						if selectedSlot == nil {
-							expanded = .none
-						} else {
-							expanded = .comparison
-						}
-					}
-					.onAppear {
-						if selectedSlot != nil {
-							expanded = .comparison
-						}
-					}
 			#endif
 		}
 	}

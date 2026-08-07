@@ -10,16 +10,26 @@ struct AdministrationFriendshipDateChangeRequestsView: View {
 			ForEach(requests) { request in
 				Section(request.requesterDisplayName ?? request.requesterID.uuidString) {
 					LabeledContent("Requested date") {
-						Text(request.requestedDate, format: .dateTime.day().month().year())
+						Text(request.requestedDate, format: .dateTime.minute().hour().day().month().year())
 					}
 					LabeledContent("Status", value: statusLabel(for: request.action))
 					if request.action == .pending {
-						Button("Approve", systemImage: "checkmark", role: .confirm) {
-							resolve(request, action: .approved)
-						}
-						.buttonStyle(.glassProminent)
-						Button("Reject", systemImage: "xmark", role: .destructive) {
-							resolve(request, action: .rejected)
+						GlassEffectContainer {
+							HStack {
+								Button("Approve", systemImage: "checkmark", role: .confirm) {
+									resolve(request, action: .approved)
+								}
+								.buttonStyle(.glassProminent)
+								.buttonSizing(.flexible)
+								.foregroundStyle(.white)
+
+								Button("Reject", systemImage: "xmark", role: .destructive) {
+									resolve(request, action: .rejected)
+								}
+								.buttonStyle(.glassProminent)
+								.buttonSizing(.flexible)
+								.foregroundStyle(.white)
+							}
 						}
 					}
 				}
@@ -63,13 +73,30 @@ struct AdministrationUserReportsView: View {
 				Section(report.reportedUserDisplayName ?? report.reportedUserID.uuidString) {
 					LabeledContent("Reported by", value: report.reporterDisplayName ?? report.reporterID.uuidString)
 					LabeledContent("Status", value: statusLabel(for: report.action))
-					if report.action == .pending {
-						Button("Do Nothing", systemImage: "checkmark", role: .confirm) {
-							resolve(report, action: .noAction)
+
+					if let createdAt = report.createdAt {
+						LabeledContent("Reported date") {
+							Text(createdAt, format: .dateTime.minute().hour().day().month().year())
 						}
-						.buttonStyle(.glassProminent)
-						Button("Delete Account", systemImage: "trash", role: .destructive) {
-							resolve(report, action: .accountDeleted)
+					}
+
+					if report.action == .pending {
+						GlassEffectContainer {
+							HStack {
+								Button("Do Nothing", systemImage: "checkmark", role: .confirm) {
+									resolve(report, action: .noAction)
+								}
+								.foregroundStyle(.white)
+								.buttonStyle(.glassProminent)
+								.buttonSizing(.flexible)
+
+								Button("Delete Account", systemImage: "trash", role: .destructive) {
+									resolve(report, action: .accountDeleted)
+								}
+								.buttonStyle(.glassProminent)
+								.buttonSizing(.flexible)
+								.foregroundStyle(.white)
+							}
 						}
 					}
 				}

@@ -31,7 +31,7 @@
 									.stroke(.white, lineWidth: 2)
 							}
 							.gesture(dragGesture.simultaneously(with: magnifyGesture))
-							.accessibilityLabel("Profile photo crop preview")
+							.accessibilityLabel("Profile photo crop previexsw")
 					} else {
 						ContentUnavailableView(
 							"Photo Unavailable",

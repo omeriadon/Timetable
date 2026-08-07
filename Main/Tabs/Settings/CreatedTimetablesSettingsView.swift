@@ -61,9 +61,7 @@ struct CreatedTimetablesSettingsView: View {
 				.presentationDetents([.medium])
 		}
 		.overlay {
-			if !networkManager.isOnline {
-				ContentUnavailableView("Offline", systemImage: "wifi.slash", description: Text("Created timetables are unavailable until a connection is restored."))
-			} else if service.timetables.isEmpty {
+			if service.timetables.isEmpty {
 				ContentUnavailableView("No Created Timetables", systemImage: "person.2.crop.square.stack")
 					.fontWeight(.regular)
 					.foregroundStyle(.secondary)

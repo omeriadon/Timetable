@@ -56,11 +56,6 @@ struct AccountAndSyncSettingsView: View {
 			}
 		}
 		.disabled(!networkManager.isOnline)
-		.overlay {
-			if !networkManager.isOnline {
-				ContentUnavailableView("Offline", systemImage: "wifi.slash", description: Text("Account preferences are unavailable until a connection is restored."))
-			}
-		}
 		.animation(.easeInOut, value: notificationRegistration.registrationState)
 		.appGroupedFormStyle()
 		.appNavigationTitle("Updates", accent: true)

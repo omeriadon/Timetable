@@ -221,6 +221,7 @@ struct ProfileAppearanceSheet: View {
 				},
 				close: { photoCropRequest = nil }
 			)
+			.interactiveDismissDisabled()
 			.presentationDetents([.fraction(0.7)])
 		}
 		#endif
