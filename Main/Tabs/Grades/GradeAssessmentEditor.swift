@@ -65,10 +65,10 @@ struct GradeAssessmentEditor: View {
 									Label {
 										Text(option.title(for: subject))
 										Text(option.subtitle)
-											.foregroundStyle(.secondary)
 									} icon: {
 										Image(systemName: "checkmark")
 											.opacity(location == option ? 1 : 0)
+											.foregroundStyle(location == option ? Color.primary : Color.clear)
 									}
 								}
 							}

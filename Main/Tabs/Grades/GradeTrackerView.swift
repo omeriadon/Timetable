@@ -119,8 +119,7 @@ struct GradeAverageCard: View {
 	var body: some View {
 		VStack(alignment: .leading, spacing: 14) {
 			HStack(alignment: .center, spacing: 18) {
-				GradeGauge(value: average)
-					.tint(.black)
+				GradeGauge(value: average, tint: .black)
 
 				VStack(alignment: .leading, spacing: 4) {
 					Text("Overall Average")
@@ -129,6 +128,7 @@ struct GradeAverageCard: View {
 
 					if let average {
 						Text(average, format: .percent.precision(.fractionLength(1)))
+							.bold()
 							.font(.title)
 					} else {
 						Text("No assessments yet")
@@ -141,23 +141,27 @@ struct GradeAverageCard: View {
 				VStack {
 					HStack {
 						Text("Predicted ATAR")
-						Spacer()
+							.frame(maxWidth: .infinity)
 						Text("Goal ATAR")
-						Spacer()
+							.frame(maxWidth: .infinity)
 						Text("Gap")
+							.frame(maxWidth: .infinity)
 					}
 					.font(.caption)
 					.foregroundStyle(.secondary)
 
 					HStack {
 						Text(predictedATAR.map { "\($0, specifier: "%.2f")" } ?? "Not set")
-						Spacer()
+							.frame(maxWidth: .infinity)
 						Text(goalATAR.map { "\($0, specifier: "%.2f")" } ?? "Not set")
-						Spacer()
+							.frame(maxWidth: .infinity)
 						Text({
 							guard let goal = goalATAR, let predicted = predictedATAR else { return "Not set" }
-							return String(format: "%.2f", goal - predicted)
+							let diff = goal - predicted
+							return String(format: "%+.2f", diff)
 						}())
+							.bold()
+							.frame(maxWidth: .infinity)
 					}
 					.font(.headline)
 				}
@@ -182,16 +186,20 @@ struct GradeSubjectCard: View {
 			VStack(alignment: .leading, spacing: 5) {
 				Text(subject.id)
 					.font(.title3.weight(.semibold))
+					.foregroundStyle(.secondary)
+
 				if let average {
-					Text("\(average, format: .percent.precision(.fractionLength(1))) average")
+					Text("\(average, format: .percent.precision(.fractionLength(1)))")
+						.bold()
+						.font(.title2)
 				} else {
 					Text("No assessments yet")
+						.foregroundStyle(.secondary)
 				}
 			}
 
 			Spacer()
 		}
-		.foregroundStyle(.secondary)
 		.padding(14)
 		.background(FriendPaperBackground(cornerRadius: 28))
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
@@ -237,10 +245,23 @@ struct ATARSettingsSheet: View {
 		NavigationStack {
 			Form {
 				Section("ATAR") {
-					TextField("Predicted ATAR", value: $predictedATAR, format: .number.precision(.fractionLength(2)))
-						.keyboardType(.decimalPad)
-					TextField("Goal ATAR", value: $goalATAR, format: .number.precision(.fractionLength(2)))
-						.keyboardType(.decimalPad)
+					HStack {
+						Text("Predicted ATAR")
+							.foregroundStyle(.secondary)
+							.padding(.trailing)
+
+						TextField("Predicted ATAR", value: $predictedATAR, format: .number.precision(.fractionLength(2)))
+							.keyboardType(.decimalPad)
+					}
+
+					HStack {
+						Text("Goal ATAR")
+							.foregroundStyle(.secondary)
+							.padding(.trailing)
+
+						TextField("Goal ATAR", value: $goalATAR, format: .number.precision(.fractionLength(2)))
+							.keyboardType(.decimalPad)
+					}
 				}
 			}
 			.appNavigationTitle("ATAR")
@@ -292,25 +313,27 @@ struct GradeAssessmentRow: View {
 	let assessment: GradeAssessment
 
 	var body: some View {
-		HStack(alignment: .lastTextBaseline, spacing: 14) {
+		HStack(alignment: .center, spacing: 14) {
 			GradeGauge(value: assessment.score, tint: .brown)
 
-			VStack(alignment: .leading, spacing: 4) {
-				Text(assessment.name)
-					.font(.title3)
-				Text(assessment.date.displayLabel)
-					.font(.caption)
-					.foregroundStyle(.secondary)
-			}
+			HStack(alignment: .lastTextBaseline) {
+				VStack(alignment: .leading, spacing: 4) {
+					Text(assessment.name)
+						.font(.title3)
+					Text(assessment.date.displayLabel)
+						.font(.caption)
+						.foregroundStyle(.secondary)
+				}
 
-			Spacer()
+				Spacer()
 
-			VStack(alignment: .trailing, spacing: 4) {
-				Text(assessment.score, format: .percent.precision(.fractionLength(1)))
-					.font(.title2)
-				Text("Weighting: \(assessment.weighting, format: .percent.precision(.fractionLength(1)))")
-					.font(.caption)
-					.foregroundStyle(.secondary)
+				VStack(alignment: .trailing, spacing: 4) {
+					Text(assessment.score, format: .percent.precision(.fractionLength(1)))
+						.font(.title2)
+					Text("Weighting: \(assessment.weighting, format: .percent.precision(.fractionLength(1)))")
+						.font(.caption)
+						.foregroundStyle(.secondary)
+				}
 			}
 		}
 	}
