@@ -173,18 +173,13 @@ struct GradeSubjectCard: View {
 				Text(subject.id)
 					.font(.title3.weight(.semibold))
 				if let average {
-					Text(average, format: .percent.precision(.fractionLength(1)))
-						+ Text(" average")
+					Text("\(average, format: .percent.precision(.fractionLength(1))) average")
 				} else {
 					Text("No assessments yet")
 				}
-					.foregroundStyle(.secondary)
 			}
-
-			Spacer()
-			Image(systemName: "chevron.right")
-				.foregroundStyle(.secondary)
 		}
+		.foregroundStyle(.secondary)
 		.padding(14)
 		.background(FriendPaperBackground(cornerRadius: 28))
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
@@ -202,10 +197,11 @@ struct GradeGauge: View {
 		} currentValueLabel: {
 			if let value {
 				Text(value, format: .percent.precision(.fractionLength(0)))
+					.font(.caption.bold())
 			} else {
 				Text("—")
+					.font(.caption.bold())
 			}
-				.font(.caption.bold())
 		} minimumValueLabel: {
 			EmptyView()
 		} maximumValueLabel: {

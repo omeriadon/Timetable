@@ -38,15 +38,6 @@
         }
       }
     },
-    "%.0f%%" : {
-
-    },
-    "%.1f%%" : {
-
-    },
-    "%.1f%% average" : {
-
-    },
     "%.2f" : {
 
     },
@@ -113,6 +104,9 @@
           }
         }
       }
+    },
+    "%@ average" : {
+
     },
     "%@ used" : {
       "localizations" : {
@@ -7595,13 +7589,13 @@
         }
       }
     },
-    "Weight %.1f" : {
-
-    },
     "Weighting" : {
 
     },
     "Weighting for Semester %lld." : {
+
+    },
+    "Weighting: %@" : {
 
     },
     "What should we call you?" : {
