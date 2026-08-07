@@ -34,20 +34,17 @@ struct TimetableView: View {
 
 	@State private var currentTab: Int = 0
 	@State private var scrollPosition: Int?
+	let fixedSubtab: TimetableSubtab?
 
-	#if os(iOS)
 		init(
-			startComparisonOpen: Bool = false
+			startComparisonOpen: Bool = false,
+			fixedSubtab: TimetableSubtab? = nil
 		) {
 			_showTimetableComparison = State(initialValue: startComparisonOpen)
-		}
-	#else
-		init(
-			startComparisonOpen: Bool = false
-		) {
-			_showTimetableComparison = State(initialValue: startComparisonOpen)
+			self.fixedSubtab = fixedSubtab
 		}
 
+	#if os(macOS)
 		var currentTimetableTitle: String {
 			if let timetable = selectedTimetable {
 				return "\(timetable.sender)'s Timetable"
@@ -57,6 +54,28 @@ struct TimetableView: View {
 	#endif
 
 	var body: some View {
+		Group {
+			if let fixedSubtab {
+				fixedSubtabView(fixedSubtab)
+			} else {
+				compactTimetableView
+			}
+		}
+	}
+
+	@ViewBuilder
+	private func fixedSubtabView(_ subtab: TimetableSubtab) -> some View {
+		switch subtab {
+			case .today:
+				TodayTimetableView(subjects: selectedTimetable?.subjects ?? subjects)
+			case .week:
+				mainView
+			case .planner:
+				DatesView()
+		}
+	}
+
+	private var compactTimetableView: some View {
 		ScrollView(.horizontal) {
 			HStack(spacing: 0) {
 				TodayTimetableView(

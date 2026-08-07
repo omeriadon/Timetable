@@ -11,7 +11,9 @@ struct WideAppShell: View {
 
 		NavigationSplitView(columnVisibility: sidebarVisibility) {
 			List(selection: sidebarSelection) {
-				sidebarRoot("Timetable", systemImage: "calendar.day.timeline.left", destination: .timetable)
+				sidebarRoot("Today", systemImage: "calendar.day.timeline.left", destination: .timetableToday)
+				sidebarRoot("Week", systemImage: "7.calendar", destination: .timetableWeek)
+				sidebarRoot("Planner", systemImage: "pencil.and.list.clipboard", destination: .timetablePlanner)
 				sidebarRoot("Friends", systemImage: "person.2", destination: .friends)
 					.badge(incomingFriendRequests.count)
 				sidebarRoot("Grades", systemImage: "chart.bar.xaxis", destination: .grades)
@@ -59,7 +61,7 @@ struct WideAppShell: View {
 			}
 		}
 		.onReceive(NotificationCenter.default.publisher(for: .openTimetableTab)) { _ in
-			router.selectRoot(.timetable)
+			router.selectRoot(.timetableToday)
 		}
 		.onReceive(NotificationCenter.default.publisher(for: .openSettingsTab)) { _ in
 			router.selectRoot(.settings)

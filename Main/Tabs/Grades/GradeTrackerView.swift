@@ -14,7 +14,7 @@ struct GradeTrackerView: View {
 	var body: some View {
 		NavigationStack {
 			ScrollView {
-				LazyVStack(spacing: 14) {
+				VStack(spacing: 14) {
 					if isSenior {
 						Button {
 							showsATARSheet = true
@@ -34,22 +34,22 @@ struct GradeTrackerView: View {
 						)
 						.padding(.top, 72)
 					} else {
-						let reduceMotionValue = reduceMotion
-
-						ForEach(subjects) { subject in
-							Button {
-								selectedSubject = subject
-							} label: {
-								GradeSubjectCard(
-									subject: subject,
-									average: subjectAverage(for: subject.id)
-								)
-							}
-							.buttonStyle(.plain)
-							.scrollTransition(.animated(.snappy(duration: 0.3))) { card, phase in
-								card
-									.opacity(reduceMotionValue || phase.isIdentity ? 1 : 0.65)
-									.scaleEffect(reduceMotionValue || phase.isIdentity ? 1 : 0.96)
+						LazyVGrid(columns: [GridItem(.adaptive(minimum: 320, maximum: 520), spacing: 14)], spacing: 14) {
+							ForEach(subjects) { subject in
+								Button {
+									selectedSubject = subject
+								} label: {
+									GradeSubjectCard(
+										subject: subject,
+										average: subjectAverage(for: subject.id)
+									)
+								}
+								.buttonStyle(.plain)
+								.scrollTransition(.animated(.snappy(duration: 0.3))) { card, phase in
+									card
+										.opacity(reduceMotion || phase.isIdentity ? 1 : 0.65)
+										.scaleEffect(reduceMotion || phase.isIdentity ? 1 : 0.96)
+									}
 							}
 						}
 					}

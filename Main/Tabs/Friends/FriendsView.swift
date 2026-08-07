@@ -117,9 +117,8 @@ struct FriendsView: View {
 
 	private var friendsList: some View {
 		ScrollView {
-			LazyVStack(spacing: 14) {
+			VStack(spacing: 14) {
 				LocationStatusRow(showsArrivalStatistics: $showsArrivalStatistics)
-					.padding(.bottom, 10)
 
 				if friends.isEmpty {
 					ContentUnavailableView(
@@ -127,21 +126,23 @@ struct FriendsView: View {
 						systemImage: "person.2.slash",
 						description: Text("Search by name to find friends.")
 					)
-					.padding(.top, 72)
+						.padding(.top, 72)
 				} else {
-					ForEach(friends) { friend in
-						Button {
-							if presentation == .iOS {
-								selectedFriend = friend
-							} else {
-								router.navigate(to: .friends(.friend(id: friend.id)))
+					LazyVGrid(columns: [GridItem(.adaptive(minimum: 320, maximum: 520), spacing: 14)], spacing: 14) {
+						ForEach(friends) { friend in
+							Button {
+								if presentation == .iOS {
+									selectedFriend = friend
+								} else {
+									router.navigate(to: .friends(.friend(id: friend.id)))
+								}
+							} label: {
+								animatedScrollCard(FriendStatusCard(friend: friend))
 							}
-						} label: {
-							animatedScrollCard(FriendStatusCard(friend: friend))
-						}
-						.buttonStyle(.plain)
+							.buttonStyle(.plain)
+							}
+						.reorderable()
 					}
-					.reorderable()
 				}
 			}
 			.reorderContainer(for: FriendSummary.self) { difference in

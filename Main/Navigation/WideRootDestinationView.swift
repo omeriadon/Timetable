@@ -7,6 +7,12 @@ struct WideRootDestinationView: View {
 		switch destination {
 			case .timetable:
 				TimetableView()
+			case .timetableToday:
+				TimetableView(fixedSubtab: .today)
+			case .timetableWeek:
+				TimetableView(fixedSubtab: .week)
+			case .timetablePlanner:
+				TimetableView(fixedSubtab: .planner)
 			case .friends:
 				FriendsView()
 			case .grades:

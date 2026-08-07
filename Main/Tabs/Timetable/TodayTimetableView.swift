@@ -23,6 +23,13 @@ struct TodayTimetableView: View {
 						.minimumScaleFactor(0.01)
 						.foregroundStyle(.white)
 
+					if let termWeekLabel = termWeekLabel(for: now) {
+						Text(termWeekLabel)
+							.font(.headline)
+							.foregroundStyle(.white.opacity(0.8))
+							.frame(maxWidth: .infinity, alignment: .center)
+					}
+
 					if let noSchoolDay = eventSnapshot.noSchoolDay {
 						TodayNoSchoolDayCard(noSchoolDay: noSchoolDay)
 					}
@@ -90,6 +97,27 @@ struct TodayTimetableView: View {
 				)
 			}
 		}
+	}
+
+	private func termWeekLabel(for date: Date) -> String? {
+		let schoolDate = SchoolCalendarDate(date)
+		guard let term = schoolCalendar.termRanges.first(where: { range in
+			range.start <= schoolDate && schoolDate <= range.end
+		}) else {
+			return nil
+		}
+
+		let termNumber = term.label
+			.split(whereSeparator: { !$0.isNumber })
+			.first
+			.map(String.init) ?? "?"
+		let start = term.start.startOfDay() ?? date
+		let current = schoolDate.startOfDay() ?? date
+		let elapsedDays = SchoolCalendarProjection.perthCalendar
+			.dateComponents([.day], from: start, to: current)
+			.day ?? 0
+
+		return "Term \(termNumber) Week \(elapsedDays / 7 + 1)"
 	}
 
 	@ViewBuilder private func eventSection(_ title: String, events: [CalendarEvent], showsDate: Bool = false) -> some View {

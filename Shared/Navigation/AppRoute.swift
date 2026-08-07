@@ -2,6 +2,9 @@ import Foundation
 
 enum AppRootDestination: String, CaseIterable, Codable, Hashable, Identifiable, Sendable {
 	case timetable
+	case timetableToday
+	case timetableWeek
+	case timetablePlanner
 	case friends
 	case grades
 	case settings

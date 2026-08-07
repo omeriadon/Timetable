@@ -86,7 +86,13 @@ final class AppRouter {
 		gradesPath = snapshot?.gradesPath ?? []
 		settingsPath = snapshot?.settingsPath ?? []
 		administrationPath = snapshot?.administrationPath ?? []
-		selectedSidebarDestination = snapshot?.selectedSidebarDestination ?? .timetable
+		if let savedSidebarDestination = snapshot?.selectedSidebarDestination,
+		   savedSidebarDestination != .timetable
+		{
+			selectedSidebarDestination = savedSidebarDestination
+		} else {
+			selectedSidebarDestination = .timetableToday
+		}
 		sidebarPath = snapshot?.sidebarPath ?? []
 		sidebarVisibility = .automatic
 		inspectorRoute = nil
@@ -165,7 +171,7 @@ final class AppRouter {
 		gradesPath = []
 		settingsPath = []
 		administrationPath = []
-		selectedSidebarDestination = .timetable
+		selectedSidebarDestination = .timetableToday
 		sidebarPath = []
 		sidebarVisibility = .automatic
 		inspectorRoute = nil
@@ -177,6 +183,10 @@ final class AppRouter {
 	func popCurrentRoute() {
 		switch selectedTab {
 			case .timetable:
+				if !timetablePath.isEmpty {
+					timetablePath.removeLast()
+				}
+			case .timetableToday, .timetableWeek, .timetablePlanner:
 				if !timetablePath.isEmpty {
 					timetablePath.removeLast()
 				}
@@ -205,6 +215,8 @@ final class AppRouter {
 	) {
 		switch destination {
 			case .timetable:
+				timetablePath.append(route)
+			case .timetableToday, .timetableWeek, .timetablePlanner:
 				timetablePath.append(route)
 			case .friends:
 				friendsPath.append(route)
@@ -268,6 +280,8 @@ final class AppRouter {
 		switch destination {
 			case .timetable:
 				timetablePath = []
+			case .timetableToday, .timetableWeek, .timetablePlanner:
+				timetablePath = []
 			case .friends:
 				friendsPath = []
 			case .grades:
@@ -282,6 +296,8 @@ final class AppRouter {
 	private func path(for destination: AppRootDestination) -> [AppRoute] {
 		switch destination {
 			case .timetable:
+				timetablePath
+			case .timetableToday, .timetableWeek, .timetablePlanner:
 				timetablePath
 			case .friends:
 				friendsPath
