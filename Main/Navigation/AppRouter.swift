@@ -21,6 +21,10 @@ final class AppRouter {
 		didSet { persistIfNeeded() }
 	}
 
+	var gradesPath: [AppRoute] {
+		didSet { persistIfNeeded() }
+	}
+
 	var settingsPath: [AppRoute] {
 		didSet { persistIfNeeded() }
 	}
@@ -79,6 +83,7 @@ final class AppRouter {
 		timetableSubtab = snapshot?.timetableSubtab ?? .today
 		timetablePath = snapshot?.timetablePath ?? []
 		friendsPath = snapshot?.friendsPath ?? []
+		gradesPath = snapshot?.gradesPath ?? []
 		settingsPath = snapshot?.settingsPath ?? []
 		administrationPath = snapshot?.administrationPath ?? []
 		selectedSidebarDestination = snapshot?.selectedSidebarDestination ?? .timetable
@@ -157,6 +162,7 @@ final class AppRouter {
 		timetableSubtab = .today
 		timetablePath = []
 		friendsPath = []
+		gradesPath = []
 		settingsPath = []
 		administrationPath = []
 		selectedSidebarDestination = .timetable
@@ -178,6 +184,10 @@ final class AppRouter {
 				if !friendsPath.isEmpty {
 					friendsPath.removeLast()
 				}
+			case .grades:
+				if !gradesPath.isEmpty {
+					gradesPath.removeLast()
+				}
 			case .settings:
 				if !settingsPath.isEmpty {
 					settingsPath.removeLast()
@@ -198,6 +208,8 @@ final class AppRouter {
 				timetablePath.append(route)
 			case .friends:
 				friendsPath.append(route)
+			case .grades:
+				gradesPath.append(route)
 			case .settings:
 				settingsPath.append(route)
 			case .administration:
@@ -258,6 +270,8 @@ final class AppRouter {
 				timetablePath = []
 			case .friends:
 				friendsPath = []
+			case .grades:
+				gradesPath = []
 			case .settings:
 				settingsPath = []
 			case .administration:
@@ -271,6 +285,8 @@ final class AppRouter {
 				timetablePath
 			case .friends:
 				friendsPath
+			case .grades:
+				gradesPath
 			case .settings:
 				settingsPath
 			case .administration:
@@ -291,6 +307,7 @@ final class AppRouter {
 			timetableSubtab: timetableSubtab,
 			timetablePath: timetablePath,
 			friendsPath: friendsPath,
+			gradesPath: gradesPath,
 			settingsPath: settingsPath,
 			administrationPath: administrationPath,
 			selectedSidebarDestination: selectedSidebarDestination,

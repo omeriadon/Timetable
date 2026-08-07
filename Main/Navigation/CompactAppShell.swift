@@ -92,6 +92,18 @@ struct CompactAppShell: View {
 				})
 			),
 			UIKitTabItem(
+				title: "Grades",
+				systemImage: "chart.bar.xaxis",
+				value: .grades,
+				badge: nil,
+				content: AnyView(NavigationStack(path: Binding(get: { router.gradesPath }, set: { router.gradesPath = $0 })) {
+					GradeTrackerView()
+						.navigationDestination(for: AppRoute.self) { route in
+							CompactRouteDestinationView(route: route)
+						}
+				})
+			),
+			UIKitTabItem(
 				title: "Settings",
 				systemImage: "gear",
 				value: .settings,

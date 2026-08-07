@@ -9,6 +9,8 @@ struct WideRootDestinationView: View {
 				TimetableView()
 			case .friends:
 				FriendsView()
+			case .grades:
+				GradeTrackerView()
 			case .settings:
 				SettingsView()
 			case .administration:

@@ -14,6 +14,7 @@ struct WideAppShell: View {
 				sidebarRoot("Timetable", systemImage: "calendar.day.timeline.left", destination: .timetable)
 				sidebarRoot("Friends", systemImage: "person.2", destination: .friends)
 					.badge(incomingFriendRequests.count)
+				sidebarRoot("Grades", systemImage: "chart.bar.xaxis", destination: .grades)
 				sidebarRoot("Settings", systemImage: "gear", destination: .settings)
 
 				if accountProfile?.authority.isAdministrator == true {

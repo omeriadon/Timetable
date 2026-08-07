@@ -37,6 +37,7 @@ struct AppNavigationSnapshot: Codable, Equatable, Sendable {
 	let timetableSubtab: TimetableSubtab
 	let timetablePath: [AppRoute]
 	let friendsPath: [AppRoute]
+	let gradesPath: [AppRoute]
 	let settingsPath: [AppRoute]
 	let administrationPath: [AppRoute]
 	let selectedSidebarDestination: AppRootDestination
@@ -47,6 +48,7 @@ struct AppNavigationSnapshot: Codable, Equatable, Sendable {
 		timetableSubtab: TimetableSubtab,
 		timetablePath: [AppRoute],
 		friendsPath: [AppRoute],
+		gradesPath: [AppRoute],
 		settingsPath: [AppRoute],
 		administrationPath: [AppRoute],
 		selectedSidebarDestination: AppRootDestination,
@@ -57,6 +59,7 @@ struct AppNavigationSnapshot: Codable, Equatable, Sendable {
 		self.timetableSubtab = timetableSubtab
 		self.timetablePath = timetablePath
 		self.friendsPath = friendsPath
+		self.gradesPath = gradesPath
 		self.settingsPath = settingsPath
 		self.administrationPath = administrationPath
 		self.selectedSidebarDestination = selectedSidebarDestination
@@ -69,6 +72,7 @@ struct AppNavigationSnapshot: Codable, Equatable, Sendable {
 		case timetableSubtab
 		case timetablePath
 		case friendsPath
+		case gradesPath
 		case settingsPath
 		case administrationPath
 		case selectedSidebarDestination
@@ -82,6 +86,7 @@ struct AppNavigationSnapshot: Codable, Equatable, Sendable {
 		timetableSubtab = try container.decodeIfPresent(TimetableSubtab.self, forKey: .timetableSubtab) ?? .today
 		timetablePath = try container.decode([AppRoute].self, forKey: .timetablePath)
 		friendsPath = try container.decode([AppRoute].self, forKey: .friendsPath)
+		gradesPath = try container.decodeIfPresent([AppRoute].self, forKey: .gradesPath) ?? []
 		settingsPath = try container.decode([AppRoute].self, forKey: .settingsPath)
 		administrationPath = try container.decode([AppRoute].self, forKey: .administrationPath)
 		selectedSidebarDestination = try container.decode(AppRootDestination.self, forKey: .selectedSidebarDestination)
