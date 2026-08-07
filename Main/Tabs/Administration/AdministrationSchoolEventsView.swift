@@ -5,7 +5,7 @@ struct AdministrationSchoolEventsView: View {
 	let closeWideDestination: (() -> Void)?
 	@Default(.calendarEvents) private var events
 	@State private var service = CalendarEventsSyncService.shared
-	@State private var editorTarget: AdministrationSchoolEventEditorTarget?
+	@State private var editorTarget: CalendarEventEditorTarget?
 	@Environment(\.statusBadgeManager) private var badges
 	@Environment(\.appPresentation) private var presentation
 
@@ -30,13 +30,14 @@ struct AdministrationSchoolEventsView: View {
 			await refreshEvents()
 		}
 		.sheet(item: $editorTarget) { target in
-			AdministrationSchoolEventEditor(
+			CalendarEventEditor(
 				target: target,
+				canManageGlobalEvents: true,
+				close: { editorTarget = nil },
 				save: save,
-				delete: delete,
-				close: { editorTarget = nil }
+				delete: delete
 			)
-			.presentationDetents([.fraction(0.6)])
+			.presentationDetents([.fraction(0.7)])
 		}
 	}
 
@@ -51,13 +52,13 @@ struct AdministrationSchoolEventsView: View {
 			.buttonStyle(.plain)
 		} else {
 			NavigationLink {
-				AdministrationSchoolEventEditor(
+				CalendarEventEditor(
 					target: .edit(event),
+					canManageGlobalEvents: true,
+					close: closeWideEditor,
 					save: save,
 					delete: delete,
-					close: closeWideEditor,
-					embedsInNavigation: false,
-					showsCloseButton: false
+					embedsInNavigation: false
 				)
 			} label: {
 				eventLabel(event)
@@ -69,17 +70,17 @@ struct AdministrationSchoolEventsView: View {
 	private var addEventLink: some View {
 		if presentation == .iOS {
 			Button("Add School Event", systemImage: "plus") {
-				editorTarget = .create
+				editorTarget = .create(.globalEvent)
 			}
 		} else {
 			NavigationLink {
-				AdministrationSchoolEventEditor(
-					target: .create,
+				CalendarEventEditor(
+					target: .create(.globalEvent),
+					canManageGlobalEvents: true,
+					close: closeWideEditor,
 					save: save,
 					delete: delete,
-					close: closeWideEditor,
-					embedsInNavigation: false,
-					showsCloseButton: false
+					embedsInNavigation: false
 				)
 			} label: {
 				Label("Add School Event", systemImage: "plus")
@@ -127,27 +128,5 @@ struct AdministrationSchoolEventsView: View {
 
 	private func delete(_ event: CalendarEvent) async throws {
 		try await service.deleteEvent(id: event.id, globally: true)
-	}
-}
-
-enum AdministrationSchoolEventEditorTarget: Identifiable {
-	case create
-	case edit(CalendarEvent)
-
-	var id: String {
-		switch self {
-			case .create:
-				"create"
-			case let .edit(event):
-				event.id.uuidString
-		}
-	}
-
-	var event: CalendarEvent? {
-		if case let .edit(event) = self {
-			return event
-		}
-
-		return nil
 	}
 }

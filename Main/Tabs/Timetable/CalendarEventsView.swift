@@ -15,42 +15,25 @@ struct DatesView: View {
 	var body: some View {
 		ScrollView {
 			LazyVStack(alignment: .leading, spacing: 16, pinnedViews: [.sectionHeaders]) {
-				Section {
-					if todayEventEntries.isEmpty {
-						ContentUnavailableView(
-							"No Events Today",
-							systemImage: "calendar",
-							description: Text("There are no events scheduled for today.")
-						)
-						.frame(maxWidth: .infinity)
-						.padding(.vertical, 36)
-					} else {
-						ForEach(todayEventEntries) { entry in
-							animatedScrollCard(timelineEntry(entry))
-						}
-					}
 
-				} header: {
-					plannerSectionHeader("Today")
+				if !todayEventEntries.isEmpty {
+					Section {
+							ForEach(todayEventEntries) { entry in
+								animatedScrollCard(timelineEntry(entry))
+							}
+					} header: {
+						plannerSectionHeader("Today")
+					}
 				}
 
-				Section {
-					if upcomingEventEntries.isEmpty {
-						ContentUnavailableView(
-							"No Upcoming Events",
-							systemImage: "calendar.badge.clock",
-							description: Text("Add a personal event or wait for the school calendar to update.")
-						)
-						.frame(maxWidth: .infinity)
-						.padding(.vertical, 36)
-					} else {
+				if !upcomingEventEntries.isEmpty {
+					Section {
 						ForEach(upcomingEventEntries) { entry in
 							animatedScrollCard(timelineEntry(entry))
 						}
+					} header: {
+						plannerSectionHeader("Upcoming")
 					}
-
-				} header: {
-					plannerSectionHeader("Upcoming")
 				}
 
 				Section {
@@ -495,9 +478,18 @@ private enum PlannerPresentationTarget: Identifiable {
 	}
 }
 
-private enum CalendarEventEditorTarget {
+enum CalendarEventEditorTarget: Identifiable {
 	case create(CalendarEventScope)
 	case edit(CalendarEvent)
+
+	var id: String {
+		 switch self {
+			case let .create(scope):
+				"create-\(scope.id)"
+			case let .edit(event):
+				"edit-\(event.id.uuidString)"
+		}
+	}
 
 	var scope: CalendarEventScope {
 		switch self {
@@ -554,7 +546,7 @@ private struct NoSchoolDayDetailView: View {
 	}
 }
 
-private enum CalendarEventScope: String, Identifiable {
+enum CalendarEventScope: String, Identifiable {
 	case privateEvent
 	case globalEvent
 	var id: String {
@@ -566,10 +558,11 @@ private enum CalendarEventScope: String, Identifiable {
 	}
 }
 
-private struct CalendarEventEditor: View {
+struct CalendarEventEditor: View {
 	let target: CalendarEventEditorTarget
 	let close: () -> Void
 	let canManageGlobalEvents: Bool
+	let embedsInNavigation: Bool
 	let save: (CreateCalendarEventRequest, CalendarEvent?) async throws -> Void
 	let delete: (CalendarEvent) async throws -> Void
 	@Environment(\.statusBadgeManager) private var badges
@@ -583,12 +576,20 @@ private struct CalendarEventEditor: View {
 	@State private var tagSections: [EventTagCatalogueSection]
 	@State private var selectedTagIDs: Set<UUID>
 
-	init(target: CalendarEventEditorTarget, canManageGlobalEvents: Bool, close: @escaping () -> Void, save: @escaping (CreateCalendarEventRequest, CalendarEvent?) async throws -> Void, delete: @escaping (CalendarEvent) async throws -> Void) {
+	init(
+		target: CalendarEventEditorTarget,
+		canManageGlobalEvents: Bool,
+		close: @escaping () -> Void,
+		save: @escaping (CreateCalendarEventRequest, CalendarEvent?) async throws -> Void,
+		delete: @escaping (CalendarEvent) async throws -> Void,
+		embedsInNavigation: Bool = true
+	) {
 		self.target = target
 		self.canManageGlobalEvents = canManageGlobalEvents
 		self.close = close
 		self.save = save
 		self.delete = delete
+		self.embedsInNavigation = embedsInNavigation
 		let event = target.event
 		_title = State(initialValue: event?.title ?? "")
 		_notes = State(initialValue: event?.notes ?? "")
@@ -611,44 +612,54 @@ private struct CalendarEventEditor: View {
 	}
 
 	var body: some View {
-		NavigationStack {
-			Form {
-				if isReadOnlyGlobalEvent {
-					readOnlyEventRows
-				} else {
-					TextField("Title", text: $title)
-					TextField("Notes", text: $notes, axis: .vertical)
-						.lineLimit(3 ... 6)
-					DatePicker("Date", selection: $date, displayedComponents: .date)
-					Button {
-						showsSymbolPicker = true
-					} label: {
-						Label("Symbol", systemImage: symbol)
-					}
-
-					EventTagSelector(
-						sections: tagSections,
-						allowsYearGroups: target.scope == .globalEvent,
-						selectedTagIDs: $selectedTagIDs
-					)
+		Group {
+			if embedsInNavigation {
+				NavigationStack {
+					content
 				}
+			} else {
+				content
 			}
-			.appNavigationTitle(navigationTitle)
-			.toolbar {
-				ToolbarItem(placement: .cancellationAction) {
-					Button(role: .cancel) {
-						close()
-					}
-					.disabled(isSaving)
+		}
+	}
+
+	private var content: some View {
+		Form {
+			if isReadOnlyGlobalEvent {
+				readOnlyEventRows
+			} else {
+				TextField("Title", text: $title)
+				TextField("Notes", text: $notes, axis: .vertical)
+					.lineLimit(3 ... 6)
+				DatePicker("Date", selection: $date, displayedComponents: .date)
+				Button {
+					showsSymbolPicker = true
+				} label: {
+					Label("Symbol", systemImage: symbol)
 				}
-				if !isReadOnlyGlobalEvent {
-					ToolbarItem(placement: .confirmationAction) {
-						Button(target.event == nil ? "Add" : "Save", systemImage: target.event == nil ? "plus" : "checkmark", role: .confirm) {
-							submit()
-						}
-						.buttonStyle(.glassProminent)
-						.disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSaving)
+
+				EventTagSelector(
+					sections: tagSections,
+					allowsYearGroups: target.scope == .globalEvent,
+					selectedTagIDs: $selectedTagIDs
+				)
+			}
+		}
+		.appNavigationTitle(navigationTitle)
+		.toolbar {
+			ToolbarItem(placement: .cancellationAction) {
+				Button(role: .cancel) {
+					close()
+				}
+				.disabled(isSaving)
+			}
+			if !isReadOnlyGlobalEvent {
+				ToolbarItem(placement: .confirmationAction) {
+					Button(target.event == nil ? "Add" : "Save", systemImage: target.event == nil ? "plus" : "checkmark", role: .confirm) {
+						submit()
 					}
+					.buttonStyle(.glassProminent)
+					.disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSaving)
 				}
 			}
 		}
