@@ -153,10 +153,18 @@ struct GradeAverageCard: View {
 			if showsATAR {
 				GeometryReader { proxy in
 					HStack(spacing: 0) {
-						averageSummary(title: "Average", value: average)
+						averageSummary(
+							title: "Average",
+							value: average,
+							gaugeOnTrailing: false
+						)
 							.frame(width: proxy.size.width / 2, alignment: .leading)
 
-						averageSummary(title: "Top 4", value: topFourAverage)
+						averageSummary(
+							title: "Top 4",
+							value: topFourAverage,
+							gaugeOnTrailing: true
+						)
 							.frame(width: proxy.size.width / 2, alignment: .leading)
 					}
 					.overlay {
@@ -167,7 +175,11 @@ struct GradeAverageCard: View {
 				}
 				.frame(height: 86)
 			} else {
-				averageSummary(title: "Average", value: average)
+				averageSummary(
+					title: "Average",
+					value: average,
+					gaugeOnTrailing: false
+				)
 			}
 
 			if showsATAR {
@@ -205,29 +217,57 @@ struct GradeAverageCard: View {
 		.background(FriendPaperBackground(cornerRadius: 28))
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
 		.foregroundStyle(.black)
+		.dynamicTypeSize(.small)
 	}
 
 	@ViewBuilder
-	private func averageSummary(title: String, value: Double?) -> some View {
+	private func averageSummary(
+		title: String,
+		value: Double?,
+		gaugeOnTrailing: Bool
+	) -> some View {
 		HStack(alignment: .center, spacing: 8) {
-			GradeGauge(value: value, tint: .black)
-
-			VStack(alignment: .leading, spacing: 4) {
-				Text(title)
-					.font(.headline.weight(.semibold))
-					.foregroundStyle(.secondary)
-
-				if let value {
-					Text(value, format: .percent.precision(.fractionLength(1)))
-						.bold()
-						.font(.title)
-				} else {
-					Text("No assessments yet")
-						.font(.title)
-				}
+			if gaugeOnTrailing {
+				averageSummaryText(title: title, value: value, isTrailing: true)
+				GradeGauge(value: value, tint: .black)
+			} else {
+				GradeGauge(value: value, tint: .black)
+				averageSummaryText(title: title, value: value, isTrailing: false)
 			}
 		}
-		.frame(maxWidth: .infinity, alignment: .leading)
+		.frame(
+			maxWidth: .infinity,
+			alignment: gaugeOnTrailing ? .trailing : .leading
+		)
+	}
+
+	@ViewBuilder
+	private func averageSummaryText(
+		title: String,
+		value: Double?,
+		isTrailing: Bool
+	) -> some View {
+		VStack(
+			alignment: isTrailing ? .trailing : .leading,
+			spacing: 4
+		) {
+			Text(title)
+				.font(.headline.weight(.semibold))
+				.foregroundStyle(.secondary)
+
+			if let value {
+				Text(value, format: .percent.precision(.fractionLength(1)))
+					.bold()
+					.font(.title)
+			} else {
+				Text("No assessments yet")
+					.font(.title)
+			}
+		}
+		.frame(
+			maxWidth: .infinity,
+			alignment: isTrailing ? .trailing : .leading
+		)
 	}
 }
 
