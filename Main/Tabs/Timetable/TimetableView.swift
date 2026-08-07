@@ -226,21 +226,14 @@ struct TimetableView: View {
 					.scrollIndicatorsFlash(onAppear: true)
 				#endif // os(macOS)
 					.opacity(selectedSlot == nil ? 0 : 1)
-					.safeAreaBar(edge: .top, alignment: .center, spacing: 10) {
-						GlassEffectContainer(spacing: 2) {
-							HStack(spacing: 4) {
-								VStack(spacing: 4) {
-									Text("")
-
-									ForEach(TimetableLayout.sessions, id: \.self) { session in
-										sessionLabel(for: session)
-									}
-								}
-								.frame(width: 15)
-
-								mainContent(subjectLookup: subjectLookup)
-									.drawingGroup(opaque: false)
-							}
+						.safeAreaBar(edge: .top, alignment: .center, spacing: 10) {
+							GlassEffectContainer(spacing: 2) {
+								TimetableWeekGrid(
+									subjects: selectedTimetable?.subjects ?? subjects,
+									selectedSlot: selectedSlot,
+									onSelectSlot: { selectedSlot = $0 }
+								)
+								.drawingGroup(opaque: false)
 						}
 						.padding(.bottom, Device.isMacOS ? 7 : 10)
 						#if os(macOS)
@@ -325,58 +318,6 @@ struct TimetableView: View {
 		}
 
 		return lesson.subject
-	}
-
-	func mainContent(subjectLookup: [Slot: Subject]) -> some View {
-		ForEach(0 ..< 5) { day in
-			VStack(spacing: 4) {
-				Text(TimetableLayout.shortDayLabels[day])
-					.padding(.top, 3)
-				ForEach(0 ..< 8) { session in
-					SessionCellView(day, session, subjectLookup, selectedSlot)
-						.contentShape(Rectangle())
-						.onTapGesture {
-							withAnimation(.snappy(duration: 0.3)) {
-								if selectedSlot == Slot(day, session) {
-									selectedSlot = nil
-								} else if subjectLookup[Slot(day, session)] != nil {
-									selectedSlot = Slot(day, session)
-								}
-							}
-						}
-				}
-			}
-			.overlay {
-				if accountSettings.highlightsCurrentDay, currentDayIndex == day {
-					ZStack {
-						RoundedRectangle(cornerRadius: 12, style: .continuous)
-							.fill(.white.opacity(0.1))
-							.strokeBorder(.white, lineWidth: 2)
-							.blur(radius: 5)
-							.clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-						RoundedRectangle(cornerRadius: 12, style: .continuous)
-							.fill(.white.opacity(0.1))
-							.strokeBorder(.white, lineWidth: 2)
-					}
-
-					.allowsHitTesting(false)
-				}
-			}
-		}
-	}
-
-	private var currentDayIndex: Int? {
-		let weekday = Calendar.current.component(.weekday, from: TimetableClock.now)
-		guard (2 ... 6).contains(weekday) else { return nil }
-		return weekday - 2
-	}
-
-	func sessionLabel(for session: String) -> some View {
-		let isBreakSession = TimetableLayout.isBreakSession(label: session)
-
-		return Text(session)
-			.frame(height: isBreakSession ? TimetableLayout.breakCellHeight : TimetableLayout.sessionCellHeight)
-			.foregroundStyle(isBreakSession ? Color.clear : Color.primary)
 	}
 
 	func editableSlot(fromDay day: Int, session: Int) -> EditableSlot? {

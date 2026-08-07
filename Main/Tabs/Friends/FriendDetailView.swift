@@ -45,17 +45,15 @@ struct FriendDetailView: View {
 								FriendOverview(
 									detail: detail,
 									friendName: detail.friend.displayName,
+									locationStatus: friend.locationStatus,
 									requestFriendsSinceDate: { showsFriendsSinceRequest = true }
 								)
 							}
 							.containerRelativeFrame(.horizontal)
 							.id(0)
 
-							ScrollView {
 								FriendWeek(detail: detail)
-									.padding(.top, 14)
-							}
-							.containerRelativeFrame(.horizontal)
+								.containerRelativeFrame(.horizontal)
 							.id(1)
 						}
 						.scrollTargetLayout()
@@ -69,7 +67,7 @@ struct FriendDetailView: View {
 			}
 			.foregroundStyle(.black)
 			.scrollEdgeEffectStyle(.soft, for: .top)
-			.safeAreaBar(edge: .top, alignment: .center, spacing: 0) {
+			.safeAreaInset(edge: .top, spacing: 0) {
 				TabsPicker(
 					items: FriendDetailTab.allCases.map { ($0.title, $0.symbol) },
 					selection: Binding(
@@ -226,6 +224,7 @@ private struct FriendDetailHeader: View {
 private struct FriendOverview: View {
 	let detail: FriendDetail
 	let friendName: String
+	let locationStatus: LocationStatusItem?
 	let requestFriendsSinceDate: () -> Void
 	@Default(.timetable) private var ownerSubjects
 	@Default(.schoolCalendar) private var schoolCalendar
@@ -233,6 +232,8 @@ private struct FriendOverview: View {
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 14) {
+			FriendStatusCard(friend: statusSummary)
+
 			currentAndNextClasses
 
 			sharedClassesCard(comparison.sharedClasses)
@@ -289,6 +290,18 @@ private struct FriendOverview: View {
 		}
 
 		return LocationArrivalTimeFormatter.string(for: seconds)
+	}
+
+	private var statusSummary: FriendSummary {
+		FriendSummary(
+			relationshipID: detail.relationshipID,
+			friend: detail.friend,
+			state: .friends,
+			requestedAt: detail.acceptedAt,
+			acceptedAt: detail.acceptedAt,
+			timetable: detail.timetable,
+			locationStatus: locationStatus
+		)
 	}
 
 	private func sharedClassesCard(_ classes: [SharedClass]) -> some View {
@@ -549,7 +562,7 @@ private struct FriendBrownPaperBackground: View {
 }
 
 private enum FriendDetailLayout {
-	static let horizontalPadding: CGFloat = 8
+	static let horizontalPadding: CGFloat = 16
 	static let cardCornerRadius: CGFloat = 25
 	static let itemCornerRadius: CGFloat = 13
 }
@@ -792,12 +805,17 @@ private struct FriendWeek: View {
 
 	var body: some View {
 		if let timetable = detail.timetable {
-			TimetablePreviewGrid(subjects: timetable.subjects)
-				.padding(18)
-				.background {
-					FriendPaperBackground(cornerRadius: 26)
-				}
-				.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 26, style: .continuous))
+			TimetableWeekGrid(
+				subjects: timetable.subjects,
+				selectedSlot: nil,
+				onSelectSlot: nil
+			)
+			.padding(.vertical, 10)
+			.background(Color.black)
+			.background {
+				FriendPaperBackground(cornerRadius: 26)
+			}
+			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 26, style: .continuous))
 		} else {
 			ContentUnavailableView("No Timetable", systemImage: "calendar.badge.exclamationmark")
 		}
