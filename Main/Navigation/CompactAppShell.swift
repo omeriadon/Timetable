@@ -12,58 +12,16 @@
 		var body: some View {
 			@Bindable var router = router
 
-			TabView(selection: $router.selectedTab) {
-				Tab(
-					"Timetable",
-					systemImage: "calendar.day.timeline.left",
-					value: MainTab.timetable
-				) {
-					NavigationStack(path: $router.timetablePath) {
-						TimetableView()
-							.navigationDestination(for: AppRoute.self) { route in
-								CompactRouteDestinationView(route: route)
+			Group {
+				if Platform.current == .iOS {
+					UIKitTabView(selection: $router.selectedTab, items: tabItems(router: router))
+				} else {
+					TabView(selection: $router.selectedTab) {
+						ForEach(tabItems(router: router), id: \.value) { item in
+							Tab(item.title, systemImage: item.systemImage, value: item.value) {
+								item.content
 							}
-					}
-				}
-
-				Tab(
-					"Friends",
-					systemImage: "person.2",
-					value: MainTab.friends
-				) {
-					NavigationStack(path: $router.friendsPath) {
-						FriendsView()
-							.navigationDestination(for: AppRoute.self) { route in
-								CompactRouteDestinationView(route: route)
-							}
-					}
-				}
-				.badge(incomingFriendRequests.count)
-
-				Tab(
-					"Settings",
-					systemImage: "gear",
-					value: MainTab.settings
-				) {
-					NavigationStack(path: $router.settingsPath) {
-						SettingsView()
-							.navigationDestination(for: AppRoute.self) { route in
-								CompactRouteDestinationView(route: route)
-							}
-					}
-				}
-
-				if canShowAdministration {
-					Tab(
-						"Admin",
-						systemImage: "calendar.badge.lock",
-						value: MainTab.administration
-					) {
-						NavigationStack(path: $router.administrationPath) {
-							AdministrationView()
-								.navigationDestination(for: AppRoute.self) { route in
-									CompactRouteDestinationView(route: route)
-								}
+							.badge(item.badge ?? "")
 						}
 					}
 				}
@@ -105,6 +63,60 @@
 
 		private var canShowAdministration: Bool {
 			accountProfile?.authority.isAdministrator ?? false
+		}
+
+		private func tabItems(router: AppRouter) -> [UIKitTabItem] {
+			[
+				UIKitTabItem(
+					title: "Timetable",
+					systemImage: "calendar.day.timeline.left",
+					value: .timetable,
+					badge: nil,
+					content: AnyView(NavigationStack(path: Binding(get: { router.timetablePath }, set: { router.timetablePath = $0 })) {
+						TimetableView()
+							.navigationDestination(for: AppRoute.self) { route in
+								CompactRouteDestinationView(route: route)
+							}
+					})
+				),
+				UIKitTabItem(
+					title: "Friends",
+					systemImage: "person.2",
+					value: .friends,
+					badge: incomingFriendRequests.isEmpty ? nil : "\(incomingFriendRequests.count)",
+					content: AnyView(NavigationStack(path: Binding(get: { router.friendsPath }, set: { router.friendsPath = $0 })) {
+						FriendsView()
+							.navigationDestination(for: AppRoute.self) { route in
+								CompactRouteDestinationView(route: route)
+							}
+					})
+				),
+				UIKitTabItem(
+					title: "Settings",
+					systemImage: "gear",
+					value: .settings,
+					badge: nil,
+					content: AnyView(NavigationStack(path: Binding(get: { router.settingsPath }, set: { router.settingsPath = $0 })) {
+						SettingsView()
+							.navigationDestination(for: AppRoute.self) { route in
+								CompactRouteDestinationView(route: route)
+							}
+					})
+				),
+			].appendingIf(canShowAdministration) {
+				UIKitTabItem(
+					title: "Admin",
+					systemImage: "calendar.badge.lock",
+					value: .administration,
+					badge: nil,
+					content: AnyView(NavigationStack(path: Binding(get: { router.administrationPath }, set: { router.administrationPath = $0 })) {
+						AdministrationView()
+							.navigationDestination(for: AppRoute.self) { route in
+								CompactRouteDestinationView(route: route)
+							}
+					})
+				)
+			}
 		}
 	}
 
