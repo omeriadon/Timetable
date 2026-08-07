@@ -17,7 +17,8 @@ struct FriendStatusCard: View {
 				schoolCalendar: schoolCalendar
 			)
 			let locationStatus = FriendLocationStatus(
-				item: friend.locationStatus
+				item: friend.locationStatus,
+				at: TimetableClock.adjusted(context.date)
 			)
 			HStack(alignment: .center, spacing: 14) {
 				FriendAvatar(profile: friend.friend)
@@ -37,7 +38,7 @@ struct FriendStatusCard: View {
 								.regular.tint(locationStatus.tint ?? nil).interactive(),
 								in: Capsule()
 							)
-							.padding(7)
+							.padding([.top, .trailing], 7)
 							.foregroundStyle(.white)
 							.frame(maxHeight: .infinity, alignment: .topTrailing)
 					}
@@ -78,7 +79,7 @@ private struct FriendLocationStatus {
 	let title: String
 	let tint: Color?
 
-	init(item: LocationStatusItem?) {
+	init(item: LocationStatusItem?, at date: Date) {
 		guard let item else {
 			title = "Status unavailable"
 			tint = nil
@@ -89,10 +90,45 @@ private struct FriendLocationStatus {
 			case .onCampus:
 				title = "On Campus"
 				tint = .green
+
 			case .offCampus:
 				title = "Off Campus"
-				tint = .blue
+				tint = Self.isDuringSchoolHours(at: date) ? .red : .blue
 		}
+	}
+
+	private static func isDuringSchoolHours(at date: Date) -> Bool {
+		let calendar = SchoolCalendarProjection.perthCalendar
+		let components = calendar.dateComponents(
+			[.weekday, .hour, .minute],
+			from: date
+		)
+
+		guard
+			let weekday = components.weekday,
+			let hour = components.hour,
+			let minute = components.minute
+		else {
+			return false
+		}
+
+		let minutes = hour * 60 + minute
+		let schoolStart = 8 * 60 + 50
+
+		let schoolEnd: Int
+
+		switch weekday {
+			case 2, 3, 5: // Monday, Tuesday, Thursday
+				schoolEnd = 15 * 60 + 30
+
+			case 4, 6: // Wednesday, Friday
+				schoolEnd = 14 * 60 + 30
+
+			default: // Saturday, Sunday
+				return false
+		}
+
+		return minutes >= schoolStart && minutes < schoolEnd
 	}
 }
 

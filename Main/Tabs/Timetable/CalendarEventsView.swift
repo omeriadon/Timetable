@@ -319,11 +319,10 @@ struct ArchivedEventsView: View {
 		.toolbar {
 			ToolbarItem(placement: .primaryAction) {
 				Picker("Delete Past Events", selection: archivePolicyBinding) {
-					Text("Delete past events...")
-						.disabled(true)
-
-					ForEach(CalendarEventArchivePolicy.allCases, id: \.self) { policy in
-						Text(policy.title).tag(policy)
+					Section("Delete past events...") {
+						ForEach(CalendarEventArchivePolicy.allCases, id: \.self) { policy in
+							Text(policy.title).tag(policy)
+						}
 					}
 				}
 				.labelsHidden()

@@ -36,7 +36,9 @@ struct LocationStatusRow: View {
 
 							Spacer()
 
-							Text(status.updatedAt, format: .dateTime.hour().minute())
+							let prefix = status.state == .onCampus ? "Arrived: " : "Left: "
+
+							Text("\(prefix)\(status.updatedAt, format: .dateTime.hour().minute())")
 								.foregroundStyle(.secondary)
 						}
 					} else {
@@ -48,9 +50,8 @@ struct LocationStatusRow: View {
 				Spacer()
 			}
 		}
-		.padding(8)
 		.foregroundStyle(.white)
-		.padding(18)
+		.padding(10)
 		.background {
 			GeometryReader { proxy in
 				Image("paperBlack")
