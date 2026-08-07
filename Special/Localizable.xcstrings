@@ -3073,6 +3073,9 @@
         }
       }
     },
+    "Gap" : {
+
+    },
     "Get ${person}'s timetable" : {
       "localizations" : {
         "fr" : {
@@ -7592,7 +7595,7 @@
     "Weighting" : {
 
     },
-    "Weighting for Semester %lld." : {
+    "Weighting applies across the academic year." : {
 
     },
     "Weighting: %@" : {
