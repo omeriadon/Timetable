@@ -16,10 +16,29 @@ struct DatesView: View {
 		ScrollView {
 			LazyVStack(alignment: .leading, spacing: 16, pinnedViews: [.sectionHeaders]) {
 				Section {
+					if todayEventEntries.isEmpty {
+						ContentUnavailableView(
+							"No Events Today",
+							systemImage: "calendar",
+							description: Text("There are no events scheduled for today.")
+						)
+						.frame(maxWidth: .infinity)
+						.padding(.vertical, 36)
+					} else {
+						ForEach(todayEventEntries) { entry in
+							animatedScrollCard(timelineEntry(entry))
+						}
+					}
+
+				} header: {
+					plannerSectionHeader("Today")
+				}
+
+				Section {
 					if upcomingEventEntries.isEmpty {
 						ContentUnavailableView(
 							"No Upcoming Events",
-							systemImage: "calendar",
+							systemImage: "calendar.badge.clock",
 							description: Text("Add a personal event or wait for the school calendar to update.")
 						)
 						.frame(maxWidth: .infinity)
@@ -31,7 +50,7 @@ struct DatesView: View {
 					}
 
 				} header: {
-					plannerSectionHeader("Future & Current")
+					plannerSectionHeader("Upcoming")
 				}
 
 				Section {
@@ -213,9 +232,14 @@ struct DatesView: View {
 		return start ... end
 	}
 
+	private var todayEventEntries: [PlannerTimelineEntry] {
+		let today = SchoolCalendarDate(TimetableClock.now, calendar: calendar)
+		return eventEntries.filter { $0.date == today }
+	}
+
 	private var upcomingEventEntries: [PlannerTimelineEntry] {
 		let today = SchoolCalendarDate(TimetableClock.now, calendar: calendar)
-		return eventEntries.filter { $0.date >= today }
+		return eventEntries.filter { $0.date > today }
 	}
 
 	private var eventEntries: [PlannerTimelineEntry] {
@@ -295,6 +319,9 @@ struct ArchivedEventsView: View {
 		.toolbar {
 			ToolbarItem(placement: .primaryAction) {
 				Picker("Delete Past Events", selection: archivePolicyBinding) {
+					Text("Delete past events...")
+						.disabled(true)
+
 					ForEach(CalendarEventArchivePolicy.allCases, id: \.self) { policy in
 						Text(policy.title).tag(policy)
 					}
