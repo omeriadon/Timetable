@@ -17,6 +17,14 @@ struct OnboardingCalendarPermissionView: View {
 	@State private var eventStore = EKEventStore()
 
 	var body: some View {
+		if authorizationStatus == .fullAccess {
+			OnboardingCalendarImportView(context: context)
+		} else {
+			permissionView
+		}
+	}
+
+	private var permissionView: some View {
 		VStack(spacing: 40) {
 			Image(systemName: "calendar.badge.checkmark")
 				.font(.system(size: 72))
