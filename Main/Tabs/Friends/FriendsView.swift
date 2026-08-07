@@ -13,6 +13,7 @@ struct FriendsView: View {
 	@State private var isSearching = false
 	@State private var showsArrivalStatistics = false
 	@State private var showsLocationStatusSheet = false
+	@Namespace private var friendSheetNamespace
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	@Environment(\.appPresentation) private var presentation
 	@Environment(AppRouter.self) private var router
@@ -54,8 +55,6 @@ struct FriendsView: View {
 				.labelStyle(.iconOnly)
 			}
 		}
-		.refreshable { await refresh() }
-		.searchable(text: $searchText, prompt: "Search by name")
 		.task { await refresh() }
 		.task(id: searchText) {
 			await search(for: searchText)
@@ -79,6 +78,9 @@ struct FriendsView: View {
 		}
 		.sheet(item: $selectedFriend) { friend in
 			FriendDetailView(friend: friend, close: { selectedFriend = nil })
+				.navigationTransition(
+					.zoom(sourceID: friendTransitionID(friend), in: friendSheetNamespace)
+				)
 		}
 		.popover(isPresented: $showsArrivalStatistics) {
 			PersonalArrivalStatisticsView()
@@ -145,6 +147,10 @@ struct FriendsView: View {
 								animatedScrollCard(FriendStatusCard(friend: friend))
 							}
 							.buttonStyle(.plain)
+							.matchedTransitionSource(
+								id: friendTransitionID(friend),
+								in: friendSheetNamespace
+							)
 						}
 						.reorderable()
 					}
@@ -156,6 +162,10 @@ struct FriendsView: View {
 			}
 			.padding()
 		}
+		.refreshable {
+			await refresh()
+		}
+		.searchable(text: $searchText, prompt: "Search by name")
 	}
 
 	private var friendSearchResults: some View {
@@ -175,6 +185,10 @@ struct FriendsView: View {
 			}
 		}
 		.listStyle(.plain)
+		.refreshable {
+			await refreshSearchResults()
+		}
+		.searchable(text: $searchText, prompt: "Search by name")
 	}
 
 	private struct PersonalArrivalStatisticsView: View {
@@ -239,6 +253,11 @@ struct FriendsView: View {
 			guard !Task.isCancelled else { return }
 			searchResults = []
 		}
+	}
+
+	private func refreshSearchResults() async {
+		await refresh()
+		await search(for: searchText)
 	}
 
 	private func saveFriendOrder(_ orderedFriends: [FriendSummary]) {

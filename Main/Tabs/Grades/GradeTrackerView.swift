@@ -10,6 +10,7 @@ struct GradeTrackerView: View {
 	@State var selectedSubject: Subject?
 	@State var showsATARSheet = false
 	@Environment(\.accessibilityReduceMotion) var reduceMotion
+	@Namespace private var gradeSheetNamespace
 
 	var body: some View {
 		NavigationStack {
@@ -52,6 +53,10 @@ struct GradeTrackerView: View {
 									)
 								}
 								.buttonStyle(.plain)
+								.matchedTransitionSource(
+									id: gradeTransitionID(subject),
+									in: gradeSheetNamespace
+								)
 								.scrollTransition(.animated(.snappy(duration: 0.3))) { card, phase in
 									card
 										.opacity(reduceMotionValue || phase.isIdentity ? 1 : 0.65)
@@ -67,6 +72,9 @@ struct GradeTrackerView: View {
 			.appNavigationTitle("Grades", style: .main, accent: true)
 			.sheet(item: $selectedSubject) { subject in
 				GradeSubjectDetailView(subject: subject)
+					.navigationTransition(
+						.zoom(sourceID: gradeTransitionID(subject), in: gradeSheetNamespace)
+					)
 			}
 			.sheet(isPresented: $showsATARSheet) {
 				ATARSettingsSheet()
@@ -126,6 +134,10 @@ struct GradeTrackerView: View {
 			return nil
 		}
 		return assessments.reduce(0) { $0 + ($1.score * $1.weighting) } / totalWeight
+	}
+
+	private func gradeTransitionID(_ subject: Subject) -> String {
+		"grade-subject-\(subject.id)"
 	}
 }
 
