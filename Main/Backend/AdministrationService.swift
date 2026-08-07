@@ -13,19 +13,25 @@ final class AdministrationService {
 	}
 
 	func tagCatalogue() async throws -> EventTagCatalogueResponse {
-		try await networkManager.send(.v1Tags)
+		let response: EventTagCatalogueResponse = try await networkManager.send(.v1Tags)
+		Defaults[.eventTagCatalogue] = response
+		return response
 	}
 
 	func tagSubscriptions() async throws -> EventTagSubscriptionResponse {
-		try await networkManager.send(.v1TagSubscriptions)
+		let response: EventTagSubscriptionResponse = try await networkManager.send(.v1TagSubscriptions)
+		Defaults[.eventTagSubscriptionIDs] = response.tagIDs
+		return response
 	}
 
 	func replaceTagSubscriptions(_ tagIDs: Set<UUID>) async throws -> EventTagSubscriptionResponse {
-		try await networkManager.send(
+		let response: EventTagSubscriptionResponse = try await networkManager.send(
 			.v1TagSubscriptionsUpdate,
 			body: EventTagSubscriptionUpdateRequest(tagIDs: Array(tagIDs)),
 			context: .userInitiated
 		)
+		Defaults[.eventTagSubscriptionIDs] = response.tagIDs
+		return response
 	}
 
 	func replaceSubjectTagSubscriptions(_ tagIDs: Set<UUID>) async throws -> EventTagSubscriptionResponse {

@@ -96,6 +96,8 @@ extension Defaults.Keys {
 	static let ownerTimetableShareAlias = Key<String>("ownerTimetableShareAlias", default: "", suite: sharedDefaults)
 	static let hapticsEnabled = Key<Bool>("hapticsEnabled", default: true, suite: sharedDefaults)
 	static let persistsNavigationState = Key<Bool>("persistsNavigationState", default: false, suite: sharedDefaults)
+	static let eventTagCatalogue = Key<EventTagCatalogueResponse>("eventTagCatalogue", default: EventTagCatalogueResponse(sections: []), suite: sharedDefaults)
+	static let eventTagSubscriptionIDs = Key<[UUID]>("eventTagSubscriptionIDs", default: [], suite: sharedDefaults)
 
 	#if DEBUG
 		nonisolated static let debugOffset = Key<TimeInterval>("debugOffset", default: 87896, suite: sharedDefaults)

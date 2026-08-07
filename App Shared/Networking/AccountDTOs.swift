@@ -121,7 +121,7 @@ nonisolated struct CreateCalendarEventRequest: Codable, Sendable {
 	}
 }
 
-nonisolated struct EventTagCatalogueResponse: Codable, Sendable {
+nonisolated struct EventTagCatalogueResponse: Codable, Defaults.Serializable, Sendable {
 	let sections: [EventTagCatalogueSection]
 }
 
