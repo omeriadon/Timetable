@@ -101,17 +101,7 @@ struct GradeTrackerView: View {
 	}
 
 	func subjectAverage(for subjectID: String) -> Double? {
-		let semesterAverages = [1, 2].compactMap { semesterAverage(subjectID: subjectID, semester: $0) }
-		guard !semesterAverages.isEmpty else {
-			return nil
-		}
-		return semesterAverages.reduce(0, +) / Double(semesterAverages.count)
-	}
-
-	func semesterAverage(subjectID: String, semester: Int) -> Double? {
-		let assessments = document.assessments.filter {
-			$0.subjectID == subjectID && $0.semester == semester
-		}
+		let assessments = document.assessments.filter { $0.subjectID == subjectID }
 		let totalWeight = assessments.reduce(0) { $0 + $1.weighting }
 		guard totalWeight > 0 else {
 			return nil

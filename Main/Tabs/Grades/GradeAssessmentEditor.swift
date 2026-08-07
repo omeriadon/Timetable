@@ -100,6 +100,10 @@ struct GradeAssessmentEditor: View {
 						TextField("Percentage", value: $weighting, format: .percent.precision(.fractionLength(1)))
 							.keyboardType(.decimalPad)
 					}
+
+					Text("Weighting applies across the academic year.")
+						.font(.caption)
+						.foregroundStyle(.secondary)
 				}
 			}
 			.appNavigationTitle(assessment == nil ? "New Assessment" : "Edit Assessment")
