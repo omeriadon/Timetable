@@ -34,7 +34,12 @@ struct GradeTrackerView: View {
 						)
 						.padding(.top, 72)
 					} else {
-						LazyVGrid(columns: [GridItem(.adaptive(minimum: 320, maximum: 520), spacing: 14)], spacing: 14) {
+						LazyVGrid(
+							columns: [
+								GridItem(.adaptive(minimum: 320, maximum: 520), spacing: 14),
+							],
+							spacing: 14
+						) {
 							ForEach(subjects) { subject in
 								Button {
 									selectedSubject = subject
@@ -49,7 +54,7 @@ struct GradeTrackerView: View {
 									card
 										.opacity(reduceMotion || phase.isIdentity ? 1 : 0.65)
 										.scaleEffect(reduceMotion || phase.isIdentity ? 1 : 0.96)
-									}
+								}
 							}
 						}
 					}

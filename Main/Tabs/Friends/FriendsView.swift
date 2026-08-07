@@ -126,9 +126,14 @@ struct FriendsView: View {
 						systemImage: "person.2.slash",
 						description: Text("Search by name to find friends.")
 					)
-						.padding(.top, 72)
+					.padding(.top, 72)
 				} else {
-					LazyVGrid(columns: [GridItem(.adaptive(minimum: 320, maximum: 520), spacing: 14)], spacing: 14) {
+					LazyVGrid(
+						columns: [
+							GridItem(.adaptive(minimum: 320, maximum: 520), spacing: 14),
+						],
+						spacing: 14
+					) {
 						ForEach(friends) { friend in
 							Button {
 								if presentation == .iOS {
@@ -140,7 +145,7 @@ struct FriendsView: View {
 								animatedScrollCard(FriendStatusCard(friend: friend))
 							}
 							.buttonStyle(.plain)
-							}
+						}
 						.reorderable()
 					}
 				}

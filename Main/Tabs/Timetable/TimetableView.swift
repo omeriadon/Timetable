@@ -36,13 +36,13 @@ struct TimetableView: View {
 	@State private var scrollPosition: Int?
 	let fixedSubtab: TimetableSubtab?
 
-		init(
-			startComparisonOpen: Bool = false,
-			fixedSubtab: TimetableSubtab? = nil
-		) {
-			_showTimetableComparison = State(initialValue: startComparisonOpen)
-			self.fixedSubtab = fixedSubtab
-		}
+	init(
+		startComparisonOpen: Bool = false,
+		fixedSubtab: TimetableSubtab? = nil
+	) {
+		_showTimetableComparison = State(initialValue: startComparisonOpen)
+		self.fixedSubtab = fixedSubtab
+	}
 
 	#if os(macOS)
 		var currentTimetableTitle: String {
@@ -54,12 +54,10 @@ struct TimetableView: View {
 	#endif
 
 	var body: some View {
-		Group {
-			if let fixedSubtab {
-				fixedSubtabView(fixedSubtab)
-			} else {
-				compactTimetableView
-			}
+		if let fixedSubtab {
+			fixedSubtabView(fixedSubtab)
+		} else {
+			compactTimetableView
 		}
 	}
 
