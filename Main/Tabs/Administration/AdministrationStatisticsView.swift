@@ -3,11 +3,16 @@
 //  Main
 //
 
+import Defaults
 import SwiftUI
 
 struct AdministrationStatisticsView: View {
 	@State private var service = LocationStatusStatisticsService.shared
 	@State private var statistics: AdministrationStatisticsResponse?
+	@Default(.friends) private var friends
+	@Default(.calendarEvents) private var calendarEvents
+	@Default(.eventTagSubscriptionIDs) private var subscribedTagIDs
+	@Default(.incomingFriendRequests) private var incomingFriendRequests
 	@Environment(\.statusBadgeManager) private var statusBadges
 
 	var body: some View {
@@ -16,6 +21,18 @@ struct AdministrationStatisticsView: View {
 				LabeledContent("Total users") {
 					Text(statistics?.totalUsers.formatted() ?? "No data")
 				}
+			}
+
+			Section("Community") {
+				LabeledContent("Friends in account", value: friends.count.formatted())
+				LabeledContent("Pending friend requests", value: incomingFriendRequests.count.formatted())
+				LabeledContent("Subscribed event tags", value: subscribedTagIDs.count.formatted())
+			}
+
+			Section("Calendar") {
+				LabeledContent("Visible events", value: calendarEvents.allEvents.count.formatted())
+				LabeledContent("Global events", value: calendarEvents.globalEvents.count.formatted())
+				LabeledContent("Personal events", value: calendarEvents.privateEvents.count.formatted())
 			}
 
 			Section("Status") {
