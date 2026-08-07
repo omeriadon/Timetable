@@ -126,8 +126,8 @@ struct AdministrationSpecialBadgeEditor: View {
 			_ = try await save(
 				AdministrationSpecialBadgeRequest(
 					symbol: symbol.trimmingCharacters(in: .whitespacesAndNewlines),
-					backgroundColor: backgroundColor.toRGBA(),
-					symbolColor: symbolColor.toRGBA(),
+					backgroundColor: backgroundColor.toRGBA().normalized,
+					symbolColor: symbolColor.toRGBA().normalized,
 					priority: target.badge?.priority ?? 0,
 					accessibilityLabel: accessibilityLabel.trimmingCharacters(in: .whitespacesAndNewlines)
 				),
