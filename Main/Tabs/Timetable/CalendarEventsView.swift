@@ -5,7 +5,6 @@ import SwiftUI
 struct DatesView: View {
 	@Default(.schoolCalendar) private var schoolCalendar
 	@Default(.calendarEvents) private var events
-	@Default(.accountSettings) private var accountSettings
 	@State private var presentationTarget: PlannerPresentationTarget?
 	@State private var eventService = CalendarEventsSyncService.shared
 	@Environment(\.statusBadgeManager) private var badges
@@ -36,19 +35,6 @@ struct DatesView: View {
 				}
 
 				Section {
-					if archivedEventEntries.isEmpty {
-						Text("No archived events")
-							.foregroundStyle(.secondary)
-					} else {
-						ForEach(archivedEventEntries) { entry in
-							animatedScrollCard(timelineEntry(entry))
-						}
-					}
-				} header: {
-					plannerSectionHeader("Archived")
-				}
-
-				Section {
 					termDateCards
 				} header: {
 					plannerSectionHeader("Term Dates")
@@ -74,17 +60,6 @@ struct DatesView: View {
 		}
 		.sheet(item: $presentationTarget) { target in
 			plannerPresentation(for: target)
-		}
-		.toolbar {
-			ToolbarItem(placement: .primaryAction) {
-				Picker("Delete Past Events", selection: archivePolicyBinding) {
-					ForEach(CalendarEventArchivePolicy.allCases, id: \.self) { policy in
-						Text(policy.title).tag(policy)
-					}
-				}
-				.labelsHidden()
-				.pickerStyle(.menu)
-			}
 		}
 	}
 
@@ -243,38 +218,11 @@ struct DatesView: View {
 		return eventEntries.filter { $0.date >= today }
 	}
 
-	private var archivedEventEntries: [PlannerTimelineEntry] {
-		let today = SchoolCalendarDate(TimetableClock.now, calendar: calendar)
-		return eventEntries.filter { $0.date < today }
-	}
-
 	private var eventEntries: [PlannerTimelineEntry] {
 		(events.globalEvents + events.privateEvents)
 			.enumerated()
 			.map { PlannerTimelineEntry(event: $0.element, occurrence: $0.offset) }
 			.sorted { $0.date < $1.date }
-	}
-
-	private var archivePolicy: CalendarEventArchivePolicy {
-		CalendarEventArchivePolicy(rawValue: accountSettings.calendarEventAutoDeleteDays) ?? .never
-	}
-
-	private var archivePolicyBinding: Binding<CalendarEventArchivePolicy> {
-		Binding(
-			get: { archivePolicy },
-			set: { policy in
-				var proposed = accountSettings
-				proposed.calendarEventAutoDeleteDays = policy.rawValue
-				accountSettings = proposed
-				Task {
-					do {
-						try await AccountSettingsSyncService.shared.updateSettings(proposed)
-					} catch {
-						badges.present(error: error, title: "Unable to save event deletion preference")
-					}
-				}
-			}
-		)
 	}
 
 	private var timelineEntries: [PlannerTimelineEntry] {
@@ -302,6 +250,111 @@ struct DatesView: View {
 
 				return $0.date < $1.date
 			}
+	}
+}
+
+struct ArchivedEventsView: View {
+	@Default(.calendarEvents) private var events
+	@Default(.accountSettings) private var accountSettings
+	@State private var selectedEvent: CalendarEvent?
+	@State private var eventService = CalendarEventsSyncService.shared
+	@Environment(\.statusBadgeManager) private var badges
+
+	private let calendar = SchoolCalendarProjection.perthCalendar
+
+	var body: some View {
+		List {
+			if archivedEvents.isEmpty {
+				ContentUnavailableView(
+					"No Archived Events",
+					systemImage: "archivebox",
+					description: Text("Past events will appear here after they pass.")
+				)
+				.frame(maxWidth: .infinity)
+			} else {
+				ForEach(archivedEvents) { event in
+					Button {
+						selectedEvent = event
+					} label: {
+						Label {
+							VStack(alignment: .leading, spacing: 4) {
+								Text(event.title)
+								Text(event.date.startOfDay()?.formatted(date: .long, time: .omitted) ?? "")
+									.font(.caption)
+									.foregroundStyle(.secondary)
+							}
+						} icon: {
+							Image(systemName: event.symbol)
+						}
+					}
+					.buttonStyle(.plain)
+				}
+			}
+		}
+		.appNavigationTitle("Archived Events", accent: true)
+		.toolbar {
+			ToolbarItem(placement: .primaryAction) {
+				Picker("Delete Past Events", selection: archivePolicyBinding) {
+					ForEach(CalendarEventArchivePolicy.allCases, id: \.self) { policy in
+						Text(policy.title).tag(policy)
+					}
+				}
+				.labelsHidden()
+				.pickerStyle(.menu)
+			}
+		}
+		.sheet(item: $selectedEvent) { event in
+			CalendarEventEditor(
+				target: .edit(event),
+				canManageGlobalEvents: events.canManageGlobalEvents,
+				close: { selectedEvent = nil }
+			) { request, existingEvent in
+				guard let existingEvent else {
+					return
+				}
+
+				try await eventService.updateEvent(
+					id: existingEvent.id,
+					request: request,
+					globally: existingEvent.isGlobal
+				)
+			} delete: { event in
+				try await eventService.deleteEvent(
+					id: event.id,
+					globally: event.isGlobal
+				)
+			}
+			.presentationDetents([.fraction(0.7)])
+		}
+	}
+
+	private var archivedEvents: [CalendarEvent] {
+		let today = SchoolCalendarDate(TimetableClock.now, calendar: calendar)
+		return (events.globalEvents + events.privateEvents)
+			.filter { $0.date < today }
+			.sorted { $0.date < $1.date }
+	}
+
+	private var archivePolicy: CalendarEventArchivePolicy {
+		CalendarEventArchivePolicy(rawValue: accountSettings.calendarEventAutoDeleteDays) ?? .never
+	}
+
+	private var archivePolicyBinding: Binding<CalendarEventArchivePolicy> {
+		Binding(
+			get: { archivePolicy },
+			set: { policy in
+				var proposed = accountSettings
+				proposed.calendarEventAutoDeleteDays = policy.rawValue
+				accountSettings = proposed
+				Task {
+					do {
+						try await AccountSettingsSyncService.shared.updateSettings(proposed)
+					} catch {
+						badges.present(error: error, title: "Unable to save event deletion preference")
+					}
+				}
+			}
+		)
 	}
 }
 
