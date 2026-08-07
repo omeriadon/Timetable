@@ -146,7 +146,7 @@ struct ProfileAppearanceSheet: View {
 			.scrollEdgeEffectStyle(.hard, for: .bottom)
 			.safeAreaBar(edge: .top, alignment: .center, spacing: 12) {
 				VStack(spacing: 12) {
-					ProfileEditorPreview(draft: draft)
+					ProfileEditorPreview(draft: draft, onTap: reopenPhotoCrop)
 						.frame(width: 250, height: 250)
 
 					HStack {
@@ -221,7 +221,6 @@ struct ProfileAppearanceSheet: View {
 				},
 				close: { photoCropRequest = nil }
 			)
-			.interactiveDismissDisabled()
 			.presentationDetents([.fraction(0.7)])
 		}
 		#endif
@@ -255,6 +254,21 @@ struct ProfileAppearanceSheet: View {
 				} catch {
 					photoSelectionState = .failed(error.localizedDescription)
 				}
+			}
+		}
+
+		private func reopenPhotoCrop() {
+			if let pendingPhotoData = draft.pendingPhotoData {
+				photoCropRequest = ProfilePhotoCropRequest(sourceData: pendingPhotoData)
+				return
+			}
+
+			guard let photo = draft.photo else { return }
+			Task {
+				guard let data = await ProfileImageCache.shared.imageData(for: photo, displaySize: 300) else {
+					return
+				}
+				photoCropRequest = ProfilePhotoCropRequest(sourceData: data)
 			}
 		}
 

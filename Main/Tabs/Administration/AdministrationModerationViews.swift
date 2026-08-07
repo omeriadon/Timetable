@@ -3,11 +3,12 @@ import SwiftUI
 struct AdministrationFriendshipDateChangeRequestsView: View {
 	@State private var service = AdministrationService.shared
 	@State private var requests: [AdministrationFriendshipDateChangeRequest] = []
+	@State private var searchText = ""
 	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
 		List {
-			ForEach(requests) { request in
+			ForEach(filteredRequests) { request in
 				Section(request.requesterDisplayName ?? request.requesterID.uuidString) {
 					LabeledContent("Requested date") {
 						Text(request.requestedDate, format: .dateTime.minute().hour().day().month().year())
@@ -36,8 +37,19 @@ struct AdministrationFriendshipDateChangeRequestsView: View {
 			}
 		}
 		.appNavigationTitle("Friends-Since Requests")
+		.searchable(text: $searchText, prompt: "Search requests")
 		.task { await load() }
 		.refreshable { await load() }
+	}
+
+	private var filteredRequests: [AdministrationFriendshipDateChangeRequest] {
+		let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+		guard !query.isEmpty else { return requests }
+		return requests.filter {
+			($0.requesterDisplayName ?? "").localizedCaseInsensitiveContains(query)
+				|| $0.requesterID.uuidString.localizedCaseInsensitiveContains(query)
+				|| statusLabel(for: $0.action).localizedCaseInsensitiveContains(query)
+		}
 	}
 
 	private func load() async {
@@ -65,11 +77,12 @@ struct AdministrationFriendshipDateChangeRequestsView: View {
 struct AdministrationUserReportsView: View {
 	@State private var service = AdministrationService.shared
 	@State private var reports: [AdministrationUserReport] = []
+	@State private var searchText = ""
 	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
 		List {
-			ForEach(reports) { report in
+			ForEach(filteredReports) { report in
 				Section(report.reportedUserDisplayName ?? report.reportedUserID.uuidString) {
 					LabeledContent("Reported by", value: report.reporterDisplayName ?? report.reporterID.uuidString)
 					LabeledContent("Status", value: statusLabel(for: report.action))
@@ -103,8 +116,21 @@ struct AdministrationUserReportsView: View {
 			}
 		}
 		.appNavigationTitle("User Reports")
+		.searchable(text: $searchText, prompt: "Search reports")
 		.task { await load() }
 		.refreshable { await load() }
+	}
+
+	private var filteredReports: [AdministrationUserReport] {
+		let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+		guard !query.isEmpty else { return reports }
+		return reports.filter {
+			($0.reportedUserDisplayName ?? "").localizedCaseInsensitiveContains(query)
+				|| ($0.reporterDisplayName ?? "").localizedCaseInsensitiveContains(query)
+				|| $0.reportedUserID.uuidString.localizedCaseInsensitiveContains(query)
+				|| $0.reporterID.uuidString.localizedCaseInsensitiveContains(query)
+				|| statusLabel(for: $0.action).localizedCaseInsensitiveContains(query)
+		}
 	}
 
 	private func load() async {

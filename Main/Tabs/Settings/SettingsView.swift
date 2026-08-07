@@ -8,6 +8,7 @@
 import ColorfulX
 import Defaults
 import SwiftUI
+import TipKit
 import WidgetKit
 
 #if os(iOS)
@@ -239,6 +240,13 @@ import WidgetKit
 					FeedbackView(close: { showFeedbackSheet = false })
 						.presentationDetents([.fraction(0.7)])
 				}
+
+				Button("Reset Tips", systemImage: "lightbulb") {
+					try? Tips.resetDatastore()
+				}
+				Text("After you restart the app, tips will show again, highlighting features of the app.")
+					.font(.footnote)
+					.foregroundStyle(.secondary)
 
 				NavigationLink {
 					AboutView()

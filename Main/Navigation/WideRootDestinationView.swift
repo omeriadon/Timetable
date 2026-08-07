@@ -10,7 +10,7 @@ struct WideRootDestinationView: View {
 			case .friends:
 				FriendsView()
 			case .settings:
-				WideSettingsView()
+				SettingsView()
 			case .administration:
 				AdministrationView()
 		}

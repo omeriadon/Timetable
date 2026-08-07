@@ -4,14 +4,18 @@ struct ProfileEditorPreview: View {
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 
 	let draft: ProfileAppearanceDraft
+	let onTap: () -> Void
 
 	var body: some View {
-		profilePicture
-			.shadow(radius: 14)
-			.animation(
-				reduceMotion ? .none : .smooth(duration: 0.35),
-				value: draft.contentKind.rawValue
-			)
+		Button(action: onTap) {
+			profilePicture
+		}
+		.buttonStyle(.plain)
+		.shadow(radius: 14)
+		.animation(
+			reduceMotion ? .none : .smooth(duration: 0.35),
+			value: draft.contentKind.rawValue
+		)
 	}
 
 	@ViewBuilder
