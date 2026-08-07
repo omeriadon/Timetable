@@ -11,16 +11,29 @@ struct WideAppShell: View {
 
 		NavigationSplitView(columnVisibility: sidebarVisibility) {
 			List(selection: sidebarSelection) {
-				sidebarRoot("Today", systemImage: "calendar.day.timeline.left", destination: .timetableToday)
-				sidebarRoot("Week", systemImage: "7.calendar", destination: .timetableWeek)
-				sidebarRoot("Planner", systemImage: "pencil.and.list.clipboard", destination: .timetablePlanner)
-				sidebarRoot("Friends", systemImage: "person.2", destination: .friends)
-					.badge(incomingFriendRequests.count)
-				sidebarRoot("Grades", systemImage: "chart.bar.xaxis", destination: .grades)
-				sidebarRoot("Settings", systemImage: "gear", destination: .settings)
+				Section("Timetable") {
+					sidebarRoot("Today", systemImage: "calendar.day.timeline.left", destination: .timetableToday)
+					sidebarRoot("Week", systemImage: "7.calendar", destination: .timetableWeek)
+					sidebarRoot("Planner", systemImage: "pencil.and.list.clipboard", destination: .timetablePlanner)
+				}
+
+				Section("Community") {
+					sidebarRoot("Friends", systemImage: "person.2", destination: .friends)
+						.badge(incomingFriendRequests.count)
+				}
+
+				Section("Study") {
+					sidebarRoot("Grades", systemImage: "chart.bar.xaxis", destination: .grades)
+				}
+
+				Section("App") {
+					sidebarRoot("Settings", systemImage: "gear", destination: .settings)
+				}
 
 				if accountProfile?.authority.isAdministrator == true {
-					sidebarRoot("Administration", systemImage: "calendar.badge.lock", destination: .administration)
+					Section("Administration") {
+						sidebarRoot("Administration", systemImage: "calendar.badge.lock", destination: .administration)
+					}
 				}
 			}
 			.appNavigationTitle(router.presentation == .iOS ? "Timetable" : "")
