@@ -948,6 +948,9 @@
         }
       }
     },
+    "Archived Events" : {
+
+    },
     "Archived sections and their tags are removed from active selection." : {
       "localizations" : {
         "fr" : {
@@ -1806,6 +1809,9 @@
           }
         }
       }
+    },
+    "Customize Share Link" : {
+
     },
     "Date" : {
       "localizations" : {
@@ -3956,7 +3962,7 @@
         }
       }
     },
-    "No archived events" : {
+    "No Archived Events" : {
 
     },
     "No Created Timetables" : {
@@ -4601,6 +4607,9 @@
         }
       }
     },
+    "Past events will appear here after they pass." : {
+
+    },
     "Pending friend requests" : {
 
     },
@@ -4889,6 +4898,9 @@
           }
         }
       }
+    },
+    "Received Timetables" : {
+
     },
     "Received: %@" : {
       "localizations" : {
@@ -5947,6 +5959,9 @@
           }
         }
       }
+    },
+    "Share My Timetable" : {
+
     },
     "Shared Classes" : {
       "localizations" : {
