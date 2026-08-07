@@ -22,9 +22,7 @@ import SwiftUI
 		}
 
 		func updateUIView(_ uiView: TabsView, context _: Context) {
-			if uiView.selectedTagIndex != selection {
-				uiView.selectedTagIndex = selection
-			}
+			uiView.selectInitialTagIndex(selection)
 		}
 	}
 #else
@@ -76,7 +74,10 @@ class TabsView: PlatformView {
 	var onSelectionChange: ((Int) -> Void)?
 
 	var items: [(title: String, icon: String)] = [] {
-		didSet { updateButtons(with: items) }
+		didSet {
+			updateButtons(with: items)
+			updateSelection(for: selectedTagIndex)
+		}
 	}
 
 	var selectedTagIndex: Int = 0 {

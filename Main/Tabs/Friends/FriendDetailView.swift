@@ -21,6 +21,7 @@ struct FriendDetailView: View {
 		let cachedDetail = Defaults[.friendDetails].first(where: { $0.relationshipID == friend.relationshipID })
 		_detail = State(initialValue: cachedDetail)
 		_isLoading = State(initialValue: cachedDetail == nil)
+		_scrollPosition = State(initialValue: FriendDetailTab.allCases.firstIndex(of: .main))
 	}
 
 	private var displayedFriendName: String {
