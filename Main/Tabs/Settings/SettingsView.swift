@@ -246,12 +246,15 @@ struct SettingsView: View {
 					.presentationDetents([.fraction(0.7)])
 			}
 
-			Button("Reset Tips", systemImage: "lightbulb") {
+			Button {
 				try? Tips.resetDatastore()
+
+			} label: {
+				Label("Reset Tips", systemImage: "lightbulb")
+				Text("After you restart the app, tips will show again, highlighting features of the app.")
+					.font(.footnote)
+					.foregroundStyle(.secondary)
 			}
-			Text("After you restart the app, tips will show again, highlighting features of the app.")
-				.font(.footnote)
-				.foregroundStyle(.secondary)
 
 			NavigationLink {
 				AboutView()
