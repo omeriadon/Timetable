@@ -46,8 +46,6 @@ struct LocationStatusRow: View {
 							.foregroundStyle(.secondary)
 					}
 				}
-
-				Spacer()
 			}
 		}
 		.foregroundStyle(.white)
