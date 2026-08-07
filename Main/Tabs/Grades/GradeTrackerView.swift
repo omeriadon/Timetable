@@ -431,21 +431,38 @@ private struct GradeAssessmentEditor: View {
 				Section("Assessment") {
 					TextField("Name", text: $name)
 					DatePicker("Date", selection: $date, displayedComponents: .date)
-					Text("Selected: \(selectedLocationTitle)")
-						.font(.caption)
-						.foregroundStyle(.secondary)
 					Picker("Assessment period", selection: $location) {
 						ForEach(locationOptions, id: \.self) { option in
-							Text(option.title(for: subject)).tag(option)
+							Label {
+								VStack(alignment: .leading, spacing: 2) {
+									Text(option.title(for: subject))
+									Text(option.subtitle)
+										.font(.caption)
+										.foregroundStyle(.secondary)
+								}
+							} icon: {
+								Image(systemName: option.symbol)
+							}
+							.tag(option)
 						}
 					}
 				}
 
 				Section("Result") {
-					TextField("Score (%)", value: $score, format: .number.precision(.fractionLength(1)))
-						.keyboardType(.decimalPad)
-					TextField("Semester weighting", value: $weighting, format: .number.precision(.fractionLength(1)))
-						.keyboardType(.decimalPad)
+					LabeledContent("Score") {
+						HStack {
+							TextField("Percentage", value: $score, format: .number.precision(.fractionLength(1)))
+								.keyboardType(.decimalPad)
+							Text("%")
+						}
+					}
+					LabeledContent("Weighting") {
+						HStack {
+							TextField("Percentage", value: $weighting, format: .number.precision(.fractionLength(1)))
+								.keyboardType(.decimalPad)
+							Text("%")
+						}
+					}
 					Text("This weighting is calculated within Semester \(semester).")
 						.font(.caption)
 						.foregroundStyle(.secondary)
@@ -513,10 +530,6 @@ private struct GradeAssessmentEditor: View {
 		return options
 	}
 
-	private var selectedLocationTitle: String {
-		location.title(for: subject)
-	}
-
 	private func submit() async {
 		isSaving = true
 		let proposed = GradeAssessment(
@@ -553,6 +566,14 @@ private struct GradeAssessmentEditor: View {
 private extension GradeAssessmentLocation {
 	var symbol: String {
 		"checkmark.seal"
+	}
+
+	var subtitle: String {
+		switch self {
+			case .exam: "While school is cancelled."
+			case .directedStudy: "CAP that replaces Directed Study."
+			case .subjectPeriod: "A test in the subject's period."
+		}
 	}
 
 	func title(for subject: Subject) -> String {

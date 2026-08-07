@@ -21,7 +21,7 @@ final class GradeTrackerService {
 		}
 
 		let task = Task { @MainActor in
-			let response: GradeTrackerResponse = try await networkManager.send(.v1Grades)
+			let response: GradeTrackerResponse = try await networkManager.send(.v1GradesGet)
 			Defaults[.gradeTracker] = response.document
 			Defaults[.lastServerSync] = .now
 		}
@@ -44,5 +44,6 @@ final class GradeTrackerService {
 }
 
 private extension Endpoint {
-	static let v1Grades = Endpoint("/v1/grades")
+	static let v1Grades = Endpoint("/v1/grades", method: .put)
+	static let v1GradesGet = Endpoint("/v1/grades")
 }
