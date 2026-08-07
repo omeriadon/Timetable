@@ -29,31 +29,18 @@ private struct EventTagSelectionView: View {
 
 	var body: some View {
 		List {
-			ForEach(availableTags) { tag in
-				let isSelected = selectedTagIDs.contains(tag.id)
-
-				Button {
-					toggle(tag)
-				} label: {
-					HStack {
-						Image(systemName: tag.symbol ?? "tag")
-							.foregroundStyle(.white)
-						Text(tag.displayName)
-							.foregroundStyle(isSelected ? .white : .primary)
-						Spacer()
-						if isSelected {
-							Image(systemName: "checkmark")
-								.foregroundStyle(.white)
-						}
+			if allowsYearGroups, !yearGroupTags.isEmpty {
+				Section("Year Groups") {
+					ForEach(yearGroupTags) { tag in
+						tagRow(tag)
 					}
 				}
-				.buttonStyle(.plain)
-				.listRowBackground(
-					Rectangle()
-						.fill(isSelected ? Color.accentColor : .clear)
-						.animation(.snappy, value: isSelected)
-				)
-				.accessibilityAddTraits(isSelected ? .isSelected : [])
+			}
+
+			Section("Other Tags") {
+				ForEach(otherTags) { tag in
+					tagRow(tag)
+				}
 			}
 		}
 		.appNavigationTitle("Tags")
@@ -61,6 +48,40 @@ private struct EventTagSelectionView: View {
 
 	private var availableTags: [EventTagCatalogueTag] {
 		sections.flatMap(\.tags)
+	}
+
+	private var yearGroupTags: [EventTagCatalogueTag] {
+		availableTags.filter { $0.category == .yearGroup }
+	}
+
+	private var otherTags: [EventTagCatalogueTag] {
+		availableTags.filter { $0.category != .yearGroup }
+	}
+
+	private func tagRow(_ tag: EventTagCatalogueTag) -> some View {
+		let isSelected = selectedTagIDs.contains(tag.id)
+		return Button {
+			toggle(tag)
+		} label: {
+			HStack {
+				Image(systemName: tag.symbol ?? "tag")
+					.foregroundStyle(.white)
+				Text(tag.displayName)
+					.foregroundStyle(isSelected ? .white : .primary)
+				Spacer()
+				if isSelected {
+					Image(systemName: "checkmark")
+						.foregroundStyle(.white)
+				}
+			}
+		}
+		.buttonStyle(.plain)
+		.listRowBackground(
+			Rectangle()
+				.fill(isSelected ? Color.accentColor : .clear)
+				.animation(.snappy, value: isSelected)
+		)
+		.accessibilityAddTraits(isSelected ? .isSelected : [])
 	}
 
 	private var yearGroupTagIDs: Set<UUID> {
