@@ -40,6 +40,8 @@ struct GradeTrackerView: View {
 							],
 							spacing: 14
 						) {
+							let reduceMotionValue = reduceMotion
+
 							ForEach(subjects) { subject in
 								Button {
 									selectedSubject = subject
@@ -52,8 +54,8 @@ struct GradeTrackerView: View {
 								.buttonStyle(.plain)
 								.scrollTransition(.animated(.snappy(duration: 0.3))) { card, phase in
 									card
-										.opacity(reduceMotion || phase.isIdentity ? 1 : 0.65)
-										.scaleEffect(reduceMotion || phase.isIdentity ? 1 : 0.96)
+										.opacity(reduceMotionValue || phase.isIdentity ? 1 : 0.65)
+										.scaleEffect(reduceMotionValue || phase.isIdentity ? 1 : 0.96)
 								}
 							}
 						}
