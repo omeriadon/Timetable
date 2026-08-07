@@ -199,7 +199,7 @@ struct TimetableApp: App {
 				.keyboardShortcut("4", modifiers: .command)
 			}
 
-			CommandGroup(after: .appSettings) {
+			CommandGroup(replacing: .appSettings) {
 				Button("Settings…") { NotificationCenter.default.post(name: .openSettingsTab, object: nil) }
 					.keyboardShortcut(",", modifiers: .command)
 			}
