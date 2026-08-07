@@ -21,7 +21,6 @@ struct AccountView: View {
 	@State private var isLoadingYearGroups = false
 	@State private var isSavingYearGroup = false
 	@State private var yearGroupsFailedToLoad = false
-	@State private var locationStatistics: LocationArrivalStatisticsResponse?
 	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
@@ -37,13 +36,18 @@ struct AccountView: View {
 					}
 					.task(id: profile.id) {
 						await loadYearGroups()
-						await loadLocationStatistics()
 					}
 					.appNavigationTitle("Account")
 					.transition(.blurReplace)
 				case .restoring:
-					ProgressView("Restoring Account…")
-						.transition(.blurReplace)
+					if let cachedProfile = Defaults[.accountProfile] {
+						List { accountRows(profile: cachedProfile) }
+							.listStyle(.insetGrouped)
+							.scrollContentBackground(.hidden)
+							.appNavigationTitle("Account")
+					} else {
+						ProgressView("Restoring Account…")
+					}
 				case .signedOut:
 					ScrollView {
 						AccountAuthenticationView()
@@ -101,7 +105,7 @@ struct AccountView: View {
 		}
 
 		Section("Year Group") {
-			if isLoadingYearGroups {
+			if isLoadingYearGroups, yearGroupTags.isEmpty {
 				LabeledContent("Year Group") {
 					ProgressView()
 				}
@@ -140,10 +144,6 @@ struct AccountView: View {
 		}
 
 		Section("Status") {
-			LabeledContent("Average arrival") {
-				Text(formattedAverageArrival)
-			}
-
 			#if os(iOS) && !targetEnvironment(macCatalyst)
 				LocationStatusPermissionRecoveryRow()
 			#endif
@@ -159,14 +159,6 @@ struct AccountView: View {
 		}
 	}
 
-	private var formattedAverageArrival: String {
-		guard let seconds = locationStatistics?.averageArrivalSecondsSinceMidnight else {
-			return "No data"
-		}
-
-		return LocationArrivalTimeFormatter.string(for: seconds)
-	}
-
 	private func signOut() {
 		Task {
 			await sessionStore.signOut()
@@ -174,16 +166,13 @@ struct AccountView: View {
 	}
 
 	@MainActor
-	private func loadLocationStatistics() async {
-		do {
-			locationStatistics = try await LocationStatusStatisticsService.shared.personalArrivalStatistics()
-		} catch {
-			locationStatistics = nil
-		}
-	}
-
-	@MainActor
 	private func loadYearGroups() async {
+		let cachedCatalogue = Defaults[.eventTagCatalogue]
+		let cachedSubscriptions = Set(Defaults[.eventTagSubscriptionIDs])
+		let cachedTags = cachedCatalogue.sections.first(where: { $0.category == .yearGroup })?.tags ?? []
+		if !cachedTags.isEmpty {
+			applyYearGroupData(tags: cachedTags, subscribedTagIDs: cachedSubscriptions)
+		}
 		isLoadingYearGroups = true
 		yearGroupsFailedToLoad = false
 		defer {
@@ -210,13 +199,26 @@ struct AccountView: View {
 				await saveYearGroup(selectedYearGroupID)
 			}
 		} catch {
-			yearGroupTags = []
-			subscribedTagIDs = []
-			selectedYearGroupID = nil
-			committedYearGroupID = nil
+			if yearGroupTags.isEmpty {
+				yearGroupTags = []
+				subscribedTagIDs = []
+				selectedYearGroupID = nil
+				committedYearGroupID = nil
+			}
 			yearGroupsFailedToLoad = true
 			badges.present(error: error, title: "Unable to load year groups")
 		}
+	}
+
+	@MainActor
+	private func applyYearGroupData(tags: [EventTagCatalogueTag], subscribedTagIDs: Set<UUID>) {
+		let selectedYearGroupID = tags.first(where: { subscribedTagIDs.contains($0.id) })?.id
+			?? tags.first(where: { $0.displayName == "Year 7" })?.id
+			?? tags.first?.id
+		yearGroupTags = tags
+		self.subscribedTagIDs = subscribedTagIDs
+		self.selectedYearGroupID = selectedYearGroupID
+		committedYearGroupID = selectedYearGroupID
 	}
 
 	@MainActor

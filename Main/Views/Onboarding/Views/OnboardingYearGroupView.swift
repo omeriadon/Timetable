@@ -1,3 +1,4 @@
+import Defaults
 import SwiftUI
 
 #if os(iOS)
@@ -19,7 +20,7 @@ import SwiftUI
 				Text("This controls which year-group school events you receive. You can change it later in Settings.")
 					.foregroundStyle(.secondary)
 
-				if isLoading {
+				if isLoading, yearGroupTags.isEmpty {
 					ProgressView("Loading year groups…")
 						.frame(maxWidth: .infinity)
 				} else if yearGroupTags.isEmpty {
@@ -71,9 +72,19 @@ import SwiftUI
 		}
 
 		private func load() async {
+			let cachedCatalogue = Defaults[.eventTagCatalogue]
+			let cachedSubscriptions = Set(Defaults[.eventTagSubscriptionIDs])
+			yearGroupTags = cachedCatalogue.sections.first(where: { $0.category == .yearGroup })?.tags ?? []
+			subscriptions = cachedSubscriptions
+			selectedTagID = yearGroupTags.first(where: { subscriptions.contains($0.id) })?.id
+			if !yearGroupTags.isEmpty {
+				context.configure(canAdvance: selectedTagID != nil, isWorking: false, statusMessage: nil)
+			}
 			isLoading = true
 			loadFailed = false
-			context.configure(canAdvance: false, isWorking: true, statusMessage: "Loading year groups…")
+			if yearGroupTags.isEmpty {
+				context.configure(canAdvance: false, isWorking: true, statusMessage: "Loading year groups…")
+			}
 			defer {
 				isLoading = false
 			}

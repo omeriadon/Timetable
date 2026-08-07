@@ -81,6 +81,7 @@ extension Defaults.Keys {
 	static let calendarEvents = Key<CalendarEventsProjection>("calendarEvents", default: .empty, suite: sharedDefaults)
 	static let receivedTimetables = Key<[ReceivedTimetable]>("receivedTimetables", default: [], suite: sharedDefaults)
 	static let friends = Key<[FriendSummary]>("friends", default: [], suite: sharedDefaults)
+	static let friendDetails = Key<[FriendDetail]>("friendDetails", default: [], suite: sharedDefaults)
 	static let incomingFriendRequests = Key<[FriendSummary]>("incomingFriendRequests", default: [], suite: sharedDefaults)
 	static let outgoingFriendRequests = Key<[FriendSummary]>("outgoingFriendRequests", default: [], suite: sharedDefaults)
 	static let locationStatus = Key<LocationStatusItem?>("locationStatus", default: nil, suite: sharedDefaults)

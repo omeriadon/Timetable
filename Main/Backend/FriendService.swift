@@ -138,6 +138,10 @@ final class FriendService {
 			)
 			Defaults[.friends] = friends
 		}
+		var cachedDetails = Defaults[.friendDetails]
+		cachedDetails.removeAll { $0.relationshipID == detail.relationshipID }
+		cachedDetails.append(detail)
+		Defaults[.friendDetails] = cachedDetails
 		return detail
 	}
 

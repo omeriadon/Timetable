@@ -4,12 +4,15 @@ import SwiftUI
 struct FriendsView: View {
 	@Default(.friends) private var friends
 	@Default(.incomingFriendRequests) private var incomingFriendRequests
+	@Default(.hasSeenLocationStatusWhatsNew) private var hasSeenLocationStatusWhatsNew
 	@State private var service = FriendService.shared
 	@State private var searchText = ""
 	@State private var searchResults: [FriendSearchResult] = []
 	@State private var sheet: FriendsSheet?
 	@State private var selectedFriend: FriendSummary?
 	@State private var isSearching = false
+	@State private var showsArrivalStatistics = false
+	@State private var showsLocationStatusSheet = false
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	@Environment(\.appPresentation) private var presentation
 	@Environment(AppRouter.self) private var router
@@ -76,6 +79,25 @@ struct FriendsView: View {
 		.sheet(item: $selectedFriend) { friend in
 			FriendDetailView(friend: friend, close: { selectedFriend = nil })
 		}
+		.popover(isPresented: $showsArrivalStatistics) {
+			PersonalArrivalStatisticsView()
+				.presentationCompactAdaptation(.popover)
+		}
+		.sheet(isPresented: $showsLocationStatusSheet) {
+			LocationStatusWhatsNewSheet {
+				showsLocationStatusSheet = false
+				hasSeenLocationStatusWhatsNew = true
+			}
+			.presentationDetents([.large])
+			.presentationDragIndicator(.hidden)
+		}
+		.onAppear {
+			#if os(iOS) && !targetEnvironment(macCatalyst)
+				if !hasSeenLocationStatusWhatsNew {
+					showsLocationStatusSheet = true
+				}
+			#endif
+		}
 		.dynamicTypeSize(.medium)
 	}
 
@@ -97,7 +119,7 @@ struct FriendsView: View {
 	private var friendsList: some View {
 		ScrollView {
 			LazyVStack(spacing: 14) {
-				LocationStatusRow()
+				LocationStatusRow(showsArrivalStatistics: $showsArrivalStatistics)
 					.padding(.bottom, 10)
 
 				if friends.isEmpty {
@@ -149,6 +171,30 @@ struct FriendsView: View {
 			}
 		}
 		.listStyle(.plain)
+	}
+
+	private struct PersonalArrivalStatisticsView: View {
+		@State private var statistics: LocationArrivalStatisticsResponse?
+
+		var body: some View {
+			VStack(alignment: .leading, spacing: 8) {
+				Text("Average arrival")
+					.font(.headline)
+				Text(formattedAverageArrival)
+					.foregroundStyle(.secondary)
+			}
+			.padding()
+			.task {
+				statistics = try? await LocationStatusStatisticsService.shared.personalArrivalStatistics()
+			}
+		}
+
+		private var formattedAverageArrival: String {
+			guard let seconds = statistics?.averageArrivalSecondsSinceMidnight else {
+				return "No data"
+			}
+			return LocationArrivalTimeFormatter.string(for: seconds)
+		}
 	}
 
 	private func refresh() async {

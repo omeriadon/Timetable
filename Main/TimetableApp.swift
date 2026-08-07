@@ -27,7 +27,6 @@ struct TimetableApp: App {
 	@Default(.hasCompletedOnboarding) private var hasCompletedOnboarding
 	#if os(iOS)
 		@State private var launchIllusionVisible = true
-		@Default(.hasSeenLocationStatusWhatsNew) private var hasSeenLocationStatusWhatsNew
 	#endif
 
 	@Default(.incomingFriendRequests) private var incomingFriendRequests
@@ -132,24 +131,6 @@ struct TimetableApp: App {
 				)) {
 					OnboardingView()
 						.interactiveDismissDisabled()
-				}
-				.sheet(isPresented: Binding(
-					get: {
-						Platform.current == .iOS
-							&& hasCompletedOnboarding
-							&& !hasSeenLocationStatusWhatsNew
-					},
-					set: { isPresented in
-						if !isPresented {
-							hasSeenLocationStatusWhatsNew = true
-						}
-					}
-				)) {
-					LocationStatusWhatsNewSheet {
-						hasSeenLocationStatusWhatsNew = true
-					}
-					.presentationDetents([.large])
-					.presentationDragIndicator(.hidden)
 				}
 				#endif // os(iOS)
 				.onChange(of: scenePhase) { _, phase in

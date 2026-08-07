@@ -11,9 +11,17 @@ struct FriendDetailView: View {
 	@State private var action: FriendAction?
 	@State private var showsReportConfirmation = false
 	@State private var showsFriendsSinceRequest = false
-	@State private var isLoading = true
+	@State private var isLoading: Bool
 	@Environment(\.statusBadgeManager) private var badges
 	@Environment(\.appPresentation) private var presentation
+
+	init(friend: FriendSummary, close: @escaping () -> Void) {
+		self.friend = friend
+		self.close = close
+		let cachedDetail = Defaults[.friendDetails].first(where: { $0.relationshipID == friend.relationshipID })
+		_detail = State(initialValue: cachedDetail)
+		_isLoading = State(initialValue: cachedDetail == nil)
+	}
 
 	private var displayedFriendName: String {
 		detail?.friend.displayName ?? friend.friend.displayName

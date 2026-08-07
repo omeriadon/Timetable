@@ -437,7 +437,7 @@ private struct CalendarEventEditor: View {
 	@State private var isSaving = false
 	@State private var showsSymbolPicker = false
 	@State private var administrationService = AdministrationService.shared
-	@State private var tagSections: [EventTagCatalogueSection] = []
+	@State private var tagSections: [EventTagCatalogueSection]
 	@State private var selectedTagIDs: Set<UUID>
 
 	init(target: CalendarEventEditorTarget, canManageGlobalEvents: Bool, close: @escaping () -> Void, save: @escaping (CreateCalendarEventRequest, CalendarEvent?) async throws -> Void, delete: @escaping (CalendarEvent) async throws -> Void) {
@@ -452,6 +452,7 @@ private struct CalendarEventEditor: View {
 		_symbol = State(initialValue: event?.symbol ?? "calendar")
 		_date = State(initialValue: event?.date.startOfDay() ?? TimetableClock.now)
 		_selectedTagIDs = State(initialValue: Set(event?.tagIDs ?? []))
+		_tagSections = State(initialValue: Defaults[.eventTagCatalogue].sections)
 	}
 
 	private var isReadOnlyGlobalEvent: Bool {

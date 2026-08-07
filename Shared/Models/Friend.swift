@@ -129,7 +129,7 @@ nonisolated struct FriendRequestSnapshot: Sendable {
 	let outgoing: [FriendSummary]
 }
 
-nonisolated struct FriendDetail: Codable, Hashable, Sendable {
+nonisolated struct FriendDetail: Codable, Defaults.Serializable, Hashable, Sendable {
 	let relationshipID: UUID
 	let friend: FriendProfile
 	let acceptedAt: Date

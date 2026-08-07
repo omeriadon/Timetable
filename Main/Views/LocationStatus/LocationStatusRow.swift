@@ -7,41 +7,46 @@ import Defaults
 import SwiftUI
 
 struct LocationStatusRow: View {
+	@Binding var showsArrivalStatistics: Bool
 	@Default(.accountProfile) private var profile
 	@Default(.locationStatus) private var status
 
 	var body: some View {
-		HStack(spacing: 12) {
-			if let profile {
-				ProfilePicture(
-					appearance: profile.appearance,
-					photo: profile.photo,
-					size: 60,
-					badges: profile.badges,
-					accessibilityName: profile.displayName
-				)
-			}
+		Button {
+			showsArrivalStatistics = true
+		} label: {
+			HStack(spacing: 12) {
+				if let profile {
+					ProfilePicture(
+						appearance: profile.appearance,
+						photo: profile.photo,
+						size: 60,
+						badges: profile.badges,
+						accessibilityName: profile.displayName
+					)
+				}
 
-			VStack(alignment: .leading, spacing: 4) {
-				Text("You")
-					.font(.headline)
+				VStack(alignment: .leading, spacing: 4) {
+					Text("You")
+						.font(.headline)
 
-				if let status {
-					HStack {
-						Text(status.state == .onCampus ? "On campus" : "Off campus")
+					if let status {
+						HStack {
+							Text(status.state == .onCampus ? "On campus" : "Off campus")
 
-						Spacer()
+							Spacer()
 
-						Text(status.updatedAt, format: .dateTime.hour().minute())
+							Text(status.updatedAt, format: .dateTime.hour().minute())
+								.foregroundStyle(.secondary)
+						}
+					} else {
+						Text("Status unavailable")
 							.foregroundStyle(.secondary)
 					}
-				} else {
-					Text("Status unavailable")
-						.foregroundStyle(.secondary)
 				}
-			}
 
-			Spacer()
+				Spacer()
+			}
 		}
 		.padding(8)
 		.foregroundStyle(.black)
