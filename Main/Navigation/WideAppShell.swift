@@ -11,30 +11,39 @@ struct WideAppShell: View {
 
 		NavigationSplitView(columnVisibility: sidebarVisibility) {
 			List(selection: sidebarSelection) {
-				Section("Timetable") {
+				Section {
 					sidebarRoot("Today", systemImage: "calendar.day.timeline.left", destination: .timetableToday)
 					sidebarRoot("Week", systemImage: "7.calendar", destination: .timetableWeek)
 					sidebarRoot("Planner", systemImage: "pencil.and.list.clipboard", destination: .timetablePlanner)
 				}
 
-				Section("Community") {
+				Section {
 					sidebarRoot("Friends", systemImage: "person.2", destination: .friends)
 						.badge(incomingFriendRequests.count)
 				}
 
-				Section("Study") {
+				Section {
 					sidebarRoot("Grades", systemImage: "chart.bar.xaxis", destination: .grades)
 				}
+			}
+			.scrollBounceBehavior(.basedOnSize)
+			.safeAreaInset(edge: .bottom, spacing: 0) {
+				VStack(spacing: 2) {
+					Divider()
 
-				Section("App") {
-					sidebarRoot("Settings", systemImage: "gear", destination: .settings)
-				}
+					sidebarUtilityItem("Settings", systemImage: "gear", destination: .settings)
 
-				if accountProfile?.authority.isAdministrator == true {
-					Section("Administration") {
-						sidebarRoot("Administration", systemImage: "calendar.badge.lock", destination: .administration)
+					if accountProfile?.authority.isAdministrator == true {
+						sidebarUtilityItem(
+							"Administration",
+							systemImage: "calendar.badge.lock",
+							destination: .administration
+						)
 					}
 				}
+				.padding(.horizontal, 8)
+				.padding(.vertical, 6)
+				.background(.bar)
 			}
 			.appNavigationTitle(router.presentation == .iOS ? "Timetable" : "")
 			.listStyle(.sidebar)
@@ -145,5 +154,28 @@ struct WideAppShell: View {
 	) -> some View {
 		Label(title, systemImage: systemImage)
 			.tag(destination)
+	}
+
+	private func sidebarUtilityItem(
+		_ title: String,
+		systemImage: String,
+		destination: AppRootDestination
+	) -> some View {
+		Button {
+			router.selectRoot(destination)
+		} label: {
+			Label(title, systemImage: systemImage)
+				.frame(maxWidth: .infinity, alignment: .leading)
+				.padding(.horizontal, 12)
+				.padding(.vertical, 8)
+		}
+		.buttonStyle(.plain)
+		.background {
+			if router.selectedSidebarDestination == destination {
+				RoundedRectangle(cornerRadius: 8)
+					.fill(.quaternary)
+			}
+		}
+		.clipShape(RoundedRectangle(cornerRadius: 8))
 	}
 }
