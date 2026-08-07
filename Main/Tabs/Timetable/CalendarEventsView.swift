@@ -15,12 +15,11 @@ struct DatesView: View {
 	var body: some View {
 		ScrollView {
 			LazyVStack(alignment: .leading, spacing: 16, pinnedViews: [.sectionHeaders]) {
-
 				if !todayEventEntries.isEmpty {
 					Section {
-							ForEach(todayEventEntries) { entry in
-								animatedScrollCard(timelineEntry(entry))
-							}
+						ForEach(todayEventEntries) { entry in
+							animatedScrollCard(timelineEntry(entry))
+						}
 					} header: {
 						plannerSectionHeader("Today")
 					}
@@ -483,7 +482,7 @@ enum CalendarEventEditorTarget: Identifiable {
 	case edit(CalendarEvent)
 
 	var id: String {
-		 switch self {
+		switch self {
 			case let .create(scope):
 				"create-\(scope.id)"
 			case let .edit(event):
@@ -612,14 +611,12 @@ struct CalendarEventEditor: View {
 	}
 
 	var body: some View {
-		Group {
-			if embedsInNavigation {
-				NavigationStack {
-					content
-				}
-			} else {
+		if embedsInNavigation {
+			NavigationStack {
 				content
 			}
+		} else {
+			content
 		}
 	}
 

@@ -13,21 +13,23 @@ struct TodayTimetableView: View {
 			let now = TimetableClock.adjusted(context.date)
 			ScrollView {
 				VStack(alignment: .leading, spacing: 16) {
-					Text(now.formatted(.dateTime.weekday(.wide).day().month(.wide).hour(.defaultDigits(amPM: .wide)).minute(.defaultDigits).second(.defaultDigits)))
-						.contentTransition(.numericText())
-						.animation(.easeInOut, value: now)
-						.frame(maxWidth: .infinity, alignment: .center)
-						.multilineTextAlignment(.center)
-						.lineLimit(1)
-						.font(.system(size: 200))
-						.minimumScaleFactor(0.01)
-						.foregroundStyle(.white)
-
-					if let termWeekLabel = termWeekLabel(for: now) {
-						Text(termWeekLabel)
-							.font(.headline)
-							.foregroundStyle(.white.opacity(0.8))
+					VStack(alignment: .leading, spacing: 6) {
+						Text(now.formatted(.dateTime.weekday(.wide).day().month(.wide).hour(.defaultDigits(amPM: .wide)).minute(.defaultDigits).second(.defaultDigits)))
+							.contentTransition(.numericText())
+							.animation(.easeInOut, value: now)
 							.frame(maxWidth: .infinity, alignment: .center)
+							.multilineTextAlignment(.center)
+							.lineLimit(1)
+							.font(.system(size: 200))
+							.minimumScaleFactor(0.01)
+							.foregroundStyle(.white)
+
+						if let termWeekLabel = termWeekLabel(for: now) {
+							Text(termWeekLabel)
+								.font(.title3)
+								.foregroundStyle(.white.opacity(0.8))
+								.frame(maxWidth: .infinity, alignment: .leading)
+						}
 					}
 
 					if let noSchoolDay = eventSnapshot.noSchoolDay {

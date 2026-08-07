@@ -37,12 +37,13 @@ private struct EventTagSelectionView: View {
 				}
 			}
 
-			Section("Other Tags") {
+			Section {
 				ForEach(otherTags) { tag in
 					tagRow(tag)
 				}
 			}
 		}
+		.listStyle(.sidebar)
 		.appNavigationTitle("Tags")
 	}
 
@@ -74,13 +75,11 @@ private struct EventTagSelectionView: View {
 						.foregroundStyle(.white)
 				}
 			}
+			.contentShape(Rectangle())
 		}
 		.buttonStyle(.plain)
-		.listRowBackground(
-			Rectangle()
-				.fill(isSelected ? Color.accentColor : .clear)
-				.animation(.snappy, value: isSelected)
-		)
+		.listRowBackground(isSelected ? Color.accentColor : nil)
+		.animation(.snappy(duration: 0.1), value: isSelected)
 		.accessibilityAddTraits(isSelected ? .isSelected : [])
 	}
 
