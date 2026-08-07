@@ -53,6 +53,7 @@ struct GradeAssessmentEditor: View {
 
 					HStack {
 						Text("Assessment period")
+							.foregroundStyle(.secondary)
 
 						Spacer()
 
@@ -66,38 +67,39 @@ struct GradeAssessmentEditor: View {
 										Text(option.subtitle)
 											.foregroundStyle(.secondary)
 									} icon: {
-										Image(systemName: location == option ? "checkmark" : "")
+										Image(systemName: "checkmark")
+											.opacity(location == option ? 1 : 0)
 									}
 								}
 							}
 						} label: {
-							VStack(alignment: .trailing) {
+							HStack(spacing: 4) {
 								Text(location.title(for: subject))
+
+								Image(systemName: "chevron.up.chevron.down")
 							}
 						}
 					}
 				}
 
 				Section("Result") {
-					LabeledContent("Score") {
-						HStack {
-							Spacer(minLength: 150)
-							TextField("Percentage", value: $score, format: .percent.precision(.fractionLength(1)))
-								.keyboardType(.decimalPad)
-						}
+					HStack {
+						Text("Score")
+							.foregroundStyle(.secondary)
+							.padding(.trailing)
+
+						TextField("Percentage", value: $score, format: .percent.precision(.fractionLength(1)))
+							.keyboardType(.decimalPad)
 					}
 
-					LabeledContent("Weighting") {
-						HStack {
-							Spacer(minLength: 150)
-							TextField("Percentage", value: $weighting, format: .percent.precision(.fractionLength(1)))
-								.keyboardType(.decimalPad)
-						}
-					}
+					HStack {
+						Text("Weighting")
+							.foregroundStyle(.secondary)
+							.padding(.trailing)
 
-					Text("Weighting for Semester \(semester).")
-						.font(.caption)
-						.foregroundStyle(.secondary)
+						TextField("Percentage", value: $weighting, format: .percent.precision(.fractionLength(1)))
+							.keyboardType(.decimalPad)
+					}
 				}
 			}
 			.appNavigationTitle(assessment == nil ? "New Assessment" : "Edit Assessment")

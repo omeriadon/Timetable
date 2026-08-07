@@ -18,47 +18,49 @@ struct GradeSubjectDetailView: View {
 	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
-		List {
-			ForEach([1, 2], id: \.self) { semester in
-				Section("Semester \(semester)") {
-					ForEach(assessments(for: semester)) { assessment in
-						Button {
-							editorContext = AssessmentEditorContext(
-								semester: semester,
-								assessment: assessment
-							)
-						} label: {
-							GradeAssessmentRow(assessment: assessment)
+		NavigationStack {
+			List {
+				ForEach([1, 2], id: \.self) { semester in
+					Section("Semester \(semester)") {
+						ForEach(assessments(for: semester)) { assessment in
+							Button {
+								editorContext = AssessmentEditorContext(
+									semester: semester,
+									assessment: assessment
+								)
+							} label: {
+								GradeAssessmentRow(assessment: assessment)
+							}
+							.buttonStyle(.plain)
 						}
-						.buttonStyle(.plain)
-					}
 
-					Button {
-						editorContext = AssessmentEditorContext(semester: semester)
-					} label: {
-						Label("New Assessment", systemImage: "plus")
+						Button {
+							editorContext = AssessmentEditorContext(semester: semester)
+						} label: {
+							Label("New Assessment", systemImage: "plus")
+						}
 					}
 				}
 			}
-		}
-		.appNavigationTitle(subject.id, accent: true)
-		.toolbar {
-			ToolbarItem(placement: .cancellationAction) {
-				Button(role: .cancel) {
-					dismiss()
+			.appNavigationTitle(subject.id, accent: true)
+			.toolbar {
+				ToolbarItem(placement: .cancellationAction) {
+					Button(role: .cancel) {
+						dismiss()
+					}
 				}
 			}
-		}
-		.sheet(item: $editorContext) { context in
-			GradeAssessmentEditor(
-				subject: subject,
-				semester: context.semester,
-				assessment: context.assessment,
-				subjects: subjects,
-				save: save,
-				delete: delete
-			)
-			.presentationDetents([.fraction(0.7)])
+			.sheet(item: $editorContext) { context in
+				GradeAssessmentEditor(
+					subject: subject,
+					semester: context.semester,
+					assessment: context.assessment,
+					subjects: subjects,
+					save: save,
+					delete: delete
+				)
+				.presentationDetents([.fraction(0.7)])
+			}
 		}
 	}
 

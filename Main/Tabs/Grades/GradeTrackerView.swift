@@ -130,26 +130,46 @@ struct GradeAverageCard: View {
 		VStack(alignment: .leading, spacing: 14) {
 			HStack(alignment: .center, spacing: 18) {
 				GradeGauge(value: average)
+					.tint(.black)
 
 				VStack(alignment: .leading, spacing: 4) {
 					Text("Overall Average")
-						.font(.title2.weight(.semibold))
+						.font(.headline.weight(.semibold))
+						.foregroundStyle(.secondary)
+
 					if let average {
 						Text(average, format: .percent.precision(.fractionLength(1)))
-							.font(.title3)
-							.foregroundStyle(.secondary)
+							.font(.title)
 					} else {
 						Text("No assessments yet")
-							.font(.title3)
-							.foregroundStyle(.secondary)
+							.font(.title)
 					}
 				}
 			}
 
 			if showsATAR {
-				HStack(spacing: 18) {
-					ATARValue(title: "Predicted ATAR", value: predictedATAR)
-					ATARValue(title: "Goal ATAR", value: goalATAR)
+				VStack {
+					HStack {
+						Text("Predicted ATAR")
+						Spacer()
+						Text("Goal ATAR")
+						Spacer()
+						Text("Gap")
+					}
+					.font(.caption)
+					.foregroundStyle(.secondary)
+
+					HStack {
+						Text(predictedATAR.map { "\($0, specifier: "%.2f")" } ?? "Not set")
+						Spacer()
+						Text(goalATAR.map { "\($0, specifier: "%.2f")" } ?? "Not set")
+						Spacer()
+						Text({
+							guard let goal = goalATAR, let predicted = predictedATAR else { return "Not set" }
+							return String(format: "%.2f", goal - predicted)
+						}())
+					}
+					.font(.headline)
 				}
 			}
 		}
@@ -178,6 +198,8 @@ struct GradeSubjectCard: View {
 					Text("No assessments yet")
 				}
 			}
+
+			Spacer()
 		}
 		.foregroundStyle(.secondary)
 		.padding(14)
@@ -210,21 +232,6 @@ struct GradeGauge: View {
 		.gaugeStyle(.accessoryCircularCapacity)
 		.tint(tint)
 		.frame(width: 68, height: 68)
-	}
-}
-
-struct ATARValue: View {
-	let title: String
-	let value: Double?
-
-	var body: some View {
-		VStack(alignment: .leading, spacing: 2) {
-			Text(title)
-				.font(.caption)
-				.foregroundStyle(.secondary)
-			Text(value.map { "\($0, specifier: "%.2f")" } ?? "Not set")
-				.font(.headline)
-		}
 	}
 }
 
@@ -295,12 +302,12 @@ struct GradeAssessmentRow: View {
 	let assessment: GradeAssessment
 
 	var body: some View {
-		HStack(spacing: 14) {
+		HStack(alignment: .lastTextBaseline, spacing: 14) {
 			GradeGauge(value: assessment.score, tint: .brown)
 
 			VStack(alignment: .leading, spacing: 4) {
 				Text(assessment.name)
-					.font(.headline)
+					.font(.title3)
 				Text(assessment.date.displayLabel)
 					.font(.caption)
 					.foregroundStyle(.secondary)
@@ -310,7 +317,7 @@ struct GradeAssessmentRow: View {
 
 			VStack(alignment: .trailing, spacing: 4) {
 				Text(assessment.score, format: .percent.precision(.fractionLength(1)))
-					.font(.title3)
+					.font(.title2)
 				Text("Weighting: \(assessment.weighting, format: .percent.precision(.fractionLength(1)))")
 					.font(.caption)
 					.foregroundStyle(.secondary)
