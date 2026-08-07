@@ -129,10 +129,10 @@ private struct GradeAverageCard: View {
 
 				VStack(alignment: .leading, spacing: 4) {
 					Text("Overall Average")
-					.font(.title2.weight(.semibold))
+						.font(.title2.weight(.semibold))
 					Text(average.map { "\($0, specifier: "%.1f")%" } ?? "No assessments yet")
-					.font(.title3)
-					.foregroundStyle(.secondary)
+						.font(.title3)
+						.foregroundStyle(.secondary)
 				}
 			}
 
@@ -186,7 +186,7 @@ private struct GradeGauge: View {
 			Image(systemName: "chart.line.uptrend.xyaxis")
 		} currentValueLabel: {
 			Text(value.map { "\($0, specifier: "%.0f")%" } ?? "—")
-			.font(.caption.bold())
+				.font(.caption.bold())
 		} minimumValueLabel: {
 			EmptyView()
 		} maximumValueLabel: {
@@ -519,9 +519,9 @@ private struct GradeAssessmentEditor: View {
 
 		let dayIndex = day - 2
 		if subjects.contains(where: { subject in
-				subject.slots.contains { $0.day == dayIndex }
-					&& subject.id.localizedCaseInsensitiveContains("directed study")
-			}) {
+			subject.slots.contains { $0.day == dayIndex }
+				&& subject.id.localizedCaseInsensitiveContains("directed study")
+		}) {
 			options.append(.directedStudy)
 		}
 		if subject.slots.contains(where: { $0.day == dayIndex }) {
