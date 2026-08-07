@@ -27,7 +27,6 @@ struct CompactAppShell: View {
 			}
 		}
 		.ignoresSafeArea()
-		.animation(.easeInOut(duration: 0.1), value: router.selectedTab)
 		.onReceive(NotificationCenter.default.publisher(for: .openTimetableTab)) { _ in
 			router.selectRoot(.timetable)
 		}

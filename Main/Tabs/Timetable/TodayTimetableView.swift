@@ -113,13 +113,20 @@ struct TodayTimetableView: View {
 			.split(whereSeparator: { !$0.isNumber })
 			.first
 			.map(String.init) ?? "?"
-		let start = term.start.startOfDay() ?? date
-		let current = schoolDate.startOfDay() ?? date
+		let start = monday(of: term.start.startOfDay() ?? date)
+		let current = monday(of: schoolDate.startOfDay() ?? date)
 		let elapsedDays = SchoolCalendarProjection.perthCalendar
 			.dateComponents([.day], from: start, to: current)
 			.day ?? 0
 
 		return "Term \(termNumber) Week \(elapsedDays / 7 + 1)"
+	}
+
+	private func monday(of date: Date) -> Date {
+		let calendar = SchoolCalendarProjection.perthCalendar
+		let weekday = calendar.component(.weekday, from: date)
+		let daysFromMonday = (weekday + 6) % 7
+		return calendar.date(byAdding: .day, value: -daysFromMonday, to: date) ?? date
 	}
 
 	@ViewBuilder private func eventSection(_ title: String, events: [CalendarEvent], showsDate: Bool = false) -> some View {

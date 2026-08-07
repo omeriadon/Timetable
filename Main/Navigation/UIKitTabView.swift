@@ -80,9 +80,7 @@ struct UIKitTabView: UIViewControllerRepresentable {
 			animationControllerForTransitionFrom fromVC: UIViewController,
 			to toVC: UIViewController
 		) -> UIViewControllerAnimatedTransitioning? {
-			TabTransitionAnimator(
-				forward: toVC.view.frame.minX >= fromVC.view.frame.minX
-			)
+			TabTransitionAnimator()
 		}
 	}
 }
@@ -94,14 +92,8 @@ extension Array {
 }
 
 private final class TabTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
-	let forward: Bool
-
-	init(forward: Bool) {
-		self.forward = forward
-	}
-
 	func transitionDuration(using _: UIViewControllerContextTransitioning?) -> TimeInterval {
-		0.28
+		0.1
 	}
 
 	func animateTransition(using context: UIViewControllerContextTransitioning) {
@@ -113,17 +105,19 @@ private final class TabTransitionAnimator: NSObject, UIViewControllerAnimatedTra
 		}
 
 		let container = context.containerView
-		let offset = container.bounds.width * (forward ? 1 : -1)
-		toView.frame = container.bounds.offsetBy(dx: offset, dy: 0)
+		toView.frame = container.bounds
+		toView.alpha = 0
 		container.addSubview(toView)
 		UIView.animate(
 			withDuration: transitionDuration(using: context),
 			delay: 0,
-			options: [.curveEaseInOut]
+			options: [.curveEaseInOut, .beginFromCurrentState]
 		) {
-			fromView.frame = container.bounds.offsetBy(dx: -offset, dy: 0)
-			toView.frame = container.bounds
+			fromView.alpha = 0
+			toView.alpha = 1
 		} completion: { finished in
+			fromView.alpha = 1
+			toView.alpha = 1
 			context.completeTransition(finished)
 		}
 	}

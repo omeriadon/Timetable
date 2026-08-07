@@ -45,6 +45,7 @@ struct TimetableComparison: View {
 							{
 								Button {
 									presentedSubject = PresentedSubject(
+										ownerID: friend.friend.id,
 										owner: friend.friend.displayName,
 										subject: theirSubject
 									)
@@ -58,6 +59,13 @@ struct TimetableComparison: View {
 									.tint(.white)
 								}
 								.buttonStyle(.plain)
+								.popover(item: presentedSubjectBinding(for: friend.friend.id)) { presented in
+									SubjectContextPopover(
+										owner: presented.owner,
+										subject: presented.subject
+									)
+									.presentationCompactAdaptation(.popover)
+								}
 							} else {
 								item(
 									left: Text(friend.friend.displayName),
@@ -74,13 +82,22 @@ struct TimetableComparison: View {
 			Spacer()
 		}
 		.padding()
-		.popover(item: $presentedSubject) { presented in
-			SubjectContextPopover(
-				owner: presented.owner,
-				subject: presented.subject
-			)
-			.presentationCompactAdaptation(.popover)
-		}
+	}
+
+	private func presentedSubjectBinding(for ownerID: UUID) -> Binding<PresentedSubject?> {
+		Binding(
+			get: {
+				guard presentedSubject?.ownerID == ownerID else {
+					return nil
+				}
+				return presentedSubject
+			},
+			set: { value in
+				if value == nil, presentedSubject?.ownerID == ownerID {
+					presentedSubject = nil
+				}
+			}
+		)
 	}
 
 	private func getSubjectAtSlot(day: Int, session: Int, in timetable: [Subject]) -> Subject? {
@@ -90,9 +107,17 @@ struct TimetableComparison: View {
 }
 
 private struct PresentedSubject: Identifiable {
-	let id = UUID()
+	let id: UUID
+	let ownerID: UUID
 	let owner: String
 	let subject: Subject
+
+	init(ownerID: UUID, owner: String, subject: Subject) {
+		id = UUID()
+		self.ownerID = ownerID
+		self.owner = owner
+		self.subject = subject
+	}
 }
 
 func item(
