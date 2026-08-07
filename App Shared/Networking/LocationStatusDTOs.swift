@@ -20,5 +20,12 @@ nonisolated struct LocationArrivalStatisticsResponse: Codable, Sendable {
 
 nonisolated struct AdministrationStatisticsResponse: Codable, Sendable {
 	let totalUsers: Int
+	let usersWithOwnerTimetable: Int
+	let activeDevicesLast30Days: Int
+	let acceptedFriendships: Int
+	let totalCalendarEvents: Int
+	let globalCalendarEvents: Int
+	let personalCalendarEvents: Int
+	let activeEventTagSubscriptions: Int
 	let averageArrivalSecondsSinceMidnight: Double?
 }

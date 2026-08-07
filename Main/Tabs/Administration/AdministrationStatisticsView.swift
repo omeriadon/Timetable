@@ -21,18 +21,37 @@ struct AdministrationStatisticsView: View {
 				LabeledContent("Total users") {
 					Text(statistics?.totalUsers.formatted() ?? "No data")
 				}
+				LabeledContent("Users with a timetable") {
+					Text(statistics?.usersWithOwnerTimetable.formatted() ?? "No data")
+				}
+				LabeledContent("Active devices in the last 30 days") {
+					Text(statistics?.activeDevicesLast30Days.formatted() ?? "No data")
+				}
 			}
 
 			Section("Community") {
 				LabeledContent("Friends in account", value: friends.count.formatted())
 				LabeledContent("Pending friend requests", value: incomingFriendRequests.count.formatted())
+				LabeledContent("Accepted friendships") {
+					Text(statistics?.acceptedFriendships.formatted() ?? "No data")
+				}
 				LabeledContent("Subscribed event tags", value: subscribedTagIDs.count.formatted())
+				LabeledContent("All active tag subscriptions") {
+					Text(statistics?.activeEventTagSubscriptions.formatted() ?? "No data")
+				}
 			}
 
 			Section("Calendar") {
 				LabeledContent("Visible events", value: calendarEvents.allEvents.count.formatted())
-				LabeledContent("Global events", value: calendarEvents.globalEvents.count.formatted())
-				LabeledContent("Personal events", value: calendarEvents.privateEvents.count.formatted())
+				LabeledContent("All calendar events") {
+					Text(statistics?.totalCalendarEvents.formatted() ?? "No data")
+				}
+				LabeledContent("Global events") {
+					Text(statistics?.globalCalendarEvents.formatted() ?? "No data")
+				}
+				LabeledContent("Personal events") {
+					Text(statistics?.personalCalendarEvents.formatted() ?? "No data")
+				}
 			}
 
 			Section("Status") {
