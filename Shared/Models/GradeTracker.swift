@@ -5,6 +5,22 @@ nonisolated enum GradeAssessmentLocation: String, Codable, Hashable, Sendable {
 	case exam
 	case directedStudy
 	case subjectPeriod
+
+	var subtitle: String {
+		switch self {
+			case .exam: "While school is cancelled."
+			case .directedStudy: "CAP that replaces Directed Study."
+			case .subjectPeriod: "A test in the subject's period."
+		}
+	}
+
+	func title(for subject: Subject) -> String {
+		switch self {
+			case .exam: "Exam"
+			case .directedStudy: "Directed Study"
+			case .subjectPeriod: subject.id
+		}
+	}
 }
 
 nonisolated struct GradeAssessment: Codable, Defaults.Serializable, Identifiable, Hashable, Sendable {

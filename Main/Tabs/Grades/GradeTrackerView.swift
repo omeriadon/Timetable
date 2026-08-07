@@ -2,72 +2,76 @@ import Defaults
 import SwiftUI
 
 struct GradeTrackerView: View {
-	@Default(.timetable) private var subjects
-	@Default(.gradeTracker) private var document
-	@Default(.eventTagCatalogue) private var tagCatalogue
-	@Default(.eventTagSubscriptionIDs) private var subscriptionIDs
-	@State private var service = GradeTrackerService.shared
-	@State private var selectedSubject: Subject?
-	@State private var showsATARSheet = false
-	@Environment(\.accessibilityReduceMotion) private var reduceMotion
+	@Default(.timetable) var subjects
+	@Default(.gradeTracker) var document
+	@Default(.eventTagCatalogue) var tagCatalogue
+	@Default(.eventTagSubscriptionIDs) var subscriptionIDs
+	@State var service = GradeTrackerService.shared
+	@State var selectedSubject: Subject?
+	@State var showsATARSheet = false
+	@Environment(\.accessibilityReduceMotion) var reduceMotion
 
 	var body: some View {
-		ScrollView {
-			LazyVStack(spacing: 14) {
-				if isSenior {
-					Button {
-						showsATARSheet = true
-					} label: {
-						averageCard
-					}
-					.buttonStyle(.plain)
-				} else {
-					averageCard
-				}
-
-				if subjects.isEmpty {
-					ContentUnavailableView(
-						"No Subjects Yet",
-						systemImage: "book.closed",
-						description: Text("Add subjects to your timetable before tracking grades.")
-					)
-					.padding(.top, 72)
-				} else {
-					ForEach(subjects) { subject in
+		NavigationStack {
+			ScrollView {
+				LazyVStack(spacing: 14) {
+					if isSenior {
 						Button {
-							selectedSubject = subject
+							showsATARSheet = true
 						} label: {
-							GradeSubjectCard(
-								subject: subject,
-								average: subjectAverage(for: subject.id)
-							)
+							averageCard
 						}
 						.buttonStyle(.plain)
-						.scrollTransition(.animated(.snappy(duration: 0.3))) { card, phase in
-							card
-								.opacity(reduceMotion || phase.isIdentity ? 1 : 0.65)
-								.scaleEffect(reduceMotion || phase.isIdentity ? 1 : 0.96)
+					} else {
+						averageCard
+					}
+
+					if subjects.isEmpty {
+						ContentUnavailableView(
+							"No Subjects Yet",
+							systemImage: "book.closed",
+							description: Text("Add subjects to your timetable before tracking grades.")
+						)
+						.padding(.top, 72)
+					} else {
+						let reduceMotionValue = reduceMotion
+
+						ForEach(subjects) { subject in
+							Button {
+								selectedSubject = subject
+							} label: {
+								GradeSubjectCard(
+									subject: subject,
+									average: subjectAverage(for: subject.id)
+								)
+							}
+							.buttonStyle(.plain)
+							.scrollTransition(.animated(.snappy(duration: 0.3))) { card, phase in
+								card
+									.opacity(reduceMotionValue || phase.isIdentity ? 1 : 0.65)
+									.scaleEffect(reduceMotionValue || phase.isIdentity ? 1 : 0.96)
+							}
 						}
 					}
 				}
+				.padding()
 			}
-			.padding()
-		}
-		.scrollEdgeEffect()
-		.appNavigationTitle("Grades", style: .main, accent: true)
-		.sheet(item: $selectedSubject) { subject in
-			GradeSubjectDetailView(subject: subject)
-		}
-		.sheet(isPresented: $showsATARSheet) {
-			ATARSettingsSheet()
-				.presentationDetents([.fraction(0.5)])
-		}
-		.task {
-			try? await service.refresh()
+			.scrollEdgeEffect()
+			.appNavigationTitle("Grades", style: .main, accent: true)
+			.sheet(item: $selectedSubject) { subject in
+				GradeSubjectDetailView(subject: subject)
+			}
+			.sheet(isPresented: $showsATARSheet) {
+				ATARSettingsSheet()
+					.presentationDetents([.fraction(0.5)])
+			}
+			.task {
+				try? await service.refresh()
+			}
 		}
 	}
 
-	private var isSenior: Bool {
+	var isSenior: Bool {
 		let yearGroupTags = tagCatalogue.sections
 			.filter { $0.category == .yearGroup }
 			.flatMap(\.tags)
@@ -79,7 +83,7 @@ struct GradeTrackerView: View {
 		}
 	}
 
-	private var averageCard: some View {
+	var averageCard: some View {
 		GradeAverageCard(
 			average: overallAverage,
 			predictedATAR: document.predictedATAR,
@@ -88,7 +92,7 @@ struct GradeTrackerView: View {
 		)
 	}
 
-	private var overallAverage: Double? {
+	var overallAverage: Double? {
 		let averages = subjects.compactMap { subjectAverage(for: $0.id) }
 		guard !averages.isEmpty else {
 			return nil
@@ -96,7 +100,7 @@ struct GradeTrackerView: View {
 		return averages.reduce(0, +) / Double(averages.count)
 	}
 
-	private func subjectAverage(for subjectID: String) -> Double? {
+	func subjectAverage(for subjectID: String) -> Double? {
 		let semesterAverages = [1, 2].compactMap { semesterAverage(subjectID: subjectID, semester: $0) }
 		guard !semesterAverages.isEmpty else {
 			return nil
@@ -104,7 +108,7 @@ struct GradeTrackerView: View {
 		return semesterAverages.reduce(0, +) / Double(semesterAverages.count)
 	}
 
-	private func semesterAverage(subjectID: String, semester: Int) -> Double? {
+	func semesterAverage(subjectID: String, semester: Int) -> Double? {
 		let assessments = document.assessments.filter {
 			$0.subjectID == subjectID && $0.semester == semester
 		}
@@ -116,7 +120,7 @@ struct GradeTrackerView: View {
 	}
 }
 
-private struct GradeAverageCard: View {
+struct GradeAverageCard: View {
 	let average: Double?
 	let predictedATAR: Double?
 	let goalATAR: Double?
@@ -151,7 +155,7 @@ private struct GradeAverageCard: View {
 	}
 }
 
-private struct GradeSubjectCard: View {
+struct GradeSubjectCard: View {
 	let subject: Subject
 	let average: Double?
 
@@ -177,7 +181,7 @@ private struct GradeSubjectCard: View {
 	}
 }
 
-private struct GradeGauge: View {
+struct GradeGauge: View {
 	let value: Double?
 	var tint: Color = .brown
 
@@ -198,7 +202,7 @@ private struct GradeGauge: View {
 	}
 }
 
-private struct ATARValue: View {
+struct ATARValue: View {
 	let title: String
 	let value: Double?
 
@@ -213,13 +217,13 @@ private struct ATARValue: View {
 	}
 }
 
-private struct ATARSettingsSheet: View {
-	@Default(.gradeTracker) private var document
-	@State private var predictedATAR: Double?
-	@State private var goalATAR: Double?
-	@State private var service = GradeTrackerService.shared
-	@Environment(\.dismiss) private var dismiss
-	@Environment(\.statusBadgeManager) private var badges
+struct ATARSettingsSheet: View {
+	@Default(.gradeTracker) var document
+	@State var predictedATAR: Double?
+	@State var goalATAR: Double?
+	@State var service = GradeTrackerService.shared
+	@Environment(\.dismiss) var dismiss
+	@Environment(\.statusBadgeManager) var badges
 
 	var body: some View {
 		NavigationStack {
@@ -252,7 +256,7 @@ private struct ATARSettingsSheet: View {
 		}
 	}
 
-	private func save() async {
+	func save() async {
 		var proposed = document
 		proposed.predictedATAR = predictedATAR
 		proposed.goalATAR = goalATAR
@@ -265,91 +269,7 @@ private struct ATARSettingsSheet: View {
 	}
 }
 
-private struct GradeSubjectDetailView: View {
-	let subject: Subject
-	@Default(.timetable) private var subjects
-	@Default(.gradeTracker) private var document
-	@State private var service = GradeTrackerService.shared
-	@State private var editorContext: AssessmentEditorContext?
-	@Environment(\.dismiss) private var dismiss
-	@Environment(\.statusBadgeManager) private var badges
-
-	var body: some View {
-		List {
-			ForEach([1, 2], id: \.self) { semester in
-				Section("Semester \(semester)") {
-					Button {
-						editorContext = AssessmentEditorContext(semester: semester)
-					} label: {
-						Label("New Assessment", systemImage: "plus")
-					}
-
-					ForEach(assessments(for: semester)) { assessment in
-						Button {
-							editorContext = AssessmentEditorContext(
-								semester: semester,
-								assessment: assessment
-							)
-						} label: {
-							GradeAssessmentRow(assessment: assessment)
-						}
-						.buttonStyle(.plain)
-					}
-				}
-			}
-		}
-		.appNavigationTitle(subject.id, accent: true)
-		.toolbar {
-			ToolbarItem(placement: .cancellationAction) {
-				Button(role: .cancel) {
-					dismiss()
-				}
-			}
-		}
-		.sheet(item: $editorContext) { context in
-			GradeAssessmentEditor(
-				subject: subject,
-				semester: context.semester,
-				assessment: context.assessment,
-				subjects: subjects,
-				save: save,
-				delete: delete
-			)
-			.presentationDetents([.fraction(0.7)])
-		}
-	}
-
-	private func assessments(for semester: Int) -> [GradeAssessment] {
-		document.assessments
-			.filter { $0.subjectID == subject.id && $0.semester == semester }
-			.sorted { $0.date < $1.date }
-	}
-
-	private func save(_ assessment: GradeAssessment) async {
-		var proposed = document
-		proposed.assessments.removeAll { $0.id == assessment.id }
-		proposed.assessments.append(assessment)
-		do {
-			try await service.save(proposed)
-			editorContext = nil
-		} catch {
-			badges.present(error: error, title: "Unable to save assessment")
-		}
-	}
-
-	private func delete(_ assessment: GradeAssessment) async {
-		var proposed = document
-		proposed.assessments.removeAll { $0.id == assessment.id }
-		do {
-			try await service.save(proposed)
-			editorContext = nil
-		} catch {
-			badges.present(error: error, title: "Unable to delete assessment")
-		}
-	}
-}
-
-private struct AssessmentEditorContext: Identifiable {
+struct AssessmentEditorContext: Identifiable {
 	let id = UUID()
 	let semester: Int
 	let assessment: GradeAssessment?
@@ -360,7 +280,7 @@ private struct AssessmentEditorContext: Identifiable {
 	}
 }
 
-private struct GradeAssessmentRow: View {
+struct GradeAssessmentRow: View {
 	let assessment: GradeAssessment
 
 	var body: some View {
@@ -378,209 +298,12 @@ private struct GradeAssessmentRow: View {
 			Spacer()
 
 			VStack(alignment: .trailing, spacing: 4) {
-				Text("\(assessment.score, specifier: "%.1f")%")
-					.font(.headline)
-				Text("Weight \(assessment.weighting, specifier: "%.1f")")
+				Text(assessment.score, format: .percent.precision(.fractionLength(1)))
+					.font(.title3)
+				Text("Weighting: \(assessment.weighting, format: .percent.precision(.fractionLength(1)))")
 					.font(.caption)
 					.foregroundStyle(.secondary)
 			}
-		}
-		.padding(.vertical, 4)
-	}
-}
-
-private struct GradeAssessmentEditor: View {
-	let subject: Subject
-	let semester: Int
-	let assessment: GradeAssessment?
-	let subjects: [Subject]
-	let save: (GradeAssessment) async -> Void
-	let delete: (GradeAssessment) async -> Void
-	@State private var name: String
-	@State private var date: Date
-	@State private var score: Double
-	@State private var weighting: Double
-	@State private var location: GradeAssessmentLocation
-	@State private var isSaving = false
-	@Environment(\.dismiss) private var dismiss
-
-	init(
-		subject: Subject,
-		semester: Int,
-		assessment: GradeAssessment?,
-		subjects: [Subject],
-		save: @escaping (GradeAssessment) async -> Void,
-		delete: @escaping (GradeAssessment) async -> Void
-	) {
-		self.subject = subject
-		self.semester = semester
-		self.assessment = assessment
-		self.subjects = subjects
-		self.save = save
-		self.delete = delete
-		_name = State(initialValue: assessment?.name ?? "")
-		_date = State(initialValue: assessment?.date.date ?? Self.nextWeekday())
-		_score = State(initialValue: assessment?.score ?? 0)
-		_weighting = State(initialValue: assessment?.weighting ?? 1)
-		_location = State(initialValue: assessment?.location ?? .exam)
-	}
-
-	var body: some View {
-		NavigationStack {
-			Form {
-				Section("Assessment") {
-					TextField("Name", text: $name)
-					DatePicker("Date", selection: $date, displayedComponents: .date)
-					Picker("Assessment period", selection: $location) {
-						ForEach(locationOptions, id: \.self) { option in
-							Label {
-								VStack(alignment: .leading, spacing: 2) {
-									Text(option.title(for: subject))
-									Text(option.subtitle)
-										.font(.caption)
-										.foregroundStyle(.secondary)
-								}
-							} icon: {
-								Image(systemName: option.symbol)
-							}
-							.tag(option)
-						}
-					}
-				}
-
-				Section("Result") {
-					LabeledContent("Score") {
-						HStack {
-							TextField("Percentage", value: $score, format: .number.precision(.fractionLength(1)))
-								.keyboardType(.decimalPad)
-							Text("%")
-						}
-					}
-					LabeledContent("Weighting") {
-						HStack {
-							TextField("Percentage", value: $weighting, format: .number.precision(.fractionLength(1)))
-								.keyboardType(.decimalPad)
-							Text("%")
-						}
-					}
-					Text("This weighting is calculated within Semester \(semester).")
-						.font(.caption)
-						.foregroundStyle(.secondary)
-				}
-			}
-			.appNavigationTitle(assessment == nil ? "New Assessment" : "Edit Assessment")
-			.toolbar {
-				ToolbarItem(placement: .cancellationAction) {
-					Button(role: .cancel) {
-						dismiss()
-					}
-					.disabled(isSaving)
-				}
-				ToolbarItem(placement: .confirmationAction) {
-					Button(assessment == nil ? "Add" : "Save", systemImage: assessment == nil ? "plus" : "checkmark", role: .confirm) {
-						Task { await submit() }
-					}
-					.buttonStyle(.glassProminent)
-					.disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || weighting <= 0 || isSaving)
-				}
-			}
-			.safeAreaBar(edge: .bottom) {
-				if let assessment {
-					Button("Delete Assessment", systemImage: "trash", role: .destructive) {
-						Task {
-							isSaving = true
-							await delete(assessment)
-							isSaving = false
-						}
-					}
-					.buttonStyle(.glassProminent)
-					.tint(.red)
-				}
-			}
-			.onChange(of: date) { _, value in
-				let corrected = Self.nearestWeekday(value)
-				if corrected != value {
-					date = corrected
-				}
-				if !locationOptions.contains(location) {
-					location = locationOptions.first ?? .exam
-				}
-			}
-		}
-	}
-
-	private var locationOptions: [GradeAssessmentLocation] {
-		var options: [GradeAssessmentLocation] = [.exam]
-		guard let day = SchoolCalendarProjection.perthCalendar.dateComponents([.weekday], from: date).weekday,
-		      (2 ... 6).contains(day)
-		else {
-			return options
-		}
-
-		let dayIndex = day - 2
-		if subjects.contains(where: { subject in
-			subject.slots.contains { $0.day == dayIndex }
-				&& subject.id.localizedCaseInsensitiveContains("directed study")
-		}) {
-			options.append(.directedStudy)
-		}
-		if subject.slots.contains(where: { $0.day == dayIndex }) {
-			options.append(.subjectPeriod)
-		}
-		return options
-	}
-
-	private func submit() async {
-		isSaving = true
-		let proposed = GradeAssessment(
-			id: assessment?.id ?? UUID(),
-			subjectID: subject.id,
-			semester: semester,
-			name: name.trimmingCharacters(in: .whitespacesAndNewlines),
-			date: SchoolCalendarDate(date),
-			score: min(max(score, 0), 100),
-			weighting: weighting,
-			location: location
-		)
-		await save(proposed)
-		isSaving = false
-	}
-
-	private static func nextWeekday() -> Date {
-		nearestWeekday(.now)
-	}
-
-	private static func nearestWeekday(_ date: Date) -> Date {
-		let calendar = SchoolCalendarProjection.perthCalendar
-		let weekday = calendar.component(.weekday, from: date)
-		if weekday == 7 {
-			return calendar.date(byAdding: .day, value: 2, to: date) ?? date
-		}
-		if weekday == 1 {
-			return calendar.date(byAdding: .day, value: 1, to: date) ?? date
-		}
-		return date
-	}
-}
-
-private extension GradeAssessmentLocation {
-	var symbol: String {
-		"checkmark.seal"
-	}
-
-	var subtitle: String {
-		switch self {
-			case .exam: "While school is cancelled."
-			case .directedStudy: "CAP that replaces Directed Study."
-			case .subjectPeriod: "A test in the subject's period."
-		}
-	}
-
-	func title(for subject: Subject) -> String {
-		switch self {
-			case .exam: "Exam"
-			case .directedStudy: "Directed Study"
-			case .subjectPeriod: subject.id
 		}
 	}
 }
