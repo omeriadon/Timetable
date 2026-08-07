@@ -89,7 +89,6 @@ extension Defaults.Keys {
 	static let pendingLocationStatusUpdates = Key<[LocationStatusItem]>("pendingLocationStatusUpdates", default: [], suite: sharedDefaults)
 	static let hasSeenLocationStatusWhatsNew = Key<Bool>("hasSeenLocationStatusWhatsNew_v1", default: false, suite: sharedDefaults)
 	static let profileAppearance = Key<ProfileAppearance>("profileAppearance", default: .default, suite: sharedDefaults)
-	static let createdTimetables = Key<[TimetableDetailResponse]>("createdTimetables", default: [], suite: sharedDefaults)
 	static let pendingMessageTimetableIDs = Key<[String]>("pendingMessageTimetableIDs", default: [], suite: sharedDefaults)
 	static let pendingMessageTimetableLocators = Key<[String]>("pendingMessageTimetableLocators", default: [], suite: sharedDefaults)
 	static let userDisplayName = Key<String>("userDisplayName", default: "Account", suite: sharedDefaults)

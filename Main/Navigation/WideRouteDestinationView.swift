@@ -73,8 +73,6 @@ struct WideRouteDestinationView: View {
 					ProfileAppearanceSheet(close: close)
 				case .settings(.navigationPersistence):
 					NavigationPersistenceSettingsView()
-				case .settings(.createdTimetables), .settings(.createdTimetable(id: _)):
-					CreatedTimetablesSettingsView(closeWideDestination: closeWideDestination)
 				case .settings(.receivedTimetables):
 					ReceivedTimetablesView()
 				case .administration(.statistics):

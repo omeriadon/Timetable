@@ -21,10 +21,6 @@ enum Platform: String, Codable, Sendable, CaseIterable {
 		self != .watchOS
 	}
 
-	var allowsCreatedTimetableMutation: Bool {
-		self != .watchOS
-	}
-
 	var allowsReceivedTimetableMutation: Bool {
 		self != .watchOS
 	}

@@ -168,14 +168,8 @@ struct SettingsView: View {
 			}
 		}
 
-		Section("Created Timetables") {
+		Section("Sharing") {
 			if sessionStore.isAuthenticated {
-				NavigationLink {
-					CreatedTimetablesSettingsView(closeWideDestination: nil)
-				} label: {
-					Label("Manage Created Timetables", systemImage: "person.2.crop.square.stack")
-				}
-
 				NavigationLink {
 					ReceivedTimetablesView()
 				} label: {
@@ -193,8 +187,6 @@ struct SettingsView: View {
 				} label: {
 					Label("Customize Share Link", systemImage: "link.badge.plus")
 				}
-			} else {
-				Button { showSignInRequired() } label: { Label("Manage Created Timetables", systemImage: "person.2.crop.square.stack") }
 			}
 		}
 

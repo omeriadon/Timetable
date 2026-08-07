@@ -48,8 +48,6 @@ struct CompactRouteDestinationView: View {
 				AccountAndSyncSettingsView()
 			case .settings(.tagSubscriptions):
 				TagSubscriptionsView()
-			case .settings(.createdTimetables), .settings(.createdTimetable(id: _)):
-				CreatedTimetablesSettingsView(closeWideDestination: nil)
 			case .settings(.receivedTimetables):
 				ReceivedTimetablesView()
 			case .settings(.feedback):

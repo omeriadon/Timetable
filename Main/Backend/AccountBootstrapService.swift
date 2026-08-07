@@ -69,9 +69,6 @@ final class AccountBootstrapService {
 				)
 				Defaults[.locationStatus] = response.item
 			}
-			async let created: Void = self.runBootstrapStage("Created timetables") {
-				try await CreatedTimetableService.shared.refresh()
-			}
 			async let schoolCalendar: Void = self.runBootstrapStage("School calendar") {
 				try await self.schoolCalendarSync.downloadCalendar()
 			}
@@ -84,7 +81,6 @@ final class AccountBootstrapService {
 				settings,
 				friends,
 				locationStatus,
-				created,
 				schoolCalendar,
 				calendarEvents
 			)

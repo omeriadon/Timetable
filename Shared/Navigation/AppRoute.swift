@@ -43,8 +43,6 @@ enum SettingsRoute: Codable, Hashable, Sendable {
 	case account
 	case updatesAndNotifications
 	case tagSubscriptions
-	case createdTimetables
-	case createdTimetable(id: UUID)
 	case receivedTimetables
 	case feedback
 	case shareAlias
