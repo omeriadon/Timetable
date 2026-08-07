@@ -1,7 +1,7 @@
 import Defaults
 import Foundation
 
-nonisolated enum GradeAssessmentLocation: Codable, Hashable, Sendable {
+nonisolated enum GradeAssessmentLocation: String, Codable, Hashable, Sendable {
 	case exam
 	case directedStudy
 	case subjectPeriod
