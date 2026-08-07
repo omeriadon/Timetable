@@ -2076,6 +2076,9 @@
     "Delete Past Events" : {
 
     },
+    "Delete past events..." : {
+
+    },
     "Delete Request" : {
       "localizations" : {
         "fr" : {
@@ -3980,6 +3983,9 @@
           }
         }
       }
+    },
+    "No Events Today" : {
+
     },
     "No Friend Requests" : {
       "localizations" : {
@@ -6820,6 +6826,9 @@
           }
         }
       }
+    },
+    "There are no events scheduled for today." : {
+
     },
     "This account is not an administrator." : {
       "localizations" : {
