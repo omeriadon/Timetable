@@ -17,6 +17,7 @@ import WidgetKit
 		@Default(.timetable) var subjects
 		@Default(.lastServerSync) var lastServerSync
 		@Default(.userDisplayName) var userDisplayName
+		@Default(.calendarEventArchivePolicy) private var archivePolicy
 
 		@Environment(\.statusBadgeManager) private var statusBadgeManager
 		@State private var sessionStore = SessionStore.shared
@@ -153,6 +154,13 @@ import WidgetKit
 				Toggle("Highlight Current Day in timetables", systemImage: "inset.filled.lefthalf.righthalf.rectangle", isOn: highlightsCurrentDayBinding)
 
 				Toggle("Haptic Feedback", systemImage: "iphone.radiowaves.left.and.right", isOn: hapticsBinding)
+
+				Picker("Delete Past Events", selection: $archivePolicy) {
+					ForEach(CalendarEventArchivePolicy.allCases, id: \.self) { policy in
+						Text(policy.title).tag(policy)
+					}
+				}
+				.pickerStyle(.menu)
 			}
 
 			Section("Created Timetables") {

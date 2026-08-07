@@ -1,6 +1,22 @@
 import Defaults
 import Foundation
 
+nonisolated enum CalendarEventArchivePolicy: Int, CaseIterable, Codable, Defaults.Serializable, Hashable, Sendable {
+	case oneWeek = 7
+	case thirtyDays = 30
+	case oneYear = 365
+	case never = 0
+
+	var title: String {
+		switch self {
+			case .oneWeek: "1 week after they pass"
+			case .thirtyDays: "30 days after they pass"
+			case .oneYear: "1 year after they pass"
+			case .never: "Never"
+		}
+	}
+}
+
 nonisolated struct CalendarEvent: Codable, Defaults.Serializable, Hashable, Identifiable, Sendable {
 	let id: UUID
 	let title: String

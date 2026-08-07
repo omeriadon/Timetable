@@ -5,6 +5,7 @@ import SwiftUI
 struct DatesView: View {
 	@Default(.schoolCalendar) private var schoolCalendar
 	@Default(.calendarEvents) private var events
+	@Default(.calendarEventArchivePolicy) private var archivePolicy
 	@State private var presentationTarget: PlannerPresentationTarget?
 	@State private var eventService = CalendarEventsSyncService.shared
 	@Environment(\.statusBadgeManager) private var badges
@@ -16,7 +17,7 @@ struct DatesView: View {
 		ScrollView {
 			LazyVStack(alignment: .leading, spacing: 16, pinnedViews: [.sectionHeaders]) {
 				Section {
-					if timelineEntries.isEmpty {
+					if upcomingEventEntries.isEmpty {
 						ContentUnavailableView(
 							"No Upcoming Events",
 							systemImage: "calendar",
@@ -25,13 +26,26 @@ struct DatesView: View {
 						.frame(maxWidth: .infinity)
 						.padding(.vertical, 36)
 					} else {
-						ForEach(timelineEntries) { entry in
+						ForEach(upcomingEventEntries) { entry in
 							animatedScrollCard(timelineEntry(entry))
 						}
 					}
 
 				} header: {
-					plannerSectionHeader("Upcoming")
+					plannerSectionHeader("Future & Current")
+				}
+
+				Section {
+					if archivedEventEntries.isEmpty {
+						Text("No archived events")
+							.foregroundStyle(.secondary)
+					} else {
+						ForEach(archivedEventEntries) { entry in
+							animatedScrollCard(timelineEntry(entry))
+						}
+					}
+				} header: {
+					plannerSectionHeader("Archived")
 				}
 
 				Section {
@@ -60,6 +74,20 @@ struct DatesView: View {
 		}
 		.sheet(item: $presentationTarget) { target in
 			plannerPresentation(for: target)
+		}
+		.toolbar {
+			ToolbarItem(placement: .primaryAction) {
+				Picker("Delete Past Events", selection: $archivePolicy) {
+					ForEach(CalendarEventArchivePolicy.allCases, id: \.self) { policy in
+						Text(policy.title).tag(policy)
+					}
+				}
+				.labelsHidden()
+				.pickerStyle(.menu)
+			}
+		}
+		.task(id: archivePolicy) {
+			await deleteExpiredPrivateEvents()
 		}
 	}
 
@@ -211,6 +239,41 @@ struct DatesView: View {
 		let start = SchoolCalendarDate(TimetableClock.now, calendar: calendar)
 		let end = SchoolCalendarDate(calendar.date(byAdding: .month, value: 3, to: TimetableClock.now) ?? TimetableClock.now, calendar: calendar)
 		return start ... end
+	}
+
+	private var upcomingEventEntries: [PlannerTimelineEntry] {
+		let today = SchoolCalendarDate(TimetableClock.now, calendar: calendar)
+		return eventEntries.filter { $0.date >= today }
+	}
+
+	private var archivedEventEntries: [PlannerTimelineEntry] {
+		let today = SchoolCalendarDate(TimetableClock.now, calendar: calendar)
+		return eventEntries.filter { $0.date < today }
+	}
+
+	private var eventEntries: [PlannerTimelineEntry] {
+		(events.globalEvents + events.privateEvents)
+			.enumerated()
+			.map { PlannerTimelineEntry(event: $0.element, occurrence: $0.offset) }
+			.sorted { $0.date < $1.date }
+	}
+
+	private func deleteExpiredPrivateEvents() async {
+		guard archivePolicy != .never else { return }
+		let cutoff = calendar.date(
+			byAdding: .day,
+			value: -archivePolicy.rawValue,
+			to: TimetableClock.now
+		) ?? TimetableClock.now
+		let cutoffDate = SchoolCalendarDate(cutoff, calendar: calendar)
+		for event in events.privateEvents where event.date < cutoffDate {
+			do {
+				try await eventService.deleteEvent(id: event.id, globally: false)
+			} catch {
+				badges.present(error: error, title: "Unable to delete expired event")
+				return
+			}
+		}
 	}
 
 	private var timelineEntries: [PlannerTimelineEntry] {
