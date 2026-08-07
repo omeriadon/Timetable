@@ -106,18 +106,19 @@
 
 		func animateTransition(using context: UIViewControllerContextTransitioning) {
 			guard let fromView = context.view(forKey: .from),
-			      let toView = context.view(forKey: .to),
-			      let container = context.containerView
+			      let toView = context.view(forKey: .to)
 			else {
 				context.completeTransition(false)
 				return
 			}
 
+			let container = context.containerView
 			let offset = container.bounds.width * (forward ? 1 : -1)
 			toView.frame = container.bounds.offsetBy(dx: offset, dy: 0)
 			container.addSubview(toView)
 			UIView.animate(
 				withDuration: transitionDuration(using: context),
+				delay: 0,
 				options: [.curveEaseInOut]
 			) {
 				fromView.frame = container.bounds.offsetBy(dx: -offset, dy: 0)

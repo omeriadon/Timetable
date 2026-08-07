@@ -99,7 +99,6 @@ extension Defaults.Keys {
 	static let persistsNavigationState = Key<Bool>("persistsNavigationState", default: false, suite: sharedDefaults)
 	static let eventTagCatalogue = Key<EventTagCatalogueResponse>("eventTagCatalogue", default: EventTagCatalogueResponse(sections: []), suite: sharedDefaults)
 	static let eventTagSubscriptionIDs = Key<[UUID]>("eventTagSubscriptionIDs", default: [], suite: sharedDefaults)
-	static let calendarEventArchivePolicy = Key<CalendarEventArchivePolicy>("calendarEventArchivePolicy", default: .never, suite: sharedDefaults)
 
 	#if DEBUG
 		nonisolated static let debugOffset = Key<TimeInterval>("debugOffset", default: 87896, suite: sharedDefaults)

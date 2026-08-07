@@ -17,7 +17,6 @@ import WidgetKit
 		@Default(.timetable) var subjects
 		@Default(.lastServerSync) var lastServerSync
 		@Default(.userDisplayName) var userDisplayName
-		@Default(.calendarEventArchivePolicy) private var archivePolicy
 
 		@Environment(\.statusBadgeManager) private var statusBadgeManager
 		@State private var sessionStore = SessionStore.shared
@@ -155,7 +154,7 @@ import WidgetKit
 
 				Toggle("Haptic Feedback", systemImage: "iphone.radiowaves.left.and.right", isOn: hapticsBinding)
 
-				Picker("Delete Past Events", selection: $archivePolicy) {
+				Picker("Delete Past Events", selection: archivePolicyBinding) {
 					ForEach(CalendarEventArchivePolicy.allCases, id: \.self) { policy in
 						Text(policy.title).tag(policy)
 					}
@@ -304,6 +303,32 @@ import WidgetKit
 					let generation = settingsSaveGeneration
 					let previous = committedSettings
 					settings.highlightsCurrentDay = value
+					let proposed = settings
+					Task {
+						do {
+							try await settingsSync.updateSettings(proposed)
+							guard generation == settingsSaveGeneration else { return }
+							committedSettings = proposed
+						} catch {
+							guard generation == settingsSaveGeneration else { return }
+							settings = previous
+							statusBadgeManager.addBadge(id: UUID(), title: "Unable to save preferences", secondaryText: error.localizedDescription, priority: 4, view: .error)
+						}
+					}
+				}
+			)
+		}
+
+		private var archivePolicyBinding: Binding<CalendarEventArchivePolicy> {
+			Binding(
+				get: {
+					CalendarEventArchivePolicy(rawValue: settings.calendarEventAutoDeleteDays) ?? .never
+				},
+				set: { policy in
+					settingsSaveGeneration += 1
+					let generation = settingsSaveGeneration
+					let previous = committedSettings
+					settings.calendarEventAutoDeleteDays = policy.rawValue
 					let proposed = settings
 					Task {
 						do {

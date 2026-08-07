@@ -30,6 +30,7 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 	var notificationLeadTimes: Set<NotificationLeadTime>
 	var breakToPeriodNotificationLeadTimes: Set<NotificationLeadTime>
 	var eventNotificationSchedules: Set<EventNotificationSchedule>
+	var calendarEventAutoDeleteDays: Int
 	var serverRevision: Int
 
 	private enum LegacyCodingKeys: String, CodingKey {
@@ -44,6 +45,7 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 		notificationLeadTimes: [.zero],
 		breakToPeriodNotificationLeadTimes: [.zero],
 		eventNotificationSchedules: [],
+		calendarEventAutoDeleteDays: 0,
 		serverRevision: 0
 	)
 
@@ -55,6 +57,7 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 		notificationLeadTimes: Set<NotificationLeadTime>,
 		breakToPeriodNotificationLeadTimes: Set<NotificationLeadTime> = [.zero],
 		eventNotificationSchedules: Set<EventNotificationSchedule> = [],
+		calendarEventAutoDeleteDays: Int = 0,
 		serverRevision: Int = 0
 	) {
 		self.liveActivitiesEnabled = liveActivitiesEnabled
@@ -64,6 +67,7 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 		self.notificationLeadTimes = notificationLeadTimes
 		self.breakToPeriodNotificationLeadTimes = breakToPeriodNotificationLeadTimes
 		self.eventNotificationSchedules = eventNotificationSchedules
+		self.calendarEventAutoDeleteDays = calendarEventAutoDeleteDays
 		self.serverRevision = serverRevision
 	}
 
@@ -83,6 +87,7 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 		}
 		breakToPeriodNotificationLeadTimes = try container.decodeIfPresent(Set<NotificationLeadTime>.self, forKey: .breakToPeriodNotificationLeadTimes) ?? Self.default.breakToPeriodNotificationLeadTimes
 		eventNotificationSchedules = try container.decodeIfPresent(Set<EventNotificationSchedule>.self, forKey: .eventNotificationSchedules) ?? Self.default.eventNotificationSchedules
+		calendarEventAutoDeleteDays = try container.decodeIfPresent(Int.self, forKey: .calendarEventAutoDeleteDays) ?? Self.default.calendarEventAutoDeleteDays
 		serverRevision = try container.decodeIfPresent(Int.self, forKey: .serverRevision) ?? 0
 	}
 }

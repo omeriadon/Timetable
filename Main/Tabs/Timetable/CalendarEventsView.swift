@@ -5,7 +5,7 @@ import SwiftUI
 struct DatesView: View {
 	@Default(.schoolCalendar) private var schoolCalendar
 	@Default(.calendarEvents) private var events
-	@Default(.calendarEventArchivePolicy) private var archivePolicy
+	@Default(.accountSettings) private var accountSettings
 	@State private var presentationTarget: PlannerPresentationTarget?
 	@State private var eventService = CalendarEventsSyncService.shared
 	@Environment(\.statusBadgeManager) private var badges
@@ -77,7 +77,7 @@ struct DatesView: View {
 		}
 		.toolbar {
 			ToolbarItem(placement: .primaryAction) {
-				Picker("Delete Past Events", selection: $archivePolicy) {
+				Picker("Delete Past Events", selection: archivePolicyBinding) {
 					ForEach(CalendarEventArchivePolicy.allCases, id: \.self) { policy in
 						Text(policy.title).tag(policy)
 					}
@@ -85,9 +85,6 @@ struct DatesView: View {
 				.labelsHidden()
 				.pickerStyle(.menu)
 			}
-		}
-		.task(id: archivePolicy) {
-			await deleteExpiredPrivateEvents()
 		}
 	}
 
@@ -258,22 +255,26 @@ struct DatesView: View {
 			.sorted { $0.date < $1.date }
 	}
 
-	private func deleteExpiredPrivateEvents() async {
-		guard archivePolicy != .never else { return }
-		let cutoff = calendar.date(
-			byAdding: .day,
-			value: -archivePolicy.rawValue,
-			to: TimetableClock.now
-		) ?? TimetableClock.now
-		let cutoffDate = SchoolCalendarDate(cutoff, calendar: calendar)
-		for event in events.privateEvents where event.date < cutoffDate {
-			do {
-				try await eventService.deleteEvent(id: event.id, globally: false)
-			} catch {
-				badges.present(error: error, title: "Unable to delete expired event")
-				return
+	private var archivePolicy: CalendarEventArchivePolicy {
+		CalendarEventArchivePolicy(rawValue: accountSettings.calendarEventAutoDeleteDays) ?? .never
+	}
+
+	private var archivePolicyBinding: Binding<CalendarEventArchivePolicy> {
+		Binding(
+			get: { archivePolicy },
+			set: { policy in
+				var proposed = accountSettings
+				proposed.calendarEventAutoDeleteDays = policy.rawValue
+				accountSettings = proposed
+				Task {
+					do {
+						try await AccountSettingsSyncService.shared.updateSettings(proposed)
+					} catch {
+						badges.present(error: error, title: "Unable to save event deletion preference")
+					}
+				}
 			}
-		}
+		)
 	}
 
 	private var timelineEntries: [PlannerTimelineEntry] {

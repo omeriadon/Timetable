@@ -103,20 +103,18 @@
 							}
 					})
 				),
-			].appendingIf(canShowAdministration) {
-				UIKitTabItem(
-					title: "Admin",
-					systemImage: "calendar.badge.lock",
-					value: .administration,
-					badge: nil,
-					content: AnyView(NavigationStack(path: Binding(get: { router.administrationPath }, set: { router.administrationPath = $0 })) {
-						AdministrationView()
-							.navigationDestination(for: AppRoute.self) { route in
-								CompactRouteDestinationView(route: route)
-							}
-					})
-				)
-			}
+			].appendingIf(canShowAdministration, UIKitTabItem(
+				title: "Admin",
+				systemImage: "calendar.badge.lock",
+				value: .administration,
+				badge: nil,
+				content: AnyView(NavigationStack(path: Binding(get: { router.administrationPath }, set: { router.administrationPath = $0 })) {
+					AdministrationView()
+						.navigationDestination(for: AppRoute.self) { route in
+							CompactRouteDestinationView(route: route)
+						}
+				})
+			))
 		}
 	}
 
