@@ -87,7 +87,7 @@
 		}
 	}
 
-	private extension Array {
+	extension Array {
 		func appendingIf(_ condition: Bool, _ item: @autoclosure () -> Element) -> [Element] {
 			condition ? self + [item()] : self
 		}
