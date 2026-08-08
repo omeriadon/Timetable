@@ -3,7 +3,7 @@ import SwiftUI
 import WatchKit
 
 private extension View {
-	func watchPageTransition(height: CGFloat) -> some View {
+	func watchPageCard(height: CGFloat) -> some View {
 		frame(height: height)
 			.frame(maxWidth: .infinity)
 			.background {
@@ -14,11 +14,6 @@ private extension View {
 			}
 			.clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
 			.foregroundStyle(.white)
-			.scrollTransition { content, phase in
-				content
-					.scaleEffect(phase.isIdentity ? 1 : 0.75)
-					.blur(radius: phase.isIdentity ? 0 : 8)
-			}
 	}
 }
 
@@ -46,27 +41,37 @@ struct WatchTimetablesTabView: View {
 		WKInterfaceDevice.current().screenBounds.height
 	}
 
+	private var cardHeight: CGFloat {
+		max(1, screenHeight - 24)
+	}
+
 	var body: some View {
 		ScrollView(.vertical) {
 			LazyVStack(spacing: 0) {
 				ContentView()
-					.watchPageTransition(height: screenHeight)
+					.watchPageCard(height: cardHeight)
+					.padding(.horizontal, 8)
+					.padding(.vertical, 12)
 
 				if !subjects.isEmpty {
 					CurrentSubjectView()
-						.watchPageTransition(height: screenHeight)
+						.watchPageCard(height: cardHeight)
+						.padding(.horizontal, 8)
+						.padding(.vertical, 12)
 				}
 
 				ForEach(friends) { friend in
 					if let timetable = friend.timetable {
 						FriendsTimetablesView(friend: friend, timetable: timetable)
-							.watchPageTransition(height: screenHeight)
+							.watchPageCard(height: cardHeight)
+							.padding(.horizontal, 8)
+							.padding(.vertical, 12)
 					}
 				}
 			}
 			.scrollTargetLayout()
 		}
-		.scrollTargetBehavior(.viewAligned)
+		.scrollTargetBehavior(.viewAligned(limitBehavior: .always))
 		.scrollClipDisabled()
 		.background {
 			WatchPaperBackground(imageName: "paperBlack", cornerRadius: 0)

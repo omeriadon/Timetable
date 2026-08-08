@@ -136,14 +136,14 @@ struct CurrentSubjectView: View {
 					Spacer()
 
 					Text(timerInterval: now ... end, countsDown: true, showsHours: true)
-						.contentTransition(.numericText())
+						.contentTransition(.numericText(countsDown: true))
 						.animation(.easeInOut, value: now)
 						.font(.title2)
 						.lineLimit(1)
 						.bold()
 						.padding(.horizontal, 15)
 						.padding(.vertical, 10)
-						.background(.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
 
 					Spacer()
 
@@ -202,7 +202,7 @@ struct CurrentSubjectView: View {
 						.bold()
 						.padding(.horizontal, 15)
 						.padding(.vertical, 10)
-						.background(.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
 
 					Spacer()
 						.frame(height: geo.size.height * 0.1)

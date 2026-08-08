@@ -120,14 +120,14 @@ struct FriendsTimetablesView: View {
 
 				if let countdownEnd {
 					Text(timerInterval: now ... countdownEnd, countsDown: true, showsHours: true)
-						.contentTransition(.numericText())
+						.contentTransition(.numericText(countsDown: true))
 						.animation(.easeInOut, value: now)
 						.font(.title3)
 						.lineLimit(1)
 						.bold()
 						.padding(.horizontal, 13)
 						.padding(.vertical, 8)
-						.background(.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
 				}
 
 				Spacer()
