@@ -3,17 +3,12 @@ import SwiftUI
 import WatchKit
 
 private extension View {
-	func watchPageCard(height: CGFloat) -> some View {
-		frame(height: height)
-			.frame(maxWidth: .infinity)
-			.background {
-				WatchPaperBackground(
-					imageName: "paper",
-					cornerRadius: 24
-				)
-			}
-			.clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-			.foregroundStyle(.white)
+	func watchCardStyle(cornerRadius: CGFloat = 24) -> some View {
+		background {
+			WatchPaperBackground(imageName: "paper", cornerRadius: cornerRadius)
+		}
+		.clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+		.foregroundStyle(.white)
 	}
 }
 
@@ -33,48 +28,65 @@ private struct WatchPaperBackground: View {
 	}
 }
 
+private struct WatchPage<Content: View>: View {
+	let verticalInset: CGFloat
+	let horizontalPadding: CGFloat
+	@ViewBuilder var content: Content
+
+	var body: some View {
+		content
+			.frame(maxWidth: .infinity)
+			.containerRelativeFrame(.vertical) { length, _ in
+				max(1, length - verticalInset * 2)
+			}
+			.watchCardStyle()
+			.padding(.horizontal, horizontalPadding)
+			.padding(.vertical, verticalInset)
+			.containerRelativeFrame(.vertical, alignment: .top)
+			.scrollTransition(.animated(.smooth), axis: .vertical) { view, phase in
+				let magnitude = min(abs(phase.value), 1)
+
+				return view
+					.scaleEffect(1 - magnitude * 0.08)
+					.blur(radius: magnitude * 4)
+					.opacity(1 - magnitude * 0.2)
+			}
+	}
+}
+
 struct WatchTimetablesTabView: View {
 	@Default(.friends) private var friends
 	@Default(.timetable) private var subjects
 
-	private var screenHeight: CGFloat {
-		WKInterfaceDevice.current().screenBounds.height
-	}
-
-	private var cardHeight: CGFloat {
-		max(1, screenHeight - 24)
-	}
-
 	var body: some View {
 		ScrollView(.vertical) {
 			LazyVStack(spacing: 0) {
-				ContentView()
-					.watchPageCard(height: cardHeight)
-					.padding(.horizontal, 8)
-					.padding(.vertical, 12)
+				WatchPage(verticalInset: 0, horizontalPadding: 3) {
+					ContentView()
+				}
 
 				if !subjects.isEmpty {
-					CurrentSubjectView()
-						.watchPageCard(height: cardHeight)
-						.padding(.horizontal, 8)
-						.padding(.vertical, 12)
+					WatchPage(verticalInset: 4, horizontalPadding: 8) {
+						CurrentSubjectView()
+					}
 				}
 
 				ForEach(friends) { friend in
 					if let timetable = friend.timetable {
-						FriendsTimetablesView(friend: friend, timetable: timetable)
-							.watchPageCard(height: cardHeight)
-							.padding(.horizontal, 8)
-							.padding(.vertical, 12)
+						WatchPage(verticalInset: 4, horizontalPadding: 8) {
+							FriendsTimetablesView(friend: friend, timetable: timetable)
+						}
 					}
 				}
 			}
 			.scrollTargetLayout()
 		}
+		.dynamicTypeSize(.xSmall)
 		.scrollTargetBehavior(.viewAligned(limitBehavior: .always))
 		.scrollClipDisabled()
 		.background {
 			WatchPaperBackground(imageName: "paperBlack", cornerRadius: 0)
+				.ignoresSafeArea()
 		}
 	}
 }
