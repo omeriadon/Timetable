@@ -31,6 +31,9 @@ struct TimetableApp: App {
 
 	@Default(.incomingFriendRequests) private var incomingFriendRequests
 	@Default(.accountSettings) private var accountSettings
+	@State private var renderedAppFontDesign = Defaults[.accountSettings].appFontDesign
+	@State private var appFontTransitionOpacity = 1.0
+	@State private var appFontTransitionGeneration = 0
 
 	@State private var sessionStore = SessionStore.shared
 	@State private var statusBadgeManager = StatusBadgeManager.shared
@@ -77,6 +80,9 @@ struct TimetableApp: App {
 					#endif
 				}
 				.animation(.easeInOut, value: sessionStore.state)
+				.id(renderedAppFontDesign)
+				.transition(.opacity)
+				.opacity(appFontTransitionOpacity)
 				.onOpenURL { url in
 					handleAppRoute(url, router: router)
 				}
@@ -139,8 +145,11 @@ struct TimetableApp: App {
 						)
 					}
 				}
-				.fontDesign(accountSettings.appFontDesign.swiftUIFontDesign)
-				.fontWidth(accountSettings.appFontDesign.swiftUIFontWidth)
+				.fontDesign(renderedAppFontDesign.swiftUIFontDesign)
+				.fontWidth(renderedAppFontDesign.swiftUIFontWidth)
+				.onChange(of: accountSettings.appFontDesign) { _, newDesign in
+					transitionAppFont(to: newDesign)
+				}
 				.environment(\.statusBadgeManager, statusBadgeManager)
 				.buttonStyle(.haptic)
 				#if os(macOS)
@@ -193,6 +202,25 @@ struct TimetableApp: App {
 			CommandGroup(replacing: .appSettings) {
 				Button("Settings…") { NotificationCenter.default.post(name: .openSettingsTab, object: nil) }
 					.keyboardShortcut(",", modifiers: .command)
+			}
+		}
+	}
+
+	@MainActor
+	private func transitionAppFont(to design: AppFontDesign) {
+		appFontTransitionGeneration += 1
+		let generation = appFontTransitionGeneration
+
+		withAnimation(.linear(duration: 0.05)) {
+			appFontTransitionOpacity = 0
+		}
+
+		Task { @MainActor in
+			try? await Task.sleep(for: .milliseconds(50))
+			guard generation == appFontTransitionGeneration else { return }
+			renderedAppFontDesign = design
+			withAnimation(.linear(duration: 0.05)) {
+				appFontTransitionOpacity = 1
 			}
 		}
 	}
