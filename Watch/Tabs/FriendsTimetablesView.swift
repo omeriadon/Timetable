@@ -28,7 +28,6 @@ struct FriendsTimetablesView: View {
 				.background {
 					WatchSchoolProgressBackground(state: state, now: now)
 						.animation(.smooth, value: state)
-						.ignoresSafeArea()
 				}
 		}
 		.id(debugOffset)

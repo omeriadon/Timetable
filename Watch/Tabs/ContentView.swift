@@ -20,41 +20,39 @@ struct ContentView: View {
 	var body: some View {
 		let subjectLookup = TimetableLayout.subjectLookup(for: subjects)
 
-		NavigationStack {
-			ZStack {
-				if subjects.isEmpty {
-					VStack {
-						Spacer()
-						ContentUnavailableView("No Timetable", systemImage: "calendar.badge.exclamationmark", description: Text("Sync your timetable from iPhone to view it here."))
-						Spacer()
-					}
-					.transition(.blurReplace)
-				} else {
-					VStack {
-						HStack(spacing: 2) {
-							VStack(spacing: 2) {
-								Text("")
-									.frame(height: 15)
-									.font(.footnote)
+		ZStack {
+			if subjects.isEmpty {
+				VStack {
+					Spacer()
+					ContentUnavailableView("No Timetable", systemImage: "calendar.badge.exclamationmark", description: Text("Sync your timetable from iPhone to view it here."))
+					Spacer()
+				}
+				.transition(.blurReplace)
+			} else {
+				VStack {
+					HStack(spacing: 2) {
+						VStack(spacing: 2) {
+							Text("")
+								.frame(height: 15)
+								.font(.footnote)
 
-								ForEach(Array(TimetableLayout.sessions.enumerated()), id: \.offset) { index, session in
-									if TimetableLayout.isBreakSession(index: index) {
-										Color.clear.frame(height: TimetableLayout.breakCellHeight)
-									} else {
-										Text(session)
-											.font(.footnote)
-											.frame(height: TimetableLayout.sessionCellHeight)
-									}
+							ForEach(Array(TimetableLayout.sessions.enumerated()), id: \.offset) { index, session in
+								if TimetableLayout.isBreakSession(index: index) {
+									Color.clear.frame(height: TimetableLayout.breakCellHeight)
+								} else {
+									Text(session)
+										.font(.footnote)
+										.frame(height: TimetableLayout.sessionCellHeight)
 								}
 							}
-							.frame(width: 7)
-
-							mainContent(subjectLookup: subjectLookup)
 						}
-						Spacer()
+						.frame(width: 7)
+
+						mainContent(subjectLookup: subjectLookup)
 					}
-					.transition(.blurReplace)
+					Spacer()
 				}
+				.transition(.blurReplace)
 			}
 		}
 		.animation(.easeInOut, value: subjects.isEmpty)
