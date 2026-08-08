@@ -61,27 +61,27 @@ struct TimetableApp: App {
 				ZStack {
 					ZStack {
 						switch sessionStore.state {
-						case .signedOut:
-							MainPlatformAuthenticationView()
-								.transition(.blurReplace)
-						case .restoring:
-							ProgressView("Restoring Account…")
-								.transition(.blurReplace)
-						case .authenticated:
-							AdaptiveAppShell()
-								.transition(.blurReplace)
-					}
+							case .signedOut:
+								MainPlatformAuthenticationView()
+									.transition(.blurReplace)
+							case .restoring:
+								ProgressView("Restoring Account…")
+									.transition(.blurReplace)
+							case .authenticated:
+								AdaptiveAppShell()
+									.transition(.blurReplace)
+						}
 
-					#if os(iOS)
-						StatusBadgeOverlay()
-							.zIndex(9_999_999)
-					#endif
+						#if os(iOS)
+							StatusBadgeOverlay()
+								.zIndex(9_999_999)
+						#endif
 					}
 					.animation(.easeInOut, value: sessionStore.state)
 					.fontDesign(accountSettings.appFontDesign.swiftUIFontDesign)
 					.fontWidth(accountSettings.appFontDesign.swiftUIFontWidth)
 					.id(accountSettings.appFontDesign)
-					.transition(.opacity.animation(.easeInOut(duration: 0.1)))
+					.transition(.opacity.animation(.easeInOut(duration: 0.3)))
 				}
 				.animation(.easeInOut(duration: 0.1), value: accountSettings.appFontDesign)
 				.onOpenURL { url in
