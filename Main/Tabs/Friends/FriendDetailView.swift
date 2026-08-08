@@ -470,7 +470,7 @@ private struct FriendOverview: View {
 			)
 
 		return content()
-			.padding(14)
+			.padding(5)
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.background {
 				FriendBrownPaperBackground(shape: shape)
@@ -485,8 +485,35 @@ private struct FriendOverview: View {
 		title: String,
 		subject: Subject
 	) -> some View {
-		LabeledContent(title) {
+		HStack(spacing: 8) {
+			Text(title)
+
+			Spacer(minLength: 8)
+
 			Label(subject.id, systemImage: subject.symbol)
+				.padding(.horizontal, 10)
+				.padding(.vertical, 8)
+				.background {
+					GeometryReader { proxy in
+						Image("paperWhite")
+							.resizable()
+							.scaledToFill()
+							.frame(width: proxy.size.width, height: proxy.size.height)
+							.clipped()
+					}
+					.clipShape(
+						ConcentricRectangle(
+							corners: .concentric(),
+							isUniform: false
+						)
+					)
+				}
+				.clipShape(
+					ConcentricRectangle(
+						corners: .concentric(),
+						isUniform: false
+					)
+				)
 				.foregroundStyle(subject.colour.swiftUIColor)
 		}
 	}
