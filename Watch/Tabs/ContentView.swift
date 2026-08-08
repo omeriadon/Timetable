@@ -62,12 +62,14 @@ struct ContentView: View {
 	}
 
 	func mainContent(subjectLookup: [Slot: Subject]) -> some View {
-		HStack(spacing: 2) {
+		HStack(spacing: 1) {
 			ForEach(0 ..< 5) { day in
-				VStack(spacing: 2) {
+				VStack(spacing: 1) {
 					Text(TimetableLayout.shortDayLabels[day])
 						.font(.footnote.scaled(by: 0.8))
 						.frame(height: 15)
+						.frame(maxWidth: .infinity)
+
 					ForEach(0 ..< 8) { session in
 						sessionCell(day, session, subjectLookup: subjectLookup)
 					}
@@ -126,6 +128,7 @@ struct ContentView: View {
 				}
 			}
 		}
+		.frame(maxWidth: .infinity)
 		.foregroundStyle(.white)
 	}
 

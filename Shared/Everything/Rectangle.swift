@@ -36,6 +36,7 @@ import SwiftUI
 					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
 			}
 			.padding(2)
+			.frame(maxWidth: .infinity)
 			.background(
 				isBreak ? .clear : fill,
 				in: RoundedRectangle(cornerRadius: isBreak ? 2 : 6)
