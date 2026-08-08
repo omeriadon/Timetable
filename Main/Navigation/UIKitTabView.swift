@@ -50,10 +50,28 @@ struct UIKitTabView: UIViewControllerRepresentable {
 		let font = baseFont.fontDescriptor.withDesign(design)
 			.map { UIFont(descriptor: $0, size: 10) }
 			?? baseFont
+
+		let appearance = controller.tabBar.standardAppearance
+		apply(font: font, to: appearance.stackedLayoutAppearance)
+		apply(font: font, to: appearance.inlineLayoutAppearance)
+		apply(font: font, to: appearance.compactInlineLayoutAppearance)
+		controller.tabBar.standardAppearance = appearance
+		controller.tabBar.scrollEdgeAppearance = appearance
+
 		for item in controller.tabBar.items ?? [] {
 			item.setTitleTextAttributes([.font: font], for: .normal)
 			item.setTitleTextAttributes([.font: font], for: .selected)
 		}
+	}
+
+	private func apply(font: UIFont, to appearance: UITabBarItemAppearance) {
+		var normalAttributes = appearance.normal.titleTextAttributes
+		normalAttributes[.font] = font
+		appearance.normal.titleTextAttributes = normalAttributes
+
+		var selectedAttributes = appearance.selected.titleTextAttributes
+		selectedAttributes[.font] = font
+		appearance.selected.titleTextAttributes = selectedAttributes
 	}
 
 	private func makeViewController(item: UIKitTabItem) -> UIViewController {
