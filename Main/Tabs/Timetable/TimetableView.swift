@@ -226,14 +226,14 @@ struct TimetableView: View {
 					.scrollIndicatorsFlash(onAppear: true)
 				#endif // os(macOS)
 					.opacity(selectedSlot == nil ? 0 : 1)
-						.safeAreaBar(edge: .top, alignment: .center, spacing: 10) {
-							GlassEffectContainer(spacing: 2) {
-								TimetableWeekGrid(
-									subjects: selectedTimetable?.subjects ?? subjects,
-									selectedSlot: selectedSlot,
-									onSelectSlot: { selectedSlot = $0 }
-								)
-								.drawingGroup(opaque: false)
+					.safeAreaBar(edge: .top, alignment: .center, spacing: 10) {
+						GlassEffectContainer(spacing: 2) {
+							TimetableWeekGrid(
+								subjects: selectedTimetable?.subjects ?? subjects,
+								selectedSlot: selectedSlot,
+								onSelectSlot: { selectedSlot = $0 }
+							)
+							.drawingGroup(opaque: false)
 						}
 						.padding(.bottom, Device.isMacOS ? 7 : 10)
 						#if os(macOS)

@@ -395,6 +395,9 @@
         }
       }
     },
+    "Accepted friendships" : {
+
+    },
     "Accessibility Label" : {
       "localizations" : {
         "fr" : {
@@ -494,6 +497,9 @@
         }
       }
     },
+    "Active devices in the last 30 days" : {
+
+    },
     "Add" : {
       "localizations" : {
         "fr" : {
@@ -543,6 +549,7 @@
       }
     },
     "Add a personal event or wait for the school calendar to update." : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -826,6 +833,12 @@
           }
         }
       }
+    },
+    "All active tag subscriptions" : {
+
+    },
+    "All calendar events" : {
+
     },
     "All non-system-administrator accounts will receive an access error until normal access is restored." : {
       "localizations" : {
@@ -1719,6 +1732,7 @@
       }
     },
     "Create Timetable" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -1735,6 +1749,7 @@
       }
     },
     "Created Timetables" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -1989,6 +2004,9 @@
     "Delete Assessment" : {
 
     },
+    "Delete Assessment?" : {
+
+    },
     "Delete Badge" : {
       "localizations" : {
         "fr" : {
@@ -2140,6 +2158,7 @@
       }
     },
     "Delete this timetable?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -2156,6 +2175,7 @@
       }
     },
     "Delete Timetable" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -2254,6 +2274,7 @@
       }
     },
     "Details" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -2435,6 +2456,7 @@
       }
     },
     "Edit Subjects" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -3766,6 +3788,7 @@
 
     },
     "Manage Created Timetables" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -3903,6 +3926,7 @@
 
     },
     "New Created Timetable" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -4009,6 +4033,7 @@
 
     },
     "No Created Timetables" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -4023,9 +4048,6 @@
           }
         }
       }
-    },
-    "No Events Today" : {
-
     },
     "No Friend Requests" : {
       "localizations" : {
@@ -4261,6 +4283,7 @@
       }
     },
     "No Upcoming Events" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -4608,9 +4631,6 @@
     "Other Tags" : {
 
     },
-    "Overall Average" : {
-
-    },
     "Overview" : {
 
     },
@@ -4794,6 +4814,7 @@
       }
     },
     "Private" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -6081,6 +6102,9 @@
         }
       }
     },
+    "Sharing" : {
+
+    },
     "Show ${person}'s timetable" : {
       "localizations" : {
         "fr" : {
@@ -6891,9 +6915,6 @@
         }
       }
     },
-    "There are no events scheduled for today." : {
-
-    },
     "This account is not an administrator." : {
       "localizations" : {
         "fr" : {
@@ -7007,6 +7028,7 @@
       }
     },
     "This removes the timetable from the server and revokes installed passes." : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -7522,6 +7544,9 @@
         }
       }
     },
+    "Users with a timetable" : {
+
+    },
     "Visible events" : {
 
     },
@@ -7558,6 +7583,7 @@
       }
     },
     "Weekly timetable preview with %lld subjects" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {

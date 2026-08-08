@@ -163,14 +163,14 @@ struct GradeAverageCard: View {
 							value: average,
 							gaugeOnTrailing: false
 						)
-							.frame(width: proxy.size.width / 2, alignment: .leading)
+						.frame(width: proxy.size.width / 2, alignment: .leading)
 
 						averageSummary(
 							title: "Top 4",
 							value: topFourAverage,
 							gaugeOnTrailing: true
 						)
-							.frame(width: proxy.size.width / 2, alignment: .leading)
+						.frame(width: proxy.size.width / 2, alignment: .leading)
 					}
 					.overlay {
 						Rectangle()
@@ -225,7 +225,6 @@ struct GradeAverageCard: View {
 		.dynamicTypeSize(.small)
 	}
 
-	@ViewBuilder
 	private func averageSummary(
 		title: String,
 		value: Double?,
@@ -246,7 +245,6 @@ struct GradeAverageCard: View {
 		)
 	}
 
-	@ViewBuilder
 	private func averageSummaryText(
 		title: String,
 		value: Double?,

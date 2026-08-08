@@ -77,8 +77,8 @@ struct UIKitTabView: UIViewControllerRepresentable {
 
 		func tabBarController(
 			_: UITabBarController,
-			animationControllerForTransitionFrom fromVC: UIViewController,
-			to toVC: UIViewController
+			animationControllerForTransitionFrom _: UIViewController,
+			to _: UIViewController
 		) -> UIViewControllerAnimatedTransitioning? {
 			TabTransitionAnimator()
 		}

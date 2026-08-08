@@ -59,7 +59,7 @@ struct FriendDetailView: View {
 			}
 			.foregroundStyle(.black)
 			.scrollEdgeEffectStyle(.soft, for: .top)
-			.safeAreaInset(edge: .top, spacing: 0) {
+			.safeAreaBar(edge: .top, spacing: 0) {
 				TabsPicker(
 					items: FriendDetailTab.allCases.map { ($0.title, $0.symbol) },
 					selection: Binding(

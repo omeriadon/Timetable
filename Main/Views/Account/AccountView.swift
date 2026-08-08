@@ -105,7 +105,7 @@ struct AccountView: View {
 		}
 		.listRowBackground(Rectangle().fill(.thinMaterial))
 
-		Section("Year Group") {
+		Section {
 			if isLoadingYearGroups, yearGroupTags.isEmpty {
 				LabeledContent("Year Group") {
 					ProgressView()
