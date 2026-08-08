@@ -30,21 +30,11 @@ final class SpotlightIndexer {
 		await rebuildFromDefaults()
 	}
 
-	func indexReceivedTimetables() async {
-		await rebuildFromDefaults()
-	}
-
-	func removeDeletedTimetables() async {
-		await rebuildFromDefaults()
-	}
-
 	private func performRebuild() async {
 		do {
-			let received = Defaults[.receivedTimetables].filter { !$0.isDeleted }
-			var timetables = received.toTimetableEntities()
-			if !Defaults[.timetable].isEmpty {
-				timetables.append(TimetableEntity(id: "timetable.owner", subjects: Defaults[.timetable].toSubjectEntities(prefix: "subject.owner")))
-			}
+			let timetables = Defaults[.timetable].isEmpty
+				? []
+				: [TimetableEntity(id: "timetable.owner", subjects: Defaults[.timetable].toSubjectEntities(prefix: "subject.owner"))]
 			try Task.checkCancellation()
 			let uniqueTimetables = Dictionary(timetables.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first }).values.sorted { $0.id < $1.id }
 			let uniqueSubjects = Dictionary(uniqueTimetables.flatMap(\.subjects).map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first }).values.sorted { $0.id < $1.id }

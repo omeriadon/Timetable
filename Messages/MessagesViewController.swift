@@ -3,13 +3,12 @@ import SwiftUI
 import UIKit
 
 final class MessagesViewController: MSMessagesAppViewController {
-	private let model = MessagesViewModel()
 	private var hostingController: UIHostingController<MessagesRootView>?
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
 
-		let hostingController = UIHostingController(rootView: MessagesRootView(model: model))
+		let hostingController = UIHostingController(rootView: MessagesRootView())
 		addChild(hostingController)
 		hostingController.view.translatesAutoresizingMaskIntoConstraints = false
 		view.addSubview(hostingController.view)
@@ -23,8 +22,4 @@ final class MessagesViewController: MSMessagesAppViewController {
 		self.hostingController = hostingController
 	}
 
-	override func willBecomeActive(with conversation: MSConversation) {
-		super.willBecomeActive(with: conversation)
-		model.becomeActive(with: conversation)
-	}
 }

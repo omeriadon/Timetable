@@ -58,20 +58,6 @@ enum AppRouteURLCodec {
 			return .timetable(.root)
 		}
 
-		if first == "received", parts.count >= 2 {
-			let timetableID = String(parts[1])
-			if parts.count >= 4, parts[2] == "subject" {
-				return .timetable(
-					.subject(
-						timetableID: timetableID,
-						subjectID: String(parts[3]),
-						slot: slot(from: url)
-					)
-				)
-			}
-			return .timetable(.received(id: timetableID))
-		}
-
 		if first == "owner", parts.count >= 3, parts[1] == "subject" {
 			return .timetable(
 				.subject(
@@ -82,7 +68,7 @@ enum AppRouteURLCodec {
 			)
 		}
 
-		return .timetable(.received(id: first))
+		return nil
 	}
 
 	private static func slot(from url: URL) -> Slot? {

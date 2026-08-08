@@ -25,9 +25,9 @@ struct WideRouteDestinationView: View {
 			switch route {
 				case .root, .timetable(.root), .friends(.root), .settings(.root), .administration(.root):
 					EmptyView()
-				case let .timetable(.subject(timetableID, subjectID, slot)):
-					TimetableSubjectInspectorView(timetableID: timetableID, subjectID: subjectID, slot: slot)
-				case .timetable(.planner), .timetable(.calendarEvent), .timetable(.received):
+				case let .timetable(.subject(_, subjectID, slot)):
+					TimetableSubjectInspectorView(subjectID: subjectID, slot: slot)
+				case .timetable(.planner), .timetable(.calendarEvent):
 					ContentUnavailableView("Timetable Detail", systemImage: "calendar")
 				case .friends(.addFriend):
 					AddFriendSheet(
@@ -61,20 +61,12 @@ struct WideRouteDestinationView: View {
 						embedsInNavigation: false,
 						showsCloseButton: false
 					)
-				case .settings(.shareAlias):
-					TimetableShareAliasSheet(
-						close: close,
-						embedsInNavigation: false,
-						showsCloseButton: false
-					)
 				case .settings(.about):
 					AboutView()
 				case .settings(.profileAppearance):
 					ProfileAppearanceSheet(close: close)
 				case .settings(.navigationPersistence):
 					NavigationPersistenceSettingsView()
-				case .settings(.receivedTimetables):
-					ReceivedTimetablesView()
 				case .administration(.statistics):
 					AdministrationStatisticsView()
 				case .administration(.friendshipDateChangeRequests):

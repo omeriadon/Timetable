@@ -55,7 +55,6 @@ final class AccountBootstrapService {
 			}
 			async let timetable: Void = self.runBootstrapStage("Owner timetable") {
 				try await self.ownerTimetableSync.reconcileOwnerTimetable()
-				await TimetableShareAliasService.shared.fetchCurrentAlias()
 			}
 			async let settings: Void = self.runBootstrapStage("Account settings") {
 				try await self.settingsSync.downloadSettings()

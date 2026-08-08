@@ -21,9 +21,6 @@ struct TimetableEntity: Identifiable, AppEntity, SyncableEntity {
 	@Property(title: "Subjects")
 	var subjects: [SubjectEntity]
 
-	@Property(title: "Shared Info")
-	var sharedInfo: SharedInfo?
-
 	#if !os(watchOS)
 		@Property(identifier: "searchDescription", title: "Search Description", indexingKey: \CSSearchableItemAttributeSet.contentDescription)
 		var searchDescription: String
@@ -33,7 +30,7 @@ struct TimetableEntity: Identifiable, AppEntity, SyncableEntity {
 		var contentURL: URL?
 	#endif
 
-	init(id: String, subjects: [SubjectEntity], sender: String? = nil, receivedAt: Date? = nil) {
+	init(id: String, subjects: [SubjectEntity]) {
 		self.id = id
 		self.subjects = subjects
 		#if !os(watchOS)
@@ -41,57 +38,19 @@ struct TimetableEntity: Identifiable, AppEntity, SyncableEntity {
 			searchKeywords = []
 			contentURL = nil
 		#endif
-		if let sender, let receivedAt {
-			sharedInfo = SharedInfo(receivedAt: receivedAt, sender: sender)
-		}
 		#if !os(watchOS)
 			let names = subjects.map(\.name)
 			searchDescription = "\(subjects.count) subjects" + (names.isEmpty ? "" : ": \(names.prefix(8).joined(separator: ", "))")
-			searchKeywords = [sender].compactMap(\.self) + names
-			let rawReceivedID = id.hasPrefix("timetable.received.") ? String(id.dropFirst("timetable.received.".count)) : nil
-			contentURL = if let rawReceivedID {
-				AppRoute.timetable(.received(id: rawReceivedID)).url
-			} else {
-				AppRoute.timetable(.root).url
-			}
+			searchKeywords = names
+			contentURL = AppRoute.timetable(.root).url
 		#endif
 	}
 
 	var displayRepresentation: DisplayRepresentation {
-		let string = if let sharedInfo {
-			"\(sharedInfo.sender)'s Timetable"
-		} else {
-			"Your timetable"
-		}
-
-		return DisplayRepresentation(stringLiteral: string)
+		DisplayRepresentation(stringLiteral: "Your timetable")
 	}
 }
 
 #if !os(watchOS)
 	extension TimetableEntity: IndexedEntity {}
 #endif
-
-nonisolated struct SharedInfo: Codable, Identifiable, TransientAppEntity {
-	var id: String {
-		"\(sender)\(receivedAt.description)"
-	}
-
-	static let typeDisplayRepresentation = TypeDisplayRepresentation(stringLiteral: "Owner")
-	var displayRepresentation: DisplayRepresentation {
-		DisplayRepresentation(stringLiteral: "\(sender)'s Timetable")
-	}
-
-	var receivedAt: Date
-	var sender: String
-
-	init() {
-		receivedAt = Date()
-		sender = ""
-	}
-
-	init(receivedAt: Date, sender: String) {
-		self.receivedAt = receivedAt
-		self.sender = sender
-	}
-}

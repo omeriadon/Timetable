@@ -48,15 +48,8 @@ struct CompactRouteDestinationView: View {
 				AccountAndSyncSettingsView()
 			case .settings(.tagSubscriptions):
 				TagSubscriptionsView()
-			case .settings(.receivedTimetables):
-				ReceivedTimetablesView()
 			case .settings(.feedback):
 				FeedbackView(
-					close: router.popCurrentRoute,
-					embedsInNavigation: false
-				)
-			case .settings(.shareAlias):
-				TimetableShareAliasSheet(
 					close: router.popCurrentRoute,
 					embedsInNavigation: false
 				)

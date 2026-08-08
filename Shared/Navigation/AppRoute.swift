@@ -19,7 +19,6 @@ typealias MainTab = AppRootDestination
 
 enum TimetableRoute: Codable, Hashable, Sendable {
 	case root
-	case received(id: String)
 	case subject(timetableID: String?, subjectID: String, slot: Slot?)
 	case planner
 	case calendarEvent(id: UUID)
@@ -43,9 +42,7 @@ enum SettingsRoute: Codable, Hashable, Sendable {
 	case account
 	case updatesAndNotifications
 	case tagSubscriptions
-	case receivedTimetables
 	case feedback
-	case shareAlias
 	case about
 	case profileAppearance
 	case navigationPersistence

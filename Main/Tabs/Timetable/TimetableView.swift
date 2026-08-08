@@ -24,9 +24,6 @@ struct TimetableView: View {
 	@Default(.schoolCalendar) private var schoolCalendar
 	@Default(.calendarEvents) private var calendarEvents
 
-	@Default(.receivedTimetables) private var receivedTimetables
-
-	@State private var selectedTimetable: ReceivedTimetable?
 	@State private var showTimetableComparison = false
 	@State private var selectedSlot: Slot? = nil
 	@State private var schoolCalendarSync = SchoolCalendarSyncService.shared
@@ -44,15 +41,6 @@ struct TimetableView: View {
 		self.fixedSubtab = fixedSubtab
 	}
 
-	#if os(macOS)
-		var currentTimetableTitle: String {
-			if let timetable = selectedTimetable {
-				return "\(timetable.sender)'s Timetable"
-			}
-			return "Timetable"
-		}
-	#endif
-
 	var body: some View {
 		if let fixedSubtab {
 			fixedSubtabView(fixedSubtab)
@@ -65,7 +53,7 @@ struct TimetableView: View {
 	private func fixedSubtabView(_ subtab: TimetableSubtab) -> some View {
 		switch subtab {
 			case .today:
-				TodayTimetableView(subjects: selectedTimetable?.subjects ?? subjects)
+				TodayTimetableView(subjects: subjects)
 			case .week:
 				mainView
 			case .planner:
@@ -76,9 +64,7 @@ struct TimetableView: View {
 	private var compactTimetableView: some View {
 		ScrollView(.horizontal) {
 			HStack(spacing: 0) {
-				TodayTimetableView(
-					subjects: selectedTimetable?.subjects ?? subjects
-				)
+				TodayTimetableView(subjects: subjects)
 				.containerRelativeFrame(.horizontal)
 				.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.7)
 				.scrollEdgeEffect(offset: 0.9, maxBlurRadius: 4, maximumOpacity: 0.7)
@@ -141,7 +127,7 @@ struct TimetableView: View {
 	}
 
 	private var mainView: some View {
-		let subjectLookup = TimetableLayout.subjectLookup(for: selectedTimetable?.subjects ?? subjects)
+		let subjectLookup = TimetableLayout.subjectLookup(for: subjects)
 
 		return NavigationStack {
 			VStack {
@@ -229,7 +215,7 @@ struct TimetableView: View {
 					.safeAreaBar(edge: .top, alignment: .center, spacing: 10) {
 						GlassEffectContainer(spacing: 2) {
 							TimetableWeekGrid(
-								subjects: selectedTimetable?.subjects ?? subjects,
+								subjects: subjects,
 								selectedSlot: selectedSlot,
 								onSelectSlot: { selectedSlot = $0 }
 							)
@@ -262,14 +248,8 @@ struct TimetableView: View {
 				}
 				switch destination {
 					case .root:
-						selectedTimetable = nil
 						selectedSlot = nil
-					case let .received(id):
-						selectedTimetable = receivedTimetables.first { $0.id == id && !$0.isDeleted }
-						selectedSlot = nil
-					case let .subject(timetableID, subjectID, slot):
-						selectedTimetable = timetableID.flatMap { received in receivedTimetables.first { $0.id == received && !$0.isDeleted } }
-						let subjects = selectedTimetable?.subjects ?? subjects
+					case let .subject(_, subjectID, slot):
 						selectedSlot = slot ?? subjects.first(where: { $0.id == subjectID })?.slots.first
 					case .planner:
 						currentTab = TimetableSubtab.planner.rawValue
@@ -292,7 +272,7 @@ struct TimetableView: View {
 				router.navigate(
 					to: .timetable(
 						.subject(
-							timetableID: selectedTimetable?.id,
+							timetableID: nil,
 							subjectID: subject.id,
 							slot: slot
 						)

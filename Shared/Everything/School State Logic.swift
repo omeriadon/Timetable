@@ -280,39 +280,6 @@ nonisolated enum SchoolStateEngine {
 		calculate(at: TimetableClock.now, subjects: Defaults[.timetable], schoolCalendar: Defaults[.schoolCalendar])
 	}
 
-	@MainActor
-	static func currentReceivedStates() -> [ReceivedSchoolState] {
-		Defaults[.receivedTimetables]
-			.filter { !$0.isDeleted }
-			.map {
-				ReceivedSchoolState(
-					id: $0.id,
-					displayName: $0.sender,
-					state: calculate(at: TimetableClock.now, subjects: $0.subjects, schoolCalendar: Defaults[.schoolCalendar])
-				)
-			}
-	}
-
-	@MainActor
-	static func state(forReceivedTimetableID id: String) -> SchoolState {
-		guard let timetable = Defaults[.receivedTimetables].first(where: { $0.id == id }),
-		      !timetable.isDeleted
-		else {
-			return .noTimetable
-		}
-
-		return calculate(at: TimetableClock.now, subjects: timetable.subjects, schoolCalendar: Defaults[.schoolCalendar])
-	}
-
-	@MainActor
-	static func timelineTransitions(forReceivedTimetableID id: String) -> [Date] {
-		guard let timetable = Defaults[.receivedTimetables].first(where: { $0.id == id }) else {
-			return []
-		}
-
-		return timelineTransitions(on: TimetableClock.now, subjects: timetable.subjects, schoolCalendar: Defaults[.schoolCalendar])
-	}
-
 	static func calculate(
 		at date: Date,
 		subjects: [Subject],
@@ -537,10 +504,4 @@ nonisolated enum SchoolStateEngine {
 		}
 		return destination(forPeriodAt: index + 1, dayIndex: dayIndex, lookup: lookup)
 	}
-}
-
-nonisolated struct ReceivedSchoolState: Identifiable, Hashable {
-	let id: String
-	let displayName: String
-	let state: SchoolState
 }

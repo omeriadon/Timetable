@@ -15,7 +15,6 @@ struct SettingsView: View {
 	@Default(.timetable) var subjects
 	@Default(.lastServerSync) var lastServerSync
 	@Default(.userDisplayName) var userDisplayName
-	@Default(.ownerTimetableShareAlias) private var ownerTimetableShareAlias
 
 	@Environment(\.statusBadgeManager) private var statusBadgeManager
 	@State private var sessionStore = SessionStore.shared
@@ -46,7 +45,7 @@ struct SettingsView: View {
 			.toolbarMinimizationBehavior(.onScrollDown, for: .navigationBar)
 			.toolbarMinimizationSafeAreaAdjustment(.disabled, for: .navigationBar)
 			.listStyle(.sidebar)
-			.scrollEdgeEffect(offset: 0.95, maxBlurRadius: 1, maximumOpacity: 0.2)
+			.scrollEdgeEffect(offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.3)
 			.scrollEdgeEffectStyle(.soft, for: .top)
 			.scrollContentBackground(.hidden)
 			.appNavigationTitle("Settings", style: .main, accent: true)
@@ -55,14 +54,6 @@ struct SettingsView: View {
 	private var accountBackground: some View {
 		AccountBackgroundView(profile: Defaults[.accountProfile])
 			.opacity(0.5)
-	}
-
-	private var ownerShareURL: URL? {
-		guard let ownerID = UUID(uuidString: Defaults[.ownerTimetableID]) else {
-			return nil
-		}
-
-		return TimetableShareURL.ownerURL(id: ownerID, alias: ownerTimetableShareAlias)
 	}
 
 	@ContentBuilder
@@ -109,7 +100,7 @@ struct SettingsView: View {
 				Button("No", role: .cancel) {}
 
 			}, message: {
-				Text("This will delete your current timetable and reimport. Anyone you shared this timetable with will be able to access the updated one.")
+				Text("This will delete your current timetable and reimport it from Calendar.")
 			})
 			.sheet(isPresented: $showCalendarImportSheet) {
 				CalendarImportView()
@@ -165,28 +156,6 @@ struct SettingsView: View {
 				ArchivedEventsView()
 			} label: {
 				Label("Archived Events", systemImage: "archivebox")
-			}
-		}
-
-		Section("Sharing") {
-			if sessionStore.isAuthenticated {
-				NavigationLink {
-					ReceivedTimetablesView()
-				} label: {
-					Label("Received Timetables", systemImage: "square.and.arrow.down")
-				}
-
-				if let ownerShareURL {
-					ShareLink(item: ownerShareURL) {
-						Label("Share My Timetable", systemImage: "square.and.arrow.up")
-					}
-				}
-
-				NavigationLink {
-					TimetableShareAliasSheet(close: {})
-				} label: {
-					Label("Customize Share Link", systemImage: "link.badge.plus")
-				}
 			}
 		}
 

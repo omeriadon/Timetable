@@ -88,25 +88,10 @@ struct WeeklyScheduleProvider: AppIntentTimelineProvider {
 		at date: Date,
 		isPlaceholder: Bool
 	) -> WeeklyScheduleEntry {
-		let selectedID = configuration.person?.id ?? PersonTimetableEntity.ownerID
-		if selectedID == PersonTimetableEntity.ownerID {
-			return WeeklyScheduleEntry(
-				date: date,
-				displayName: "You",
-				subjects: Defaults[.timetable],
-				isPlaceholder: isPlaceholder,
-				relevance: nil
-			)
-		}
-
-		guard let timetable = Defaults[.receivedTimetables].first(where: { $0.id == selectedID && !$0.isDeleted }) else {
-			return WeeklyScheduleEntry(date: date, displayName: configuration.person?.displayName ?? "Person", subjects: [], isPlaceholder: isPlaceholder, relevance: nil)
-		}
-
 		return WeeklyScheduleEntry(
 			date: date,
-			displayName: timetable.sender,
-			subjects: timetable.subjects,
+			displayName: "You",
+			subjects: Defaults[.timetable],
 			isPlaceholder: isPlaceholder,
 			relevance: nil
 		)

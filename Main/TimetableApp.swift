@@ -33,7 +33,6 @@ struct TimetableApp: App {
 
 	@State private var sessionStore = SessionStore.shared
 	@State private var statusBadgeManager = StatusBadgeManager.shared
-	@State private var pendingSharedTimetableLocator: String?
 
 	#if os(macOS)
 		@NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
@@ -78,11 +77,11 @@ struct TimetableApp: App {
 				}
 				.animation(.easeInOut, value: sessionStore.state)
 				.onOpenURL { url in
-					handleIncomingURL(url, router: router)
+					handleAppRoute(url, router: router)
 				}
 				.onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { activity in
 					guard let url = activity.webpageURL else { return }
-					handleIncomingURL(url, router: router)
+					handleAppRoute(url, router: router)
 				}
 				.task {
 					NetworkManager.shared.configureFeedback { StatusBadgeManager.shared.present(networkError: $0) }
@@ -108,9 +107,6 @@ struct TimetableApp: App {
 					_ = ClientIdentityProvider.shared.identity()
 					await indexEntities()
 					await sessionStore.restore()
-					await openSharedTimetableIfPossible(router: router)
-					await MessageImportReconciliationService.reconcile()
-
 					await NotificationRegistrationService.shared.requestRemoteRegistration()
 
 					#if os(iOS) && !targetEnvironment(macCatalyst)
@@ -132,10 +128,6 @@ struct TimetableApp: App {
 				#endif // os(iOS)
 				.onChange(of: scenePhase) { _, phase in
 					guard phase == .active else { return }
-					Task {
-						await openSharedTimetableIfPossible(router: router)
-						await MessageImportReconciliationService.reconcile()
-					}
 				}
 				.onChange(of: sessionStore.state) { _, state in
 					guard case .authenticated = state else { return }
@@ -144,9 +136,6 @@ struct TimetableApp: App {
 							name: .openTimetableDestination,
 							object: route
 						)
-					}
-					Task {
-						await openSharedTimetableIfPossible(router: router)
 					}
 				}
 				.monospaced()
@@ -211,25 +200,7 @@ struct TimetableApp: App {
 	}
 
 	@MainActor
-	private func handleIncomingURL(_ url: URL, router: AppRouter) {
-		if url.scheme == "https", url.host == TimetableShareURL.host {
-			if let locator = TimetableShareURL.locator(from: url) {
-				queueSharedTimetable(locator, router: router)
-			} else {
-				StatusBadgeManager.shared.addBadge(
-					id: UUID(),
-					title: "Invalid timetable link",
-					secondaryText: "This link does not identify a timetable.",
-					priority: 4,
-					view: .error
-				)
-			}
-			return
-		}
-		if let locator = TimetableShareURL.locator(fromFallbackURL: url) {
-			queueSharedTimetable(locator, router: router)
-			return
-		}
+	private func handleAppRoute(_ url: URL, router: AppRouter) {
 		guard let route = AppRoute(url: url) else { return }
 		if sessionStore.isAuthenticated {
 			router.navigate(to: route)
@@ -239,88 +210,4 @@ struct TimetableApp: App {
 		NotificationCenter.default.post(name: .openTimetableDestination, object: route)
 	}
 
-	@MainActor
-	private func queueSharedTimetable(_ locator: String, router: AppRouter) {
-		if isOwnerShareLink(locator) {
-			router.navigate(to: .timetable(.root))
-			NotificationCenter.default.post(
-				name: .openTimetableDestination,
-				object: AppRoute.timetable(.root)
-			)
-			StatusBadgeManager.shared.addBadge(
-				id: UUID(),
-				title: "Imported your own timetable",
-				priority: 3,
-				view: .info
-			)
-			return
-		}
-
-		pendingSharedTimetableLocator = locator
-		var locators = Defaults[.pendingMessageTimetableLocators]
-		if !locators.contains(locator) {
-			locators.append(locator)
-			Defaults[.pendingMessageTimetableLocators] = locators
-		}
-
-		Task {
-			await openSharedTimetableIfPossible(router: router)
-		}
-	}
-
-	@MainActor
-	private func openSharedTimetableIfPossible(router: AppRouter? = nil) async {
-		guard SessionStore.shared.isAuthenticated,
-		      let locator = pendingSharedTimetableLocator
-		else { return }
-
-		do {
-			let timetable = try await ReceivedTimetableSyncService.shared.importTimetable(locator: locator)
-			var locators = Defaults[.pendingMessageTimetableLocators]
-			locators.removeAll { $0 == locator }
-			Defaults[.pendingMessageTimetableLocators] = locators
-			pendingSharedTimetableLocator = nil
-			let route = AppRoute.timetable(.received(id: timetable.id))
-			router?.navigate(to: route)
-			NotificationCenter.default.post(
-				name: .openTimetableDestination,
-				object: route
-			)
-			StatusBadgeManager.shared.addBadge(
-				id: UUID(),
-				title: "Opened shared timetable",
-				priority: 3,
-				view: .success
-			)
-		} catch let error as NetworkError {
-			guard case let .server(statusCode, _) = error, statusCode == 404 else { return }
-			clearQueuedSharedTimetable(locator)
-			StatusBadgeManager.shared.addBadge(
-				id: UUID(),
-				title: "Invalid timetable link",
-				secondaryText: "This timetable is unavailable.",
-				priority: 4,
-				view: .error
-			)
-		} catch {
-			// Keep the locator queued for the next authenticated foreground pass.
-		}
-	}
-
-	@MainActor
-	private func isOwnerShareLink(_ locator: String) -> Bool {
-		if UUID(uuidString: Defaults[.ownerTimetableID])?.uuidString.caseInsensitiveCompare(locator) == .orderedSame {
-			return true
-		}
-		let alias = Defaults[.ownerTimetableShareAlias]
-		return !alias.isEmpty && TimetableShareAliasValidator.canonicalize(alias) == TimetableShareAliasValidator.canonicalize(locator)
-	}
-
-	@MainActor
-	private func clearQueuedSharedTimetable(_ locator: String) {
-		var locators = Defaults[.pendingMessageTimetableLocators]
-		locators.removeAll { $0 == locator }
-		Defaults[.pendingMessageTimetableLocators] = locators
-		pendingSharedTimetableLocator = nil
-	}
 }

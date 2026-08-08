@@ -1,44 +1,12 @@
 import SwiftUI
 
 struct MessagesRootView: View {
-	@Bindable var model: MessagesViewModel
-
 	var body: some View {
-		ZStack {
-			let suite = UserDefaults(suiteName: "group.omeriadon.timetable") ?? .standard
-			if suite.bool(forKey: "ownerIsSearchable") == true {
-				VStack(spacing: 18) {
-					Text("Timetable")
-						.font(.largeTitle)
-						.bold()
-					Spacer()
-						.frame(height: 50)
-
-					Button(action: model.sendTimetable) {
-						Label("Send Timetable", systemImage: "paperplane.fill")
-					}
-					.controlSize(.large)
-					.buttonStyle(.glassProminent)
-					.disabled(model.isImporting)
-
-					Spacer()
-
-					if let status = model.status {
-						Label(status.text, systemImage: status.isSuccess ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-							.multilineTextAlignment(.center)
-							.foregroundStyle(status.isSuccess ? .green : .secondary)
-							.transition(.blurReplace)
-					}
-				}
-				.padding(10)
-				.frame(maxWidth: .infinity, maxHeight: .infinity)
-				.background(.background)
-				.animation(.easeInOut(duration: 0.2), value: model.status)
-			} else {
-				ContentUnavailableView("Timetable is not shareable", systemImage: "calendar.badge.lock", description: Text("Go to settings and enable searching this timetable."))
-					.foregroundStyle(.red)
-			}
-		}
+		ContentUnavailableView(
+			"Timetable Sharing Removed",
+			systemImage: "calendar.badge.xmark",
+			description: Text("Timetables are no longer shared through Messages.")
+		)
 		.monospaced()
 	}
 }

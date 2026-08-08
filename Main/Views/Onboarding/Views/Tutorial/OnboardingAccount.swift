@@ -32,7 +32,7 @@ struct OnboardingAccountView: View {
 					.frame(maxWidth: .infinity, minHeight: 360)
 				} else {
 					VStack(spacing: 30) {
-						Text("Create or sign in to an account before importing your timetable. This enables server syncing, sharing, search, and notifications.")
+						Text("Create or sign in to an account before importing your timetable. This enables server syncing and notifications.")
 							.font(.title2)
 							.multilineTextAlignment(.leading)
 

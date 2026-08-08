@@ -14,7 +14,7 @@ struct SubjectQuery: EntityStringQuery {
 			let identifierSet = Set(identifiers)
 			return IntentTimetableResolver.all().flatMap { timetable in
 				timetable.subjects.compactMap { subject in
-					let canonical = "subject.\(timetable.isOwner ? "owner" : "received.\(timetable.receivedID ?? timetable.id)").\(subject.id)"
+					let canonical = "subject.owner.\(subject.id)"
 					guard identifierSet.contains(canonical) || (timetable.isOwner && (identifierSet.contains(subject.id) || identifierSet.contains("subject.owner.\(subject.id)"))) else { return nil }
 					return subject.toSubjectEntity(identifier: canonical, timetable: timetable)
 				}
@@ -28,7 +28,7 @@ struct SubjectQuery: EntityStringQuery {
 			guard !text.isEmpty else { return suggestedEntitiesSync() }
 			return IntentTimetableResolver.all().flatMap { timetable in
 				timetable.subjects.filter { $0.id.localizedCaseInsensitiveContains(text) || $0.teacher.displayName.localizedCaseInsensitiveContains(text) || $0.classroom.displayName.localizedCaseInsensitiveContains(text) || timetable.displayName.localizedCaseInsensitiveContains(text) }.map { subject in
-					subject.toSubjectEntity(identifier: "subject.\(timetable.isOwner ? "owner" : "received.\(timetable.receivedID ?? timetable.id)").\(subject.id)", timetable: timetable)
+					subject.toSubjectEntity(identifier: "subject.owner.\(subject.id)", timetable: timetable)
 				}
 			}
 		}
@@ -43,7 +43,9 @@ struct SubjectQuery: EntityStringQuery {
 	@MainActor
 	private func suggestedEntitiesSync() -> [SubjectEntity] {
 		IntentTimetableResolver.all().flatMap { timetable in
-			timetable.subjects.map { subject in subject.toSubjectEntity(identifier: "subject.\(timetable.isOwner ? "owner" : "received.\(timetable.receivedID ?? timetable.id)").\(subject.id)", timetable: timetable) }
+			timetable.subjects.map { subject in
+				subject.toSubjectEntity(identifier: "subject.owner.\(subject.id)", timetable: timetable)
+			}
 		}
 	}
 }
