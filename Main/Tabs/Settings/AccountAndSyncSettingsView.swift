@@ -22,16 +22,6 @@ struct AccountAndSyncSettingsView: View {
 
 	var body: some View {
 		Form {
-			Section("Appearance") {
-				Picker("App Font", selection: appFontDesignBinding) {
-					ForEach(AppFontDesign.allCases) { design in
-						Text(design.title)
-							.fontDesign(design.swiftUIFontDesign)
-							.tag(design)
-					}
-				}
-			}
-
 			Toggle(isOn: preferenceBinding(\.liveActivitiesEnabled)) {
 				Text("Live Activities")
 				Text("Show live countdowns and details for your subjects and breaks throughout the school day, including on your Watch.")
@@ -77,20 +67,6 @@ struct AccountAndSyncSettingsView: View {
 				let generation = saveGeneration
 				let previous = committedSettings
 				settings[keyPath: keyPath] = value
-				let proposed = settings
-				Task { await save(proposed, previous: previous, generation: generation) }
-			}
-		)
-	}
-
-	private var appFontDesignBinding: Binding<AppFontDesign> {
-		Binding(
-			get: { settings.appFontDesign },
-			set: { value in
-				saveGeneration += 1
-				let generation = saveGeneration
-				let previous = committedSettings
-				settings.appFontDesign = value
 				let proposed = settings
 				Task { await save(proposed, previous: previous, generation: generation) }
 			}

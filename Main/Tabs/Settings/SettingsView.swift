@@ -144,6 +144,14 @@ struct SettingsView: View {
 
 			if sessionStore.isAuthenticated {
 				NavigationLink { AccountAndSyncSettingsView() } label: { Label("Updates & Notifications", systemImage: "switch.2") }
+
+				Picker("App Font", selection: appFontDesignBinding) {
+					ForEach(AppFontDesign.allCases) { design in
+						Text(design.title)
+							.fontDesign(design.swiftUIFontDesign)
+							.tag(design)
+					}
+				}
 			} else {
 				Button { showSignInRequired() } label: { Label("Updates", systemImage: "switch.2") }
 			}
@@ -301,6 +309,30 @@ struct SettingsView: View {
 				let generation = settingsSaveGeneration
 				let previous = committedSettings
 				settings.highlightsCurrentDay = value
+				let proposed = settings
+				Task {
+					do {
+						try await settingsSync.updateSettings(proposed)
+						guard generation == settingsSaveGeneration else { return }
+						committedSettings = proposed
+					} catch {
+						guard generation == settingsSaveGeneration else { return }
+						settings = previous
+						statusBadgeManager.addBadge(id: UUID(), title: "Unable to save preferences", secondaryText: error.localizedDescription, priority: 4, view: .error)
+					}
+				}
+			}
+		)
+	}
+
+	private var appFontDesignBinding: Binding<AppFontDesign> {
+		Binding(
+			get: { settings.appFontDesign },
+			set: { value in
+				settingsSaveGeneration += 1
+				let generation = settingsSaveGeneration
+				let previous = committedSettings
+				settings.appFontDesign = value
 				let proposed = settings
 				Task {
 					do {
