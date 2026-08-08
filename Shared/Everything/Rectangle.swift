@@ -37,9 +37,15 @@ import SwiftUI
 			}
 			.padding(2)
 			.background(
-				isBreak ? .clear : fill.opacity(0.72),
+				isBreak ? .clear : fill,
 				in: RoundedRectangle(cornerRadius: isBreak ? 2 : 6)
 			)
+			.overlay {
+				if !isBreak {
+					RoundedRectangle(cornerRadius: isBreak ? 2 : 6)
+						.strokeBorder(.white.opacity(0.5), lineWidth: 1)
+				}
+			}
 		}
 	}
 

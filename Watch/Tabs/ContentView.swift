@@ -50,13 +50,13 @@ struct ContentView: View {
 
 						mainContent(subjectLookup: subjectLookup)
 					}
-					Spacer()
 				}
 				.transition(.blurReplace)
 			}
 		}
 		.animation(.easeInOut, value: subjects.isEmpty)
-		.padding(.trailing, 8)
+		.padding(.horizontal, 2)
+		.padding(.bottom, 2)
 		.environment(\.dynamicTypeSize, .xSmall)
 		.dynamicTypeSize(.xSmall)
 	}

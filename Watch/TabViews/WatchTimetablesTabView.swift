@@ -31,26 +31,49 @@ private struct WatchPaperBackground: View {
 private struct WatchPage<Content: View>: View {
 	let verticalInset: CGFloat
 	let horizontalPadding: CGFloat
+	let cornerRadius: CGFloat
 	@ViewBuilder var content: Content
+	let sizesToFitContent: Bool
+
+	init(
+		verticalInset: CGFloat,
+		horizontalPadding: CGFloat,
+		cornerRadius: CGFloat = 24,
+		sizesToFitContent: Bool = false,
+		@ViewBuilder content: () -> Content
+	) {
+		self.verticalInset = verticalInset
+		self.horizontalPadding = horizontalPadding
+		self.cornerRadius = cornerRadius
+		self.sizesToFitContent = sizesToFitContent
+		self.content = content()
+	}
 
 	var body: some View {
-		content
-			.frame(maxWidth: .infinity)
-			.containerRelativeFrame(.vertical) { length, _ in
-				max(1, length - verticalInset * 2)
+		Group {
+			if sizesToFitContent {
+				content
+					.frame(maxWidth: .infinity)
+			} else {
+				content
+					.frame(maxWidth: .infinity)
+					.containerRelativeFrame(.vertical) { length, _ in
+						max(1, length - verticalInset * 2)
+					}
 			}
-			.watchCardStyle()
-			.padding(.horizontal, horizontalPadding)
-			.padding(.vertical, verticalInset)
-			.containerRelativeFrame(.vertical, alignment: .top)
-			.scrollTransition(.animated(.smooth), axis: .vertical) { view, phase in
-				let magnitude = min(abs(phase.value), 1)
+		}
+		.watchCardStyle(cornerRadius: cornerRadius)
+		.padding(.horizontal, horizontalPadding)
+		.padding(.vertical, verticalInset)
+		.containerRelativeFrame(.vertical, alignment: .top)
+		.scrollTransition(.animated(.smooth), axis: .vertical) { view, phase in
+			let magnitude = min(abs(phase.value), 1)
 
-				return view
-					.scaleEffect(1 - magnitude * 0.08)
-					.blur(radius: magnitude * 4)
-					.opacity(1 - magnitude * 0.2)
-			}
+			return view
+				.scaleEffect(1 - magnitude * 0.08)
+				.blur(radius: magnitude * 4)
+				.opacity(1 - magnitude * 0.2)
+		}
 	}
 }
 
@@ -61,19 +84,20 @@ struct WatchTimetablesTabView: View {
 	var body: some View {
 		ScrollView(.vertical) {
 			LazyVStack(spacing: 0) {
-				WatchPage(verticalInset: 0, horizontalPadding: 3) {
+				WatchPage(verticalInset: 4, horizontalPadding: 3, cornerRadius: 13, sizesToFitContent: true) {
 					ContentView()
+						.frame(alignment: .center)
 				}
 
 				if !subjects.isEmpty {
-					WatchPage(verticalInset: 4, horizontalPadding: 8) {
+					WatchPage(verticalInset: 30, horizontalPadding: 8) {
 						CurrentSubjectView()
 					}
 				}
 
 				ForEach(friends) { friend in
 					if let timetable = friend.timetable {
-						WatchPage(verticalInset: 4, horizontalPadding: 8) {
+						WatchPage(verticalInset: 30, horizontalPadding: 8) {
 							FriendsTimetablesView(friend: friend, timetable: timetable)
 						}
 					}
@@ -84,6 +108,7 @@ struct WatchTimetablesTabView: View {
 		.dynamicTypeSize(.xSmall)
 		.scrollTargetBehavior(.viewAligned(limitBehavior: .always))
 		.scrollClipDisabled()
+		.ignoresSafeArea(.container, edges: .vertical)
 		.background {
 			WatchPaperBackground(imageName: "paperBlack", cornerRadius: 0)
 				.ignoresSafeArea()
