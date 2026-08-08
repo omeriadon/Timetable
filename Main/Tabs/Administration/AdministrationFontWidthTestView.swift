@@ -26,6 +26,8 @@ struct AdministrationFontWidthTestView: View {
 			}
 			.padding()
 		}
+		.fontDesign(.default)
+		.fontWidth(.standard)
 		.appNavigationTitle("Font Width Test", accent: true)
 	}
 
@@ -49,8 +51,7 @@ struct AdministrationFontWidthTestView: View {
 						.foregroundStyle(.secondary)
 
 					Text(sampleText)
-						.font(font(30))
-						.fontWidth(option.width)
+						.font(font(30).width(option.width))
 				}
 			}
 		}
