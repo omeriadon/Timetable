@@ -28,7 +28,7 @@ struct TodayTimetableView: View {
 					if let termWeekLabel = termWeekLabel(for: now) {
 						Text(termWeekLabel)
 							.font(.title3)
-							.foregroundStyle(.secondary)
+							.foregroundStyle(.white.opacity(0.8))
 							.frame(maxWidth: .infinity, alignment: .leading)
 							.padding(.leading, 8)
 					}
