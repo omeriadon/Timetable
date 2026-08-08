@@ -255,7 +255,14 @@ class TabsView: PlatformView {
 		private func button(with item: (title: String, icon: String), foregroundColor: UIColor, tag: Int, interactive: Bool) -> UIButton {
 			let titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { container in
 				var container = container
-				let design: UIFontDescriptor.SystemDesign = self.appFontDesign == .rounded ? .rounded : .monospaced
+				let design: UIFontDescriptor.SystemDesign = switch self.appFontDesign {
+					case .monospaced:
+						.monospaced
+					case .rounded:
+						.rounded
+					case .expanded:
+						.default
+				}
 				let baseFont = UIFont.systemFont(ofSize: 13, weight: .semibold)
 				container.font = baseFont.fontDescriptor.withDesign(design)
 					.map { UIFont(descriptor: $0, size: 13) }
@@ -291,9 +298,12 @@ class TabsView: PlatformView {
 			button.attributedTitle = NSAttributedString(
 				string: item.title,
 				attributes: [
-					.font: appFontDesign == .rounded
-						? NSFont.systemFont(ofSize: 13, weight: .semibold)
-						: NSFont.monospacedSystemFont(ofSize: 13, weight: .semibold),
+					.font: switch appFontDesign {
+						case .monospaced:
+							NSFont.monospacedSystemFont(ofSize: 13, weight: .semibold)
+						case .rounded, .expanded:
+							NSFont.systemFont(ofSize: 13, weight: .semibold)
+					},
 					.foregroundColor: foregroundColor,
 				]
 			)

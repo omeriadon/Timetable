@@ -45,7 +45,14 @@ struct UIKitTabView: UIViewControllerRepresentable {
 	}
 
 	private func applyFontDesign(to controller: UITabBarController) {
-		let design: UIFontDescriptor.SystemDesign = fontDesign == .rounded ? .rounded : .monospaced
+		let design: UIFontDescriptor.SystemDesign = switch fontDesign {
+			case .monospaced:
+				.monospaced
+			case .rounded:
+				.rounded
+			case .expanded:
+				.default
+		}
 		let baseFont = UIFont.systemFont(ofSize: 10, weight: .semibold)
 		let font = baseFont.fontDescriptor.withDesign(design)
 			.map { UIFont(descriptor: $0, size: 10) }

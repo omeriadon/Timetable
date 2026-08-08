@@ -3,6 +3,7 @@ import SwiftUI
 nonisolated enum AppFontDesign: String, Codable, CaseIterable, Identifiable, Sendable {
 	case monospaced
 	case rounded
+	case expanded
 
 	var id: String {
 		rawValue
@@ -18,6 +19,8 @@ nonisolated enum AppFontDesign: String, Codable, CaseIterable, Identifiable, Sen
 				.monospaced
 			case .rounded:
 				.rounded
+			case .expanded:
+				.default
 		}
 	}
 
@@ -26,6 +29,8 @@ nonisolated enum AppFontDesign: String, Codable, CaseIterable, Identifiable, Sen
 			case .monospaced:
 				.standard
 			case .rounded:
+				.expanded
+			case .expanded:
 				.expanded
 		}
 	}
