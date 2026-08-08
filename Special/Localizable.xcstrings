@@ -2643,7 +2643,11 @@
         }
       }
     },
+    "Events" : {
+
+    },
     "Events Today" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
