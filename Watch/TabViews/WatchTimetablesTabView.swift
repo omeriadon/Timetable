@@ -91,10 +91,10 @@ struct WatchTimetablesTabView: View {
 	var body: some View {
 		ScrollView(.vertical) {
 			VStack(spacing: 0) {
-				WatchPage(verticalInset: 4, horizontalPadding: 3, cornerRadius: 13, sizesToFitContent: true, pageAlignment: .center, peekHeight: 10) {
+				WatchPage(verticalInset: 10, horizontalPadding: 3, cornerRadius: 13, sizesToFitContent: true, pageAlignment: .center, peekHeight: 10) {
 					ContentView()
 				}
-				.padding(.top)
+				.padding(.top, 18)
 
 				if !subjects.isEmpty {
 					WatchPage(verticalInset: 50, horizontalPadding: 8, peekHeight: 70) {
