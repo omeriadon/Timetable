@@ -32,7 +32,7 @@ struct LocationStatusRow: View {
 
 					if let status {
 						HStack {
-							Text(status.state == .onCampus ? "On campus" : "Off campus")
+							Text(status.state == .onCampus ? "On Campus" : "Off Campus")
 
 							Spacer()
 
