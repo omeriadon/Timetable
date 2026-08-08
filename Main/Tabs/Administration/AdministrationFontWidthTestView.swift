@@ -6,23 +6,22 @@ struct AdministrationFontWidthTestView: View {
 	var body: some View {
 		ScrollView {
 			VStack(alignment: .leading, spacing: 24) {
-				fontFamilySection(
-					title: "SwiftUI Rounded Design",
-					subtitle: "The app’s current rounded design with each available width.",
-					font: { size in Font.system(size: size, design: .rounded) }
+				Text("Rounded Font Faces")
+					.font(.title.bold())
+
+				Text("SF Pro Rounded and SF Compact Rounded do not expose real width instances. These rows render the actual font faces without width modifiers or transforms.")
+					.foregroundStyle(.secondary)
+
+				swiftUIRoundedSection
+				fontFaceSection(
+					title: "SF Pro Rounded Medium",
+					postScriptName: "SFProRounded-Medium"
+				)
+				fontFaceSection(
+					title: "SF Compact Rounded Regular",
+					postScriptName: ".SFCompactRounded-Regular"
 				)
 
-				fontFamilySection(
-					title: "SF Pro Rounded",
-					subtitle: "Raw font family.",
-					font: { size in Font.custom("SF Pro Rounded", size: size) }
-				)
-
-				fontFamilySection(
-					title: "SF Compact Rounded",
-					subtitle: "Raw font family.",
-					font: { size in Font.custom("SF Compact Rounded", size: size) }
-				)
 			}
 			.padding()
 		}
@@ -31,73 +30,31 @@ struct AdministrationFontWidthTestView: View {
 		.appNavigationTitle("Font Width Test", accent: true)
 	}
 
-	private func fontFamilySection(
-		title: String,
-		subtitle: String,
-		font: @escaping (CGFloat) -> Font
-	) -> some View {
+	private var swiftUIRoundedSection: some View {
+		VStack(alignment: .leading, spacing: 10) {
+			Text("SwiftUI Rounded")
+				.font(.title2.bold())
+
+			Text("Font.system(design: .rounded)")
+				.font(.subheadline)
+				.foregroundStyle(.secondary)
+
+			Text(sampleText)
+				.font(.system(size: 30, design: .rounded))
+		}
+	}
+
+	private func fontFaceSection(title: String, postScriptName: String) -> some View {
 		VStack(alignment: .leading, spacing: 10) {
 			Text(title)
 				.font(.title2.bold())
 
-			Text(subtitle)
+			Text(postScriptName)
 				.font(.subheadline)
 				.foregroundStyle(.secondary)
 
-			ForEach(FontWidthTestOption.allCases) { option in
-				VStack(alignment: .leading, spacing: 3) {
-					Text(option.title)
-						.font(.caption)
-						.foregroundStyle(.secondary)
-
-					Text(sampleText)
-						.font(font(30))
-						.fontWidth(option.width)
-						.scaleEffect(x: option.horizontalScale, y: 1, anchor: .leading)
-						.frame(maxWidth: .infinity, alignment: .leading)
-				}
-			}
-		}
-	}
-}
-
-private enum FontWidthTestOption: String, CaseIterable, Identifiable {
-	case compressed
-	case condensed
-	case standard
-	case expanded
-
-	var id: String {
-		rawValue
-	}
-
-	var title: String {
-		rawValue.capitalized
-	}
-
-	var width: Font.Width {
-		switch self {
-			case .compressed:
-				.compressed
-			case .condensed:
-				.condensed
-			case .standard:
-				.standard
-			case .expanded:
-				.expanded
-		}
-	}
-
-	var horizontalScale: CGFloat {
-		switch self {
-			case .compressed:
-				0.8
-			case .condensed:
-				0.9
-			case .standard:
-				1
-			case .expanded:
-				1.2
+			Text(sampleText)
+				.font(.custom(postScriptName, size: 30))
 		}
 	}
 }
