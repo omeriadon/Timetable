@@ -216,7 +216,6 @@
       }
     },
     "%lld pending requests" : {
-      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -600,7 +599,6 @@
       }
     },
     "Add friend" : {
-      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -912,6 +910,12 @@
           }
         }
       }
+    },
+    "App Font" : {
+
+    },
+    "Appearance" : {
+
     },
     "Apple Watch devices" : {
 
@@ -3035,7 +3039,6 @@
       }
     },
     "Friend requests" : {
-      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -4217,7 +4220,6 @@
       }
     },
     "No pending requests" : {
-      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -7453,9 +7455,6 @@
           }
         }
       }
-    },
-    "Up Next" : {
-
     },
     "Upcoming" : {
       "extractionState" : "stale",
