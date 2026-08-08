@@ -20,7 +20,6 @@ struct CompactAppShell: View {
 					items: tabItems(router: router),
 					fontDesign: accountSettings.appFontDesign
 				)
-				.id(accountSettings.appFontDesign)
 			} else {
 				TabView(selection: $router.selectedTab) {
 					ForEach(tabItems(router: router), id: \.value) { item in
