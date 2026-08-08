@@ -1,27 +1,28 @@
 import SwiftUI
 
 struct AdministrationFontWidthTestView: View {
-	private let sampleText = "Rounded Typography 0123456789"
+	private let sampleText = "Default Typography 0123456789"
 
 	var body: some View {
 		ScrollView {
-			VStack(alignment: .leading, spacing: 24) {
-				Text("Rounded Font Faces")
+			VStack(alignment: .leading, spacing: 18) {
+				Text("Default Font Widths")
 					.font(.title.bold())
 
-				Text("SF Pro Rounded and SF Compact Rounded do not expose real width instances. These rows render the actual font faces without width modifiers or transforms.")
+				Text("The system default font with each available SwiftUI width.")
 					.foregroundStyle(.secondary)
 
-				swiftUIRoundedSection
-				fontFaceSection(
-					title: "SF Pro Rounded Medium",
-					postScriptName: "SFProRounded-Medium"
-				)
-				fontFaceSection(
-					title: "SF Compact Rounded Regular",
-					postScriptName: ".SFCompactRounded-Regular"
-				)
+				ForEach(FontWidthTestOption.allCases) { option in
+					VStack(alignment: .leading, spacing: 4) {
+						Text(option.title)
+							.font(.caption)
+							.foregroundStyle(.secondary)
 
+						Text(sampleText)
+							.font(.system(size: 30))
+							.fontWidth(option.width)
+					}
+				}
 			}
 			.padding()
 		}
@@ -29,32 +30,32 @@ struct AdministrationFontWidthTestView: View {
 		.fontWidth(.standard)
 		.appNavigationTitle("Font Width Test", accent: true)
 	}
+}
 
-	private var swiftUIRoundedSection: some View {
-		VStack(alignment: .leading, spacing: 10) {
-			Text("SwiftUI Rounded")
-				.font(.title2.bold())
+private enum FontWidthTestOption: String, CaseIterable, Identifiable {
+	case compressed
+	case condensed
+	case standard
+	case expanded
 
-			Text("Font.system(design: .rounded)")
-				.font(.subheadline)
-				.foregroundStyle(.secondary)
-
-			Text(sampleText)
-				.font(.system(size: 30, design: .rounded))
-		}
+	var id: String {
+		rawValue
 	}
 
-	private func fontFaceSection(title: String, postScriptName: String) -> some View {
-		VStack(alignment: .leading, spacing: 10) {
-			Text(title)
-				.font(.title2.bold())
+	var title: String {
+		rawValue.capitalized
+	}
 
-			Text(postScriptName)
-				.font(.subheadline)
-				.foregroundStyle(.secondary)
-
-			Text(sampleText)
-				.font(.custom(postScriptName, size: 30))
+	var width: Font.Width {
+		switch self {
+			case .compressed:
+				.compressed
+			case .condensed:
+				.condensed
+			case .standard:
+				.standard
+			case .expanded:
+				.expanded
 		}
 	}
 }
