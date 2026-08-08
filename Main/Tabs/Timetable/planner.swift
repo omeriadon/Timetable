@@ -292,6 +292,8 @@ struct ArchivedEventsView: View {
 						} icon: {
 							Image(systemName: event.symbol)
 						}
+						.frame(maxWidth: .infinity)
+						.contentShape(Rectangle())
 					}
 					.buttonStyle(.plain)
 				}
