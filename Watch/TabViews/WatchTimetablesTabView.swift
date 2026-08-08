@@ -1,30 +1,35 @@
-import Defaults
 import SwiftUI
+import WatchKit
+
+private extension View {
+	func watchPageTransition(height: CGFloat) -> some View {
+		frame(height: height)
+			.frame(maxWidth: .infinity)
+			.scrollTransition { content, phase in
+				content
+					.scaleEffect(phase.isIdentity ? 1 : 0.75)
+					.blur(radius: phase.isIdentity ? 0 : 8)
+			}
+	}
+}
 
 struct WatchTimetablesTabView: View {
-	@Default(.friends) private var friends
-	@Default(.timetable) private var subjects
+	private var screenHeight: CGFloat {
+		WKInterfaceDevice.current().screenBounds.height
+	}
 
 	var body: some View {
-		TabView {
-			Tab("Timetable", systemImage: "calendar") {
-				ContentView()
-			}
-
-			if !subjects.isEmpty {
-				Tab("Current Subject", systemImage: "timer") {
-					CurrentSubjectView()
+		ScrollView(.vertical) {
+			LazyVStack(spacing: 0) {
+				ForEach(0 ..< 5) { _ in
+					Color.blue
+						.watchPageTransition(height: screenHeight)
 				}
 			}
-
-			ForEach(friends) { friend in
-				if let timetable = friend.timetable {
-					Tab(friend.friend.displayName, systemImage: "person") {
-						FriendsTimetablesView(friend: friend, timetable: timetable)
-					}
-				}
-			}
+			.scrollTargetLayout()
 		}
-		.tabViewStyle(.verticalPage)
+		.scrollTargetBehavior(.viewAligned)
+		.scrollClipDisabled()
+		.ignoresSafeArea()
 	}
 }
