@@ -51,7 +51,10 @@ struct AdministrationFontWidthTestView: View {
 						.foregroundStyle(.secondary)
 
 					Text(sampleText)
-						.font(font(30).width(option.width))
+						.font(font(30))
+						.fontWidth(option.width)
+						.scaleEffect(x: option.horizontalScale, y: 1, anchor: .leading)
+						.frame(maxWidth: .infinity, alignment: .leading)
 				}
 			}
 		}
@@ -82,6 +85,19 @@ private enum FontWidthTestOption: String, CaseIterable, Identifiable {
 				.standard
 			case .expanded:
 				.expanded
+		}
+	}
+
+	var horizontalScale: CGFloat {
+		switch self {
+			case .compressed:
+				0.8
+			case .condensed:
+				0.9
+			case .standard:
+				1
+			case .expanded:
+				1.2
 		}
 	}
 }
