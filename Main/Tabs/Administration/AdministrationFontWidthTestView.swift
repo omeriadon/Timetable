@@ -32,7 +32,7 @@ struct AdministrationFontWidthTestView: View {
 	private func fontFamilySection(
 		title: String,
 		subtitle: String,
-		font: (CGFloat) -> Font
+		font: @escaping (CGFloat) -> Font
 	) -> some View {
 		VStack(alignment: .leading, spacing: 10) {
 			Text(title)
