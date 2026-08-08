@@ -185,7 +185,8 @@ private struct AdministrationJSONNode: View {
 			}
 			.listRowBackground(rowBackground)
 		} else {
-			LabeledContent(row.label) {
+			VStack(alignment: .leading, spacing: 4) {
+				Text(row.label)
 				AdministrationJSONFormattedValue(value: row.value)
 			}
 			.listRowBackground(rowBackground)

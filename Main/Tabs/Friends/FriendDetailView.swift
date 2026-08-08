@@ -240,8 +240,6 @@ private struct FriendOverview: View {
 		VStack(alignment: .leading, spacing: 14) {
 			FriendStatusCard(friend: statusSummary, style: .detail)
 
-			currentAndNextClasses
-
 			sharedClassesCard(comparison.sharedClasses)
 
 			sharedSubjectsCard(comparison.sharedSubjects)
@@ -429,49 +427,6 @@ private struct FriendOverview: View {
 				style: .continuous
 			)
 		)
-	}
-
-	@ViewBuilder
-	private var currentAndNextClasses: some View {
-		let subjects = detail.timetable?.subjects ?? []
-		let state = SchoolStateEngine.calculate(
-			at: TimetableClock.now,
-			subjects: subjects,
-			calendar: SchoolCalendarProjection.perthCalendar,
-			schoolCalendar: schoolCalendar
-		)
-
-		if state.currentSubject != nil || state.nextSubject != nil {
-			VStack(spacing: 10) {
-				if let currentSubject = state.currentSubject {
-					classPaperRow(
-						title: "Current Class",
-						subject: currentSubject
-					)
-				}
-
-				if let nextSubject = state.nextSubject {
-					classPaperRow(
-						title: "Up Next",
-						subject: nextSubject
-					)
-				}
-			}
-			.padding(14)
-			.frame(maxWidth: .infinity, alignment: .leading)
-			.background {
-				FriendBrownPaperBackground(
-					cornerRadius: FriendDetailLayout.cardCornerRadius
-				)
-			}
-			.glassEffect(
-				.clear.interactive(),
-				in: RoundedRectangle(
-					cornerRadius: FriendDetailLayout.cardCornerRadius,
-					style: .continuous
-				)
-			)
-		}
 	}
 
 	private func classPaperRow(

@@ -28,7 +28,7 @@ struct LocationStatusRow: View {
 
 				VStack(alignment: .leading, spacing: 4) {
 					Text("You")
-						.font(.headline)
+						.font(.title3)
 
 					if let status {
 						HStack {
