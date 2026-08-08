@@ -1,6 +1,16 @@
 import Defaults
 import Foundation
 
+nonisolated extension Subject {
+	var supportsGradeTracking: Bool {
+		let normalizedName = id
+			.trimmingCharacters(in: .whitespacesAndNewlines)
+			.lowercased()
+
+		return normalizedName != "directed study" && normalizedName != "advocacy"
+	}
+}
+
 nonisolated enum GradeAssessmentLocation: String, Codable, Hashable, Sendable {
 	case exam
 	case directedStudy

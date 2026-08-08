@@ -27,7 +27,7 @@ struct GradeTrackerView: View {
 						averageCard
 					}
 
-					if subjects.isEmpty {
+					if gradeSubjects.isEmpty {
 						ContentUnavailableView(
 							"No Subjects Yet",
 							systemImage: "book.closed",
@@ -43,7 +43,7 @@ struct GradeTrackerView: View {
 						) {
 							let reduceMotionValue = reduceMotion
 
-							ForEach(subjects) { subject in
+							ForEach(gradeSubjects) { subject in
 								Button {
 									selectedSubject = subject
 								} label: {
@@ -51,12 +51,13 @@ struct GradeTrackerView: View {
 										subject: subject,
 										average: subjectAverage(for: subject.id)
 									)
+									.contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+									.matchedTransitionSource(
+										id: gradeTransitionID(subject),
+										in: gradeSheetNamespace
+									)
 								}
 								.buttonStyle(.plain)
-								.matchedTransitionSource(
-									id: gradeTransitionID(subject),
-									in: gradeSheetNamespace
-								)
 								.scrollTransition(.animated(.snappy(duration: 0.3))) { card, phase in
 									card
 										.opacity(reduceMotionValue || phase.isIdentity ? 1 : 0.65)
@@ -98,6 +99,10 @@ struct GradeTrackerView: View {
 		}
 	}
 
+	var gradeSubjects: [Subject] {
+		subjects.filter(\.supportsGradeTracking)
+	}
+
 	var averageCard: some View {
 		GradeAverageCard(
 			average: overallAverage,
@@ -109,7 +114,7 @@ struct GradeTrackerView: View {
 	}
 
 	var overallAverage: Double? {
-		let averages = subjects.compactMap { subjectAverage(for: $0.id) }
+		let averages = gradeSubjects.compactMap { subjectAverage(for: $0.id) }
 		guard !averages.isEmpty else {
 			return nil
 		}
@@ -117,7 +122,7 @@ struct GradeTrackerView: View {
 	}
 
 	var topFourAverage: Double? {
-		let averages = subjects
+		let averages = gradeSubjects
 			.compactMap { subjectAverage(for: $0.id) }
 			.sorted(by: >)
 			.prefix(4)
