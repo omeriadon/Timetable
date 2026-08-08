@@ -28,10 +28,12 @@ struct SubjectEditorSheet: View {
 	let onSave: (([Subject]) async throws -> [Subject])?
 
 	init(
+		close: @escaping () -> Void = {},
 		subjects: Binding<[Subject]>,
 		initialRequest: EditorRequest?,
 		onSave: (([Subject]) async throws -> [Subject])? = nil
 	) {
+		self.close = close
 		_subjects = subjects
 		self.initialRequest = initialRequest
 		self.onSave = onSave
