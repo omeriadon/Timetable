@@ -119,7 +119,7 @@ struct CurrentSubjectView: View {
 					Spacer()
 
 					Image(systemName: symbol)
-						.font(.title)
+						.font(.title2)
 						.bold()
 						.contentTransition(.symbolEffect(.replace))
 						.symbolEffect(.bounce, value: symbol)
@@ -135,16 +135,27 @@ struct CurrentSubjectView: View {
 
 					Spacer()
 
-					Text(timerInterval: now ... end, countsDown: true, showsHours: true)
+					TimelineView(.periodic(from: .now, by: 1)) { context in
+						let remaining = max(0, end.timeIntervalSince(context.date))
+						let seconds = Int(remaining)
+
+						Text(
+							Duration.seconds(seconds),
+							format: .time(pattern: .hourMinuteSecond)
+						)
 						.contentTransition(.numericText(countsDown: true))
-						.animation(.easeInOut, value: now)
-						.font(.title2)
+						.animation(.easeInOut(duration: 0.3), value: seconds)
+						.font(.title3)
+						.monospacedDigit()
 						.lineLimit(1)
 						.bold()
-						.padding(.horizontal, 15)
-						.padding(.vertical, 10)
-						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
-
+						.padding(.horizontal, 10)
+						.padding(.vertical, 7)
+						.glassEffect(
+							.clear.interactive(),
+							in: RoundedRectangle(cornerRadius: 10)
+						)
+					}
 					Spacer()
 
 					Text(nextText)
@@ -197,7 +208,7 @@ struct CurrentSubjectView: View {
 					Text(timerInterval: now ... targetDate, countsDown: true, showsHours: true)
 						.contentTransition(.numericText(countsDown: true))
 						.animation(.easeInOut(duration: 0.5), value: now)
-						.font(.title2)
+						.font(.title3)
 						.lineLimit(1)
 						.bold()
 						.padding(.horizontal, 15)
@@ -209,6 +220,7 @@ struct CurrentSubjectView: View {
 				}
 			}
 		}
+		.padding(.bottom, 10)
 		.tint(color)
 	}
 }

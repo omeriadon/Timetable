@@ -97,10 +97,10 @@ struct FriendsTimetablesView: View {
 		return GeometryReader { geo in
 			VStack(alignment: .center) {
 				Text(friend.friend.displayName)
-					.font(.title2)
+					.font(.system(size: 17, weight: .semibold))
 					.bold()
 					.lineLimit(2)
-					.minimumScaleFactor(0.8)
+					.minimumScaleFactor(0.7)
 					.multilineTextAlignment(.center)
 
 				Spacer()
@@ -109,25 +109,39 @@ struct FriendsTimetablesView: View {
 					Image(systemName: symbol)
 						.contentTransition(.symbolEffect(.replace))
 						.symbolEffect(.bounce, value: symbol)
+						.font(.headline)
 					Text(title)
 						.contentTransition(.opacity)
 						.animation(.smooth, value: title)
+						.font(.system(size: 100))
+						.minimumScaleFactor(0.05)
 				}
-				.font(.title2.scaled(by: 0.9))
 				.bold()
 
 				Spacer()
 
 				if let countdownEnd {
-					Text(timerInterval: now ... countdownEnd, countsDown: true, showsHours: true)
-						.contentTransition(.numericText(countsDown: true))
-						.animation(.easeInOut, value: now)
+					TimelineView(.periodic(from: .now, by: 1)) { context in
+						let remaining = max(0, countdownEnd.timeIntervalSince(context.date))
+						let seconds = Int(remaining)
+
+						Text(
+							Duration.seconds(seconds),
+							format: .time(pattern: .hourMinuteSecond)
+						)
 						.font(.title3)
-						.lineLimit(1)
 						.bold()
+						.monospacedDigit()
+						.lineLimit(1)
+						.contentTransition(.numericText(countsDown: true))
+						.animation(.easeInOut(duration: 0.3), value: seconds)
 						.padding(.horizontal, 13)
 						.padding(.vertical, 8)
-						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
+						.glassEffect(
+							.clear.interactive(),
+							in: RoundedRectangle(cornerRadius: 10)
+						)
+					}
 				}
 
 				Spacer()
@@ -149,6 +163,7 @@ struct FriendsTimetablesView: View {
 			}
 			.frame(width: geo.size.width)
 		}
+		.padding(.top, 4)
 		.dynamicTypeSize(.xSmall)
 		.tint(color)
 	}
