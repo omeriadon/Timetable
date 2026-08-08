@@ -121,6 +121,7 @@ struct SettingsView: View {
 			.disabled(!networkManager.isOnline)
 			.sheet(isPresented: $showEditTimetableSheet) {
 				SubjectEditorSheet(
+					close: { showEditTimetableSheet = false },
 					subjects: $subjects,
 					initialRequest: nil,
 					onSave: { proposedSubjects in
