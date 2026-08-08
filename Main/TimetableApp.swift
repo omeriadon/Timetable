@@ -209,5 +209,4 @@ struct TimetableApp: App {
 		}
 		NotificationCenter.default.post(name: .openTimetableDestination, object: route)
 	}
-
 }

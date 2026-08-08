@@ -65,10 +65,10 @@ struct TimetableView: View {
 		ScrollView(.horizontal) {
 			HStack(spacing: 0) {
 				TodayTimetableView(subjects: subjects)
-				.containerRelativeFrame(.horizontal)
-				.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.7)
-				.scrollEdgeEffect(offset: 0.9, maxBlurRadius: 4, maximumOpacity: 0.7)
-				.id(0)
+					.containerRelativeFrame(.horizontal)
+					.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.7)
+					.scrollEdgeEffect(offset: 0.9, maxBlurRadius: 4, maximumOpacity: 0.7)
+					.id(0)
 
 				mainView
 					.containerRelativeFrame(.horizontal)

@@ -84,11 +84,11 @@ struct WeeklyScheduleProvider: AppIntentTimelineProvider {
 
 	@MainActor
 	private func entry(
-		for configuration: WeeklyScheduleConfigurationIntent,
+		for _: WeeklyScheduleConfigurationIntent,
 		at date: Date,
 		isPlaceholder: Bool
 	) -> WeeklyScheduleEntry {
-		return WeeklyScheduleEntry(
+		WeeklyScheduleEntry(
 			date: date,
 			displayName: "You",
 			subjects: Defaults[.timetable],

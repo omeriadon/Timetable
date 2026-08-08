@@ -21,5 +21,4 @@ final class MessagesViewController: MSMessagesAppViewController {
 		hostingController.didMove(toParent: self)
 		self.hostingController = hostingController
 	}
-
 }

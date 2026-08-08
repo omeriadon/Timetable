@@ -31,7 +31,7 @@ enum IntentTimetableResolver {
 		resolve(personID: PersonTimetableEntity.ownerID).map { [$0] } ?? []
 	}
 
-	static func timetableURL(for timetable: ResolvedTimetable) -> URL {
+	static func timetableURL(for _: ResolvedTimetable) -> URL {
 		let route = AppRoute.timetable(.root)
 		guard let url = route.url else {
 			preconditionFailure("Unable to encode timetable route.")
@@ -39,7 +39,7 @@ enum IntentTimetableResolver {
 		return url
 	}
 
-	static func subjectURL(for timetable: ResolvedTimetable, subjectID: String, day: Int? = nil, session: Int? = nil) -> URL {
+	static func subjectURL(for _: ResolvedTimetable, subjectID: String, day: Int? = nil, session: Int? = nil) -> URL {
 		let slot: Slot? = if let day,
 		                     let session,
 		                     (0 ..< 5).contains(day),

@@ -70,6 +70,8 @@ struct GradeTrackerView: View {
 				.padding()
 			}
 			.scrollEdgeEffect()
+			.toolbarMinimizationBehavior(.onScrollDown, for: .navigationBar)
+			.toolbarMinimizationSafeAreaAdjustment(.disabled, for: .navigationBar)
 			.appNavigationTitle("Grades", style: .main, accent: true)
 			.sheet(item: $selectedSubject) { subject in
 				GradeSubjectDetailView(subject: subject)

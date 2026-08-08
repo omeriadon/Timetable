@@ -29,7 +29,7 @@ struct TodayTimetableView: View {
 								.font(.title3)
 								.foregroundStyle(.white.opacity(0.8))
 								.frame(maxWidth: .infinity, alignment: .leading)
-								.padding(.leading, 4)
+								.padding(.leading, 6)
 						}
 					}
 
