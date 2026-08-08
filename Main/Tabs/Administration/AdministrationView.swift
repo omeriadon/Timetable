@@ -96,6 +96,12 @@ struct AdministrationView: View {
 			administrationLink("Broadcast History", systemImage: "clock.arrow.circlepath", route: .administration(.broadcastHistory)) { AdministrationBroadcastHistoryView() }
 		}
 
+		Section("Testing") {
+			administrationLink("Font Width Test", systemImage: "textformat.size", route: .administration(.fontWidthTest)) {
+				AdministrationFontWidthTestView()
+			}
+		}
+
 		if authority == .systemOwner {
 			Section("System Administration") {
 				administrationLink("Administrators", systemImage: "person.badge.shield.checkmark", route: .administration(.administrators)) { AdministrationAdministratorsView() }

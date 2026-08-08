@@ -89,6 +89,8 @@ struct WideRouteDestinationView: View {
 					AdministrationAdministratorsView()
 				case .administration(.serverAccess):
 					AdministrationDevelopmentAccessView()
+				case .administration(.fontWidthTest):
+					AdministrationFontWidthTestView()
 				case .administration(.profileStorage):
 					AdministrationProfileStorageView()
 				case .administration(.specialBadges), .administration(.specialBadge(id: _)):
