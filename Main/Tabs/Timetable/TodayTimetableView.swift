@@ -23,14 +23,14 @@ struct TodayTimetableView: View {
 							.font(.system(size: 200))
 							.minimumScaleFactor(0.01)
 							.foregroundStyle(.white)
+					}
 
-						if let termWeekLabel = termWeekLabel(for: now) {
-							Text(termWeekLabel)
-								.font(.title3)
-								.foregroundStyle(.secondary)
-								.frame(maxWidth: .infinity, alignment: .leading)
-								.padding(.leading, 8)
-						}
+					if let termWeekLabel = termWeekLabel(for: now) {
+						Text(termWeekLabel)
+							.font(.title3)
+							.foregroundStyle(.secondary)
+							.frame(maxWidth: .infinity, alignment: .leading)
+							.padding(.leading, 8)
 					}
 
 					if let noSchoolDay = eventSnapshot.noSchoolDay {
@@ -39,7 +39,7 @@ struct TodayTimetableView: View {
 
 					if !eventSnapshot.schoolEvents.isEmpty || !eventSnapshot.personalEvents.isEmpty || !eventSnapshot.upcomingEvents.isEmpty {
 						VStack(alignment: .leading) {
-							Text("Events Today")
+							Text("Events")
 								.font(.title)
 								.bold()
 
