@@ -72,6 +72,7 @@ struct FriendDetailView: View {
 					.scrollTargetBehavior(.paging)
 					.scrollIndicators(.hidden)
 					.scrollPosition(id: selectedTabPosition)
+					.animation(.easeInOut(duration: 0.25), value: selectedTab)
 					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 				} else {
 					ContentUnavailableView("Friend Unavailable", systemImage: "person.crop.circle.badge.exclamationmark")
@@ -89,7 +90,9 @@ struct FriendDetailView: View {
 								return
 							}
 
-							selectedTab = FriendDetailTab.allCases[index]
+							withAnimation(.easeInOut(duration: 0.25)) {
+								selectedTab = FriendDetailTab.allCases[index]
+							}
 						}
 					)
 				)
