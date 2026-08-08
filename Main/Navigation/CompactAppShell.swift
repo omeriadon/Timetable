@@ -28,6 +28,7 @@ struct CompactAppShell: View {
 						} label: {
 							Label(item.title, systemImage: item.systemImage)
 								.fontDesign(accountSettings.appFontDesign.swiftUIFontDesign)
+								.fontWidth(accountSettings.appFontDesign.swiftUIFontWidth)
 						}
 						.badge(item.badge ?? "")
 					}

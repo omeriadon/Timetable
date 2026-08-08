@@ -140,6 +140,7 @@ struct TimetableApp: App {
 					}
 				}
 				.fontDesign(accountSettings.appFontDesign.swiftUIFontDesign)
+				.fontWidth(accountSettings.appFontDesign.swiftUIFontWidth)
 				.environment(\.statusBadgeManager, statusBadgeManager)
 				.buttonStyle(.haptic)
 				#if os(macOS)

@@ -149,6 +149,7 @@ struct SettingsView: View {
 					ForEach(AppFontDesign.allCases) { design in
 						Text(design.title)
 							.fontDesign(design.swiftUIFontDesign)
+							.fontWidth(design.swiftUIFontWidth)
 							.tag(design)
 					}
 				}

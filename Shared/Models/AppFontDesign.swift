@@ -20,4 +20,13 @@ nonisolated enum AppFontDesign: String, Codable, CaseIterable, Identifiable, Sen
 				.rounded
 		}
 	}
+
+	var swiftUIFontWidth: Font.Width {
+		switch self {
+			case .monospaced:
+				.standard
+			case .rounded:
+				.expanded
+		}
+	}
 }

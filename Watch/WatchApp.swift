@@ -21,6 +21,7 @@ struct TimetableWatchApp: App {
 				WatchStatusBadgeOverlay()
 			}
 			.fontDesign(accountSettings.appFontDesign.swiftUIFontDesign)
+			.fontWidth(accountSettings.appFontDesign.swiftUIFontWidth)
 			.environment(\.statusBadgeManager, statusBadgeManager)
 			.buttonStyle(.haptic)
 			.task {
