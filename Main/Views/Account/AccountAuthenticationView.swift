@@ -22,7 +22,6 @@ struct AccountAuthenticationView: View {
 				Picker("Account action", selection: $model.mode) {
 					ForEach(AccountAuthenticationMode.allCases) { mode in
 						Text(mode.rawValue)
-							.fontDesign(.monospaced)
 							.tag(mode)
 					}
 				}

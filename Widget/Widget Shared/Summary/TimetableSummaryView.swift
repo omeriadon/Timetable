@@ -38,7 +38,7 @@ struct TimetableSummaryView: View {
 		}
 		.foregroundStyle(.white)
 		.dynamicTypeSize(.medium)
-		.monospaced()
+		.widgetAppFontDesign()
 	}
 }
 
@@ -88,7 +88,8 @@ private struct TimetableSummaryFriendsSection: View {
 						size: 28
 					)
 					Text(schedule.name)
-						.font(.subheadline.monospaced())
+						.font(.subheadline)
+						.widgetAppFontDesign()
 						.lineLimit(1)
 					Spacer()
 					Text(TimetableSummaryStatePresentation.title(for: schedule.currentState))

@@ -25,6 +25,7 @@ nonisolated enum NotificationLeadTime: Int, Codable, CaseIterable, Defaults.Seri
 nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 	var liveActivitiesEnabled: Bool
 	var highlightsCurrentDay: Bool
+	var appFontDesign: AppFontDesign
 	var notificationsEnabled: Bool
 	var broadcastNotificationsEnabled: Bool
 	var notificationLeadTimes: Set<NotificationLeadTime>
@@ -40,6 +41,7 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 	static let `default` = AccountSettings(
 		liveActivitiesEnabled: true,
 		highlightsCurrentDay: true,
+		appFontDesign: .monospaced,
 		notificationsEnabled: true,
 		broadcastNotificationsEnabled: true,
 		notificationLeadTimes: [.zero],
@@ -52,6 +54,7 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 	init(
 		liveActivitiesEnabled: Bool,
 		highlightsCurrentDay: Bool = true,
+		appFontDesign: AppFontDesign = .monospaced,
 		notificationsEnabled: Bool,
 		broadcastNotificationsEnabled: Bool,
 		notificationLeadTimes: Set<NotificationLeadTime>,
@@ -62,6 +65,7 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 	) {
 		self.liveActivitiesEnabled = liveActivitiesEnabled
 		self.highlightsCurrentDay = highlightsCurrentDay
+		self.appFontDesign = appFontDesign
 		self.notificationsEnabled = notificationsEnabled
 		self.broadcastNotificationsEnabled = broadcastNotificationsEnabled
 		self.notificationLeadTimes = notificationLeadTimes
@@ -76,6 +80,7 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 		let legacyContainer = try decoder.container(keyedBy: LegacyCodingKeys.self)
 		liveActivitiesEnabled = try container.decodeIfPresent(Bool.self, forKey: .liveActivitiesEnabled) ?? Self.default.liveActivitiesEnabled
 		highlightsCurrentDay = try container.decodeIfPresent(Bool.self, forKey: .highlightsCurrentDay) ?? Self.default.highlightsCurrentDay
+		appFontDesign = try container.decodeIfPresent(AppFontDesign.self, forKey: .appFontDesign) ?? Self.default.appFontDesign
 		notificationsEnabled = try container.decodeIfPresent(Bool.self, forKey: .notificationsEnabled) ?? Self.default.notificationsEnabled
 		broadcastNotificationsEnabled = try container.decodeIfPresent(Bool.self, forKey: .broadcastNotificationsEnabled) ?? Self.default.broadcastNotificationsEnabled
 		if let leadTimes = try container.decodeIfPresent(Set<NotificationLeadTime>.self, forKey: .notificationLeadTimes) {

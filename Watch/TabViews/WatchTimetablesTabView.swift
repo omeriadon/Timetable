@@ -25,7 +25,6 @@ struct WatchTimetablesTabView: View {
 				}
 			}
 		}
-		.monospaced()
 		.tabViewStyle(.verticalPage)
 	}
 }

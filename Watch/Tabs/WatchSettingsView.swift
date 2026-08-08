@@ -31,7 +31,6 @@ struct WatchSettingsView: View {
 							Task { await SessionStore.shared.signOut() }
 						} label: {
 							Label("Sign out", systemImage: "door.left.hand.open")
-								.monospaced()
 								.foregroundStyle(.red)
 						}
 					})
@@ -84,7 +83,6 @@ struct WatchSettingsView: View {
 			.toolbar {
 				ToolbarItem(placement: .topBarLeading) {
 					Text("Timetable")
-						.monospaced()
 						.bold()
 						.font(.title3)
 				}

@@ -5,6 +5,7 @@
 //   Created by Adon Omeri on 13/5/2026.
 //
 
+import Defaults
 import SwiftUI
 import WidgetKit
 
@@ -113,7 +114,7 @@ struct FriendsTimeLeftView: View {
 			}
 		}
 		.foregroundStyle(.white)
-		.fontDesign(.monospaced)
+		.widgetAppFontDesign()
 		.dynamicTypeSize(.medium)
 	}
 }
@@ -128,12 +129,12 @@ struct FriendsCurrentRow: View {
 			Spacer()
 			VStack(alignment: .leading, spacing: 2) {
 				Text(nextText)
-					.font(.system(size: 11, weight: .regular, design: .monospaced))
+					.font(.system(size: 11, weight: .regular, design: Defaults[.accountSettings].appFontDesign.swiftUIFontDesign))
 					.foregroundStyle(.secondary)
 					.lineLimit(1)
 
 				Label(title, systemImage: symbol)
-					.font(.system(size: 14, weight: .semibold, design: .monospaced))
+					.font(.system(size: 14, weight: .semibold, design: Defaults[.accountSettings].appFontDesign.swiftUIFontDesign))
 					.lineLimit(2)
 			}
 		}
@@ -143,11 +144,11 @@ struct FriendsCurrentRow: View {
 	private var currentTimer: some View {
 		if let target = countdownTarget {
 			Text(timerInterval: now ... target, countsDown: true, showsHours: true)
-				.font(.system(size: 18, weight: .regular, design: .monospaced))
+				.font(.system(size: 18, weight: .regular, design: Defaults[.accountSettings].appFontDesign.swiftUIFontDesign))
 				.monospacedDigit()
 		} else {
 			Text("—")
-				.font(.system(size: 18, design: .monospaced))
+				.font(.system(size: 18, design: Defaults[.accountSettings].appFontDesign.swiftUIFontDesign))
 		}
 	}
 
@@ -209,12 +210,12 @@ private struct FriendsScheduleRow: View {
 	var body: some View {
 		HStack(spacing: 8) {
 			Text(schedule.name)
-				.font(.system(size: 13, weight: .regular, design: .monospaced))
+				.font(.system(size: 13, weight: .regular, design: Defaults[.accountSettings].appFontDesign.swiftUIFontDesign))
 
 			Spacer()
 
 			Label(title, systemImage: symbol)
-				.font(.system(size: 13, weight: .medium, design: .monospaced))
+				.font(.system(size: 13, weight: .medium, design: Defaults[.accountSettings].appFontDesign.swiftUIFontDesign))
 				.lineLimit(1)
 		}
 		.padding(.horizontal, 8)

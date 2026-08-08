@@ -5,16 +5,19 @@
 //  Created by Adon Omeri on 25/7/2026.
 //
 
+import Defaults
 import SwiftUI
 
 #if os(iOS)
 	struct TabsPicker: UIViewRepresentable {
 		let items: [(title: String, icon: String)]
 		@Binding var selection: Int
+		@Default(.accountSettings) private var accountSettings
 
 		func makeUIView(context _: Context) -> TabsView {
 			let view = TabsView()
 			view.tintColor = .brown
+			view.appFontDesign = accountSettings.appFontDesign
 			view.items = items
 			view.onSelectionChange = { selection = $0 }
 			view.selectInitialTagIndex(selection)
@@ -22,6 +25,7 @@ import SwiftUI
 		}
 
 		func updateUIView(_ uiView: TabsView, context _: Context) {
+			uiView.appFontDesign = accountSettings.appFontDesign
 			uiView.selectInitialTagIndex(selection)
 		}
 	}
@@ -72,6 +76,12 @@ class TabsView: PlatformView {
 	private var dragStartX: CGFloat = 0
 
 	var onSelectionChange: ((Int) -> Void)?
+
+	var appFontDesign: AppFontDesign = .monospaced {
+		didSet {
+			updateButtons(with: items)
+		}
+	}
 
 	var items: [(title: String, icon: String)] = [] {
 		didSet {
@@ -245,7 +255,8 @@ class TabsView: PlatformView {
 		private func button(with item: (title: String, icon: String), foregroundColor: UIColor, tag: Int, interactive: Bool) -> UIButton {
 			let titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { container in
 				var container = container
-				container.font = UIFont.monospacedSystemFont(ofSize: 13, weight: .semibold)
+				let design: UIFontDescriptor.SystemDesign = self.appFontDesign == .rounded ? .rounded : .monospaced
+				container.font = UIFont.systemFont(ofSize: 13, weight: .semibold, design: design)
 				return container
 			}
 			let button = UIButton(type: .system)
@@ -277,7 +288,9 @@ class TabsView: PlatformView {
 			button.attributedTitle = NSAttributedString(
 				string: item.title,
 				attributes: [
-					.font: NSFont.monospacedSystemFont(ofSize: 13, weight: .semibold),
+					.font: appFontDesign == .rounded
+						? NSFont.systemFont(ofSize: 13, weight: .semibold)
+						: NSFont.monospacedSystemFont(ofSize: 13, weight: .semibold),
 					.foregroundColor: foregroundColor,
 				]
 			)

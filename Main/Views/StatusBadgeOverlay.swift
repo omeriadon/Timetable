@@ -31,7 +31,6 @@ struct StatusBadgeOverlay: View {
 			.frame(maxWidth: .infinity)
 			.padding(.top, topPadding)
 		}
-		.monospaced()
 		.animation(animation, value: manager.badges)
 		.animation(animation, value: manager.activeBadgeID)
 		.onChange(of: manager.mainBadge?.id) {

@@ -127,7 +127,6 @@ struct CalendarImportView: View {
 		}
 		.ignoresSafeArea()
 		.padding([.horizontal], 32)
-		.monospaced()
 		.presentationDetents(dismissesWhenFinished ? [.fraction(0.55)] : [.large])
 		.interactiveDismissDisabled()
 		.presentationDragIndicator(.hidden)

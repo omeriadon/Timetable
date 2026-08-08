@@ -13,6 +13,7 @@ struct UIKitTabItem {
 struct UIKitTabView: UIViewControllerRepresentable {
 	@Binding var selection: MainTab
 	let items: [UIKitTabItem]
+	let fontDesign: AppFontDesign
 
 	func makeCoordinator() -> Coordinator {
 		Coordinator(selection: $selection, items: items)
@@ -22,6 +23,7 @@ struct UIKitTabView: UIViewControllerRepresentable {
 		let controller = UITabBarController()
 		controller.delegate = context.coordinator
 		controller.viewControllers = items.map(makeViewController)
+		applyFontDesign(to: controller)
 		select(selection, in: controller)
 		return controller
 	}
@@ -38,7 +40,17 @@ struct UIKitTabView: UIViewControllerRepresentable {
 			hostingController.rootView = item.content
 			hostingController.tabBarItem.badgeValue = item.badge
 		}
+		applyFontDesign(to: controller)
 		select(selection, in: controller)
+	}
+
+	private func applyFontDesign(to controller: UITabBarController) {
+		let design: UIFontDescriptor.SystemDesign = fontDesign == .rounded ? .rounded : .monospaced
+		let font = UIFont.systemFont(ofSize: 10, weight: .semibold, design: design)
+		for item in controller.tabBar.items ?? [] {
+			item.setTitleTextAttributes([.font: font], for: .normal)
+			item.setTitleTextAttributes([.font: font], for: .selected)
+		}
 	}
 
 	private func makeViewController(item: UIKitTabItem) -> UIViewController {

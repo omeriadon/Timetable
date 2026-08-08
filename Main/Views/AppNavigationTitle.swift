@@ -13,7 +13,6 @@ private struct AppNavigationTitleModifier: ViewModifier {
 					Text(title)
 						.font(style == .main ? .largeTitle : .title2)
 						.bold()
-						.monospaced()
 						.foregroundStyle(usesAccentColor ? .accent : .primary)
 						.lineLimit(2)
 				}

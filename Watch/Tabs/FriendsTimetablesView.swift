@@ -170,5 +170,4 @@ struct FriendsTimetablesView: View {
 		),
 		timetable: FriendTimetable(title: "Adon's Timetable", subjects: debugTimetable, updatedAt: .now)
 	)
-	.monospaced()
 }

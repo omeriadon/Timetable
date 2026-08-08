@@ -8,18 +8,26 @@ struct CompactAppShell: View {
 	@Default(.accountProfile) private var accountProfile
 
 	@Default(.incomingFriendRequests) private var incomingFriendRequests
+	@Default(.accountSettings) private var accountSettings
 
 	var body: some View {
 		@Bindable var router = router
 
 		Group {
 			if Platform.current == .iOS {
-				UIKitTabView(selection: $router.selectedTab, items: tabItems(router: router))
+				UIKitTabView(
+					selection: $router.selectedTab,
+					items: tabItems(router: router),
+					fontDesign: accountSettings.appFontDesign
+				)
 			} else {
 				TabView(selection: $router.selectedTab) {
 					ForEach(tabItems(router: router), id: \.value) { item in
-						Tab(item.title, systemImage: item.systemImage, value: item.value) {
+						Tab(value: item.value) {
 							item.content
+						} label: {
+							Label(item.title, systemImage: item.systemImage)
+								.fontDesign(accountSettings.appFontDesign.swiftUIFontDesign)
 						}
 						.badge(item.badge ?? "")
 					}

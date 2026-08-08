@@ -219,5 +219,4 @@ struct CurrentSubjectView: View {
 
 #Preview {
 	CurrentSubjectView()
-		.monospaced()
 }

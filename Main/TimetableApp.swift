@@ -30,6 +30,7 @@ struct TimetableApp: App {
 	#endif
 
 	@Default(.incomingFriendRequests) private var incomingFriendRequests
+	@Default(.accountSettings) private var accountSettings
 
 	@State private var sessionStore = SessionStore.shared
 	@State private var statusBadgeManager = StatusBadgeManager.shared
@@ -138,7 +139,7 @@ struct TimetableApp: App {
 						)
 					}
 				}
-				.monospaced()
+				.fontDesign(accountSettings.appFontDesign.swiftUIFontDesign)
 				.environment(\.statusBadgeManager, statusBadgeManager)
 				.buttonStyle(.haptic)
 				#if os(macOS)

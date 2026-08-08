@@ -6,6 +6,7 @@
 //
 
 import ActivityKit
+import Defaults
 import SwiftUI
 import WidgetKit
 
@@ -32,7 +33,7 @@ struct SchoolDayLiveActivityWidget: Widget {
 					Image(systemName: context.state.symbol)
 						.font(.system(size: 34))
 						.foregroundStyle(context.state.color.swiftUIColor)
-						.monospaced()
+						.widgetAppFontDesign()
 				}
 
 				DynamicIslandExpandedRegion(.trailing) {
@@ -45,7 +46,7 @@ struct SchoolDayLiveActivityWidget: Widget {
 								EmptyView()
 							} currentValueLabel: {
 								Text(timerInterval: startDate ... endDate, countsDown: true, showsHours: false)
-									.monospaced()
+									.widgetAppFontDesign()
 							}
 							.progressViewStyle(.circular)
 							.tint(context.state.color.swiftUIColor)
@@ -69,7 +70,7 @@ struct SchoolDayLiveActivityWidget: Widget {
 						.font(.system(size: 22))
 						.bold()
 						.lineLimit(1)
-						.monospaced()
+						.widgetAppFontDesign()
 						.foregroundStyle(isBreak ? .white : context.state.color.swiftUIColor)
 
 						if let nextText = context.state.nextText {
@@ -93,7 +94,7 @@ struct SchoolDayLiveActivityWidget: Widget {
 							.clipShape(RoundedRectangle(cornerRadius: 20))
 						}
 					}
-					.monospaced()
+					.widgetAppFontDesign()
 				}
 			} compactLeading: {
 				Image(systemName: context.state.symbol)
@@ -117,13 +118,13 @@ struct SchoolDayLiveActivityWidget: Widget {
 						EmptyView()
 					} currentValueLabel: {
 						Text(timerInterval: startDate ... endDate, countsDown: true, showsHours: false)
-							.font(.system(size: 12, design: .monospaced))
-							.fontDesign(.monospaced)
+							.font(.system(size: 12, design: Defaults[.accountSettings].appFontDesign.swiftUIFontDesign))
+							.widgetAppFontDesign()
 							.monospacedDigit()
 					}
 					.progressViewStyle(.circular)
 					.tint(context.state.color.swiftUIColor)
-					.monospaced()
+					.widgetAppFontDesign()
 
 				} else {
 					Text("Done")
@@ -174,7 +175,7 @@ private struct SchoolDayLiveActivityView: View {
 
 				Text(context.state.title)
 					.lineLimit(1)
-					.font(.system(size: 16, weight: .semibold, design: .monospaced))
+					.font(.system(size: 16, weight: .semibold, design: Defaults[.accountSettings].appFontDesign.swiftUIFontDesign))
 			}
 
 			Spacer(minLength: 1)
@@ -184,12 +185,12 @@ private struct SchoolDayLiveActivityView: View {
 			   startDate < endDate
 			{
 				Text(timerInterval: startDate ... endDate, countsDown: true, showsHours: false)
-					.font(.system(size: 25, weight: .regular, design: .monospaced))
-					.fontDesign(.monospaced)
+					.font(.system(size: 25, weight: .regular, design: Defaults[.accountSettings].appFontDesign.swiftUIFontDesign))
+					.widgetAppFontDesign()
 					.monospacedDigit()
 			} else {
 				Text("Done")
-					.font(.system(size: 25, weight: .regular, design: .monospaced))
+					.font(.system(size: 25, weight: .regular, design: Defaults[.accountSettings].appFontDesign.swiftUIFontDesign))
 			}
 
 			Spacer(minLength: 1)
@@ -197,8 +198,8 @@ private struct SchoolDayLiveActivityView: View {
 			if let nextText = context.state.nextText {
 				HStack {
 					Text(nextText == "Last Period" ? "Last Period" : "Next: \(nextText)")
-						.font(.system(size: 20, weight: .regular, design: .monospaced))
-						.fontDesign(.monospaced)
+						.font(.system(size: 20, weight: .regular, design: Defaults[.accountSettings].appFontDesign.swiftUIFontDesign))
+						.widgetAppFontDesign()
 						.lineLimit(1)
 				}
 			} else {
@@ -206,7 +207,7 @@ private struct SchoolDayLiveActivityView: View {
 					Spacer()
 
 					Text("No more classes")
-						.font(.system(size: 19, weight: .regular, design: .monospaced))
+						.font(.system(size: 19, weight: .regular, design: Defaults[.accountSettings].appFontDesign.swiftUIFontDesign))
 						.foregroundStyle(.secondary)
 				}
 			}
@@ -234,8 +235,8 @@ private struct SchoolDayLiveActivityView: View {
 				HStack(alignment: .lastTextBaseline) {
 					Text(timerInterval: startDate ... endDate, countsDown: true, showsHours: false)
 						.foregroundStyle(.white)
-						.font(.system(size: 20, design: .monospaced))
-						.fontDesign(.monospaced)
+						.font(.system(size: 20, design: Defaults[.accountSettings].appFontDesign.swiftUIFontDesign))
+						.widgetAppFontDesign()
 						.monospacedDigit()
 						.fixedSize(horizontal: true, vertical: false)
 
@@ -244,8 +245,8 @@ private struct SchoolDayLiveActivityView: View {
 							.frame(width: 40)
 
 						Text(nextText == "Last Period" ? "Last Period" : "Next: \(nextText)")
-							.font(.system(size: 16, design: .monospaced))
-							.fontDesign(.monospaced)
+							.font(.system(size: 16, design: Defaults[.accountSettings].appFontDesign.swiftUIFontDesign))
+							.widgetAppFontDesign()
 							.lineLimit(1)
 							.truncationMode(.tail)
 							.frame(maxWidth: .infinity, alignment: .trailing)
@@ -263,7 +264,7 @@ private struct SchoolDayLiveActivityView: View {
 					.foregroundStyle(.secondary)
 			}
 		}
-		.monospaced()
+		.widgetAppFontDesign()
 		.padding([.horizontal])
 		.padding(.vertical, 10)
 		.tint(context.state.color.swiftUIColor)

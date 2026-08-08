@@ -28,7 +28,7 @@ struct AdministrationEventTagSectionTagsView: View {
 						VStack(alignment: .leading, spacing: 4) {
 							Text(tag.displayName)
 							Text(tag.slug)
-								.font(.footnote.monospaced())
+								.font(.footnote)
 								.foregroundStyle(.secondary)
 						}
 					} icon: {

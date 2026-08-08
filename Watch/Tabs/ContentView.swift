@@ -60,7 +60,6 @@ struct ContentView: View {
 		.animation(.easeInOut, value: subjects.isEmpty)
 		.padding(.trailing, 8)
 		.environment(\.dynamicTypeSize, .xSmall)
-		.monospaced()
 		.dynamicTypeSize(.xSmall)
 	}
 

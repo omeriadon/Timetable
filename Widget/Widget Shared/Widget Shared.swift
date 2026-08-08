@@ -10,6 +10,12 @@ import Foundation
 import SwiftUI
 import WidgetKit
 
+extension View {
+	func widgetAppFontDesign() -> some View {
+		fontDesign(Defaults[.accountSettings].appFontDesign.swiftUIFontDesign)
+	}
+}
+
 // MARK: - Provider
 
 struct Provider: TimelineProvider {

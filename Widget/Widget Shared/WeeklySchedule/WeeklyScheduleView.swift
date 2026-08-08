@@ -94,7 +94,7 @@ struct WeeklyScheduleView: View {
 			}
 			.padding([.bottom, .horizontal], Device.isNotWatchOS ? 8 : 0)
 			.environment(\.dynamicTypeSize, .xSmall)
-			.monospaced()
+			.widgetAppFontDesign()
 		}
 	}
 

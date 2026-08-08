@@ -12,6 +12,7 @@ import SwiftUI
 struct TimetableWatchApp: App {
 	@State private var sessionStore = SessionStore.shared
 	@State private var statusBadgeManager = StatusBadgeManager.shared
+	@Default(.accountSettings) private var accountSettings
 
 	var body: some Scene {
 		WindowGroup {
@@ -19,7 +20,7 @@ struct TimetableWatchApp: App {
 				WatchSessionRootView(sessionStore: sessionStore)
 				WatchStatusBadgeOverlay()
 			}
-			.monospaced()
+			.fontDesign(accountSettings.appFontDesign.swiftUIFontDesign)
 			.environment(\.statusBadgeManager, statusBadgeManager)
 			.buttonStyle(.haptic)
 			.task {
