@@ -44,6 +44,7 @@ struct FriendStatusCard: View {
 							Spacer()
 							locationBadge(locationStatus)
 						}
+						.padding([.top, .trailing], style == .list ? 7 : 0)
 					}
 
 					HStack(spacing: 6) {
@@ -83,7 +84,6 @@ struct FriendStatusCard: View {
 				in: Capsule()
 			)
 			.foregroundStyle(.white)
-			.padding([.top, .trailing], style == .list ? 7 : 0)
 	}
 
 	private func nextClassTitle(for status: FriendScheduleStatus) -> String {

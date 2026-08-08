@@ -441,97 +441,64 @@ private struct FriendOverview: View {
 			schoolCalendar: schoolCalendar
 		)
 
-		if let currentSubject = state.currentSubject {
-			currentAndNextClassesCard(isCompact: state.nextSubject == nil) {
-				currentAndNextClassesContent(
-					currentSubject: currentSubject,
-					nextSubject: state.nextSubject
-				)
-			}
-		} else if let nextSubject = state.nextSubject {
-			currentAndNextClassesCard(isCompact: true) {
-				currentAndNextClassesContent(
-					currentSubject: nil,
-					nextSubject: nextSubject
-				)
-			}
-		}
-	}
-
-	private func currentAndNextClassesContent(
-		currentSubject: Subject?,
-		nextSubject: Subject?
-	) -> some View {
-		HStack(spacing: 5) {
-			VStack(alignment: .leading, spacing: 8) {
-				if currentSubject != nil {
-					Text("Current Class")
-				}
-
-				if nextSubject != nil {
-					Text("Up Next")
-				}
-			}
-			.frame(maxWidth: .infinity, alignment: .leading)
-
-			VStack(alignment: .trailing, spacing: 5) {
-				if let currentSubject {
-					subjectLabel(currentSubject)
-				}
-
-				if let nextSubject {
-					subjectLabel(nextSubject)
-				}
-			}
-			.padding(8)
-			.frame(maxWidth: .infinity, alignment: .trailing)
-			.background {
-				GeometryReader { proxy in
-					Image("paperWhite")
-						.resizable()
-						.scaledToFill()
-						.frame(width: proxy.size.width, height: proxy.size.height)
-						.clipped()
-				}
-				.clipShape(
-					ConcentricRectangle(
-						corners: .concentric(minimum: 12),
-						isUniform: false
+		if state.currentSubject != nil || state.nextSubject != nil {
+			VStack(spacing: 10) {
+				if let currentSubject = state.currentSubject {
+					classPaperRow(
+						title: "Current Class",
+						subject: currentSubject
 					)
+				}
+
+				if let nextSubject = state.nextSubject {
+					classPaperRow(
+						title: "Up Next",
+						subject: nextSubject
+					)
+				}
+			}
+			.padding(14)
+			.frame(maxWidth: .infinity, alignment: .leading)
+			.background {
+				FriendBrownPaperBackground(
+					cornerRadius: FriendDetailLayout.cardCornerRadius
 				)
 			}
-			.clipShape(
-				ConcentricRectangle(
-					corners: .concentric(minimum: 12),
-					isUniform: false
-				)
-			)
-		}
-	}
-
-	private func currentAndNextClassesCard(
-		isCompact: Bool,
-		@ViewBuilder content: () -> some View
-	) -> some View {
-		let shape = isCompact
-			? AnyShape(Capsule())
-			: AnyShape(
-				RoundedRectangle(
+			.glassEffect(
+				.clear.interactive(),
+				in: RoundedRectangle(
 					cornerRadius: FriendDetailLayout.cardCornerRadius,
 					style: .continuous
 				)
 			)
+		}
+	}
 
-		return content()
-			.padding(5)
-			.frame(maxWidth: .infinity, alignment: .leading)
-			.background {
-				FriendBrownPaperBackground(shape: shape)
-			}
-			.glassEffect(
-				.clear.interactive(),
-				in: shape
+	private func classPaperRow(
+		title: String,
+		subject: Subject
+	) -> some View {
+		HStack {
+			Text(title)
+
+			Spacer()
+
+			subjectLabel(subject)
+		}
+		.padding(14)
+		.frame(maxWidth: .infinity)
+		.background {
+			FriendPaperBackground(
+				cornerRadius: FriendDetailLayout.itemCornerRadius
 			)
+		}
+		.glassEffect(
+			.clear.interactive(),
+			in: RoundedRectangle(
+				cornerRadius: FriendDetailLayout.itemCornerRadius,
+				style: .continuous
+			)
+		)
 	}
 
 	private func subjectLabel(_ subject: Subject) -> some View {

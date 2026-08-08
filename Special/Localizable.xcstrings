@@ -1803,6 +1803,9 @@
         }
       }
     },
+    "Current Class" : {
+
+    },
     "Current Subject" : {
       "localizations" : {
         "fr" : {
@@ -4493,7 +4496,7 @@
         }
       }
     },
-    "Off campus" : {
+    "Off Campus" : {
 
     },
     "Offline" : {
@@ -4513,7 +4516,7 @@
         }
       }
     },
-    "On campus" : {
+    "On Campus" : {
 
     },
     "On the day" : {
@@ -7425,6 +7428,9 @@
           }
         }
       }
+    },
+    "Up Next" : {
+
     },
     "Upcoming" : {
       "extractionState" : "stale",
