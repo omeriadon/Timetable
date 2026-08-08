@@ -11,25 +11,21 @@ import SwiftUI
 struct CurrentSubjectView: View {
 	@Default(.timetable) private var subjects
 	@Default(.schoolCalendar) private var schoolCalendar
-	@Default(.debugOffset) private var debugOffset
 
 	var body: some View {
-		TimelineView(.periodic(from: .now, by: 1)) { context in
-			let now = TimetableClock.adjusted(context.date)
-			let state = SchoolStateEngine.calculate(
-				at: now,
-				subjects: subjects,
-				calendar: SchoolCalendarProjection.perthCalendar,
-				schoolCalendar: schoolCalendar
-			)
+		let now = TimetableClock.adjusted(.now)
+		let state = SchoolStateEngine.calculate(
+			at: now,
+			subjects: subjects,
+			calendar: SchoolCalendarProjection.perthCalendar,
+			schoolCalendar: schoolCalendar
+		)
 
-			content(state: state, now: now)
-				.background {
-					WatchSchoolProgressBackground(state: state, now: now)
-						.animation(.smooth, value: state)
-				}
-		}
-		.id(debugOffset)
+		content(state: state, now: now)
+			.background {
+				WatchSchoolProgressBackground(state: state, now: now)
+					.animation(.smooth, value: state)
+			}
 	}
 
 	@ViewBuilder

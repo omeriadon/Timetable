@@ -12,25 +12,21 @@ struct FriendsTimetablesView: View {
 	let friend: FriendSummary
 	let timetable: FriendTimetable
 	@Default(.schoolCalendar) private var schoolCalendar
-	@Default(.debugOffset) private var debugOffset
 
 	var body: some View {
-		TimelineView(.periodic(from: .now, by: 1)) { context in
-			let now = TimetableClock.adjusted(context.date)
-			let state = SchoolStateEngine.calculate(
-				at: now,
-				subjects: timetable.subjects,
-				calendar: SchoolCalendarProjection.perthCalendar,
-				schoolCalendar: schoolCalendar
-			)
+		let now = TimetableClock.adjusted(.now)
+		let state = SchoolStateEngine.calculate(
+			at: now,
+			subjects: timetable.subjects,
+			calendar: SchoolCalendarProjection.perthCalendar,
+			schoolCalendar: schoolCalendar
+		)
 
-			content(state: state, now: now)
-				.background {
-					WatchSchoolProgressBackground(state: state, now: now)
-						.animation(.smooth, value: state)
-				}
-		}
-		.id(debugOffset)
+		content(state: state, now: now)
+			.background {
+				WatchSchoolProgressBackground(state: state, now: now)
+					.animation(.smooth, value: state)
+			}
 	}
 
 	private func content(state: SchoolState, now: Date) -> some View {
