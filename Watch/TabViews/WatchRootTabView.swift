@@ -6,20 +6,15 @@ struct WatchRootTabView: View {
 
 	var body: some View {
 		TabView {
-			Tab(value: 0) {
+			Tab("Timetables", systemImage: "circle.fill") {
 				WatchTimetablesTabView()
-			} label: {
-				Label("Timetables", systemImage: "circle.fill")
-					.fontDesign(accountSettings.appFontDesign.swiftUIFontDesign)
 			}
 
-			Tab(value: 1) {
+			Tab("Settings", systemImage: "circle.fill") {
 				WatchSettingsView()
-			} label: {
-				Label("Settings", systemImage: "circle.fill")
-					.fontDesign(accountSettings.appFontDesign.swiftUIFontDesign)
 			}
 		}
 		.tabViewStyle(.page)
+		.fontDesign(accountSettings.appFontDesign.swiftUIFontDesign)
 	}
 }

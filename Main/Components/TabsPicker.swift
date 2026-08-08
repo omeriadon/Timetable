@@ -256,7 +256,8 @@ class TabsView: PlatformView {
 			let titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { container in
 				var container = container
 				let design: UIFontDescriptor.SystemDesign = self.appFontDesign == .rounded ? .rounded : .monospaced
-				container.font = UIFont.systemFont(ofSize: 13, weight: .semibold, design: design)
+				let baseFont = UIFont.systemFont(ofSize: 13, weight: .semibold)
+				container.font = UIFont(descriptor: baseFont.fontDescriptor.withDesign(design), size: 13)
 				return container
 			}
 			let button = UIButton(type: .system)
