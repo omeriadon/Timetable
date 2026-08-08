@@ -37,30 +37,22 @@ struct FriendStatusCard: View {
 				}
 
 				VStack(alignment: .leading, spacing: style == .detail ? 7 : 5) {
-					HStack {
-						if style == .list {
+					if style == .list {
+						HStack {
 							Text(displayName)
 								.font(.title3.weight(.semibold))
+							Spacer()
+							locationBadge(locationStatus)
 						}
-
-						Spacer()
-
-						Text(locationStatus.title)
-							.fontWeight(.medium)
-							.font(.caption)
-							.padding(5)
-							.glassEffect(
-								.regular.tint(locationStatus.tint ?? nil).interactive(),
-								in: Capsule()
-							)
-							.padding([.top, .trailing], 7)
-							.foregroundStyle(.white)
-							.frame(maxHeight: .infinity, alignment: .topTrailing)
 					}
 
 					HStack(spacing: 6) {
 						Image(systemName: scheduleStatus.symbol)
 						Text(scheduleStatus.title)
+						if style == .detail {
+							Spacer()
+							locationBadge(locationStatus)
+						}
 					}
 					.font(style == .detail ? .title3 : .body)
 					.contentTransition(.numericText())
@@ -79,6 +71,18 @@ struct FriendStatusCard: View {
 			.contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
 			.animation(.bouncy, value: scheduleStatus.title)
 		}
+	}
+
+	private func locationBadge(_ locationStatus: FriendLocationStatus) -> some View {
+		Text(locationStatus.title)
+			.fontWeight(.medium)
+			.font(.caption)
+			.padding(5)
+			.glassEffect(
+				.regular.tint(locationStatus.tint ?? nil).interactive(),
+				in: Capsule()
+			)
+			.foregroundStyle(.white)
 	}
 
 	private func nextClassTitle(for status: FriendScheduleStatus) -> String {

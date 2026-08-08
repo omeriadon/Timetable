@@ -193,7 +193,7 @@ struct DatesView: View {
 			.frame(width: 42)
 		}
 		.padding([.vertical, .leading])
-		.padding(.trailing, 14)
+		.padding(.trailing, 10)
 		.foregroundStyle(entry.foregroundColor)
 		.background {
 			GeometryReader { proxy in

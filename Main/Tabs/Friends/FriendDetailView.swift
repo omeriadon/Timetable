@@ -57,9 +57,9 @@ struct FriendDetailView: View {
 					ContentUnavailableView("Friend Unavailable", systemImage: "person.crop.circle.badge.exclamationmark")
 				}
 			}
+			.navigationBarTitleDisplayMode(.inline)
 			.foregroundStyle(.black)
-			.scrollEdgeEffectStyle(.soft, for: .top)
-			.safeAreaBar(edge: .top, spacing: 0) {
+			.safeAreaBar(edge: .top, spacing: 5) {
 				TabsPicker(
 					items: FriendDetailTab.allCases.map { ($0.title, $0.symbol) },
 					selection: Binding(
@@ -73,9 +73,11 @@ struct FriendDetailView: View {
 						}
 					)
 				)
-				.frame(height: 40)
 				.padding(.horizontal)
+				.frame(height: 36)
+				.padding(.bottom, 5)
 			}
+			.scrollEdgeEffectStyle(.soft, for: .top)
 			.toolbar {
 				if presentation == .iOS {
 					ToolbarItem(placement: .cancellationAction) {
@@ -219,27 +221,31 @@ private struct FriendOverview: View {
 
 			sharedSubjectsCard(comparison.sharedSubjects)
 
-			VStack(alignment: .leading, spacing: 6) {
+			HStack {
 				Text("Average arrival")
 					.font(.headline)
+
+				Spacer()
+
 				Text(averageArrival)
 					.foregroundStyle(.secondary)
 			}
 			.padding(14)
-			.frame(maxWidth: .infinity, alignment: .leading)
 			.background {
 				FriendPaperBackground(cornerRadius: FriendDetailLayout.cardCornerRadius)
 			}
 
 			Button(action: requestFriendsSinceDate) {
-				VStack(alignment: .leading, spacing: 6) {
+				HStack {
 					Text("Friends since")
 						.font(.headline)
+
+					Spacer()
+
 					Text(detail.acceptedAt, format: .dateTime.month().day().year())
 						.foregroundStyle(.secondary)
 				}
 				.padding(14)
-				.frame(maxWidth: .infinity, alignment: .leading)
 			}
 			.contentShape(Rectangle())
 			.buttonSizing(.flexible)

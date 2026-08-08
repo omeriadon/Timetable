@@ -29,7 +29,7 @@ struct TimetableWeekGrid: View {
 						cell(day: day, session: session, subjectLookup: subjectLookup)
 					}
 				}
-				.overlay {
+				.background {
 					if accountSettings.highlightsCurrentDay, currentDayIndex == day {
 						ZStack {
 							RoundedRectangle(cornerRadius: 12, style: .continuous)
