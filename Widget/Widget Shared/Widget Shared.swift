@@ -13,6 +13,7 @@ import WidgetKit
 extension View {
 	func widgetAppFontDesign() -> some View {
 		fontDesign(Defaults[.accountSettings].appFontDesign.swiftUIFontDesign)
+			.fontWidth(Defaults[.accountSettings].appFontDesign.swiftUIFontWidth)
 	}
 }
 

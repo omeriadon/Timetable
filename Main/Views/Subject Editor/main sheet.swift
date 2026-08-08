@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SubjectEditorSheet: View {
-	let close: () -> Void = {}
+	let close: () -> Void
 	@Environment(\.statusBadgeManager) private var statusBadgeManager
 
 	@Binding var subjects: [Subject]
