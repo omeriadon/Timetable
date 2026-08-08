@@ -63,6 +63,8 @@ struct FriendDetailView: View {
 							.id(FriendDetailTab.main)
 
 							FriendWeek(detail: detail)
+								.padding(.top, 14)
+								.padding(.horizontal, 7)
 								.frame(maxHeight: .infinity, alignment: .top)
 								.containerRelativeFrame(.horizontal)
 								.id(FriendDetailTab.week)
@@ -441,18 +443,69 @@ private struct FriendOverview: View {
 
 		if let currentSubject = state.currentSubject {
 			currentAndNextClassesCard(isCompact: state.nextSubject == nil) {
-				VStack(alignment: .leading, spacing: 8) {
-					contextButton(title: "Current Class", subject: currentSubject)
-
-					if let nextSubject = state.nextSubject {
-						contextButton(title: "Up Next", subject: nextSubject)
-					}
-				}
+				currentAndNextClassesContent(
+					currentSubject: currentSubject,
+					nextSubject: state.nextSubject
+				)
 			}
 		} else if let nextSubject = state.nextSubject {
 			currentAndNextClassesCard(isCompact: true) {
-				contextButton(title: "Next Class", subject: nextSubject)
+				currentAndNextClassesContent(
+					currentSubject: nil,
+					nextSubject: nextSubject
+				)
 			}
+		}
+	}
+
+	private func currentAndNextClassesContent(
+		currentSubject: Subject?,
+		nextSubject: Subject?
+	) -> some View {
+		HStack(spacing: 5) {
+			VStack(alignment: .leading, spacing: 8) {
+				if currentSubject != nil {
+					Text("Current Class")
+				}
+
+				if nextSubject != nil {
+					Text("Up Next")
+				}
+			}
+			.frame(maxWidth: .infinity, alignment: .leading)
+
+			VStack(alignment: .trailing, spacing: 5) {
+				if let currentSubject {
+					subjectLabel(currentSubject)
+				}
+
+				if let nextSubject {
+					subjectLabel(nextSubject)
+				}
+			}
+			.padding(8)
+			.frame(maxWidth: .infinity, alignment: .trailing)
+			.background {
+				GeometryReader { proxy in
+					Image("paperWhite")
+						.resizable()
+						.scaledToFill()
+						.frame(width: proxy.size.width, height: proxy.size.height)
+						.clipped()
+				}
+				.clipShape(
+					ConcentricRectangle(
+						corners: .concentric(minimum: 12),
+						isUniform: false
+					)
+				)
+			}
+			.clipShape(
+				ConcentricRectangle(
+					corners: .concentric(minimum: 12),
+					isUniform: false
+				)
+			)
 		}
 	}
 
@@ -481,41 +534,9 @@ private struct FriendOverview: View {
 			)
 	}
 
-	private func contextButton(
-		title: String,
-		subject: Subject
-	) -> some View {
-		HStack(spacing: 8) {
-			Text(title)
-
-			Spacer(minLength: 8)
-
-			Label(subject.id, systemImage: subject.symbol)
-				.padding(.horizontal, 10)
-				.padding(.vertical, 8)
-				.background {
-					GeometryReader { proxy in
-						Image("paperWhite")
-							.resizable()
-							.scaledToFill()
-							.frame(width: proxy.size.width, height: proxy.size.height)
-							.clipped()
-					}
-					.clipShape(
-						ConcentricRectangle(
-							corners: .concentric(),
-							isUniform: false
-						)
-					)
-				}
-				.clipShape(
-					ConcentricRectangle(
-						corners: .concentric(),
-						isUniform: false
-					)
-				)
-				.foregroundStyle(subject.colour.swiftUIColor)
-		}
+	private func subjectLabel(_ subject: Subject) -> some View {
+		Label(subject.id, systemImage: subject.symbol)
+			.foregroundStyle(subject.colour.swiftUIColor)
 	}
 }
 
@@ -845,7 +866,6 @@ private struct FriendWeek: View {
 				selectedSlot: nil,
 				onSelectSlot: nil
 			)
-			.padding(.top, 14)
 			.frame(maxWidth: .infinity, alignment: .top)
 		} else {
 			ContentUnavailableView("No Timetable", systemImage: "calendar.badge.exclamationmark")
