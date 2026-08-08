@@ -77,8 +77,6 @@ struct TimetableApp: App {
 					#endif
 				}
 				.animation(.easeInOut, value: sessionStore.state)
-				.id(accountSettings.appFontDesign)
-				.transition(.opacity.animation(.easeInOut(duration: 0.1)))
 				.onOpenURL { url in
 					handleAppRoute(url, router: router)
 				}
@@ -164,6 +162,8 @@ struct TimetableApp: App {
 				#endif
 						.preferredColorScheme(.dark)
 			}
+			.id(accountSettings.appFontDesign)
+			.transition(.opacity.animation(.easeInOut(duration: 0.1)))
 		}
 		.commands {
 			CommandMenu("Navigate") {

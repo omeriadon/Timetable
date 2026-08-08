@@ -145,7 +145,7 @@ struct SettingsView: View {
 			if sessionStore.isAuthenticated {
 				NavigationLink { AccountAndSyncSettingsView() } label: { Label("Updates & Notifications", systemImage: "switch.2") }
 
-				Picker("App Font", selection: appFontDesignBinding) {
+				Picker("App Font", systemImage: "character", selection: appFontDesignBinding) {
 					ForEach(AppFontDesign.allCases) { design in
 						Text(design.title)
 							.fontDesign(design.swiftUIFontDesign)
