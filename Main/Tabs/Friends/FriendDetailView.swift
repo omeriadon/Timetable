@@ -30,6 +30,17 @@ struct FriendDetailView: View {
 		detail?.friend ?? friend.friend
 	}
 
+	private var selectedTabPosition: Binding<FriendDetailTab?> {
+		Binding(
+			get: { selectedTab },
+			set: { newValue in
+				if let newValue {
+					selectedTab = newValue
+				}
+			}
+		)
+	}
+
 	var body: some View {
 		NavigationStack {
 			Group {
@@ -60,7 +71,7 @@ struct FriendDetailView: View {
 					}
 					.scrollTargetBehavior(.paging)
 					.scrollIndicators(.hidden)
-					.scrollPosition(id: $selectedTab)
+					.scrollPosition(id: selectedTabPosition)
 					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 				} else {
 					ContentUnavailableView("Friend Unavailable", systemImage: "person.crop.circle.badge.exclamationmark")
