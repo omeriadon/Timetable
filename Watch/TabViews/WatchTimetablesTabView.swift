@@ -1,3 +1,4 @@
+import Defaults
 import SwiftUI
 import WatchKit
 
@@ -14,6 +15,9 @@ private extension View {
 }
 
 struct WatchTimetablesTabView: View {
+	@Default(.friends) private var friends
+	@Default(.timetable) private var subjects
+
 	private var screenHeight: CGFloat {
 		WKInterfaceDevice.current().screenBounds.height
 	}
@@ -21,9 +25,19 @@ struct WatchTimetablesTabView: View {
 	var body: some View {
 		ScrollView(.vertical) {
 			LazyVStack(spacing: 0) {
-				ForEach(0 ..< 5) { _ in
-					Color.blue
+				ContentView()
+					.watchPageTransition(height: screenHeight)
+
+				if !subjects.isEmpty {
+					CurrentSubjectView()
 						.watchPageTransition(height: screenHeight)
+				}
+
+				ForEach(friends) { friend in
+					if let timetable = friend.timetable {
+						FriendsTimetablesView(friend: friend, timetable: timetable)
+							.watchPageTransition(height: screenHeight)
+					}
 				}
 			}
 			.scrollTargetLayout()
