@@ -7,7 +7,6 @@ struct FriendDetailView: View {
 	@State private var detail: FriendDetail?
 	@State private var service = FriendService.shared
 	@State private var selectedTab = FriendDetailTab.main
-	@State private var scrollPosition: Int?
 	@State private var action: FriendAction?
 	@State private var showsReportConfirmation = false
 	@State private var showsFriendsSinceRequest = false
@@ -21,7 +20,6 @@ struct FriendDetailView: View {
 		let cachedDetail = Defaults[.friendDetails].first(where: { $0.relationshipID == friend.relationshipID })
 		_detail = State(initialValue: cachedDetail)
 		_isLoading = State(initialValue: cachedDetail == nil)
-		_scrollPosition = State(initialValue: FriendDetailTab.allCases.firstIndex(of: .main))
 	}
 
 	private var displayedFriendName: String {
@@ -39,28 +37,22 @@ struct FriendDetailView: View {
 					ProgressView()
 						.frame(maxWidth: .infinity, minHeight: 180)
 				} else if let detail {
-					ScrollView(.horizontal) {
-						HStack(spacing: 0) {
-							ScrollView {
-								FriendOverview(
-									detail: detail,
-									friendName: detail.friend.displayName,
-									locationStatus: friend.locationStatus,
-									requestFriendsSinceDate: { showsFriendsSinceRequest = true }
-								)
-							}
-							.containerRelativeFrame(.horizontal)
-							.id(0)
-
-								FriendWeek(detail: detail)
-								.containerRelativeFrame(.horizontal)
-							.id(1)
+					TabView(selection: $selectedTab) {
+						ScrollView {
+							FriendOverview(
+								detail: detail,
+								friendName: detail.friend.displayName,
+								locationStatus: friend.locationStatus,
+								requestFriendsSinceDate: { showsFriendsSinceRequest = true }
+							)
 						}
-						.scrollTargetLayout()
+						.tag(FriendDetailTab.main)
+
+						FriendWeek(detail: detail)
+							.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+							.tag(FriendDetailTab.week)
 					}
-					.scrollTargetBehavior(.paging)
-					.scrollIndicators(.hidden)
-					.scrollPosition(id: $scrollPosition)
+					.tabViewStyle(.page(indexDisplayMode: .never))
 				} else {
 					ContentUnavailableView("Friend Unavailable", systemImage: "person.crop.circle.badge.exclamationmark")
 				}
@@ -83,19 +75,6 @@ struct FriendDetailView: View {
 				)
 				.frame(height: 40)
 				.padding(.horizontal)
-			}
-			.onChange(of: selectedTab) { _, selectedTab in
-				withAnimation {
-					scrollPosition = FriendDetailTab.allCases.firstIndex(of: selectedTab)
-				}
-			}
-			.onChange(of: scrollPosition) { _, scrollPosition in
-				guard let scrollPosition,
-				      FriendDetailTab.allCases.indices.contains(scrollPosition)
-				else {
-					return
-				}
-				selectedTab = FriendDetailTab.allCases[scrollPosition]
 			}
 			.toolbar {
 				if presentation == .iOS {
@@ -232,7 +211,7 @@ private struct FriendOverview: View {
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 14) {
-			FriendStatusCard(friend: statusSummary)
+			FriendStatusCard(friend: statusSummary, style: .detail)
 
 			currentAndNextClasses
 
@@ -810,12 +789,8 @@ private struct FriendWeek: View {
 				selectedSlot: nil,
 				onSelectSlot: nil
 			)
-			.padding(.vertical, 10)
-			.background(Color.black)
-			.background {
-				FriendPaperBackground(cornerRadius: 26)
-			}
-			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 26, style: .continuous))
+			.padding(.top, 14)
+			.frame(maxWidth: .infinity, alignment: .top)
 		} else {
 			ContentUnavailableView("No Timetable", systemImage: "calendar.badge.exclamationmark")
 		}

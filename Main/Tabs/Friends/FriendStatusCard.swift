@@ -1,12 +1,23 @@
 import Defaults
 import SwiftUI
 
+enum FriendStatusCardStyle: Equatable {
+	case list
+	case detail
+}
+
 struct FriendStatusCard: View {
 	let friend: FriendSummary
+	let style: FriendStatusCardStyle
 	@Default(.schoolCalendar) private var schoolCalendar
 
 	private var displayName: String {
 		friend.friend.displayName
+	}
+
+	init(friend: FriendSummary, style: FriendStatusCardStyle = .list) {
+		self.friend = friend
+		self.style = style
 	}
 
 	var body: some View {
@@ -21,12 +32,16 @@ struct FriendStatusCard: View {
 				at: TimetableClock.adjusted(context.date)
 			)
 			HStack(alignment: .center, spacing: 14) {
-				FriendAvatar(profile: friend.friend)
+				if style == .list {
+					FriendAvatar(profile: friend.friend)
+				}
 
-				VStack(alignment: .leading, spacing: 5) {
+				VStack(alignment: .leading, spacing: style == .detail ? 7 : 5) {
 					HStack {
-						Text(displayName)
-							.font(.title3.weight(.semibold))
+						if style == .list {
+							Text(displayName)
+								.font(.title3.weight(.semibold))
+						}
 
 						Spacer()
 
@@ -47,16 +62,16 @@ struct FriendStatusCard: View {
 						Image(systemName: scheduleStatus.symbol)
 						Text(scheduleStatus.title)
 					}
-					.font(.body)
+					.font(style == .detail ? .title3 : .body)
 					.contentTransition(.numericText())
 
 					Text(nextClassTitle(for: scheduleStatus))
-						.font(.caption)
+						.font(style == .detail ? .body : .caption)
 						.foregroundStyle(.secondary)
 				}
 			}
 			.foregroundStyle(.black)
-			.padding(10)
+			.padding(style == .detail ? 14 : 10)
 			.background {
 				FriendPaperBackground(cornerRadius: 28)
 			}
