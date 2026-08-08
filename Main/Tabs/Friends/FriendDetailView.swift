@@ -37,22 +37,31 @@ struct FriendDetailView: View {
 					ProgressView()
 						.frame(maxWidth: .infinity, minHeight: 180)
 				} else if let detail {
-					TabView(selection: $selectedTab) {
-						ScrollView {
-							FriendOverview(
-								detail: detail,
-								friendName: detail.friend.displayName,
-								locationStatus: friend.locationStatus,
-								requestFriendsSinceDate: { showsFriendsSinceRequest = true }
-							)
-						}
-						.tag(FriendDetailTab.main)
+					ScrollView(.horizontal) {
+						HStack(spacing: 0) {
+							ScrollView {
+								FriendOverview(
+									detail: detail,
+									friendName: detail.friend.displayName,
+									locationStatus: friend.locationStatus,
+									requestFriendsSinceDate: { showsFriendsSinceRequest = true }
+								)
+							}
+							.scrollIndicators(.hidden)
+							.containerRelativeFrame(.horizontal)
+							.id(FriendDetailTab.main)
 
-						FriendWeek(detail: detail)
-							.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-							.tag(FriendDetailTab.week)
+							FriendWeek(detail: detail)
+								.frame(maxHeight: .infinity, alignment: .top)
+								.containerRelativeFrame(.horizontal)
+								.id(FriendDetailTab.week)
+						}
+						.scrollTargetLayout()
 					}
-					.tabViewStyle(.page(indexDisplayMode: .never))
+					.scrollTargetBehavior(.paging)
+					.scrollIndicators(.hidden)
+					.scrollPosition(id: $selectedTab)
+					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 				} else {
 					ContentUnavailableView("Friend Unavailable", systemImage: "person.crop.circle.badge.exclamationmark")
 				}
