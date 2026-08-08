@@ -31,8 +31,6 @@ struct FriendsView: View {
 		.animation(.easeInOut, value: searchText.isEmpty)
 		.scrollEdgeEffect()
 		.appNavigationTitle("Friends", style: .main, accent: true)
-		.toolbarMinimizationBehavior(.onScrollDown, for: .navigationBar)
-		.toolbarMinimizationSafeAreaAdjustment(.disabled, for: .navigationBar)
 		.toolbar {
 			ToolbarItem(placement: .topBarLeading) {
 				Button("Friend requests", systemImage: incomingFriendRequests.isEmpty ? "bell" : "bell.badge") {
@@ -164,6 +162,7 @@ struct FriendsView: View {
 			}
 			.padding()
 		}
+		.toolbarMinimizationBehavior(.onScrollDown, for: .navigationBar)
 		.refreshable {
 			await refresh()
 		}
@@ -186,6 +185,7 @@ struct FriendsView: View {
 				}
 			}
 		}
+		.toolbarMinimizationBehavior(.onScrollDown, for: .navigationBar)
 		.listStyle(.plain)
 		.refreshable {
 			await refreshSearchResults()
