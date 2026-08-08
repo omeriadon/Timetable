@@ -29,7 +29,6 @@ struct AdministrationFontWidthTestView: View {
 		.appNavigationTitle("Font Width Test", accent: true)
 	}
 
-	@ViewBuilder
 	private func fontFamilySection(
 		title: String,
 		subtitle: String,
