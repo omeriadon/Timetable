@@ -59,7 +59,8 @@ struct TimetableApp: App {
 		WindowGroup {
 			AppRouterHost { router in
 				ZStack {
-					switch sessionStore.state {
+					ZStack {
+						switch sessionStore.state {
 						case .signedOut:
 							MainPlatformAuthenticationView()
 								.transition(.blurReplace)
@@ -75,8 +76,14 @@ struct TimetableApp: App {
 						StatusBadgeOverlay()
 							.zIndex(9_999_999)
 					#endif
+					}
+					.animation(.easeInOut, value: sessionStore.state)
+					.fontDesign(accountSettings.appFontDesign.swiftUIFontDesign)
+					.fontWidth(accountSettings.appFontDesign.swiftUIFontWidth)
+					.id(accountSettings.appFontDesign)
+					.transition(.opacity.animation(.easeInOut(duration: 0.1)))
 				}
-				.animation(.easeInOut, value: sessionStore.state)
+				.animation(.easeInOut(duration: 0.1), value: accountSettings.appFontDesign)
 				.onOpenURL { url in
 					handleAppRoute(url, router: router)
 				}
@@ -139,8 +146,6 @@ struct TimetableApp: App {
 						)
 					}
 				}
-				.fontDesign(accountSettings.appFontDesign.swiftUIFontDesign)
-				.fontWidth(accountSettings.appFontDesign.swiftUIFontWidth)
 				.environment(\.statusBadgeManager, statusBadgeManager)
 				.buttonStyle(.haptic)
 				#if os(macOS)
@@ -162,8 +167,6 @@ struct TimetableApp: App {
 				#endif
 						.preferredColorScheme(.dark)
 			}
-			.id(accountSettings.appFontDesign)
-			.transition(.opacity.animation(.easeInOut(duration: 0.1)))
 		}
 		.commands {
 			CommandMenu("Navigate") {

@@ -16,14 +16,17 @@ struct TimetableWatchApp: App {
 
 	var body: some Scene {
 		WindowGroup {
-			ZStack(alignment: .top) {
-				WatchSessionRootView(sessionStore: sessionStore)
-				WatchStatusBadgeOverlay()
+			ZStack {
+				ZStack(alignment: .top) {
+					WatchSessionRootView(sessionStore: sessionStore)
+					WatchStatusBadgeOverlay()
+				}
+				.fontDesign(accountSettings.appFontDesign.swiftUIFontDesign)
+				.fontWidth(accountSettings.appFontDesign.swiftUIFontWidth)
+				.id(accountSettings.appFontDesign)
+				.transition(.opacity.animation(.easeInOut(duration: 0.1)))
 			}
-			.id(accountSettings.appFontDesign)
-			.transition(.opacity.animation(.easeInOut(duration: 0.1)))
-			.fontDesign(accountSettings.appFontDesign.swiftUIFontDesign)
-			.fontWidth(accountSettings.appFontDesign.swiftUIFontWidth)
+			.animation(.easeInOut(duration: 0.1), value: accountSettings.appFontDesign)
 			.environment(\.statusBadgeManager, statusBadgeManager)
 			.buttonStyle(.haptic)
 			.task {
