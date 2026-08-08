@@ -6,11 +6,35 @@ private extension View {
 	func watchPageTransition(height: CGFloat) -> some View {
 		frame(height: height)
 			.frame(maxWidth: .infinity)
+			.background {
+				WatchPaperBackground(
+					imageName: "paper",
+					cornerRadius: 24
+				)
+			}
+			.clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+			.foregroundStyle(.white)
 			.scrollTransition { content, phase in
 				content
 					.scaleEffect(phase.isIdentity ? 1 : 0.75)
 					.blur(radius: phase.isIdentity ? 0 : 8)
 			}
+	}
+}
+
+private struct WatchPaperBackground: View {
+	let imageName: String
+	let cornerRadius: CGFloat
+
+	var body: some View {
+		GeometryReader { proxy in
+			Image(imageName)
+				.resizable()
+				.scaledToFill()
+				.frame(width: proxy.size.width, height: proxy.size.height)
+				.clipped()
+		}
+		.clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
 	}
 }
 
@@ -44,6 +68,8 @@ struct WatchTimetablesTabView: View {
 		}
 		.scrollTargetBehavior(.viewAligned)
 		.scrollClipDisabled()
-		.ignoresSafeArea()
+		.background {
+			WatchPaperBackground(imageName: "paperBlack", cornerRadius: 0)
+		}
 	}
 }

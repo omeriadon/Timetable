@@ -127,7 +127,7 @@ struct FriendsTimetablesView: View {
 						.bold()
 						.padding(.horizontal, 13)
 						.padding(.vertical, 8)
-						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
+						.background(.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
 				}
 
 				Spacer()
