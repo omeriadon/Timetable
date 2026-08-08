@@ -47,7 +47,9 @@ struct UIKitTabView: UIViewControllerRepresentable {
 	private func applyFontDesign(to controller: UITabBarController) {
 		let design: UIFontDescriptor.SystemDesign = fontDesign == .rounded ? .rounded : .monospaced
 		let baseFont = UIFont.systemFont(ofSize: 10, weight: .semibold)
-		let font = UIFont(descriptor: baseFont.fontDescriptor.withDesign(design), size: 10)
+		let font = baseFont.fontDescriptor.withDesign(design)
+			.map { UIFont(descriptor: $0, size: 10) }
+			?? baseFont
 		for item in controller.tabBar.items ?? [] {
 			item.setTitleTextAttributes([.font: font], for: .normal)
 			item.setTitleTextAttributes([.font: font], for: .selected)

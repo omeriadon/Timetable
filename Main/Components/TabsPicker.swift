@@ -257,7 +257,9 @@ class TabsView: PlatformView {
 				var container = container
 				let design: UIFontDescriptor.SystemDesign = self.appFontDesign == .rounded ? .rounded : .monospaced
 				let baseFont = UIFont.systemFont(ofSize: 13, weight: .semibold)
-				container.font = UIFont(descriptor: baseFont.fontDescriptor.withDesign(design), size: 13)
+				container.font = baseFont.fontDescriptor.withDesign(design)
+					.map { UIFont(descriptor: $0, size: 13) }
+					?? baseFont
 				return container
 			}
 			let button = UIButton(type: .system)
