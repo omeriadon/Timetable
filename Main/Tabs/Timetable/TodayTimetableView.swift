@@ -23,14 +23,14 @@ struct TodayTimetableView: View {
 							.font(.system(size: 200))
 							.minimumScaleFactor(0.01)
 							.foregroundStyle(.white)
-					}
 
-					if let termWeekLabel = termWeekLabel(for: now) {
-						Text(termWeekLabel)
-							.font(.title3)
-							.foregroundStyle(.white.opacity(0.8))
-							.frame(maxWidth: .infinity, alignment: .leading)
-							.padding(.leading, 8)
+						if let termWeekLabel = termWeekLabel(for: now) {
+							Text(termWeekLabel)
+								.font(.title3)
+								.foregroundStyle(.white.opacity(0.8))
+								.frame(maxWidth: .infinity, alignment: .leading)
+								.padding(.leading, 4)
+						}
 					}
 
 					if let noSchoolDay = eventSnapshot.noSchoolDay {
@@ -120,7 +120,7 @@ struct TodayTimetableView: View {
 			.dateComponents([.day], from: start, to: current)
 			.day ?? 0
 
-		return "Term \(termNumber) Week \(elapsedDays / 7 + 1)"
+		return "Term \(termNumber), Week \(elapsedDays / 7 + 1)"
 	}
 
 	private func monday(of date: Date) -> Date {
