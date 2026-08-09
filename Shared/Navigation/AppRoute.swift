@@ -51,6 +51,7 @@ enum SettingsRoute: Codable, Hashable, Sendable {
 enum AdministrationRoute: Codable, Hashable, Sendable {
 	case root
 	case statistics
+	case devices
 	case friendshipDateChangeRequests
 	case userReports
 	case schoolEvents

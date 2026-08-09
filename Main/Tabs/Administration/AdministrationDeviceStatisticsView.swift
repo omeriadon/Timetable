@@ -2,12 +2,13 @@ import Charts
 import SwiftUI
 
 struct AdministrationDeviceStatisticsView: View {
-	let statistics: AdministrationStatisticsResponse?
+	@State private var model = AdministrationStatisticsModel()
+	@Environment(\.statusBadgeManager) private var statusBadges
 
 	var body: some View {
 		List {
 			Section("Device types") {
-				if let deviceTypes = statistics?.deviceTypes, !deviceTypes.isEmpty {
+				if let deviceTypes = model.statistics?.deviceTypes, !deviceTypes.isEmpty {
 					Chart(deviceTypes) { item in
 						SectorMark(angle: .value("Devices", item.count))
 							.foregroundStyle(by: .value("Device type", item.label))
@@ -24,7 +25,7 @@ struct AdministrationDeviceStatisticsView: View {
 			}
 
 			Section("Major operating system versions") {
-				if let osMajorVersions = statistics?.osMajorVersions, !osMajorVersions.isEmpty {
+				if let osMajorVersions = model.statistics?.osMajorVersions, !osMajorVersions.isEmpty {
 					Chart(osMajorVersions) { item in
 						SectorMark(angle: .value("Devices", item.count))
 							.foregroundStyle(by: .value("Operating system", item.label))
@@ -41,7 +42,7 @@ struct AdministrationDeviceStatisticsView: View {
 			}
 
 			Section("Operating systems by device type") {
-				let grouped = Dictionary(grouping: statistics?.deviceOSMajorVersions ?? [], by: \.platform)
+				let grouped = Dictionary(grouping: model.statistics?.deviceOSMajorVersions ?? [], by: \.platform)
 				ForEach(grouped.keys.sorted(), id: \.self) { platform in
 					DisclosureGroup(platform) {
 						ForEach(grouped[platform] ?? []) { item in
@@ -57,5 +58,17 @@ struct AdministrationDeviceStatisticsView: View {
 		}
 		.scrollEdgeEffect()
 		.appNavigationTitle("Devices", accent: true)
+		.refreshable {
+			await load()
+		}
+		.task {
+			await load()
+		}
+	}
+
+	private func load() async {
+		if let error = await model.load(), !Task.isCancelled, !error.isCancellation {
+			statusBadges.present(error: error, title: "Unable to load device statistics")
+		}
 	}
 }

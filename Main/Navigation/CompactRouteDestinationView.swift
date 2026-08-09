@@ -63,6 +63,8 @@ struct CompactRouteDestinationView: View {
 				AdministrationView()
 			case .administration(.statistics):
 				AdministrationStatisticsView()
+			case .administration(.devices):
+				AdministrationDeviceStatisticsView()
 			case .administration(.friendshipDateChangeRequests):
 				AdministrationFriendshipDateChangeRequestsView()
 			case .administration(.userReports):

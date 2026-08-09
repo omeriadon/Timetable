@@ -45,9 +45,7 @@ struct AdministrationStatisticsView: View {
 			}
 
 			Section("Devices") {
-				NavigationLink {
-					AdministrationDeviceStatisticsView(statistics: model.statistics)
-				} label: {
+				NavigationLink(value: AppRoute.administration(.devices)) {
 					Label("Devices", systemImage: "iphone.gen3")
 				}
 				LabeledContent("All devices") {
@@ -133,7 +131,7 @@ struct AdministrationStatisticsView: View {
 
 @MainActor
 @Observable
-private final class AdministrationStatisticsModel {
+final class AdministrationStatisticsModel {
 	private(set) var statistics: AdministrationStatisticsResponse?
 
 	func load() async -> Error? {
