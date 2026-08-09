@@ -197,10 +197,10 @@ struct WatchTimetableView: View {
 						.layoutPriority(1)
 				}
 			}
+			.padding(.bottom, 14)
 			.frame(width: geometry.size.width)
 		}
 		.padding(.top, 2)
-		.padding(.bottom, 6)
 		.tint(color)
 	}
 }
