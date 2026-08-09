@@ -34,7 +34,6 @@ private struct WatchPaperBackground: View {
 private struct WatchPage<Content: View>: View {
 	let height: CGFloat
 	let verticalInset: CGFloat
-	let horizontalPadding: CGFloat
 	let cornerRadius: CGFloat
 	let scrollTransitionIntensity: CGFloat
 	let usesBackground: Bool
@@ -43,7 +42,6 @@ private struct WatchPage<Content: View>: View {
 	init(
 		height: CGFloat,
 		verticalInset: CGFloat,
-		horizontalPadding: CGFloat,
 		cornerRadius: CGFloat = 24,
 		scrollTransitionIntensity: CGFloat = 1,
 		usesBackground: Bool = true,
@@ -51,7 +49,6 @@ private struct WatchPage<Content: View>: View {
 	) {
 		self.height = height
 		self.verticalInset = verticalInset
-		self.horizontalPadding = horizontalPadding
 		self.cornerRadius = cornerRadius
 		self.scrollTransitionIntensity = scrollTransitionIntensity
 		self.usesBackground = usesBackground
@@ -72,7 +69,7 @@ private struct WatchPage<Content: View>: View {
 			content
 				.frame(maxWidth: .infinity, maxHeight: .infinity)
 		)
-		.padding(.horizontal, horizontalPadding)
+		.padding(.horizontal, 8)
 		.padding(.vertical, verticalInset)
 		.frame(height: height)
 		.scrollTransition(axis: .vertical) { view, phase in
@@ -82,6 +79,9 @@ private struct WatchPage<Content: View>: View {
 				.blur(radius: magnitude * 3)
 				.opacity(1 - magnitude * 0.2)
 		}
+		.listRowInsets(EdgeInsets())
+		.listRowBackground(Color.clear)
+		.listRowSeparator(.hidden)
 	}
 }
 
@@ -101,42 +101,38 @@ struct WatchTimetablesTabView: View {
 				proxy.size.height - peekHeight * 2 - secondaryCardHeightReduction
 			)
 
-			ScrollView(.vertical) {
-				LazyVStack(spacing: cardSpacing) {
+			List {
+				WatchPage(
+					height: pageHeight,
+					verticalInset: verticalCardInset,
+					usesBackground: false
+				) {
+					ContentView()
+				}
+
+				if !subjects.isEmpty {
 					WatchPage(
 						height: pageHeight,
-						verticalInset: verticalCardInset,
-						horizontalPadding: 3,
-						scrollTransitionIntensity: 0,
-						usesBackground: false
+						verticalInset: verticalCardInset
 					) {
-						ContentView()
+						CurrentSubjectView()
 					}
+				}
 
-					if !subjects.isEmpty {
+				ForEach(friends) { friend in
+					if let timetable = friend.timetable {
 						WatchPage(
 							height: pageHeight,
-							verticalInset: verticalCardInset,
-							horizontalPadding: 8
+							verticalInset: verticalCardInset
 						) {
-							CurrentSubjectView()
-						}
-					}
-
-					ForEach(friends) { friend in
-						if let timetable = friend.timetable {
-							WatchPage(
-								height: pageHeight,
-								verticalInset: verticalCardInset,
-								horizontalPadding: 8
-							) {
-								FriendsTimetablesView(friend: friend, timetable: timetable)
-							}
+							FriendsTimetablesView(friend: friend, timetable: timetable)
 						}
 					}
 				}
-				.scrollTargetLayout()
 			}
+			.listStyle(.plain)
+			.listRowSpacing(cardSpacing)
+			.scrollContentBackground(.hidden)
 			.contentMargins(.vertical, peekHeight, for: .scrollContent)
 			.scrollTargetBehavior(.viewAligned(limitBehavior: .always, anchor: .center))
 			.scrollClipDisabled()
