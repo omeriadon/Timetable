@@ -14,6 +14,7 @@ struct WatchRootTabView: View {
 				WatchSettingsView()
 			}
 		}
+		.tabViewStyle(.page)
 		.fontDesign(accountSettings.appFontDesign.swiftUIFontDesign)
 	}
 }
