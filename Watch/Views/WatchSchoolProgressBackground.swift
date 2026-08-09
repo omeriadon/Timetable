@@ -3,31 +3,41 @@ import SwiftUI
 struct WatchSchoolProgressBackground: View {
 	let state: SchoolState
 	let now: Date
+	let cornerRadius: CGFloat
+
+	init(state: SchoolState, now: Date, cornerRadius: CGFloat = 24) {
+		self.state = state
+		self.now = now
+		self.cornerRadius = cornerRadius
+	}
 
 	var body: some View {
-		switch state {
-			case let .beforeSchool(next):
-				WatchProgressFill(color: next.subject.colour.swiftUIColor, now: now)
-			case let .lesson(lesson):
-				WatchProgressFill(
-					color: lesson.subject.colour.swiftUIColor,
-					start: lesson.interval.start,
-					end: lesson.interval.end,
-					now: now
-				)
-			case let .freePeriod(period):
-				WatchProgressFill(color: .blue, start: period.interval.start, end: period.interval.end, now: now)
-			case let .recess(state), let .lunch(state):
-				WatchProgressFill(
-					color: .black,
-					start: state.interval.start,
-					end: state.interval.end,
-					now: now,
-					isBreak: true
-				)
-			case .afterSchool, .weekend, .noTimetable:
-				Color.clear
+		Group {
+			switch state {
+				case let .beforeSchool(next):
+					WatchProgressFill(color: next.subject.colour.swiftUIColor, now: now)
+				case let .lesson(lesson):
+					WatchProgressFill(
+						color: lesson.subject.colour.swiftUIColor,
+						start: lesson.interval.start,
+						end: lesson.interval.end,
+						now: now
+					)
+				case let .freePeriod(period):
+					WatchProgressFill(color: .blue, start: period.interval.start, end: period.interval.end, now: now)
+				case let .recess(state), let .lunch(state):
+					WatchProgressFill(
+						color: .black,
+						start: state.interval.start,
+						end: state.interval.end,
+						now: now,
+						isBreak: true
+					)
+				case .afterSchool, .weekend, .noTimetable:
+					Color.clear
+			}
 		}
+		.clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
 	}
 }
 
