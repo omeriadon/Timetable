@@ -50,6 +50,7 @@ final class SessionStore {
 	private var accountBootstrapHandler: (() async throws -> Void)?
 	private var authenticatedHandler: (() async -> Void)?
 	private var signingOutHandler: (() async -> Void)?
+	private var sessionRecoveryHandler: (() -> Void)?
 
 	private static var initialState: AuthenticationState {
 		if let profile = Defaults[.accountProfile] {
@@ -90,7 +91,11 @@ final class SessionStore {
 		} catch {
 			PrintError("Session restoration failed", category: .account, error: error)
 			if isExplicitServerSignOut(error) {
-				clearSessionState()
+				if let sessionRecoveryHandler {
+					sessionRecoveryHandler()
+				} else {
+					clearSessionState()
+				}
 			}
 		}
 	}
@@ -148,7 +153,6 @@ final class SessionStore {
 		} catch let NetworkError.server(statusCode, response)
 			where statusCode == 401 || response.code == .sessionExpired
 		{
-			clearSessionState()
 			throw NetworkError.server(statusCode: statusCode, response: response)
 		}
 	}
@@ -209,6 +213,10 @@ final class SessionStore {
 		signingOutHandler = signingOut
 	}
 
+	func configureSessionRecovery(_ recovery: @escaping () -> Void) {
+		sessionRecoveryHandler = recovery
+	}
+
 	private var accessToken: String? {
 		KeychainManager.read(forKey: accessTokenKey)
 	}
@@ -230,11 +238,10 @@ final class SessionStore {
 	}
 
 	private func apply(_ response: TokenResponse, bootstrap: Bool) async throws {
-		guard KeychainManager.save(string: response.accessToken, forKey: accessTokenKey),
-		      KeychainManager.save(string: response.refreshToken, forKey: refreshTokenKey)
-		else {
-			KeychainManager.delete(forKey: accessTokenKey)
-			KeychainManager.delete(forKey: refreshTokenKey)
+		guard KeychainManager.save(string: response.accessToken, forKey: accessTokenKey) else {
+			throw SessionStoreError.credentialPersistenceFailed
+		}
+		guard KeychainManager.save(string: response.refreshToken, forKey: refreshTokenKey) else {
 			throw SessionStoreError.credentialPersistenceFailed
 		}
 		let profile = persist(response.user)

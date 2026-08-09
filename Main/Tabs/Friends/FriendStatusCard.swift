@@ -52,7 +52,14 @@ struct FriendStatusCard: View {
 						Text(scheduleStatus.title)
 						if style == .detail {
 							Spacer()
-							locationBadge(locationStatus)
+							VStack(alignment: .trailing, spacing: 4) {
+								locationBadge(locationStatus)
+								if let statusTime = locationStatus.statusTime {
+									Text(statusTime)
+										.font(.caption2)
+										.foregroundStyle(.secondary)
+								}
+							}
 						}
 					}
 					.font(style == .detail ? .title3 : .body)
@@ -100,11 +107,13 @@ struct FriendStatusCard: View {
 private struct FriendLocationStatus {
 	let title: String
 	let tint: Color?
+	let statusTime: String?
 
 	init(item: LocationStatusItem?, at date: Date) {
 		guard let item else {
 			title = "Status unavailable"
 			tint = nil
+			statusTime = nil
 			return
 		}
 
@@ -112,10 +121,12 @@ private struct FriendLocationStatus {
 			case .onCampus:
 				title = "On Campus"
 				tint = .green
+				statusTime = "Arrived: \(item.updatedAt.formatted(date: .omitted, time: .shortened))"
 
 			case .offCampus:
 				title = "Off Campus"
 				tint = Self.isDuringSchoolHours(at: date) ? .red : .blue
+				statusTime = "Left: \(item.updatedAt.formatted(date: .omitted, time: .shortened))"
 		}
 	}
 

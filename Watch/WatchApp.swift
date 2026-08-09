@@ -37,6 +37,9 @@ struct TimetableWatchApp: App {
 		SessionStore.shared.configureAccountBootstrap {
 			try await WatchAccountBootstrapService.shared.bootstrap()
 		}
+		SessionStore.shared.configureSessionRecovery {
+			WatchProvisioningService.shared.requestSessionIfPossible()
+		}
 		NetworkManager.shared.configureFeedback {
 			StatusBadgeManager.shared.present(networkError: $0)
 		}

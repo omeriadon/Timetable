@@ -130,7 +130,19 @@ final class WatchProvisioningService: NSObject, WCSessionDelegate {
 		_: WCSession,
 		activationDidCompleteWith _: WCSessionActivationState,
 		error _: Error?
-	) {}
+	) {
+		Task { @MainActor in
+			guard SessionStore.shared.isAuthenticated else { return }
+			self.requestSessionIfPossible()
+		}
+	}
+
+	nonisolated func sessionReachabilityDidChange(_: WCSession) {
+		Task { @MainActor in
+			guard SessionStore.shared.isAuthenticated else { return }
+			self.requestSessionIfPossible()
+		}
+	}
 
 	nonisolated func session(_: WCSession, didReceiveMessage message: [String: Any]) {
 		guard let action = message[WatchSessionMessage.actionKey] as? String else { return }
