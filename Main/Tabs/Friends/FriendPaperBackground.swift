@@ -5,7 +5,7 @@ struct FriendPaperBackground: View {
 
 	var body: some View {
 		GeometryReader { proxy in
-			Image("paperWhite")
+			Image("paperGray")
 				.resizable()
 				.scaledToFill()
 				.frame(

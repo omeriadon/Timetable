@@ -113,7 +113,7 @@ struct FriendDetailView: View {
 					}
 				}
 
-				ToolbarItem(placement: .principal) {
+				let toolbarItem = ToolbarItem(placement: .principal) {
 					HStack {
 						FriendAvatar(profile: displayedFriendProfile, size: 44)
 						Text(displayedFriendName)
@@ -123,7 +123,14 @@ struct FriendDetailView: View {
 					}
 				}
 				.sharedBackgroundVisibility(.hidden)
-				.contentMarginsRemoved()
+
+				if #available(anyAppleOS 27, *) {
+					toolbarItem
+						.contentMarginsRemoved()
+
+				} else {
+					toolbarItem
+				}
 
 				ToolbarItem(placement: .primaryAction) {
 					Menu("Friend actions", systemImage: "ellipsis") {

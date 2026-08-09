@@ -42,8 +42,7 @@ struct SettingsView: View {
 
 	var body: some View {
 		List { list }
-			.toolbarMinimizationBehavior(.onScrollDown, for: .navigationBar)
-			.toolbarMinimizationSafeAreaAdjustment(.disabled, for: .navigationBar)
+			.minimizingToolbarOnScrollDown()
 			.listStyle(.sidebar)
 			.scrollEdgeEffect(offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.3)
 			.scrollEdgeEffectStyle(.soft, for: .top)

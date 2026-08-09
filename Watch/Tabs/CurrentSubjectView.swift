@@ -48,7 +48,7 @@ struct CurrentSubjectView: View {
 					title: lesson.subject.id,
 					symbol: lesson.subject.symbol,
 					color: lesson.subject.colour.swiftUIColor,
-					nextText: lesson.next.title,
+					nextText: "Next: \(lesson.next.title)",
 					start: lesson.interval.start,
 					end: lesson.interval.end
 				)
@@ -58,7 +58,7 @@ struct CurrentSubjectView: View {
 					title: "Free Period",
 					symbol: "studentdesk",
 					color: .blue,
-					nextText: period.next.title,
+					nextText: "Next: \(period.next.title)",
 					start: period.interval.start,
 					end: period.interval.end
 				)
@@ -73,7 +73,7 @@ struct CurrentSubjectView: View {
 					title: type.description,
 					symbol: type.symbol,
 					color: .orange,
-					nextText: breakState.next.title,
+					nextText: "Next: \(breakState.next.title)",
 					start: breakState.interval.start,
 					end: breakState.interval.end
 				)
@@ -151,10 +151,7 @@ struct CurrentSubjectView: View {
 						.bold()
 						.padding(.horizontal, 10)
 						.padding(.vertical, 7)
-//						.glassEffect(
-//							.clear.interactive(),
-//							in: RoundedRectangle(cornerRadius: 10)
-//						)
+						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
 					}
 					Spacer()
 
@@ -165,9 +162,6 @@ struct CurrentSubjectView: View {
 						.foregroundStyle(.secondary)
 						.lineLimit(4)
 						.layoutPriority(1)
-
-					Spacer()
-						.frame(height: geo.size.height * 0.1)
 				}
 				.frame(width: geo.size.width)
 			} else {
@@ -213,7 +207,7 @@ struct CurrentSubjectView: View {
 						.bold()
 						.padding(.horizontal, 15)
 						.padding(.vertical, 10)
-//						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
+						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
 
 					Spacer()
 						.frame(height: geo.size.height * 0.1)

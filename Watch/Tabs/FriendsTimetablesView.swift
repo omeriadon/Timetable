@@ -50,28 +50,28 @@ struct FriendsTimetablesView: View {
 				title = lesson.subject.id
 				symbol = lesson.subject.symbol
 				color = lesson.subject.colour.swiftUIColor
-				nextText = lesson.next.title
+				nextText = "Next: \(lesson.next.title)"
 				countdownEnd = lesson.interval.end
 
 			case let .freePeriod(period):
 				title = "Free Period"
 				symbol = "studentdesk"
 				color = .blue
-				nextText = period.next.title
+				nextText = "Next: \(period.next.title)"
 				countdownEnd = period.interval.end
 
 			case let .recess(breakState):
 				title = BreakType.recess.description
 				symbol = BreakType.recess.symbol
 				color = .orange
-				nextText = breakState.next.title
+				nextText = "Next: \(breakState.next.title)"
 				countdownEnd = breakState.interval.end
 
 			case let .lunch(breakState):
 				title = BreakType.lunch.description
 				symbol = BreakType.lunch.symbol
 				color = .orange
-				nextText = breakState.next.title
+				nextText = "Next: \(breakState.next.title)"
 				countdownEnd = breakState.interval.end
 
 			case .afterSchool, .weekend:
@@ -137,10 +137,7 @@ struct FriendsTimetablesView: View {
 						.animation(.easeInOut(duration: 0.3), value: seconds)
 						.padding(.horizontal, 13)
 						.padding(.vertical, 8)
-//						.glassEffect(
-//							.clear.interactive(),
-//							in: RoundedRectangle(cornerRadius: 10)
-//						)
+						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
 					}
 				}
 

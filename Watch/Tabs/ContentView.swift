@@ -66,6 +66,7 @@ struct ContentView: View {
 					.font(.footnote.scaled(by: 0.8))
 					.frame(height: 10)
 					.frame(maxWidth: .infinity)
+					.foregroundStyle(accountSettings.highlightsCurrentDay && currentDayIndex == day ? .black : .white)
 					.background {
 						if accountSettings.highlightsCurrentDay, currentDayIndex == day {
 							RoundedRectangle(cornerRadius: 5)

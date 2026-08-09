@@ -32,8 +32,7 @@ struct AdministrationView: View {
 			}
 		}
 		.tint(.accent)
-		.toolbarMinimizationBehavior(.onScrollDown, for: .navigationBar)
-		.toolbarMinimizationSafeAreaAdjustment(.disabled, for: .navigationBar)
+		.minimizingToolbarOnScrollDown()
 		.appNavigationTitle("Administration", style: .main, accent: true)
 		.task {
 			await load()

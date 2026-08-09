@@ -10,8 +10,8 @@ struct AdministrationSpecialBadgesView: View {
 
 	var body: some View {
 		ScrollView {
-			LazyVStack(spacing: 10) {
-				ForEach(displayedBadges) { badge in
+			let lazyVStack = LazyVStack(spacing: 10) {
+				let forEach = ForEach(displayedBadges) { badge in
 					Button {
 						editor = .edit(badge)
 					} label: {
@@ -37,15 +37,29 @@ struct AdministrationSpecialBadgesView: View {
 					.buttonStyle(.plain)
 					.contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
 				}
-				.reorderable()
+
+				if #available(anyAppleOS 27, *) {
+					forEach
+						.reorderable()
+
+				} else {
+					forEach
+				}
 			}
-			.reorderContainer(for: AdministrationSpecialBadgeResponse.self) { difference in
-				var reorderedBadges = displayedBadges
-				difference.apply(to: &reorderedBadges)
-				badgeOrder = reorderedBadges.map(\.id)
-				saveBadgeOrder(badgeOrder)
+
+			if #available(anyAppleOS 27, *) {
+				lazyVStack
+					.reorderContainer(for: AdministrationSpecialBadgeResponse.self) { difference in
+						var reorderedBadges = displayedBadges
+						difference.apply(to: &reorderedBadges)
+						badgeOrder = reorderedBadges.map(\.id)
+						saveBadgeOrder(badgeOrder)
+					}
+					.padding()
+			} else {
+				lazyVStack
+					.padding()
 			}
-			.padding()
 		}
 		.appNavigationTitle("Badges", accent: true)
 		.toolbar {
@@ -226,6 +240,7 @@ struct AdministrationSpecialBadgesView: View {
 	}
 }
 
+@available(anyAppleOS 27.0, *)
 private extension ReorderDifference where CollectionID == ReorderableSingleCollectionIdentifier {
 	func apply<C: RangeReplaceableCollection>(to collection: inout C)
 		where C.Element: Identifiable,

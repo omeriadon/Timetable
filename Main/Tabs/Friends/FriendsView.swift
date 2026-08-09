@@ -119,7 +119,7 @@ struct FriendsView: View {
 
 	private var friendsList: some View {
 		ScrollView {
-			VStack(spacing: 14) {
+			let vStack = VStack(spacing: 14) {
 				LocationStatusRow(showsArrivalStatistics: $showsArrivalStatistics)
 
 				if friends.isEmpty {
@@ -130,39 +130,52 @@ struct FriendsView: View {
 					)
 					.padding(.top, 72)
 				} else {
+					let forEach = ForEach(friends) { friend in
+						Button {
+							if presentation == .iOS {
+								selectedFriend = friend
+							} else {
+								router.navigate(to: .friends(.friend(id: friend.id)))
+							}
+						} label: {
+							animatedScrollCard(FriendStatusCard(friend: friend))
+						}
+						.buttonStyle(.plain)
+						.matchedTransitionSource(
+							id: friendTransitionID(friend),
+							in: friendSheetNamespace
+						)
+					}
+
 					LazyVGrid(
 						columns: [
 							GridItem(.adaptive(minimum: 320, maximum: 520), spacing: 14),
 						],
 						spacing: 14
 					) {
-						ForEach(friends) { friend in
-							Button {
-								if presentation == .iOS {
-									selectedFriend = friend
-								} else {
-									router.navigate(to: .friends(.friend(id: friend.id)))
-								}
-							} label: {
-								animatedScrollCard(FriendStatusCard(friend: friend))
-							}
-							.buttonStyle(.plain)
-							.matchedTransitionSource(
-								id: friendTransitionID(friend),
-								in: friendSheetNamespace
-							)
+						if #available(anyAppleOS 27, *) {
+							forEach
+								.reorderable()
+						} else {
+							forEach
 						}
-						.reorderable()
 					}
 				}
 			}
-			.reorderContainer(for: FriendSummary.self) { difference in
-				difference.apply(to: &friends)
-				saveFriendOrder(friends)
+
+			if #available(anyAppleOS 27, *) {
+				vStack
+					.reorderContainer(for: FriendSummary.self) { difference in
+						difference.apply(to: &friends)
+						saveFriendOrder(friends)
+					}
+					.padding()
+			} else {
+				vStack
+					.padding()
 			}
-			.padding()
 		}
-		.toolbarMinimizationBehavior(.onScrollDown, for: .navigationBar)
+		.minimizingToolbarOnScrollDown()
 		.refreshable {
 			await refresh()
 		}
@@ -185,7 +198,7 @@ struct FriendsView: View {
 				}
 			}
 		}
-		.toolbarMinimizationBehavior(.onScrollDown, for: .navigationBar)
+		.minimizingToolbarOnScrollDown()
 		.listStyle(.plain)
 		.refreshable {
 			await refreshSearchResults()
@@ -277,6 +290,7 @@ struct FriendsView: View {
 	}
 }
 
+@available(anyAppleOS 27.0, *)
 private extension ReorderDifference where CollectionID == ReorderableSingleCollectionIdentifier {
 	func apply<C: RangeReplaceableCollection>(to collection: inout C)
 		where C.Element: Identifiable,
