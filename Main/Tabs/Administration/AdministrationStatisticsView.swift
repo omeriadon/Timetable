@@ -4,10 +4,11 @@
 //
 
 import Defaults
+import Observation
 import SwiftUI
 
 struct AdministrationStatisticsView: View {
-	@State private var statistics: AdministrationStatisticsResponse?
+	@State private var model = AdministrationStatisticsModel()
 	@Default(.friends) private var friends
 	@Default(.calendarEvents) private var calendarEvents
 	@Default(.eventTagSubscriptionIDs) private var subscribedTagIDs
@@ -18,42 +19,42 @@ struct AdministrationStatisticsView: View {
 		List {
 			Section("Users") {
 				LabeledContent("Total users") {
-					Text(statistics?.totalUsers.formatted() ?? "No data")
+					Text(model.statistics?.totalUsers.formatted() ?? "No data")
 				}
 				LabeledContent("Users with a timetable") {
-					Text(statistics?.usersWithOwnerTimetable.formatted() ?? "No data")
+					Text(model.statistics?.usersWithOwnerTimetable.formatted() ?? "No data")
 				}
 				LabeledContent("Users with assessments") {
-					Text(statistics?.usersWithAssessments.formatted() ?? "No data")
+					Text(model.statistics?.usersWithAssessments.formatted() ?? "No data")
 				}
 				LabeledContent("Users with location history") {
-					Text(statistics?.usersWithLocationStatus.formatted() ?? "No data")
+					Text(model.statistics?.usersWithLocationStatus.formatted() ?? "No data")
 				}
 			}
 
 			Section("Grades") {
 				LabeledContent("Assessments") {
-					Text(statistics?.totalAssessments.formatted() ?? "No data")
+					Text(model.statistics?.totalAssessments.formatted() ?? "No data")
 				}
 				LabeledContent("Average assessments per user") {
-					Text(formattedAverage(statistics?.averageAssessmentsPerUser))
+					Text(formattedAverage(model.statistics?.averageAssessmentsPerUser))
 				}
 				LabeledContent("Average assessments for users with assessments") {
-					Text(formattedAverage(statistics?.averageAssessmentsPerUserWithMultipleAssessments))
+					Text(formattedAverage(model.statistics?.averageAssessmentsPerUserWithMultipleAssessments))
 				}
 			}
 
 			Section("Devices") {
 				NavigationLink {
-					AdministrationDeviceStatisticsView(statistics: statistics)
+					AdministrationDeviceStatisticsView(statistics: model.statistics)
 				} label: {
 					Label("Devices", systemImage: "iphone.gen3")
 				}
 				LabeledContent("All devices") {
-					Text(statistics?.totalDevices.formatted() ?? "No data")
+					Text(model.statistics?.totalDevices.formatted() ?? "No data")
 				}
 				LabeledContent("Active devices in the last 30 days") {
-					Text(statistics?.activeDevicesLast30Days.formatted() ?? "No data")
+					Text(model.statistics?.activeDevicesLast30Days.formatted() ?? "No data")
 				}
 			}
 
@@ -61,30 +62,30 @@ struct AdministrationStatisticsView: View {
 				LabeledContent("Friends in account", value: friends.count.formatted())
 				LabeledContent("Pending friend requests", value: incomingFriendRequests.count.formatted())
 				LabeledContent("Accepted friendships") {
-					Text(statistics?.acceptedFriendships.formatted() ?? "No data")
+					Text(model.statistics?.acceptedFriendships.formatted() ?? "No data")
 				}
 				LabeledContent("Average friends per user") {
-					Text(formattedAverage(statistics?.averageFriendsPerUser))
+					Text(formattedAverage(model.statistics?.averageFriendsPerUser))
 				}
 				LabeledContent("Average friends for users with friends") {
-					Text(formattedAverage(statistics?.averageFriendsPerUserWithFriends))
+					Text(formattedAverage(model.statistics?.averageFriendsPerUserWithFriends))
 				}
 				LabeledContent("Subscribed event tags", value: subscribedTagIDs.count.formatted())
 				LabeledContent("All active tag subscriptions") {
-					Text(statistics?.activeEventTagSubscriptions.formatted() ?? "No data")
+					Text(model.statistics?.activeEventTagSubscriptions.formatted() ?? "No data")
 				}
 			}
 
 			Section("Calendar") {
 				LabeledContent("Visible events", value: calendarEvents.allEvents.count.formatted())
 				LabeledContent("All calendar events") {
-					Text(statistics?.totalCalendarEvents.formatted() ?? "No data")
+					Text(model.statistics?.totalCalendarEvents.formatted() ?? "No data")
 				}
 				LabeledContent("Global events") {
-					Text(statistics?.globalCalendarEvents.formatted() ?? "No data")
+					Text(model.statistics?.globalCalendarEvents.formatted() ?? "No data")
 				}
 				LabeledContent("Personal events") {
-					Text(statistics?.personalCalendarEvents.formatted() ?? "No data")
+					Text(model.statistics?.personalCalendarEvents.formatted() ?? "No data")
 				}
 			}
 
@@ -93,7 +94,7 @@ struct AdministrationStatisticsView: View {
 					Text(formattedAverageArrival)
 				}
 				LabeledContent("Recorded status updates") {
-					Text(statistics?.totalLocationStatusUpdates.formatted() ?? "No data")
+					Text(model.statistics?.totalLocationStatusUpdates.formatted() ?? "No data")
 				}
 			}
 		}
@@ -108,7 +109,7 @@ struct AdministrationStatisticsView: View {
 	}
 
 	private var formattedAverageArrival: String {
-		guard let seconds = statistics?.averageArrivalSecondsSinceMidnight else {
+		guard let seconds = model.statistics?.averageArrivalSecondsSinceMidnight else {
 			return "No data"
 		}
 
@@ -124,23 +125,33 @@ struct AdministrationStatisticsView: View {
 	}
 
 	private func load() async {
+		if let error = await model.load(), !Task.isCancelled, !error.isCancellation {
+			statusBadges.present(error: error, title: "Unable to load statistics")
+		}
+	}
+}
+
+@MainActor
+@Observable
+private final class AdministrationStatisticsModel {
+	private(set) var statistics: AdministrationStatisticsResponse?
+
+	func load() async -> Error? {
 		guard !Task.isCancelled else {
-			return
+			return nil
 		}
 
 		do {
 			let response = try await LocationStatusStatisticsService.shared.administrationStatistics()
 			guard !Task.isCancelled else {
-				return
+				return nil
 			}
 			statistics = response
+			return nil
 		} catch is CancellationError {
-			return
+			return nil
 		} catch {
-			guard !Task.isCancelled, !error.isCancellation else {
-				return
-			}
-			statusBadges.present(error: error, title: "Unable to load statistics")
+			return error
 		}
 	}
 }
