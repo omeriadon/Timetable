@@ -145,6 +145,16 @@
         }
       }
     },
+    "%@%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@%2$@"
+          }
+        }
+      }
+    },
     "%lld" : {
       "localizations" : {
         "fr" : {
@@ -832,9 +842,6 @@
     "App Font" : {
 
     },
-    "Apple Watch devices" : {
-
-    },
     "Applies before first period and after recess or lunch." : {
 
     },
@@ -990,7 +997,7 @@
     "Average arrival" : {
 
     },
-    "Average assessments for users with multiple assessments" : {
+    "Average assessments for users with assessments" : {
 
     },
     "Average assessments per user" : {
@@ -2064,6 +2071,12 @@
         }
       }
     },
+    "Device type" : {
+
+    },
+    "Device types" : {
+
+    },
     "Devices" : {
 
     },
@@ -3131,12 +3144,6 @@
         }
       }
     },
-    "iPad devices" : {
-
-    },
-    "iPhone devices" : {
-
-    },
     "Joshua Gilgallon" : {
       "localizations" : {
         "fr" : {
@@ -3234,9 +3241,6 @@
       }
     },
     "Left: " : {
-
-    },
-    "Legacy devices" : {
 
     },
     "Limit" : {
@@ -3374,7 +3378,7 @@
     "Location access enabled" : {
 
     },
-    "Mac devices" : {
+    "Major operating system versions" : {
 
     },
     "Matching periods" : {
@@ -3588,6 +3592,9 @@
     "No assessments yet" : {
 
     },
+    "No device data" : {
+
+    },
     "No Friend Requests" : {
       "localizations" : {
         "fr" : {
@@ -3688,6 +3695,9 @@
         }
       }
     },
+    "No operating system data" : {
+
+    },
     "No pending requests" : {
       "localizations" : {
         "fr" : {
@@ -3703,6 +3713,9 @@
           }
         }
       }
+    },
+    "No per-device operating system data" : {
+
     },
     "No School Today" : {
       "localizations" : {
@@ -4117,6 +4130,15 @@
         }
       }
     },
+    "Operating system" : {
+
+    },
+    "Operating systems by device type" : {
+
+    },
+    "OS %lld" : {
+
+    },
     "Other Tags" : {
 
     },
@@ -4400,6 +4422,9 @@
           }
         }
       }
+    },
+    "Recorded status updates" : {
+
     },
     "Reject" : {
 
@@ -6764,6 +6789,12 @@
       }
     },
     "Users with a timetable" : {
+
+    },
+    "Users with assessments" : {
+
+    },
+    "Users with location history" : {
 
     },
     "Visible events" : {
