@@ -47,13 +47,14 @@ struct LocationStatusRow: View {
 					}
 				}
 			}
+			.contentShape(Rectangle())
 		}
-		.foregroundStyle(.white)
+		.foregroundStyle(.black)
 		.padding(10)
 		.padding(.trailing, 10)
 		.background {
 			GeometryReader { proxy in
-				Image("paperBlack")
+				Image("paperWhite")
 					.resizable()
 					.scaledToFill()
 					.frame(

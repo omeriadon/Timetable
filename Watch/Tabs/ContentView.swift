@@ -69,8 +69,8 @@ struct ContentView: View {
 					.foregroundStyle(accountSettings.highlightsCurrentDay && currentDayIndex == day ? .black : .white)
 					.background {
 						if accountSettings.highlightsCurrentDay, currentDayIndex == day {
-							RoundedRectangle(cornerRadius: 5)
-								.fill(.white.opacity(0.1))
+							RoundedRectangle(cornerRadius: 2)
+								.fill(.white)
 						}
 					}
 			}

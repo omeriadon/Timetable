@@ -220,7 +220,24 @@ struct GradeAverageCard: View {
 		}
 		.padding(18)
 		.frame(maxWidth: .infinity, alignment: .leading)
-		.background(FriendPaperBackground(cornerRadius: 28))
+		.background {
+			GeometryReader { proxy in
+				Image("paperWhite")
+					.resizable()
+					.scaledToFill()
+					.frame(
+						width: proxy.size.width,
+						height: proxy.size.height
+					)
+					.clipped()
+			}
+			.clipShape(
+				RoundedRectangle(
+					cornerRadius: 28,
+					style: .continuous
+				)
+			)
+		}
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
 		.foregroundStyle(.black)
 		.dynamicTypeSize(.small)
@@ -286,12 +303,11 @@ struct GradeSubjectCard: View {
 			VStack(alignment: .leading, spacing: 5) {
 				Text(subject.id)
 					.font(.title3.weight(.semibold))
-					.foregroundStyle(.secondary)
 
 				if let average {
 					Text("\(average, format: .percent.precision(.fractionLength(1)))")
 						.bold()
-						.font(.title2)
+						.font(.title)
 				} else {
 					Text("No assessments yet")
 						.foregroundStyle(.secondary)
@@ -301,9 +317,9 @@ struct GradeSubjectCard: View {
 			Spacer()
 		}
 		.padding(14)
-		.background(FriendPaperBackground(cornerRadius: 28))
+		.background(FriendGrayPaperBackground(cornerRadius: 28))
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-		.foregroundStyle(.black)
+		.foregroundStyle(.white)
 	}
 }
 

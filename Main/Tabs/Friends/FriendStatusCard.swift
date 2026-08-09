@@ -63,10 +63,10 @@ struct FriendStatusCard: View {
 						.foregroundStyle(.secondary)
 				}
 			}
-			.foregroundStyle(.black)
+			.foregroundStyle(.white)
 			.padding(style == .detail ? 14 : 10)
 			.background {
-				FriendPaperBackground(cornerRadius: 28)
+				FriendGrayPaperBackground(cornerRadius: 28)
 			}
 			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
 			.contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))

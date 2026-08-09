@@ -82,10 +82,6 @@ struct FriendsView: View {
 					.zoom(sourceID: friendTransitionID(friend), in: friendSheetNamespace)
 				)
 		}
-		.popover(isPresented: $showsArrivalStatistics) {
-			PersonalArrivalStatisticsView()
-				.presentationCompactAdaptation(.popover)
-		}
 		.sheet(isPresented: $showsLocationStatusSheet) {
 			LocationStatusWhatsNewSheet {
 				showsLocationStatusSheet = false
@@ -121,6 +117,10 @@ struct FriendsView: View {
 		ScrollView {
 			let vStack = VStack(spacing: 14) {
 				LocationStatusRow(showsArrivalStatistics: $showsArrivalStatistics)
+					.popover(isPresented: $showsArrivalStatistics) {
+						PersonalArrivalStatisticsView()
+							.presentationCompactAdaptation(.popover)
+					}
 
 				if friends.isEmpty {
 					ContentUnavailableView(
