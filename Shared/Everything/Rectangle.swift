@@ -37,16 +37,10 @@ import SwiftUI
 			}
 			.padding(2)
 			.frame(maxWidth: .infinity)
-			.background(
-				isBreak ? .clear : fill,
+			.glassEffect(
+				isBreak ? .identity : .clear.tint(fill).interactive(),
 				in: RoundedRectangle(cornerRadius: isBreak ? 2 : 6)
 			)
-			.overlay {
-				if !isBreak {
-					RoundedRectangle(cornerRadius: isBreak ? 2 : 6)
-						.strokeBorder(.white.opacity(0.5), lineWidth: 1)
-				}
-			}
 		}
 	}
 

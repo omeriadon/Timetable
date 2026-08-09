@@ -59,13 +59,12 @@ private struct WatchPage<Content: View, Status: View>: View {
 	}
 
 	var body: some View {
-		VStack(spacing: 0) {
+		VStack(spacing: 5) {
 			styled(
 				content
 					.frame(maxWidth: .infinity, maxHeight: .infinity)
 			)
 			.padding(.horizontal, 8)
-			.padding(.vertical, verticalInset)
 
 			status
 		}
@@ -94,7 +93,7 @@ struct WatchTimetablesTabView: View {
 	@Default(.locationStatus) private var locationStatus
 	@Default(.timetable) private var subjects
 
-	private let verticalCardInset: CGFloat = 8
+	private let verticalCardInset: CGFloat = 2
 
 	var body: some View {
 		TabView {
@@ -103,15 +102,11 @@ struct WatchTimetablesTabView: View {
 				usesBackground: false
 			) {
 				ContentView()
-			} status: {
-				WatchLocationStatusView(item: locationStatus)
 			}
 
 			if !subjects.isEmpty {
 				WatchPage(verticalInset: verticalCardInset) {
 					CurrentSubjectView()
-				} status: {
-					WatchLocationStatusView(item: locationStatus)
 				}
 			}
 
@@ -127,12 +122,11 @@ struct WatchTimetablesTabView: View {
 		}
 		.tabViewStyle(.verticalPage)
 		.dynamicTypeSize(.xSmall)
-		.ignoresSafeArea(.container, edges: .vertical)
+		.ignoresSafeArea(.all, edges: .vertical)
 		.background {
 			WatchPaperBackground(imageName: "paperGray", cornerRadius: 0)
 				.ignoresSafeArea()
 		}
-		.ignoresSafeArea()
 	}
 }
 
@@ -143,26 +137,25 @@ private struct WatchLocationStatusView: View {
 		TimelineView(.periodic(from: .now, by: 60)) { context in
 			let now = TimetableClock.adjusted(context.date)
 			let title = item.map { $0.state == .onCampus ? "On Campus" : "Off Campus" } ?? "Status unavailable"
-			let symbol = item.map { $0.state == .onCampus ? "location.fill" : "location.slash.fill" } ?? "location.slash"
 			let tint = item.map { statusTint(for: $0.state, at: now) } ?? .secondary
 
 			HStack(spacing: 4) {
-				Image(systemName: symbol)
 				Text(title)
 
 				if let item {
-					Text(
-						item.state == .onCampus ? "Arrived: " : "Left: "
-					)
-					.foregroundStyle(.secondary)
+					Spacer(minLength: 1)
 
 					Text(item.updatedAt, format: .dateTime.hour().minute())
 						.foregroundStyle(.secondary)
 				}
 			}
-			.font(.caption2)
-			.foregroundStyle(tint)
+			.font(.caption2.scaled(by: 0.8))
+			.foregroundStyle(.white)
+			.padding(3)
+			.padding(.horizontal, 1.5)
+			.glassEffect(.clear.tint(tint).interactive(), in: Capsule())
 		}
+		.padding(.horizontal, 20)
 	}
 
 	private func statusTint(for state: LocationStatus, at date: Date) -> Color {

@@ -51,7 +51,7 @@ struct FriendsTimetablesView: View {
 				title = lesson.subject.id
 				symbol = lesson.subject.symbol
 				color = lesson.subject.colour.swiftUIColor
-				nextText = "Next: \(lesson.next.title)"
+				nextText = lesson.next.title == "Next Period" ? lesson.next.title : "Next: \(lesson.next.title)"
 				countdownEnd = lesson.interval.end
 
 			case let .freePeriod(period):
