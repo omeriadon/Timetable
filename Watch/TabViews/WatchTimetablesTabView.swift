@@ -134,7 +134,6 @@ private extension WatchPage where Status == EmptyView {
 
 struct WatchTimetablesTabView: View {
 	@Default(.friends) private var friends
-	@Default(.locationStatus) private var locationStatus
 	@Default(.timetable) private var subjects
 
 	private let verticalCardInset: CGFloat = 2
@@ -146,6 +145,12 @@ struct WatchTimetablesTabView: View {
 				usesBackground: false
 			) {
 				ContentView()
+			} top: {
+				Spacer()
+				Spacer()
+			} status: {
+				Spacer()
+				Spacer()
 			}
 
 			if !subjects.isEmpty {
@@ -160,9 +165,9 @@ struct WatchTimetablesTabView: View {
 						FriendsTimetablesView(friend: friend, timetable: timetable)
 					} top: {
 						Text(friend.friend.displayName)
-							.font(.title2)
+							.font(.title3)
 							.bold()
-							.lineLimit(2)
+							.lineLimit(1)
 							.multilineTextAlignment(.center)
 					} status: {
 						WatchLocationStatusView(item: friend.locationStatus)

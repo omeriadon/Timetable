@@ -1,5 +1,5 @@
 //
-//  WatchTimetableView.swift
+//  CurrentSubjectView.swift
 //  Timetable
 //
 //  Created by Adon Omeri on 9/8/2026.
@@ -60,7 +60,7 @@ struct WatchTimetableView: View {
 					title: "Free Period",
 					symbol: "studentdesk",
 					color: .blue,
-					nextText: "Next: (period.next.title)",
+					nextText: "Next: \(period.next.title)",
 					start: period.interval.start,
 					end: period.interval.end,
 					now: now
@@ -77,7 +77,7 @@ struct WatchTimetableView: View {
 					title: type.description,
 					symbol: type.symbol,
 					color: .orange,
-					nextText: "Next: (breakState.next.title)",
+					nextText: "Next: \(breakState.next.title)",
 					start: breakState.interval.start,
 					end: breakState.interval.end,
 					now: now
@@ -94,7 +94,7 @@ struct WatchTimetableView: View {
 						title: "School's Out",
 						symbol: "house.fill",
 						color: .secondary,
-						nextText: "Next: (next.subject.id)",
+						nextText: "Next: \(next.subject.id)",
 						start: now,
 						end: next.interval.start,
 						now: now
@@ -156,14 +156,13 @@ struct WatchTimetableView: View {
 					Spacer()
 
 					Image(systemName: symbol)
-						.font(.headline)
+						.font(.title3)
 						.bold()
 						.contentTransition(.symbolEffect(.replace))
 						.symbolEffect(.bounce, value: symbol)
 
 					Text(title)
-						.font(.system(size: 30))
-						.minimumScaleFactor(0.4)
+						.font(.title2)
 						.lineLimit(2)
 						.multilineTextAlignment(.center)
 						.frame(maxWidth: geometry.size.width * 0.9)
@@ -200,8 +199,8 @@ struct WatchTimetableView: View {
 			}
 			.frame(width: geometry.size.width)
 		}
-		.padding(.top, 4)
-		.padding(.bottom, 10)
+		.padding(.top, 2)
+		.padding(.bottom, 6)
 		.tint(color)
 	}
 }
