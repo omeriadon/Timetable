@@ -178,7 +178,8 @@ struct WatchTimetableView: View {
 					Spacer(minLength: 1)
 
 					TimelineView(.periodic(from: .now, by: 1)) { context in
-						let remaining = max(0, end.timeIntervalSince(context.date))
+						let now = TimetableClock.adjusted(context.date)
+						let remaining = max(0, end.timeIntervalSince(now))
 						let seconds = Int(remaining)
 
 						Text(Duration.seconds(seconds), format: .time(pattern: .hourMinuteSecond))

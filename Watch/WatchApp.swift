@@ -23,10 +23,7 @@ struct TimetableWatchApp: App {
 				}
 				.fontDesign(accountSettings.appFontDesign.swiftUIFontDesign)
 				.fontWidth(accountSettings.appFontDesign.swiftUIFontWidth)
-				.id(accountSettings.appFontDesign)
-				.transition(.opacity.animation(.easeInOut(duration: 0.1)))
 			}
-			.animation(.easeInOut(duration: 0.1), value: accountSettings.appFontDesign)
 			.environment(\.statusBadgeManager, statusBadgeManager)
 			.buttonStyle(.haptic)
 			.task {
