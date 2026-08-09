@@ -83,8 +83,9 @@ private struct WatchPage<Content: View>: View {
 		.scrollTransition(axis: .vertical) { view, phase in
 			let magnitude = min(abs(phase.value), 1)
 			return view
-				.scaleEffect(1 - magnitude * 0.04)
-				.opacity(1 - magnitude * 0.12)
+				.scaleEffect(1 - magnitude * 0.1)
+				.blur(radius: magnitude * 3)
+				.opacity(1 - magnitude * 0.2)
 		}
 	}
 }
@@ -108,6 +109,7 @@ struct WatchTimetablesTabView: View {
 					usesBackground: false
 				) {
 					ContentView()
+						.drawingGroup(opaque: false)
 				}
 
 				if !subjects.isEmpty {
