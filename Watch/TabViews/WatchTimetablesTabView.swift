@@ -56,7 +56,7 @@ private struct WatchPage<Content: View>: View {
 	}
 
 	@ViewBuilder
-	private func styled<V: View>(_ view: V) -> some View {
+	private func styled(_ view: some View) -> some View {
 		if usesBackground {
 			view.watchCardStyle(cornerRadius: cornerRadius)
 		} else {
@@ -81,6 +81,7 @@ private struct WatchPage<Content: View>: View {
 				.scaleEffect(1 - magnitude * 0.04)
 				.opacity(1 - magnitude * 0.12)
 		}
+	}
 }
 
 struct WatchTimetablesTabView: View {
