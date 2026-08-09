@@ -11,6 +11,14 @@ struct WatchTimetableView: View {
 	let subjects: [Subject]
 	let schoolCalendar: SchoolCalendarProjection
 
+	let shorter: Bool
+
+	init(subjects: [Subject], schoolCalendar: SchoolCalendarProjection, shorter: Bool = false) {
+		self.subjects = subjects
+		self.schoolCalendar = schoolCalendar
+		self.shorter = shorter
+	}
+
 	var body: some View {
 		TimelineView(.periodic(from: .now, by: 1)) { context in
 			let now = TimetableClock.adjusted(context.date)
@@ -121,7 +129,7 @@ struct WatchTimetableView: View {
 		GeometryReader { geometry in
 			VStack(alignment: .center) {
 				if isBeforeSchool {
-					Spacer()
+					Color.clear.frame(height: 10)
 
 					Text("First Period")
 						.font(.caption)
@@ -139,7 +147,7 @@ struct WatchTimetableView: View {
 						.frame(maxWidth: geometry.size.width * 0.9)
 						.bold()
 
-					Spacer()
+					Color.clear.frame(height: 10)
 
 					Text(timerInterval: now ... end, countsDown: true, showsHours: true)
 						.contentTransition(.numericText(countsDown: true))
@@ -151,9 +159,9 @@ struct WatchTimetableView: View {
 						.padding(.vertical, 10)
 						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
 
-					Spacer()
+					Color.clear.frame(height: 10)
 				} else {
-					Spacer()
+					Color.clear.frame(height: 10)
 
 					Image(systemName: symbol)
 						.font(.title3)
@@ -168,7 +176,7 @@ struct WatchTimetableView: View {
 						.frame(maxWidth: geometry.size.width * 0.9)
 						.bold()
 
-					Spacer()
+					Color.clear.frame(height: 10)
 
 					TimelineView(.periodic(from: .now, by: 1)) { context in
 						let remaining = max(0, end.timeIntervalSince(context.date))
@@ -186,7 +194,7 @@ struct WatchTimetableView: View {
 							.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
 					}
 
-					Spacer()
+					Color.clear.frame(height: 10)
 
 					Text(nextText ?? "")
 						.frame(maxWidth: geometry.size.width * 0.8)
@@ -195,10 +203,11 @@ struct WatchTimetableView: View {
 						.foregroundStyle(.secondary)
 						.lineLimit(4)
 						.layoutPriority(1)
+
+					Color.clear.frame(height: 10)
 				}
 			}
-			.padding(.bottom, 14)
-			.frame(width: geometry.size.width)
+			.frame(width: geometry.size.width, height: geometry.size.height - (shorter ? 100 : 60))
 		}
 		.padding(.top, 2)
 		.tint(color)

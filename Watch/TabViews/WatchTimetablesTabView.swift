@@ -147,9 +147,11 @@ struct WatchTimetablesTabView: View {
 			) {
 				ContentView()
 			} top: {
-				Color.clear.frame(height: 6)
+				Spacer()
+				Spacer()
 			} status: {
-				Color.clear.frame(height: 6)
+				Spacer()
+				Spacer()
 			}
 
 			if !subjects.isEmpty {
