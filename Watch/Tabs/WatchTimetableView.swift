@@ -1,32 +1,15 @@
-import Defaults
+//
+//  WatchTimetableView.swift
+//  Timetable
+//
+//  Created by Adon Omeri on 9/8/2026.
+//
+
 import SwiftUI
-
-struct CurrentSubjectView: View {
-	@Default(.timetable) private var subjects
-	@Default(.schoolCalendar) private var schoolCalendar
-
-	var body: some View {
-		WatchTimetableView(
-			subjects: subjects,
-			schoolCalendar: schoolCalendar
-		)
-	}
-}
 
 struct WatchTimetableView: View {
 	let subjects: [Subject]
-	let displayName: String?
 	let schoolCalendar: SchoolCalendarProjection
-
-	init(
-		subjects: [Subject],
-		displayName: String? = nil,
-		schoolCalendar: SchoolCalendarProjection
-	) {
-		self.subjects = subjects
-		self.displayName = displayName
-		self.schoolCalendar = schoolCalendar
-	}
 
 	var body: some View {
 		TimelineView(.periodic(from: .now, by: 1)) { context in
@@ -66,7 +49,7 @@ struct WatchTimetableView: View {
 					title: lesson.subject.id,
 					symbol: lesson.subject.symbol,
 					color: lesson.subject.colour.swiftUIColor,
-					nextText: lesson.next.title == "Last Period" ? lesson.next.title : "Next: (lesson.next.title)",
+					nextText: lesson.next.title == "Last Period" ? lesson.next.title : "Next: \(lesson.next.title)",
 					start: lesson.interval.start,
 					end: lesson.interval.end,
 					now: now
@@ -137,14 +120,6 @@ struct WatchTimetableView: View {
 	) -> some View {
 		GeometryReader { geometry in
 			VStack(alignment: .center) {
-				if let displayName {
-					Text(displayName)
-						.font(.title2)
-						.bold()
-						.lineLimit(2)
-						.multilineTextAlignment(.center)
-				}
-
 				if isBeforeSchool {
 					Spacer()
 
@@ -225,7 +200,7 @@ struct WatchTimetableView: View {
 			}
 			.frame(width: geometry.size.width)
 		}
-		.padding(.top, displayName == nil ? 4 : 8)
+		.padding(.top, 4)
 		.padding(.bottom, 10)
 		.tint(color)
 	}

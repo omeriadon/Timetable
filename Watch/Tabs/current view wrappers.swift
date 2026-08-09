@@ -9,7 +9,18 @@ struct FriendsTimetablesView: View {
 	var body: some View {
 		WatchTimetableView(
 			subjects: timetable.subjects,
-			displayName: friend.friend.displayName,
+			schoolCalendar: schoolCalendar
+		)
+	}
+}
+
+struct CurrentSubjectView: View {
+	@Default(.timetable) private var subjects
+	@Default(.schoolCalendar) private var schoolCalendar
+
+	var body: some View {
+		WatchTimetableView(
+			subjects: subjects,
 			schoolCalendar: schoolCalendar
 		)
 	}

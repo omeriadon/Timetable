@@ -28,11 +28,12 @@ private struct WatchPaperBackground: View {
 	}
 }
 
-private struct WatchPage<Content: View, Status: View>: View {
+private struct WatchPage<Content: View, Top: View, Status: View>: View {
 	let verticalInset: CGFloat
 	let cornerRadius: CGFloat
 	let usesBackground: Bool
 	let content: Content
+	let top: Top
 	let status: Status
 
 	init(
@@ -40,12 +41,14 @@ private struct WatchPage<Content: View, Status: View>: View {
 		cornerRadius: CGFloat = 24,
 		usesBackground: Bool = true,
 		@ViewBuilder content: () -> Content,
+		@ViewBuilder top: () -> Top,
 		@ViewBuilder status: () -> Status
 	) {
 		self.verticalInset = verticalInset
 		self.cornerRadius = cornerRadius
 		self.usesBackground = usesBackground
 		self.content = content()
+		self.top = top()
 		self.status = status()
 	}
 
@@ -60,6 +63,8 @@ private struct WatchPage<Content: View, Status: View>: View {
 
 	var body: some View {
 		VStack(spacing: 5) {
+			top
+
 			styled(
 				content
 					.frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -71,7 +76,7 @@ private struct WatchPage<Content: View, Status: View>: View {
 	}
 }
 
-private extension WatchPage where Status == EmptyView {
+private extension WatchPage where Top == EmptyView, Status == EmptyView {
 	init(
 		verticalInset: CGFloat,
 		cornerRadius: CGFloat = 24,
@@ -83,6 +88,45 @@ private extension WatchPage where Status == EmptyView {
 			cornerRadius: cornerRadius,
 			usesBackground: usesBackground,
 			content: content,
+			top: { EmptyView() },
+			status: { EmptyView() }
+		)
+	}
+}
+
+private extension WatchPage where Top == EmptyView {
+	init(
+		verticalInset: CGFloat,
+		cornerRadius: CGFloat = 24,
+		usesBackground: Bool = true,
+		@ViewBuilder content: () -> Content,
+		@ViewBuilder status: () -> Status
+	) {
+		self.init(
+			verticalInset: verticalInset,
+			cornerRadius: cornerRadius,
+			usesBackground: usesBackground,
+			content: content,
+			top: { EmptyView() },
+			status: status
+		)
+	}
+}
+
+private extension WatchPage where Status == EmptyView {
+	init(
+		verticalInset: CGFloat,
+		cornerRadius: CGFloat = 24,
+		usesBackground: Bool = true,
+		@ViewBuilder content: () -> Content,
+		@ViewBuilder top: () -> Top
+	) {
+		self.init(
+			verticalInset: verticalInset,
+			cornerRadius: cornerRadius,
+			usesBackground: usesBackground,
+			content: content,
+			top: top,
 			status: { EmptyView() }
 		)
 	}
@@ -114,6 +158,12 @@ struct WatchTimetablesTabView: View {
 				if let timetable = friend.timetable {
 					WatchPage(verticalInset: verticalCardInset) {
 						FriendsTimetablesView(friend: friend, timetable: timetable)
+					} top: {
+						Text(friend.friend.displayName)
+							.font(.title2)
+							.bold()
+							.lineLimit(2)
+							.multilineTextAlignment(.center)
 					} status: {
 						WatchLocationStatusView(item: friend.locationStatus)
 					}
