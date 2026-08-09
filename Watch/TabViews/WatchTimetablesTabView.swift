@@ -72,27 +72,47 @@ private struct WatchPage<Content: View>: View {
 		.padding(.horizontal, 8)
 		.padding(.vertical, verticalInset)
 		.frame(height: height)
-		.scrollTransition(axis: .vertical) { view, phase in
-			let magnitude = min(abs(phase.value), 1) * scrollTransitionIntensity
-			return view
-				.scaleEffect(1 - magnitude * 0.1)
-				.blur(radius: magnitude * 3)
-				.opacity(1 - magnitude * 0.2)
-		}
+//		.scrollTransition(axis: .vertical) { view, phase in
+//			let magnitude = min(abs(phase.value), 1) * scrollTransitionIntensity
+//			return view
+//				.scaleEffect(1 - magnitude * 0.1)
+//				.blur(radius: magnitude * 3)
+//				.opacity(1 - magnitude * 0.2)
+//		}
 		.listRowInsets(EdgeInsets())
 		.listRowBackground(Color.clear)
-		.listRowSeparator(.hidden)
 	}
 }
 
 struct WatchTimetablesTabView: View {
+	private enum PageID: Hashable {
+		case timetable
+		case currentSubject
+		case friend(UUID)
+	}
+
 	@Default(.friends) private var friends
 	@Default(.timetable) private var subjects
+	@State private var crownPosition = 0.0
 
-	private let cardSpacing: CGFloat = 8
 	private let peekHeight: CGFloat = 18
 	private let secondaryCardHeightReduction: CGFloat = 36
 	private let verticalCardInset: CGFloat = 8
+
+	private var pageIDs: [PageID] {
+		var pageIDs: [PageID] = [.timetable]
+
+		if !subjects.isEmpty {
+			pageIDs.append(.currentSubject)
+		}
+
+		pageIDs.append(contentsOf: friends.compactMap { friend in
+			guard friend.timetable != nil else { return nil }
+			return .friend(friend.id)
+		})
+
+		return pageIDs
+	}
 
 	var body: some View {
 		GeometryReader { proxy in
@@ -100,42 +120,66 @@ struct WatchTimetablesTabView: View {
 				1,
 				proxy.size.height - peekHeight * 2 - secondaryCardHeightReduction
 			)
+			let verticalContentMargin = max(0, (proxy.size.height - pageHeight) / 2)
+			let maximumCrownPosition = Double(max(1, pageIDs.count - 1))
 
-			List {
-				WatchPage(
-					height: pageHeight,
-					verticalInset: verticalCardInset,
-					usesBackground: false
-				) {
-					ContentView()
-				}
-
-				if !subjects.isEmpty {
+			ScrollViewReader { scrollProxy in
+				List {
 					WatchPage(
 						height: pageHeight,
-						verticalInset: verticalCardInset
+						verticalInset: verticalCardInset,
+						usesBackground: false
 					) {
-						CurrentSubjectView()
+						ContentView()
 					}
-				}
+					.drawingGroup(opaque: false)
+					.id(PageID.timetable)
 
-				ForEach(friends) { friend in
-					if let timetable = friend.timetable {
+					if !subjects.isEmpty {
 						WatchPage(
 							height: pageHeight,
 							verticalInset: verticalCardInset
 						) {
-							FriendsTimetablesView(friend: friend, timetable: timetable)
+							CurrentSubjectView()
+						}
+						.id(PageID.currentSubject)
+					}
+
+					ForEach(friends) { friend in
+						if let timetable = friend.timetable {
+							WatchPage(
+								height: pageHeight,
+								verticalInset: verticalCardInset
+							) {
+								FriendsTimetablesView(friend: friend, timetable: timetable)
+							}
+							.id(PageID.friend(friend.id))
 						}
 					}
 				}
+				.listStyle(.plain)
+				.scrollContentBackground(.hidden)
+				.contentMargins(.vertical, verticalContentMargin, for: .scrollContent)
+				.scrollClipDisabled()
+				.focusable()
+				.digitalCrownRotation(
+					$crownPosition,
+					from: 0,
+					through: maximumCrownPosition,
+					by: 1,
+					sensitivity: .medium,
+					isContinuous: false,
+					isHapticFeedbackEnabled: true
+				)
+				.onChange(of: crownPosition) { _, newPosition in
+					let requestedIndex = Int(newPosition.rounded())
+					let index = min(requestedIndex, pageIDs.count - 1)
+
+					withAnimation(.smooth) {
+						scrollProxy.scrollTo(pageIDs[index], anchor: .center)
+					}
+				}
 			}
-			.listStyle(.plain)
-			.listRowSpacing(cardSpacing)
-			.scrollContentBackground(.hidden)
-			.contentMargins(.vertical, peekHeight, for: .scrollContent)
-			.scrollTargetBehavior(.viewAligned(limitBehavior: .always, anchor: .center))
-			.scrollClipDisabled()
 		}
 		.dynamicTypeSize(.xSmall)
 		.ignoresSafeArea(.container, edges: .vertical)
