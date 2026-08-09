@@ -73,6 +73,7 @@ private struct WatchPage<Content: View, Top: View, Status: View>: View {
 
 			status
 		}
+		.ignoresSafeArea()
 	}
 }
 
@@ -146,11 +147,9 @@ struct WatchTimetablesTabView: View {
 			) {
 				ContentView()
 			} top: {
-				Spacer()
-				Spacer()
+				Color.clear.frame(height: 6)
 			} status: {
-				Spacer()
-				Spacer()
+				Color.clear.frame(height: 6)
 			}
 
 			if !subjects.isEmpty {
@@ -177,11 +176,11 @@ struct WatchTimetablesTabView: View {
 		}
 		.tabViewStyle(.verticalPage)
 		.dynamicTypeSize(.xSmall)
-		.ignoresSafeArea(.all, edges: .vertical)
 		.background {
 			WatchPaperBackground(imageName: "paperGray", cornerRadius: 0)
 				.ignoresSafeArea()
 		}
+		.ignoresSafeArea()
 	}
 }
 
