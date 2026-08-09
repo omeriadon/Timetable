@@ -1,16 +1,32 @@
-//
-//   CurrentSubjectView.swift
-//   Watch
-//
-//   Created by Adon Omeri on 11/6/2026.
-//
-
 import Defaults
 import SwiftUI
 
 struct CurrentSubjectView: View {
 	@Default(.timetable) private var subjects
 	@Default(.schoolCalendar) private var schoolCalendar
+
+	var body: some View {
+		WatchTimetableView(
+			subjects: subjects,
+			schoolCalendar: schoolCalendar
+		)
+	}
+}
+
+struct WatchTimetableView: View {
+	let subjects: [Subject]
+	let displayName: String?
+	let schoolCalendar: SchoolCalendarProjection
+
+	init(
+		subjects: [Subject],
+		displayName: String? = nil,
+		schoolCalendar: SchoolCalendarProjection
+	) {
+		self.subjects = subjects
+		self.displayName = displayName
+		self.schoolCalendar = schoolCalendar
+	}
 
 	var body: some View {
 		TimelineView(.periodic(from: .now, by: 1)) { context in
@@ -34,33 +50,37 @@ struct CurrentSubjectView: View {
 	private func content(state: SchoolState, now: Date) -> some View {
 		switch state {
 			case let .beforeSchool(next):
-				createProgressView(
+				progressView(
 					title: next.subject.id,
 					symbol: next.subject.symbol,
 					color: next.subject.colour.swiftUIColor,
 					nextText: nil,
 					start: now,
-					end: next.interval.start
+					end: next.interval.start,
+					isBeforeSchool: true,
+					now: now
 				)
 
 			case let .lesson(lesson):
-				createProgressView(
+				progressView(
 					title: lesson.subject.id,
 					symbol: lesson.subject.symbol,
 					color: lesson.subject.colour.swiftUIColor,
-					nextText: lesson.next.title == "Next Period" ? lesson.next.title : "Next: \(lesson.next.title)",
+					nextText: lesson.next.title == "Last Period" ? lesson.next.title : "Next: (lesson.next.title)",
 					start: lesson.interval.start,
-					end: lesson.interval.end
+					end: lesson.interval.end,
+					now: now
 				)
 
 			case let .freePeriod(period):
-				createProgressView(
+				progressView(
 					title: "Free Period",
 					symbol: "studentdesk",
 					color: .blue,
-					nextText: "Next: \(period.next.title)",
+					nextText: "Next: (period.next.title)",
 					start: period.interval.start,
-					end: period.interval.end
+					end: period.interval.end,
+					now: now
 				)
 
 			case let .recess(breakState), let .lunch(breakState):
@@ -69,13 +89,15 @@ struct CurrentSubjectView: View {
 				} else {
 					.lunch
 				}
-				createProgressView(
+
+				progressView(
 					title: type.description,
 					symbol: type.symbol,
 					color: .orange,
-					nextText: "Next: \(breakState.next.title)",
+					nextText: "Next: (breakState.next.title)",
 					start: breakState.interval.start,
-					end: breakState.interval.end
+					end: breakState.interval.end,
+					now: now
 				)
 
 			case .afterSchool, .weekend:
@@ -85,13 +107,14 @@ struct CurrentSubjectView: View {
 					calendar: SchoolCalendarProjection.perthCalendar,
 					schoolCalendar: schoolCalendar
 				) {
-					createProgressView(
+					progressView(
 						title: "School's Out",
 						symbol: "house.fill",
 						color: .secondary,
-						nextText: "Next: \(next.subject.id)",
+						nextText: "Next: (next.subject.id)",
 						start: now,
-						end: next.interval.start
+						end: next.interval.start,
+						now: now
 					)
 				} else {
 					ContentUnavailableView("School's Out", systemImage: "house.fill")
@@ -102,19 +125,59 @@ struct CurrentSubjectView: View {
 		}
 	}
 
-	private func createProgressView(
+	private func progressView(
 		title: String,
 		symbol: String,
 		color: Color,
 		nextText: String?,
-		start: Date?,
-		end: Date?
+		start _: Date,
+		end: Date,
+		isBeforeSchool: Bool = false,
+		now: Date
 	) -> some View {
-		let now = start ?? TimetableClock.adjusted(.now)
+		GeometryReader { geometry in
+			VStack(alignment: .center) {
+				if let displayName {
+					Text(displayName)
+						.font(.title2)
+						.bold()
+						.lineLimit(2)
+						.multilineTextAlignment(.center)
+				}
 
-		return GeometryReader { geo in
-			if let nextText, let end {
-				VStack(alignment: .center) {
+				if isBeforeSchool {
+					Spacer()
+
+					Text("First Period")
+						.font(.caption)
+
+					Image(systemName: symbol)
+						.font(.title)
+						.bold()
+						.contentTransition(.symbolEffect(.replace))
+						.symbolEffect(.bounce, value: symbol)
+
+					Text(title)
+						.font(.title3.scaled(by: 0.9))
+						.lineLimit(2)
+						.multilineTextAlignment(.center)
+						.frame(maxWidth: geometry.size.width * 0.9)
+						.bold()
+
+					Spacer()
+
+					Text(timerInterval: now ... end, countsDown: true, showsHours: true)
+						.contentTransition(.numericText(countsDown: true))
+						.animation(.easeInOut(duration: 0.5), value: now)
+						.font(.title3)
+						.lineLimit(1)
+						.bold()
+						.padding(.horizontal, 15)
+						.padding(.vertical, 10)
+						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
+
+					Spacer()
+				} else {
 					Spacer()
 
 					Image(systemName: symbol)
@@ -128,10 +191,8 @@ struct CurrentSubjectView: View {
 						.minimumScaleFactor(0.4)
 						.lineLimit(2)
 						.multilineTextAlignment(.center)
-						.frame(maxWidth: geo.size.width * 0.9)
+						.frame(maxWidth: geometry.size.width * 0.9)
 						.bold()
-						.contentTransition(.opacity)
-						.animation(.smooth, value: title)
 
 					Spacer()
 
@@ -139,87 +200,33 @@ struct CurrentSubjectView: View {
 						let remaining = max(0, end.timeIntervalSince(context.date))
 						let seconds = Int(remaining)
 
-						Text(
-							Duration.seconds(seconds),
-							format: .time(pattern: .hourMinuteSecond)
-						)
-						.contentTransition(.numericText(countsDown: true))
-						.animation(.easeInOut(duration: 0.3), value: seconds)
-						.font(.title3)
-						.monospacedDigit()
-						.lineLimit(1)
-						.bold()
-						.padding(.horizontal, 10)
-						.padding(.vertical, 7)
-						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
+						Text(Duration.seconds(seconds), format: .time(pattern: .hourMinuteSecond))
+							.contentTransition(.numericText(countsDown: true))
+							.animation(.easeInOut(duration: 0.3), value: seconds)
+							.font(.title3)
+							.monospacedDigit()
+							.lineLimit(1)
+							.bold()
+							.padding(.horizontal, 10)
+							.padding(.vertical, 7)
+							.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
 					}
+
 					Spacer()
 
-					Text(nextText)
-						.frame(maxWidth: geo.size.width * 0.8)
+					Text(nextText ?? "")
+						.frame(maxWidth: geometry.size.width * 0.8)
 						.font(.caption)
 						.multilineTextAlignment(.center)
 						.foregroundStyle(.secondary)
 						.lineLimit(4)
 						.layoutPriority(1)
-				}
-				.frame(width: geo.size.width)
-			} else {
-				VStack(alignment: .center) {
-					Spacer()
-					Spacer()
-
-					Text("Before School")
-						.font(.caption)
-						.foregroundStyle(.secondary)
-						.lineLimit(4)
-						.layoutPriority(1)
-
-					Spacer()
-
-					Text("First Period:")
-						.font(.caption2)
-						.foregroundStyle(.secondary)
-
-					Image(systemName: symbol)
-						.font(.title)
-						.bold()
-						.contentTransition(.symbolEffect(.replace))
-						.symbolEffect(.bounce, value: symbol)
-
-					Text(title)
-						.font(.title2.scaled(by: 0.9))
-						.lineLimit(2)
-						.multilineTextAlignment(.center)
-						.frame(maxWidth: geo.size.width * 0.9)
-						.bold()
-						.contentTransition(.opacity)
-						.animation(.smooth, value: title)
-
-					Spacer()
-
-					let targetDate = end ?? now
-					Text(timerInterval: now ... targetDate, countsDown: true, showsHours: true)
-						.contentTransition(.numericText(countsDown: true))
-						.animation(.easeInOut(duration: 0.5), value: now)
-						.font(.title3)
-						.lineLimit(1)
-						.bold()
-						.padding(.horizontal, 15)
-						.padding(.vertical, 10)
-						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
-
-					Spacer()
-						.frame(height: geo.size.height * 0.1)
 				}
 			}
+			.frame(width: geometry.size.width)
 		}
+		.padding(.top, displayName == nil ? 4 : 8)
 		.padding(.bottom, 10)
-		.padding(.top, 4)
 		.tint(color)
 	}
-}
-
-#Preview {
-	CurrentSubjectView()
 }
