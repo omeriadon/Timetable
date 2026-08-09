@@ -36,6 +36,7 @@ private struct WatchPage<Content: View>: View {
 	let horizontalPadding: CGFloat
 	let cornerRadius: CGFloat
 	let pageAlignment: VerticalAlignment
+	let heightReduction: CGFloat
 	let usesBackground: Bool
 	@ViewBuilder var content: Content
 
@@ -44,6 +45,7 @@ private struct WatchPage<Content: View>: View {
 		horizontalPadding: CGFloat,
 		cornerRadius: CGFloat = 24,
 		pageAlignment: VerticalAlignment = .top,
+		heightReduction: CGFloat = 0,
 		usesBackground: Bool = true,
 		@ViewBuilder content: () -> Content
 	) {
@@ -51,6 +53,7 @@ private struct WatchPage<Content: View>: View {
 		self.horizontalPadding = horizontalPadding
 		self.cornerRadius = cornerRadius
 		self.pageAlignment = pageAlignment
+		self.heightReduction = heightReduction
 		self.usesBackground = usesBackground
 		self.content = content()
 	}
@@ -67,14 +70,16 @@ private struct WatchPage<Content: View>: View {
 	var body: some View {
 		styled(
 			content
-				.frame(maxWidth: .infinity)
-				.containerRelativeFrame(.vertical) { length, _ in
-					max(1, length - verticalInset * 2)
-				}
+				.frame(maxWidth: .infinity, maxHeight: .infinity)
 		)
 		.padding(.horizontal, horizontalPadding)
 		.padding(.vertical, verticalInset)
-		.containerRelativeFrame(.vertical, alignment: Alignment(horizontal: .center, vertical: pageAlignment))
+		.containerRelativeFrame(
+			.vertical,
+			alignment: Alignment(horizontal: .center, vertical: pageAlignment)
+		) { length, _ in
+			max(1, length - heightReduction)
+		}
 		.scrollTransition(axis: .vertical) { view, phase in
 			let magnitude = min(abs(phase.value), 1)
 			return view
@@ -90,6 +95,7 @@ struct WatchTimetablesTabView: View {
 
 	private let cardSpacing: CGFloat = 8
 	private let peekHeight: CGFloat = 18
+	private let secondaryCardHeightReduction: CGFloat = 36
 	private let verticalCardInset: CGFloat = 8
 
 	var body: some View {
@@ -105,14 +111,22 @@ struct WatchTimetablesTabView: View {
 				}
 
 				if !subjects.isEmpty {
-					WatchPage(verticalInset: verticalCardInset, horizontalPadding: 8) {
+					WatchPage(
+						verticalInset: verticalCardInset,
+						horizontalPadding: 8,
+						heightReduction: secondaryCardHeightReduction
+					) {
 						CurrentSubjectView()
 					}
 				}
 
 				ForEach(friends) { friend in
 					if let timetable = friend.timetable {
-						WatchPage(verticalInset: verticalCardInset, horizontalPadding: 8) {
+						WatchPage(
+							verticalInset: verticalCardInset,
+							horizontalPadding: 8,
+							heightReduction: secondaryCardHeightReduction
+						) {
 							FriendsTimetablesView(friend: friend, timetable: timetable)
 						}
 					}
