@@ -72,6 +72,13 @@ private struct WatchPage<Content: View>: View {
 		.padding(.horizontal, horizontalPadding)
 		.padding(.vertical, verticalInset)
 		.frame(height: height)
+		.scrollTransition(axis: .vertical) { view, phase in
+			let magnitude = min(abs(phase.value), 1)
+			return view
+				.scaleEffect(1 - magnitude * 0.1)
+				.blur(radius: magnitude * 3)
+				.opacity(1 - magnitude * 0.2)
+		}
 	}
 }
 
@@ -85,23 +92,27 @@ struct WatchTimetablesTabView: View {
 	private let verticalCardInset: CGFloat = 8
 
 	var body: some View {
-		GeometryReader { _ in
-			let secondaryPageHeight = max(1, firstPageHeight - secondaryCardHeightReduction)
+		GeometryReader { proxy in
+			let pageHeight = max(
+				1,
+				proxy.size.height - peekHeight * 2 - secondaryCardHeightReduction
+			)
 
 			ScrollView(.vertical) {
 				LazyVStack(spacing: cardSpacing) {
 					WatchPage(
-						height: secondaryPageHeight,
+						height: pageHeight,
 						verticalInset: verticalCardInset,
 						horizontalPadding: 3,
 						usesBackground: false
 					) {
 						ContentView()
+							.drawingGroup(opaque: false)
 					}
 
 					if !subjects.isEmpty {
 						WatchPage(
-							height: secondaryPageHeight,
+							height: pageHeight,
 							verticalInset: verticalCardInset,
 							horizontalPadding: 8
 						) {
@@ -112,7 +123,7 @@ struct WatchTimetablesTabView: View {
 					ForEach(friends) { friend in
 						if let timetable = friend.timetable {
 							WatchPage(
-								height: secondaryPageHeight,
+								height: pageHeight,
 								verticalInset: verticalCardInset,
 								horizontalPadding: 8
 							) {
