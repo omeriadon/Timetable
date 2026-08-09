@@ -27,6 +27,7 @@ struct FriendsTimetablesView: View {
 				WatchCurrentTimeMarker(state: state, now: now)
 				content(state: state, now: now)
 			}
+			.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 		}
 	}
 
