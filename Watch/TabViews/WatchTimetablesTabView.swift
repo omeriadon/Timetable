@@ -85,14 +85,13 @@ struct WatchTimetablesTabView: View {
 	private let verticalCardInset: CGFloat = 8
 
 	var body: some View {
-		GeometryReader { proxy in
-			let firstPageHeight = max(1, proxy.size.height - peekHeight * 2)
+		GeometryReader { _ in
 			let secondaryPageHeight = max(1, firstPageHeight - secondaryCardHeightReduction)
 
 			ScrollView(.vertical) {
 				LazyVStack(spacing: cardSpacing) {
 					WatchPage(
-						height: firstPageHeight,
+						height: secondaryPageHeight,
 						verticalInset: verticalCardInset,
 						horizontalPadding: 3,
 						usesBackground: false
