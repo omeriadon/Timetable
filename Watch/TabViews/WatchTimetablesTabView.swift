@@ -28,22 +28,25 @@ private struct WatchPaperBackground: View {
 	}
 }
 
-private struct WatchPage<Content: View>: View {
+private struct WatchPage<Content: View, Status: View>: View {
 	let verticalInset: CGFloat
 	let cornerRadius: CGFloat
 	let usesBackground: Bool
-	@ViewBuilder var content: Content
+	let content: Content
+	let status: Status
 
 	init(
 		verticalInset: CGFloat,
 		cornerRadius: CGFloat = 24,
 		usesBackground: Bool = true,
-		@ViewBuilder content: () -> Content
+		@ViewBuilder content: () -> Content,
+		@ViewBuilder status: () -> Status
 	) {
 		self.verticalInset = verticalInset
 		self.cornerRadius = cornerRadius
 		self.usesBackground = usesBackground
 		self.content = content()
+		self.status = status()
 	}
 
 	@ViewBuilder
@@ -56,12 +59,33 @@ private struct WatchPage<Content: View>: View {
 	}
 
 	var body: some View {
-		styled(
-			content
-				.frame(maxWidth: .infinity, maxHeight: .infinity)
+		VStack(spacing: 0) {
+			styled(
+				content
+					.frame(maxWidth: .infinity, maxHeight: .infinity)
+			)
+			.padding(.horizontal, 8)
+			.padding(.vertical, verticalInset)
+
+			status
+		}
+	}
+}
+
+private extension WatchPage where Status == EmptyView {
+	init(
+		verticalInset: CGFloat,
+		cornerRadius: CGFloat = 24,
+		usesBackground: Bool = true,
+		@ViewBuilder content: () -> Content
+	) {
+		self.init(
+			verticalInset: verticalInset,
+			cornerRadius: cornerRadius,
+			usesBackground: usesBackground,
+			content: content,
+			status: { EmptyView() }
 		)
-		.padding(.horizontal, 8)
-		.padding(.vertical, verticalInset)
 	}
 }
 
