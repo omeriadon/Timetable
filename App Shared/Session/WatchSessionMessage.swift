@@ -1,6 +1,7 @@
 nonisolated enum WatchSessionMessage {
 	static let actionKey = "watchSessionAction"
 	static let installationIDKey = "watchSessionInstallationID"
+	static let osMajorVersionKey = "watchSessionOSMajorVersion"
 	static let sessionKey = "watchSession"
 	static let errorKey = "error"
 

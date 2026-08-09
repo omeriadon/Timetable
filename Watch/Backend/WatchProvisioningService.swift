@@ -62,9 +62,13 @@ final class WatchProvisioningService: NSObject, WCSessionDelegate {
 		startTimeout()
 
 		let installationID = ClientIdentityProvider.shared.identity(for: .watchOS).installationID
+		let osMajorVersion = ProcessInfo.processInfo.operatingSystemVersion.majorVersion
 
 		session.sendMessage(
-			[WatchSessionMessage.installationIDKey: installationID],
+			[
+				WatchSessionMessage.installationIDKey: installationID,
+				WatchSessionMessage.osMajorVersionKey: osMajorVersion,
+			],
 			replyHandler: { reply in
 				Task { @MainActor in
 					self.finishRequest()
