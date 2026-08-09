@@ -22,11 +22,10 @@ struct CurrentSubjectView: View {
 				schoolCalendar: schoolCalendar
 			)
 
-			content(state: state, now: now)
-				.background {
-					WatchSchoolProgressBackground(state: state, now: now)
-						.animation(.smooth, value: state)
-				}
+			VStack(spacing: 0) {
+				WatchCurrentTimeMarker(state: state, now: now)
+				content(state: state, now: now)
+			}
 		}
 	}
 
