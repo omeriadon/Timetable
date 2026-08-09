@@ -482,6 +482,7 @@ nonisolated struct FeedbackRequest: Codable {
 nonisolated struct RegisterUserDeviceRequest: Codable {
 	let installationID: String
 	let platform: String
+	let osMajorVersion: Int? = nil
 	let apnsToken: String
 	/// true when the token is from a debug/sandbox build.
 	let isDebug: Bool

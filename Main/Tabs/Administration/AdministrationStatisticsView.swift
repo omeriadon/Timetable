@@ -24,6 +24,12 @@ struct AdministrationStatisticsView: View {
 				LabeledContent("Users with a timetable") {
 					Text(statistics?.usersWithOwnerTimetable.formatted() ?? "No data")
 				}
+				LabeledContent("Users with assessments") {
+					Text(statistics?.usersWithAssessments.formatted() ?? "No data")
+				}
+				LabeledContent("Users with location history") {
+					Text(statistics?.usersWithLocationStatus.formatted() ?? "No data")
+				}
 			}
 
 			Section("Grades") {
@@ -33,32 +39,22 @@ struct AdministrationStatisticsView: View {
 				LabeledContent("Average assessments per user") {
 					Text(formattedAverage(statistics?.averageAssessmentsPerUser))
 				}
-				LabeledContent("Average assessments for users with multiple assessments") {
+				LabeledContent("Average assessments for users with assessments") {
 					Text(formattedAverage(statistics?.averageAssessmentsPerUserWithMultipleAssessments))
 				}
 			}
 
 			Section("Devices") {
+				NavigationLink {
+					AdministrationDeviceStatisticsView(statistics: statistics)
+				} label: {
+					Label("Devices", systemImage: "iphone.gen3")
+				}
 				LabeledContent("All devices") {
 					Text(statistics?.totalDevices.formatted() ?? "No data")
 				}
 				LabeledContent("Active devices in the last 30 days") {
 					Text(statistics?.activeDevicesLast30Days.formatted() ?? "No data")
-				}
-				LabeledContent("iPhone devices") {
-					Text(statistics?.iPhoneDevices.formatted() ?? "No data")
-				}
-				LabeledContent("iPad devices") {
-					Text(statistics?.iPadDevices.formatted() ?? "No data")
-				}
-				LabeledContent("Mac devices") {
-					Text(statistics?.macDevices.formatted() ?? "No data")
-				}
-				LabeledContent("Apple Watch devices") {
-					Text(statistics?.watchDevices.formatted() ?? "No data")
-				}
-				LabeledContent("Legacy devices") {
-					Text(statistics?.legacyDevices.formatted() ?? "No data")
 				}
 			}
 
@@ -96,6 +92,9 @@ struct AdministrationStatisticsView: View {
 			Section("Status") {
 				LabeledContent("Average arrival") {
 					Text(formattedAverageArrival)
+				}
+				LabeledContent("Recorded status updates") {
+					Text(statistics?.totalLocationStatusUpdates.formatted() ?? "No data")
 				}
 			}
 		}

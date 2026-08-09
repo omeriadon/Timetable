@@ -116,6 +116,7 @@ final class NotificationRegistrationService {
 					body: RegisterUserDeviceRequest(
 						installationID: identity.installationID,
 						platform: identity.platform.rawValue,
+						osMajorVersion: ProcessInfo.processInfo.operatingSystemVersion.majorVersion,
 						apnsToken: token,
 						isDebug: Self.isDebug
 					)
