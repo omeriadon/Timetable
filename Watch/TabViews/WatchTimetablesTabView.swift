@@ -155,7 +155,7 @@ private struct WatchLocationStatusView: View {
 			.padding(.horizontal, 1.5)
 			.glassEffect(.clear.tint(tint).interactive(), in: Capsule())
 		}
-		.padding(.horizontal, 20)
+		.padding(.horizontal, item != nil ? 25 : 0)
 	}
 
 	private func statusTint(for state: LocationStatus, at date: Date) -> Color {
