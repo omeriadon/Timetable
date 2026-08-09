@@ -12,6 +12,7 @@ struct AdministrationDeviceStatisticsView: View {
 				if let statistics = model.statistics {
 					LabeledContent("Debug builds", value: statistics.debugDevices.formatted())
 					LabeledContent("Beta builds", value: statistics.betaDevices.formatted())
+					LabeledContent("Release builds", value: statistics.releaseDevices.formatted())
 				}
 			}
 
@@ -37,8 +38,8 @@ struct AdministrationDeviceStatisticsView: View {
 					Text("Major versions")
 						.tag(OperatingSystemChartMode.majorVersions)
 
-					Text("Betas")
-						.tag(OperatingSystemChartMode.betas)
+					Text("Builds")
+						.tag(OperatingSystemChartMode.builds)
 
 					Text("Minor versions")
 						.tag(OperatingSystemChartMode.minorVersions)
@@ -62,11 +63,15 @@ struct AdministrationDeviceStatisticsView: View {
 					ForEach(operatingSystemChartItems) { item in
 						HStack {
 							Text(item.label)
-							Spacer()
+						Spacer()
 							if item.isDebug {
 								Image(systemName: "flask")
 									.foregroundStyle(.secondary)
 									.accessibilityLabel("Debug build")
+							}
+							if let buildLabel = item.buildLabel {
+								Text(buildLabel)
+									.foregroundStyle(.secondary)
 							}
 							Text(item.count.formatted())
 								.foregroundStyle(.secondary)
@@ -83,10 +88,19 @@ struct AdministrationDeviceStatisticsView: View {
 				ForEach(grouped.keys.sorted(), id: \.self) { platform in
 					DisclosureGroup(platform) {
 						ForEach(grouped[platform] ?? []) { item in
-							LabeledContent(
-								"OS \(item.osMajorVersion).\(item.osMinorVersion)",
-								value: item.count.formatted()
-							)
+							HStack {
+								Text("OS \(item.osMajorVersion).\(item.osMinorVersion)")
+								Spacer()
+								if item.isDebug {
+									Image(systemName: "flask")
+										.foregroundStyle(.secondary)
+										.accessibilityLabel("Debug build")
+								}
+								Text(item.buildLabel)
+									.foregroundStyle(.secondary)
+								Text(item.count.formatted())
+									.foregroundStyle(.secondary)
+							}
 						}
 					}
 				}
@@ -123,12 +137,11 @@ struct AdministrationDeviceStatisticsView: View {
 		switch operatingSystemChartMode {
 			case .majorVersions:
 				return groupedMajorVersions(statistics.deviceOSVersions)
-			case .betas:
-				let totalDevices = statistics.deviceTypes.reduce(0) { $0 + $1.count }
-				let betaDevices = min(statistics.betaDevices, totalDevices)
+			case .builds:
 				return [
-					OperatingSystemChartItem(label: "Beta", chartLabel: "Beta", count: betaDevices),
-					OperatingSystemChartItem(label: "Non-beta", chartLabel: "Non-beta", count: max(0, totalDevices - betaDevices)),
+					OperatingSystemChartItem(label: "Debug", chartLabel: "Debug", count: statistics.debugDevices),
+					OperatingSystemChartItem(label: "Beta", chartLabel: "Beta", count: statistics.betaDevices),
+					OperatingSystemChartItem(label: "Release", chartLabel: "Release", count: statistics.releaseDevices),
 				].filter { $0.count > 0 }
 			case .minorVersions:
 				return groupedMinorVersions(statistics.deviceOSVersions)
@@ -155,13 +168,14 @@ struct AdministrationDeviceStatisticsView: View {
 			let label = "OS \($0.osMajorVersion).\($0.osMinorVersion)"
 			return OperatingSystemChartItem(
 				label: label,
-				chartLabel: $0.isDebug ? "\(label) (Debug)" : label,
+				chartLabel: "\(label) · \($0.buildLabel)",
 				count: $0.count,
-				isDebug: $0.isDebug
+				isDebug: $0.isDebug,
+				buildLabel: $0.buildLabel
 			)
 		}.sorted {
 			if $0.label == $1.label {
-				return !$0.isDebug && $1.isDebug
+				return ($0.buildLabel ?? "") < ($1.buildLabel ?? "")
 			}
 			return $0.label > $1.label
 		}
@@ -170,7 +184,7 @@ struct AdministrationDeviceStatisticsView: View {
 
 private enum OperatingSystemChartMode: Hashable {
 	case majorVersions
-	case betas
+	case builds
 	case minorVersions
 	case minorVersionsForMajor(Int)
 }
@@ -180,15 +194,26 @@ private struct OperatingSystemChartItem: Identifiable {
 	let chartLabel: String
 	let count: Int
 	let isDebug: Bool
+	let buildLabel: String?
 
-	init(label: String, chartLabel: String, count: Int, isDebug: Bool = false) {
+	init(label: String, chartLabel: String, count: Int, isDebug: Bool = false, buildLabel: String? = nil) {
 		self.label = label
 		self.chartLabel = chartLabel
 		self.count = count
 		self.isDebug = isDebug
+		self.buildLabel = buildLabel
 	}
 
 	var id: String {
 		"\(chartLabel)-\(isDebug)"
+	}
+}
+
+private extension AdministrationDeviceOSVersionCount {
+	var buildLabel: String {
+		if isDebug {
+			return "Debug"
+		}
+		return isBeta ? "Beta" : "Release"
 	}
 }
