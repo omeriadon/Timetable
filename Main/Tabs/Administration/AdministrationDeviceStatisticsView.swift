@@ -7,6 +7,13 @@ struct AdministrationDeviceStatisticsView: View {
 
 	var body: some View {
 		List {
+			Section("Builds") {
+				if let statistics = model.statistics {
+					LabeledContent("Debug builds", value: statistics.debugDevices.formatted())
+					LabeledContent("Beta builds", value: statistics.betaDevices.formatted())
+				}
+			}
+
 			Section("Device types") {
 				if let deviceTypes = model.statistics?.deviceTypes, !deviceTypes.isEmpty {
 					Chart(deviceTypes) { item in
@@ -24,15 +31,15 @@ struct AdministrationDeviceStatisticsView: View {
 				}
 			}
 
-			Section("Major operating system versions") {
-				if let osMajorVersions = model.statistics?.osMajorVersions, !osMajorVersions.isEmpty {
-					Chart(osMajorVersions) { item in
+			Section("Operating system versions") {
+				if let osVersions = model.statistics?.osVersions, !osVersions.isEmpty {
+					Chart(osVersions) { item in
 						SectorMark(angle: .value("Devices", item.count))
 							.foregroundStyle(by: .value("Operating system", item.label))
 					}
 					.frame(height: 220)
 
-					ForEach(osMajorVersions) { item in
+					ForEach(osVersions) { item in
 						LabeledContent(item.label, value: item.count.formatted())
 					}
 				} else {
@@ -42,11 +49,14 @@ struct AdministrationDeviceStatisticsView: View {
 			}
 
 			Section("Operating systems by device type") {
-				let grouped = Dictionary(grouping: model.statistics?.deviceOSMajorVersions ?? [], by: \.platform)
+				let grouped = Dictionary(grouping: model.statistics?.deviceOSVersions ?? [], by: \.platform)
 				ForEach(grouped.keys.sorted(), id: \.self) { platform in
 					DisclosureGroup(platform) {
 						ForEach(grouped[platform] ?? []) { item in
-							LabeledContent("OS \(item.osMajorVersion)", value: item.count.formatted())
+							LabeledContent(
+								"OS \(item.osMajorVersion).\(item.osMinorVersion)",
+								value: item.count.formatted()
+							)
 						}
 					}
 				}

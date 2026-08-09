@@ -48,9 +48,7 @@ final class PhoneWatchSyncBridge: NSObject, WCSessionDelegate {
 	}
 
 	func session(_: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
-		guard let installationID = message[WatchSessionMessage.installationIDKey] as? String,
-		      let osMajorVersion = message[WatchSessionMessage.osMajorVersionKey] as? Int
-		else {
+		guard let installationID = message[WatchSessionMessage.installationIDKey] as? String else {
 			replyHandler([WatchSessionMessage.errorKey: "The Watch sign-in request was invalid."])
 			return
 		}
@@ -63,8 +61,7 @@ final class PhoneWatchSyncBridge: NSObject, WCSessionDelegate {
 				let response: TokenResponse = try await NetworkManager.shared.send(
 					Endpoint("/v1/auth/watch-session", method: .post),
 					body: WatchSessionRequest(
-						installationID: installationID,
-						osMajorVersion: osMajorVersion
+						installationID: installationID
 					),
 					context: .background
 				)

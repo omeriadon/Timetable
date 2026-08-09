@@ -40,5 +40,4 @@ nonisolated struct LogoutRequest: Codable, Sendable {
 
 nonisolated struct WatchSessionRequest: Codable, Sendable {
 	let installationID: String
-	let osMajorVersion: Int
 }

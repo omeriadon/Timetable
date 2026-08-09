@@ -482,10 +482,18 @@ nonisolated struct FeedbackRequest: Codable {
 nonisolated struct RegisterUserDeviceRequest: Codable {
 	let installationID: String
 	let platform: String
-	let osMajorVersion: Int
-	let apnsToken: String?
+	let apnsToken: String
 	/// true when the token is from a debug/sandbox build.
 	let isDebug: Bool
+}
+
+nonisolated struct SynchronizeUserDeviceRequest: Codable, Sendable {
+	let installationID: String
+	let platform: String
+	let osMajorVersion: Int
+	let osMinorVersion: Int
+	let isDebug: Bool
+	let isBeta: Bool
 }
 
 nonisolated struct RemoveUserDeviceRequest: Codable {

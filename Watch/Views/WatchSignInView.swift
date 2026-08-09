@@ -16,9 +16,7 @@ struct WatchSignInView: View {
 				.fontWeight(.regular)
 
 			Button {
-				Task {
-					provisioningService.requestSessionIfPossible()
-				}
+				provisioningService.requestSessionIfPossible()
 			} label: {
 				ZStack {
 					if provisioningService.isRequesting {

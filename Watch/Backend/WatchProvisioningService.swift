@@ -26,6 +26,7 @@ final class WatchProvisioningService: NSObject, WCSessionDelegate {
 	var isRequesting = false
 
 	private var didConfigureSession = false
+	private var isMessageInFlight = false
 	private var timeoutTask: Task<Void, Never>?
 
 	func activate() {
@@ -46,33 +47,31 @@ final class WatchProvisioningService: NSObject, WCSessionDelegate {
 	func requestSessionIfPossible() {
 		guard WCSession.isSupported(), !isRequesting else { return }
 
-		activate()
-
-		let session = WCSession.default
-
-		guard session.activationState == .activated, session.isReachable else {
-			StatusBadgeManager.shared.present(
-				error: WatchProvisioningError.phoneUnavailable,
-				title: "Unable to Sign In"
-			)
-			return
-		}
-
 		isRequesting = true
 		startTimeout()
+		activate()
+		sendRequestIfReady()
+	}
+
+	private func sendRequestIfReady() {
+		let session = WCSession.default
+
+		guard isRequesting,
+		      !isMessageInFlight,
+		      session.activationState == .activated,
+		      session.isReachable
+		else { return }
+
+		isMessageInFlight = true
 
 		let installationID = ClientIdentityProvider.shared.identity(for: .watchOS).installationID
-		let osMajorVersion = ProcessInfo.processInfo.operatingSystemVersion.majorVersion
-
 		session.sendMessage(
 			[
 				WatchSessionMessage.installationIDKey: installationID,
-				WatchSessionMessage.osMajorVersionKey: osMajorVersion,
 			],
 			replyHandler: { reply in
 				Task { @MainActor in
-					self.finishRequest()
-
+					defer { self.finishRequest() }
 					do {
 						if let message = reply[WatchSessionMessage.errorKey] as? String {
 							throw WatchProvisioningError.provisioningFailed(message)
@@ -127,6 +126,7 @@ final class WatchProvisioningService: NSObject, WCSessionDelegate {
 	private func finishRequest() {
 		timeoutTask?.cancel()
 		timeoutTask = nil
+		isMessageInFlight = false
 		isRequesting = false
 	}
 
@@ -136,15 +136,15 @@ final class WatchProvisioningService: NSObject, WCSessionDelegate {
 		error _: Error?
 	) {
 		Task { @MainActor in
-			guard SessionStore.shared.isAuthenticated else { return }
-			self.requestSessionIfPossible()
+			guard !SessionStore.shared.isAuthenticated else { return }
+			self.sendRequestIfReady()
 		}
 	}
 
 	nonisolated func sessionReachabilityDidChange(_: WCSession) {
 		Task { @MainActor in
-			guard SessionStore.shared.isAuthenticated else { return }
-			self.requestSessionIfPossible()
+			guard !SessionStore.shared.isAuthenticated else { return }
+			self.sendRequestIfReady()
 		}
 	}
 

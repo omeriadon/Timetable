@@ -40,6 +40,11 @@ struct TimetableWatchApp: App {
 		SessionStore.shared.configureSessionRecovery {
 			WatchProvisioningService.shared.requestSessionIfPossible()
 		}
+		SessionStore.shared.configureDeviceLifecycle {
+			await DeviceSynchronizationService.shared.synchronize()
+		} signingOut: {
+			await DeviceSynchronizationService.shared.remove()
+		}
 		NetworkManager.shared.configureFeedback {
 			StatusBadgeManager.shared.present(networkError: $0)
 		}

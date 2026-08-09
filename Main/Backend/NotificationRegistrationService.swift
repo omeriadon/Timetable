@@ -99,17 +99,6 @@ final class NotificationRegistrationService {
 		uploadTask = nil
 	}
 
-	func syncCurrentDeviceMetadata() async {
-		guard SessionStore.shared.isAuthenticated else { return }
-
-		do {
-			try await registerCurrentDevice(apnsToken: nil)
-			Print("Device metadata synchronized", category: .network)
-		} catch {
-			PrintError("Device metadata synchronization failed", category: .network, error: error)
-		}
-	}
-
 	private func performUploadPendingToken() async {
 		guard SessionStore.shared.isAuthenticated else { return }
 		let token = Defaults[.pendingAPNsToken]
@@ -146,36 +135,20 @@ final class NotificationRegistrationService {
 		}
 	}
 
-	private func registerCurrentDevice(apnsToken: String?) async throws {
+	private func registerCurrentDevice(apnsToken: String) async throws {
 		let identity = ClientIdentityProvider.shared.identity()
 		let _: UserDeviceResponse = try await networkManager.send(
 			.v1CurrentDevice,
 			body: RegisterUserDeviceRequest(
 				installationID: identity.installationID,
 				platform: identity.platform.rawValue,
-				osMajorVersion: ProcessInfo.processInfo.operatingSystemVersion.majorVersion,
 				apnsToken: apnsToken,
 				isDebug: Self.isDebug
 			)
 		)
 	}
 
-	func removeServerRegistration() async {
-		Print("Removing server APNs registration", category: .network)
-		if SessionStore.shared.isAuthenticated {
-			do {
-				let identity = ClientIdentityProvider.shared.identity()
-				try await networkManager.send(
-					.v1CurrentDeviceDelete,
-					body: RemoveUserDeviceRequest(
-						installationID: identity.installationID,
-						platform: identity.platform.rawValue
-					)
-				)
-			} catch {
-				PrintError("Device notification removal failed", category: .network, error: error)
-			}
-		}
+	func clearLocalRegistration() {
 		Defaults[.hasRegisteredAPNsToken] = false
 		registrationState = hasLocalToken ? .tokenReceived : .idle
 	}
@@ -206,5 +179,4 @@ private nonisolated struct EmptyRequest: Codable {}
 
 private extension Endpoint {
 	static let v1CurrentDevice = Endpoint("/v1/devices/current", method: .put)
-	static let v1CurrentDeviceDelete = Endpoint("/v1/devices/current", method: .delete)
 }

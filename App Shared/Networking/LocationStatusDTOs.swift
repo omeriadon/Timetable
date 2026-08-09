@@ -29,6 +29,8 @@ nonisolated struct AdministrationStatisticsResponse: Codable, Sendable {
 	let averageAssessmentsPerUserWithMultipleAssessments: Double?
 	let totalDevices: Int
 	let activeDevicesLast30Days: Int
+	let debugDevices: Int
+	let betaDevices: Int
 	let iPhoneDevices: Int
 	let iPadDevices: Int
 	let macDevices: Int
@@ -43,8 +45,8 @@ nonisolated struct AdministrationStatisticsResponse: Codable, Sendable {
 	let activeEventTagSubscriptions: Int
 	let averageArrivalSecondsSinceMidnight: Double?
 	let deviceTypes: [AdministrationStatisticCount]
-	let osMajorVersions: [AdministrationStatisticCount]
-	let deviceOSMajorVersions: [AdministrationDeviceOSMajorVersionCount]
+	let osVersions: [AdministrationStatisticCount]
+	let deviceOSVersions: [AdministrationDeviceOSVersionCount]
 }
 
 nonisolated struct AdministrationStatisticCount: Codable, Identifiable, Sendable {
@@ -56,12 +58,13 @@ nonisolated struct AdministrationStatisticCount: Codable, Identifiable, Sendable
 	}
 }
 
-nonisolated struct AdministrationDeviceOSMajorVersionCount: Codable, Identifiable, Sendable {
+nonisolated struct AdministrationDeviceOSVersionCount: Codable, Identifiable, Sendable {
 	let platform: String
 	let osMajorVersion: Int
+	let osMinorVersion: Int
 	let count: Int
 
 	var id: String {
-		"\(platform)-\(osMajorVersion)"
+		"\(platform)-\(osMajorVersion)-\(osMinorVersion)"
 	}
 }

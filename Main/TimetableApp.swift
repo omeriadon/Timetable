@@ -97,7 +97,7 @@ struct TimetableApp: App {
 						try await AccountBootstrapService.shared.bootstrap()
 					}
 					sessionStore.configureDeviceLifecycle {
-						await NotificationRegistrationService.shared.syncCurrentDeviceMetadata()
+						await DeviceSynchronizationService.shared.synchronize()
 						await NotificationRegistrationService.shared.uploadPendingToken()
 						#if os(iOS) && !targetEnvironment(macCatalyst)
 							if Platform.current == .iOS {
@@ -107,11 +107,12 @@ struct TimetableApp: App {
 							PhoneWatchSyncBridge.shared.sendAuthenticatedStateIfPossible()
 						#endif
 					} signingOut: {
+						await DeviceSynchronizationService.shared.remove()
 						#if os(iOS) && !targetEnvironment(macCatalyst)
 							PhoneWatchSyncBridge.shared.sendSignedOutStateIfPossible()
 							await LiveActivityRegistrationService.shared.removeLiveActivityToken()
 						#endif
-						await NotificationRegistrationService.shared.removeServerRegistration()
+						NotificationRegistrationService.shared.clearLocalRegistration()
 					}
 					_ = ClientIdentityProvider.shared.identity()
 					await indexEntities()
