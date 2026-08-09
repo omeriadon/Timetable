@@ -129,7 +129,7 @@ struct WatchTimetableView: View {
 		GeometryReader { geometry in
 			VStack(alignment: .center) {
 				if isBeforeSchool {
-					Color.clear.frame(height: 10)
+					Spacer()
 
 					Text("First Period")
 						.font(.caption)
@@ -147,7 +147,7 @@ struct WatchTimetableView: View {
 						.frame(maxWidth: geometry.size.width * 0.9)
 						.bold()
 
-					Color.clear.frame(height: 10)
+					Spacer()
 
 					Text(timerInterval: now ... end, countsDown: true, showsHours: true)
 						.contentTransition(.numericText(countsDown: true))
@@ -159,9 +159,9 @@ struct WatchTimetableView: View {
 						.padding(.vertical, 10)
 						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
 
-					Color.clear.frame(height: 10)
+					Spacer()
 				} else {
-					Color.clear.frame(height: 10)
+					Spacer()
 
 					Image(systemName: symbol)
 						.font(.title3)
@@ -176,7 +176,7 @@ struct WatchTimetableView: View {
 						.frame(maxWidth: geometry.size.width * 0.9)
 						.bold()
 
-					Color.clear.frame(height: 10)
+					Spacer()
 
 					TimelineView(.periodic(from: .now, by: 1)) { context in
 						let remaining = max(0, end.timeIntervalSince(context.date))
@@ -194,7 +194,7 @@ struct WatchTimetableView: View {
 							.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
 					}
 
-					Color.clear.frame(height: 10)
+					Spacer()
 
 					Text(nextText ?? "")
 						.frame(maxWidth: geometry.size.width * 0.8)
@@ -204,10 +204,10 @@ struct WatchTimetableView: View {
 						.lineLimit(4)
 						.layoutPriority(1)
 
-					Color.clear.frame(height: 10)
+					Spacer()
 				}
 			}
-			.frame(width: geometry.size.width, height: geometry.size.height - (shorter ? 100 : 60))
+			.frame(width: geometry.size.width)
 		}
 		.padding(.top, 2)
 		.tint(color)

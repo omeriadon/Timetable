@@ -21,7 +21,8 @@ struct CurrentSubjectView: View {
 	var body: some View {
 		WatchTimetableView(
 			subjects: subjects,
-			schoolCalendar: schoolCalendar
+			schoolCalendar: schoolCalendar,
+			shorter: true
 		)
 	}
 }

@@ -67,12 +67,13 @@ private struct WatchPage<Content: View, Top: View, Status: View>: View {
 
 			styled(
 				content
-					.frame(maxWidth: .infinity, maxHeight: .infinity)
 			)
 			.padding(.horizontal, 8)
 
 			status
 		}
+		.padding(.top, 25)
+		.padding(.bottom, 20)
 		.ignoresSafeArea()
 	}
 }
