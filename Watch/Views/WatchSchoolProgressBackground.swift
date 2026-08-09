@@ -33,8 +33,7 @@ struct WatchCurrentTimeMarker: View {
 			}
 			.padding(.horizontal, 10)
 			.padding(.vertical, 8)
-			.frame(height: 32)
-			.layoutPriority(1)
+			.frame(maxWidth: .infinity, maxHeight: .infinity)
 			.accessibilityLabel("Current time")
 		} else {
 			Color.clear
@@ -47,8 +46,8 @@ private struct WatchCurrentTimeMarkerShape: Shape {
 	var progress: CGFloat
 
 	func path(in rect: CGRect) -> Path {
-		let circleDiameter: CGFloat = 12
-		let lineHeight: CGFloat = 5
+		let circleDiameter: CGFloat = 15
+		let lineWidth: CGFloat = 5
 		let markerX = max(
 			0,
 			min(rect.width - circleDiameter, rect.width * progress - circleDiameter / 2)
@@ -66,21 +65,12 @@ private struct WatchCurrentTimeMarkerShape: Shape {
 		)
 		path.addRoundedRect(
 			in: CGRect(
-				x: markerCenterX - 1.5,
+				x: markerCenterX - lineWidth / 2,
 				y: circleDiameter - 1,
-				width: 3,
-				height: rect.height - circleDiameter + 1
+				width: lineWidth,
+				height: max(0, rect.height - circleDiameter + 1)
 			),
-			cornerSize: CGSize(width: 1.5, height: 1.5)
-		)
-		path.addRoundedRect(
-			in: CGRect(
-				x: 0,
-				y: circleDiameter / 2 - lineHeight / 2,
-				width: rect.width,
-				height: lineHeight
-			),
-			cornerSize: CGSize(width: lineHeight / 2, height: lineHeight / 2)
+			cornerSize: CGSize(width: lineWidth / 2, height: lineWidth / 2)
 		)
 		return path
 	}

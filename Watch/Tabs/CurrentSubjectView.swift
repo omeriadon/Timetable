@@ -22,11 +22,11 @@ struct CurrentSubjectView: View {
 				schoolCalendar: schoolCalendar
 			)
 
-			VStack(spacing: 0) {
-				WatchCurrentTimeMarker(state: state, now: now)
-				content(state: state, now: now)
-			}
-			.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+			content(state: state, now: now)
+				.overlay {
+					WatchCurrentTimeMarker(state: state, now: now)
+						.allowsHitTesting(false)
+				}
 		}
 	}
 
