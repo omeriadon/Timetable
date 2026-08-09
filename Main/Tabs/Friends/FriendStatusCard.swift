@@ -38,7 +38,7 @@ struct FriendStatusCard: View {
 
 				VStack(alignment: .leading, spacing: style == .detail ? 7 : 5) {
 					if style == .list {
-						HStack {
+						HStack(alignment: .top) {
 							Text(displayName)
 								.font(.title3.weight(.semibold))
 							Spacer()

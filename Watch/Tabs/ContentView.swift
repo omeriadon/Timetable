@@ -42,7 +42,7 @@ struct ContentView: View {
 							}
 						}
 					}
-					.frame(width: 7)
+					.frame(width: 10)
 
 					mainContent(subjectLookup: subjectLookup)
 						.frame(maxWidth: .infinity)
@@ -51,7 +51,7 @@ struct ContentView: View {
 			}
 		}
 		.animation(.easeInOut, value: subjects.isEmpty)
-		.padding(.horizontal, 2)
+		.padding(.trailing, 2)
 		.dynamicTypeSize(.xSmall)
 	}
 
@@ -69,7 +69,7 @@ struct ContentView: View {
 					.foregroundStyle(accountSettings.highlightsCurrentDay && currentDayIndex == day ? .black : .white)
 					.background {
 						if accountSettings.highlightsCurrentDay, currentDayIndex == day {
-							RoundedRectangle(cornerRadius: 2)
+							RoundedRectangle(cornerRadius: 5)
 								.fill(.white)
 						}
 					}

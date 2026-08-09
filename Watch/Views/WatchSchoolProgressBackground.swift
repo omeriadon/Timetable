@@ -3,41 +3,31 @@ import SwiftUI
 struct WatchSchoolProgressBackground: View {
 	let state: SchoolState
 	let now: Date
-	let cornerRadius: CGFloat
-
-	init(state: SchoolState, now: Date, cornerRadius: CGFloat = 24) {
-		self.state = state
-		self.now = now
-		self.cornerRadius = cornerRadius
-	}
 
 	var body: some View {
-		Group {
-			switch state {
-				case let .beforeSchool(next):
-					WatchProgressFill(color: next.subject.colour.swiftUIColor, now: now)
-				case let .lesson(lesson):
-					WatchProgressFill(
-						color: lesson.subject.colour.swiftUIColor,
-						start: lesson.interval.start,
-						end: lesson.interval.end,
-						now: now
-					)
-				case let .freePeriod(period):
-					WatchProgressFill(color: .blue, start: period.interval.start, end: period.interval.end, now: now)
-				case let .recess(state), let .lunch(state):
-					WatchProgressFill(
-						color: .black,
-						start: state.interval.start,
-						end: state.interval.end,
-						now: now,
-						isBreak: true
-					)
-				case .afterSchool, .weekend, .noTimetable:
-					Color.clear
-			}
+		switch state {
+			case let .beforeSchool(next):
+				WatchProgressFill(color: next.subject.colour.swiftUIColor, now: now)
+			case let .lesson(lesson):
+				WatchProgressFill(
+					color: lesson.subject.colour.swiftUIColor,
+					start: lesson.interval.start,
+					end: lesson.interval.end,
+					now: now
+				)
+			case let .freePeriod(period):
+				WatchProgressFill(color: .blue, start: period.interval.start, end: period.interval.end, now: now)
+			case let .recess(state), let .lunch(state):
+				WatchProgressFill(
+					color: .black,
+					start: state.interval.start,
+					end: state.interval.end,
+					now: now,
+					isBreak: true
+				)
+			case .afterSchool, .weekend, .noTimetable:
+				Color.clear
 		}
-		.clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
 	}
 }
 
@@ -63,7 +53,7 @@ private struct WatchProgressFill: View {
 						.frame(width: geometry.size.width * progress)
 						.clipShape(
 							UnevenRoundedRectangle(
-								cornerRadii: .init(bottomTrailing: 30, topTrailing: 30)
+								cornerRadii: .init(bottomTrailing: 20, topTrailing: 20)
 							)
 						)
 
@@ -88,6 +78,12 @@ private struct WatchTexturedProgressFill: View {
 			} else {
 				color
 			}
+
+			Image("paperWhite")
+				.resizable()
+				.scaledToFill()
+				.blendMode(.multiply)
+				.opacity(0.9)
 
 			Image("paperWhite")
 				.resizable()

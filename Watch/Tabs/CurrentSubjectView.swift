@@ -116,16 +116,16 @@ struct CurrentSubjectView: View {
 			if let nextText, let end {
 				VStack(alignment: .center) {
 					Spacer()
-					Spacer()
 
 					Image(systemName: symbol)
-						.font(.title2)
+						.font(.headline)
 						.bold()
 						.contentTransition(.symbolEffect(.replace))
 						.symbolEffect(.bounce, value: symbol)
 
 					Text(title)
-						.font(.title2.scaled(by: 0.9))
+						.font(.system(size: 30))
+						.minimumScaleFactor(0.4)
 						.lineLimit(2)
 						.multilineTextAlignment(.center)
 						.frame(maxWidth: geo.size.width * 0.9)
@@ -215,6 +215,7 @@ struct CurrentSubjectView: View {
 			}
 		}
 		.padding(.bottom, 10)
+		.padding(.top, 4)
 		.tint(color)
 	}
 }

@@ -24,6 +24,7 @@ struct FriendsTimetablesView: View {
 			)
 
 			content(state: state, now: now)
+				.padding(.horizontal, 8)
 				.background {
 					WatchSchoolProgressBackground(state: state, now: now)
 						.animation(.smooth, value: state)
@@ -97,10 +98,9 @@ struct FriendsTimetablesView: View {
 		return GeometryReader { geo in
 			VStack(alignment: .center) {
 				Text(friend.friend.displayName)
-					.font(.system(size: 17, weight: .semibold))
+					.font(.title2)
 					.bold()
 					.lineLimit(2)
-					.minimumScaleFactor(0.7)
 					.multilineTextAlignment(.center)
 
 				Spacer()
@@ -109,7 +109,7 @@ struct FriendsTimetablesView: View {
 					Image(systemName: symbol)
 						.contentTransition(.symbolEffect(.replace))
 						.symbolEffect(.bounce, value: symbol)
-						.font(.headline)
+						.font(.title2)
 					Text(title)
 						.contentTransition(.opacity)
 						.animation(.smooth, value: title)
@@ -160,7 +160,7 @@ struct FriendsTimetablesView: View {
 			}
 			.frame(width: geo.size.width)
 		}
-		.padding(.top, 4)
+		.padding(.top, 8)
 		.dynamicTypeSize(.xSmall)
 		.tint(color)
 	}

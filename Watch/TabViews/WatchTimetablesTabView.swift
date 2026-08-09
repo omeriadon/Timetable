@@ -7,10 +7,7 @@ private extension View {
 			WatchPaperBackground(imageName: "paper", cornerRadius: cornerRadius)
 		}
 		.clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-		.overlay {
-			RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-				.strokeBorder(.white.opacity(0.5), lineWidth: 2)
-		}
+		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
 		.foregroundStyle(.white)
 	}
 }
@@ -101,7 +98,7 @@ struct WatchTimetablesTabView: View {
 		.dynamicTypeSize(.xSmall)
 		.ignoresSafeArea(.container, edges: .vertical)
 		.background {
-			WatchPaperBackground(imageName: "paperBlack", cornerRadius: 0)
+			WatchPaperBackground(imageName: "paperGray", cornerRadius: 0)
 				.ignoresSafeArea()
 		}
 		.ignoresSafeArea()
