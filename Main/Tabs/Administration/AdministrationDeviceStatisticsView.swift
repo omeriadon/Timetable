@@ -63,7 +63,7 @@ struct AdministrationDeviceStatisticsView: View {
 					ForEach(operatingSystemChartItems) { item in
 						HStack {
 							Text(item.label)
-						Spacer()
+							Spacer()
 							if item.isDebug {
 								Image(systemName: "flask")
 									.foregroundStyle(.secondary)
