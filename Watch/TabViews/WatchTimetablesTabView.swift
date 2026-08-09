@@ -151,11 +151,11 @@ struct WatchTimetablesTabView: View {
 			}
 			.padding(.vertical, 30)
 
-//			if !subjects.isEmpty {
-//				WatchPage(verticalInset: verticalCardInset) {
-//					CurrentSubjectView()
-//				}
-//			}
+			if !subjects.isEmpty {
+				WatchPage(verticalInset: verticalCardInset) {
+					CurrentSubjectView()
+				}
+			}
 
 			ForEach(friends) { friend in
 				if let timetable = friend.timetable {

@@ -38,7 +38,7 @@ struct WatchCurrentTimeMarker: View {
 					.background(.red.gradient.opacity(0.9), in: WatchCurrentTimeMarkerShape())
 					.overlay {
 						WatchCurrentTimeMarkerShape()
-							.stroke(.white.opacity(0.5), lineWidth: 0.4)
+							.stroke(.red, lineWidth: 0.4)
 					}
 					.shadow(color: .red.mix(with: .black, by: 0.5), radius: 4)
 					.frame(width: circleDiameter, height: geometry.size.height)
