@@ -48,16 +48,43 @@ private struct WatchProgressFill: View {
 	var body: some View {
 		GeometryReader { geometry in
 			if let progress {
-				ZStack(alignment: .leading) {
-					UnevenRoundedRectangle(
-						cornerRadii: .init(bottomTrailing: 30, topTrailing: 30)
-					)
-					.fill(isBreak ? AnyShapeStyle(.thinMaterial) : AnyShapeStyle(color))
-					.frame(width: geometry.size.width * progress)
+				HStack(spacing: 0) {
+					WatchTexturedProgressFill(color: color, usesMaterial: isBreak)
+						.frame(width: geometry.size.width * progress)
+						.clipShape(
+							UnevenRoundedRectangle(
+								cornerRadii: .init(bottomTrailing: 30, topTrailing: 30)
+							)
+						)
+
+					Spacer(minLength: 0)
 				}
+			} else {
+				WatchTexturedProgressFill(color: color, usesMaterial: isBreak)
+			}
+		}
+	}
+}
+
+private struct WatchTexturedProgressFill: View {
+	let color: Color
+	let usesMaterial: Bool
+
+	var body: some View {
+		ZStack {
+			if usesMaterial {
+				Rectangle()
+					.fill(.thinMaterial)
 			} else {
 				color
 			}
+
+			Image("paperWhite")
+				.resizable()
+				.scaledToFill()
+				.blendMode(.multiply)
+				.opacity(0.9)
 		}
+		.clipped()
 	}
 }
