@@ -145,16 +145,6 @@
         }
       }
     },
-    "%@%@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@%2$@"
-          }
-        }
-      }
-    },
     "%lld" : {
       "localizations" : {
         "fr" : {
@@ -949,6 +939,9 @@
           }
         }
       }
+    },
+    "Arrived: " : {
+
     },
     "Assessment" : {
 
@@ -3236,6 +3229,9 @@
           }
         }
       }
+    },
+    "Left: " : {
+
     },
     "Legacy devices" : {
 
