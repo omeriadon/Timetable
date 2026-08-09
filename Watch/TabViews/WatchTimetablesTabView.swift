@@ -1,11 +1,10 @@
 import Defaults
 import SwiftUI
-import WatchKit
 
 private extension View {
-	func watchCardStyle(imageName: String = "paper", cornerRadius: CGFloat = 24) -> some View {
+	func watchCardStyle(cornerRadius: CGFloat = 24) -> some View {
 		background {
-			WatchPaperBackground(imageName: imageName, cornerRadius: cornerRadius)
+			WatchPaperBackground(imageName: "paper", cornerRadius: cornerRadius)
 		}
 		.clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
 		.overlay {
@@ -36,89 +35,91 @@ private struct WatchPage<Content: View>: View {
 	let verticalInset: CGFloat
 	let horizontalPadding: CGFloat
 	let cornerRadius: CGFloat
-	let sizesToFitContent: Bool
 	let pageAlignment: VerticalAlignment
-	let peekHeight: CGFloat
-	let useBlackPaper: Bool
+	let usesBackground: Bool
 	@ViewBuilder var content: Content
 
 	init(
 		verticalInset: CGFloat,
 		horizontalPadding: CGFloat,
 		cornerRadius: CGFloat = 24,
-		sizesToFitContent: Bool = false,
 		pageAlignment: VerticalAlignment = .top,
-		peekHeight: CGFloat = 0,
-		useBlackPaper: Bool = false,
+		usesBackground: Bool = true,
 		@ViewBuilder content: () -> Content
 	) {
 		self.verticalInset = verticalInset
 		self.horizontalPadding = horizontalPadding
 		self.cornerRadius = cornerRadius
-		self.sizesToFitContent = sizesToFitContent
 		self.pageAlignment = pageAlignment
-		self.peekHeight = peekHeight
-		self.useBlackPaper = useBlackPaper
+		self.usesBackground = usesBackground
 		self.content = content()
 	}
 
-	var body: some View {
-		Group {
-			if sizesToFitContent {
-				content
-					.frame(maxWidth: .infinity)
-			} else {
-				content
-					.frame(maxWidth: .infinity)
-					.containerRelativeFrame(.vertical) { length, _ in
-						max(1, length - verticalInset * 2)
-					}
-			}
-		}
-		.watchCardStyle(imageName: useBlackPaper ? "paperBlack" : "paper", cornerRadius: cornerRadius)
-		.padding(.horizontal, horizontalPadding)
-		.padding(.vertical, verticalInset)
-		.containerRelativeFrame(.vertical, alignment: Alignment(horizontal: .center, vertical: pageAlignment)) { length, _ in
-			max(1, length - peekHeight)
-		}
-		.scrollTransition(.animated(.smooth), axis: .vertical) { view, phase in
-			let magnitude = min(abs(phase.value), 1)
-			return view
-				.scaleEffect(1 - magnitude * 0.08)
-				.blur(radius: magnitude * 4)
-				.opacity(1 - magnitude * 0.2)
+	@ViewBuilder
+	private func styled<V: View>(_ view: V) -> some View {
+		if usesBackground {
+			view.watchCardStyle(cornerRadius: cornerRadius)
+		} else {
+			view.foregroundStyle(.white)
 		}
 	}
+
+	var body: some View {
+		styled(
+			content
+				.frame(maxWidth: .infinity)
+				.containerRelativeFrame(.vertical) { length, _ in
+					max(1, length - verticalInset * 2)
+				}
+		)
+		.padding(.horizontal, horizontalPadding)
+		.padding(.vertical, verticalInset)
+		.containerRelativeFrame(.vertical, alignment: Alignment(horizontal: .center, vertical: pageAlignment))
+		.scrollTransition(axis: .vertical) { view, phase in
+			let magnitude = min(abs(phase.value), 1)
+			return view
+				.scaleEffect(1 - magnitude * 0.04)
+				.opacity(1 - magnitude * 0.12)
+		}
 }
 
 struct WatchTimetablesTabView: View {
 	@Default(.friends) private var friends
 	@Default(.timetable) private var subjects
 
+	private let cardSpacing: CGFloat = 8
+	private let peekHeight: CGFloat = 18
+	private let verticalCardInset: CGFloat = 8
+
 	var body: some View {
 		ScrollView(.vertical) {
-			VStack(spacing: 0) {
-				WatchPage(verticalInset: 10, horizontalPadding: 3, cornerRadius: 13, sizesToFitContent: true, pageAlignment: .center, peekHeight: 70, useBlackPaper: true) {
+			LazyVStack(spacing: cardSpacing) {
+				WatchPage(
+					verticalInset: verticalCardInset,
+					horizontalPadding: 3,
+					pageAlignment: .center,
+					usesBackground: false
+				) {
 					ContentView()
 				}
 
 				if !subjects.isEmpty {
-					WatchPage(verticalInset: 50, horizontalPadding: 8, peekHeight: 70) {
+					WatchPage(verticalInset: verticalCardInset, horizontalPadding: 8) {
 						CurrentSubjectView()
 					}
 				}
 
 				ForEach(friends) { friend in
 					if let timetable = friend.timetable {
-						WatchPage(verticalInset: 50, horizontalPadding: 8, peekHeight: 70) {
+						WatchPage(verticalInset: verticalCardInset, horizontalPadding: 8) {
 							FriendsTimetablesView(friend: friend, timetable: timetable)
 						}
 					}
 				}
 			}
-			.padding(.bottom, 70)
 			.scrollTargetLayout()
 		}
+		.contentMargins(.vertical, peekHeight, for: .scrollContent)
 		.dynamicTypeSize(.xSmall)
 		.scrollTargetBehavior(.viewAligned(limitBehavior: .always))
 		.scrollClipDisabled()
