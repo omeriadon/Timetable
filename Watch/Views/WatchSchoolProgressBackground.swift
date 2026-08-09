@@ -24,17 +24,15 @@ struct WatchCurrentTimeMarker: View {
 
 	var body: some View {
 		if let progress {
-			GeometryReader { _ in
-				Color.clear
-					.glassEffect(
-						.regular.tint(.red),
-						in: WatchCurrentTimeMarkerShape(progress: progress)
-					)
-			}
-			.padding(.horizontal, 10)
-			.padding(.vertical, 8)
-			.frame(maxWidth: .infinity, maxHeight: .infinity)
-			.accessibilityLabel("Current time")
+			Color.clear
+				.glassEffect(
+					.clear.tint(.red.opacity(0.8)).interactive(),
+					in: WatchCurrentTimeMarkerShape(progress: progress)
+				)
+				.padding(.horizontal, 10)
+				.padding(.vertical, 8)
+				.frame(maxWidth: .infinity, maxHeight: .infinity)
+				.accessibilityLabel("Current time")
 		} else {
 			Color.clear
 				.frame(height: 0)
@@ -66,9 +64,9 @@ private struct WatchCurrentTimeMarkerShape: Shape {
 		path.addRoundedRect(
 			in: CGRect(
 				x: markerCenterX - lineWidth / 2,
-				y: circleDiameter - 1,
+				y: circleDiameter / 2,
 				width: lineWidth,
-				height: max(0, rect.height - circleDiameter + 1)
+				height: max(0, rect.height - circleDiameter / 2)
 			),
 			cornerSize: CGSize(width: lineWidth / 2, height: lineWidth / 2)
 		)
