@@ -10,8 +10,7 @@
 - iOS, iPadOS, macOS, watchOS app for tracking the school timetable for my school.
 
 > [!Note]
-> Only available for OS27 and later on iOS, macOS, and iPadOS, and OS26 and later on watchOS.
-> This is due to too many APIs requiring the new OS.
+> Timetable is available for OS26 and later.
 > I apologise if you are on an earlier version.
 
 > [!Note]
