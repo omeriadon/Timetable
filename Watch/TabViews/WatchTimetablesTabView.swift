@@ -36,6 +36,7 @@ private struct WatchPage<Content: View>: View {
 	let verticalInset: CGFloat
 	let horizontalPadding: CGFloat
 	let cornerRadius: CGFloat
+	let scrollTransitionIntensity: CGFloat
 	let usesBackground: Bool
 	@ViewBuilder var content: Content
 
@@ -44,6 +45,7 @@ private struct WatchPage<Content: View>: View {
 		verticalInset: CGFloat,
 		horizontalPadding: CGFloat,
 		cornerRadius: CGFloat = 24,
+		scrollTransitionIntensity: CGFloat = 1,
 		usesBackground: Bool = true,
 		@ViewBuilder content: () -> Content
 	) {
@@ -51,6 +53,7 @@ private struct WatchPage<Content: View>: View {
 		self.verticalInset = verticalInset
 		self.horizontalPadding = horizontalPadding
 		self.cornerRadius = cornerRadius
+		self.scrollTransitionIntensity = scrollTransitionIntensity
 		self.usesBackground = usesBackground
 		self.content = content()
 	}
@@ -73,7 +76,7 @@ private struct WatchPage<Content: View>: View {
 		.padding(.vertical, verticalInset)
 		.frame(height: height)
 		.scrollTransition(axis: .vertical) { view, phase in
-			let magnitude = min(abs(phase.value), 1)
+			let magnitude = min(abs(phase.value), 1) * scrollTransitionIntensity
 			return view
 				.scaleEffect(1 - magnitude * 0.1)
 				.blur(radius: magnitude * 3)
@@ -104,10 +107,10 @@ struct WatchTimetablesTabView: View {
 						height: pageHeight,
 						verticalInset: verticalCardInset,
 						horizontalPadding: 3,
+						scrollTransitionIntensity: 0,
 						usesBackground: false
 					) {
 						ContentView()
-							.drawingGroup(opaque: false)
 					}
 
 					if !subjects.isEmpty {
