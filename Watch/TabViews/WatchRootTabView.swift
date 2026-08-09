@@ -15,6 +15,8 @@ struct WatchRootTabView: View {
 			}
 		}
 		.tabViewStyle(.page)
+		.indexViewStyle(.page(backgroundDisplayMode: .never))
+		.ignoresSafeArea(.container, edges: .vertical)
 		.fontDesign(accountSettings.appFontDesign.swiftUIFontDesign)
 	}
 }
