@@ -97,6 +97,7 @@ struct TimetableApp: App {
 						try await AccountBootstrapService.shared.bootstrap()
 					}
 					sessionStore.configureDeviceLifecycle {
+						await NotificationRegistrationService.shared.syncCurrentDeviceMetadata()
 						await NotificationRegistrationService.shared.uploadPendingToken()
 						#if os(iOS) && !targetEnvironment(macCatalyst)
 							if Platform.current == .iOS {

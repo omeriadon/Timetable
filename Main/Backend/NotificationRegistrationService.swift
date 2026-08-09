@@ -99,6 +99,17 @@ final class NotificationRegistrationService {
 		uploadTask = nil
 	}
 
+	func syncCurrentDeviceMetadata() async {
+		guard SessionStore.shared.isAuthenticated else { return }
+
+		do {
+			try await registerCurrentDevice(apnsToken: nil)
+			Print("Device metadata synchronized", category: .network)
+		} catch {
+			PrintError("Device metadata synchronization failed", category: .network, error: error)
+		}
+	}
+
 	private func performUploadPendingToken() async {
 		guard SessionStore.shared.isAuthenticated else { return }
 		let token = Defaults[.pendingAPNsToken]
@@ -108,19 +119,9 @@ final class NotificationRegistrationService {
 		}
 
 		registrationState = .registering
-		let identity = ClientIdentityProvider.shared.identity()
 		for attempt in 1 ... 3 {
 			do {
-				let _: UserDeviceResponse = try await networkManager.send(
-					.v1CurrentDevice,
-					body: RegisterUserDeviceRequest(
-						installationID: identity.installationID,
-						platform: identity.platform.rawValue,
-						osMajorVersion: ProcessInfo.processInfo.operatingSystemVersion.majorVersion,
-						apnsToken: token,
-						isDebug: Self.isDebug
-					)
-				)
+				try await registerCurrentDevice(apnsToken: token)
 				Defaults[.hasRegisteredAPNsToken] = true
 				registrationState = .registered
 				Print("Device registered for APNs", category: .network)
@@ -143,6 +144,20 @@ final class NotificationRegistrationService {
 				)
 			}
 		}
+	}
+
+	private func registerCurrentDevice(apnsToken: String?) async throws {
+		let identity = ClientIdentityProvider.shared.identity()
+		let _: UserDeviceResponse = try await networkManager.send(
+			.v1CurrentDevice,
+			body: RegisterUserDeviceRequest(
+				installationID: identity.installationID,
+				platform: identity.platform.rawValue,
+				osMajorVersion: ProcessInfo.processInfo.operatingSystemVersion.majorVersion,
+				apnsToken: apnsToken,
+				isDebug: Self.isDebug
+			)
+		)
 	}
 
 	func removeServerRegistration() async {
