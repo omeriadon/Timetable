@@ -72,8 +72,9 @@ private struct WatchPage<Content: View, Top: View, Status: View>: View {
 
 			status
 		}
-		.padding(.top, 25)
+		.padding(.top, 35)
 		.padding(.bottom, 20)
+		.padding(.trailing, 3)
 		.ignoresSafeArea()
 	}
 }
@@ -147,19 +148,14 @@ struct WatchTimetablesTabView: View {
 				usesBackground: false
 			) {
 				ContentView()
-			} top: {
-				Spacer()
-				Spacer()
-			} status: {
-				Spacer()
-				Spacer()
 			}
+			.padding(.vertical, 30)
 
-			if !subjects.isEmpty {
-				WatchPage(verticalInset: verticalCardInset) {
-					CurrentSubjectView()
-				}
-			}
+//			if !subjects.isEmpty {
+//				WatchPage(verticalInset: verticalCardInset) {
+//					CurrentSubjectView()
+//				}
+//			}
 
 			ForEach(friends) { friend in
 				if let timetable = friend.timetable {

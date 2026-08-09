@@ -24,15 +24,28 @@ struct WatchCurrentTimeMarker: View {
 
 	var body: some View {
 		if let progress {
-			Color.clear
-				.glassEffect(
-					.clear.tint(.red.opacity(0.8)).interactive(),
-					in: WatchCurrentTimeMarkerShape(progress: progress)
+			GeometryReader { geometry in
+				let circleDiameter: CGFloat = 15
+				let markerX = max(
+					0,
+					min(
+						geometry.size.width - circleDiameter,
+						geometry.size.width * progress - circleDiameter / 2
+					)
 				)
-				.padding(.horizontal, 10)
-				.padding(.vertical, 8)
-				.frame(maxWidth: .infinity, maxHeight: .infinity)
-				.accessibilityLabel("Current time")
+
+				Color.clear
+					.glassEffect(
+						.clear.tint(.red.opacity(0.8)),
+						in: WatchCurrentTimeMarkerShape()
+					)
+					.frame(width: circleDiameter, height: geometry.size.height)
+					.offset(x: markerX)
+			}
+			.padding(.horizontal, 10)
+			.padding(.vertical, 8)
+			.frame(maxWidth: .infinity, maxHeight: .infinity)
+			.accessibilityLabel("Current time")
 		} else {
 			Color.clear
 				.frame(height: 0)
@@ -41,21 +54,15 @@ struct WatchCurrentTimeMarker: View {
 }
 
 private struct WatchCurrentTimeMarkerShape: Shape {
-	var progress: CGFloat
-
 	func path(in rect: CGRect) -> Path {
 		let circleDiameter: CGFloat = 15
 		let lineWidth: CGFloat = 5
-		let markerX = max(
-			0,
-			min(rect.width - circleDiameter, rect.width * progress - circleDiameter / 2)
-		)
-		let markerCenterX = markerX + circleDiameter / 2
+		let markerCenterX = circleDiameter / 2
 
 		var path = Path()
 		path.addEllipse(
 			in: CGRect(
-				x: markerX,
+				x: 0,
 				y: 0,
 				width: circleDiameter,
 				height: circleDiameter

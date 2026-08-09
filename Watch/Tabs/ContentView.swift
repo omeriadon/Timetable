@@ -20,39 +20,43 @@ struct ContentView: View {
 	var body: some View {
 		let subjectLookup = TimetableLayout.subjectLookup(for: subjects)
 
-		ZStack {
-			if subjects.isEmpty {
-				ContentUnavailableView("No Timetable", systemImage: "calendar.badge.exclamationmark", description: Text("Sync your timetable from iPhone to view it here."))
-					.padding(5)
-					.transition(.blurReplace)
-			} else {
-				HStack(spacing: 1) {
-					VStack(spacing: 1) {
-						Text("")
-							.frame(height: 10)
-							.font(.footnote)
+		VStack(spacing: 0) {
+			ZStack {
+				if subjects.isEmpty {
+					ContentUnavailableView("No Timetable", systemImage: "calendar.badge.exclamationmark", description: Text("Sync your timetable from iPhone to view it here."))
+						.padding(5)
+						.transition(.blurReplace)
+				} else {
+					HStack(spacing: 1) {
+						VStack(spacing: 1) {
+							Text("")
+								.frame(height: 10)
+								.font(.footnote)
 
-						ForEach(Array(TimetableLayout.sessions.enumerated()), id: \.offset) { index, session in
-							if TimetableLayout.isBreakSession(index: index) {
-								Color.clear.frame(height: TimetableLayout.breakCellHeight)
-							} else {
-								Text(session)
-									.font(.footnote)
-									.frame(height: TimetableLayout.sessionCellHeight)
+							ForEach(Array(TimetableLayout.sessions.enumerated()), id: \.offset) { index, session in
+								if TimetableLayout.isBreakSession(index: index) {
+									Color.clear.frame(height: TimetableLayout.breakCellHeight)
+								} else {
+									Text(session)
+										.font(.footnote)
+										.frame(height: TimetableLayout.sessionCellHeight)
+								}
 							}
 						}
-					}
-					.frame(width: 10)
+						.frame(width: 10)
 
-					mainContent(subjectLookup: subjectLookup)
-						.frame(maxWidth: .infinity)
+						mainContent(subjectLookup: subjectLookup)
+							.frame(maxWidth: .infinity)
+					}
+					.transition(.blurReplace)
 				}
-				.transition(.blurReplace)
 			}
+			.animation(.easeInOut, value: subjects.isEmpty)
+			.padding(.trailing, 2)
+			.dynamicTypeSize(.xSmall)
+
+			Spacer(minLength: 0)
 		}
-		.animation(.easeInOut, value: subjects.isEmpty)
-		.padding(.trailing, 2)
-		.dynamicTypeSize(.xSmall)
 	}
 
 	private var gridColumns: [GridItem] {
