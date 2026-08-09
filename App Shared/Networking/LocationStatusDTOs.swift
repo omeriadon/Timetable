@@ -62,9 +62,10 @@ nonisolated struct AdministrationDeviceOSVersionCount: Codable, Identifiable, Se
 	let platform: String
 	let osMajorVersion: Int
 	let osMinorVersion: Int
+	let isDebug: Bool
 	let count: Int
 
 	var id: String {
-		"\(platform)-\(osMajorVersion)-\(osMinorVersion)"
+		"\(platform)-\(osMajorVersion)-\(osMinorVersion)-\(isDebug)"
 	}
 }
