@@ -60,6 +60,7 @@ private struct WatchCurrentTimeMarkerShape: Shape {
 		let circleDiameter: CGFloat = 15
 		let lineWidth: CGFloat = 5
 		let markerCenterX = circleDiameter / 2
+		let radius = lineWidth / 2
 
 		let circle = Path(
 			ellipseIn: CGRect(
@@ -70,14 +71,26 @@ private struct WatchCurrentTimeMarkerShape: Shape {
 			)
 		)
 
-		let stem = Path(
-			roundedRect: CGRect(
-				x: markerCenterX - lineWidth / 2,
+		var stem = Path()
+
+		// Straight stem, extending underneath the circle.
+		stem.addRect(
+			CGRect(
+				x: markerCenterX - radius,
 				y: circleDiameter / 2,
 				width: lineWidth,
-				height: max(0, rect.height - circleDiameter / 2)
-			),
-			cornerRadius: lineWidth / 2
+				height: max(0, rect.height - circleDiameter / 2 - radius)
+			)
+		)
+
+		// Only round the bottom.
+		stem.addEllipse(
+			in: CGRect(
+				x: markerCenterX - radius,
+				y: rect.height - lineWidth,
+				width: lineWidth,
+				height: lineWidth
+			)
 		)
 
 		return circle.union(stem)

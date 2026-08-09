@@ -36,10 +36,13 @@ private struct WatchPage<Content: View, Top: View, Status: View>: View {
 	let top: Top
 	let status: Status
 
+	let shorter: Bool
+
 	init(
 		verticalInset: CGFloat,
 		cornerRadius: CGFloat = 24,
 		usesBackground: Bool = true,
+		shorter: Bool = false,
 		@ViewBuilder content: () -> Content,
 		@ViewBuilder top: () -> Top,
 		@ViewBuilder status: () -> Status
@@ -47,6 +50,7 @@ private struct WatchPage<Content: View, Top: View, Status: View>: View {
 		self.verticalInset = verticalInset
 		self.cornerRadius = cornerRadius
 		self.usesBackground = usesBackground
+		self.shorter = shorter
 		self.content = content()
 		self.top = top()
 		self.status = status()
@@ -75,6 +79,7 @@ private struct WatchPage<Content: View, Top: View, Status: View>: View {
 		.padding(.top, 35)
 		.padding(.bottom, 20)
 		.padding(.trailing, 3)
+		.padding(.vertical, shorter ? 20 : 0)
 		.ignoresSafeArea()
 	}
 }
@@ -84,12 +89,14 @@ private extension WatchPage where Top == EmptyView, Status == EmptyView {
 		verticalInset: CGFloat,
 		cornerRadius: CGFloat = 24,
 		usesBackground: Bool = true,
+		shorter: Bool = false,
 		@ViewBuilder content: () -> Content
 	) {
 		self.init(
 			verticalInset: verticalInset,
 			cornerRadius: cornerRadius,
 			usesBackground: usesBackground,
+			shorter: shorter,
 			content: content,
 			top: { EmptyView() },
 			status: { EmptyView() }
@@ -149,10 +156,9 @@ struct WatchTimetablesTabView: View {
 			) {
 				ContentView()
 			}
-			.padding(.vertical, 30)
 
 			if !subjects.isEmpty {
-				WatchPage(verticalInset: verticalCardInset) {
+				WatchPage(verticalInset: verticalCardInset, shorter: true) {
 					CurrentSubjectView()
 				}
 			}
