@@ -35,15 +35,17 @@ struct WatchCurrentTimeMarker: View {
 				)
 
 				Color.clear
-					.glassEffect(
-						.clear.tint(.red.opacity(0.8)),
-						in: WatchCurrentTimeMarkerShape()
-					)
+					.background(.red.gradient.opacity(0.9), in: WatchCurrentTimeMarkerShape())
+					.overlay {
+						WatchCurrentTimeMarkerShape()
+							.stroke(.white.opacity(0.5), lineWidth: 0.4)
+					}
+					.shadow(color: .red.mix(with: .black, by: 0.5), radius: 4)
 					.frame(width: circleDiameter, height: geometry.size.height)
 					.offset(x: markerX)
 			}
 			.padding(.horizontal, 10)
-			.padding(.vertical, 8)
+			.padding(.vertical, 4)
 			.frame(maxWidth: .infinity, maxHeight: .infinity)
 			.accessibilityLabel("Current time")
 		} else {
@@ -59,24 +61,25 @@ private struct WatchCurrentTimeMarkerShape: Shape {
 		let lineWidth: CGFloat = 5
 		let markerCenterX = circleDiameter / 2
 
-		var path = Path()
-		path.addEllipse(
-			in: CGRect(
+		let circle = Path(
+			ellipseIn: CGRect(
 				x: 0,
 				y: 0,
 				width: circleDiameter,
 				height: circleDiameter
 			)
 		)
-		path.addRoundedRect(
-			in: CGRect(
+
+		let stem = Path(
+			roundedRect: CGRect(
 				x: markerCenterX - lineWidth / 2,
 				y: circleDiameter / 2,
 				width: lineWidth,
 				height: max(0, rect.height - circleDiameter / 2)
 			),
-			cornerSize: CGSize(width: lineWidth / 2, height: lineWidth / 2)
+			cornerRadius: lineWidth / 2
 		)
-		return path
+
+		return circle.union(stem)
 	}
 }
