@@ -45,7 +45,9 @@ struct AdministrationStatisticsView: View {
 			}
 
 			Section("Devices") {
-				NavigationLink(value: AppRoute.administration(.devices)) {
+				NavigationLink {
+					AdministrationDeviceStatisticsView()
+				} label: {
 					Label("Devices", systemImage: "iphone.gen3")
 				}
 				LabeledContent("All devices") {
