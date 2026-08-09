@@ -1082,6 +1082,9 @@
     "Beta builds" : {
 
     },
+    "Betas" : {
+
+    },
     "Bob Han-Busi" : {
       "localizations" : {
         "fr" : {
@@ -1713,6 +1716,9 @@
           }
         }
       }
+    },
+    "Debug build" : {
+
     },
     "Debug builds" : {
 
@@ -3377,6 +3383,9 @@
     "Location access enabled" : {
 
     },
+    "Major versions" : {
+
+    },
     "Matching periods" : {
       "localizations" : {
         "fr" : {
@@ -3408,6 +3417,12 @@
           }
         }
       }
+    },
+    "Minor versions" : {
+
+    },
+    "Minor versions for OS %lld" : {
+
     },
     "Moderation" : {
 
@@ -6801,6 +6816,9 @@
 
     },
     "Users with location history" : {
+
+    },
+    "View" : {
 
     },
     "Visible events" : {
