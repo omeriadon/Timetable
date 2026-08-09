@@ -145,16 +145,6 @@
         }
       }
     },
-    "%@%@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@%2$@"
-          }
-        }
-      }
-    },
     "%lld" : {
       "localizations" : {
         "fr" : {
@@ -1089,6 +1079,9 @@
         }
       }
     },
+    "Beta builds" : {
+
+    },
     "Bob Han-Busi" : {
       "localizations" : {
         "fr" : {
@@ -1192,6 +1185,9 @@
           }
         }
       }
+    },
+    "Builds" : {
+
     },
     "Calendar" : {
 
@@ -1717,6 +1713,9 @@
           }
         }
       }
+    },
+    "Debug builds" : {
+
     },
     "Debug Offset" : {
       "localizations" : {
@@ -3378,9 +3377,6 @@
     "Location access enabled" : {
 
     },
-    "Major operating system versions" : {
-
-    },
     "Matching periods" : {
       "localizations" : {
         "fr" : {
@@ -4133,11 +4129,21 @@
     "Operating system" : {
 
     },
+    "Operating system versions" : {
+
+    },
     "Operating systems by device type" : {
 
     },
-    "OS %lld" : {
-
+    "OS %lld.%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "OS %1$lld.%2$lld"
+          }
+        }
+      }
     },
     "Other Tags" : {
 
