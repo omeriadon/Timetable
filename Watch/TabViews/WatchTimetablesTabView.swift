@@ -3,11 +3,15 @@ import SwiftUI
 import WatchKit
 
 private extension View {
-	func watchCardStyle(cornerRadius: CGFloat = 24) -> some View {
+	func watchCardStyle(imageName: String = "paper", cornerRadius: CGFloat = 24) -> some View {
 		background {
-			WatchPaperBackground(imageName: "paper", cornerRadius: cornerRadius)
+			WatchPaperBackground(imageName: imageName, cornerRadius: cornerRadius)
 		}
 		.clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+		.overlay {
+			RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+				.strokeBorder(.white.opacity(0.5), lineWidth: 2)
+		}
 		.foregroundStyle(.white)
 	}
 }
@@ -35,6 +39,7 @@ private struct WatchPage<Content: View>: View {
 	let sizesToFitContent: Bool
 	let pageAlignment: VerticalAlignment
 	let peekHeight: CGFloat
+	let useBlackPaper: Bool
 	@ViewBuilder var content: Content
 
 	init(
@@ -44,6 +49,7 @@ private struct WatchPage<Content: View>: View {
 		sizesToFitContent: Bool = false,
 		pageAlignment: VerticalAlignment = .top,
 		peekHeight: CGFloat = 0,
+		useBlackPaper: Bool = false,
 		@ViewBuilder content: () -> Content
 	) {
 		self.verticalInset = verticalInset
@@ -52,6 +58,7 @@ private struct WatchPage<Content: View>: View {
 		self.sizesToFitContent = sizesToFitContent
 		self.pageAlignment = pageAlignment
 		self.peekHeight = peekHeight
+		self.useBlackPaper = useBlackPaper
 		self.content = content()
 	}
 
@@ -68,7 +75,7 @@ private struct WatchPage<Content: View>: View {
 					}
 			}
 		}
-		.watchCardStyle(cornerRadius: cornerRadius)
+		.watchCardStyle(imageName: useBlackPaper ? "paperBlack" : "paper", cornerRadius: cornerRadius)
 		.padding(.horizontal, horizontalPadding)
 		.padding(.vertical, verticalInset)
 		.containerRelativeFrame(.vertical, alignment: Alignment(horizontal: .center, vertical: pageAlignment)) { length, _ in
@@ -91,10 +98,9 @@ struct WatchTimetablesTabView: View {
 	var body: some View {
 		ScrollView(.vertical) {
 			VStack(spacing: 0) {
-				WatchPage(verticalInset: 10, horizontalPadding: 3, cornerRadius: 13, sizesToFitContent: true, pageAlignment: .center, peekHeight: 10) {
+				WatchPage(verticalInset: 10, horizontalPadding: 3, cornerRadius: 13, sizesToFitContent: true, pageAlignment: .center, peekHeight: 70, useBlackPaper: true) {
 					ContentView()
 				}
-				.padding(.top, 18)
 
 				if !subjects.isEmpty {
 					WatchPage(verticalInset: 50, horizontalPadding: 8, peekHeight: 70) {
@@ -110,6 +116,7 @@ struct WatchTimetablesTabView: View {
 					}
 				}
 			}
+			.padding(.bottom, 70)
 			.scrollTargetLayout()
 		}
 		.dynamicTypeSize(.xSmall)

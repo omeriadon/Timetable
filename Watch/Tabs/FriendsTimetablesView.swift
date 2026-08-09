@@ -137,10 +137,10 @@ struct FriendsTimetablesView: View {
 						.animation(.easeInOut(duration: 0.3), value: seconds)
 						.padding(.horizontal, 13)
 						.padding(.vertical, 8)
-						.glassEffect(
-							.clear.interactive(),
-							in: RoundedRectangle(cornerRadius: 10)
-						)
+//						.glassEffect(
+//							.clear.interactive(),
+//							in: RoundedRectangle(cornerRadius: 10)
+//						)
 					}
 				}
 

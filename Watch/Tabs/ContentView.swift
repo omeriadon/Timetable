@@ -22,17 +22,14 @@ struct ContentView: View {
 
 		ZStack {
 			if subjects.isEmpty {
-				VStack {
-					Spacer()
-					ContentUnavailableView("No Timetable", systemImage: "calendar.badge.exclamationmark", description: Text("Sync your timetable from iPhone to view it here."))
-					Spacer()
-				}
-				.transition(.blurReplace)
+				ContentUnavailableView("No Timetable", systemImage: "calendar.badge.exclamationmark", description: Text("Sync your timetable from iPhone to view it here."))
+					.padding(5)
+					.transition(.blurReplace)
 			} else {
-				HStack(spacing: 2) {
-					VStack(spacing: 2) {
+				HStack(spacing: 1) {
+					VStack(spacing: 1) {
 						Text("")
-							.frame(height: 15)
+							.frame(height: 10)
 							.font(.footnote)
 
 						ForEach(Array(TimetableLayout.sessions.enumerated()), id: \.offset) { index, session in
@@ -55,7 +52,6 @@ struct ContentView: View {
 		}
 		.animation(.easeInOut, value: subjects.isEmpty)
 		.padding(.horizontal, 2)
-		.environment(\.dynamicTypeSize, .xSmall)
 		.dynamicTypeSize(.xSmall)
 	}
 

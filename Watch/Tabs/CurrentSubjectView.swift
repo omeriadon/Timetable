@@ -151,10 +151,10 @@ struct CurrentSubjectView: View {
 						.bold()
 						.padding(.horizontal, 10)
 						.padding(.vertical, 7)
-						.glassEffect(
-							.clear.interactive(),
-							in: RoundedRectangle(cornerRadius: 10)
-						)
+//						.glassEffect(
+//							.clear.interactive(),
+//							in: RoundedRectangle(cornerRadius: 10)
+//						)
 					}
 					Spacer()
 
@@ -213,7 +213,7 @@ struct CurrentSubjectView: View {
 						.bold()
 						.padding(.horizontal, 15)
 						.padding(.vertical, 10)
-						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
+//						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 10))
 
 					Spacer()
 						.frame(height: geo.size.height * 0.1)
