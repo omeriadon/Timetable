@@ -32,28 +32,25 @@ private struct WatchPaperBackground: View {
 }
 
 private struct WatchPage<Content: View>: View {
+	let height: CGFloat
 	let verticalInset: CGFloat
 	let horizontalPadding: CGFloat
 	let cornerRadius: CGFloat
-	let pageAlignment: VerticalAlignment
-	let heightReduction: CGFloat
 	let usesBackground: Bool
 	@ViewBuilder var content: Content
 
 	init(
+		height: CGFloat,
 		verticalInset: CGFloat,
 		horizontalPadding: CGFloat,
 		cornerRadius: CGFloat = 24,
-		pageAlignment: VerticalAlignment = .top,
-		heightReduction: CGFloat = 0,
 		usesBackground: Bool = true,
 		@ViewBuilder content: () -> Content
 	) {
+		self.height = height
 		self.verticalInset = verticalInset
 		self.horizontalPadding = horizontalPadding
 		self.cornerRadius = cornerRadius
-		self.pageAlignment = pageAlignment
-		self.heightReduction = heightReduction
 		self.usesBackground = usesBackground
 		self.content = content()
 	}
@@ -74,19 +71,7 @@ private struct WatchPage<Content: View>: View {
 		)
 		.padding(.horizontal, horizontalPadding)
 		.padding(.vertical, verticalInset)
-		.containerRelativeFrame(
-			.vertical,
-			alignment: Alignment(horizontal: .center, vertical: pageAlignment)
-		) { length, _ in
-			max(1, length - heightReduction)
-		}
-		.scrollTransition(axis: .vertical) { view, phase in
-			let magnitude = min(abs(phase.value), 1)
-			return view
-				.scaleEffect(1 - magnitude * 0.1)
-				.blur(radius: magnitude * 3)
-				.opacity(1 - magnitude * 0.2)
-		}
+		.frame(height: height)
 	}
 }
 
@@ -100,46 +85,50 @@ struct WatchTimetablesTabView: View {
 	private let verticalCardInset: CGFloat = 8
 
 	var body: some View {
-		ScrollView(.vertical) {
-			LazyVStack(spacing: cardSpacing) {
-				WatchPage(
-					verticalInset: verticalCardInset,
-					horizontalPadding: 3,
-					pageAlignment: .center,
-					usesBackground: false
-				) {
-					ContentView()
-						.drawingGroup(opaque: false)
-				}
+		GeometryReader { proxy in
+			let firstPageHeight = max(1, proxy.size.height - peekHeight * 2)
+			let secondaryPageHeight = max(1, firstPageHeight - secondaryCardHeightReduction)
 
-				if !subjects.isEmpty {
+			ScrollView(.vertical) {
+				LazyVStack(spacing: cardSpacing) {
 					WatchPage(
+						height: firstPageHeight,
 						verticalInset: verticalCardInset,
-						horizontalPadding: 8,
-						heightReduction: secondaryCardHeightReduction
+						horizontalPadding: 3,
+						usesBackground: false
 					) {
-						CurrentSubjectView()
+						ContentView()
 					}
-				}
 
-				ForEach(friends) { friend in
-					if let timetable = friend.timetable {
+					if !subjects.isEmpty {
 						WatchPage(
+							height: secondaryPageHeight,
 							verticalInset: verticalCardInset,
-							horizontalPadding: 8,
-							heightReduction: secondaryCardHeightReduction
+							horizontalPadding: 8
 						) {
-							FriendsTimetablesView(friend: friend, timetable: timetable)
+							CurrentSubjectView()
+						}
+					}
+
+					ForEach(friends) { friend in
+						if let timetable = friend.timetable {
+							WatchPage(
+								height: secondaryPageHeight,
+								verticalInset: verticalCardInset,
+								horizontalPadding: 8
+							) {
+								FriendsTimetablesView(friend: friend, timetable: timetable)
+							}
 						}
 					}
 				}
+				.scrollTargetLayout()
 			}
-			.scrollTargetLayout()
+			.contentMargins(.vertical, peekHeight, for: .scrollContent)
+			.scrollTargetBehavior(.viewAligned(limitBehavior: .always, anchor: .center))
+			.scrollClipDisabled()
 		}
-		.contentMargins(.vertical, peekHeight, for: .scrollContent)
 		.dynamicTypeSize(.xSmall)
-		.scrollTargetBehavior(.viewAligned(limitBehavior: .always))
-		.scrollClipDisabled()
 		.ignoresSafeArea(.container, edges: .vertical)
 		.background {
 			WatchPaperBackground(imageName: "paperBlack", cornerRadius: 0)
