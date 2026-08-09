@@ -87,7 +87,9 @@ struct FriendStatusCard: View {
 	}
 
 	private func nextClassTitle(for status: FriendScheduleStatus) -> String {
-		if status.nextTitle.hasPrefix("Next:") || status.nextTitle == "No upcoming classes" {
+		if status.nextTitle == "Last Period" {
+			status.nextTitle
+		} else if status.nextTitle.hasPrefix("Next:") || status.nextTitle == "No upcoming classes" {
 			status.nextTitle
 		} else {
 			"Next: \(status.nextTitle)"
