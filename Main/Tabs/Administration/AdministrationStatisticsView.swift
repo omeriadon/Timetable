@@ -7,7 +7,6 @@ import Defaults
 import SwiftUI
 
 struct AdministrationStatisticsView: View {
-	@State private var service = LocationStatusStatisticsService.shared
 	@State private var statistics: AdministrationStatisticsResponse?
 	@Default(.friends) private var friends
 	@Default(.calendarEvents) private var calendarEvents
@@ -125,9 +124,22 @@ struct AdministrationStatisticsView: View {
 	}
 
 	private func load() async {
+		guard !Task.isCancelled else {
+			return
+		}
+
 		do {
-			statistics = try await service.administrationStatistics()
+			let response = try await LocationStatusStatisticsService.shared.administrationStatistics()
+			guard !Task.isCancelled else {
+				return
+			}
+			statistics = response
+		} catch is CancellationError {
+			return
 		} catch {
+			guard !Task.isCancelled, !error.isCancellation else {
+				return
+			}
 			statusBadges.present(error: error, title: "Unable to load statistics")
 		}
 	}
