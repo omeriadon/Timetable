@@ -104,5 +104,6 @@ struct WatchTimetablesTabView: View {
 			WatchPaperBackground(imageName: "paperBlack", cornerRadius: 0)
 				.ignoresSafeArea()
 		}
+		.ignoresSafeArea()
 	}
 }
