@@ -88,7 +88,7 @@ struct ContentView: View {
 		}
 
 		if accountSettings.watchBleedEnabled {
-			GlassEffectContainer(spacing: -1) {
+			GlassEffectContainer(spacing: 0) {
 				content
 			}
 		} else {
