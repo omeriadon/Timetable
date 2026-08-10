@@ -282,15 +282,16 @@ struct ArchivedEventsView: View {
 					Button {
 						selectedEvent = event
 					} label: {
-						Label {
+						HStack(spacing: 10) {
+							Image(systemName: event.symbol)
+								.frame(width: 20)
+
 							VStack(alignment: .leading, spacing: 4) {
 								Text(event.title)
 								Text(event.date.startOfDay()?.formatted(date: .long, time: .omitted) ?? "")
 									.font(.caption)
 									.foregroundStyle(.secondary)
 							}
-						} icon: {
-							Image(systemName: event.symbol)
 						}
 						.frame(maxWidth: .infinity)
 						.contentShape(Rectangle())
