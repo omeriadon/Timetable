@@ -63,6 +63,7 @@ struct DatesView: View {
 		}
 		.sheet(item: $presentationTarget) { target in
 			plannerPresentation(for: target)
+				.appPaperPresentation()
 		}
 	}
 
@@ -346,6 +347,7 @@ struct ArchivedEventsView: View {
 				)
 			}
 			.presentationDetents([.fraction(0.7)])
+			.appPaperPresentation()
 		}
 	}
 
@@ -700,7 +702,10 @@ struct CalendarEventEditor: View {
 				.tint(.red)
 			}
 		}
-		.sheet(isPresented: $showsSymbolPicker) { CalendarEventSymbolPicker(symbol: $symbol) }
+		.sheet(isPresented: $showsSymbolPicker) {
+			CalendarEventSymbolPicker(symbol: $symbol)
+				.appPaperPresentation()
+		}
 		.task {
 			guard let catalogue = try? await administrationService.tagCatalogue() else {
 				return

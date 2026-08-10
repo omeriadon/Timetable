@@ -205,6 +205,7 @@ struct EventNotificationSchedulesEditor: View {
 					close: { isAdding = false },
 					selection: $selection
 				)
+				.appPaperPresentation()
 			}
 			.animation(reduceMotion ? nil : .snappy, value: selection)
 	}

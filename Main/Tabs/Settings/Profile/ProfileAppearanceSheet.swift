@@ -193,6 +193,7 @@ struct ProfileAppearanceSheet: View {
 				close: { presentsEmojiPicker = false }
 			)
 			.presentationDetents([.large])
+			.appPaperPresentation()
 		}
 
 		.onChange(of: selectedPhotoItem) { _, item in
@@ -209,6 +210,7 @@ struct ProfileAppearanceSheet: View {
 				close: { photoCropRequest = nil }
 			)
 			.presentationDetents([.fraction(0.7)])
+			.appPaperPresentation()
 		}
 	}
 

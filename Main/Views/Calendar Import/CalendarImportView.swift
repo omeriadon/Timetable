@@ -326,5 +326,6 @@ struct CalendarImportView: View {
 		.ignoresSafeArea()
 		.sheet(isPresented: .constant(true)) {
 			CalendarImportView()
+				.appPaperPresentation()
 		}
 }

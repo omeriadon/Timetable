@@ -104,6 +104,7 @@ struct AdministrationEventTagsView: View {
 						)
 				}
 			}
+			.appPaperPresentation()
 		}
 	}
 

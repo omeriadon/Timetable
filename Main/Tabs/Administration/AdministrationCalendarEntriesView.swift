@@ -40,6 +40,7 @@ struct AdministrationCalendarEntriesView: View {
 				delete: deleteFromEditor,
 				close: { editor = nil }
 			)
+			.appPaperPresentation()
 		}
 	}
 

@@ -77,10 +77,12 @@ struct GradeTrackerView: View {
 					.navigationTransition(
 						.zoom(sourceID: gradeTransitionID(subject), in: gradeSheetNamespace)
 					)
+					.appPaperPresentation()
 			}
 			.sheet(isPresented: $showsATARSheet) {
 				ATARSettingsSheet()
 					.presentationDetents([.fraction(0.5)])
+					.appPaperPresentation()
 			}
 			.task {
 				try? await service.refresh()

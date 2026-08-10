@@ -72,6 +72,7 @@ struct AdministrationUsersView: View {
 				close: { editor = nil }
 			)
 			.presentationDetents(editor == .create ? [.fraction(0.6)] : [.large])
+			.appPaperPresentation()
 		}
 	}
 

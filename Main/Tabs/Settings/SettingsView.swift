@@ -105,6 +105,7 @@ struct SettingsView: View {
 				CalendarImportView()
 					.presentationDetents([.fraction(1 / 3)])
 					.presentationDragIndicator(.hidden)
+					.appPaperPresentation()
 			}
 
 			Button {
@@ -130,6 +131,7 @@ struct SettingsView: View {
 				.presentationDetents([.large])
 				.presentationContentInteraction(.scrolls)
 				.presentationDragIndicator(.hidden)
+				.appPaperPresentation()
 			}
 		}
 
@@ -240,6 +242,7 @@ struct SettingsView: View {
 			.sheet(isPresented: $showFeedbackSheet) {
 				FeedbackView(close: { showFeedbackSheet = false })
 					.presentationDetents([.fraction(0.7)])
+					.appPaperPresentation()
 			}
 
 			Button {

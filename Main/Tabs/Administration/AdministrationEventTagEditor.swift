@@ -153,6 +153,7 @@ struct AdministrationEventTagEditor: View {
 		.presentationDetents([.large])
 		.sheet(isPresented: $showsSymbolPicker) {
 			AdministrationEventSymbolPicker(symbol: $symbol)
+				.appPaperPresentation()
 		}
 	}
 

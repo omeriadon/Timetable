@@ -60,6 +60,7 @@ struct GradeSubjectDetailView: View {
 					delete: delete
 				)
 				.presentationDetents([.fraction(0.7)])
+				.appPaperPresentation()
 			}
 		}
 	}

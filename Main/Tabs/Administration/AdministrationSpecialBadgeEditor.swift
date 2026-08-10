@@ -102,6 +102,7 @@ struct AdministrationSpecialBadgeEditor: View {
 		.presentationDetents([.large])
 		.sheet(isPresented: $showsSymbolPicker) {
 			AdministrationEventSymbolPicker(symbol: $symbol)
+				.appPaperPresentation()
 		}
 		.confirmationDialog("Delete Badge?", isPresented: $showsDeleteConfirmation, titleVisibility: .visible) {
 			if let badge = target.badge {

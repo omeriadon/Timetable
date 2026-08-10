@@ -79,6 +79,7 @@ struct AdministrationSpecialBadgesView: View {
 				close: { editor = nil }
 			)
 			.presentationDetents([.fraction(0.7)])
+			.appPaperPresentation()
 		}
 	}
 

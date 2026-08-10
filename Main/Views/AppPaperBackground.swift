@@ -12,3 +12,12 @@ struct AppPaperBackground: View {
 		.ignoresSafeArea()
 	}
 }
+
+extension View {
+	func appPaperPresentation() -> some View {
+		presentationBackground {
+			AppPaperBackground()
+		}
+		.scrollContentBackground(.hidden)
+	}
+}

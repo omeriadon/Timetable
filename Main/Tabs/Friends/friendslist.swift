@@ -79,6 +79,7 @@ struct FriendsView: View {
 					.navigationTransition(
 						.zoom(sourceID: friendTransitionID(friend), in: friendSheetNamespace)
 					)
+					.appPaperPresentation()
 			}
 			.sheet(isPresented: $showsLocationStatusSheet) {
 				LocationStatusWhatsNewSheet {
@@ -87,6 +88,7 @@ struct FriendsView: View {
 				}
 				.presentationDetents([.large])
 				.presentationDragIndicator(.hidden)
+				.appPaperPresentation()
 			}
 			.onAppear {
 				if !hasSeenLocationStatusWhatsNew {

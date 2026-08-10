@@ -80,6 +80,7 @@ struct AdministrationEventTagSectionTagsView: View {
 						)
 				}
 			}
+			.appPaperPresentation()
 		}
 		.task {
 			await reloadFromServer()

@@ -189,6 +189,7 @@ struct FriendDetailView: View {
 						close: { showsFriendsSinceRequest = false }
 					)
 					.presentationDetents([.fraction(0.5)])
+					.appPaperPresentation()
 				}
 			}
 			.task { await load() }

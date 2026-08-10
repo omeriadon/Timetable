@@ -69,6 +69,7 @@ struct AccountView: View {
 			ProfileAppearanceSheet(close: { showsProfileEditor = false })
 				.presentationDetents([.large])
 				.presentationDragIndicator(.hidden)
+				.appPaperPresentation()
 		}
 		.animation(.easeInOut, value: sessionStore.state)
 	}

@@ -137,6 +137,7 @@ struct SubjectEditorSheet: View {
 					subjectID: id,
 					draftSubjects: $draftSubjects
 				)
+				.appPaperPresentation()
 			}
 		}
 
