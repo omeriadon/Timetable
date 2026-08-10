@@ -83,11 +83,9 @@ struct AdministrationAdministratorsView: View {
 					VStack(alignment: .leading) {
 						Text(user.displayName)
 
-						if let email = user.email {
-							Text(email)
-								.font(.footnote)
-								.foregroundStyle(.secondary)
-						}
+						Text(user.email)
+							.font(.footnote)
+							.foregroundStyle(.secondary)
 					}
 				}
 			}
@@ -118,7 +116,7 @@ struct AdministrationAdministratorsView: View {
 
 		return users.filter {
 			$0.displayName.localizedCaseInsensitiveContains(searchText)
-				|| ($0.email?.localizedCaseInsensitiveContains(searchText) ?? false)
+				|| $0.email.localizedCaseInsensitiveContains(searchText)
 		}
 	}
 

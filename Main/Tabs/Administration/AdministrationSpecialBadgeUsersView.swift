@@ -22,11 +22,9 @@ struct AdministrationSpecialBadgeUsersView: View {
 
 					VStack(alignment: .leading, spacing: 4) {
 						Text(user.displayName)
-						if let email = user.email {
-							Text(email)
-								.font(.footnote)
-								.foregroundStyle(.secondary)
-						}
+						Text(user.email)
+							.font(.footnote)
+							.foregroundStyle(.secondary)
 					}
 
 					Spacer()
@@ -50,7 +48,7 @@ struct AdministrationSpecialBadgeUsersView: View {
 
 		return users.filter {
 			$0.displayName.localizedCaseInsensitiveContains(searchText)
-				|| ($0.email?.localizedCaseInsensitiveContains(searchText) ?? false)
+				|| $0.email.localizedCaseInsensitiveContains(searchText)
 		}
 	}
 

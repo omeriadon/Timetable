@@ -16,10 +16,8 @@ struct WatchSettingsView: View {
 				Section("Account") {
 					if let profile {
 						LabeledContent("Name", value: profile.displayName)
-						if let email = profile.email {
-							LabeledContent("Email", value: email)
-								.lineLimit(2)
-						}
+						LabeledContent("Email", value: profile.email)
+							.lineLimit(2)
 					}
 					Button("Sign Out", systemImage: "door.left.hand.open", role: .destructive) {
 						signOutConfirm = true

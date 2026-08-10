@@ -99,9 +99,7 @@ struct AccountView: View {
 			.onChange(of: displayName) { _, value in
 				ServerSyncCoordinator.shared.scheduleProfileUpdate(value)
 			}
-			if let email = profile.email {
-				LabeledContent("Email", value: email)
-			}
+			LabeledContent("Email", value: profile.email)
 		}
 		.listRowBackground(Rectangle().fill(.thinMaterial))
 

@@ -96,11 +96,9 @@ struct AdministrationUsersView: View {
 					.font(.caption)
 					.foregroundStyle(authorityColor(for: user.authority))
 
-				if let email = user.email {
-					Text(email)
-						.font(.footnote)
-						.foregroundStyle(.secondary)
-				}
+				Text(user.email)
+					.font(.footnote)
+					.foregroundStyle(.secondary)
 			}
 		}
 	}
@@ -112,7 +110,7 @@ struct AdministrationUsersView: View {
 
 		return users.filter {
 			$0.displayName.localizedCaseInsensitiveContains(searchText)
-				|| ($0.email?.localizedCaseInsensitiveContains(searchText) ?? false)
+				|| $0.email.localizedCaseInsensitiveContains(searchText)
 		}
 	}
 
