@@ -9,56 +9,49 @@ struct AdministrationSpecialBadgesView: View {
 	@Environment(\.statusBadgeManager) private var statusBadges
 
 	var body: some View {
-		ScrollView {
-			let lazyVStack = LazyVStack(spacing: 10) {
-				let forEach = ForEach(displayedBadges) { badge in
-					Button {
-						editor = .edit(badge)
-					} label: {
-						HStack(spacing: 12) {
-							badgePreview(badge)
+		let list = List {
+			let forEach = ForEach(displayedBadges) { badge in
+				Button {
+					editor = .edit(badge)
+				} label: {
+					HStack(spacing: 12) {
+						badgePreview(badge)
 
-							VStack(alignment: .leading, spacing: 4) {
-								Text(badge.accessibilityLabel)
-								Text("\(badge.assignedUserIDs.count) users")
-									.font(.footnote)
-									.foregroundStyle(.secondary)
-							}
-
-							Spacer()
-							Image(systemName: "line.3.horizontal")
+						VStack(alignment: .leading, spacing: 4) {
+							Text(badge.accessibilityLabel)
+							Text("\(badge.assignedUserIDs.count) users")
+								.font(.footnote)
 								.foregroundStyle(.secondary)
 						}
-						.frame(maxWidth: .infinity, alignment: .leading)
-						.padding(.horizontal, 14)
-						.padding(.vertical, 10)
-						.background(.regularMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+
+						Spacer()
+						Image(systemName: "line.3.horizontal")
+							.foregroundStyle(.secondary)
 					}
-					.buttonStyle(.plain)
-					.contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+					.contentShape(Rectangle())
 				}
-
-				if #available(anyAppleOS 27, *) {
-					forEach
-						.reorderable()
-
-				} else {
-					forEach
-				}
+				.buttonStyle(.plain)
 			}
 
 			if #available(anyAppleOS 27, *) {
-				lazyVStack
+				forEach
+					.reorderable()
+			} else {
+				forEach
+			}
+		}
+
+		Group {
+			if #available(anyAppleOS 27, *) {
+				list
 					.reorderContainer(for: AdministrationSpecialBadgeResponse.self) { difference in
 						var reorderedBadges = displayedBadges
 						difference.apply(to: &reorderedBadges)
 						badgeOrder = reorderedBadges.map(\.id)
 						saveBadgeOrder(badgeOrder)
 					}
-					.padding()
 			} else {
-				lazyVStack
-					.padding()
+				list
 			}
 		}
 		.appNavigationTitle("Badges", accent: true)
@@ -85,6 +78,7 @@ struct AdministrationSpecialBadgesView: View {
 				delete: delete,
 				close: { editor = nil }
 			)
+			.presentationDetents([.fraction(0.7)])
 		}
 	}
 
