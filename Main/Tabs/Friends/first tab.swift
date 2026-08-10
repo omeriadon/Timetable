@@ -191,9 +191,13 @@ struct FriendInfo: View {
 				}
 			}
 
-			Section {
-				LabeledContent("Average arrival", value: averageArrival)
+			Section("Average arrival") {
+				ForEach(Array(weekdayNames.enumerated()), id: \.offset) { index, day in
+					LabeledContent(day, value: averageArrival(for: index))
+				}
+			}
 
+			Section {
 				Button(action: requestFriendsSinceDate) {
 					HStack {
 						Label("Friends since", systemImage: "calendar")
@@ -210,9 +214,13 @@ struct FriendInfo: View {
 		.listStyle(.insetGrouped)
 	}
 
-	private var averageArrival: String {
-		guard let seconds = detail.averageArrivalSecondsSinceMidnight else {
-			return "No data"
+	private let weekdayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+
+	private func averageArrival(for weekdayIndex: Int) -> String {
+		guard detail.weekdayAverageArrivalSecondsSinceMidnight.indices.contains(weekdayIndex),
+		      let seconds = detail.weekdayAverageArrivalSecondsSinceMidnight[weekdayIndex]
+		else {
+			return "No Data"
 		}
 
 		return LocationArrivalTimeFormatter.string(for: seconds)

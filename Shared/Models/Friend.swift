@@ -135,6 +135,7 @@ nonisolated struct FriendDetail: Codable, Defaults.Serializable, Hashable, Senda
 	let acceptedAt: Date
 	let timetable: FriendTimetable?
 	let averageArrivalSecondsSinceMidnight: Double?
+	let weekdayAverageArrivalSecondsSinceMidnight: [Double?]
 	let locationNotificationPreferences: Set<LocationNotificationPreference>
 
 	init(
@@ -143,6 +144,7 @@ nonisolated struct FriendDetail: Codable, Defaults.Serializable, Hashable, Senda
 		acceptedAt: Date,
 		timetable: FriendTimetable?,
 		averageArrivalSecondsSinceMidnight: Double?,
+		weekdayAverageArrivalSecondsSinceMidnight: [Double?] = [],
 		locationNotificationPreferences: Set<LocationNotificationPreference> = []
 	) {
 		self.relationshipID = relationshipID
@@ -150,6 +152,7 @@ nonisolated struct FriendDetail: Codable, Defaults.Serializable, Hashable, Senda
 		self.acceptedAt = acceptedAt
 		self.timetable = timetable
 		self.averageArrivalSecondsSinceMidnight = averageArrivalSecondsSinceMidnight
+		self.weekdayAverageArrivalSecondsSinceMidnight = weekdayAverageArrivalSecondsSinceMidnight
 		self.locationNotificationPreferences = locationNotificationPreferences
 	}
 
@@ -159,6 +162,7 @@ nonisolated struct FriendDetail: Codable, Defaults.Serializable, Hashable, Senda
 		case acceptedAt
 		case timetable
 		case averageArrivalSecondsSinceMidnight
+		case weekdayAverageArrivalSecondsSinceMidnight
 		case locationNotificationPreferences
 	}
 
@@ -172,6 +176,10 @@ nonisolated struct FriendDetail: Codable, Defaults.Serializable, Hashable, Senda
 			Double.self,
 			forKey: .averageArrivalSecondsSinceMidnight
 		)
+		weekdayAverageArrivalSecondsSinceMidnight = try container.decodeIfPresent(
+			[Double?].self,
+			forKey: .weekdayAverageArrivalSecondsSinceMidnight
+		) ?? []
 		locationNotificationPreferences = try container.decodeIfPresent(
 			Set<LocationNotificationPreference>.self,
 			forKey: .locationNotificationPreferences

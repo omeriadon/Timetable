@@ -218,6 +218,7 @@ struct FriendDetailView: View {
 			acceptedAt: currentDetail.acceptedAt,
 			timetable: currentDetail.timetable,
 			averageArrivalSecondsSinceMidnight: currentDetail.averageArrivalSecondsSinceMidnight,
+			weekdayAverageArrivalSecondsSinceMidnight: currentDetail.weekdayAverageArrivalSecondsSinceMidnight,
 			locationNotificationPreferences: preferences
 		)
 
@@ -234,6 +235,7 @@ struct FriendDetailView: View {
 					acceptedAt: currentDetail.acceptedAt,
 					timetable: currentDetail.timetable,
 					averageArrivalSecondsSinceMidnight: currentDetail.averageArrivalSecondsSinceMidnight,
+					weekdayAverageArrivalSecondsSinceMidnight: currentDetail.weekdayAverageArrivalSecondsSinceMidnight,
 					locationNotificationPreferences: previousPreferences
 				)
 				badges.present(error: error, title: "Unable to update notifications")
