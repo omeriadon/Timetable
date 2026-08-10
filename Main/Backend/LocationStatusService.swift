@@ -75,11 +75,7 @@ final class LocationStatusService: NSObject, CLLocationManagerDelegate {
 	}
 
 	func locationManager(_: CLLocationManager, didEnterRegion region: CLRegion) {
-		guard region.identifier == Self.schoolRegion.identifier else {
-			return
-		}
-
-		record(.onCampus)
+		handleEntry(for: region.identifier)
 	}
 
 	func locationManager(_: CLLocationManager, didExitRegion region: CLRegion) {
@@ -95,19 +91,42 @@ final class LocationStatusService: NSObject, CLLocationManagerDelegate {
 		didDetermineState state: CLRegionState,
 		for region: CLRegion
 	) {
-		guard region.identifier == Self.schoolRegion.identifier else {
+		guard Self.region(for: region.identifier) != nil else {
 			return
 		}
 
 		switch state {
 			case .inside:
-				record(.onCampus)
+				handleEntry(for: region.identifier)
 			case .outside:
-				record(.offCampus)
+				if region.identifier == Self.schoolRegion.identifier {
+					record(.offCampus)
+				}
 			case .unknown:
 				break
 			@unknown default:
 				break
+		}
+	}
+
+	private func handleEntry(for identifier: String) {
+		switch identifier {
+			case Self.schoolRegion.identifier:
+				record(.onCampus)
+			case Self.withinFiveMinutesRegion.identifier:
+				guard Defaults[.locationStatus]?.state == .offCampus
+					|| Defaults[.locationStatus]?.state == .withinTenMinutes
+				else {
+					return
+				}
+				record(.withinFiveMinutes)
+			case Self.withinTenMinutesRegion.identifier:
+				guard Defaults[.locationStatus]?.state == .offCampus else {
+					return
+				}
+				record(.withinTenMinutes)
+			default:
+				return
 		}
 	}
 
@@ -118,10 +137,14 @@ final class LocationStatusService: NSObject, CLLocationManagerDelegate {
 
 		if !isMonitoring {
 			locationManager.startMonitoring(for: Self.schoolRegion)
+			locationManager.startMonitoring(for: Self.withinFiveMinutesRegion)
+			locationManager.startMonitoring(for: Self.withinTenMinutesRegion)
 			isMonitoring = true
 		}
 
 		locationManager.requestState(for: Self.schoolRegion)
+		locationManager.requestState(for: Self.withinFiveMinutesRegion)
+		locationManager.requestState(for: Self.withinTenMinutesRegion)
 	}
 
 	private func record(_ state: LocationStatus) {
@@ -194,4 +217,29 @@ final class LocationStatusService: NSObject, CLLocationManagerDelegate {
 		radius: 225,
 		identifier: "school-campus"
 	)
+
+	private static let withinFiveMinutesRegion = CLCircularRegion(
+		center: schoolRegion.center,
+		radius: 500,
+		identifier: "school-campus-within-5-minutes"
+	)
+
+	private static let withinTenMinutesRegion = CLCircularRegion(
+		center: schoolRegion.center,
+		radius: 1000,
+		identifier: "school-campus-within-10-minutes"
+	)
+
+	private static func region(for identifier: String) -> CLCircularRegion? {
+		switch identifier {
+			case schoolRegion.identifier:
+				schoolRegion
+			case withinFiveMinutesRegion.identifier:
+				withinFiveMinutesRegion
+			case withinTenMinutesRegion.identifier:
+				withinTenMinutesRegion
+			default:
+				nil
+		}
+	}
 }

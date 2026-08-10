@@ -153,6 +153,17 @@ final class FriendService {
 		)
 	}
 
+	func updateLocationNotificationPreferences(
+		for friendID: UUID,
+		preferences: Set<LocationNotificationPreference>
+	) async throws {
+		try await networkManager.send(
+			.v1FriendLocationNotifications(friendID),
+			body: FriendLocationNotificationPreferencesRequest(preferences: preferences),
+			context: .userInitiated
+		)
+	}
+
 	func remove(friendID: UUID) async throws {
 		try await networkManager.send(.v1Friend(friendID, method: .delete), context: .userInitiated)
 		try await refresh()
@@ -277,6 +288,10 @@ private extension Endpoint {
 
 	static func v1Friend(_ friendID: UUID, method: HTTPMethod = .get) -> Endpoint {
 		Endpoint("/v1/friends/\(friendID.uuidString)", method: method)
+	}
+
+	static func v1FriendLocationNotifications(_ friendID: UUID) -> Endpoint {
+		Endpoint("/v1/friends/\(friendID.uuidString)/location-notifications", method: .put)
 	}
 
 	static func v1BlockFriend(_ friendID: UUID) -> Endpoint {

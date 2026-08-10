@@ -32,11 +32,18 @@ struct LocationStatusRow: View {
 
 					if let status {
 						HStack {
-							Text(status.state == .onCampus ? "On Campus" : "Off Campus")
+							Text(status.title)
 
 							Spacer()
 
-							let prefix = status.state == .onCampus ? "Arrived: " : "Left: "
+							let prefix = switch status.state {
+								case .onCampus:
+									"Arrived: "
+								case .offCampus:
+									"Left: "
+								case .withinTenMinutes, .withinFiveMinutes:
+									"Updated: "
+							}
 
 							Text("\(prefix)\(status.updatedAt, format: .dateTime.hour().minute())")
 								.foregroundStyle(.secondary)
@@ -72,5 +79,20 @@ struct LocationStatusRow: View {
 		}
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
 		.contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+	}
+}
+
+private extension LocationStatusItem {
+	var title: String {
+		switch state {
+			case .offCampus:
+				"Off Campus"
+			case .withinTenMinutes:
+				"Within 10 mins"
+			case .withinFiveMinutes:
+				"Within 5 mins"
+			case .onCampus:
+				"On Campus"
+		}
 	}
 }

@@ -123,6 +123,16 @@ private struct FriendLocationStatus {
 				tint = .green
 				statusTime = "Arrived: \(item.updatedAt.formatted(date: .omitted, time: .shortened))"
 
+			case .withinFiveMinutes:
+				title = "Within 5 mins"
+				tint = .orange
+				statusTime = "Updated: \(item.updatedAt.formatted(date: .omitted, time: .shortened))"
+
+			case .withinTenMinutes:
+				title = "Within 10 mins"
+				tint = .yellow
+				statusTime = "Updated: \(item.updatedAt.formatted(date: .omitted, time: .shortened))"
+
 			case .offCampus:
 				title = "Off Campus"
 				tint = Self.isDuringSchoolHours(at: date) ? .red : .blue

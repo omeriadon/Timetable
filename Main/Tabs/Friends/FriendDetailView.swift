@@ -55,7 +55,8 @@ struct FriendDetailView: View {
 									detail: detail,
 									friendName: detail.friend.displayName,
 									locationStatus: friend.locationStatus,
-									requestFriendsSinceDate: { showsFriendsSinceRequest = true }
+									requestFriendsSinceDate: { showsFriendsSinceRequest = true },
+									updateLocationNotificationPreferences: updateLocationNotificationPreferences
 								)
 							}
 							.scrollIndicators(.hidden)
@@ -189,6 +190,43 @@ struct FriendDetailView: View {
 			detail = try await service.detail(for: friend.friend.id)
 		} catch {
 			badges.present(error: error, title: "Unable to load friend")
+		}
+	}
+
+	private func updateLocationNotificationPreferences(
+		_ preferences: Set<LocationNotificationPreference>
+	) {
+		guard let currentDetail = detail else {
+			return
+		}
+
+		let previousPreferences = currentDetail.locationNotificationPreferences
+		detail = FriendDetail(
+			relationshipID: currentDetail.relationshipID,
+			friend: currentDetail.friend,
+			acceptedAt: currentDetail.acceptedAt,
+			timetable: currentDetail.timetable,
+			averageArrivalSecondsSinceMidnight: currentDetail.averageArrivalSecondsSinceMidnight,
+			locationNotificationPreferences: preferences
+		)
+
+		Task {
+			do {
+				try await service.updateLocationNotificationPreferences(
+					for: friend.friend.id,
+					preferences: preferences
+				)
+			} catch {
+				detail = FriendDetail(
+					relationshipID: currentDetail.relationshipID,
+					friend: currentDetail.friend,
+					acceptedAt: currentDetail.acceptedAt,
+					timetable: currentDetail.timetable,
+					averageArrivalSecondsSinceMidnight: currentDetail.averageArrivalSecondsSinceMidnight,
+					locationNotificationPreferences: previousPreferences
+				)
+				badges.present(error: error, title: "Unable to update notifications")
+			}
 		}
 	}
 

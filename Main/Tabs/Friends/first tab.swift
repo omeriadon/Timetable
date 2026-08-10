@@ -13,6 +13,7 @@ struct FriendOverview: View {
 	let friendName: String
 	let locationStatus: LocationStatusItem?
 	let requestFriendsSinceDate: () -> Void
+	let updateLocationNotificationPreferences: (Set<LocationNotificationPreference>) -> Void
 	@Default(.timetable) private var ownerSubjects
 	@Default(.schoolCalendar) private var schoolCalendar
 	@State private var comparison = FriendTimetableComparison.empty
@@ -20,6 +21,8 @@ struct FriendOverview: View {
 	var body: some View {
 		VStack(alignment: .leading, spacing: 14) {
 			FriendStatusCard(friend: statusSummary, style: .detail)
+
+			locationNotificationsCard
 
 			sharedClassesCard(comparison.sharedClasses)
 
@@ -75,6 +78,46 @@ struct FriendOverview: View {
 				friendSubjects: detail.timetable?.subjects ?? []
 			)
 		}
+	}
+
+	private var locationNotificationsCard: some View {
+		VStack(alignment: .leading, spacing: 12) {
+			Label("Location notifications", systemImage: "bell.badge")
+				.font(.title3)
+
+			ForEach(LocationNotificationPreference.allCases, id: \.self) { preference in
+				Toggle(isOn: preferenceBinding(for: preference)) {
+					Label(preference.title, systemImage: preference.symbol)
+				}
+			}
+		}
+		.padding(14)
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.foregroundStyle(.white)
+		.background {
+			FriendGrayPaperBackground(cornerRadius: FriendDetailLayout.cardCornerRadius)
+		}
+		.glassEffect(
+			.clear.interactive(),
+			in: RoundedRectangle(cornerRadius: FriendDetailLayout.cardCornerRadius, style: .continuous)
+		)
+	}
+
+	private func preferenceBinding(
+		for preference: LocationNotificationPreference
+	) -> Binding<Bool> {
+		Binding(
+			get: { detail.locationNotificationPreferences.contains(preference) },
+			set: { isEnabled in
+				var preferences = detail.locationNotificationPreferences
+				if isEnabled {
+					preferences.insert(preference)
+				} else {
+					preferences.remove(preference)
+				}
+				updateLocationNotificationPreferences(preferences)
+			}
+		)
 	}
 
 	private var averageArrival: String {
@@ -220,6 +263,30 @@ struct FriendOverview: View {
 	private func subjectLabel(_ subject: Subject) -> some View {
 		Label(subject.id, systemImage: subject.symbol)
 			.foregroundStyle(subject.colour.swiftUIColor)
+	}
+}
+
+private extension LocationNotificationPreference {
+	var title: String {
+		switch self {
+			case .withinTenMinutes:
+				"Within 10 mins"
+			case .withinFiveMinutes:
+				"Within 5 mins"
+			case .arrived:
+				"Arrived"
+		}
+	}
+
+	var symbol: String {
+		switch self {
+			case .withinTenMinutes:
+				"figure.walk"
+			case .withinFiveMinutes:
+				"figure.run"
+			case .arrived:
+				"building.2"
+		}
 	}
 }
 

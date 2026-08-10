@@ -135,6 +135,48 @@ nonisolated struct FriendDetail: Codable, Defaults.Serializable, Hashable, Senda
 	let acceptedAt: Date
 	let timetable: FriendTimetable?
 	let averageArrivalSecondsSinceMidnight: Double?
+	let locationNotificationPreferences: Set<LocationNotificationPreference>
+
+	init(
+		relationshipID: UUID,
+		friend: FriendProfile,
+		acceptedAt: Date,
+		timetable: FriendTimetable?,
+		averageArrivalSecondsSinceMidnight: Double?,
+		locationNotificationPreferences: Set<LocationNotificationPreference> = []
+	) {
+		self.relationshipID = relationshipID
+		self.friend = friend
+		self.acceptedAt = acceptedAt
+		self.timetable = timetable
+		self.averageArrivalSecondsSinceMidnight = averageArrivalSecondsSinceMidnight
+		self.locationNotificationPreferences = locationNotificationPreferences
+	}
+
+	private enum CodingKeys: String, CodingKey {
+		case relationshipID
+		case friend
+		case acceptedAt
+		case timetable
+		case averageArrivalSecondsSinceMidnight
+		case locationNotificationPreferences
+	}
+
+	init(from decoder: any Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		relationshipID = try container.decode(UUID.self, forKey: .relationshipID)
+		friend = try container.decode(FriendProfile.self, forKey: .friend)
+		acceptedAt = try container.decode(Date.self, forKey: .acceptedAt)
+		timetable = try container.decodeIfPresent(FriendTimetable.self, forKey: .timetable)
+		averageArrivalSecondsSinceMidnight = try container.decodeIfPresent(
+			Double.self,
+			forKey: .averageArrivalSecondsSinceMidnight
+		)
+		locationNotificationPreferences = try container.decodeIfPresent(
+			Set<LocationNotificationPreference>.self,
+			forKey: .locationNotificationPreferences
+		) ?? []
+	}
 }
 
 nonisolated struct FriendSearchResult: Codable, Identifiable, Hashable, Sendable {

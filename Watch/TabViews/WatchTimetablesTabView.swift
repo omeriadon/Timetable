@@ -195,7 +195,7 @@ private struct WatchLocationStatusView: View {
 	var body: some View {
 		TimelineView(.periodic(from: .now, by: 60)) { context in
 			let now = TimetableClock.adjusted(context.date)
-			let title = item.map { $0.state == .onCampus ? "On Campus" : "Off Campus" } ?? "Status unavailable"
+			let title = item?.title ?? "Status unavailable"
 			let tint = item.map { statusTint(for: $0.state, at: now) } ?? .secondary
 
 			HStack(spacing: 4) {
@@ -218,7 +218,16 @@ private struct WatchLocationStatusView: View {
 	}
 
 	private func statusTint(for state: LocationStatus, at date: Date) -> Color {
-		guard state == .offCampus else { return .green }
+		switch state {
+			case .withinTenMinutes:
+				return .yellow
+			case .withinFiveMinutes:
+				return .orange
+			case .onCampus:
+				return .green
+			case .offCampus:
+				break
+		}
 
 		let calendar = SchoolCalendarProjection.perthCalendar
 		let components = calendar.dateComponents([.weekday, .hour, .minute], from: date)
@@ -243,5 +252,20 @@ private struct WatchLocationStatusView: View {
 		}
 
 		return minutes >= 8 * 60 + 50 && minutes < schoolEnd ? .red : .blue
+	}
+}
+
+private extension LocationStatusItem {
+	var title: String {
+		switch state {
+			case .offCampus:
+				"Off Campus"
+			case .withinTenMinutes:
+				"Within 10 mins"
+			case .withinFiveMinutes:
+				"Within 5 mins"
+			case .onCampus:
+				"On Campus"
+		}
 	}
 }

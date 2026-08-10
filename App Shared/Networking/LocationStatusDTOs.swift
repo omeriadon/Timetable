@@ -18,6 +18,10 @@ nonisolated struct LocationArrivalStatisticsResponse: Codable, Sendable {
 	let averageArrivalSecondsSinceMidnight: Double?
 }
 
+nonisolated struct FriendLocationNotificationPreferencesRequest: Codable, Sendable {
+	let preferences: Set<LocationNotificationPreference>
+}
+
 nonisolated struct AdministrationStatisticsResponse: Codable, Sendable {
 	let totalUsers: Int
 	let usersWithOwnerTimetable: Int
