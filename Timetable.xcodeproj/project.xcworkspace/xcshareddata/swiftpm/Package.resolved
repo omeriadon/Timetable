@@ -38,6 +38,15 @@
       }
     },
     {
+      "identity" : "dialstylepicker",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/noppefoxwolf/DialStylePicker",
+      "state" : {
+        "revision" : "acd7465ee67290e9a083822e2f844e3a9c54c63b",
+        "version" : "0.1.6"
+      }
+    },
+    {
       "identity" : "focusonappear",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/naan/FocusOnAppear",

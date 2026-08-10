@@ -1,6 +1,10 @@
 import Defaults
 import SwiftUI
 
+#if canImport(DialStylePicker)
+import DialStylePicker
+#endif
+
 struct FriendDetailView: View {
 	let friend: FriendSummary
 	let close: () -> Void
@@ -54,9 +58,7 @@ struct FriendDetailView: View {
 								FriendOverview(
 									detail: detail,
 									friendName: detail.friend.displayName,
-									locationStatus: friend.locationStatus,
-									requestFriendsSinceDate: { showsFriendsSinceRequest = true },
-									updateLocationNotificationPreferences: updateLocationNotificationPreferences
+									locationStatus: friend.locationStatus
 								)
 							}
 							.scrollIndicators(.hidden)
@@ -69,6 +71,14 @@ struct FriendDetailView: View {
 								.frame(maxHeight: .infinity, alignment: .top)
 								.containerRelativeFrame(.horizontal)
 								.id(FriendDetailTab.week)
+
+							FriendInfo(
+								detail: detail,
+								requestFriendsSinceDate: { showsFriendsSinceRequest = true },
+								updateLocationNotificationPreferences: updateLocationNotificationPreferences
+							)
+							.containerRelativeFrame(.horizontal)
+							.id(FriendDetailTab.info)
 						}
 						.scrollTargetLayout()
 					}
@@ -84,6 +94,16 @@ struct FriendDetailView: View {
 			.navigationBarTitleDisplayMode(.inline)
 			.foregroundStyle(.black)
 			.safeAreaBar(edge: .top, spacing: 5) {
+				#if os(iOS) && canImport(DialStylePicker)
+				DialStylePicker(selection: $selectedTab) {
+					ForEach(FriendDetailTab.allCases) { tab in
+						Label(tab.title, systemImage: tab.symbol)
+							.tag(tab)
+							.dialStylePickerGroup("friend-detail")
+					}
+				}
+				.tint(.brown)
+				#else
 				TabsPicker(
 					items: FriendDetailTab.allCases.map { ($0.title, $0.symbol) },
 					selection: Binding(
@@ -99,6 +119,7 @@ struct FriendDetailView: View {
 						}
 					)
 				)
+				#endif
 				.padding(.horizontal)
 				.frame(height: 36)
 				.padding(.bottom, 5)
@@ -256,17 +277,32 @@ struct FriendDetailView: View {
 private enum FriendDetailTab: CaseIterable, Hashable, Identifiable {
 	case main
 	case week
+	case info
 
 	var id: Self {
 		self
 	}
 
 	var title: String {
-		self == .main ? "Main" : "Week"
+		switch self {
+			case .main:
+				"Main"
+			case .week:
+				"Week"
+			case .info:
+				"Info"
+		}
 	}
 
 	var symbol: String {
-		self == .main ? "person.text.rectangle" : "calendar"
+		switch self {
+			case .main:
+				"person.text.rectangle"
+			case .week:
+				"calendar"
+			case .info:
+				"info.circle"
+		}
 	}
 }
 

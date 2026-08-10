@@ -12,8 +12,6 @@ struct FriendOverview: View {
 	let detail: FriendDetail
 	let friendName: String
 	let locationStatus: LocationStatusItem?
-	let requestFriendsSinceDate: () -> Void
-	let updateLocationNotificationPreferences: (Set<LocationNotificationPreference>) -> Void
 	@Default(.timetable) private var ownerSubjects
 	@Default(.schoolCalendar) private var schoolCalendar
 	@State private var comparison = FriendTimetableComparison.empty
@@ -22,49 +20,9 @@ struct FriendOverview: View {
 		VStack(alignment: .leading, spacing: 14) {
 			FriendStatusCard(friend: statusSummary, style: .detail)
 
-			locationNotificationsCard
-
 			sharedClassesCard(comparison.sharedClasses)
 
 			sharedSubjectsCard(comparison.sharedSubjects)
-
-			HStack {
-				Text("Average arrival")
-					.font(.headline)
-
-				Spacer()
-
-				Text(averageArrival)
-					.foregroundStyle(.secondary)
-			}
-			.padding(14)
-			.foregroundStyle(.white)
-			.background {
-				FriendGrayPaperBackground(cornerRadius: FriendDetailLayout.cardCornerRadius)
-			}
-			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: FriendDetailLayout.cardCornerRadius))
-
-			Button(action: requestFriendsSinceDate) {
-				HStack {
-					Text("Friends since")
-						.font(.headline)
-
-					Spacer()
-
-					Text(detail.acceptedAt, format: .dateTime.month().day().year())
-						.foregroundStyle(.secondary)
-				}
-				.contentShape(Rectangle())
-				.padding(14)
-			}
-			.contentShape(Rectangle())
-			.buttonSizing(.flexible)
-			.buttonStyle(.plain)
-			.foregroundStyle(.white)
-			.background {
-				FriendGrayPaperBackground(cornerRadius: FriendDetailLayout.cardCornerRadius)
-			}
-			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: FriendDetailLayout.cardCornerRadius))
 		}
 		.padding(.vertical, 14)
 		.padding(.horizontal, FriendDetailLayout.horizontalPadding)
@@ -78,54 +36,6 @@ struct FriendOverview: View {
 				friendSubjects: detail.timetable?.subjects ?? []
 			)
 		}
-	}
-
-	private var locationNotificationsCard: some View {
-		VStack(alignment: .leading, spacing: 12) {
-			Label("Location notifications", systemImage: "bell.badge")
-				.font(.title3)
-
-			ForEach(LocationNotificationPreference.allCases, id: \.self) { preference in
-				Toggle(isOn: preferenceBinding(for: preference)) {
-					Label(preference.title, systemImage: preference.symbol)
-				}
-			}
-		}
-		.padding(14)
-		.frame(maxWidth: .infinity, alignment: .leading)
-		.foregroundStyle(.white)
-		.background {
-			FriendGrayPaperBackground(cornerRadius: FriendDetailLayout.cardCornerRadius)
-		}
-		.glassEffect(
-			.clear.interactive(),
-			in: RoundedRectangle(cornerRadius: FriendDetailLayout.cardCornerRadius, style: .continuous)
-		)
-	}
-
-	private func preferenceBinding(
-		for preference: LocationNotificationPreference
-	) -> Binding<Bool> {
-		Binding(
-			get: { detail.locationNotificationPreferences.contains(preference) },
-			set: { isEnabled in
-				var preferences = detail.locationNotificationPreferences
-				if isEnabled {
-					preferences.insert(preference)
-				} else {
-					preferences.remove(preference)
-				}
-				updateLocationNotificationPreferences(preferences)
-			}
-		)
-	}
-
-	private var averageArrival: String {
-		guard let seconds = detail.averageArrivalSecondsSinceMidnight else {
-			return "No data"
-		}
-
-		return LocationArrivalTimeFormatter.string(for: seconds)
 	}
 
 	private var statusSummary: FriendSummary {
@@ -263,6 +173,117 @@ struct FriendOverview: View {
 	private func subjectLabel(_ subject: Subject) -> some View {
 		Label(subject.id, systemImage: subject.symbol)
 			.foregroundStyle(subject.colour.swiftUIColor)
+	}
+}
+
+struct FriendInfo: View {
+	let detail: FriendDetail
+	let requestFriendsSinceDate: () -> Void
+	let updateLocationNotificationPreferences: (Set<LocationNotificationPreference>) -> Void
+
+	var body: some View {
+		VStack(alignment: .leading, spacing: 14) {
+			locationNotificationsCard
+
+			averageArrivalCard
+
+			Button(action: requestFriendsSinceDate) {
+				HStack {
+					Text("Friends since")
+						.font(.headline)
+
+					Spacer()
+
+					Text(detail.acceptedAt, format: .dateTime.month().day().year())
+						.foregroundStyle(.secondary)
+				}
+				.contentShape(Rectangle())
+				.padding(14)
+			}
+			.contentShape(Rectangle())
+			.buttonSizing(.flexible)
+			.buttonStyle(.plain)
+			.foregroundStyle(.white)
+			.background {
+				FriendGrayPaperBackground(cornerRadius: FriendDetailLayout.cardCornerRadius)
+			}
+			.glassEffect(
+				.clear.interactive(),
+				in: RoundedRectangle(cornerRadius: FriendDetailLayout.cardCornerRadius)
+			)
+		}
+		.padding(.vertical, 14)
+		.padding(.horizontal, FriendDetailLayout.horizontalPadding)
+		.frame(maxWidth: .infinity, alignment: .leading)
+	}
+
+	private var locationNotificationsCard: some View {
+		VStack(alignment: .leading, spacing: 12) {
+			Label("Location notifications", systemImage: "bell")
+				.font(.title3)
+
+			ForEach(LocationNotificationPreference.allCases, id: \.self) { preference in
+				Toggle(isOn: preferenceBinding(for: preference)) {
+					Label(preference.title, systemImage: preference.symbol)
+				}
+			}
+		}
+		.padding(14)
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.foregroundStyle(.white)
+		.background {
+			FriendGrayPaperBackground(cornerRadius: FriendDetailLayout.cardCornerRadius)
+		}
+		.glassEffect(
+			.clear.interactive(),
+			in: RoundedRectangle(cornerRadius: FriendDetailLayout.cardCornerRadius, style: .continuous)
+		)
+	}
+
+	private var averageArrivalCard: some View {
+		HStack {
+			Text("Average arrival")
+				.font(.headline)
+
+			Spacer()
+
+			Text(averageArrival)
+				.foregroundStyle(.secondary)
+		}
+		.padding(14)
+		.foregroundStyle(.white)
+		.background {
+			FriendGrayPaperBackground(cornerRadius: FriendDetailLayout.cardCornerRadius)
+		}
+		.glassEffect(
+			.clear.interactive(),
+			in: RoundedRectangle(cornerRadius: FriendDetailLayout.cardCornerRadius)
+		)
+	}
+
+	private var averageArrival: String {
+		guard let seconds = detail.averageArrivalSecondsSinceMidnight else {
+			return "No data"
+		}
+
+		return LocationArrivalTimeFormatter.string(for: seconds)
+	}
+
+	private func preferenceBinding(
+		for preference: LocationNotificationPreference
+	) -> Binding<Bool> {
+		Binding(
+			get: { detail.locationNotificationPreferences.contains(preference) },
+			set: { isEnabled in
+				var preferences = detail.locationNotificationPreferences
+				if isEnabled {
+					preferences.insert(preference)
+				} else {
+					preferences.remove(preference)
+				}
+				updateLocationNotificationPreferences(preferences)
+			}
+		)
 	}
 }
 
