@@ -29,7 +29,6 @@
 		2AC5F7ED2FD8435700B813EA /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AC5F7EC2FD8435700B813EA /* Defaults */; };
 		2AE0586F300B591D00473DBD /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2A02379A2F9C907000AB1E1F /* Defaults */; };
 		2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */ = {isa = PBXBuildFile; platformFilters = (macos, ); productRef = 2AE0F13A2FE03989002B5D9D /* MaterialView */; };
-		2B0000013000000000000001 /* Timetable Messages.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2B0000023000000000000002 /* Timetable Messages.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,13 +52,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 2AA6DF132FDFAC8F00BBC70E;
 			remoteInfo = WidgetExtension;
-		};
-		2B0000033000000000000003 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 2A0237832F9C8EA000AB1E1F /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 2B0000043000000000000004;
-			remoteInfo = Messages;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -104,7 +96,6 @@
 			dstSubfolder = PlugIns;
 			files = (
 				2AA6DF242FDFAC9000BBC70E /* Widget.appex in Embed Foundation Extensions */,
-				2B0000013000000000000001 /* Timetable Messages.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 		};
@@ -116,7 +107,6 @@
 		2A2586A02FB5D6490030C8CD /* Watch Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Watch Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2AA6DF142FDFAC8F00BBC70E /* Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Widget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		2AF3B0073000000000000007 /* TimetableTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TimetableTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		2B0000023000000000000002 /* Timetable Messages.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Timetable Messages.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -260,13 +250,6 @@
 			);
 			target = 2A098C822F9DB842002065BE /* Watch */;
 		};
-		2B00000D300000000000000D /* Exceptions for "Messages" folder in "Messages" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 2B0000043000000000000004 /* Messages */;
-		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -329,14 +312,6 @@
 			path = Special;
 			sourceTree = "<group>";
 		};
-		2B0000053000000000000005 /* Messages */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				2B00000D300000000000000D /* Exceptions for "Messages" folder in "Messages" target */,
-			);
-			path = Messages;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -384,18 +359,12 @@
 				2AE0586F300B591D00473DBD /* Defaults in Frameworks */,
 			);
 		};
-		2B0000063000000000000006 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			files = (
-			);
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		2A0237822F9C8EA000AB1E1F = {
 			isa = PBXGroup;
 			children = (
-				2B0000053000000000000005 /* Messages */,
 				2AD85A712FE8F239004EAB2B /* Special */,
 				2A5F92192FE66817007302CF /* App Intents */,
 				2A60F50B2FD953D1009F4CE8 /* Watch */,
@@ -416,7 +385,6 @@
 				2A2586A02FB5D6490030C8CD /* Watch Widget.appex */,
 				2AA6DF142FDFAC8F00BBC70E /* Widget.appex */,
 				2AF3B0073000000000000007 /* TimetableTests.xctest */,
-				2B0000023000000000000002 /* Timetable Messages.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -447,7 +415,6 @@
 			dependencies = (
 				2A098C8C2F9DB844002065BE /* PBXTargetDependency */,
 				2AA6DF232FDFAC9000BBC70E /* PBXTargetDependency */,
-				2B00000A300000000000000A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				2A02379F2F9C908300AB1E1F /* Shared */,
@@ -574,24 +541,6 @@
 			productReference = 2AF3B0073000000000000007 /* TimetableTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		2B0000043000000000000004 /* Messages */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 2B0000073000000000000007 /* Build configuration list for PBXNativeTarget "Messages" */;
-			buildPhases = (
-				2B0000083000000000000008 /* Sources */,
-				2B0000063000000000000006 /* Frameworks */,
-				2B0000093000000000000009 /* Resources */,
-			);
-			buildRules = (
-			);
-			fileSystemSynchronizedGroups = (
-				2B0000053000000000000005 /* Messages */,
-			);
-			name = Messages;
-			productName = Messages;
-			productReference = 2B0000023000000000000002 /* Timetable Messages.appex */;
-			productType = "com.apple.product-type.app-extension.messages";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -620,9 +569,6 @@
 						CreatedOnToolsVersion = 26.5;
 					};
 					2AA6DF132FDFAC8F00BBC70E = {
-						CreatedOnToolsVersion = 27.0;
-					};
-					2B0000043000000000000004 = {
 						CreatedOnToolsVersion = 27.0;
 					};
 				};
@@ -658,7 +604,6 @@
 			targets = (
 				2A02378A2F9C8EA000AB1E1F /* Timetable */,
 				2AA6DF132FDFAC8F00BBC70E /* Widget */,
-				2B0000043000000000000004 /* Messages */,
 				2A098C822F9DB842002065BE /* Watch */,
 				2A25869F2FB5D6490030C8CD /* Watch Widget */,
 				2AF3B0023000000000000002 /* TimetableTests */,
@@ -692,11 +637,6 @@
 			files = (
 			);
 		};
-		2B0000093000000000000009 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			files = (
-			);
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -725,11 +665,6 @@
 			files = (
 			);
 		};
-		2B0000083000000000000008 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			files = (
-			);
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -749,12 +684,6 @@
 			platformFilter = ios;
 			target = 2AA6DF132FDFAC8F00BBC70E /* Widget */;
 			targetProxy = 2AA6DF222FDFAC9000BBC70E /* PBXContainerItemProxy */;
-		};
-		2B00000A300000000000000A /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			platformFilter = ios;
-			target = 2B0000043000000000000004 /* Messages */;
-			targetProxy = 2B0000033000000000000003 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1366,68 +1295,6 @@
 			};
 			name = Release;
 		};
-		2B00000B300000000000000B /* Debug configuration for PBXNativeTarget "Messages" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				APPLICATION_EXTENSION_API_ONLY = YES;
-				ASSETCATALOG_COMPILER_APPICON_NAME = "Messages Icon";
-				CODE_SIGN_ENTITLEMENTS = Messages/Messages.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 16;
-				DEVELOPMENT_TEAM = P6PV2R9443;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = Messages/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Timetable Messages";
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 2.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.omeriadon.Timetable.Messages;
-				PRODUCT_MODULE_NAME = TimetableMessages;
-				PRODUCT_NAME = "Timetable Messages";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		2B00000C300000000000000C /* Release configuration for PBXNativeTarget "Messages" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				APPLICATION_EXTENSION_API_ONLY = YES;
-				ASSETCATALOG_COMPILER_APPICON_NAME = "Messages Icon";
-				CODE_SIGN_ENTITLEMENTS = Messages/Messages.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 16;
-				DEVELOPMENT_TEAM = P6PV2R9443;
-				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = Messages/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Timetable Messages";
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 2.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.omeriadon.Timetable.Messages;
-				PRODUCT_MODULE_NAME = TimetableMessages;
-				PRODUCT_NAME = "Timetable Messages";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1476,14 +1343,6 @@
 			buildConfigurations = (
 				2AF3B0093000000000000009 /* Debug configuration for PBXNativeTarget "TimetableTests" */,
 				2AF3B00B300000000000000B /* Release configuration for PBXNativeTarget "TimetableTests" */,
-			);
-			defaultConfigurationName = Release;
-		};
-		2B0000073000000000000007 /* Build configuration list for PBXNativeTarget "Messages" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				2B00000B300000000000000B /* Debug configuration for PBXNativeTarget "Messages" */,
-				2B00000C300000000000000C /* Release configuration for PBXNativeTarget "Messages" */,
 			);
 			defaultConfigurationName = Release;
 		};
