@@ -545,7 +545,7 @@ private struct TodaySchoolTimeline: View {
 	private func markerOffset(for firstPeriod: SchoolPeriod) -> CGFloat {
 		guard currentMinute < firstPeriod.start.minutesSinceMidnight else {
 			return CGFloat(currentMinute - SchoolStateEngine.schoolStart.minutesSinceMidnight) * minuteHeight
-				+ expandedContentOffset(before: currentMinute)
+				+ expandedMarkerOffset(at: currentMinute)
 				- 4
 		}
 
@@ -566,6 +566,26 @@ private struct TodaySchoolTimeline: View {
 		}
 
 		return expandedContentHeight
+	}
+
+	private func expandedMarkerOffset(at minute: Int) -> CGFloat {
+		guard let expandedPeriodNumber,
+		      let expandedPeriod = periods.first(where: { $0.number == expandedPeriodNumber })
+		else {
+			return 0
+		}
+
+		let start = expandedPeriod.start.minutesSinceMidnight
+		let end = expandedPeriod.end.minutesSinceMidnight
+		if minute >= end {
+			return expandedContentHeight
+		}
+		guard minute > start, end > start else {
+			return 0
+		}
+
+		let progress = CGFloat(minute - start) / CGFloat(end - start)
+		return expandedContentHeight * progress
 	}
 
 	private func subject(for period: SchoolPeriod) -> Subject? {
