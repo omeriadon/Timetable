@@ -122,7 +122,7 @@ struct FriendRequestsSheet: View {
 			.disabled(deletingRequestID == request.id)
 		}
 		.padding(.vertical, 6)
-		.listRowBackground(Image("paper").resizable().scaledToFill())
+		.personalPaperListRow()
 	}
 
 	private func outgoingRequestRow(_ request: FriendSummary) -> some View {
@@ -148,7 +148,7 @@ struct FriendRequestsSheet: View {
 			.disabled(deletingRequestID == request.id)
 		}
 		.padding(.vertical, 6)
-		.listRowBackground(Image("paper").resizable().scaledToFill())
+		.personalPaperListRow()
 	}
 
 	private func refreshRequests() async {

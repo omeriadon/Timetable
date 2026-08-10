@@ -83,6 +83,7 @@ struct GradeAssessmentEditor: View {
 						}
 					}
 				}
+				.personalPaperListRow()
 
 				Section("Result") {
 					HStack {
@@ -103,6 +104,7 @@ struct GradeAssessmentEditor: View {
 							.keyboardType(.decimalPad)
 					}
 				}
+				.personalPaperListRow()
 			}
 			.appNavigationTitle(assessment == nil ? "New Assessment" : "Edit Assessment")
 			.toolbar {

@@ -119,7 +119,6 @@ struct ProfilePicture: View {
 						)
 						.fontDesign(appearance.fontDesign.profilePictureFontDesign)
 						.minimumScaleFactor(0.01)
-						.foregroundStyle(.primary)
 						.padding(size * 0.15)
 						.contentTransition(.numericText())
 						.animation(.easeInOut, value: appearance.fontDesign.profilePictureFontDesign)

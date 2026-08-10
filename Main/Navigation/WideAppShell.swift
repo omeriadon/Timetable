@@ -74,6 +74,7 @@ struct WideAppShell: View {
 				.inspectorColumnWidth(min: 400, ideal: 500, max: 700)
 			}
 		}
+		.appPaperBackground()
 		.onReceive(NotificationCenter.default.publisher(for: .openTimetableTab)) { _ in
 			router.selectRoot(.timetableToday)
 		}

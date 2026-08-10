@@ -85,7 +85,8 @@ struct CompactAppShell: View {
 						.navigationDestination(for: AppRoute.self) { route in
 							CompactRouteDestinationView(route: route)
 						}
-				})
+				}
+				.appPaperBackground())
 			),
 			UIKitTabItem(
 				title: "Friends",
@@ -97,7 +98,8 @@ struct CompactAppShell: View {
 						.navigationDestination(for: AppRoute.self) { route in
 							CompactRouteDestinationView(route: route)
 						}
-				})
+				}
+				.appPaperBackground())
 			),
 			UIKitTabItem(
 				title: "Grades",
@@ -109,7 +111,8 @@ struct CompactAppShell: View {
 						.navigationDestination(for: AppRoute.self) { route in
 							CompactRouteDestinationView(route: route)
 						}
-				})
+				}
+				.appPaperBackground())
 			),
 			UIKitTabItem(
 				title: "Settings",
@@ -121,7 +124,8 @@ struct CompactAppShell: View {
 						.navigationDestination(for: AppRoute.self) { route in
 							CompactRouteDestinationView(route: route)
 						}
-				})
+				}
+				.appPaperBackground())
 			),
 		].appendingIf(canShowAdministration, UIKitTabItem(
 			title: "Admin",
@@ -133,7 +137,8 @@ struct CompactAppShell: View {
 					.navigationDestination(for: AppRoute.self) { route in
 						CompactRouteDestinationView(route: route)
 					}
-			})
+			}
+			.appPaperBackground())
 		))
 	}
 }

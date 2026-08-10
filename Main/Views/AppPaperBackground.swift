@@ -14,10 +14,25 @@ struct AppPaperBackground: View {
 }
 
 extension View {
+	func personalPaperListRow() -> some View {
+		listRowBackground(
+			Image("foregroundPaper")
+				.resizable()
+				.scaledToFill()
+		)
+	}
+
+	func appPaperBackground() -> some View {
+		scrollContentBackground(.hidden)
+			.background {
+				AppPaperBackground()
+			}
+	}
+
 	func appPaperPresentation() -> some View {
 		presentationBackground {
 			AppPaperBackground()
 		}
-		.scrollContentBackground(.hidden)
+		.appPaperBackground()
 	}
 }

@@ -238,13 +238,14 @@ private struct EventNotificationScheduleSheet: View {
 						.foregroundStyle(.accent)
 						.tag(7)
 				}
+				.personalPaperListRow()
 
 				Picker("Time", selection: $timeMinutes) {
 					ForEach(Array(stride(from: 5 * 60, through: 22 * 60, by: 15)), id: \.self) { minutes in
 						Text(timeLabel(minutes)).tag(minutes)
 					}
 				}
-
+				.personalPaperListRow()
 				.pickerStyle(.wheel)
 			}
 			.presentationDetents([.medium])

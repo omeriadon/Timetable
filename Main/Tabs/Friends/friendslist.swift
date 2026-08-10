@@ -117,6 +117,7 @@ struct FriendsView: View {
 								isSearchPresented = true
 							}
 							.labelStyle(.iconOnly)
+							.padding(.bottom, 80)
 						}
 					}
 				}

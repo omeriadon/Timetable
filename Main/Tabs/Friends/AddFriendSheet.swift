@@ -58,7 +58,7 @@ struct AddFriendSheet: View {
 				List {
 					ForEach(results) { result in
 						FriendSearchRow(result: result)
-							.listRowBackground(Image("paper").resizable().scaledToFill())
+							.personalPaperListRow()
 							.listRowSeparator(.hidden)
 							.id(result.id)
 							.transition(.blurReplace)

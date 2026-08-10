@@ -44,10 +44,13 @@ struct AdministrationCalendarEditor: View {
 	private var content: some View {
 		Form {
 			TextField("Name", text: $label)
+				.personalPaperListRow()
 			DatePicker("Start", selection: $start, displayedComponents: .date)
+				.personalPaperListRow()
 
 			if entry.kind == "term" {
 				DatePicker("End", selection: $end, displayedComponents: .date)
+					.personalPaperListRow()
 			}
 		}
 		.appGroupedFormStyle()

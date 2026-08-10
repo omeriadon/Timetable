@@ -304,7 +304,7 @@ struct ArchivedEventsView: View {
 									.foregroundStyle(.secondary)
 							}
 						}
-						.frame(maxWidth: .infinity)
+						.frame(maxWidth: .infinity, alignment: .leading)
 						.contentShape(Rectangle())
 					}
 					.buttonStyle(.plain)
@@ -561,10 +561,12 @@ private struct NoSchoolDayDetailView: View {
 		NavigationStack {
 			Form {
 				LabeledContent("Name", value: target.title)
+					.personalPaperListRow()
 				LabeledContent(
 					"Date",
 					value: target.date.startOfDay()?.formatted(date: .long, time: .omitted) ?? ""
 				)
+				.personalPaperListRow()
 			}
 			.appNavigationTitle("Pupil Free Day")
 			.toolbar {
@@ -657,22 +659,28 @@ struct CalendarEventEditor: View {
 		Form {
 			if isReadOnlyGlobalEvent {
 				readOnlyEventRows
+					.personalPaperListRow()
 			} else {
 				TextField("Title", text: $title)
+					.personalPaperListRow()
 				TextField("Notes", text: $notes, axis: .vertical)
 					.lineLimit(3 ... 6)
+					.personalPaperListRow()
 				DatePicker("Date", selection: $date, displayedComponents: .date)
+					.personalPaperListRow()
 				Button {
 					showsSymbolPicker = true
 				} label: {
 					Label("Symbol", systemImage: symbol)
 				}
+				.personalPaperListRow()
 
 				EventTagSelector(
 					sections: tagSections,
 					allowsYearGroups: target.scope == .globalEvent,
 					selectedTagIDs: $selectedTagIDs
 				)
+				.personalPaperListRow()
 			}
 		}
 		.appNavigationTitle(navigationTitle)

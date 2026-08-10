@@ -36,18 +36,22 @@ struct AdministrationUserEditor: View {
 					Section("Authority") {
 						LabeledContent("Role", value: user.authority.displayName)
 					}
+					.personalPaperListRow()
 				}
 
 				TextField("Name", text: $displayName)
+					.personalPaperListRow()
 				TextField("Email", text: $email)
 					.textInputAutocapitalization(.never)
 					.keyboardType(.emailAddress)
+					.personalPaperListRow()
 
 				Section {
 					SecureField(target.user == nil ? "Password" : "New Password", text: $password)
 				} footer: {
 					Text(target.user == nil ? "Passwords must contain at least eight characters." : "Leave blank to keep the current password.")
 				}
+				.personalPaperListRow()
 
 				if target.user != nil {
 					Section("Account Data") {
@@ -65,6 +69,7 @@ struct AdministrationUserEditor: View {
 							AdministrationJSONText(value: rawData)
 						}
 					}
+					.personalPaperListRow()
 				}
 			}
 			.appGroupedFormStyle()

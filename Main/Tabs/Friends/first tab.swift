@@ -307,6 +307,7 @@ struct FriendshipDateChangeRequestSheet: View {
 		NavigationStack {
 			Form {
 				DatePicker("Friends since", selection: $requestedDate, displayedComponents: .date)
+					.personalPaperListRow()
 			}
 			.appNavigationTitle("Change Friends Since")
 			.toolbar {
