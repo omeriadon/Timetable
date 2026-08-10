@@ -16,7 +16,7 @@ nonisolated struct TokenResponse: Codable {
 
 nonisolated struct UserProfileResponse: Codable {
 	let id: UUID
-	let email: String?
+	let email: String
 	let displayName: String
 	let createdAt: Date?
 	let authority: AccountAuthority
@@ -40,7 +40,7 @@ nonisolated struct UserProfileResponse: Codable {
 	init(from decoder: any Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		id = try container.decode(UUID.self, forKey: .id)
-		email = try container.decodeIfPresent(String.self, forKey: .email)
+		email = try container.decode(String.self, forKey: .email)
 		displayName = try container.decode(String.self, forKey: .displayName)
 		createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt)
 		authority = try container.decodeIfPresent(AccountAuthority.self, forKey: .authority) ?? .user
@@ -166,7 +166,7 @@ nonisolated struct AdministrationDashboardResponse: Codable, Sendable {
 nonisolated struct AdministrationUserResponse: Codable, Identifiable, Sendable, Equatable {
 	let id: UUID
 	let displayName: String
-	let email: String?
+	let email: String
 	let createdAt: Date?
 	let authority: AccountAuthority
 	let appearance: ProfileAppearance
@@ -188,7 +188,7 @@ nonisolated struct AdministrationUserResponse: Codable, Identifiable, Sendable, 
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		id = try container.decode(UUID.self, forKey: .id)
 		displayName = try container.decode(String.self, forKey: .displayName)
-		email = try container.decodeIfPresent(String.self, forKey: .email)
+		email = try container.decode(String.self, forKey: .email)
 		createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt)
 		authority = try container.decodeIfPresent(AccountAuthority.self, forKey: .authority) ?? .user
 		appearance = try container.decodeIfPresent(ProfileAppearance.self, forKey: .appearance) ?? .default

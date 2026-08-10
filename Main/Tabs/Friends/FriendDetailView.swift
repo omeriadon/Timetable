@@ -122,10 +122,16 @@ struct FriendDetailView: View {
 				let toolbarItem = ToolbarItem(placement: .principal) {
 					HStack {
 						FriendAvatar(profile: displayedFriendProfile, size: 44)
-						Text(displayedFriendName)
-							.font(.largeTitle)
-							.bold()
-							.monospaced()
+						VStack(alignment: .leading, spacing: 0) {
+							Text(displayedFriendName)
+								.font(.title)
+								.bold()
+								.monospaced()
+
+							Text(displayedFriendProfile.email)
+								.foregroundStyle(.tertiary)
+								.font(.caption)
+						}
 					}
 				}
 				.sharedBackgroundVisibility(.hidden)

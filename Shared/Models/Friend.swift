@@ -10,7 +10,7 @@ nonisolated enum FriendRelationshipState: String, Codable, Sendable {
 nonisolated struct FriendProfile: Codable, Defaults.Serializable, Identifiable, Hashable, Sendable {
 	let userID: UUID
 	let displayName: String
-	let email: String?
+	let email: String
 	let appearanceData: Data?
 	let appearance: ProfileAppearance?
 	let photo: ProfilePhotoMetadata?
@@ -24,7 +24,7 @@ nonisolated struct FriendProfile: Codable, Defaults.Serializable, Identifiable, 
 	init(
 		userID: UUID,
 		displayName: String,
-		email: String?,
+		email: String,
 		appearanceData: Data?,
 		appearance: ProfileAppearance? = nil,
 		photo: ProfilePhotoMetadata? = nil,
@@ -56,7 +56,7 @@ nonisolated struct FriendProfile: Codable, Defaults.Serializable, Identifiable, 
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		userID = try container.decode(UUID.self, forKey: .userID)
 		displayName = try container.decode(String.self, forKey: .displayName)
-		email = try container.decodeIfPresent(String.self, forKey: .email)
+		email = try container.decode(String.self, forKey: .email)
 		appearanceData = try container.decodeIfPresent(Data.self, forKey: .appearanceData)
 		appearance = try container.decodeIfPresent(ProfileAppearance.self, forKey: .appearance)
 		photo = try container.decodeIfPresent(ProfilePhotoMetadata.self, forKey: .photo)

@@ -10,7 +10,7 @@ import Foundation
 
 struct AccountProfile: Codable, Defaults.Serializable, Hashable {
 	let id: String
-	let email: String?
+	let email: String
 	let displayName: String
 	let createdAt: Date?
 	let authority: AccountAuthority
@@ -34,7 +34,7 @@ struct AccountProfile: Codable, Defaults.Serializable, Hashable {
 	init(from decoder: any Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		id = try container.decode(String.self, forKey: .id)
-		email = try container.decodeIfPresent(String.self, forKey: .email)
+		email = try container.decode(String.self, forKey: .email)
 		displayName = try container.decode(String.self, forKey: .displayName)
 		createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt)
 		authority = try container.decodeIfPresent(AccountAuthority.self, forKey: .authority) ?? .user
