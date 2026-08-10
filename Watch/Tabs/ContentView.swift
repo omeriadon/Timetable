@@ -63,6 +63,7 @@ struct ContentView: View {
 		Array(repeating: GridItem(.flexible(minimum: 0), spacing: 1), count: 5)
 	}
 
+	@ViewBuilder
 	func mainContent(subjectLookup: [Slot: Subject]) -> some View {
 		let content = LazyVGrid(columns: gridColumns, spacing: 1) {
 			ForEach(0 ..< 5) { day in
