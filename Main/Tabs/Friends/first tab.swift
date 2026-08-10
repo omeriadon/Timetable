@@ -206,6 +206,7 @@ struct FriendInfo: View {
 				}
 			}
 		}
+		.scrollIndicators(.hidden)
 		.listStyle(.insetGrouped)
 	}
 

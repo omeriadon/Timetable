@@ -1,9 +1,6 @@
 import Defaults
+import DialStylePicker
 import SwiftUI
-
-#if canImport(DialStylePicker)
-	import DialStylePicker
-#endif
 
 struct FriendDetailView: View {
 	let friend: FriendSummary
@@ -72,13 +69,11 @@ struct FriendDetailView: View {
 								.containerRelativeFrame(.horizontal)
 								.id(FriendDetailTab.week)
 
-							List {
-								FriendInfo(
-									detail: detail,
-									requestFriendsSinceDate: { showsFriendsSinceRequest = true },
-									updateLocationNotificationPreferences: updateLocationNotificationPreferences
-								)
-							}
+							FriendInfo(
+								detail: detail,
+								requestFriendsSinceDate: { showsFriendsSinceRequest = true },
+								updateLocationNotificationPreferences: updateLocationNotificationPreferences
+							)
 							.scrollIndicators(.hidden)
 							.containerRelativeFrame(.horizontal)
 							.id(FriendDetailTab.info)
@@ -95,7 +90,6 @@ struct FriendDetailView: View {
 				}
 			}
 			.navigationBarTitleDisplayMode(.inline)
-			.foregroundStyle(.black)
 			.safeAreaBar(edge: .top, spacing: 5) {
 				DialStylePicker(selection: $selectedTab) {
 					ForEach(FriendDetailTab.allCases) { tab in
@@ -105,7 +99,7 @@ struct FriendDetailView: View {
 							Spacer()
 						}
 						.tag(tab)
-						.dialStylePickerGroup("friend-detail")
+						.dialStylePickerGroup(tab == .info ?"friend-info" : "friend-detail")
 					}
 				}
 				.tint(.brown)

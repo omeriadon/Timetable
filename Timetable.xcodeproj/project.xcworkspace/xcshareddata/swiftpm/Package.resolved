@@ -1,5 +1,5 @@
 {
-  "originHash" : "7e4a57158aafef69ef8f39963a190aefb2b30257dd3755211c2634c6fe93cf15",
+  "originHash" : "f4036bc615d053f52194552fc0dc1b0424c15be2181a1573a9fba47b496aa1aa",
   "pins" : [
     {
       "identity" : "chronicle",
@@ -35,15 +35,6 @@
       "state" : {
         "revision" : "00a7465a0668a87fa159e779b9d80f1f9652357e",
         "version" : "9.0.9"
-      }
-    },
-    {
-      "identity" : "dialstylepicker",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/noppefoxwolf/DialStylePicker",
-      "state" : {
-        "revision" : "acd7465ee67290e9a083822e2f844e3a9c54c63b",
-        "version" : "0.1.6"
       }
     },
     {

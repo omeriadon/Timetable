@@ -15,6 +15,7 @@
 		2A324C082FF2980C00E6A3D5 /* FocusOnAppear in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2A324C092FF2980C00E6A3D5 /* FocusOnAppear */; };
 		2A43AFB12FE785E300BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFB02FE785E300BBC8BD /* IrregularGradient */; };
 		2A43AFB32FE785E700BBC8BD /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A43AFB22FE785E700BBC8BD /* IrregularGradient */; };
+		2A582A2F3029E45F009DEEB2 /* DialStylePicker in Frameworks */ = {isa = PBXBuildFile; productRef = 2A582A2E3029E45F009DEEB2 /* DialStylePicker */; };
 		2A5F91F12FE650FE007302CF /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A5F91F02FE650FE007302CF /* IrregularGradient */; };
 		2A79F3B030138FAB003CA797 /* Sticker in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2A79F3AF30138FAB003CA797 /* Sticker */; };
 		2A79F3B330138FD2003CA797 /* SFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 2A79F3B230138FD2003CA797 /* SFSymbolsPicker */; };
@@ -28,7 +29,6 @@
 		2AC5F7ED2FD8435700B813EA /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AC5F7EC2FD8435700B813EA /* Defaults */; };
 		2AE0586F300B591D00473DBD /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2A02379A2F9C907000AB1E1F /* Defaults */; };
 		2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */ = {isa = PBXBuildFile; platformFilters = (macos, ); productRef = 2AE0F13A2FE03989002B5D9D /* MaterialView */; };
-		2AFD7C0E3020000000000001 /* DialStylePicker in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2AFD7C0D3020000000000001 /* DialStylePicker */; };
 		2B0000013000000000000001 /* Timetable Messages.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2B0000023000000000000002 /* Timetable Messages.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -343,7 +343,6 @@
 		2A0237882F9C8EA000AB1E1F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
-				2AFD7C0E3020000000000001 /* DialStylePicker in Frameworks */,
 				2A79F3B93013924E003CA797 /* IrregularGradient in Frameworks */,
 				2A79F3B030138FAB003CA797 /* Sticker in Frameworks */,
 				2AB674D7300E387100A6815A /* Sticker in Frameworks */,
@@ -352,6 +351,7 @@
 				2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */,
 				2A02379B2F9C907000AB1E1F /* Defaults in Frameworks */,
 				2ABBBA042FF4AD3A00878A9D /* PortalHeaders in Frameworks */,
+				2A582A2F3029E45F009DEEB2 /* DialStylePicker in Frameworks */,
 				2A79F3B330138FD2003CA797 /* SFSymbolsPicker in Frameworks */,
 				2ABBBA062FF4AD3A00878A9D /* PortalTransitions in Frameworks */,
 				2A99A535301C3525005E48F7 /* SwiftEmoji in Frameworks */,
@@ -459,7 +459,6 @@
 			name = Timetable;
 			packageProductDependencies = (
 				2A02379A2F9C907000AB1E1F /* Defaults */,
-				2AFD7C0D3020000000000001 /* DialStylePicker */,
 				2AE0F13A2FE03989002B5D9D /* MaterialView */,
 				2A324C062FF2980C00E6A3D5 /* ColorfulX */,
 				2A324C092FF2980C00E6A3D5 /* FocusOnAppear */,
@@ -470,6 +469,7 @@
 				2A79F3B230138FD2003CA797 /* SFSymbolsPicker */,
 				2A79F3B83013924E003CA797 /* IrregularGradient */,
 				2A99A534301C3525005E48F7 /* SwiftEmoji */,
+				2A582A2E3029E45F009DEEB2 /* DialStylePicker */,
 			);
 			productName = Timetable;
 			productReference = 2A02378B2F9C8EA000AB1E1F /* Timetable.app */;
@@ -640,7 +640,6 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */,
-				2AFD7C0C3020000000000001 /* XCRemoteSwiftPackageReference "DialStylePicker" */,
 				2AE0F1392FE03989002B5D9D /* XCRemoteSwiftPackageReference "MaterialView" */,
 				2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */,
 				2A324C052FF2980C00E6A3D5 /* XCRemoteSwiftPackageReference "ColorfulX" */,
@@ -650,6 +649,7 @@
 				2A79F3B130138FD2003CA797 /* XCLocalSwiftPackageReference "../SFSymbolsPickerForSwiftUI-main" */,
 				2A79F3B430138FFC003CA797 /* XCLocalSwiftPackageReference "../swiftui-window-overlay-main" */,
 				2A99A533301C3525005E48F7 /* XCRemoteSwiftPackageReference "SwiftEmoji" */,
+				2A582A2D3029E45F009DEEB2 /* XCLocalSwiftPackageReference "../../DialStylePicker" */,
 			);
 			preferredProjectObjectVersion = 110;
 			productRefGroup = 2A02378C2F9C8EA000AB1E1F /* Products */;
@@ -1490,6 +1490,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
+		2A582A2D3029E45F009DEEB2 /* XCLocalSwiftPackageReference "../../DialStylePicker" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../DialStylePicker;
+		};
 		2A79F3AE30138FAB003CA797 /* XCLocalSwiftPackageReference "../Sticker-main" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "../Sticker-main";
@@ -1511,14 +1515,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 9.0.8;
-			};
-		};
-		2AFD7C0C3020000000000001 /* XCRemoteSwiftPackageReference "DialStylePicker" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/noppefoxwolf/DialStylePicker";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.1.0;
 			};
 		};
 		2A324C052FF2980C00E6A3D5 /* XCRemoteSwiftPackageReference "ColorfulX" */ = {
@@ -1577,11 +1573,6 @@
 			package = 2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = Defaults;
 		};
-		2AFD7C0D3020000000000001 /* DialStylePicker */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2AFD7C0C3020000000000001 /* XCRemoteSwiftPackageReference "DialStylePicker" */;
-			productName = DialStylePicker;
-		};
 		2A1DB40D2F9DE9A300E5AE7C /* Defaults */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */;
@@ -1606,6 +1597,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */;
 			productName = IrregularGradient;
+		};
+		2A582A2E3029E45F009DEEB2 /* DialStylePicker */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DialStylePicker;
 		};
 		2A5F91F02FE650FE007302CF /* IrregularGradient */ = {
 			isa = XCSwiftPackageProductDependency;
