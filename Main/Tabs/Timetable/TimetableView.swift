@@ -6,6 +6,7 @@
 //
 
 import Defaults
+import DialStylePicker
 import SwiftUI
 
 extension Notification.Name {
@@ -88,14 +89,20 @@ struct TimetableView: View {
 		.scrollIndicators(.hidden)
 		.scrollPosition(id: $scrollPosition)
 		.safeAreaBar(edge: .top, alignment: .center, spacing: 0) {
-			TabsPicker(
-				items: [
-					("Today", "calendar.day.timeline.left"),
-					("Week", "7.calendar"),
-					("Planner", "pencil.and.list.clipboard"),
-				],
-				selection: $currentTab
-			)
+			DialStylePicker(selection: $currentTab) {
+				Label("Today", systemImage: "calendar.day.timeline.left")
+					.tag(TimetableSubtab.today.rawValue)
+					.dialStylePickerGroup("timetable-subtabs")
+
+				Label("Week", systemImage: "7.calendar")
+					.tag(TimetableSubtab.week.rawValue)
+					.dialStylePickerGroup("timetable-subtabs")
+
+				Label("Planner", systemImage: "pencil.and.list.clipboard")
+					.tag(TimetableSubtab.planner.rawValue)
+					.dialStylePickerGroup("timetable-subtabs")
+			}
+			.tint(.brown)
 			.padding(.horizontal, 10)
 			.frame(height: 36)
 			.padding(.bottom, 5)

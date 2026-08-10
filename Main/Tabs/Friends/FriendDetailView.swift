@@ -99,7 +99,7 @@ struct FriendDetailView: View {
 							Spacer()
 						}
 						.tag(tab)
-						.dialStylePickerGroup(tab == .info ?"friend-info" : "friend-detail")
+						.dialStylePickerGroup("friend-detail-tabs")
 					}
 				}
 				.tint(.brown)

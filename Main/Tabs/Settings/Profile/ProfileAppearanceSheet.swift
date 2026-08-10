@@ -1,4 +1,5 @@
 import Defaults
+import DialStylePicker
 import PhotosUI
 import SwiftEmojiIndex
 import SwiftUI
@@ -150,21 +151,20 @@ struct ProfileAppearanceSheet: View {
 					.padding(.horizontal, 5)
 					.glassEffect(.regular.interactive())
 
-					TabsPicker(
-						items: [
-							("Photo", "photo"),
-							("Monogram", "character"),
-							("Emoji", "face.smiling"),
-						],
-						selection: Binding(
-							get: {
-								ProfileContentKind.allCases.firstIndex(of: draft.contentKind)!
-							},
-							set: {
-								setContentKind(ProfileContentKind.allCases[$0])
-							}
-						)
-					)
+					DialStylePicker(selection: $draft.contentKind) {
+						Label("Photo", systemImage: "photo")
+							.tag(ProfileContentKind.photo)
+							.dialStylePickerGroup("profile-content")
+
+						Label("Monogram", systemImage: "character")
+							.tag(ProfileContentKind.monogram)
+							.dialStylePickerGroup("profile-content")
+
+						Label("Emoji", systemImage: "face.smiling")
+							.tag(ProfileContentKind.emoji)
+							.dialStylePickerGroup("profile-content")
+					}
+					.tint(.brown)
 					.frame(height: 40)
 				}
 				.padding(.horizontal, 10)
@@ -266,12 +266,6 @@ struct ProfileAppearanceSheet: View {
 		selectedPhotoItem = nil
 		photoSelectionState = .idle
 		photoCropRequest = nil
-	}
-
-	private func setContentKind(_ contentKind: ProfileContentKind) {
-		withAnimation(reduceMotion ? .none : .smooth(duration: 0.35)) {
-			draft.contentKind = contentKind
-		}
 	}
 
 	private func save() {
