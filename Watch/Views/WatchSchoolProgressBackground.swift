@@ -45,7 +45,7 @@ struct WatchCurrentTimeMarker: View {
 					.offset(x: markerX)
 			}
 			.padding(.horizontal, 10)
-			.padding(.vertical, 4)
+			.padding(.vertical, 6)
 			.frame(maxWidth: .infinity, maxHeight: .infinity)
 			.accessibilityLabel("Current time")
 		} else {
