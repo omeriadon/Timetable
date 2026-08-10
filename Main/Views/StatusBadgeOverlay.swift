@@ -57,7 +57,13 @@ struct StatusBadgeOverlay: View {
 			)
 			.padding(.horizontal, horizontalPadding)
 		}
-		.frame(width: mainBadgeWidth(availableWidth))
+		.modifier(
+			StatusBadgeWidthModifier(
+				width: badge.width,
+				standardWidth: mainBadgeWidth(availableWidth),
+				availableWidth: availableWidth
+			)
+		)
 		.frame(height: badgeHeight)
 		.contentShape(.capsule)
 		.clipShape(.capsule)
@@ -110,9 +116,9 @@ struct StatusBadgeOverlay: View {
 
 	private func mainBadgeWidth(_ availableWidth: CGFloat) -> CGFloat {
 		#if os(iOS)
-			availableWidth * 0.64
+			min(availableWidth, availableWidth * 0.64 + 50)
 		#else
-			250
+			300
 		#endif
 	}
 
@@ -146,6 +152,21 @@ struct StatusBadgeOverlay: View {
 		#else
 			.blurReplace
 		#endif
+	}
+}
+
+private struct StatusBadgeWidthModifier: ViewModifier {
+	let width: StatusBadgeWidth
+	let standardWidth: CGFloat
+	let availableWidth: CGFloat
+
+	func body(content: Content) -> some View {
+		switch width {
+			case .standard:
+				content.frame(width: standardWidth)
+			case .flexible:
+				content.frame(maxWidth: availableWidth)
+		}
 	}
 }
 

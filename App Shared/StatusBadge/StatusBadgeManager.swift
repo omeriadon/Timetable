@@ -35,12 +35,19 @@ enum StatusBadgeView: Equatable {
 	}
 }
 
+enum StatusBadgeWidth: Equatable {
+	case standard
+	case flexible
+}
+
 struct StatusBadge: Identifiable, Equatable {
 	let id: UUID
 	var title: String
 	var secondaryText: String?
 	var priority: Int
 	var view: StatusBadgeView
+	var width: StatusBadgeWidth
+	var dismissalDuration: Duration?
 	let sequence: UInt64
 }
 
@@ -71,7 +78,9 @@ final class StatusBadgeManager {
 		title: String,
 		secondaryText: String? = nil,
 		priority: Int,
-		view: StatusBadgeView
+		view: StatusBadgeView,
+		width: StatusBadgeWidth = .standard,
+		dismissalDuration: Duration? = nil
 	) {
 		if view == .success {
 			HapticManager.shared.play(.success)
@@ -91,6 +100,8 @@ final class StatusBadgeManager {
 			badges[index].secondaryText = secondaryText
 			badges[index].priority = min(max(priority, 1), 5)
 			badges[index].view = view
+			badges[index].width = width
+			badges[index].dismissalDuration = dismissalDuration
 		} else {
 			nextSequence += 1
 			badges.append(
@@ -100,13 +111,15 @@ final class StatusBadgeManager {
 					secondaryText: secondaryText,
 					priority: min(max(priority, 1), 5),
 					view: view,
+					width: width,
+					dismissalDuration: dismissalDuration,
 					sequence: nextSequence
 				)
 			)
 		}
 
 		activateNextBadgeIfNeeded()
-		scheduleRemovalIfNeeded(for: id, view: view)
+		scheduleRemovalIfNeeded(for: id, view: view, durationOverride: dismissalDuration)
 	}
 
 	func updateBadge(
@@ -133,7 +146,11 @@ final class StatusBadgeManager {
 			HapticManager.shared.play(.warning)
 		}
 
-		scheduleRemovalIfNeeded(for: id, view: view)
+		scheduleRemovalIfNeeded(
+			for: id,
+			view: view,
+			durationOverride: badges[index].dismissalDuration
+		)
 	}
 
 	func dismissMainBadge() {
@@ -186,11 +203,23 @@ final class StatusBadgeManager {
 		guard activeBadgeID == nil else { return }
 		activeBadgeID = rankedBadges.first?.id
 		guard let mainBadge else { return }
-		scheduleRemovalIfNeeded(for: mainBadge.id, view: mainBadge.view)
+		scheduleRemovalIfNeeded(
+			for: mainBadge.id,
+			view: mainBadge.view,
+			durationOverride: mainBadge.dismissalDuration
+		)
 	}
 
-	private func scheduleRemovalIfNeeded(for id: UUID, view: StatusBadgeView) {
+	private func scheduleRemovalIfNeeded(
+		for id: UUID,
+		view: StatusBadgeView,
+		durationOverride: Duration?
+	) {
 		guard activeBadgeID == id else { return }
+		if let durationOverride {
+			scheduleRemoval(for: id, after: durationOverride)
+			return
+		}
 		let duration: Duration
 		switch view {
 			case .success:
