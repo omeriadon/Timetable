@@ -64,28 +64,34 @@ struct ContentView: View {
 	}
 
 	func mainContent(subjectLookup: [Slot: Subject]) -> some View {
-		GlassEffectContainer(spacing: -1) {
-			LazyVGrid(columns: gridColumns, spacing: 1) {
-				ForEach(0 ..< 5) { day in
-					Text(TimetableLayout.shortDayLabels[day])
-						.font(.footnote.scaled(by: 0.8))
-						.frame(height: 10)
-						.frame(maxWidth: .infinity)
-						.foregroundStyle(accountSettings.highlightsCurrentDay && currentDayIndex == day ? .black : .white)
-						.background {
-							if accountSettings.highlightsCurrentDay, currentDayIndex == day {
-								RoundedRectangle(cornerRadius: 5)
-									.fill(.white)
-							}
+		let content = LazyVGrid(columns: gridColumns, spacing: 1) {
+			ForEach(0 ..< 5) { day in
+				Text(TimetableLayout.shortDayLabels[day])
+					.font(.footnote.scaled(by: 0.8))
+					.frame(height: 10)
+					.frame(maxWidth: .infinity)
+					.foregroundStyle(accountSettings.highlightsCurrentDay && currentDayIndex == day ? .black : .white)
+					.background {
+						if accountSettings.highlightsCurrentDay, currentDayIndex == day {
+							RoundedRectangle(cornerRadius: 5)
+								.fill(.white)
 						}
-				}
-
-				ForEach(0 ..< 8) { session in
-					ForEach(0 ..< 5) { day in
-						sessionCell(day, session, subjectLookup: subjectLookup)
 					}
+			}
+
+			ForEach(0 ..< 8) { session in
+				ForEach(0 ..< 5) { day in
+					sessionCell(day, session, subjectLookup: subjectLookup)
 				}
 			}
+		}
+
+		if accountSettings.watchBleedEnabled {
+			GlassEffectContainer(spacing: -1) {
+				content
+			}
+		} else {
+			content
 		}
 	}
 

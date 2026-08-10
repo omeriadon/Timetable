@@ -5,6 +5,7 @@ import WidgetKit
 struct WatchSettingsView: View {
 	@Default(.accountProfile) private var profile
 	@Default(.debugOffset) private var debugOffset
+	@Default(.accountSettings) private var accountSettings
 	@Environment(\.statusBadgeManager) private var badges
 
 	@State private var bootstrapService = WatchAccountBootstrapService.shared
@@ -47,6 +48,10 @@ struct WatchSettingsView: View {
 						}
 					}
 					.disabled(bootstrapService.isSyncing)
+				}
+
+				Section("Appearance") {
+					Toggle("Bleed", systemImage: "drop.degreesign", isOn: bleedBinding)
 				}
 
 				#if DEBUG
@@ -126,4 +131,33 @@ struct WatchSettingsView: View {
 		WidgetCenter.shared.reloadAllTimelines()
 		badges.addBadge(id: UUID(), title: "Widgets Reloaded", priority: 3, view: .success)
 	}
+
+	private var bleedBinding: Binding<Bool> {
+		Binding(
+			get: { accountSettings.watchBleedEnabled },
+			set: { enabled in
+				let previous = accountSettings
+				var proposed = accountSettings
+				proposed.watchBleedEnabled = enabled
+				accountSettings = proposed
+
+				Task {
+					do {
+						let updated: AccountSettings = try await NetworkManager.shared.send(
+							.v1SettingsUpdate,
+							body: proposed
+						)
+						accountSettings = updated
+					} catch {
+						accountSettings = previous
+						badges.present(error: error, title: "Unable to Save Bleed")
+					}
+				}
+			}
+		)
+	}
+}
+
+private extension Endpoint {
+	static let v1SettingsUpdate = Endpoint("/v1/settings", method: .put)
 }
