@@ -162,7 +162,8 @@ struct GradeAverageCard: View {
 						averageSummary(
 							title: "Average",
 							value: average,
-							gaugeOnTrailing: false
+							gaugeOnTrailing: false,
+							showsGauge: false
 						)
 						.frame(width: proxy.size.width / 2, alignment: .leading)
 
@@ -246,14 +247,19 @@ struct GradeAverageCard: View {
 	private func averageSummary(
 		title: String,
 		value: Double?,
-		gaugeOnTrailing: Bool
+		gaugeOnTrailing: Bool,
+		showsGauge: Bool = true
 	) -> some View {
 		HStack(alignment: .center, spacing: 8) {
 			if gaugeOnTrailing {
 				averageSummaryText(title: title, value: value, isTrailing: true)
-				GradeGauge(value: value, tint: .black)
+				if showsGauge {
+					GradeGauge(value: value, tint: .black)
+				}
 			} else {
-				GradeGauge(value: value, tint: .black)
+				if showsGauge {
+					GradeGauge(value: value, tint: .black)
+				}
 				averageSummaryText(title: title, value: value, isTrailing: false)
 			}
 		}
@@ -301,7 +307,7 @@ struct GradeSubjectCard: View {
 			GradeGauge(value: average, tint: subject.colour.swiftUIColor)
 
 			VStack(alignment: .leading, spacing: 5) {
-				Text(subject.id)
+				Label(subject.id, systemImage: subject.symbol)
 					.font(.title3.weight(.semibold))
 
 				if let average {
