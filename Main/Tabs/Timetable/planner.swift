@@ -5,6 +5,8 @@ import SwiftUI
 struct DatesView: View {
 	@Default(.schoolCalendar) private var schoolCalendar
 	@Default(.calendarEvents) private var events
+	@Default(.gradeTracker) private var gradeTracker
+	@Default(.timetable) private var subjects
 	@State private var presentationTarget: PlannerPresentationTarget?
 	@State private var eventService = CalendarEventsSyncService.shared
 	@Environment(\.statusBadgeManager) private var badges
@@ -210,7 +212,7 @@ struct DatesView: View {
 
 	private var dateWindow: ClosedRange<SchoolCalendarDate> {
 		let start = SchoolCalendarDate(TimetableClock.now, calendar: calendar)
-		let end = SchoolCalendarDate(calendar.date(byAdding: .month, value: 3, to: TimetableClock.now) ?? TimetableClock.now, calendar: calendar)
+		let end = SchoolCalendarDate(calendar.date(byAdding: .month, value: 2, to: TimetableClock.now) ?? TimetableClock.now, calendar: calendar)
 		return start ... end
 	}
 
@@ -221,13 +223,21 @@ struct DatesView: View {
 
 	private var upcomingEventEntries: [PlannerTimelineEntry] {
 		let today = SchoolCalendarDate(TimetableClock.now, calendar: calendar)
-		return eventEntries.filter { $0.date > today }
+		return eventEntries.filter { $0.date > today && dateWindow.contains($0.date) }
 	}
 
 	private var eventEntries: [PlannerTimelineEntry] {
-		(events.globalEvents + events.privateEvents)
+		let calendarEntries = (events.globalEvents + events.privateEvents)
 			.enumerated()
 			.map { PlannerTimelineEntry(event: $0.element, occurrence: $0.offset) }
+		let assessmentEntries = gradeTracker.assessments.map { assessment in
+			PlannerTimelineEntry(
+				assessment: assessment,
+				subject: subjects.first { $0.id == assessment.subjectID }
+			)
+		}
+
+		return (calendarEntries + assessmentEntries)
 			.sorted { $0.date < $1.date }
 	}
 
@@ -374,6 +384,7 @@ private struct PlannerTimelineEntry: Identifiable {
 		case noSchoolDay
 		case termDate
 		case event(CalendarEvent)
+		case assessment
 
 		var title: String {
 			switch self {
@@ -383,6 +394,8 @@ private struct PlannerTimelineEntry: Identifiable {
 					""
 				case .event:
 					""
+				case .assessment:
+					"Assessment"
 			}
 		}
 	}
@@ -395,16 +408,20 @@ private struct PlannerTimelineEntry: Identifiable {
 	let kind: Kind
 
 	var backgroundImageName: String {
-		isPersonalEvent ? "foregroundPaper" : "paper"
+		usesForegroundPaper ? "foregroundPaper" : "paper"
 	}
 
 	var foregroundColor: Color {
-		isPersonalEvent ? .black : .white
+		usesForegroundPaper ? Color("inversePrimary") : .primary
 	}
 
-	private var isPersonalEvent: Bool {
+	private var usesForegroundPaper: Bool {
 		if case let .event(event) = kind {
 			return !event.isGlobal
+		}
+
+		if case .assessment = kind {
+			return true
 		}
 
 		return false
@@ -446,6 +463,15 @@ private struct PlannerTimelineEntry: Identifiable {
 		symbol = event.symbol
 		kind = .event(event)
 	}
+
+	nonisolated init(assessment: GradeAssessment, subject: Subject?) {
+		id = "assessment-\(assessment.id.uuidString)"
+		title = assessment.name
+		notes = subject?.id ?? assessment.subjectID
+		date = assessment.date
+		symbol = subject?.symbol ?? "doc.text"
+		kind = .assessment
+	}
 }
 
 private enum PlannerPresentationTarget: Identifiable {
@@ -460,6 +486,8 @@ private enum PlannerPresentationTarget: Identifiable {
 			case .noSchoolDay:
 				self = .noSchoolDay(NoSchoolDayDetailTarget(entry: entry))
 			case .termDate:
+				return nil
+			case .assessment:
 				return nil
 		}
 	}

@@ -5,6 +5,7 @@ struct TodayTimetableView: View {
 	let subjects: [Subject]
 	@Default(.schoolCalendar) private var schoolCalendar
 	@Default(.calendarEvents) private var calendarEvents
+	@Default(.gradeTracker) private var gradeTracker
 	@Default(.schoolWeather) private var schoolWeather
 	@State private var expandedPeriodNumber: Int?
 	@State private var eventSnapshot = TodayEventSnapshot.empty
@@ -43,22 +44,18 @@ struct TodayTimetableView: View {
 						TodayNoSchoolDayCard(noSchoolDay: noSchoolDay)
 					}
 
-					if !eventSnapshot.schoolEvents.isEmpty || !eventSnapshot.personalEvents.isEmpty || !eventSnapshot.upcomingEvents.isEmpty {
+					if !eventSnapshot.todayEntries.isEmpty || !eventSnapshot.upcomingEntries.isEmpty {
 						VStack(alignment: .leading) {
 							Text("Events")
 								.font(.title)
 								.bold()
 
-							if !eventSnapshot.schoolEvents.isEmpty {
-								eventSection("School Events", events: eventSnapshot.schoolEvents)
+							if !eventSnapshot.todayEntries.isEmpty {
+								eventSection("Today", entries: eventSnapshot.todayEntries)
 							}
 
-							if !eventSnapshot.personalEvents.isEmpty {
-								eventSection("Your Events", events: eventSnapshot.personalEvents)
-							}
-
-							if !eventSnapshot.upcomingEvents.isEmpty {
-								eventSection("Upcoming Events", events: eventSnapshot.upcomingEvents, showsDate: true)
+							if !eventSnapshot.upcomingEntries.isEmpty {
+								eventSection("Upcoming", entries: eventSnapshot.upcomingEntries, showsDate: true)
 							}
 						}
 						.frame(maxWidth: .infinity, alignment: .leading)
@@ -96,11 +93,15 @@ struct TodayTimetableView: View {
 			}
 			.task(id: TodayEventSnapshotInput(
 				calendarEvents: calendarEvents,
+				gradeTracker: gradeTracker,
+				subjects: subjects,
 				schoolCalendar: schoolCalendar,
 				day: SchoolCalendarDate(now)
 			)) {
 				eventSnapshot = TodayEventSnapshot(
 					calendarEvents: calendarEvents,
+					gradeTracker: gradeTracker,
+					subjects: subjects,
 					schoolCalendar: schoolCalendar,
 					day: SchoolCalendarDate(now)
 				)
@@ -139,44 +140,42 @@ struct TodayTimetableView: View {
 		return calendar.date(byAdding: .day, value: -daysFromMonday, to: date) ?? date
 	}
 
-	@ViewBuilder private func eventSection(_ title: String, events: [CalendarEvent], showsDate: Bool = false) -> some View {
+	@ViewBuilder private func eventSection(_ title: String, entries: [TodayEventEntry], showsDate: Bool = false) -> some View {
 		Text(title)
 			.fontWeight(.semibold)
-			.foregroundStyle(title == "Upcoming Events" ? .tertiary : .secondary)
+			.foregroundStyle(.secondary)
 			.padding(.top, 4)
 
-		ForEach(events) { event in
+		ForEach(entries) { entry in
 			Label {
 				VStack(alignment: .leading) {
-					Text(event.title)
-						.foregroundStyle(.secondary)
+					Text(entry.title)
 
 					if showsDate {
-						Text(event.date.displayLabel)
+						Text(entry.date.displayLabel)
 							.font(.footnote)
-							.foregroundStyle(.tertiary)
+							.opacity(0.7)
 					}
 				}
 			} icon: {
-				Image(systemName: event.symbol)
-					.foregroundStyle(.secondary)
+				Image(systemName: entry.symbol)
 			}
 			.padding(.vertical, 4)
 			.font(.title3)
 			.padding(5)
 			.frame(maxWidth: .infinity, alignment: .leading)
+			.foregroundStyle(entry.foregroundColor)
 			.background {
 				GeometryReader { proxy in
-					Image("foregroundPaper")
+					Image(entry.backgroundImageName)
 						.resizable()
 						.scaledToFill()
-						.opacity(title == "Upcoming Events" ? 0.9 : 1)
 						.frame(width: proxy.size.width, height: proxy.size.height)
 						.clipped()
 				}
 				.clipShape(RoundedRectangle(cornerRadius: TodayCardLayout.innerCornerRadius))
 			}
-			.glassEffect(title == "Upcoming Events" ? .identity : .clear.interactive(), in: RoundedRectangle(cornerRadius: TodayCardLayout.innerCornerRadius))
+			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: TodayCardLayout.innerCornerRadius))
 		}
 	}
 }
@@ -216,29 +215,28 @@ private struct TodayWeatherSummary: View {
 
 private struct TodayEventSnapshotInput: Hashable {
 	let calendarEvents: CalendarEventsProjection
+	let gradeTracker: GradeTrackerDocument
+	let subjects: [Subject]
 	let schoolCalendar: SchoolCalendarProjection
 	let day: SchoolCalendarDate
 }
 
 private struct TodayEventSnapshot: Equatable {
-	let schoolEvents: [CalendarEvent]
-	let personalEvents: [CalendarEvent]
-	let upcomingEvents: [CalendarEvent]
+	let todayEntries: [TodayEventEntry]
+	let upcomingEntries: [TodayEventEntry]
 	let noSchoolDay: SchoolCalendarNamedDate?
 
 	var isEmpty: Bool {
-		schoolEvents.isEmpty && personalEvents.isEmpty && upcomingEvents.isEmpty && noSchoolDay == nil
+		todayEntries.isEmpty && upcomingEntries.isEmpty && noSchoolDay == nil
 	}
 
 	private init(
-		schoolEvents: [CalendarEvent] = [],
-		personalEvents: [CalendarEvent] = [],
-		upcomingEvents: [CalendarEvent] = [],
+		todayEntries: [TodayEventEntry] = [],
+		upcomingEntries: [TodayEventEntry] = [],
 		noSchoolDay: SchoolCalendarNamedDate? = nil
 	) {
-		self.schoolEvents = schoolEvents
-		self.personalEvents = personalEvents
-		self.upcomingEvents = upcomingEvents
+		self.todayEntries = todayEntries
+		self.upcomingEntries = upcomingEntries
 		self.noSchoolDay = noSchoolDay
 	}
 
@@ -246,42 +244,91 @@ private struct TodayEventSnapshot: Equatable {
 
 	init(
 		calendarEvents: CalendarEventsProjection,
+		gradeTracker: GradeTrackerDocument,
+		subjects: [Subject],
 		schoolCalendar: SchoolCalendarProjection,
 		day: SchoolCalendarDate
 	) {
+		let entries = Self.entries(
+			calendarEvents: calendarEvents,
+			assessments: gradeTracker.assessments,
+			subjects: subjects
+		)
 		self.init(
-			schoolEvents: Self.events(on: day, in: calendarEvents.globalEvents),
-			personalEvents: Self.events(on: day, in: calendarEvents.privateEvents),
-			upcomingEvents: Self.upcomingEvents(after: day, events: calendarEvents),
+			todayEntries: entries.filter { $0.date == day },
+			upcomingEntries: Self.upcomingEntries(after: day, entries: entries),
 			noSchoolDay: schoolCalendar.skippedDates.first { $0.date == day }
 		)
 	}
 
-	private static func events(on day: SchoolCalendarDate, in events: [CalendarEvent]) -> [CalendarEvent] {
-		events
-			.filter { $0.date == day }
-			.sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
+	private static func entries(
+		calendarEvents: CalendarEventsProjection,
+		assessments: [GradeAssessment],
+		subjects: [Subject]
+	) -> [TodayEventEntry] {
+		let events = (calendarEvents.globalEvents + calendarEvents.privateEvents).map(TodayEventEntry.init(event:))
+		let assessmentEntries = assessments.map { assessment in
+			TodayEventEntry(
+				assessment: assessment,
+				subject: subjects.first { $0.id == assessment.subjectID }
+			)
+		}
+		return (events + assessmentEntries).sorted(by: TodayEventEntry.areInDisplayOrder)
 	}
 
-	private static func upcomingEvents(
+	private static func upcomingEntries(
 		after day: SchoolCalendarDate,
-		events: CalendarEventsProjection
-	) -> [CalendarEvent] {
+		entries: [TodayEventEntry]
+	) -> [TodayEventEntry] {
 		let calendar = SchoolCalendarProjection.perthCalendar
 		let referenceDate = day.startOfDay(calendar: calendar) ?? .now
 		let start = calendar.date(byAdding: .day, value: 1, to: referenceDate) ?? referenceDate
-		let end = calendar.date(byAdding: .day, value: 7, to: referenceDate) ?? referenceDate
+		let end = calendar.date(byAdding: .month, value: 2, to: referenceDate) ?? referenceDate
 		let dateWindow = SchoolCalendarDate(start, calendar: calendar) ... SchoolCalendarDate(end, calendar: calendar)
 
-		return (events.globalEvents + events.privateEvents)
+		return entries
 			.filter { dateWindow.contains($0.date) }
-			.sorted {
-				if $0.date == $1.date {
-					return $0.title.localizedStandardCompare($1.title) == .orderedAscending
-				}
+			.sorted(by: TodayEventEntry.areInDisplayOrder)
+	}
+}
 
-				return $0.date < $1.date
-			}
+private struct TodayEventEntry: Equatable, Identifiable {
+	let id: String
+	let title: String
+	let date: SchoolCalendarDate
+	let symbol: String
+	let usesForegroundPaper: Bool
+
+	var backgroundImageName: String {
+		usesForegroundPaper ? "foregroundPaper" : "paper"
+	}
+
+	var foregroundColor: Color {
+		usesForegroundPaper ? Color("inversePrimary") : .primary
+	}
+
+	init(event: CalendarEvent) {
+		id = "event-\(event.id.uuidString)"
+		title = event.title
+		date = event.date
+		symbol = event.symbol
+		usesForegroundPaper = !event.isGlobal
+	}
+
+	init(assessment: GradeAssessment, subject: Subject?) {
+		id = "assessment-\(assessment.id.uuidString)"
+		title = assessment.name
+		date = assessment.date
+		symbol = subject?.symbol ?? "doc.text"
+		usesForegroundPaper = true
+	}
+
+	static func areInDisplayOrder(_ lhs: Self, _ rhs: Self) -> Bool {
+		if lhs.date == rhs.date {
+			return lhs.title.localizedStandardCompare(rhs.title) == .orderedAscending
+		}
+
+		return lhs.date < rhs.date
 	}
 }
 
