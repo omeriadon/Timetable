@@ -8,11 +8,11 @@ struct AdministrationDeviceStatisticsView: View {
 
 	var body: some View {
 		List {
-			Section("Builds") {
+			Section("App channels") {
 				if let statistics = model.statistics {
-					LabeledContent("Debug builds", value: statistics.debugDevices.formatted())
-					LabeledContent("Beta builds", value: statistics.betaDevices.formatted())
-					LabeledContent("Release builds", value: statistics.releaseDevices.formatted())
+					LabeledContent("Debug", value: statistics.debugDevices.formatted())
+					LabeledContent("TestFlight", value: statistics.testFlightDevices.formatted())
+					LabeledContent("App Store", value: statistics.releaseDevices.formatted())
 				}
 			}
 
@@ -38,8 +38,8 @@ struct AdministrationDeviceStatisticsView: View {
 					Text("Major versions")
 						.tag(OperatingSystemChartMode.majorVersions)
 
-					Text("Builds")
-						.tag(OperatingSystemChartMode.builds)
+					Text("App channels")
+						.tag(OperatingSystemChartMode.appChannels)
 
 					Text("Minor versions")
 						.tag(OperatingSystemChartMode.minorVersions)
@@ -64,13 +64,13 @@ struct AdministrationDeviceStatisticsView: View {
 						HStack {
 							Text(item.label)
 							Spacer()
-							if item.isDebug {
+							if item.isOSBeta {
 								Image(systemName: "flask")
 									.foregroundStyle(.secondary)
-									.accessibilityLabel("Debug build")
+									.accessibilityLabel("Beta operating system")
 							}
-							if let buildLabel = item.buildLabel {
-								Text(buildLabel)
+							if item.isOSBeta {
+								Text("Beta")
 									.foregroundStyle(.secondary)
 							}
 							Text(item.count.formatted())
@@ -91,13 +91,15 @@ struct AdministrationDeviceStatisticsView: View {
 							HStack {
 								Text("OS \(item.osMajorVersion).\(item.osMinorVersion)")
 								Spacer()
-								if item.isDebug {
+								if item.isOSBeta {
 									Image(systemName: "flask")
 										.foregroundStyle(.secondary)
-										.accessibilityLabel("Debug build")
+										.accessibilityLabel("Beta operating system")
 								}
-								Text(item.buildLabel)
-									.foregroundStyle(.secondary)
+								if item.isOSBeta {
+									Text("Beta")
+										.foregroundStyle(.secondary)
+								}
 								Text(item.count.formatted())
 									.foregroundStyle(.secondary)
 							}
@@ -137,11 +139,11 @@ struct AdministrationDeviceStatisticsView: View {
 		switch operatingSystemChartMode {
 			case .majorVersions:
 				return groupedMajorVersions(statistics.deviceOSVersions)
-			case .builds:
+			case .appChannels:
 				return [
 					OperatingSystemChartItem(label: "Debug", chartLabel: "Debug", count: statistics.debugDevices),
-					OperatingSystemChartItem(label: "Beta", chartLabel: "Beta", count: statistics.betaDevices),
-					OperatingSystemChartItem(label: "Release", chartLabel: "Release", count: statistics.releaseDevices),
+					OperatingSystemChartItem(label: "TestFlight", chartLabel: "TestFlight", count: statistics.testFlightDevices),
+					OperatingSystemChartItem(label: "App Store", chartLabel: "App Store", count: statistics.releaseDevices),
 				].filter { $0.count > 0 }
 			case .minorVersions:
 				return groupedMinorVersions(statistics.deviceOSVersions)
@@ -168,14 +170,13 @@ struct AdministrationDeviceStatisticsView: View {
 			let label = "OS \($0.osMajorVersion).\($0.osMinorVersion)"
 			return OperatingSystemChartItem(
 				label: label,
-				chartLabel: "\(label) · \($0.buildLabel)",
+				chartLabel: "\(label) · \($0.osBetaLabel)",
 				count: $0.count,
-				isDebug: $0.isDebug,
-				buildLabel: $0.buildLabel
+				isOSBeta: $0.isOSBeta
 			)
 		}.sorted {
 			if $0.label == $1.label {
-				return ($0.buildLabel ?? "") < ($1.buildLabel ?? "")
+				return !$0.isOSBeta && $1.isOSBeta
 			}
 			return $0.label > $1.label
 		}
@@ -184,7 +185,7 @@ struct AdministrationDeviceStatisticsView: View {
 
 private enum OperatingSystemChartMode: Hashable {
 	case majorVersions
-	case builds
+	case appChannels
 	case minorVersions
 	case minorVersionsForMajor(Int)
 }
@@ -193,27 +194,22 @@ private struct OperatingSystemChartItem: Identifiable {
 	let label: String
 	let chartLabel: String
 	let count: Int
-	let isDebug: Bool
-	let buildLabel: String?
+	let isOSBeta: Bool
 
-	init(label: String, chartLabel: String, count: Int, isDebug: Bool = false, buildLabel: String? = nil) {
+	init(label: String, chartLabel: String, count: Int, isOSBeta: Bool = false) {
 		self.label = label
 		self.chartLabel = chartLabel
 		self.count = count
-		self.isDebug = isDebug
-		self.buildLabel = buildLabel
+		self.isOSBeta = isOSBeta
 	}
 
 	var id: String {
-		"\(chartLabel)-\(isDebug)"
+		"\(chartLabel)-\(isOSBeta)"
 	}
 }
 
 private extension AdministrationDeviceOSVersionCount {
-	var buildLabel: String {
-		if isDebug {
-			return "Debug"
-		}
-		return isBeta ? "Beta" : "Release"
+	var osBetaLabel: String {
+		isOSBeta ? "Beta" : "Release"
 	}
 }

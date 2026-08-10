@@ -493,7 +493,8 @@ nonisolated struct SynchronizeUserDeviceRequest: Codable, Sendable {
 	let osMajorVersion: Int
 	let osMinorVersion: Int
 	let isDebug: Bool
-	let isBeta: Bool
+	let isTestFlight: Bool
+	let isOSBeta: Bool
 }
 
 nonisolated struct RemoveUserDeviceRequest: Codable {

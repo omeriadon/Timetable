@@ -20,10 +20,25 @@ struct AboutView: View {
 	var body: some View {
 		ScrollView {
 			VStack {
-				Image("Icon")
-					.resizable()
-					.aspectRatio(contentMode: .fit)
-					.frame(width: 200)
+				ZStack(alignment: .bottomTrailing) {
+					Image("Icon")
+						.resizable()
+						.aspectRatio(contentMode: .fit)
+						.frame(width: 200)
+
+					if AppChannel.current != .appStore {
+						Text(AppChannel.current.displayName)
+							.font(.caption2.weight(.semibold))
+							.padding(.horizontal, 10)
+							.padding(.vertical, 6)
+							.foregroundStyle(.white)
+							.glassEffect(
+								.regular.tint(AppChannel.current == .debug ? .orange : .blue),
+								in: Capsule()
+							)
+							.offset(x: 12, y: 12)
+					}
+				}
 
 				Text("Timetable")
 					.font(.largeTitle)

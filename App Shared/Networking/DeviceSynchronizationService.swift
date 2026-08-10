@@ -21,7 +21,8 @@ final class DeviceSynchronizationService {
 					osMajorVersion: version.majorVersion,
 					osMinorVersion: version.minorVersion,
 					isDebug: Self.isDebug,
-					isBeta: Self.isBeta
+					isTestFlight: AppChannel.current == .testFlight,
+					isOSBeta: Self.isOSBeta
 				)
 			)
 			Print("Device synchronized", category: .network)
@@ -56,11 +57,15 @@ final class DeviceSynchronizationService {
 		#endif
 	}
 
-	private static var isBeta: Bool {
-		guard let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String else {
+	private static var isOSBeta: Bool {
+		let versionString = ProcessInfo.processInfo.operatingSystemVersionString
+		guard let buildStart = versionString.range(of: "(Build "),
+		      let buildEnd = versionString[buildStart.upperBound...].firstIndex(of: ")")
+		else {
 			return false
 		}
 
+		let build = versionString[buildStart.upperBound ..< buildEnd]
 		return build.last?.isLetter == true
 	}
 }
