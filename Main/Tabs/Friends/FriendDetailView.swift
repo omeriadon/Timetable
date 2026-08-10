@@ -2,7 +2,7 @@ import Defaults
 import SwiftUI
 
 #if canImport(DialStylePicker)
-import DialStylePicker
+	import DialStylePicker
 #endif
 
 struct FriendDetailView: View {
@@ -72,11 +72,14 @@ struct FriendDetailView: View {
 								.containerRelativeFrame(.horizontal)
 								.id(FriendDetailTab.week)
 
-							FriendInfo(
-								detail: detail,
-								requestFriendsSinceDate: { showsFriendsSinceRequest = true },
-								updateLocationNotificationPreferences: updateLocationNotificationPreferences
-							)
+							List {
+								FriendInfo(
+									detail: detail,
+									requestFriendsSinceDate: { showsFriendsSinceRequest = true },
+									updateLocationNotificationPreferences: updateLocationNotificationPreferences
+								)
+							}
+							.scrollIndicators(.hidden)
 							.containerRelativeFrame(.horizontal)
 							.id(FriendDetailTab.info)
 						}
@@ -94,35 +97,22 @@ struct FriendDetailView: View {
 			.navigationBarTitleDisplayMode(.inline)
 			.foregroundStyle(.black)
 			.safeAreaBar(edge: .top, spacing: 5) {
-				#if os(iOS) && canImport(DialStylePicker)
 				DialStylePicker(selection: $selectedTab) {
 					ForEach(FriendDetailTab.allCases) { tab in
-						Label(tab.title, systemImage: tab.symbol)
-							.tag(tab)
-							.dialStylePickerGroup("friend-detail")
+						HStack {
+							Spacer()
+							Label(tab.title, systemImage: tab.symbol)
+							Spacer()
+						}
+						.tag(tab)
+						.dialStylePickerGroup("friend-detail")
 					}
 				}
 				.tint(.brown)
-				#else
-				TabsPicker(
-					items: FriendDetailTab.allCases.map { ($0.title, $0.symbol) },
-					selection: Binding(
-						get: { FriendDetailTab.allCases.firstIndex(of: selectedTab) ?? 0 },
-						set: { index in
-							guard FriendDetailTab.allCases.indices.contains(index) else {
-								return
-							}
-
-							withAnimation(.easeInOut(duration: 0.25)) {
-								selectedTab = FriendDetailTab.allCases[index]
-							}
-						}
-					)
-				)
-				#endif
 				.padding(.horizontal)
 				.frame(height: 36)
 				.padding(.bottom, 5)
+				.padding(.top)
 			}
 			.scrollEdgeEffectStyle(.soft, for: .top)
 			.toolbar {
