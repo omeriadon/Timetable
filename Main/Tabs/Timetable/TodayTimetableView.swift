@@ -5,14 +5,20 @@ struct TodayTimetableView: View {
 	let subjects: [Subject]
 	@Default(.schoolCalendar) private var schoolCalendar
 	@Default(.calendarEvents) private var calendarEvents
+	@Default(.schoolWeather) private var schoolWeather
 	@State private var expandedPeriodNumber: Int?
 	@State private var eventSnapshot = TodayEventSnapshot.empty
+	@State private var weatherService = SchoolWeatherService.shared
 
 	var body: some View {
 		TimelineView(.periodic(from: .now, by: 1)) { context in
 			let now = TimetableClock.adjusted(context.date)
 			ScrollView {
 				VStack(alignment: .leading, spacing: 16) {
+					if let schoolWeather {
+						TodayWeatherSummary(weather: schoolWeather)
+					}
+
 					VStack(alignment: .leading, spacing: 6) {
 						Text(now.formatted(.dateTime.weekday(.wide).day().month(.wide).hour(.defaultDigits(amPM: .wide)).minute(.defaultDigits).second(.defaultDigits)))
 							.contentTransition(.numericText())
@@ -99,6 +105,9 @@ struct TodayTimetableView: View {
 					day: SchoolCalendarDate(now)
 				)
 			}
+			.task {
+				try? await weatherService.refresh()
+			}
 		}
 	}
 
@@ -169,6 +178,39 @@ struct TodayTimetableView: View {
 			}
 			.glassEffect(title == "Upcoming Events" ? .identity : .clear.interactive(), in: RoundedRectangle(cornerRadius: TodayCardLayout.innerCornerRadius))
 		}
+	}
+}
+
+private struct TodayWeatherSummary: View {
+	let weather: SchoolWeather
+
+	var body: some View {
+		HStack(spacing: 16) {
+			Label {
+				Text("\(weather.temperatureCelsius.formatted(.number.precision(.fractionLength(0))))°C")
+			} icon: {
+				Image(systemName: "thermometer.medium")
+			}
+
+			Label(conditionTitle, systemImage: "cloud.sun")
+
+			Label("UV \(weather.uvIndex)", systemImage: "sun.max")
+		}
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.padding(.horizontal, 6)
+		.accessibilityElement(children: .combine)
+		.accessibilityLabel(
+			"School weather, \(weather.temperatureCelsius.formatted(.number.precision(.fractionLength(0)))) degrees Celsius, \(conditionTitle), UV index \(weather.uvIndex)"
+		)
+	}
+
+	private var conditionTitle: String {
+		weather.conditionCode
+			.replacingOccurrences(
+				of: "([a-z])([A-Z])",
+				with: "$1 $2",
+				options: .regularExpression
+			)
 	}
 }
 

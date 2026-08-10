@@ -79,6 +79,7 @@ extension Defaults.Keys {
 	static let timetable = Key<[Subject]>("timetable", default: [], suite: sharedDefaults)
 	static let gradeTracker = Key<GradeTrackerDocument>("gradeTracker", default: .empty, suite: sharedDefaults)
 	static let schoolCalendar = Key<SchoolCalendarProjection>("schoolCalendar", default: .empty, suite: sharedDefaults)
+	static let schoolWeather = Key<SchoolWeather?>("schoolWeather", default: nil, suite: sharedDefaults)
 	static let calendarEvents = Key<CalendarEventsProjection>("calendarEvents", default: .empty, suite: sharedDefaults)
 	static let friends = Key<[FriendSummary]>("friends", default: [], suite: sharedDefaults)
 	static let friendDetails = Key<[FriendDetail]>("friendDetails", default: [], suite: sharedDefaults)
