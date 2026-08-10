@@ -93,6 +93,13 @@ final class AdministrationService {
 		)
 	}
 
+	func sendTestEmail() async throws {
+		try await networkManager.send(
+			.v1AdministrationTestEmail,
+			context: .userInitiated
+		)
+	}
+
 	func createUser(request: AdministrationUserCreateRequest) async throws -> AdministrationUserResponse {
 		try await networkManager.send(.v1AdministrationUsersCreate, body: request, context: .userInitiated)
 	}
@@ -297,6 +304,7 @@ private extension Endpoint {
 	static let v1AdministrationServerAccessModeUpdate = Endpoint("/_operations/server-access-mode", method: .put)
 	static let v1AdministrationAppVersion = Endpoint("/v1/administration/app-version")
 	static let v1AdministrationAppVersionUpdate = Endpoint("/v1/administration/app-version", method: .put)
+	static let v1AdministrationTestEmail = Endpoint("/v1/administration/test-email", method: .post)
 	static let v1AdministrationEventTags = Endpoint("/v1/administration/event-tags")
 	static let v1AdministrationEventTagsCreate = Endpoint("/v1/administration/event-tags", method: .post)
 	static let v1AdministrationEventTagsOrder = Endpoint("/v1/administration/event-tags/order", method: .put)

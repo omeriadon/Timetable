@@ -5,6 +5,7 @@ struct AdministrationView: View {
 	@State private var isAdmin = false
 	@State private var authority: AccountAuthority = .user
 	@State private var pendingModerationCount = 0
+	@State private var isSendingTestEmail = false
 	@Environment(\.statusBadgeManager) private var badges
 	@Environment(\.appPresentation) private var presentation
 	@Environment(AppRouter.self) private var router
@@ -108,6 +109,31 @@ struct AdministrationView: View {
 				administrationLink("Debug Testing", systemImage: "testtube.2", route: .administration(.serverAccess)) { AdministrationDevelopmentAccessView() }
 				administrationLink("Profile Storage", systemImage: "externaldrive.fill", route: .administration(.profileStorage)) { AdministrationProfileStorageView() }
 				administrationLink("Badges", systemImage: "rosette", route: .administration(.specialBadges)) { AdministrationSpecialBadgesView() }
+				Button("Send Test Email", systemImage: "envelope") {
+					sendTestEmail()
+				}
+				.disabled(isSendingTestEmail)
+			}
+		}
+	}
+
+	private func sendTestEmail() {
+		isSendingTestEmail = true
+		Task {
+			defer {
+				isSendingTestEmail = false
+			}
+			do {
+				try await service.sendTestEmail()
+				badges.addBadge(
+					id: UUID(),
+					title: "Test Email Sent",
+					secondaryText: "Sent to omeriadon@outlook.com",
+					priority: 3,
+					view: .success
+				)
+			} catch {
+				badges.present(error: error, title: "Unable to send test email")
 			}
 		}
 	}
