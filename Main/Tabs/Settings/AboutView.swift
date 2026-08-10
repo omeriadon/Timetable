@@ -28,15 +28,16 @@ struct AboutView: View {
 
 					if AppChannel.current != .appStore {
 						Text(AppChannel.current.displayName)
-							.font(.caption2.weight(.semibold))
-							.padding(.horizontal, 10)
-							.padding(.vertical, 6)
+							.font(.title2.weight(.semibold))
+							.padding(.horizontal, 15)
+							.padding(.vertical, 8)
 							.foregroundStyle(.white)
 							.glassEffect(
-								.regular.tint(AppChannel.current == .debug ? .orange : .blue),
+								.clear.tint(AppChannel.current == .debug ? .orange : .blue).interactive(),
 								in: Capsule()
 							)
-							.offset(x: 12, y: 12)
+							.offset(x: 20, y: 35)
+							.padding(.bottom, 30)
 					}
 				}
 
