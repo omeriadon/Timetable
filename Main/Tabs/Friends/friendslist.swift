@@ -11,6 +11,7 @@ struct FriendsView: View {
 	@State private var sheet: FriendsSheet?
 	@State private var selectedFriend: FriendSummary?
 	@State private var isSearching = false
+	@State private var isSearchPresented = false
 	@State private var showsArrivalStatistics = false
 	@State private var showsLocationStatusSheet = false
 	@Namespace private var friendSheetNamespace
@@ -19,6 +20,111 @@ struct FriendsView: View {
 	@Environment(AppRouter.self) private var router
 
 	var body: some View {
+		searchableContent
+			.animation(.easeInOut, value: searchText.isEmpty)
+			.scrollEdgeEffect()
+			.appNavigationTitle("Friends", style: .main, accent: true)
+			.toolbar {
+				ToolbarItem(placement: .topBarLeading) {
+					Button("Friend requests", systemImage: incomingFriendRequests.isEmpty ? "bell" : "bell.badge") {
+						if presentation == .iOS {
+							sheet = .requests
+						} else {
+							router.navigate(to: .friends(.requests))
+						}
+					}
+					.labelStyle(.iconOnly)
+					.badge(incomingFriendRequests.count)
+					.accessibilityValue(incomingFriendRequests.isEmpty ? "No pending requests" : "\(incomingFriendRequests.count) pending requests")
+				}
+				ToolbarItem(placement: .topBarTrailing) {
+					Button("Add friend", systemImage: "person.badge.plus") {
+						if presentation == .iOS {
+							sheet = .addFriend
+						} else {
+							router.navigate(to: .friends(.addFriend))
+						}
+					}
+					.labelStyle(.iconOnly)
+				}
+			}
+			.task { await refresh() }
+			.task(id: searchText) {
+				await search(for: searchText)
+			}
+			.onChange(of: searchText) { oldValue, newValue in
+				if !oldValue.isEmpty, newValue.isEmpty {
+					isSearchPresented = false
+				}
+			}
+			.popover(item: $sheet) { sheet in
+				Group {
+					switch sheet {
+						case .addFriend:
+							AddFriendSheet(close: { self.sheet = nil })
+								.presentationDetents([.large])
+								.presentationDragIndicator(.hidden)
+								.frame(iOS: .init(), macOS: .init(width: 620, height: 700))
+						case .requests:
+							FriendRequestsSheet(close: { self.sheet = nil })
+								.presentationDetents([.fraction(0.6), .large])
+								.presentationDragIndicator(.hidden)
+								.frame(iOS: .init(), macOS: .init(width: 620, height: 700))
+					}
+				}
+				.presentationCompactAdaptation(.sheet)
+			}
+			.sheet(item: $selectedFriend) { friend in
+				FriendDetailView(friend: friend, close: { selectedFriend = nil })
+					.navigationTransition(
+						.zoom(sourceID: friendTransitionID(friend), in: friendSheetNamespace)
+					)
+			}
+			.sheet(isPresented: $showsLocationStatusSheet) {
+				LocationStatusWhatsNewSheet {
+					showsLocationStatusSheet = false
+					hasSeenLocationStatusWhatsNew = true
+				}
+				.presentationDetents([.large])
+				.presentationDragIndicator(.hidden)
+			}
+			.onAppear {
+				if !hasSeenLocationStatusWhatsNew {
+					showsLocationStatusSheet = true
+				}
+			}
+			.dynamicTypeSize(.medium)
+	}
+
+	@ViewBuilder
+	private var searchableContent: some View {
+		if presentation == .iOS {
+			content
+				.searchable(
+					text: $searchText,
+					isPresented: searchPresentation,
+					prompt: "Search by name"
+				)
+				.toolbar {
+					if isSearchPresented {
+						DefaultToolbarItem(kind: .search, placement: .bottomBar)
+					} else {
+						ToolbarItemGroup(placement: .bottomBar) {
+							Spacer()
+							Button("Search friends", systemImage: "magnifyingglass") {
+								isSearchPresented = true
+							}
+							.labelStyle(.iconOnly)
+						}
+					}
+				}
+		} else {
+			content
+				.searchable(text: $searchText, prompt: "Search by name")
+		}
+	}
+
+	private var content: some View {
 		ZStack {
 			if searchText.isEmpty {
 				friendsList
@@ -28,74 +134,17 @@ struct FriendsView: View {
 					.transition(.blurReplace)
 			}
 		}
-		.animation(.easeInOut, value: searchText.isEmpty)
-		.scrollEdgeEffect()
-		.appNavigationTitle("Friends", style: .main, accent: true)
-		.toolbar {
-			ToolbarItem(placement: .topBarLeading) {
-				Button("Friend requests", systemImage: incomingFriendRequests.isEmpty ? "bell" : "bell.badge") {
-					if presentation == .iOS {
-						sheet = .requests
-					} else {
-						router.navigate(to: .friends(.requests))
-					}
-				}
-				.labelStyle(.iconOnly)
-				.badge(incomingFriendRequests.count)
-				.accessibilityValue(incomingFriendRequests.isEmpty ? "No pending requests" : "\(incomingFriendRequests.count) pending requests")
-			}
-			ToolbarItem(placement: .topBarTrailing) {
-				Button("Add friend", systemImage: "person.badge.plus") {
-					if presentation == .iOS {
-						sheet = .addFriend
-					} else {
-						router.navigate(to: .friends(.addFriend))
-					}
-				}
-				.labelStyle(.iconOnly)
-			}
-		}
-		.task { await refresh() }
-		.task(id: searchText) {
-			await search(for: searchText)
-		}
-		.popover(item: $sheet) { sheet in
-			Group {
-				switch sheet {
-					case .addFriend:
-						AddFriendSheet(close: { self.sheet = nil })
-							.presentationDetents([.large])
-							.presentationDragIndicator(.hidden)
-							.frame(iOS: .init(), macOS: .init(width: 620, height: 700))
-					case .requests:
-						FriendRequestsSheet(close: { self.sheet = nil })
-							.presentationDetents([.fraction(0.6), .large])
-							.presentationDragIndicator(.hidden)
-							.frame(iOS: .init(), macOS: .init(width: 620, height: 700))
+	}
+
+	private var searchPresentation: Binding<Bool> {
+		Binding(
+			get: { isSearchPresented },
+			set: { newValue in
+				if newValue || searchText.isEmpty {
+					isSearchPresented = newValue
 				}
 			}
-			.presentationCompactAdaptation(.sheet)
-		}
-		.sheet(item: $selectedFriend) { friend in
-			FriendDetailView(friend: friend, close: { selectedFriend = nil })
-				.navigationTransition(
-					.zoom(sourceID: friendTransitionID(friend), in: friendSheetNamespace)
-				)
-		}
-		.sheet(isPresented: $showsLocationStatusSheet) {
-			LocationStatusWhatsNewSheet {
-				showsLocationStatusSheet = false
-				hasSeenLocationStatusWhatsNew = true
-			}
-			.presentationDetents([.large])
-			.presentationDragIndicator(.hidden)
-		}
-		.onAppear {
-			if !hasSeenLocationStatusWhatsNew {
-				showsLocationStatusSheet = true
-			}
-		}
-		.dynamicTypeSize(.medium)
+		)
 	}
 
 	let isPad = UIDevice.current.userInterfaceIdiom == .pad
@@ -179,7 +228,6 @@ struct FriendsView: View {
 		.refreshable {
 			await refresh()
 		}
-		.searchable(text: $searchText, prompt: "Search by name")
 	}
 
 	private var friendSearchResults: some View {
@@ -203,7 +251,6 @@ struct FriendsView: View {
 		.refreshable {
 			await refreshSearchResults()
 		}
-		.searchable(text: $searchText, prompt: "Search by name")
 	}
 
 	private struct PersonalArrivalStatisticsView: View {
