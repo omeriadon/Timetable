@@ -39,7 +39,7 @@ struct AdministrationUsersView: View {
 						editor = .create
 					} label: {
 						Label("Add User", systemImage: "plus")
-							.foregroundStyle(.white)
+							.foregroundStyle(.primary)
 					}
 					.buttonStyle(.glassProminent)
 				} else {
@@ -52,7 +52,7 @@ struct AdministrationUsersView: View {
 						)
 					} label: {
 						Label("Add User", systemImage: "plus")
-							.foregroundStyle(.white)
+							.foregroundStyle(.primary)
 					}
 					.buttonStyle(.glassProminent)
 				}

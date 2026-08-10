@@ -23,12 +23,12 @@ struct FriendGrayPaperBackground: View {
 	}
 }
 
-struct FriendBlackPaperBackground: View {
+struct FriendBackgroundPaperBackground: View {
 	let cornerRadius: CGFloat
 
 	var body: some View {
 		GeometryReader { proxy in
-			Image("paperBlack")
+			Image("backgroundPaper")
 				.resizable()
 				.scaledToFill()
 				.frame(
@@ -46,12 +46,12 @@ struct FriendBlackPaperBackground: View {
 	}
 }
 
-struct FriendWhitePaperBackground: View {
+struct FriendForegroundPaperBackground: View {
 	let cornerRadius: CGFloat
 
 	var body: some View {
 		GeometryReader { proxy in
-			Image("paperWhite")
+			Image("foregroundPaper")
 				.resizable()
 				.scaledToFill()
 				.frame(

@@ -195,7 +195,7 @@ struct TimetableView: View {
 								.padding(.top, 5)
 								.transition(.opacity)
 								.animation(.spring(.bouncy), value: subject.id)
-								.foregroundStyle(.white)
+								.foregroundStyle(.primary)
 								.padding(.horizontal, Device.isIPad ? 10 : 0)
 						}
 

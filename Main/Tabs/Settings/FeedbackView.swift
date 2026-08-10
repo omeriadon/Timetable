@@ -34,11 +34,11 @@ struct FeedbackView: View {
 			Section {
 				Picker("Type", selection: $category) {
 					Label("Feedback", systemImage: "text.bubble")
-						.foregroundStyle(.white)
+						.foregroundStyle(.primary)
 						.tag("Feedback")
 
 					Label("Bug Report", systemImage: "ant")
-						.foregroundStyle(.white)
+						.foregroundStyle(.primary)
 						.tag("Bug Report")
 				}
 			}

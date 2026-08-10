@@ -32,7 +32,7 @@ struct LocationStatusWhatsNewSheet: View {
 			}
 			.padding(32)
 		}
-		.foregroundStyle(.white)
+		.foregroundStyle(.primary)
 	}
 
 	@ViewBuilder

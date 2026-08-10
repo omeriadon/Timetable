@@ -141,7 +141,7 @@ struct OnboardingView: View {
 			move(by: -1)
 		} label: {
 			Image(systemName: "chevron.left")
-				.foregroundStyle(.white)
+				.foregroundStyle(.primary)
 				.contentShape(.circle)
 		}
 		.buttonSizing(.fitted)
@@ -175,7 +175,7 @@ struct OnboardingView: View {
 		} label: {
 			Image(systemName: !(selectedIndex == pages.count - 1) ? "chevron.right" : "checkmark")
 				.contentTransition(.symbolEffect(.replace.upUp.wholeSymbol, options: .nonRepeating))
-				.foregroundStyle(.white)
+				.foregroundStyle(.primary)
 				.contentShape(.circle)
 				.animation(.easeInOut, value: selectedIndex)
 		}

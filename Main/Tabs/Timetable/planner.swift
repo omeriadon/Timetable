@@ -395,7 +395,7 @@ private struct PlannerTimelineEntry: Identifiable {
 	let kind: Kind
 
 	var backgroundImageName: String {
-		isPersonalEvent ? "paperWhite" : "paper"
+		isPersonalEvent ? "foregroundPaper" : "paper"
 	}
 
 	var foregroundColor: Color {

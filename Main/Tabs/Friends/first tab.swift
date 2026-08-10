@@ -75,10 +75,10 @@ struct FriendOverview: View {
 							}
 						}
 						.padding(14)
-						.foregroundStyle(.black)
+						.foregroundStyle(Color("inversePrimary"))
 						.frame(maxWidth: .infinity, alignment: .topLeading)
 						.background {
-							FriendWhitePaperBackground(
+							FriendForegroundPaperBackground(
 								cornerRadius: FriendDetailLayout.itemCornerRadius
 							)
 						}
@@ -101,7 +101,7 @@ struct FriendOverview: View {
 		}
 		.padding(14)
 		.frame(maxWidth: .infinity, alignment: .leading)
-		.foregroundStyle(.white)
+		.foregroundStyle(.primary)
 		.background {
 			FriendGrayPaperBackground(
 				cornerRadius: FriendDetailLayout.cardCornerRadius
@@ -132,7 +132,7 @@ struct FriendOverview: View {
 							.padding(14)
 							.frame(maxWidth: .infinity, alignment: .leading)
 							.background {
-								FriendWhitePaperBackground(
+								FriendForegroundPaperBackground(
 									cornerRadius: FriendDetailLayout.itemCornerRadius
 								)
 							}
@@ -155,7 +155,7 @@ struct FriendOverview: View {
 		}
 		.padding(14)
 		.frame(maxWidth: .infinity, alignment: .leading)
-		.foregroundStyle(.white)
+		.foregroundStyle(.primary)
 		.background {
 			FriendGrayPaperBackground(
 				cornerRadius: FriendDetailLayout.cardCornerRadius
@@ -281,7 +281,7 @@ private struct FriendDetailHeader: View {
 		}
 		.padding(18)
 		.background {
-			FriendBlackPaperBackground(cornerRadius: 26)
+			FriendBackgroundPaperBackground(cornerRadius: 26)
 		}
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 26, style: .continuous))
 	}

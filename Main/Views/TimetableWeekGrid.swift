@@ -46,7 +46,7 @@ struct TimetableWeekGrid: View {
 				}
 			}
 		}
-		.foregroundStyle(.white)
+		.foregroundStyle(.primary)
 	}
 
 	@ViewBuilder

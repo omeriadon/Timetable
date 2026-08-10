@@ -62,7 +62,7 @@ struct SessionCellView: View {
 					.frame(height: TimetableLayout.sessionCellHeight)
 			}
 		}
-		.foregroundStyle(.white)
+		.foregroundStyle(.primary)
 	}
 }
 

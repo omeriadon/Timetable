@@ -18,7 +18,7 @@ struct OnboardingAccountView: View {
 					VStack(spacing: 20) {
 						Image(systemName: "checkmark")
 							.font(.system(size: 88, weight: .medium))
-							.foregroundStyle(.white)
+							.foregroundStyle(.primary)
 							.symbolRenderingMode(.hierarchical)
 
 						Text("Account Ready")

@@ -60,7 +60,7 @@ struct AdministrationSpecialBadgesView: View {
 				Button("Add Badge", systemImage: "plus", role: .confirm) {
 					editor = .create
 				}
-				.foregroundStyle(.white)
+				.foregroundStyle(.primary)
 				.buttonStyle(.glassProminent)
 			}
 		}

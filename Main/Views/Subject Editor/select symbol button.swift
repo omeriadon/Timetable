@@ -27,7 +27,7 @@ struct SymbolSelectionRowView: View {
 					.frame(height: 15)
 			}
 			.padding(10)
-			.foregroundStyle(.white)
+			.foregroundStyle(.primary)
 			.glassEffect(.clear.interactive(), in: Capsule())
 			.frame(height: 25)
 			.contentShape(.capsule)

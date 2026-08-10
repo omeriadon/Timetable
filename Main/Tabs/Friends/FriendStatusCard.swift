@@ -70,7 +70,7 @@ struct FriendStatusCard: View {
 						.foregroundStyle(.secondary)
 				}
 			}
-			.foregroundStyle(.white)
+			.foregroundStyle(.primary)
 			.padding(style == .detail ? 14 : 10)
 			.background {
 				FriendGrayPaperBackground(cornerRadius: 28)
@@ -90,7 +90,7 @@ struct FriendStatusCard: View {
 				.regular.tint(locationStatus.tint ?? nil).interactive(),
 				in: Capsule()
 			)
-			.foregroundStyle(.white)
+			.foregroundStyle(.primary)
 	}
 
 	private func nextClassTitle(for status: FriendScheduleStatus) -> String {

@@ -28,12 +28,12 @@ struct TodayTimetableView: View {
 							.lineLimit(1)
 							.font(.system(size: 200))
 							.minimumScaleFactor(0.01)
-							.foregroundStyle(.white)
+							.foregroundStyle(.primary)
 
 						if let termWeekLabel = termWeekLabel(for: now) {
 							Text(termWeekLabel)
 								.font(.title3)
-								.foregroundStyle(.white.opacity(0.8))
+								.foregroundStyle(.primary.opacity(0.8))
 								.frame(maxWidth: .infinity, alignment: .leading)
 								.padding(.leading, 6)
 						}
@@ -89,7 +89,7 @@ struct TodayTimetableView: View {
 						TodayCountdown(subjects: subjects, schoolCalendar: schoolCalendar, now: now)
 					}
 				}
-				.foregroundStyle(.black)
+				.foregroundStyle(.primary)
 				.padding(.vertical)
 				.padding(.horizontal, 10)
 				.frame(maxWidth: .infinity, alignment: .center)
@@ -167,7 +167,7 @@ struct TodayTimetableView: View {
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.background {
 				GeometryReader { proxy in
-					Image("paperWhite")
+					Image("foregroundPaper")
 						.resizable()
 						.scaledToFill()
 						.opacity(title == "Upcoming Events" ? 0.9 : 1)
@@ -317,7 +317,7 @@ private struct TodayNoSchoolDayCard: View {
 		.padding(.horizontal, TodayCardLayout.contentInset)
 		.background {
 			GeometryReader { proxy in
-				Image("paperWhite")
+				Image("foregroundPaper")
 					.resizable()
 					.scaledToFill()
 					.frame(width: proxy.size.width, height: proxy.size.height)
@@ -351,12 +351,12 @@ private struct TodayCountdown: View {
 					.foregroundStyle(.tertiary)
 			}
 			.frame(maxWidth: .infinity, alignment: .center)
-			.foregroundStyle(.white)
+			.foregroundStyle(.primary)
 			.padding(.top, 40)
 
 		} else {
 			ContentUnavailableView("Nothing Scheduled", systemImage: "calendar")
-				.foregroundStyle(.white)
+				.foregroundStyle(.primary)
 				.padding(.top, 40)
 		}
 	}
@@ -407,7 +407,7 @@ private struct TodaySchoolTimeline: View {
 				.frame(height: height)
 				.overlay(alignment: .topLeading) { periodsLayer }
 		}
-		.foregroundStyle(.black)
+		.foregroundStyle(.primary)
 		.padding(.top, 10)
 		.padding(.bottom, 8)
 		.padding(.horizontal, timelineHorizontalPadding)
@@ -502,7 +502,7 @@ private struct TodaySchoolTimeline: View {
 		.accessibilityValue(isExpanded ? "Expanded" : "Collapsed")
 		.background {
 			GeometryReader { proxy in
-				Image("paperWhite")
+				Image("foregroundPaper")
 					.resizable()
 					.scaledToFill()
 					.frame(width: proxy.size.width, height: proxy.size.height)

@@ -66,13 +66,13 @@ private struct EventTagSelectionView: View {
 		} label: {
 			HStack {
 				Image(systemName: tag.symbol ?? "tag")
-					.foregroundStyle(.white)
+					.foregroundStyle(.primary)
 				Text(tag.displayName)
 					.foregroundStyle(isSelected ? .white : .primary)
 				Spacer()
 				if isSelected {
 					Image(systemName: "checkmark")
-						.foregroundStyle(.white)
+						.foregroundStyle(.primary)
 				}
 			}
 			.contentShape(Rectangle())

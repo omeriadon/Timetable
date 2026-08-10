@@ -56,12 +56,12 @@ struct LocationStatusRow: View {
 			}
 			.contentShape(Rectangle())
 		}
-		.foregroundStyle(.black)
+		.foregroundStyle(Color("inversePrimary"))
 		.padding(10)
 		.padding(.trailing, 10)
 		.background {
 			GeometryReader { proxy in
-				Image("paperWhite")
+				Image("foregroundPaper")
 					.resizable()
 					.scaledToFill()
 					.frame(

@@ -223,7 +223,7 @@ struct GradeAverageCard: View {
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.background {
 			GeometryReader { proxy in
-				Image("paperWhite")
+				Image("foregroundPaper")
 					.resizable()
 					.scaledToFill()
 					.frame(
@@ -240,7 +240,7 @@ struct GradeAverageCard: View {
 			)
 		}
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-		.foregroundStyle(.black)
+		.foregroundStyle(Color("inversePrimary"))
 		.dynamicTypeSize(.small)
 	}
 
@@ -325,7 +325,7 @@ struct GradeSubjectCard: View {
 		.padding(14)
 		.background(FriendGrayPaperBackground(cornerRadius: 28))
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-		.foregroundStyle(.white)
+		.foregroundStyle(.primary)
 	}
 }
 

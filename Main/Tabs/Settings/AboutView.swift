@@ -31,7 +31,7 @@ struct AboutView: View {
 							.font(.title2.weight(.semibold))
 							.padding(.horizontal, 15)
 							.padding(.vertical, 8)
-							.foregroundStyle(.white)
+							.foregroundStyle(.primary)
 							.glassEffect(
 								.clear.tint(AppChannel.current == .debug ? .orange : .blue).interactive(),
 								in: Capsule()

@@ -51,7 +51,7 @@ struct FriendSearchRow: View {
 				}
 				.buttonStyle(.glassProminent)
 				.tint(.blue)
-				.foregroundStyle(.white)
+				.foregroundStyle(.primary)
 				.disabled(isSending)
 		}
 	}

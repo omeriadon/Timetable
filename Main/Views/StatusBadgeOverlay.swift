@@ -194,7 +194,7 @@ private struct StatusBadgeContent: View {
 						.animation(contentAnimation, value: secondaryText)
 				}
 			}
-			.foregroundStyle(.white)
+			.foregroundStyle(.primary)
 			.frame(maxWidth: .infinity, alignment: .leading)
 			.padding(.leading, textLeadingPadding)
 
@@ -355,7 +355,7 @@ private struct StatusBadgeGauge: View {
 		}
 		.gaugeStyle(.accessoryCircularCapacity)
 		.tint(.white)
-		.foregroundStyle(.white)
+		.foregroundStyle(.primary)
 		.scaleEffect(0.58)
 		.frame(width: 24, height: 24)
 		.overlay {

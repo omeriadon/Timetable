@@ -22,14 +22,14 @@ struct AdministrationFriendshipDateChangeRequestsView: View {
 								}
 								.buttonStyle(.glassProminent)
 								.buttonSizing(.flexible)
-								.foregroundStyle(.white)
+								.foregroundStyle(.primary)
 
 								Button("Reject", systemImage: "xmark", role: .destructive) {
 									resolve(request, action: .rejected)
 								}
 								.buttonStyle(.glassProminent)
 								.buttonSizing(.flexible)
-								.foregroundStyle(.white)
+								.foregroundStyle(.primary)
 							}
 						}
 					}
@@ -99,7 +99,7 @@ struct AdministrationUserReportsView: View {
 								Button("Do Nothing", systemImage: "checkmark", role: .confirm) {
 									resolve(report, action: .noAction)
 								}
-								.foregroundStyle(.white)
+								.foregroundStyle(.primary)
 								.buttonStyle(.glassProminent)
 								.buttonSizing(.flexible)
 
@@ -108,7 +108,7 @@ struct AdministrationUserReportsView: View {
 								}
 								.buttonStyle(.glassProminent)
 								.buttonSizing(.flexible)
-								.foregroundStyle(.white)
+								.foregroundStyle(.primary)
 							}
 						}
 					}

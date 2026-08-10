@@ -59,6 +59,8 @@ struct TimetableApp: App {
 		WindowGroup {
 			AppRouterHost { router in
 				ZStack {
+					AppPaperBackground()
+
 					ZStack {
 						switch sessionStore.state {
 							case .signedOut:
@@ -150,6 +152,7 @@ struct TimetableApp: App {
 					}
 				}
 				.environment(\.statusBadgeManager, statusBadgeManager)
+				.scrollContentBackground(.hidden)
 				.buttonStyle(.haptic)
 				#if os(macOS)
 					.frame(minWidth: 800, minHeight: 600)
@@ -168,7 +171,6 @@ struct TimetableApp: App {
 							}
 						}
 				#endif
-						.preferredColorScheme(.dark)
 			}
 		}
 		.commands {
