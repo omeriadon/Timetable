@@ -145,6 +145,16 @@
         }
       }
     },
+    "%@%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@%2$@"
+          }
+        }
+      }
+    },
     "%lld" : {
       "localizations" : {
         "fr" : {
@@ -829,7 +839,13 @@
         }
       }
     },
+    "App channels" : {
+
+    },
     "App Font" : {
+
+    },
+    "App Store" : {
 
     },
     "Applies before first period and after recess or lunch." : {
@@ -1079,7 +1095,10 @@
         }
       }
     },
-    "Beta builds" : {
+    "Beta" : {
+
+    },
+    "Beta operating system" : {
 
     },
     "Bob Han-Busi" : {
@@ -1185,9 +1204,6 @@
           }
         }
       }
-    },
-    "Builds" : {
-
     },
     "Calendar" : {
 
@@ -1714,10 +1730,7 @@
         }
       }
     },
-    "Debug build" : {
-
-    },
-    "Debug builds" : {
+    "Debug" : {
 
     },
     "Debug Offset" : {
@@ -4447,9 +4460,6 @@
     "Reject" : {
 
     },
-    "Release builds" : {
-
-    },
     "Reload widgets now" : {
       "localizations" : {
         "fr" : {
@@ -6186,6 +6196,9 @@
           }
         }
       }
+    },
+    "TestFlight" : {
+
     },
     "Testing" : {
 
