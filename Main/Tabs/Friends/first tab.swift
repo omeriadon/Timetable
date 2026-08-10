@@ -182,83 +182,31 @@ struct FriendInfo: View {
 	let updateLocationNotificationPreferences: (Set<LocationNotificationPreference>) -> Void
 
 	var body: some View {
-		VStack(alignment: .leading, spacing: 14) {
-			locationNotificationsCard
-
-			averageArrivalCard
-
-			Button(action: requestFriendsSinceDate) {
-				HStack {
-					Text("Friends since")
-						.font(.headline)
-
-					Spacer()
-
-					Text(detail.acceptedAt, format: .dateTime.month().day().year())
-						.foregroundStyle(.secondary)
+		List {
+			Section("Location notifications") {
+				ForEach(LocationNotificationPreference.allCases, id: \.self) { preference in
+					Toggle(isOn: preferenceBinding(for: preference)) {
+						Label(preference.title, systemImage: preference.symbol)
+					}
 				}
-				.contentShape(Rectangle())
-				.padding(14)
 			}
-			.contentShape(Rectangle())
-			.buttonSizing(.flexible)
-			.buttonStyle(.plain)
-			.foregroundStyle(.white)
-			.background {
-				FriendGrayPaperBackground(cornerRadius: FriendDetailLayout.cardCornerRadius)
-			}
-			.glassEffect(
-				.clear.interactive(),
-				in: RoundedRectangle(cornerRadius: FriendDetailLayout.cardCornerRadius)
-			)
-		}
-		.padding(.vertical, 14)
-		.padding(.horizontal, FriendDetailLayout.horizontalPadding)
-		.frame(maxWidth: .infinity, alignment: .leading)
-	}
 
-	private var locationNotificationsCard: some View {
-		VStack(alignment: .leading, spacing: 12) {
-			Label("Location notifications", systemImage: "bell")
-				.font(.title3)
+			Section {
+				LabeledContent("Average arrival", value: averageArrival)
 
-			ForEach(LocationNotificationPreference.allCases, id: \.self) { preference in
-				Toggle(isOn: preferenceBinding(for: preference)) {
-					Label(preference.title, systemImage: preference.symbol)
+				Button(action: requestFriendsSinceDate) {
+					HStack {
+						Label("Friends since", systemImage: "calendar")
+
+						Spacer()
+
+						Text(detail.acceptedAt, format: .dateTime.month().day().year())
+							.foregroundStyle(.secondary)
+					}
 				}
 			}
 		}
-		.padding(14)
-		.frame(maxWidth: .infinity, alignment: .leading)
-		.foregroundStyle(.white)
-		.background {
-			FriendGrayPaperBackground(cornerRadius: FriendDetailLayout.cardCornerRadius)
-		}
-		.glassEffect(
-			.clear.interactive(),
-			in: RoundedRectangle(cornerRadius: FriendDetailLayout.cardCornerRadius, style: .continuous)
-		)
-	}
-
-	private var averageArrivalCard: some View {
-		HStack {
-			Text("Average arrival")
-				.font(.headline)
-
-			Spacer()
-
-			Text(averageArrival)
-				.foregroundStyle(.secondary)
-		}
-		.padding(14)
-		.foregroundStyle(.white)
-		.background {
-			FriendGrayPaperBackground(cornerRadius: FriendDetailLayout.cardCornerRadius)
-		}
-		.glassEffect(
-			.clear.interactive(),
-			in: RoundedRectangle(cornerRadius: FriendDetailLayout.cardCornerRadius)
-		)
+		.listStyle(.insetGrouped)
 	}
 
 	private var averageArrival: String {
