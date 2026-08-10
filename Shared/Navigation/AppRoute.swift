@@ -67,6 +67,7 @@ enum AdministrationRoute: Codable, Hashable, Sendable {
 	case broadcastRecord(id: UUID)
 	case administrators
 	case serverAccess
+	case appVersion
 	case fontWidthTest
 	case profileStorage
 	case specialBadges

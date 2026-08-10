@@ -237,6 +237,26 @@ nonisolated struct ServerAccessModeResponse: Codable, Sendable {
 	let developmentAccessOnly: Bool
 }
 
+nonisolated struct AppVersionCheckResponse: Codable, Sendable {
+	let requiresUpdate: Bool
+	let requiredVersion: String
+	let requiredBuild: Int
+}
+
+nonisolated struct AppVersionRequirementResponse: Codable, Sendable {
+	let appVersion: String
+	let appBuild: Int
+	let macVersion: String
+	let macBuild: Int
+}
+
+nonisolated struct AppVersionRequirementUpdateRequest: Codable, Sendable {
+	let appVersion: String
+	let appBuild: Int
+	let macVersion: String
+	let macBuild: Int
+}
+
 nonisolated struct ProfileStorageQuotaResponse: Codable, Sendable {
 	let storedBytes: Int64
 	let reservedBytes: Int64

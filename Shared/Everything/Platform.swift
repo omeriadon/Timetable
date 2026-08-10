@@ -40,6 +40,8 @@ enum Platform: String, Codable, Sendable, CaseIterable {
 			.macOS
 		#elseif os(iOS)
 			UIDevice.current.userInterfaceIdiom == .pad ? .iPadOS : .iOS
+		#elseif os(macOS)
+			.macOS
 		#else
 			.iOS
 		#endif

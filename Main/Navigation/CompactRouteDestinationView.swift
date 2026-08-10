@@ -86,6 +86,8 @@ struct CompactRouteDestinationView: View {
 				AdministrationAdministratorsView()
 			case .administration(.serverAccess):
 				AdministrationDevelopmentAccessView()
+			case .administration(.appVersion):
+				AdministrationAppVersionView()
 			case .administration(.fontWidthTest):
 				AdministrationFontWidthTestView()
 			case .administration(.profileStorage):

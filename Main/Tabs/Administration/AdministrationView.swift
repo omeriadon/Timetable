@@ -104,6 +104,7 @@ struct AdministrationView: View {
 		if authority == .systemOwner {
 			Section("System Administration") {
 				administrationLink("Administrators", systemImage: "person.badge.shield.checkmark", route: .administration(.administrators)) { AdministrationAdministratorsView() }
+				administrationLink("App Version", systemImage: "arrow.down.app", route: .administration(.appVersion)) { AdministrationAppVersionView() }
 				administrationLink("Debug Testing", systemImage: "testtube.2", route: .administration(.serverAccess)) { AdministrationDevelopmentAccessView() }
 				administrationLink("Profile Storage", systemImage: "externaldrive.fill", route: .administration(.profileStorage)) { AdministrationProfileStorageView() }
 				administrationLink("Badges", systemImage: "rosette", route: .administration(.specialBadges)) { AdministrationSpecialBadgesView() }

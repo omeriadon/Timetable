@@ -93,6 +93,7 @@ struct TimetableApp: App {
 				}
 				.task {
 					NetworkManager.shared.configureFeedback { StatusBadgeManager.shared.present(networkError: $0) }
+					await checkAppVersion()
 					sessionStore.configureAccountBootstrap {
 						try await AccountBootstrapService.shared.bootstrap()
 					}
@@ -198,6 +199,26 @@ struct TimetableApp: App {
 				Button("Settings…") { NotificationCenter.default.post(name: .openSettingsTab, object: nil) }
 					.keyboardShortcut(",", modifiers: .command)
 			}
+		}
+	}
+
+	private func checkAppVersion() async {
+		do {
+			let response = try await AppVersionService.check()
+			guard response.requiresUpdate else {
+				return
+			}
+			StatusBadgeManager.shared.addBadge(
+				id: UUID(),
+				title: "Please Update App",
+				secondaryText: "Please update this app to keep using all of Timetable’s features.",
+				priority: 5,
+				view: .warning,
+				width: .flexible,
+				dismissalDuration: .seconds(6)
+			)
+		} catch {
+			PrintError("Unable to check app version", category: .network, error: error)
 		}
 	}
 
