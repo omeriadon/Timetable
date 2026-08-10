@@ -28,6 +28,7 @@ struct AdministrationEventTagsView: View {
 									tag: tag,
 									section: section,
 									save: saveTag,
+									delete: deleteTag,
 									close: closeWideEditor
 								)
 							} label: {
@@ -58,6 +59,7 @@ struct AdministrationEventTagsView: View {
 							tag: nil,
 							section: addableSection,
 							save: saveTag,
+							delete: deleteTag,
 							close: closeWideEditor
 						)
 					} label: {
@@ -89,6 +91,7 @@ struct AdministrationEventTagsView: View {
 							tag: tag,
 							section: section,
 							save: saveTag,
+							delete: deleteTag,
 							close: { editor = nil }
 						)
 					case let .newTag(section):
@@ -96,6 +99,7 @@ struct AdministrationEventTagsView: View {
 							tag: nil,
 							section: section,
 							save: saveTag,
+							delete: deleteTag,
 							close: { editor = nil }
 						)
 				}
@@ -166,6 +170,11 @@ struct AdministrationEventTagsView: View {
 		} else {
 			try await service.createEventTag(request)
 		}
+		apply(updated)
+	}
+
+	private func deleteTag(_ id: UUID) async throws {
+		let updated = try await service.deleteEventTag(id: id)
 		apply(updated)
 	}
 

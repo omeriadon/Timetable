@@ -5,6 +5,7 @@ struct AdministrationEventTagEditor: View {
 	let tag: AdministrationEventTag?
 	let section: AdministrationEventTagSection
 	let save: (AdministrationEventTagRequest, UUID?) async throws -> Void
+	let delete: (UUID) async throws -> Void
 
 	let close: () -> Void
 	@State private var sectionID: UUID
@@ -17,8 +18,10 @@ struct AdministrationEventTagEditor: View {
 	@State private var associatedNames: String
 	@State private var isSaving = false
 	@State private var showsArchiveConfirmation = false
+	@State private var showsDeleteConfirmation = false
 	@State private var showsSymbolPicker = false
 	@Environment(\.appPresentation) private var presentation
+	@Environment(\.statusBadgeManager) private var statusBadges
 
 	private var isCanonicalYearGroup: Bool {
 		tag?.category == .yearGroup
@@ -28,11 +31,13 @@ struct AdministrationEventTagEditor: View {
 		tag: AdministrationEventTag?,
 		section: AdministrationEventTagSection,
 		save: @escaping (AdministrationEventTagRequest, UUID?) async throws -> Void,
+		delete: @escaping (UUID) async throws -> Void,
 		close: @escaping () -> Void
 	) {
 		self.tag = tag
 		self.section = section
 		self.save = save
+		self.delete = delete
 		self.close = close
 		_sectionID = State(initialValue: section.id)
 		_slug = State(initialValue: tag?.slug ?? "")
@@ -84,6 +89,28 @@ struct AdministrationEventTagEditor: View {
 							? "Canonical year-group names cannot be changed."
 							: "One alternate name per line. The display name is always included."
 					)
+				}
+
+				if let tag, !isCanonicalYearGroup {
+					Section {
+						Button("Delete Tag", systemImage: "trash", role: .destructive) {
+							showsDeleteConfirmation = true
+						}
+						.disabled(isSaving)
+					}
+					.confirmationDialog(
+						"Delete \(tag.displayName)?",
+						isPresented: $showsDeleteConfirmation,
+						titleVisibility: .visible
+					) {
+						Button("Delete Tag", systemImage: "trash", role: .destructive) {
+							Task {
+								await deleteTag(tag.id)
+							}
+						}
+					} message: {
+						Text("This permanently removes the tag from every event and account subscription.")
+					}
 				}
 			}
 			.appGroupedFormStyle()
@@ -152,7 +179,21 @@ struct AdministrationEventTagEditor: View {
 			try await save(request, tag?.id)
 			close()
 		} catch {
-			return
+			statusBadges.present(error: error, title: "Unable to save tag")
+		}
+	}
+
+	private func deleteTag(_ id: UUID) async {
+		isSaving = true
+		defer {
+			isSaving = false
+		}
+
+		do {
+			try await delete(id)
+			close()
+		} catch {
+			statusBadges.present(error: error, title: "Unable to delete tag")
 		}
 	}
 }

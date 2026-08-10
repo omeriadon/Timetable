@@ -67,6 +67,7 @@ struct AdministrationEventTagSectionTagsView: View {
 							tag: tag,
 							section: section,
 							save: saveTag,
+							delete: deleteTag,
 							close: { editor = nil }
 						)
 					case let .newTag(section):
@@ -74,6 +75,7 @@ struct AdministrationEventTagSectionTagsView: View {
 							tag: nil,
 							section: section,
 							save: saveTag,
+							delete: deleteTag,
 							close: { editor = nil }
 						)
 				}
@@ -113,6 +115,11 @@ struct AdministrationEventTagSectionTagsView: View {
 		existingID: UUID?
 	) async throws {
 		try await save(request, existingID)
+		await reloadFromServer()
+	}
+
+	private func deleteTag(_ id: UUID) async throws {
+		_ = try await service.deleteEventTag(id: id)
 		await reloadFromServer()
 	}
 

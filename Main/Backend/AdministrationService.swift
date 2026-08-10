@@ -213,6 +213,13 @@ final class AdministrationService {
 		)
 	}
 
+	func deleteEventTag(id: UUID) async throws -> AdministrationEventTagCatalogueResponse {
+		try await networkManager.send(
+			Endpoint("/v1/administration/event-tags/\(id.uuidString)", method: .delete),
+			context: .userInitiated
+		)
+	}
+
 	func reorderEventTags(
 		tagIDs: [UUID]
 	) async throws -> AdministrationEventTagCatalogueResponse {
