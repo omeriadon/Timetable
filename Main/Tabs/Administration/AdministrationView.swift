@@ -32,6 +32,7 @@ struct AdministrationView: View {
 				)
 			}
 		}
+		.appPaperBackground()
 		.tint(.accent)
 		.minimizingToolbarOnScrollDown()
 		.appNavigationTitle("Administration", style: .main, accent: true)

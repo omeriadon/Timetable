@@ -88,6 +88,7 @@ struct GradeTrackerView: View {
 				try? await service.refresh()
 			}
 		}
+		.appPaperBackground()
 	}
 
 	var isSenior: Bool {

@@ -16,9 +16,8 @@ struct AppPaperBackground: View {
 extension View {
 	func personalPaperListRow() -> some View {
 		listRowBackground(
-			Image("foregroundPaper")
-				.resizable()
-				.scaledToFill()
+			Rectangle()
+				.fill(.ultraThinMaterial)
 		)
 	}
 

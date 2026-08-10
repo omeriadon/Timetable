@@ -307,7 +307,7 @@ private struct TodayEventEntry: Equatable, Identifiable {
 		usesForegroundPaper ? Color("inversePrimary") : .primary
 	}
 
-	init(event: CalendarEvent) {
+	nonisolated init(event: CalendarEvent) {
 		id = "event-\(event.id.uuidString)"
 		title = event.title
 		date = event.date
@@ -315,7 +315,7 @@ private struct TodayEventEntry: Equatable, Identifiable {
 		usesForegroundPaper = !event.isGlobal
 	}
 
-	init(assessment: GradeAssessment, subject: Subject?) {
+	nonisolated init(assessment: GradeAssessment, subject: Subject?) {
 		id = "assessment-\(assessment.id.uuidString)"
 		title = assessment.name
 		date = assessment.date
@@ -323,7 +323,7 @@ private struct TodayEventEntry: Equatable, Identifiable {
 		usesForegroundPaper = true
 	}
 
-	static func areInDisplayOrder(_ lhs: Self, _ rhs: Self) -> Bool {
+	nonisolated static func areInDisplayOrder(_ lhs: Self, _ rhs: Self) -> Bool {
 		if lhs.date == rhs.date {
 			return lhs.title.localizedStandardCompare(rhs.title) == .orderedAscending
 		}

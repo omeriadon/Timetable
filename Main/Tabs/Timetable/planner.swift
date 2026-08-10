@@ -311,6 +311,7 @@ struct ArchivedEventsView: View {
 				}
 			}
 		}
+		.appPaperBackground()
 		.appNavigationTitle("Archived Events", accent: true)
 		.toolbar {
 			ToolbarItem(placement: .primaryAction) {

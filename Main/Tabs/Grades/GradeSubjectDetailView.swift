@@ -40,6 +40,7 @@ struct GradeSubjectDetailView: View {
 							Label("New Assessment", systemImage: "plus")
 						}
 					}
+					.personalPaperListRow()
 				}
 			}
 			.appNavigationTitle(subject.id, accent: true)

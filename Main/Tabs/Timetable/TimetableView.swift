@@ -43,11 +43,14 @@ struct TimetableView: View {
 	}
 
 	var body: some View {
-		if let fixedSubtab {
-			fixedSubtabView(fixedSubtab)
-		} else {
-			compactTimetableView
+		Group {
+			if let fixedSubtab {
+				fixedSubtabView(fixedSubtab)
+			} else {
+				compactTimetableView
+			}
 		}
+		.appPaperBackground()
 	}
 
 	@ViewBuilder

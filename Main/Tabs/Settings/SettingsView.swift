@@ -46,7 +46,7 @@ struct SettingsView: View {
 			.listStyle(.sidebar)
 			.scrollEdgeEffect(offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.3)
 			.scrollEdgeEffectStyle(.soft, for: .top)
-			.scrollContentBackground(.hidden)
+			.appPaperBackground()
 			.appNavigationTitle("Settings", style: .main, accent: true)
 	}
 
