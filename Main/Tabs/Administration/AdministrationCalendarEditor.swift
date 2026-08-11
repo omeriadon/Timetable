@@ -42,7 +42,7 @@ struct AdministrationCalendarEditor: View {
 	}
 
 	private var content: some View {
-		Form {
+		List {
 			TextField("Name", text: $label)
 				.glurListRowBackground()
 			DatePicker("Start", selection: $start, displayedComponents: .date)
@@ -53,7 +53,7 @@ struct AdministrationCalendarEditor: View {
 					.glurListRowBackground()
 			}
 		}
-		.appGroupedFormStyle()
+		.appPaperBackground()
 		.appNavigationTitle(entry.kind == "term" ? "Term Date" : "Pupil Free Day", accent: true)
 		.toolbar {
 			if showsCloseButton {

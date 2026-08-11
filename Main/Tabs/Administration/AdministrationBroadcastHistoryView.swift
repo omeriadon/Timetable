@@ -61,12 +61,13 @@ private struct AdministrationBroadcastHistoryDetailView: View {
 	}
 
 	var body: some View {
-		Form {
+		List {
 			Section("Message") {
 				LabeledContent("Title", value: currentRecord.title)
 				LabeledContent("Subtitle", value: currentRecord.subtitle ?? "—")
 				LabeledContent("Body", value: currentRecord.body ?? "—")
 			}
+			.glurListRowBackground()
 
 			Section("Delivery") {
 				LabeledContent("Sender", value: currentRecord.senderEmail)
@@ -78,6 +79,7 @@ private struct AdministrationBroadcastHistoryDetailView: View {
 					LabeledContent("Failure", value: failureSummary)
 				}
 			}
+			.glurListRowBackground()
 
 			if !currentRecord.isDeleted {
 				Button("Delete Notification", systemImage: "trash", role: .destructive) {
@@ -99,9 +101,10 @@ private struct AdministrationBroadcastHistoryDetailView: View {
 				} message: {
 					Text("This marks the broadcast as deleted and sends a removal push to subscribed devices.")
 				}
+				.glurListRowBackground()
 			}
 		}
-		.appGroupedFormStyle()
+		.appPaperBackground()
 		.appNavigationTitle(currentRecord.isDeleted ? "Deleted Broadcast" : "Broadcast", accent: true)
 	}
 }

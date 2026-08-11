@@ -5,8 +5,7 @@ struct NavigationPersistenceSettingsView: View {
 
 	var body: some View {
 		@Bindable var router = router
-
-		Form {
+		List {
 			Section {
 				Toggle(
 					"Restore Navigation",
@@ -16,7 +15,9 @@ struct NavigationPersistenceSettingsView: View {
 			} footer: {
 				Text("Restore the selected tab, sidebar, and navigation path when reopening Timetable.")
 			}
+			.glurListRowBackground()
 		}
+		.appPaperBackground()
 		.appNavigationTitle("Navigation", accent: true)
 	}
 }

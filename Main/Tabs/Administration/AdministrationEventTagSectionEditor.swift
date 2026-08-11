@@ -27,7 +27,7 @@ struct AdministrationEventTagSectionEditor: View {
 
 	var body: some View {
 		NavigationStack {
-			Form {
+			List {
 				Section("Section") {
 					TextField("Display Name", text: $displayName)
 					LabeledContent("Category", value: section.category.displayName)
@@ -43,9 +43,10 @@ struct AdministrationEventTagSectionEditor: View {
 						Label("Tags", systemImage: "tag")
 					}
 				}
+				.glurListRowBackground()
 			}
 			.scrollEdgeEffect()
-			.appGroupedFormStyle()
+			.appPaperBackground()
 			.appNavigationTitle("Edit Section", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {

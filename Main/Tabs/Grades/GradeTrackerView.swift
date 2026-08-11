@@ -366,7 +366,7 @@ struct ATARSettingsSheet: View {
 
 	var body: some View {
 		NavigationStack {
-			Form {
+			List {
 				Section("ATAR") {
 					HStack {
 						Text("Predicted ATAR")
@@ -387,6 +387,7 @@ struct ATARSettingsSheet: View {
 					}
 				}
 			}
+			.appPaperBackground()
 			.appNavigationTitle("ATAR")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {

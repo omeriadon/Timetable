@@ -46,7 +46,7 @@ struct GradeAssessmentEditor: View {
 
 	var body: some View {
 		NavigationStack {
-			Form {
+			List {
 				Section("Assessment") {
 					TextField("Name", text: $name)
 
@@ -106,6 +106,7 @@ struct GradeAssessmentEditor: View {
 				}
 				.glurListRowBackground()
 			}
+			.appPaperBackground()
 			.appNavigationTitle(assessment == nil ? "New Assessment" : "Edit Assessment")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {

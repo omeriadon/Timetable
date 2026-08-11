@@ -568,7 +568,7 @@ private struct NoSchoolDayDetailView: View {
 
 	var body: some View {
 		NavigationStack {
-			Form {
+			List {
 				LabeledContent("Name", value: target.title)
 					.glurListRowBackground()
 				LabeledContent(
@@ -577,6 +577,7 @@ private struct NoSchoolDayDetailView: View {
 				)
 				.glurListRowBackground()
 			}
+			.appPaperBackground()
 			.appNavigationTitle("Pupil Free Day")
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {

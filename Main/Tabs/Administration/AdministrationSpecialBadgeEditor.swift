@@ -43,7 +43,7 @@ struct AdministrationSpecialBadgeEditor: View {
 
 	var body: some View {
 		NavigationStack {
-			Form {
+			List {
 				Section("Badge") {
 					Button {
 						showsSymbolPicker = true
@@ -72,7 +72,7 @@ struct AdministrationSpecialBadgeEditor: View {
 					.glurListRowBackground()
 				}
 			}
-			.appGroupedFormStyle()
+			.appPaperBackground()
 			.appNavigationTitle(target.badge == nil ? "New Badge" : "Edit Badge", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {

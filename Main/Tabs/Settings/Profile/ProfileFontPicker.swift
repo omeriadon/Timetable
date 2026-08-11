@@ -6,7 +6,7 @@ struct ProfileFontPicker: View {
 	@Binding var weight: ProfileFontWeight
 
 	var body: some View {
-		Form {
+		List {
 			Section("Design") {
 				ForEach(ProfileFontDesign.allCases) { candidate in
 					Button {
@@ -18,6 +18,7 @@ struct ProfileFontPicker: View {
 					}
 				}
 			}
+			.glurListRowBackground()
 
 			Section("Weight") {
 				let allCases = ProfileFontWeight.allCases
@@ -38,6 +39,8 @@ struct ProfileFontPicker: View {
 					step: 1
 				)
 			}
+			.glurListRowBackground()
 		}
+		.appPaperPresentation()
 	}
 }

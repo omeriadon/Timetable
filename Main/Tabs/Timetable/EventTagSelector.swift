@@ -80,7 +80,7 @@ private struct EventTagSelectionView: View {
 			.contentShape(Rectangle())
 		}
 		.buttonStyle(.plain)
-		.listRowBackground(isSelected ? Color.accentColor : GlurView(radius: 1, offset: 0, interpolation: 0))
+		.listRowBackground(isSelected ? AnyView(Color.accentColor) : AnyView(GlurView(radius: 1, offset: 0, interpolation: 0)))
 		.animation(.snappy(duration: 0.1), value: isSelected)
 		.accessibilityAddTraits(isSelected ? .isSelected : [])
 	}

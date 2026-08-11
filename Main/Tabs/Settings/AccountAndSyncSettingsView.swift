@@ -64,7 +64,6 @@ struct AccountAndSyncSettingsView: View {
 		.appPaperBackground()
 		.listStyle(.sidebar)
 		.animation(.easeInOut, value: notificationRegistration.registrationState)
-		.appGroupedFormStyle()
 		.appNavigationTitle("Updates", accent: true)
 	}
 
@@ -229,7 +228,7 @@ private struct EventNotificationScheduleSheet: View {
 
 	var body: some View {
 		NavigationStack {
-			Form {
+			List {
 				Picker("Send notification", selection: $dayOffset) {
 					Text("On the day")
 						.foregroundStyle(.accent)
@@ -257,6 +256,7 @@ private struct EventNotificationScheduleSheet: View {
 				.glurListRowBackground()
 				.pickerStyle(.wheel)
 			}
+			.appPaperBackground()
 			.presentationDetents([.medium])
 			.appNavigationTitle("Event Notification", accent: true)
 			.toolbar {

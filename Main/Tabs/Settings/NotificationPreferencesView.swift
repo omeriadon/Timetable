@@ -7,7 +7,7 @@ struct NotificationPreferencesView: View {
 	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
-		Form {
+		List {
 			Section {
 				Toggle("Allow Class Notifications", isOn: localBinding(\.notificationsEnabled))
 
@@ -26,7 +26,7 @@ struct NotificationPreferencesView: View {
 				EventNotificationSchedulesEditor(selection: localBinding(\.eventNotificationSchedules))
 			}
 		}
-		.formStyle(.grouped)
+		.appPaperBackground()
 		.scrollContentBackground(.hidden)
 		.appNavigationTitle("Notifications", accent: true)
 	}

@@ -309,11 +309,12 @@ struct FriendshipDateChangeRequestSheet: View {
 
 	var body: some View {
 		NavigationStack {
-			Form {
+			List {
 				DatePicker("Friends since", selection: $requestedDate, displayedComponents: .date)
 					.glurListRowBackground()
 			}
 			.appNavigationTitle("Change Friends Since")
+			.appPaperBackground()
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					Button(role: .cancel, action: close)

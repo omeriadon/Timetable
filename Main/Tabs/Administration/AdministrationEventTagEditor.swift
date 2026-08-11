@@ -51,7 +51,7 @@ struct AdministrationEventTagEditor: View {
 
 	var body: some View {
 		NavigationStack {
-			Form {
+			List {
 				Section("Tag") {
 					TextField("Display Name", text: $displayName)
 					TextField("Slug", text: $slug)
@@ -116,7 +116,7 @@ struct AdministrationEventTagEditor: View {
 					}
 				}
 			}
-			.appGroupedFormStyle()
+			.appPaperBackground()
 			.appNavigationTitle(tag == nil ? "Add Tag" : "Edit Tag", accent: true)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
