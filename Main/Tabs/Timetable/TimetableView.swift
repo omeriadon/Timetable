@@ -7,6 +7,7 @@
 
 import Defaults
 import DialStylePicker
+import GlurBackdrop
 import SwiftUI
 
 extension Notification.Name {
@@ -227,15 +228,17 @@ struct TimetableView: View {
 						.drawingGroup(opaque: false)
 					}
 					.padding(.bottom, Device.isMacOS ? 7 : 10)
-//							.background {
-//								ZStack {
+					.background {
+						ZStack {
 //									 Color((.inversePrimary)).opacity(0.5)
-//
+
 //									BlurView(blurRadius: 10)
-//								}
-//							}
+							GlurView(radius: 8, offset: 0, interpolation: 0)
+								.ignoresSafeArea()
+						}
+					}
 				}
-				.scrollEdgeEffectStyle(.hard, for: .top)
+				.scrollEdgeEffectStyle(.soft, for: .top)
 			}
 			.padding(.trailing, 2)
 			.dynamicTypeSize(.medium)
