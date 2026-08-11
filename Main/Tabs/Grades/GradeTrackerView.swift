@@ -238,7 +238,7 @@ struct GradeAverageCard: View {
 			)
 		}
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-		.foregroundStyle(Color("inversePrimary"))
+		.foregroundStyle(Color(.inversePrimary))
 		.dynamicTypeSize(.small)
 	}
 
@@ -252,11 +252,11 @@ struct GradeAverageCard: View {
 			if gaugeOnTrailing {
 				averageSummaryText(title: title, value: value, isTrailing: true)
 				if showsGauge {
-					GradeGauge(value: value, tint: .black)
+					GradeGauge(value: value, tint: .inversePrimary)
 				}
 			} else {
 				if showsGauge {
-					GradeGauge(value: value, tint: .black)
+					GradeGauge(value: value, tint: .inversePrimary)
 				}
 				averageSummaryText(title: title, value: value, isTrailing: false)
 			}

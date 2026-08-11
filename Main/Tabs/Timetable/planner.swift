@@ -317,16 +317,21 @@ struct ArchivedEventsView: View {
 		.appPaperBackground()
 		.appNavigationTitle("Archived Events", accent: true)
 		.toolbar {
-			ToolbarItem(placement: .primaryAction) {
-				Picker("Delete Past Events", selection: archivePolicyBinding) {
-					Section("Delete past events...") {
-						ForEach(CalendarEventArchivePolicy.allCases, id: \.self) { policy in
-							Text(policy.title).tag(policy)
+			ToolbarItem(placement: .topBarTrailing) {
+				Menu {
+					Picker("Delete Past Events", selection: archivePolicyBinding) {
+						Section("Delete past events...") {
+							ForEach(CalendarEventArchivePolicy.allCases, id: \.self) { policy in
+								Text(policy.title).tag(policy)
+							}
 						}
 					}
+					.labelsHidden()
+					.pickerStyle(.inline)
+				} label: {
+					Label("Delete Past Events", systemImage: "gauge.range.33to100.dotted.with.needle")
 				}
-				.labelsHidden()
-				.pickerStyle(.menu)
+				.tint(.white)
 			}
 		}
 		.sheet(item: $selectedEvent) { event in
@@ -418,7 +423,7 @@ private struct PlannerTimelineEntry: Identifiable {
 	}
 
 	var foregroundColor: Color {
-		usesForegroundPaper ? Color("inversePrimary") : .primary
+		usesForegroundPaper ? Color(.inversePrimary) : .primary
 	}
 
 	private var usesForegroundPaper: Bool {

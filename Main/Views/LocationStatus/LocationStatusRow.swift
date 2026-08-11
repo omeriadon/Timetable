@@ -56,7 +56,7 @@ struct LocationStatusRow: View {
 			}
 			.contentShape(Rectangle())
 		}
-		.foregroundStyle(Color("inversePrimary"))
+		.foregroundStyle(Color(.inversePrimary))
 		.padding(10)
 		.padding(.trailing, 10)
 		.background {

@@ -37,6 +37,7 @@ struct TodayTimetableView: View {
 								.frame(maxWidth: .infinity, alignment: .leading)
 						}
 					}
+					.foregroundStyle(.primary)
 					.padding(.leading, 6)
 
 					if let noSchoolDay = eventSnapshot.noSchoolDay {
@@ -305,7 +306,7 @@ private struct TodayEventEntry: Equatable, Identifiable {
 	}
 
 	var foregroundColor: Color {
-		usesForegroundPaper ? Color("inversePrimary") : .primary
+		usesForegroundPaper ? Color(.inversePrimary) : .primary
 	}
 
 	nonisolated init(event: CalendarEvent) {

@@ -30,7 +30,7 @@ struct FeedbackView: View {
 	}
 
 	private var content: some View {
-		Form {
+		List {
 			Section {
 				Picker("Type", selection: $category) {
 					Label("Feedback", systemImage: "text.bubble")
@@ -42,6 +42,7 @@ struct FeedbackView: View {
 						.tag("Bug Report")
 				}
 			}
+			.glurListRowBackground()
 
 			TextField(
 				text: $message,
@@ -52,8 +53,8 @@ struct FeedbackView: View {
 				}
 			)
 			.lineLimit(5 ... 12)
+			.glurListRowBackground()
 		}
-
 		.navigationBarTitleDisplayMode(.large)
 		.formStyle(.grouped)
 		.scrollContentBackground(.hidden)

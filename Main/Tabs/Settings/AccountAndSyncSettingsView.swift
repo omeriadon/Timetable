@@ -368,10 +368,13 @@ struct NotificationLeadTimesSelectionView: View {
 			}
 			.buttonSizing(.flexible)
 			.buttonStyle(.plain)
+			.glurListRowBackground()
 		}
+		.appPaperBackground()
 		.safeAreaBar(edge: .top, alignment: .center, spacing: 5) {
 			if let description {
 				Text(description)
+					.padding(.horizontal, 8)
 			}
 		}
 		.appNavigationTitle(title, accent: true)

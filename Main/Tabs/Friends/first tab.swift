@@ -541,7 +541,6 @@ struct FriendSubjectContextPopover: View {
 		}
 		.frame(width: 290, alignment: .leading)
 		.padding()
-		.foregroundStyle(.white)
 		.presentationCompactAdaptation(.popover)
 	}
 
