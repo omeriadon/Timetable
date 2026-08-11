@@ -95,7 +95,9 @@ struct TimetableApp: App {
 				}
 				.task {
 					NetworkManager.shared.configureFeedback { StatusBadgeManager.shared.present(networkError: $0) }
-					await checkAppVersion()
+					Task {
+						await checkAppVersion()
+					}
 					sessionStore.configureAccountBootstrap {
 						try await AccountBootstrapService.shared.bootstrap()
 					}
