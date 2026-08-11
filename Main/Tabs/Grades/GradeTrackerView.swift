@@ -386,6 +386,7 @@ struct ATARSettingsSheet: View {
 							.keyboardType(.decimalPad)
 					}
 				}
+				.glurListRowBackground()
 			}
 			.appPaperBackground()
 			.appNavigationTitle("ATAR")

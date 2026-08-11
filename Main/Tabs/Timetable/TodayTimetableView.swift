@@ -49,7 +49,6 @@ struct TodayTimetableView: View {
 							Text("Events")
 								.font(.title)
 								.bold()
-								.foregroundStyle(.white)
 
 							if !eventSnapshot.todayEntries.isEmpty {
 								eventSection("Today", entries: eventSnapshot.todayEntries)
@@ -59,6 +58,7 @@ struct TodayTimetableView: View {
 								eventSection("Upcoming", entries: eventSnapshot.upcomingEntries, showsDate: true)
 							}
 						}
+						.foregroundStyle(.black)
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.padding(.vertical, 10)
 						.padding(.bottom, 5)
@@ -87,7 +87,6 @@ struct TodayTimetableView: View {
 						TodayCountdown(subjects: subjects, schoolCalendar: schoolCalendar, now: now)
 					}
 				}
-				.foregroundStyle(.black)
 				.padding(.vertical)
 				.padding(.horizontal, 10)
 				.frame(maxWidth: .infinity, alignment: .center)
@@ -144,7 +143,7 @@ struct TodayTimetableView: View {
 	@ViewBuilder private func eventSection(_ title: String, entries: [TodayEventEntry], showsDate: Bool = false) -> some View {
 		Text(title)
 			.fontWeight(.semibold)
-			.foregroundStyle(.secondary)
+			.foregroundStyle(.black.secondary)
 			.padding(.top, 4)
 
 		ForEach(entries) { entry in
@@ -155,7 +154,7 @@ struct TodayTimetableView: View {
 					if showsDate {
 						Text(entry.date.displayLabel)
 							.font(.footnote)
-							.opacity(0.7)
+							.foregroundStyle(.secondary)
 					}
 				}
 			} icon: {
