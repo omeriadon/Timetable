@@ -370,7 +370,7 @@ private struct FriendsSearchBar: View {
 				}
 			}
 		}
-		.animation(easeInOut(duration: 0.3), value: "\(isPresented)\(isFocused)")
+		.animation(.easeInOut(duration: 0.3), value: "\(isPresented)\(isFocused)")
 		.padding(.horizontal, 16)
 		.padding(.vertical, 10)
 		.frame(maxWidth: .infinity)
