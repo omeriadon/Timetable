@@ -13,17 +13,11 @@ struct AdministrationView: View {
 	var body: some View {
 		Group {
 			if isAdmin {
-				if presentation == .iOS {
-					List {
-						administrationSections
-					}
-					.scrollEdgeEffect()
-				} else {
-					Form {
-						administrationSections
-					}
-					.appGroupedFormStyle()
+				List {
+					administrationSections
 				}
+				.scrollEdgeEffect()
+
 			} else {
 				ContentUnavailableView(
 					"Administration Unavailable",
@@ -59,6 +53,7 @@ struct AdministrationView: View {
 				AdministrationUsersView(closeWideDestination: nil)
 			}
 		}
+		.glurListRowBackground()
 
 		Section {
 			administrationLink("Friends-Since Requests", systemImage: "person.2.badge.gearshape", route: .administration(.friendshipDateChangeRequests)) {
@@ -76,6 +71,7 @@ struct AdministrationView: View {
 				}
 			}
 		}
+		.glurListRowBackground()
 
 		Section("School Content") {
 			administrationLink("School Events", systemImage: "calendar", route: .administration(.schoolEvents)) {
@@ -91,17 +87,20 @@ struct AdministrationView: View {
 				AdministrationCalendarEntriesView(kind: "noSchool", closeWideDestination: nil)
 			}
 		}
+		.glurListRowBackground()
 
 		Section("Notifications") {
 			administrationLink("Broadcast Notification", systemImage: "megaphone", route: .administration(.broadcastNotification)) { AdministrationBroadcastNotificationView() }
 			administrationLink("Broadcast History", systemImage: "clock.arrow.circlepath", route: .administration(.broadcastHistory)) { AdministrationBroadcastHistoryView() }
 		}
+		.glurListRowBackground()
 
 		Section("Testing") {
 			administrationLink("Font Width Test", systemImage: "textformat.size", route: .administration(.fontWidthTest)) {
 				AdministrationFontWidthTestView()
 			}
 		}
+		.glurListRowBackground()
 
 		if authority == .systemOwner {
 			Section("System Administration") {
@@ -115,6 +114,7 @@ struct AdministrationView: View {
 				}
 				.disabled(isSendingTestEmail)
 			}
+			.glurListRowBackground()
 		}
 	}
 

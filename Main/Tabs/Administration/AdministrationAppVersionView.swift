@@ -11,16 +11,18 @@ struct AdministrationAppVersionView: View {
 	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
-		Form {
+		List {
 			Section("iOS and iPadOS") {
 				TextField("Version", text: $appVersion)
 				TextField("Build", value: $appBuild, format: .number)
 			}
+			.glurListRowBackground()
 
 			Section("macOS") {
 				TextField("Version", text: $macVersion)
 				TextField("Build", value: $macBuild, format: .number)
 			}
+			.glurListRowBackground()
 
 			Section {
 				Button("Save App Versions", systemImage: "checkmark", role: .confirm) {
@@ -29,8 +31,9 @@ struct AdministrationAppVersionView: View {
 				.buttonStyle(.glassProminent)
 				.disabled(isLoading || isSaving || !versionsAreValid)
 			}
+			.glurListRowBackground()
 		}
-		.appGroupedFormStyle()
+		.appPaperBackground()
 		.appNavigationTitle("App Version", accent: true)
 		.disabled(isLoading)
 		.task {

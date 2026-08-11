@@ -91,5 +91,6 @@ struct TimetableWeekGrid: View {
 		return Text(session)
 			.frame(height: isBreakSession ? TimetableLayout.breakCellHeight : TimetableLayout.sessionCellHeight)
 			.foregroundStyle(isBreakSession ? Color.secondary : Color.primary)
+			.font(.callout)
 	}
 }

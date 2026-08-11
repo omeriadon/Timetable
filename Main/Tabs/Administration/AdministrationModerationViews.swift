@@ -34,8 +34,10 @@ struct AdministrationFriendshipDateChangeRequestsView: View {
 						}
 					}
 				}
+				.glurListRowBackground()
 			}
 		}
+		.appPaperBackground()
 		.appNavigationTitle("Friends-Since Requests")
 		.searchable(text: $searchText, prompt: "Search requests")
 		.task { await load() }
@@ -113,8 +115,10 @@ struct AdministrationUserReportsView: View {
 						}
 					}
 				}
+				.glurListRowBackground()
 			}
 		}
+		.appPaperBackground()
 		.appNavigationTitle("User Reports")
 		.searchable(text: $searchText, prompt: "Search reports")
 		.task { await load() }

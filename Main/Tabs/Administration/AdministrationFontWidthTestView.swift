@@ -26,6 +26,7 @@ struct AdministrationFontWidthTestView: View {
 			}
 			.padding()
 		}
+		.appPaperBackground()
 		.fontDesign(.default)
 		.fontWidth(.standard)
 		.appNavigationTitle("Font Width Test", accent: true)

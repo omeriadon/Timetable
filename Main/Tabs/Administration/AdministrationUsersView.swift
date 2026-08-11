@@ -16,6 +16,7 @@ struct AdministrationUsersView: View {
 					editor = .edit(user)
 				} label: {
 					userLabel(user)
+						.glurListRowBackground()
 				}
 			} else {
 				NavigationLink {
@@ -27,9 +28,11 @@ struct AdministrationUsersView: View {
 					)
 				} label: {
 					userLabel(user)
+						.glurListRowBackground()
 				}
 			}
 		}
+		.appPaperBackground()
 		.searchable(text: $searchText, prompt: "Search users")
 		.appNavigationTitle("Users", accent: true)
 		.toolbar {

@@ -18,6 +18,7 @@ struct AdministrationProfileStorageView: View {
 					LabeledContent("Reserved", value: formattedBytes(quota.reservedBytes))
 					LabeledContent("Limit", value: formattedBytes(quota.storageLimitBytes))
 				}
+				.glurListRowBackground()
 
 				Section("Monthly Operations") {
 					quotaProgress(
@@ -29,6 +30,7 @@ struct AdministrationProfileStorageView: View {
 					LabeledContent("Limit", value: quota.monthlyOperationLimit.formatted())
 					LabeledContent("Write Cutoff", value: quota.monthlyWriteCutoff.formatted())
 				}
+				.glurListRowBackground()
 
 				Section("Mutation State") {
 					LabeledContent(
@@ -36,6 +38,7 @@ struct AdministrationProfileStorageView: View {
 						value: quota.writesDisabled ? "Disabled" : "Available"
 					)
 				}
+				.glurListRowBackground()
 
 				Section("Cloudflare Reconciliation") {
 					LabeledContent(
@@ -68,10 +71,12 @@ struct AdministrationProfileStorageView: View {
 						.foregroundStyle(.orange)
 					}
 				}
+				.glurListRowBackground()
 			} else {
 				ProgressView("Loading profile storage")
 			}
 		}
+		.appPaperBackground()
 		.scrollEdgeEffect()
 		.appNavigationTitle("Profile Storage", accent: true)
 		.refreshable {

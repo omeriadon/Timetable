@@ -5777,9 +5777,6 @@
         }
       }
     },
-    "Status unavailable" : {
-
-    },
     "Storage" : {
       "localizations" : {
         "fr" : {
@@ -6729,6 +6726,9 @@
           }
         }
       }
+    },
+    "Unavailable" : {
+
     },
     "Upcoming Events" : {
       "localizations" : {

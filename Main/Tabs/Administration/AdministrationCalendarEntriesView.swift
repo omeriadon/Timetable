@@ -21,11 +21,14 @@ struct AdministrationCalendarEntriesView: View {
 							delete(entry.id)
 						}
 					}
+					.glurListRowBackground()
 			}
 
 			addEntryLink
 				.listRowInsets(.init(top: 2, leading: 20, bottom: 2, trailing: 20))
+				.glurListRowBackground()
 		}
+		.appPaperBackground()
 		.appNavigationTitle(navigationTitle, accent: true)
 		.task {
 			await load()

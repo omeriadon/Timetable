@@ -1,3 +1,4 @@
+import GlurBackdrop
 import SwiftUI
 
 struct EventTagSelector: View {
@@ -44,6 +45,7 @@ private struct EventTagSelectionView: View {
 			}
 		}
 		.listStyle(.sidebar)
+		.appPaperBackground()
 		.appNavigationTitle("Tags")
 	}
 
@@ -66,19 +68,19 @@ private struct EventTagSelectionView: View {
 		} label: {
 			HStack {
 				Image(systemName: tag.symbol ?? "tag")
-					.foregroundStyle(.primary)
+					.foregroundStyle(isSelected ? .white : .primary)
 				Text(tag.displayName)
 					.foregroundStyle(isSelected ? .white : .primary)
 				Spacer()
 				if isSelected {
 					Image(systemName: "checkmark")
-						.foregroundStyle(.primary)
+						.foregroundStyle(.white)
 				}
 			}
 			.contentShape(Rectangle())
 		}
 		.buttonStyle(.plain)
-		.listRowBackground(isSelected ? Color.accentColor : nil)
+		.listRowBackground(isSelected ? Color.accentColor : GlurView(radius: 1, offset: 0, interpolation: 0))
 		.animation(.snappy(duration: 0.1), value: isSelected)
 		.accessibilityAddTraits(isSelected ? .isSelected : [])
 	}

@@ -285,7 +285,7 @@ struct SettingsView: View {
 					frameLimit: .constant(60),
 					renderScale: .constant(1)
 				)
-				.background(GlurView(radius: 1, offset: 0, interpolation: 0))
+				.background(.clear)
 			)
 
 			Label {

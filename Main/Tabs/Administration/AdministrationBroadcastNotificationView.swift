@@ -9,13 +9,16 @@ struct AdministrationBroadcastNotificationView: View {
 	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
-		Form {
+		List {
 			TextField("Title *", text: $title)
+				.glurListRowBackground()
 			TextField("Subtitle", text: $subtitle)
+				.glurListRowBackground()
 			TextField("Message", text: $notifBody, axis: .vertical)
 				.lineLimit(4 ... 8)
+				.glurListRowBackground()
 		}
-		.appGroupedFormStyle()
+		.appPaperBackground()
 		.appNavigationTitle("Broadcast Notification", accent: true)
 		.toolbar {
 			ToolbarItem(placement: .confirmationAction) {

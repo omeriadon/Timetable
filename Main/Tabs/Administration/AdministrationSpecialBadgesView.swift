@@ -31,6 +31,7 @@ struct AdministrationSpecialBadgesView: View {
 					.contentShape(Rectangle())
 				}
 				.buttonStyle(.plain)
+				.glurListRowBackground()
 			}
 
 			if #available(anyAppleOS 27, *) {
@@ -54,6 +55,7 @@ struct AdministrationSpecialBadgesView: View {
 				list
 			}
 		}
+		.appPaperBackground()
 		.appNavigationTitle("Badges", accent: true)
 		.toolbar {
 			ToolbarItem(placement: .confirmationAction) {

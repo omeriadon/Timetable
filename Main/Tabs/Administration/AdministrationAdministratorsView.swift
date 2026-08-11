@@ -16,7 +16,9 @@ struct AdministrationAdministratorsView: View {
 			} footer: {
 				Text("Only system administrators can change administrator access. System administrators cannot be changed here.")
 			}
+			.glurListRowBackground()
 		}
+		.appPaperBackground()
 		.scrollEdgeEffect()
 		.appNavigationTitle("Administrators", accent: true)
 		.searchable(text: $searchText, prompt: "Search users")

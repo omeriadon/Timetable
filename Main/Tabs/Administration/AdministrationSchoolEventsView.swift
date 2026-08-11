@@ -21,10 +21,13 @@ struct AdministrationSchoolEventsView: View {
 							}
 						}
 					}
+					.glurListRowBackground()
 			}
 
 			addEventLink
+				.glurListRowBackground()
 		}
+		.appPaperBackground()
 		.appNavigationTitle("School Events", accent: true)
 		.refreshable {
 			await refreshEvents()

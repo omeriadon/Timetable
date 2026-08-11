@@ -9,7 +9,7 @@ struct AdministrationDevelopmentAccessView: View {
 	@Environment(\.statusBadgeManager) private var badges
 
 	var body: some View {
-		Form {
+		List {
 			Section {
 				if let developmentAccessOnly {
 					Toggle(
@@ -43,9 +43,10 @@ struct AdministrationDevelopmentAccessView: View {
 			} footer: {
 				Text("When enabled, only the two system administrator accounts can use the server. Existing sessions remain intact but receive an access error.")
 			}
+			.glurListRowBackground()
 		}
 		.scrollEdgeEffect()
-		.appGroupedFormStyle()
+		.appPaperBackground()
 		.appNavigationTitle("Debug Testing", accent: true)
 		.task {
 			await load()

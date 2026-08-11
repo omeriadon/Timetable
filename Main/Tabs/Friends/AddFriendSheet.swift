@@ -70,6 +70,7 @@ struct AddFriendSheet: View {
 				.transition(.blurReplace)
 			}
 		}
+		.appPaperPresentation()
 		.searchable(text: $query, prompt: Text("Search by name"))
 		.animation(.easeOut(duration: 0.25), value: "\(cleanedQuery)\(results.isEmpty)\(isSearching)")
 		.appNavigationTitle("Add a Friend")

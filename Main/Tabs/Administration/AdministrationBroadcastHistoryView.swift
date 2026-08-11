@@ -23,7 +23,9 @@ struct AdministrationBroadcastHistoryView: View {
 					Image(systemName: record.isDeleted ? "trash" : record.deliveryState == .failed ? "exclamationmark.triangle" : "megaphone")
 				}
 			}
+			.glurListRowBackground()
 		}
+		.appPaperBackground()
 		.scrollEdgeEffect()
 		.appNavigationTitle("Broadcast History", accent: true)
 		.task {

@@ -22,6 +22,7 @@ struct AdministrationEventTagsView: View {
 								tagLabel(tag)
 							}
 							.buttonStyle(.plain)
+							.glurListRowBackground()
 						} else {
 							NavigationLink {
 								AdministrationEventTagEditor(
@@ -34,6 +35,7 @@ struct AdministrationEventTagsView: View {
 							} label: {
 								tagLabel(tag)
 							}
+							.glurListRowBackground()
 						}
 					}
 					.opacity(tag.isArchived ? 0.55 : 1)

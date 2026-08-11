@@ -37,7 +37,7 @@ struct FriendRequestsSheet: View {
 		List {
 			if incomingRequests.isEmpty, outgoingRequests.isEmpty {
 				ContentUnavailableView("No Friend Requests", systemImage: "bell.slash")
-					.listRowBackground(Color.clear)
+					.glurListRowBackground()
 			} else {
 				if !incomingRequests.isEmpty {
 					Section("Incoming") {
@@ -45,6 +45,7 @@ struct FriendRequestsSheet: View {
 							incomingRequestRow(request)
 						}
 					}
+					.glurListRowBackground()
 				}
 
 				if !outgoingRequests.isEmpty {
@@ -53,10 +54,11 @@ struct FriendRequestsSheet: View {
 							outgoingRequestRow(request)
 						}
 					}
+					.glurListRowBackground()
 				}
 			}
 		}
-
+		.appPaperPresentation()
 		.listStyle(.insetGrouped)
 		.appNavigationTitle("Friend Requests")
 		.toolbar {

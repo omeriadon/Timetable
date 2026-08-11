@@ -31,6 +31,7 @@ struct AdministrationStatisticsView: View {
 					Text(model.statistics?.usersWithLocationStatus.formatted() ?? "No data")
 				}
 			}
+			.glurListRowBackground()
 
 			Section("Grades") {
 				LabeledContent("Assessments") {
@@ -43,6 +44,7 @@ struct AdministrationStatisticsView: View {
 					Text(formattedAverage(model.statistics?.averageAssessmentsPerUserWithMultipleAssessments))
 				}
 			}
+			.glurListRowBackground()
 
 			Section("Devices") {
 				NavigationLink {
@@ -57,6 +59,7 @@ struct AdministrationStatisticsView: View {
 					Text(model.statistics?.activeDevicesLast30Days.formatted() ?? "No data")
 				}
 			}
+			.glurListRowBackground()
 
 			Section("Community") {
 				LabeledContent("Friends in account", value: friends.count.formatted())
@@ -75,6 +78,7 @@ struct AdministrationStatisticsView: View {
 					Text(model.statistics?.activeEventTagSubscriptions.formatted() ?? "No data")
 				}
 			}
+			.glurListRowBackground()
 
 			Section("Calendar") {
 				LabeledContent("Visible events", value: calendarEvents.allEvents.count.formatted())
@@ -88,6 +92,7 @@ struct AdministrationStatisticsView: View {
 					Text(model.statistics?.personalCalendarEvents.formatted() ?? "No data")
 				}
 			}
+			.glurListRowBackground()
 
 			Section("Status") {
 				LabeledContent("Average arrival") {
@@ -97,6 +102,7 @@ struct AdministrationStatisticsView: View {
 					Text(model.statistics?.totalLocationStatusUpdates.formatted() ?? "No data")
 				}
 			}
+			.glurListRowBackground()
 		}
 		.scrollEdgeEffect()
 		.appPaperBackground()

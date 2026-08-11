@@ -31,7 +31,7 @@ struct AdministrationUserEditor: View {
 
 	var body: some View {
 		NavigationStack {
-			Form {
+			List {
 				if let user = target.user {
 					Section("Authority") {
 						LabeledContent("Role", value: user.authority.displayName)
@@ -72,7 +72,7 @@ struct AdministrationUserEditor: View {
 					.glurListRowBackground()
 				}
 			}
-			.appGroupedFormStyle()
+			.appPaperBackground()
 			.appNavigationTitle(target.user == nil ? "New User" : "User", accent: true)
 			.refreshable {
 				await loadAccountData()
