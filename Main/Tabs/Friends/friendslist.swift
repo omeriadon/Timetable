@@ -12,6 +12,7 @@ struct FriendsView: View {
 	@State private var selectedFriend: FriendSummary?
 	@State private var isSearching = false
 	@State private var isSearchPresented = false
+	@FocusState private var isSearchFieldFocused
 	@State private var showsArrivalStatistics = false
 	@State private var showsLocationStatusSheet = false
 	@Namespace private var friendSheetNamespace
@@ -52,11 +53,6 @@ struct FriendsView: View {
 			.task { await refresh() }
 			.task(id: searchText) {
 				await search(for: searchText)
-			}
-			.onChange(of: searchText) { oldValue, newValue in
-				if !oldValue.isEmpty, newValue.isEmpty {
-					isSearchPresented = false
-				}
 			}
 			.popover(item: $sheet) { sheet in
 				Group {
@@ -101,31 +97,14 @@ struct FriendsView: View {
 
 	@ViewBuilder
 	private var searchableContent: some View {
-		if presentation == .iOS {
-			content
-				.searchable(
+		content
+			.safeAreaBar(edge: .bottom, spacing: 0) {
+				FriendsSearchBar(
 					text: $searchText,
-					isPresented: searchPresentation,
-					prompt: "Search by name"
+					isPresented: $isSearchPresented,
+					isFocused: $isSearchFieldFocused
 				)
-				.toolbar {
-					if isSearchPresented {
-						DefaultToolbarItem(kind: .search, placement: .bottomBar)
-					} else {
-						ToolbarItemGroup(placement: .bottomBar) {
-							Spacer()
-							Button("Search friends", systemImage: "magnifyingglass") {
-								isSearchPresented = true
-							}
-							.labelStyle(.iconOnly)
-							.padding(.bottom, 80)
-						}
-					}
-				}
-		} else {
-			content
-				.searchable(text: $searchText, prompt: "Search by name")
-		}
+			}
 	}
 
 	private var content: some View {
@@ -138,17 +117,6 @@ struct FriendsView: View {
 					.transition(.blurReplace)
 			}
 		}
-	}
-
-	private var searchPresentation: Binding<Bool> {
-		Binding(
-			get: { isSearchPresented },
-			set: { newValue in
-				if newValue || searchText.isEmpty {
-					isSearchPresented = newValue
-				}
-			}
-		)
 	}
 
 	let isPad = UIDevice.current.userInterfaceIdiom == .pad
@@ -338,6 +306,50 @@ struct FriendsView: View {
 
 	private func friendTransitionID(_ friend: FriendSummary) -> String {
 		"friend-\(friend.id.uuidString)"
+	}
+}
+
+private struct FriendsSearchBar: View {
+	@Binding var text: String
+	@Binding var isPresented: Bool
+	@FocusState.Binding var isFocused: Bool
+
+	var body: some View {
+		Group {
+			if isPresented {
+				HStack(spacing: 10) {
+					Image(systemName: "magnifyingglass")
+						.foregroundStyle(.secondary)
+
+					TextField("Search by name", text: $text)
+						.textFieldStyle(.plain)
+						.focused($isFocused)
+						.submitLabel(.search)
+
+					Button(role: .cancel) {
+						text = ""
+						isPresented = false
+						isFocused = false
+					} label: {
+						Image(systemName: "xmark.circle.fill")
+					}
+					.accessibilityLabel("Cancel search")
+				}
+			} else {
+				Button {
+					isPresented = true
+					isFocused = true
+				} label: {
+					Label("Search friends", systemImage: "magnifyingglass")
+						.frame(maxWidth: .infinity)
+				}
+			}
+		}
+		.padding(.horizontal, 16)
+		.padding(.vertical, 10)
+		.frame(maxWidth: .infinity)
+		.background(.bar)
+		.animation(.easeInOut(duration: 0.2), value: isPresented)
 	}
 }
 
