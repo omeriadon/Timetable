@@ -7,6 +7,7 @@
 
 import Defaults
 import DialStylePicker
+import Glur
 import GlurBackdrop
 import SwiftUI
 
@@ -233,7 +234,7 @@ struct TimetableView: View {
 //									 Color((.inversePrimary)).opacity(0.5)
 
 //									BlurView(blurRadius: 10)
-							GlurView(radius: 8, offset: 0, interpolation: 0)
+							GlurView(radius: 8, offset: 0, interpolation: 0.2, direction: .up)
 								.ignoresSafeArea()
 						}
 					}
