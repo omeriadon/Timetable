@@ -16,7 +16,7 @@ enum AppChannel: Equatable {
 		#if DEBUG
 			return .debug
 		#else
-			if Bundle.main.appStoreReceiptURL?.path().contains("sandboxReceipt") {
+			if Bundle.main.appStoreReceiptURL?.path().contains("sandboxReceipt") == true {
 				return .testFlight
 			}
 
