@@ -112,6 +112,7 @@ struct AdministrationDeviceStatisticsView: View {
 				}
 			}
 		}
+		.appPaperBackground()
 		.scrollEdgeEffect()
 		.appNavigationTitle("Devices", accent: true)
 		.refreshable {

@@ -12,7 +12,7 @@ extension View {
 	func minimizingToolbarOnScrollDown() -> some View {
 		if #available(anyAppleOS 27, *) {
 			toolbarMinimizationBehavior(.onScrollDown, for: .navigationBar)
-				.toolbarMinimizationSafeAreaAdjustment(.disabled, for: .navigationBar)
+				.toolbarMinimizationSafeAreaAdjustment(.enabled, for: .navigationBar)
 		} else {
 			self
 		}

@@ -33,12 +33,12 @@ struct TimetableWeekGrid: View {
 					if accountSettings.highlightsCurrentDay, currentDayIndex == day {
 						ZStack {
 							RoundedRectangle(cornerRadius: 12, style: .continuous)
-								.fill(.white.opacity(0.1))
+								.fill(.primary.opacity(0.1))
 								.strokeBorder(.white, lineWidth: 2)
 								.blur(radius: 5)
 								.clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 							RoundedRectangle(cornerRadius: 12, style: .continuous)
-								.fill(.white.opacity(0.1))
+								.fill(.primary.opacity(0.1))
 								.strokeBorder(.white, lineWidth: 2)
 						}
 						.allowsHitTesting(false)
@@ -90,6 +90,6 @@ struct TimetableWeekGrid: View {
 
 		return Text(session)
 			.frame(height: isBreakSession ? TimetableLayout.breakCellHeight : TimetableLayout.sessionCellHeight)
-			.foregroundStyle(isBreakSession ? Color.clear : Color.white)
+			.foregroundStyle(isBreakSession ? Color.secondary : Color.primary)
 	}
 }

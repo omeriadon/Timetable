@@ -21,11 +21,12 @@ struct AccountAndSyncSettingsView: View {
 	@State private var saveGeneration = 0
 
 	var body: some View {
-		Form {
+		List {
 			Toggle(isOn: preferenceBinding(\.liveActivitiesEnabled)) {
 				Text("Live Activities")
 				Text("Show live countdowns and details for your subjects and breaks throughout the school day, including on your Watch.")
 			}
+			.disabled(!networkManager.isOnline)
 
 			Section {
 				Toggle(isOn: preferenceBinding(\.notificationsEnabled)) {
@@ -41,6 +42,7 @@ struct AccountAndSyncSettingsView: View {
 					.disabled(!settings.notificationsEnabled)
 					.opacity(settings.notificationsEnabled ? 1 : 0.5)
 			}
+			.disabled(!networkManager.isOnline)
 
 			Section {
 				Toggle(isOn: preferenceBinding(\.broadcastNotificationsEnabled)) {
@@ -48,12 +50,15 @@ struct AccountAndSyncSettingsView: View {
 					Text("Special Event Notifications include announcements and limited-time events, such as special school events.")
 				}
 			}
+			.disabled(!networkManager.isOnline)
 
 			Section("Event Notifications") {
 				EventNotificationSchedulesEditor(selection: eventNotificationSchedulesBinding)
 			}
+			.disabled(!networkManager.isOnline)
 		}
-		.disabled(!networkManager.isOnline)
+		.appPaperBackground()
+		.listStyle(.sidebar)
 		.animation(.easeInOut, value: notificationRegistration.registrationState)
 		.appGroupedFormStyle()
 		.appNavigationTitle("Updates", accent: true)

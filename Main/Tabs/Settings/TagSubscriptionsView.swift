@@ -20,7 +20,7 @@ struct TagSubscriptionsView: View {
 	}
 
 	var body: some View {
-		Form {
+		List {
 			if !yearGroupTags.isEmpty {
 				Section("Year Groups") {
 					ForEach(yearGroupTags) { tag in
@@ -35,7 +35,7 @@ struct TagSubscriptionsView: View {
 				}
 			}
 		}
-		.formStyle(.grouped)
+		.appPaperBackground()
 		.scrollContentBackground(.hidden)
 		.appNavigationTitle("Event Tags", accent: true)
 		.task {

@@ -126,7 +126,6 @@ struct FriendDetailView: View {
 							Text(displayedFriendName)
 								.font(.title)
 								.bold()
-								.monospaced()
 
 							Text(displayedFriendProfile.email)
 								.foregroundStyle(.tertiary)

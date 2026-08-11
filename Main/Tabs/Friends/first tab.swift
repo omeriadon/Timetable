@@ -75,10 +75,10 @@ struct FriendOverview: View {
 							}
 						}
 						.padding(14)
-						.foregroundStyle(Color("inversePrimary"))
+						.foregroundStyle(.black)
 						.frame(maxWidth: .infinity, alignment: .topLeading)
 						.background {
-							FriendForegroundPaperBackground(
+							FriendWhitePaperBackground(
 								cornerRadius: FriendDetailLayout.itemCornerRadius
 							)
 						}
@@ -132,7 +132,7 @@ struct FriendOverview: View {
 							.padding(14)
 							.frame(maxWidth: .infinity, alignment: .leading)
 							.background {
-								FriendForegroundPaperBackground(
+								FriendWhitePaperBackground(
 									cornerRadius: FriendDetailLayout.itemCornerRadius
 								)
 							}
@@ -210,6 +210,7 @@ struct FriendInfo: View {
 				}
 			}
 		}
+		.scrollContentBackground(.hidden)
 		.scrollIndicators(.hidden)
 		.listStyle(.insetGrouped)
 	}

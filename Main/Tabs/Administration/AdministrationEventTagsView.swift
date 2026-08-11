@@ -41,7 +41,7 @@ struct AdministrationEventTagsView: View {
 			}
 			.onMove(perform: move)
 		}
-
+		.appPaperBackground()
 		.environment(\.editMode, .constant(isReordering ? .active : .inactive))
 		.appNavigationTitle("Event Tags", accent: true)
 		.toolbar {

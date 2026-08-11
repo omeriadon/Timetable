@@ -99,6 +99,7 @@ struct AdministrationStatisticsView: View {
 			}
 		}
 		.scrollEdgeEffect()
+		.appPaperBackground()
 		.appNavigationTitle("Statistics", accent: true)
 		.refreshable {
 			await load()

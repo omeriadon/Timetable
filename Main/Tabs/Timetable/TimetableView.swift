@@ -215,35 +215,27 @@ struct TimetableView: View {
 				}
 				.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.7)
 				.scrollEdgeEffect(offset: 0.9, maxBlurRadius: 6, maximumOpacity: 1)
-				.scrollEdgeEffectStyle(.soft, for: .vertical)
 				.scrollIndicators(.visible)
-				#if os(macOS)
-					.opacity(selectedSlot != nil ? 1 : 0)
-					.scrollIndicatorsFlash(onAppear: true)
-				#endif // os(macOS)
-					.opacity(selectedSlot == nil ? 0 : 1)
-					.safeAreaBar(edge: .top, alignment: .center, spacing: 10) {
-						GlassEffectContainer(spacing: 2) {
-							TimetableWeekGrid(
-								subjects: subjects,
-								selectedSlot: selectedSlot,
-								onSelectSlot: { selectedSlot = $0 }
-							)
-							.drawingGroup(opaque: false)
-						}
-						.padding(.bottom, Device.isMacOS ? 7 : 10)
-						#if os(macOS)
-							.padding([.top, .horizontal], 10)
-						#endif
-							.background {
-								ZStack {
-									Color.black.opacity(0.5)
-
-									BlurView(blurRadius: 10)
-								}
-							}
+				.opacity(selectedSlot == nil ? 0 : 1)
+				.safeAreaBar(edge: .top, alignment: .center, spacing: 10) {
+					GlassEffectContainer(spacing: 2) {
+						TimetableWeekGrid(
+							subjects: subjects,
+							selectedSlot: selectedSlot,
+							onSelectSlot: { selectedSlot = $0 }
+						)
+						.drawingGroup(opaque: false)
 					}
-					.scrollEdgeEffectStyle(.soft, for: .top)
+					.padding(.bottom, Device.isMacOS ? 7 : 10)
+//							.background {
+//								ZStack {
+//									 Color("inversePrimary").opacity(0.5)
+//
+//									BlurView(blurRadius: 10)
+//								}
+//							}
+				}
+//					.scrollEdgeEffectStyle(.hard, for: .top)
 			}
 			.padding(.trailing, 2)
 			.dynamicTypeSize(.medium)

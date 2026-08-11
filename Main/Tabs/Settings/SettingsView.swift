@@ -52,7 +52,6 @@ struct SettingsView: View {
 
 	private var accountBackground: some View {
 		AccountBackgroundView(profile: Defaults[.accountProfile])
-			.opacity(0.5)
 	}
 
 	@ContentBuilder

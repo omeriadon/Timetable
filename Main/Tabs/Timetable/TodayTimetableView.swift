@@ -16,16 +16,15 @@ struct TodayTimetableView: View {
 			let now = TimetableClock.adjusted(context.date)
 			ScrollView {
 				VStack(alignment: .leading, spacing: 16) {
-					if let schoolWeather {
-						TodayWeatherSummary(weather: schoolWeather)
-					}
-
 					VStack(alignment: .leading, spacing: 6) {
+						if let schoolWeather {
+							TodayWeatherSummary(weather: schoolWeather)
+						}
+
 						Text(now.formatted(.dateTime.weekday(.wide).day().month(.wide).hour(.defaultDigits(amPM: .wide)).minute(.defaultDigits).second(.defaultDigits)))
 							.contentTransition(.numericText())
 							.animation(.easeInOut, value: now)
-							.frame(maxWidth: .infinity, alignment: .center)
-							.multilineTextAlignment(.center)
+							.frame(maxWidth: .infinity, alignment: .leading)
 							.lineLimit(1)
 							.font(.system(size: 200))
 							.minimumScaleFactor(0.01)
@@ -34,11 +33,12 @@ struct TodayTimetableView: View {
 						if let termWeekLabel = termWeekLabel(for: now) {
 							Text(termWeekLabel)
 								.font(.title3)
-								.foregroundStyle(.primary.opacity(0.8))
+								.foregroundStyle(.secondary)
 								.frame(maxWidth: .infinity, alignment: .leading)
 								.padding(.leading, 6)
 						}
 					}
+					.padding(.leading, 6)
 
 					if let noSchoolDay = eventSnapshot.noSchoolDay {
 						TodayNoSchoolDayCard(noSchoolDay: noSchoolDay)
@@ -49,6 +49,7 @@ struct TodayTimetableView: View {
 							Text("Events")
 								.font(.title)
 								.bold()
+								.foregroundStyle(.white)
 
 							if !eventSnapshot.todayEntries.isEmpty {
 								eventSection("Today", entries: eventSnapshot.todayEntries)
@@ -195,8 +196,9 @@ private struct TodayWeatherSummary: View {
 
 			Label("UV \(weather.uvIndex)", systemImage: "sun.max")
 		}
+		.font(.callout)
 		.frame(maxWidth: .infinity, alignment: .leading)
-		.padding(.horizontal, 6)
+		.foregroundStyle(.secondary)
 		.accessibilityElement(children: .combine)
 		.accessibilityLabel(
 			"School weather, \(weather.temperatureCelsius.formatted(.number.precision(.fractionLength(0)))) degrees Celsius, \(conditionTitle), UV index \(weather.uvIndex)"
@@ -448,6 +450,7 @@ private struct TodaySchoolTimeline: View {
 			Text("Classes")
 				.font(.title)
 				.bold()
+				.foregroundStyle(.white)
 				.padding(.horizontal, periodHorizontalInset - timelineHorizontalPadding)
 
 			Color.clear
@@ -549,7 +552,7 @@ private struct TodaySchoolTimeline: View {
 		.accessibilityValue(isExpanded ? "Expanded" : "Collapsed")
 		.background {
 			GeometryReader { proxy in
-				Image("foregroundPaper")
+				Image("paperWhite")
 					.resizable()
 					.scaledToFill()
 					.frame(width: proxy.size.width, height: proxy.size.height)

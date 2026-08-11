@@ -91,3 +91,26 @@ struct FriendBrownPaperBackground: View {
 		.clipShape(shape)
 	}
 }
+
+struct FriendWhitePaperBackground: View {
+	let shape: AnyShape
+
+	init(cornerRadius: CGFloat) {
+		shape = AnyShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+	}
+
+	init(shape: AnyShape) {
+		self.shape = shape
+	}
+
+	var body: some View {
+		GeometryReader { proxy in
+			Image("paperWhite")
+				.resizable()
+				.scaledToFill()
+				.frame(width: proxy.size.width, height: proxy.size.height)
+				.clipped()
+		}
+		.clipShape(shape)
+	}
+}

@@ -21,7 +21,7 @@ struct StatusBadgeOverlay: View {
 		GeometryReader { geometry in
 			VStack(spacing: 0) {
 				if let mainBadge = manager.mainBadge {
-					mainBadgeView(mainBadge, availableWidth: geometry.size.width)
+					mainBadgeView(mainBadge, availableWidth: geometry.size.width - 40)
 						.allowsHitTesting(true)
 						.transition(mainTransition)
 				}

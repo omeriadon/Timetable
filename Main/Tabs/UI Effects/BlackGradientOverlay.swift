@@ -12,6 +12,16 @@ struct BlackGradientOverlay: View {
 	let offset: CGFloat
 	let maximumOpacity: CGFloat
 
+	@Environment(\.colorScheme) var colorScheme
+
+	var inverted: Color {
+		if colorScheme == .light {
+			.white
+		} else {
+			.black
+		}
+	}
+
 	var body: some View {
 		GeometryReader { proxy in
 			let size = proxy.size
@@ -47,19 +57,19 @@ struct BlackGradientOverlay: View {
 				location: offset - beforeTransition * beforeScale
 			),
 			.init(
-				color: .black.opacity(maximumOpacity * 0.04),
+				color: inverted.opacity(maximumOpacity * 0.04),
 				location: offset
 			),
 			.init(
-				color: .black.opacity(maximumOpacity * 0.45),
+				color: inverted.opacity(maximumOpacity * 0.45),
 				location: offset + 0.10 * afterScale
 			),
 			.init(
-				color: .black.opacity(maximumOpacity * 0.98),
+				color: inverted.opacity(maximumOpacity * 0.98),
 				location: offset + afterTransition * afterScale
 			),
 			.init(
-				color: .black.opacity(maximumOpacity),
+				color: inverted.opacity(maximumOpacity),
 				location: 1
 			),
 		]
