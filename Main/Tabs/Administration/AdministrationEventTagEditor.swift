@@ -76,7 +76,7 @@ struct AdministrationEventTagEditor: View {
 					Toggle("Archive Tag", isOn: $isArchived)
 						.disabled(isCanonicalYearGroup)
 				}
-				.personalPaperListRow()
+				.glurListRowBackground()
 
 				Section {
 					TextEditor(text: $associatedNames)
@@ -91,7 +91,7 @@ struct AdministrationEventTagEditor: View {
 							: "One alternate name per line. The display name is always included."
 					)
 				}
-				.personalPaperListRow()
+				.glurListRowBackground()
 
 				if let tag, !isCanonicalYearGroup {
 					Section {
@@ -100,7 +100,7 @@ struct AdministrationEventTagEditor: View {
 						}
 						.disabled(isSaving)
 					}
-					.personalPaperListRow()
+					.glurListRowBackground()
 					.confirmationDialog(
 						"Delete \(tag.displayName)?",
 						isPresented: $showsDeleteConfirmation,

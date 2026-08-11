@@ -133,6 +133,7 @@ struct SettingsView: View {
 				.appPaperPresentation()
 			}
 		}
+		.glurListRowBackground()
 
 		Section("Preferences") {
 			if sessionStore.isAuthenticated {
@@ -168,6 +169,7 @@ struct SettingsView: View {
 				Label("Archived Events", systemImage: "archivebox")
 			}
 		}
+		.glurListRowBackground()
 
 		Section("Developer") {
 			if _isDebugAssertConfiguration() || Defaults[.userDisplayName].contains("Adon") || Defaults[.calendarEvents].canManageGlobalEvents {
@@ -226,6 +228,7 @@ struct SettingsView: View {
 					.foregroundStyle(.accent)
 			}
 		}
+		.glurListRowBackground()
 
 		Section("Support") {
 			Button {
@@ -246,6 +249,8 @@ struct SettingsView: View {
 
 			Button {
 				try? Tips.resetDatastore()
+
+				statusBadgeManager.addBadge(id: UUID(), title: "Tips Reset", secondaryText: "Restart app to see effects.", priority: 3, view: .success)
 
 			} label: {
 				HStack(alignment: .center) {
@@ -300,6 +305,7 @@ struct SettingsView: View {
 				Image(systemName: "hammer")
 			}
 		}
+		.glurListRowBackground()
 	}
 
 	@Default(.hapticsEnabled) private var hapticsEnabled

@@ -102,7 +102,7 @@ struct AccountView: View {
 			}
 			LabeledContent("Email", value: profile.email)
 		}
-		.listRowBackground(Rectangle().fill(.thinMaterial))
+		.glurListRowBackground()
 
 		Section {
 			if isLoadingYearGroups, yearGroupTags.isEmpty {
@@ -142,7 +142,7 @@ struct AccountView: View {
 				}
 			}
 		}
-		.listRowBackground(Rectangle().fill(.thinMaterial))
+		.glurListRowBackground()
 
 		if service.authorizationStatus != .authorizedAlways {
 			Section("Status") {
@@ -152,7 +152,7 @@ struct AccountView: View {
 					}
 				}
 			}
-			.listRowBackground(Rectangle().fill(.thinMaterial))
+			.glurListRowBackground()
 		}
 
 		Section {
@@ -162,7 +162,7 @@ struct AccountView: View {
 				.disabled(isDeleting)
 				.foregroundStyle(.red)
 		}
-		.listRowBackground(Rectangle().fill(.thinMaterial))
+		.glurListRowBackground()
 	}
 
 	private func signOut() {

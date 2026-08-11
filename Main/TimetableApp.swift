@@ -215,7 +215,7 @@ struct TimetableApp: App {
 			StatusBadgeManager.shared.addBadge(
 				id: UUID(),
 				title: "Please Update App",
-				secondaryText: "Please update this app to keep using all of Timetable’s features.",
+				secondaryText: "Update to use new features and improvements.",
 				priority: 5,
 				view: .warning,
 				width: .flexible,

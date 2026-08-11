@@ -124,7 +124,7 @@ struct FriendDetailView: View {
 						FriendAvatar(profile: displayedFriendProfile, size: 44)
 						VStack(alignment: .leading, spacing: 0) {
 							Text(displayedFriendName)
-								.font(.title)
+								.font(.title2)
 								.bold()
 
 							Text(displayedFriendProfile.email)

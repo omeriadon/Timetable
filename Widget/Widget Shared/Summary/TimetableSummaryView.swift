@@ -36,7 +36,6 @@ struct TimetableSummaryView: View {
 				TimetableSummaryEventsSection(events: entry.upcomingEvents)
 			}
 		}
-		.foregroundStyle(.white)
 		.dynamicTypeSize(.medium)
 		.widgetAppFontDesign()
 	}

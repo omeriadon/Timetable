@@ -190,12 +190,14 @@ struct FriendInfo: View {
 					}
 				}
 			}
+			.glurListRowBackground()
 
 			Section("Average arrival") {
 				ForEach(Array(weekdayNames.enumerated()), id: \.offset) { index, day in
 					LabeledContent(day, value: averageArrival(for: index))
 				}
 			}
+			.glurListRowBackground()
 
 			Section {
 				Button(action: requestFriendsSinceDate) {
@@ -209,6 +211,7 @@ struct FriendInfo: View {
 					}
 				}
 			}
+			.glurListRowBackground()
 		}
 		.scrollContentBackground(.hidden)
 		.scrollIndicators(.hidden)
@@ -308,7 +311,7 @@ struct FriendshipDateChangeRequestSheet: View {
 		NavigationStack {
 			Form {
 				DatePicker("Friends since", selection: $requestedDate, displayedComponents: .date)
-					.personalPaperListRow()
+					.glurListRowBackground()
 			}
 			.appNavigationTitle("Change Friends Since")
 			.toolbar {

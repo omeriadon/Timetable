@@ -27,6 +27,7 @@ struct TagSubscriptionsView: View {
 						tagToggle(tag)
 					}
 				}
+				.glurListRowBackground()
 			}
 
 			Section("Other Tags") {
@@ -34,6 +35,7 @@ struct TagSubscriptionsView: View {
 					tagToggle(tag)
 				}
 			}
+			.glurListRowBackground()
 		}
 		.appPaperBackground()
 		.scrollContentBackground(.hidden)

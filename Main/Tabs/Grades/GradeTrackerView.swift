@@ -177,11 +177,6 @@ struct GradeAverageCard: View {
 						)
 						.frame(width: proxy.size.width / 2, alignment: .leading)
 					}
-					.overlay {
-						Rectangle()
-							.fill(.black.opacity(0.18))
-							.frame(width: 1, height: 72)
-					}
 				}
 				.frame(height: 86)
 			} else {
@@ -310,8 +305,11 @@ struct GradeSubjectCard: View {
 			GradeGauge(value: average, tint: subject.colour.swiftUIColor)
 
 			VStack(alignment: .leading, spacing: 5) {
-				Label(subject.id, systemImage: subject.symbol)
-					.font(.title3.weight(.semibold))
+				HStack(alignment: .center) {
+					Image(systemName: subject.symbol)
+					Text(subject.id)
+				}
+				.font(.title3.weight(.semibold))
 
 				if let average {
 					Text("\(average, format: .percent.precision(.fractionLength(1)))")

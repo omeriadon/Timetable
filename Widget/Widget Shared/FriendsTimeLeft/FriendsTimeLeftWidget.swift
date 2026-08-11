@@ -15,7 +15,7 @@ struct FriendsTimeLeftWidget: Widget {
 		StaticConfiguration(kind: kind, provider: Provider()) { entry in
 			FriendsTimeLeftView(entry: entry, schedules: entry.friendSchedules)
 				.containerBackground(for: .widget) {
-					Image("paperBlack")
+					Image("backgroundPaper")
 						.resizable()
 						.aspectRatio(contentMode: .fill)
 				}

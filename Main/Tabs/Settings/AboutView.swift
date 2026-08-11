@@ -6,6 +6,7 @@
 //
 
 import ColorfulX
+import GlurBackdrop
 import SwiftUI
 
 struct AboutView: View {
@@ -75,7 +76,10 @@ struct AboutView: View {
 						)
 						.padding()
 					}
-					.background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 30))
+					.background {
+						GlurView(radius: 2, offset: 0, interpolation: 0)
+							.clipShape(RoundedRectangle(cornerRadius: 30))
+					}
 					.environment(\.colorScheme, .dark)
 
 					Text("© \(Calendar.current.component(.year, from: .now).description), JDCQ. All rights reserved.")
@@ -83,11 +87,10 @@ struct AboutView: View {
 						.padding()
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.frame(height: 50)
-						.background(
-							Capsule()
-								.fill(.ultraThinMaterial)
-								.environment(\.colorScheme, .dark)
-						)
+						.background {
+							GlurView(radius: 2, offset: 0, interpolation: 0)
+								.clipShape(Capsule())
+						}
 				}
 			}
 			.padding(.horizontal)

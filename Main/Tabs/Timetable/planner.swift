@@ -280,7 +280,7 @@ struct ArchivedEventsView: View {
 	private let calendar = SchoolCalendarProjection.perthCalendar
 
 	var body: some View {
-		List {
+		ZStack {
 			if archivedEvents.isEmpty {
 				ContentUnavailableView(
 					"No Archived Events",
@@ -289,25 +289,28 @@ struct ArchivedEventsView: View {
 				)
 				.frame(maxWidth: .infinity)
 			} else {
-				ForEach(archivedEvents) { event in
-					Button {
-						selectedEvent = event
-					} label: {
-						HStack(spacing: 10) {
-							Image(systemName: event.symbol)
-								.frame(width: 20)
+				List {
+					ForEach(archivedEvents) { event in
+						Button {
+							selectedEvent = event
+						} label: {
+							HStack(spacing: 10) {
+								Image(systemName: event.symbol)
+									.frame(width: 20)
 
-							VStack(alignment: .leading, spacing: 4) {
-								Text(event.title)
-								Text(event.date.startOfDay()?.formatted(date: .long, time: .omitted) ?? "")
-									.font(.caption)
-									.foregroundStyle(.secondary)
+								VStack(alignment: .leading, spacing: 4) {
+									Text(event.title)
+									Text(event.date.startOfDay()?.formatted(date: .long, time: .omitted) ?? "")
+										.font(.caption)
+										.foregroundStyle(.secondary)
+								}
 							}
+							.frame(maxWidth: .infinity, alignment: .leading)
+							.contentShape(Rectangle())
 						}
-						.frame(maxWidth: .infinity, alignment: .leading)
-						.contentShape(Rectangle())
+						.buttonStyle(.plain)
+						.glurListRowBackground()
 					}
-					.buttonStyle(.plain)
 				}
 			}
 		}
@@ -562,12 +565,12 @@ private struct NoSchoolDayDetailView: View {
 		NavigationStack {
 			Form {
 				LabeledContent("Name", value: target.title)
-					.personalPaperListRow()
+					.glurListRowBackground()
 				LabeledContent(
 					"Date",
 					value: target.date.startOfDay()?.formatted(date: .long, time: .omitted) ?? ""
 				)
-				.personalPaperListRow()
+				.glurListRowBackground()
 			}
 			.appNavigationTitle("Pupil Free Day")
 			.toolbar {
@@ -657,31 +660,31 @@ struct CalendarEventEditor: View {
 	}
 
 	private var content: some View {
-		Form {
+		List {
 			if isReadOnlyGlobalEvent {
 				readOnlyEventRows
-					.personalPaperListRow()
+					.glurListRowBackground()
 			} else {
 				TextField("Title", text: $title)
-					.personalPaperListRow()
+					.glurListRowBackground()
 				TextField("Notes", text: $notes, axis: .vertical)
 					.lineLimit(3 ... 6)
-					.personalPaperListRow()
+					.glurListRowBackground()
 				DatePicker("Date", selection: $date, displayedComponents: .date)
-					.personalPaperListRow()
+					.glurListRowBackground()
 				Button {
 					showsSymbolPicker = true
 				} label: {
 					Label("Symbol", systemImage: symbol)
 				}
-				.personalPaperListRow()
+				.glurListRowBackground()
 
 				EventTagSelector(
 					sections: tagSections,
 					allowsYearGroups: target.scope == .globalEvent,
 					selectedTagIDs: $selectedTagIDs
 				)
-				.personalPaperListRow()
+				.glurListRowBackground()
 			}
 		}
 		.appNavigationTitle(navigationTitle)

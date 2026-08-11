@@ -111,7 +111,7 @@ private struct FriendLocationStatus {
 
 	init(item: LocationStatusItem?, at date: Date) {
 		guard let item else {
-			title = "Status unavailable"
+			title = "Unavailable"
 			tint = nil
 			statusTime = nil
 			return

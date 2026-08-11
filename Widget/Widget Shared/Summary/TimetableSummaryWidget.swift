@@ -14,7 +14,7 @@ struct TimetableSummaryWidget: Widget {
 		StaticConfiguration(kind: kind, provider: Provider()) { entry in
 			TimetableSummaryView(entry: entry)
 				.containerBackground(for: .widget) {
-					Image("paperBlack")
+					Image("backgroundPaper")
 						.resizable()
 						.aspectRatio(contentMode: .fill)
 				}

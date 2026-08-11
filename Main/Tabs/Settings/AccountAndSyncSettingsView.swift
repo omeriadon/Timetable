@@ -27,6 +27,7 @@ struct AccountAndSyncSettingsView: View {
 				Text("Show live countdowns and details for your subjects and breaks throughout the school day, including on your Watch.")
 			}
 			.disabled(!networkManager.isOnline)
+			.glurListRowBackground()
 
 			Section {
 				Toggle(isOn: preferenceBinding(\.notificationsEnabled)) {
@@ -43,6 +44,7 @@ struct AccountAndSyncSettingsView: View {
 					.opacity(settings.notificationsEnabled ? 1 : 0.5)
 			}
 			.disabled(!networkManager.isOnline)
+			.glurListRowBackground()
 
 			Section {
 				Toggle(isOn: preferenceBinding(\.broadcastNotificationsEnabled)) {
@@ -51,11 +53,13 @@ struct AccountAndSyncSettingsView: View {
 				}
 			}
 			.disabled(!networkManager.isOnline)
+			.glurListRowBackground()
 
 			Section("Event Notifications") {
 				EventNotificationSchedulesEditor(selection: eventNotificationSchedulesBinding)
 			}
 			.disabled(!networkManager.isOnline)
+			.glurListRowBackground()
 		}
 		.appPaperBackground()
 		.listStyle(.sidebar)
@@ -243,14 +247,14 @@ private struct EventNotificationScheduleSheet: View {
 						.foregroundStyle(.accent)
 						.tag(7)
 				}
-				.personalPaperListRow()
+				.glurListRowBackground()
 
 				Picker("Time", selection: $timeMinutes) {
 					ForEach(Array(stride(from: 5 * 60, through: 22 * 60, by: 15)), id: \.self) { minutes in
 						Text(timeLabel(minutes)).tag(minutes)
 					}
 				}
-				.personalPaperListRow()
+				.glurListRowBackground()
 				.pickerStyle(.wheel)
 			}
 			.presentationDetents([.medium])

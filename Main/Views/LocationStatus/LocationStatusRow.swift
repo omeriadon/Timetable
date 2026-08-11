@@ -49,7 +49,7 @@ struct LocationStatusRow: View {
 								.foregroundStyle(.secondary)
 						}
 					} else {
-						Text("Status unavailable")
+						Text("Unavailable")
 							.foregroundStyle(.secondary)
 					}
 				}

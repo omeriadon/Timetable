@@ -195,7 +195,7 @@ private struct WatchLocationStatusView: View {
 	var body: some View {
 		TimelineView(.periodic(from: .now, by: 60)) { context in
 			let now = TimetableClock.adjusted(context.date)
-			let title = item?.title ?? "Status unavailable"
+			let title = item?.title ?? "Unavailable"
 			let tint = item.map { statusTint(for: $0.state, at: now) } ?? .secondary
 
 			HStack(spacing: 4) {

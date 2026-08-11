@@ -14,13 +14,6 @@ struct AppPaperBackground: View {
 }
 
 extension View {
-	func personalPaperListRow() -> some View {
-		listRowBackground(
-			Rectangle()
-				.fill(.ultraThinMaterial)
-		)
-	}
-
 	func appPaperBackground() -> some View {
 		scrollContentBackground(.hidden)
 			.background {

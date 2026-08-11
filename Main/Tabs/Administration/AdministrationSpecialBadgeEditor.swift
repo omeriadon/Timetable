@@ -54,7 +54,7 @@ struct AdministrationSpecialBadgeEditor: View {
 					ColorPicker("Background", selection: $backgroundColor, supportsOpacity: true)
 					ColorPicker("Symbol", selection: $symbolColor, supportsOpacity: true)
 				}
-				.personalPaperListRow()
+				.glurListRowBackground()
 
 				if !isBuiltIn {
 					Section {
@@ -69,7 +69,7 @@ struct AdministrationSpecialBadgeEditor: View {
 					} footer: {
 						Text("Selected users receive this badge when the badge is saved. Deselect a user to remove it.")
 					}
-					.personalPaperListRow()
+					.glurListRowBackground()
 				}
 			}
 			.appGroupedFormStyle()

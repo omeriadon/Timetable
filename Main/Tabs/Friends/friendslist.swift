@@ -95,10 +95,9 @@ struct FriendsView: View {
 			.dynamicTypeSize(.medium)
 	}
 
-	@ViewBuilder
 	private var searchableContent: some View {
 		content
-			.safeAreaBar(edge: .bottom, spacing: 0) {
+			.safeAreaInset(edge: .bottom, spacing: 0) {
 				FriendsSearchBar(
 					text: $searchText,
 					isPresented: $isSearchPresented,
@@ -203,21 +202,27 @@ struct FriendsView: View {
 	}
 
 	private var friendSearchResults: some View {
-		List {
+		ZStack {
 			if isSearching {
 				ProgressView()
 					.frame(maxWidth: .infinity)
 					.listRowBackground(Color.clear)
+					.transition(.blurReplace)
 			} else if searchResults.isEmpty {
 				ContentUnavailableView.search(text: searchText)
 					.listRowBackground(Color.clear)
+					.transition(.blurReplace)
 			} else {
-				ForEach(searchResults) { result in
-					FriendSearchRow(result: result)
-						.listRowBackground(Image("paper").resizable().scaledToFill())
+				List {
+					ForEach(searchResults) { result in
+						FriendSearchRow(result: result)
+							.listRowBackground(Image("paper").resizable().scaledToFill())
+					}
 				}
+				.transition(.blurReplace)
 			}
 		}
+		.animation(.easeInOut, value: "\(isSearching)\(searchResults.isEmpty)")
 		.minimizingToolbarOnScrollDown()
 		.listStyle(.plain)
 		.refreshable {
@@ -314,42 +319,62 @@ private struct FriendsSearchBar: View {
 	@Binding var isPresented: Bool
 	@FocusState.Binding var isFocused: Bool
 
+	@Namespace private var glassNamespace
+
 	var body: some View {
-		Group {
-			if isPresented {
-				HStack(spacing: 10) {
-					Image(systemName: "magnifyingglass")
-						.foregroundStyle(.secondary)
+		GlassEffectContainer {
+			Group {
+				if isPresented {
+					HStack(spacing: 10) {
+						Image(systemName: "magnifyingglass")
+							.foregroundStyle(.secondary)
 
-					TextField("Search by name", text: $text)
-						.textFieldStyle(.plain)
-						.focused($isFocused)
-						.submitLabel(.search)
+						TextField("Search by name", text: $text)
+							.textFieldStyle(.plain)
+							.focused($isFocused)
+							.submitLabel(.search)
 
-					Button(role: .cancel) {
-						text = ""
-						isPresented = false
-						isFocused = false
-					} label: {
-						Image(systemName: "xmark.circle.fill")
+						Button(role: .cancel) {
+							text = ""
+
+							isPresented = false
+
+							isFocused = false
+						} label: {
+							Image(systemName: "xmark")
+						}
+						.accessibilityLabel("Cancel search")
 					}
-					.accessibilityLabel("Cancel search")
-				}
-			} else {
-				Button {
-					isPresented = true
-					isFocused = true
-				} label: {
-					Label("Search friends", systemImage: "magnifyingglass")
-						.frame(maxWidth: .infinity)
+					.padding(15)
+					.glassEffect(.regular.interactive(), in: Capsule())
+					.glassEffectID("search", in: glassNamespace)
+
+				} else {
+					HStack {
+						Spacer()
+
+						Button {
+							isPresented = true
+
+							isFocused = true
+						} label: {
+							Label("Search friends", systemImage: "magnifyingglass")
+								.labelStyle(.iconOnly)
+								.font(.title2)
+								.padding(7)
+						}
+						.buttonBorderShape(.circle)
+						.buttonStyle(.glass)
+						.glassEffectID("search", in: glassNamespace)
+					}
 				}
 			}
 		}
+		.animation(easeInOut(duration: 0.3), value: "\(isPresented)\(isFocused)")
 		.padding(.horizontal, 16)
 		.padding(.vertical, 10)
 		.frame(maxWidth: .infinity)
-		.background(.bar)
-		.animation(.easeInOut(duration: 0.2), value: isPresented)
+		.padding(.bottom, 10)
 	}
 }
 

@@ -1236,6 +1236,9 @@
         }
       }
     },
+    "Cancel search" : {
+
+    },
     "Canonical year-group names cannot be changed." : {
       "localizations" : {
         "fr" : {

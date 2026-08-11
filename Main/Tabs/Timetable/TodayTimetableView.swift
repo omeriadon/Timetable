@@ -35,7 +35,6 @@ struct TodayTimetableView: View {
 								.font(.title3)
 								.foregroundStyle(.secondary)
 								.frame(maxWidth: .infinity, alignment: .leading)
-								.padding(.leading, 6)
 						}
 					}
 					.padding(.leading, 6)
@@ -87,7 +86,7 @@ struct TodayTimetableView: View {
 						TodayCountdown(subjects: subjects, schoolCalendar: schoolCalendar, now: now)
 					}
 				}
-				.foregroundStyle(.primary)
+				.foregroundStyle(.black)
 				.padding(.vertical)
 				.padding(.horizontal, 10)
 				.frame(maxWidth: .infinity, alignment: .center)
@@ -450,14 +449,13 @@ private struct TodaySchoolTimeline: View {
 			Text("Classes")
 				.font(.title)
 				.bold()
-				.foregroundStyle(.white)
 				.padding(.horizontal, periodHorizontalInset - timelineHorizontalPadding)
 
 			Color.clear
 				.frame(height: height)
 				.overlay(alignment: .topLeading) { periodsLayer }
 		}
-		.foregroundStyle(.primary)
+		.foregroundStyle(.black)
 		.padding(.top, 10)
 		.padding(.bottom, 8)
 		.padding(.horizontal, timelineHorizontalPadding)
@@ -523,11 +521,11 @@ private struct TodaySchoolTimeline: View {
 
 						if isExpanded, let subject {
 							Label(subject.teacher.displayName, systemImage: "person.fill")
-								.font(.subheadline)
+								.font(.headline)
 								.foregroundStyle(.secondary)
 
 							Label(subject.classroom.displayName, systemImage: "door.left.hand.open")
-								.font(.subheadline)
+								.font(.headline)
 								.foregroundStyle(.secondary)
 						}
 					}

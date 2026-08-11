@@ -21,7 +21,7 @@ struct WeeklyScheduleWidget: Widget {
 		) { entry in
 			WeeklyScheduleView(entry: entry)
 				.containerBackground(for: .widget) {
-					Image("paperBlack")
+					Image("backgroundPaper")
 						.resizable()
 						.aspectRatio(contentMode: .fill)
 				}

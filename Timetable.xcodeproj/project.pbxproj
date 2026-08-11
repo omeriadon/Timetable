@@ -26,6 +26,8 @@
 		2AB674D7300E387100A6815A /* Sticker in Frameworks */ = {isa = PBXBuildFile; productRef = 2AB674D6300E387100A6815A /* Sticker */; };
 		2ABBBA042FF4AD3A00878A9D /* PortalHeaders in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2ABBBA032FF4AD3A00878A9D /* PortalHeaders */; };
 		2ABBBA062FF4AD3A00878A9D /* PortalTransitions in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 2ABBBA052FF4AD3A00878A9D /* PortalTransitions */; };
+		2ABD92FA302B3D860076BFD1 /* Glur in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABD92F9302B3D860076BFD1 /* Glur */; };
+		2ABD92FC302B3D860076BFD1 /* GlurBackdrop in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABD92FB302B3D860076BFD1 /* GlurBackdrop */; };
 		2AC5F7ED2FD8435700B813EA /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AC5F7EC2FD8435700B813EA /* Defaults */; };
 		2AE0586F300B591D00473DBD /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2A02379A2F9C907000AB1E1F /* Defaults */; };
 		2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */ = {isa = PBXBuildFile; platformFilters = (macos, ); productRef = 2AE0F13A2FE03989002B5D9D /* MaterialView */; };
@@ -326,10 +328,12 @@
 				2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */,
 				2A02379B2F9C907000AB1E1F /* Defaults in Frameworks */,
 				2ABBBA042FF4AD3A00878A9D /* PortalHeaders in Frameworks */,
+				2ABD92FC302B3D860076BFD1 /* GlurBackdrop in Frameworks */,
 				2A582A2F3029E45F009DEEB2 /* DialStylePicker in Frameworks */,
 				2A79F3B330138FD2003CA797 /* SFSymbolsPicker in Frameworks */,
 				2ABBBA062FF4AD3A00878A9D /* PortalTransitions in Frameworks */,
 				2A99A535301C3525005E48F7 /* SwiftEmoji in Frameworks */,
+				2ABD92FA302B3D860076BFD1 /* Glur in Frameworks */,
 			);
 		};
 		2A098C802F9DB842002065BE /* Frameworks */ = {
@@ -372,7 +376,6 @@
 				2A02379F2F9C908300AB1E1F /* Shared */,
 				2A324AAE2FF0E3A100E6A3D5 /* App Shared */,
 				2AAE62702FD839A7004B3FF4 /* Main */,
-				2A79F3B73013924E003CA797 /* Frameworks */,
 				2A02378C2F9C8EA000AB1E1F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -387,13 +390,6 @@
 				2AF3B0073000000000000007 /* TimetableTests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		2A79F3B73013924E003CA797 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -437,6 +433,8 @@
 				2A79F3B83013924E003CA797 /* IrregularGradient */,
 				2A99A534301C3525005E48F7 /* SwiftEmoji */,
 				2A582A2E3029E45F009DEEB2 /* DialStylePicker */,
+				2ABD92F9302B3D860076BFD1 /* Glur */,
+				2ABD92FB302B3D860076BFD1 /* GlurBackdrop */,
 			);
 			productName = Timetable;
 			productReference = 2A02378B2F9C8EA000AB1E1F /* Timetable.app */;
@@ -596,6 +594,7 @@
 				2A79F3B430138FFC003CA797 /* XCLocalSwiftPackageReference "../swiftui-window-overlay-main" */,
 				2A99A533301C3525005E48F7 /* XCRemoteSwiftPackageReference "SwiftEmoji" */,
 				2A582A2D3029E45F009DEEB2 /* XCLocalSwiftPackageReference "../../DialStylePicker" */,
+				2ABD92F8302B3D860076BFD1 /* XCRemoteSwiftPackageReference "Glur" */,
 			);
 			preferredProjectObjectVersion = 110;
 			productRefGroup = 2A02378C2F9C8EA000AB1E1F /* Products */;
@@ -1416,6 +1415,14 @@
 				minimumVersion = 6.0.0;
 			};
 		};
+		2ABD92F8302B3D860076BFD1 /* XCRemoteSwiftPackageReference "Glur" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/joogps/Glur";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 		2AE0F1392FE03989002B5D9D /* XCRemoteSwiftPackageReference "MaterialView" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/OskarGroth/MaterialView";
@@ -1502,6 +1509,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2ABBBA022FF4AD3A00878A9D /* XCRemoteSwiftPackageReference "Portal" */;
 			productName = PortalTransitions;
+		};
+		2ABD92F9302B3D860076BFD1 /* Glur */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2ABD92F8302B3D860076BFD1 /* XCRemoteSwiftPackageReference "Glur" */;
+			productName = Glur;
+		};
+		2ABD92FB302B3D860076BFD1 /* GlurBackdrop */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2ABD92F8302B3D860076BFD1 /* XCRemoteSwiftPackageReference "Glur" */;
+			productName = GlurBackdrop;
 		};
 		2AC5F7EC2FD8435700B813EA /* Defaults */ = {
 			isa = XCSwiftPackageProductDependency;

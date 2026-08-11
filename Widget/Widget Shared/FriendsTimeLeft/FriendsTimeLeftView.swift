@@ -113,7 +113,6 @@ struct FriendsTimeLeftView: View {
 				FriendsScheduleRow(schedule: schedule)
 			}
 		}
-		.foregroundStyle(.white)
 		.widgetAppFontDesign()
 		.dynamicTypeSize(.medium)
 	}

@@ -176,7 +176,6 @@ struct WeeklyScheduleView: View {
 		}
 		.compositingGroup()
 		.padding(Device.isNotWatchOS ? 1 : 0)
-		.foregroundStyle(.white)
 	}
 
 	private var currentWeekdayIndex: Int {
