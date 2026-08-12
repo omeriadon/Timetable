@@ -73,6 +73,18 @@
         }
       }
     },
+    "NSLocalNetworkUsageDescription" : {
+      "comment" : "Privacy - Local Network Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Tinkerble connects to the macOS companion app on your local development network."
+          }
+        }
+      }
+    },
     "NSLocationAlwaysAndWhenInUseUsageDescription" : {
       "comment" : "Privacy - Location Always and When In Use Usage Description",
       "extractionState" : "extracted_with_value",

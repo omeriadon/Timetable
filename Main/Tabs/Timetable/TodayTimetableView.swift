@@ -63,16 +63,6 @@ struct TodayTimetableView: View {
 						.padding(.vertical, 10)
 						.padding(.bottom, 5)
 						.padding(.horizontal, TodayCardLayout.contentInset)
-						.background {
-							GeometryReader { proxy in
-								Image("paper")
-									.resizable()
-									.scaledToFill()
-									.frame(width: proxy.size.width, height: proxy.size.height)
-									.clipped()
-							}
-							.clipShape(RoundedRectangle(cornerRadius: TodayCardLayout.outerCornerRadius))
-						}
 						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: TodayCardLayout.outerCornerRadius))
 					}
 
@@ -143,7 +133,7 @@ struct TodayTimetableView: View {
 	@ViewBuilder private func eventSection(_ title: String, entries: [TodayEventEntry], showsDate: Bool = false) -> some View {
 		Text(title)
 			.fontWeight(.semibold)
-			.foregroundStyle(.black.secondary)
+			.foregroundStyle(.black)
 			.padding(.top, 4)
 
 		ForEach(entries) { entry in
@@ -154,7 +144,7 @@ struct TodayTimetableView: View {
 					if showsDate {
 						Text(entry.date.displayLabel)
 							.font(.footnote)
-							.foregroundStyle(.secondary)
+							.foregroundStyle(.black)
 					}
 				}
 			} icon: {
@@ -164,7 +154,7 @@ struct TodayTimetableView: View {
 			.font(.title3)
 			.padding(5)
 			.frame(maxWidth: .infinity, alignment: .leading)
-			.foregroundStyle(entry.foregroundColor)
+			.foregroundStyle(.black)
 			.background {
 				GeometryReader { proxy in
 					Image(entry.backgroundImageName)
@@ -459,16 +449,6 @@ private struct TodaySchoolTimeline: View {
 		.padding(.top, 10)
 		.padding(.bottom, 8)
 		.padding(.horizontal, timelineHorizontalPadding)
-		.background {
-			GeometryReader { proxy in
-				Image("paper")
-					.resizable()
-					.scaledToFill()
-					.frame(width: proxy.size.width, height: proxy.size.height)
-					.clipped()
-			}
-			.clipShape(RoundedRectangle(cornerRadius: outerCornerRadius))
-		}
 		.glassEffect(.clear, in: RoundedRectangle(cornerRadius: outerCornerRadius))
 	}
 
@@ -508,8 +488,8 @@ private struct TodaySchoolTimeline: View {
 		let cardHeight = baseCardHeight + (isExpanded ? expandedContentHeight : 0)
 
 		VStack(alignment: .leading, spacing: 8) {
-			HStack(alignment: .top) {
-				HStack(alignment: .top, spacing: 10) {
+			HStack(alignment: .center) {
+				HStack(alignment: .center, spacing: 10) {
 					Text("\(period.number)")
 						.font(.caption.monospacedDigit())
 						.frame(width: 15)
@@ -530,7 +510,7 @@ private struct TodaySchoolTimeline: View {
 						}
 					}
 				}
-				.frame(maxHeight: .infinity, alignment: .topLeading)
+				.frame(maxHeight: .infinity, alignment: .centerLeading)
 
 				Spacer()
 
@@ -548,16 +528,6 @@ private struct TodaySchoolTimeline: View {
 		.frame(height: cardHeight, alignment: .top)
 		.accessibilityLabel(subject?.id ?? "Free Period")
 		.accessibilityValue(isExpanded ? "Expanded" : "Collapsed")
-		.background {
-			GeometryReader { proxy in
-				Image("paperWhite")
-					.resizable()
-					.scaledToFill()
-					.frame(width: proxy.size.width, height: proxy.size.height)
-					.clipped()
-			}
-			.clipShape(RoundedRectangle(cornerRadius: periodCornerRadius, style: .continuous))
-		}
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: periodCornerRadius, style: .continuous))
 		.contentShape(RoundedRectangle(cornerRadius: periodCornerRadius, style: .continuous))
 		.onTapGesture {

@@ -58,7 +58,7 @@ struct FriendRequestsSheet: View {
 				}
 			}
 		}
-		.appPaperPresentation()
+		.scrollContentBackground(.hidden)
 		.listStyle(.insetGrouped)
 		.appNavigationTitle("Friend Requests")
 		.toolbar {

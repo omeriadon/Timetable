@@ -64,6 +64,8 @@ struct HapticButtonStyle: ButtonStyle {
 	func makeBody(configuration: Configuration) -> some View {
 		configuration.label
 			.opacity(configuration.isPressed ? 0.8 : 1)
+			.scaleEffect(configuration.isPressed ? 0.96 : 1)
+			.animation(.snappy(duration: 0.15), value: configuration.isPressed)
 			.onChange(of: configuration.isPressed) { _, isPressed in
 				if isPressed {
 					HapticManager.shared.play(.button)
