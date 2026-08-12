@@ -13,6 +13,7 @@ struct FriendGrayPaperBackground: View {
 					height: proxy.size.height
 				)
 				.clipped()
+				.accessibilityHidden(true)
 		}
 		.clipShape(
 			RoundedRectangle(
@@ -36,6 +37,7 @@ struct FriendBackgroundPaperBackground: View {
 					height: proxy.size.height
 				)
 				.clipped()
+				.accessibilityHidden(true)
 		}
 		.clipShape(
 			RoundedRectangle(
@@ -59,6 +61,7 @@ struct FriendForegroundPaperBackground: View {
 					height: proxy.size.height
 				)
 				.clipped()
+				.accessibilityHidden(true)
 		}
 		.clipShape(
 			RoundedRectangle(
@@ -87,6 +90,7 @@ struct FriendBrownPaperBackground: View {
 				.scaledToFill()
 				.frame(width: proxy.size.width, height: proxy.size.height)
 				.clipped()
+				.accessibilityHidden(true)
 		}
 		.clipShape(shape)
 	}
@@ -110,6 +114,7 @@ struct FriendWhitePaperBackground: View {
 				.scaledToFill()
 				.frame(width: proxy.size.width, height: proxy.size.height)
 				.clipped()
+				.accessibilityHidden(true)
 		}
 		.clipShape(shape)
 	}

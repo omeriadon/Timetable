@@ -63,11 +63,33 @@ struct SessionCellView: View {
 			}
 		}
 		.foregroundStyle(.white)
+		.accessibilityElement(children: .ignore)
+		.accessibilityLabel(accessibilityLabel)
+	}
+
+	private var accessibilityLabel: String {
+		let dayLabel = TimetableLayout.shortDayLabels[day]
+		let sessionLabel = TimetableLayout.sessions[session]
+
+		if let subject = subjectLookup[Slot(day, session)] {
+			return "\(dayLabel), \(sessionLabel), \(subject.id)"
+		}
+
+		if TimetableLayout.isBreakSession(index: session) {
+			return "\(dayLabel), \(sessionLabel), break"
+		}
+
+		if TimetableLayout.isUnavailable(day: day, session: session) {
+			return "\(dayLabel), \(sessionLabel), unavailable"
+		}
+
+		return "\(dayLabel), \(sessionLabel), free"
 	}
 }
 
 struct BreakSessionView: View {
 	var body: some View {
 		Color.clear
+			.accessibilityHidden(true)
 	}
 }

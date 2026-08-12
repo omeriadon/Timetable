@@ -220,7 +220,37 @@ struct GradeAverageCard: View {
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
 		.foregroundStyle(Color(.inversePrimary))
+		.accessibilityElement(children: .ignore)
+		.accessibilityLabel(accessibilitySummary)
 		.dynamicTypeSize(.small)
+	}
+
+	private var accessibilitySummary: String {
+		var values = [
+			"Average \(formattedPercentage(average))",
+		]
+
+		if showsATAR {
+			values.append("Top four average \(formattedPercentage(topFourAverage))")
+			values.append("Predicted ATAR \(formattedATAR(predictedATAR))")
+			values.append("Goal ATAR \(formattedATAR(goalATAR))")
+		}
+
+		return values.joined(separator: ", ")
+	}
+
+	private func formattedPercentage(_ value: Double?) -> String {
+		guard let value else {
+			return "not set"
+		}
+		return value.formatted(.percent.precision(.fractionLength(1)))
+	}
+
+	private func formattedATAR(_ value: Double?) -> String {
+		guard let value else {
+			return "not set"
+		}
+		return value.formatted(.number.precision(.fractionLength(2)))
 	}
 
 	private func averageSummary(
@@ -294,6 +324,8 @@ struct GradeSubjectCard: View {
 		.padding(14)
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
 		.foregroundStyle(.primary)
+		.accessibilityElement(children: .ignore)
+		.accessibilityLabel("\(subject.id), \(average.map { $0.formatted(.percent.precision(.fractionLength(1))) } ?? "no assessments yet")")
 	}
 }
 
@@ -320,6 +352,7 @@ struct GradeGauge: View {
 		.gaugeStyle(.accessoryCircularCapacity)
 		.tint(tint)
 		.frame(width: 68, height: 68)
+		.accessibilityHidden(true)
 	}
 }
 
@@ -428,5 +461,7 @@ struct GradeAssessmentRow: View {
 				}
 			}
 		}
+		.accessibilityElement(children: .combine)
+		.accessibilityLabel("\(assessment.name), \(assessment.date.displayLabel), score \(assessment.score.formatted(.percent.precision(.fractionLength(1)))), weighting \(assessment.weighting.formatted(.percent.precision(.fractionLength(1))))")
 	}
 }

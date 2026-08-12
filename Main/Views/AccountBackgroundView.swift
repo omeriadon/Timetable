@@ -29,7 +29,8 @@ struct AccountBackgroundView: View {
 			let loaded = await profile.profilePictureColours()
 			colours = loaded.map(\.swiftUIColor)
 			noise = profile.profilePictureNoise
-			speed = profile.profilePictureSpeed
+			 speed = profile.profilePictureSpeed
 		}
+		.accessibilityHidden(true)
 	}
 }

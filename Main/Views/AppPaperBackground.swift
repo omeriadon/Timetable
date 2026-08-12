@@ -8,6 +8,7 @@ struct AppPaperBackground: View {
 				.scaledToFill()
 				.frame(width: proxy.size.width, height: proxy.size.height)
 				.clipped()
+				.accessibilityHidden(true)
 		}
 		.ignoresSafeArea()
 	}

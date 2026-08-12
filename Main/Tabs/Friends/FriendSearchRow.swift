@@ -25,8 +25,23 @@ struct FriendSearchRow: View {
 			action
 		}
 		.padding(.vertical, 8)
+		.accessibilityElement(children: .combine)
+		.accessibilityLabel(accessibilityLabel)
 		.onChange(of: result.relationship) { _, value in
 			relationship = value
+		}
+	}
+
+	private var accessibilityLabel: String {
+		switch relationship {
+			case .friends:
+				return "\(result.profile.displayName), friends"
+			case .pendingOutgoing:
+				return "\(result.profile.displayName), friend request sent"
+			case .pendingIncoming:
+				return "\(result.profile.displayName), incoming friend request"
+			case nil:
+				return result.profile.displayName
 		}
 	}
 

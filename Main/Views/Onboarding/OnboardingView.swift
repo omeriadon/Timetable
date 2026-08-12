@@ -149,6 +149,8 @@ struct OnboardingView: View {
 		.font(.title)
 		.buttonStyle(.glassProminent)
 		.controlSize(.extraLarge)
+		.accessibilityLabel("Previous onboarding step")
+		.accessibilityHint("Returns to the previous setup step")
 		.disabled(isBackDisabled)
 		.animation(.easeInOut, value: selectedIndex)
 	}
@@ -184,6 +186,8 @@ struct OnboardingView: View {
 		.buttonBorderShape(.circle)
 		.buttonStyle(.glassProminent)
 		.controlSize(.extraLarge)
+		.accessibilityLabel(selectedIndex == pages.count - 1 ? "Finish onboarding" : "Next onboarding step")
+		.accessibilityHint(selectedIndex == pages.count - 1 ? "Completes setup" : "Continues to the next setup step")
 		.disabled(isNextDisabled)
 	}
 

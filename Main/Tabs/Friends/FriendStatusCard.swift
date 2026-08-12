@@ -74,6 +74,8 @@ struct FriendStatusCard: View {
 			.padding(style == .detail ? 14 : 10)
 			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
 			.contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+			.accessibilityElement(children: .combine)
+			.accessibilityLabel("\(displayName), \(scheduleStatus.title), \(nextClassTitle(for: scheduleStatus)), location status \(locationStatus.title)")
 			.animation(.bouncy, value: scheduleStatus.title)
 		}
 	}

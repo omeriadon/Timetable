@@ -79,6 +79,7 @@ struct OnboardingBackground: View {
 		.background(.black)
 		.allowsHitTesting(false)
 		.ignoresSafeArea()
+		.accessibilityHidden(true)
 		.onChange(of: currentPageID, initial: true) { _, pageID in
 			updateRenderer(for: OnboardingBackgroundStyle.style(for: pageID))
 		}

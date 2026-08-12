@@ -51,6 +51,7 @@ struct TimetableWeekGrid: View {
 
 	@ViewBuilder
 	private func cell(day: Int, session: Int, subjectLookup: [Slot: Subject]) -> some View {
+		let slot = Slot(day, session)
 		let cell = SessionCellView(day, session, subjectLookup, selectedSlot)
 			.contentShape(Rectangle())
 
@@ -58,13 +59,39 @@ struct TimetableWeekGrid: View {
 			cell
 		} else {
 			cell
+				.accessibilityElement(children: .ignore)
+				.accessibilityLabel(slotAccessibilityLabel(for: slot, subjectLookup: subjectLookup))
+				.accessibilityValue(selectedSlot == slot ? "Selected" : "Not selected")
+				.accessibilityAddTraits(.isButton)
+				.accessibilityAction {
+					select(slot, isAvailable: subjectLookup[slot] != nil)
+				}
 				.onTapGesture {
 					select(
-						Slot(day, session),
-						isAvailable: subjectLookup[Slot(day, session)] != nil
+						slot,
+						isAvailable: subjectLookup[slot] != nil
 					)
 				}
 		}
+	}
+
+	private func slotAccessibilityLabel(for slot: Slot, subjectLookup: [Slot: Subject]) -> String {
+		let day = TimetableLayout.shortDayLabels[slot.day]
+		let session = TimetableLayout.sessions[slot.session]
+
+		if let subject = subjectLookup[slot] {
+			return "\(day), \(session), \(subject.id)"
+		}
+
+		if TimetableLayout.isBreakSession(index: slot.session) {
+			return "\(day), \(session), break"
+		}
+
+		if TimetableLayout.isUnavailable(day: slot.day, session: slot.session) {
+			return "\(day), \(session), unavailable"
+		}
+
+		return "\(day), \(session), free"
 	}
 
 	private func select(_ slot: Slot, isAvailable: Bool) {
