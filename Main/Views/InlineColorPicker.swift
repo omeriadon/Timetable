@@ -141,6 +141,9 @@ public struct InlineColorPicker<T: ColorOptions>: View {
 					}
 					.frame(width: 44, height: 44)
 					.buttonStyle(.plain)
+					.accessibilityLabel(accessibilityName(for: color))
+					.accessibilityValue(isSelected ? "Selected" : "Not selected")
+					.accessibilityAddTraits(isSelected ? .isSelected : [])
 				}
 			}
 		}
@@ -155,6 +158,7 @@ public struct InlineColorPicker<T: ColorOptions>: View {
 				}
 				pickerBody
 			}
+			.accessibilityElement(children: .contain)
 		}
 
 		if let systemImage, description == nil {

@@ -60,6 +60,7 @@ struct SubjectHeaderRowView: View {
 				.buttonStyle(.plain)
 				.buttonBorderShape(.circle)
 				.glassEffect(.clear.tint(.red).interactive(), in: Circle())
+				.accessibilityLabel("Delete \(subject.name.isEmpty ? "subject" : subject.name)")
 				.disabled(isSaving)
 			}
 			.padding(.top, 10)

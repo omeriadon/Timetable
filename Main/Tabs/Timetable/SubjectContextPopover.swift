@@ -33,6 +33,8 @@ struct SubjectContextPopover: View {
 		.padding(15)
 		.presentationCornerRadius(5)
 		.presentationBackground(subject.colour.swiftUIColor.opacity(0.5))
+		.accessibilityElement(children: .combine)
+		.accessibilityLabel("\(owner), \(subject.id), classroom and teacher details")
 	}
 
 	private var header: some View {
@@ -81,6 +83,7 @@ struct SubjectContextPopover: View {
 		}
 		.padding(6)
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 15))
+		.accessibilityElement(children: .combine)
 	}
 
 	@ContentBuilder

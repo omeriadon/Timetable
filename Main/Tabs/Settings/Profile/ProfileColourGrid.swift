@@ -33,9 +33,11 @@ struct ProfileColourGrid: View {
 						.animation(.snappy(duration: 0.1), value: contains(item.colour))
 				}
 				.buttonStyle(.plain)
+				.accessibilityLabel(accessibilityLabel(for: item.colour))
 				.accessibilityValue(
 					contains(item.colour) ? "Selected" : "Not selected"
 				)
+				.accessibilityAddTraits(contains(item.colour) ? .isSelected : [])
 			}
 		}
 		.compositingGroup()
@@ -60,6 +62,13 @@ struct ProfileColourGrid: View {
 
 	private func contains(_ colour: RGBAColor) -> Bool {
 		selection.contains(colour)
+	}
+
+	private func accessibilityLabel(for colour: RGBAColor) -> String {
+		let red = Int((colour.r * 255).rounded())
+		let green = Int((colour.g * 255).rounded())
+		let blue = Int((colour.b * 255).rounded())
+		return "Profile colour, red \(red), green \(green), blue \(blue)"
 	}
 
 	private static func makePalette() -> [ProfilePaletteColour] {

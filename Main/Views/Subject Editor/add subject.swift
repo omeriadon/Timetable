@@ -32,6 +32,8 @@ struct AddSubjectPageView: View {
 				}
 			}
 			.buttonStyle(.plain)
+			.accessibilityLabel("Add new subject")
+			.accessibilityHint("Creates a new subject\(pendingPrefillSlot == nil ? "" : " using the selected timetable slot")")
 			.disabled(isSaving)
 
 			Text("Add New Subject")

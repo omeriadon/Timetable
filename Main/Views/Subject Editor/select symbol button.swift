@@ -34,6 +34,8 @@ struct SymbolSelectionRowView: View {
 		}
 		.buttonStyle(.plain)
 		.frame(height: 25)
+		.accessibilityLabel("Symbol, \(subject.symbol)")
+		.accessibilityHint("Opens the symbol picker")
 		.disabled(isSaving)
 	}
 }

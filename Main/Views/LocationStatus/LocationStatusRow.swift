@@ -69,6 +69,7 @@ struct LocationStatusRow: View {
 						height: proxy.size.height
 					)
 					.clipped()
+					.accessibilityHidden(true)
 			}
 			.clipShape(
 				RoundedRectangle(
@@ -79,6 +80,26 @@ struct LocationStatusRow: View {
 		}
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
 		.contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+		.accessibilityElement(children: .combine)
+		.accessibilityLabel(accessibilityLabel)
+		.accessibilityHint("Shows your arrival statistics")
+	}
+
+	private var accessibilityLabel: String {
+		guard let status else {
+			return "Your location status, unavailable"
+		}
+
+		let prefix = switch status.state {
+			case .onCampus:
+				"Arrived"
+			case .offCampus:
+				"Left"
+			case .withinTenMinutes, .withinFiveMinutes:
+				"Updated"
+		}
+
+		return "Your location status, \(status.title), \(prefix) \(status.updatedAt.formatted(date: .omitted, time: .shortened))"
 	}
 }
 

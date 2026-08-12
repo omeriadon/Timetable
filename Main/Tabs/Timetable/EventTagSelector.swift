@@ -82,6 +82,9 @@ private struct EventTagSelectionView: View {
 		.buttonStyle(.plain)
 		.listRowBackground(isSelected ? AnyView(Color.accentColor) : AnyView(GlurView(radius: 1, offset: 0, interpolation: 0)))
 		.animation(.snappy(duration: 0.1), value: isSelected)
+		.accessibilityLabel(tag.displayName)
+		.accessibilityValue(isSelected ? "Selected" : "Not selected")
+		.accessibilityHint("Double tap to \(isSelected ? "remove" : "add") this tag")
 		.accessibilityAddTraits(isSelected ? .isSelected : [])
 	}
 

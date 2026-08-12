@@ -83,6 +83,8 @@ struct SubjectMetadataEditorView: View {
 				}
 			}
 			.buttonStyle(.plain)
+			.accessibilityLabel("Classroom, \(subject.classroom.isEmpty ? "No classroom" : subject.classroom)")
+			.accessibilityHint("Edits the classroom")
 
 			Button {
 				draftValue = subject.teacher
@@ -96,6 +98,8 @@ struct SubjectMetadataEditorView: View {
 				)
 			}
 			.buttonStyle(.plain)
+			.accessibilityLabel("Teacher, \(parsedTeacher.displayName)")
+			.accessibilityHint("Edits the teacher")
 		}
 		.alert("Edit \(editingTarget?.title ?? "Metadata")", item: $editingTarget) { target in
 			TextField(target.placeholder, text: $draftValue)

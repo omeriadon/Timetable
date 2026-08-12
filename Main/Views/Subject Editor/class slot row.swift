@@ -55,6 +55,7 @@ struct SlotRowView: View {
 			.frame(width: 20)
 			.buttonStyle(.glassProminent)
 			.buttonBorderShape(.circle)
+			.accessibilityLabel("Delete \(dayLabel(slot.day)) period \(slot.period)")
 			.disabled(isSaving)
 		}
 	}
