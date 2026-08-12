@@ -144,6 +144,7 @@ struct ProfileAppearanceSheet: View {
 				}
 			}
 		}
+		.foregroundStyle(.primary)
 		.sheet(isPresented: $presentsEmojiPicker) {
 			ProfileEmojiPicker(
 				selection: $draft.emoji,
@@ -254,7 +255,7 @@ private struct ProfileForegroundEditor: View {
 				.foregroundStyle(.secondary)
 
 			ProfileForegroundColourGrid(selection: $foregroundColour)
-				.clipShape(ConcentricRectangle(corners: .concentric(minimum: 20), isUniform: false))
+				.clipShape(ConcentricRectangle(corners: .concentric(minimum: 12), isUniform: false))
 
 			if contentKind == .monogram {
 				GlassEffectContainer(spacing: 5) {

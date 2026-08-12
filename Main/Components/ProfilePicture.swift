@@ -136,28 +136,25 @@ struct ProfilePicture: View {
 	}
 
 	private var monogramFont: Font {
-		let baseDescriptor = UIFont.systemFont(ofSize: 150).fontDescriptor
-		let designedDescriptor = baseDescriptor.withDesign(monogramUIFontDesign) ?? baseDescriptor
-		let weightedDescriptor = designedDescriptor.addingAttributes([
-			.traits: [
-				UIFontDescriptor.TraitKey.weight: monogramUIFontWeight.rawValue,
-			],
-		])
-
-		return Font(UIFont(descriptor: weightedDescriptor, size: 150))
-	}
-
-	private var monogramUIFontDesign: UIFontDescriptor.SystemDesign {
 		switch appearance.fontDesign {
 			case .default:
-				.default
+				Font(UIFont.systemFont(ofSize: 150, weight: monogramUIFontWeight))
 			case .serif:
-				.serif
+				Font(designedSystemFont(.serif))
 			case .monospaced:
-				.monospaced
+				Font(UIFont.monospacedSystemFont(ofSize: 150, weight: monogramUIFontWeight))
 			case .rounded:
-				.rounded
+				Font(designedSystemFont(.rounded))
 		}
+	}
+
+	private func designedSystemFont(_ design: UIFontDescriptor.SystemDesign) -> UIFont {
+		let weightedDescriptor = UIFont.systemFont(
+			ofSize: 150,
+			weight: monogramUIFontWeight
+		).fontDescriptor
+		let designedDescriptor = weightedDescriptor.withDesign(design) ?? weightedDescriptor
+		return UIFont(descriptor: designedDescriptor, size: 150)
 	}
 
 	private var monogramUIFontWeight: UIFont.Weight {
