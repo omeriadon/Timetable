@@ -516,6 +516,8 @@ nonisolated struct SynchronizeUserDeviceRequest: Codable, Sendable {
 	let platform: String
 	let osMajorVersion: Int
 	let osMinorVersion: Int
+	let appVersion: String
+	let appBuild: String
 	let isDebug: Bool
 	let isTestFlight: Bool
 	let isOSBeta: Bool

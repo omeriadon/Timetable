@@ -111,7 +111,6 @@ struct TimetableApp: App {
 						try await AccountBootstrapService.shared.bootstrap()
 					}
 					sessionStore.configureDeviceLifecycle {
-						await DeviceSynchronizationService.shared.synchronize()
 						await NotificationRegistrationService.shared.uploadPendingToken()
 						#if os(iOS) && !targetEnvironment(macCatalyst)
 							if Platform.current == .iOS {
@@ -131,6 +130,7 @@ struct TimetableApp: App {
 					_ = ClientIdentityProvider.shared.identity()
 					await indexEntities()
 					await sessionStore.restore()
+					await DeviceSynchronizationService.shared.synchronize()
 					await NotificationRegistrationService.shared.requestRemoteRegistration()
 
 					#if os(iOS) && !targetEnvironment(macCatalyst)

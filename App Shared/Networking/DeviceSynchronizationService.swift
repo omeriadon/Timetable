@@ -20,6 +20,8 @@ final class DeviceSynchronizationService {
 					platform: identity.platform.rawValue,
 					osMajorVersion: version.majorVersion,
 					osMinorVersion: version.minorVersion,
+					appVersion: Bundle.main.appVersion,
+					appBuild: Bundle.main.buildNumber,
 					isDebug: Self.isDebug,
 					isTestFlight: AppChannel.current == .testFlight,
 					isOSBeta: Self.isOSBeta

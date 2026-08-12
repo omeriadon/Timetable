@@ -53,6 +53,8 @@ nonisolated struct AdministrationStatisticsResponse: Codable, Sendable {
 	let deviceTypes: [AdministrationStatisticCount]
 	let osVersions: [AdministrationStatisticCount]
 	let deviceOSVersions: [AdministrationDeviceOSVersionCount]
+	let appVersions: [AdministrationStatisticCount]
+	let appVersionBuilds: [AdministrationStatisticCount]
 }
 
 nonisolated struct AdministrationStatisticCount: Codable, Identifiable, Sendable {

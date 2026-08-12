@@ -17,6 +17,46 @@ struct AdministrationDeviceStatisticsView: View {
 			}
 			.glurListRowBackground()
 
+			Section("App versions") {
+				if let appVersions = model.statistics?.appVersions, !appVersions.isEmpty {
+					Chart(appVersions) { item in
+						SectorMark(angle: .value("Devices", item.count))
+							.foregroundStyle(by: .value("App version", item.label))
+							.accessibilityLabel("Version \(item.label)")
+							.accessibilityValue("\(item.count) devices")
+					}
+					.frame(height: 220)
+
+					ForEach(appVersions) { item in
+						LabeledContent(item.label, value: item.count.formatted())
+					}
+				} else {
+					Text("No app version data")
+						.foregroundStyle(.secondary)
+				}
+			}
+			.glurListRowBackground()
+
+			Section("App versions and builds") {
+				if let appVersionBuilds = model.statistics?.appVersionBuilds, !appVersionBuilds.isEmpty {
+					Chart(appVersionBuilds) { item in
+						SectorMark(angle: .value("Devices", item.count))
+							.foregroundStyle(by: .value("App version and build", item.label))
+							.accessibilityLabel(item.label)
+							.accessibilityValue("\(item.count) devices")
+					}
+					.frame(height: 220)
+
+					ForEach(appVersionBuilds) { item in
+						LabeledContent(item.label, value: item.count.formatted())
+					}
+				} else {
+					Text("No app build data")
+						.foregroundStyle(.secondary)
+				}
+			}
+			.glurListRowBackground()
+
 			Section("Device types") {
 				if let deviceTypes = model.statistics?.deviceTypes, !deviceTypes.isEmpty {
 					Chart(deviceTypes) { item in
