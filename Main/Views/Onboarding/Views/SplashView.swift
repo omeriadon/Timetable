@@ -12,8 +12,8 @@ struct SplashView: View {
 	var body: some View {
 		VStack(spacing: 50) {
 			Image("Icon")
-				.accessibilityHidden(true)
 				.resizable()
+				.accessibilityHidden(true)
 				.aspectRatio(contentMode: .fit)
 				.frame(width: 300)
 				.animation(.spring(duration: 0.5, bounce: 0.8, blendDuration: 0)) { view in

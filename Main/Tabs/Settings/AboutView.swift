@@ -23,9 +23,9 @@ struct AboutView: View {
 			VStack {
 				ZStack(alignment: .bottomTrailing) {
 					Image("Icon")
-						.accessibilityHidden(true)
 						.resizable()
 						.aspectRatio(contentMode: .fit)
+						.accessibilityHidden(true)
 						.frame(width: 200)
 
 					if AppChannel.current != .appStore {

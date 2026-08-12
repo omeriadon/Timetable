@@ -367,9 +367,9 @@ private struct TodayNoSchoolDayCard: View {
 		.background {
 			GeometryReader { proxy in
 				Image("foregroundPaper")
-					.accessibilityHidden(true)
 					.resizable()
 					.scaledToFill()
+					.accessibilityHidden(true)
 					.frame(width: proxy.size.width, height: proxy.size.height)
 					.clipped()
 			}
@@ -464,9 +464,9 @@ private struct TodaySchoolTimeline: View {
 		.background {
 			GeometryReader { proxy in
 				Image("paper")
-					.accessibilityHidden(true)
 					.resizable()
 					.scaledToFill()
+					.accessibilityHidden(true)
 					.frame(width: proxy.size.width, height: proxy.size.height)
 					.clipped()
 			}
