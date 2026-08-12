@@ -165,15 +165,14 @@ struct GradeAverageCard: View {
 						averageSummary(
 							title: "Average",
 							value: average,
-							gaugeOnTrailing: false,
-							showsGauge: false
+							isTrailing: false
 						)
 						.frame(width: proxy.size.width / 2, alignment: .leading)
 
 						averageSummary(
 							title: "Top 4",
 							value: topFourAverage,
-							gaugeOnTrailing: true
+							isTrailing: true
 						)
 						.frame(width: proxy.size.width / 2, alignment: .leading)
 					}
@@ -183,7 +182,7 @@ struct GradeAverageCard: View {
 				averageSummary(
 					title: "Average",
 					value: average,
-					gaugeOnTrailing: false
+					isTrailing: false
 				)
 			}
 
@@ -227,25 +226,12 @@ struct GradeAverageCard: View {
 	private func averageSummary(
 		title: String,
 		value: Double?,
-		gaugeOnTrailing: Bool,
-		showsGauge: Bool = true
+		isTrailing: Bool
 	) -> some View {
-		HStack(alignment: .center, spacing: 8) {
-			if gaugeOnTrailing {
-				averageSummaryText(title: title, value: value, isTrailing: true)
-				if showsGauge {
-					GradeGauge(value: value, tint: .inversePrimary)
-				}
-			} else {
-				if showsGauge {
-					GradeGauge(value: value, tint: .inversePrimary)
-				}
-				averageSummaryText(title: title, value: value, isTrailing: false)
-			}
-		}
+		averageSummaryText(title: title, value: value, isTrailing: isTrailing)
 		.frame(
 			maxWidth: .infinity,
-			alignment: gaugeOnTrailing ? .trailing : .leading
+			alignment: isTrailing ? .trailing : .leading
 		)
 	}
 
