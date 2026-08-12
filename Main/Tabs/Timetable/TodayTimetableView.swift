@@ -522,11 +522,11 @@ private struct TodaySchoolTimeline: View {
 						if isExpanded, let subject {
 							Label(subject.teacher.displayName, systemImage: "person.fill")
 								.font(.headline)
-								.foregroundStyle(.white)
+								.foregroundStyle(.black)
 
 							Label(subject.classroom.displayName, systemImage: "door.left.hand.open")
 								.font(.headline)
-								.foregroundStyle(.white)
+								.foregroundStyle(.black)
 						}
 					}
 				}
@@ -546,7 +546,7 @@ private struct TodaySchoolTimeline: View {
 		}
 		.padding(10)
 		.frame(height: cardHeight, alignment: .top)
-		.foregroundStyle(.white)
+		.foregroundStyle(.black)
 		.accessibilityLabel(subject?.id ?? "Free Period")
 		.accessibilityValue(isExpanded ? "Expanded" : "Collapsed")
 		.background {

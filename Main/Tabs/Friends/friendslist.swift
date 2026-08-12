@@ -22,6 +22,7 @@ struct FriendsView: View {
 
 	var body: some View {
 		searchableContent
+			.appPaperBackground()
 			.animation(.easeInOut, value: searchText.isEmpty)
 			.scrollEdgeEffect()
 			.appNavigationTitle("Friends", style: .main, accent: true)
@@ -215,7 +216,6 @@ struct FriendsView: View {
 				List {
 					ForEach(searchResults) { result in
 						FriendSearchRow(result: result)
-							.listRowBackground(Image("paper").resizable().scaledToFill())
 					}
 				}
 				.transition(.blurReplace)

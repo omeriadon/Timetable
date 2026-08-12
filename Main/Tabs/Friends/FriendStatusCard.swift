@@ -72,11 +72,6 @@ struct FriendStatusCard: View {
 			}
 			.foregroundStyle(.primary)
 			.padding(style == .detail ? 14 : 10)
-			.background {
-				if style == .list {
-					FriendGrayPaperBackground(cornerRadius: 28)
-				}
-			}
 			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
 			.contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
 			.animation(.bouncy, value: scheduleStatus.title)

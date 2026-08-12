@@ -37,7 +37,6 @@ struct FriendRequestsSheet: View {
 		List {
 			if incomingRequests.isEmpty, outgoingRequests.isEmpty {
 				ContentUnavailableView("No Friend Requests", systemImage: "bell.slash")
-					.glurListRowBackground()
 			} else {
 				if !incomingRequests.isEmpty {
 					Section("Incoming") {
@@ -45,7 +44,6 @@ struct FriendRequestsSheet: View {
 							incomingRequestRow(request)
 						}
 					}
-					.glurListRowBackground()
 				}
 
 				if !outgoingRequests.isEmpty {
@@ -54,7 +52,6 @@ struct FriendRequestsSheet: View {
 							outgoingRequestRow(request)
 						}
 					}
-					.glurListRowBackground()
 				}
 			}
 		}
@@ -124,7 +121,6 @@ struct FriendRequestsSheet: View {
 			.disabled(deletingRequestID == request.id)
 		}
 		.padding(.vertical, 6)
-		.glurListRowBackground()
 	}
 
 	private func outgoingRequestRow(_ request: FriendSummary) -> some View {
@@ -150,7 +146,6 @@ struct FriendRequestsSheet: View {
 			.disabled(deletingRequestID == request.id)
 		}
 		.padding(.vertical, 6)
-		.glurListRowBackground()
 	}
 
 	private func refreshRequests() async {

@@ -88,6 +88,7 @@ struct GradeTrackerView: View {
 				try? await service.refresh()
 			}
 		}
+		.appPaperBackground()
 	}
 
 	var isSenior: Bool {
@@ -218,24 +219,6 @@ struct GradeAverageCard: View {
 		}
 		.padding(18)
 		.frame(maxWidth: .infinity, alignment: .leading)
-		.background {
-			GeometryReader { proxy in
-				Image("foregroundPaper")
-					.resizable()
-					.scaledToFill()
-					.frame(
-						width: proxy.size.width,
-						height: proxy.size.height
-					)
-					.clipped()
-			}
-			.clipShape(
-				RoundedRectangle(
-					cornerRadius: 28,
-					style: .continuous
-				)
-			)
-		}
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
 		.foregroundStyle(Color(.inversePrimary))
 		.dynamicTypeSize(.small)
@@ -323,7 +306,6 @@ struct GradeSubjectCard: View {
 			Spacer()
 		}
 		.padding(14)
-		.background(FriendGrayPaperBackground(cornerRadius: 28))
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
 		.foregroundStyle(.primary)
 	}

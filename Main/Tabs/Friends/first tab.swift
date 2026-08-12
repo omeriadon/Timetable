@@ -77,6 +77,11 @@ struct FriendOverview: View {
 						.padding(14)
 						.foregroundStyle(.black)
 						.frame(maxWidth: .infinity, alignment: .topLeading)
+						.background {
+							FriendWhitePaperBackground(
+								cornerRadius: FriendDetailLayout.itemCornerRadius
+							)
+						}
 						.clipShape(
 							RoundedRectangle(
 								cornerRadius: FriendDetailLayout.itemCornerRadius,
@@ -121,6 +126,11 @@ struct FriendOverview: View {
 							.foregroundStyle(subject.colour.swiftUIColor)
 							.padding(14)
 							.frame(maxWidth: .infinity, alignment: .leading)
+							.background {
+								FriendWhitePaperBackground(
+									cornerRadius: FriendDetailLayout.itemCornerRadius
+								)
+							}
 							.clipShape(
 								RoundedRectangle(
 									cornerRadius: FriendDetailLayout.itemCornerRadius,

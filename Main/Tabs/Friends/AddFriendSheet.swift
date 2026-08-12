@@ -58,7 +58,6 @@ struct AddFriendSheet: View {
 				List {
 					ForEach(results) { result in
 						FriendSearchRow(result: result)
-							.glurListRowBackground()
 							.listRowSeparator(.hidden)
 							.id(result.id)
 							.transition(.blurReplace)
