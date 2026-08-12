@@ -44,7 +44,11 @@ nonisolated struct UserProfileResponse: Codable {
 		displayName = try container.decode(String.self, forKey: .displayName)
 		createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt)
 		authority = try container.decodeIfPresent(AccountAuthority.self, forKey: .authority) ?? .user
-		appearance = try container.decodeIfPresent(ProfileAppearance.self, forKey: .appearance) ?? .default
+		if container.contains(.appearance), try !container.decodeNil(forKey: .appearance) {
+			appearance = try container.decode(ProfileAppearance.self, forKey: .appearance)
+		} else {
+			appearance = ProfileAppearance.default
+		}
 		photo = try container.decodeIfPresent(ProfilePhotoMetadata.self, forKey: .photo)
 		let serverBadges = try container.decodeIfPresent([ProfileBadge].self, forKey: .badges) ?? []
 		let authorityBadge = BuiltInProfileBadgeConfiguration.badge(for: authority).map { [$0] } ?? []

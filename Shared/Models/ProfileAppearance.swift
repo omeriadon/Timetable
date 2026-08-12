@@ -14,19 +14,26 @@ nonisolated struct ProfileAppearance: Codable, Defaults.Serializable, Hashable, 
 	let noise: Double
 
 	static let currentVersion = 3
+	private static let defaultForegroundColour = RGBAColor(
+		red: 1,
+		green: 1,
+		blue: 1,
+		alpha: 1
+	)
+	private static let defaultColours = [
+		RGBAColor(red: 0.416, green: 0.655, blue: 1, alpha: 1),
+		RGBAColor(red: 0.690, green: 0.424, blue: 1, alpha: 1),
+		RGBAColor(red: 0.980, green: 0.616, blue: 0.702, alpha: 1),
+	]
 
 	static let `default` = ProfileAppearance(
 		contentKind: .emoji,
 		monogram: "",
 		emoji: "👤",
-		foregroundColour: RGBAColor(hexString: "#FFFFFF"),
+		foregroundColour: defaultForegroundColour,
 		fontDesign: .rounded,
 		fontWeight: .semibold,
-		colours: [
-			RGBAColor(hexString: "#6AA7FF"),
-			RGBAColor(hexString: "#B06CFF"),
-			RGBAColor(hexString: "#FA9DB3"),
-		],
+		colours: defaultColours,
 		speed: 0.2,
 		noise: 64
 	)
@@ -76,7 +83,7 @@ nonisolated struct ProfileAppearance: Codable, Defaults.Serializable, Hashable, 
 		version = try container.decodeIfPresent(Int.self, forKey: .version) ?? 1
 		monogram = try container.decodeIfPresent(String.self, forKey: .monogram) ?? ""
 		foregroundColour = try container.decodeIfPresent(RGBAColor.self, forKey: .foregroundColour)
-			?? RGBAColor(hexString: "#FFFFFF")
+			?? Self.defaultForegroundColour
 		colours = try Array(
 			container.decodeIfPresent([RGBAColor].self, forKey: .colours) ?? Self.defaultColours
 		).prefix(3).map(\.self)
@@ -112,12 +119,6 @@ nonisolated struct ProfileAppearance: Codable, Defaults.Serializable, Hashable, 
 		try container.encode(speed, forKey: .speed)
 		try container.encode(noise, forKey: .noise)
 	}
-
-	private static let defaultColours = [
-		RGBAColor(hexString: "#6AA7FF"),
-		RGBAColor(hexString: "#B06CFF"),
-		RGBAColor(hexString: "#FA9DB3"),
-	]
 
 	private static func legacyEmoji(for symbol: String) -> String {
 		switch symbol {
