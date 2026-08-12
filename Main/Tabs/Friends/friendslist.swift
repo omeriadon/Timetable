@@ -7,10 +7,8 @@ struct FriendsView: View {
 	@Default(.hasSeenLocationStatusWhatsNew) private var hasSeenLocationStatusWhatsNew
 	@State private var service = FriendService.shared
 	@State private var searchText = ""
-	@State private var searchResults: [FriendSearchResult] = []
 	@State private var sheet: FriendsSheet?
 	@State private var selectedFriend: FriendSummary?
-	@State private var isSearching = false
 	@State private var isSearchPresented = false
 	@FocusState private var isSearchFieldFocused
 	@State private var showsArrivalStatistics = false
@@ -24,7 +22,7 @@ struct FriendsView: View {
 	var body: some View {
 		searchableContent
 			.appPaperBackground()
-			.animation(.easeInOut, value: searchText.isEmpty)
+			.animation(.easeInOut, value: filteredFriends.map(\.id))
 			.scrollEdgeEffect()
 			.appNavigationTitle("Friends", style: .main, accent: true)
 			.toolbar {
@@ -52,9 +50,6 @@ struct FriendsView: View {
 				}
 			}
 			.task { await refresh() }
-			.task(id: searchText) {
-				await search(for: searchText)
-			}
 			.popover(item: $sheet) { sheet in
 				Group {
 					switch sheet {
@@ -107,7 +102,7 @@ struct FriendsView: View {
 	}
 
 	private var searchableContent: some View {
-		content
+		friendsList
 			.safeAreaInset(edge: .bottom, spacing: 0) {
 				FriendsSearchBar(
 					text: $searchText,
@@ -115,18 +110,6 @@ struct FriendsView: View {
 					isFocused: $isSearchFieldFocused
 				)
 			}
-	}
-
-	private var content: some View {
-		ZStack {
-			if searchText.isEmpty {
-				friendsList
-					.transition(.blurReplace)
-			} else {
-				friendSearchResults
-					.transition(.blurReplace)
-			}
-		}
 	}
 
 	let isPad = UIDevice.current.userInterfaceIdiom == .pad
@@ -160,8 +143,12 @@ struct FriendsView: View {
 						description: Text("Search by name to find friends.")
 					)
 					.padding(.top, 72)
+				} else if filteredFriends.isEmpty {
+					ContentUnavailableView.search(text: cleanedSearchText)
+						.padding(.top, 72)
+						.transition(.opacity)
 				} else {
-					let forEach = ForEach(friends) { friend in
+					let forEach = ForEach(filteredFriends) { friend in
 						Button {
 							if presentation == .iOS {
 								selectedFriend = friend
@@ -179,6 +166,7 @@ struct FriendsView: View {
 							id: friendTransitionID(friend),
 							in: friendSheetNamespace
 						)
+						.transition(.opacity)
 					}
 
 					LazyVGrid(
@@ -187,7 +175,7 @@ struct FriendsView: View {
 						],
 						spacing: 14
 					) {
-						if #available(anyAppleOS 27, *) {
+						if #available(anyAppleOS 27, *), cleanedSearchText.isEmpty {
 							forEach
 								.reorderable()
 						} else {
@@ -197,7 +185,7 @@ struct FriendsView: View {
 				}
 			}
 
-			if #available(anyAppleOS 27, *) {
+			if #available(anyAppleOS 27, *), cleanedSearchText.isEmpty {
 				vStack
 					.reorderContainer(for: FriendSummary.self) { difference in
 						difference.apply(to: &friends)
@@ -212,34 +200,6 @@ struct FriendsView: View {
 		.minimizingToolbarOnScrollDown()
 		.refreshable {
 			await refresh()
-		}
-	}
-
-	private var friendSearchResults: some View {
-		ZStack {
-			if isSearching {
-				ProgressView()
-					.frame(maxWidth: .infinity)
-					.listRowBackground(Color.clear)
-					.transition(.blurReplace)
-			} else if searchResults.isEmpty {
-				ContentUnavailableView.search(text: searchText)
-					.listRowBackground(Color.clear)
-					.transition(.blurReplace)
-			} else {
-				List {
-					ForEach(searchResults) { result in
-						FriendSearchRow(result: result)
-					}
-				}
-				.transition(.blurReplace)
-			}
-		}
-		.animation(.easeInOut, value: "\(isSearching)\(searchResults.isEmpty)")
-		.minimizingToolbarOnScrollDown()
-		.listStyle(.plain)
-		.refreshable {
-			await refreshSearchResults()
 		}
 	}
 
@@ -299,41 +259,19 @@ struct FriendsView: View {
 		}
 	}
 
-	private func search(for value: String) async {
-		let query = value.trimmingCharacters(in: .whitespacesAndNewlines)
-		guard query.count >= 2 else {
-			searchResults = []
-			isSearching = false
-			return
-		}
-		do {
-			try await Task.sleep(for: .milliseconds(300))
-		} catch {
-			return
-		}
-		guard !Task.isCancelled else {
-			return
-		}
-
-		isSearching = true
-		defer {
-			if !Task.isCancelled {
-				isSearching = false
-			}
-		}
-		do {
-			let results = try await service.search(query: query)
-			guard !Task.isCancelled else { return }
-			searchResults = results
-		} catch {
-			guard !Task.isCancelled else { return }
-			searchResults = []
-		}
+	private var cleanedSearchText: String {
+		searchText.trimmingCharacters(in: .whitespacesAndNewlines)
 	}
 
-	private func refreshSearchResults() async {
-		await refresh()
-		await search(for: searchText)
+	private var filteredFriends: [FriendSummary] {
+		guard !cleanedSearchText.isEmpty else {
+			return friends
+		}
+
+		return friends.filter { friend in
+			friend.friend.displayName.localizedCaseInsensitiveContains(cleanedSearchText)
+				|| friend.friend.email.localizedCaseInsensitiveContains(cleanedSearchText)
+		}
 	}
 
 	private func saveFriendOrder(_ orderedFriends: [FriendSummary]) {
