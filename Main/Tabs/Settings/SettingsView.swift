@@ -161,6 +161,13 @@ struct SettingsView: View {
 							.tag(design)
 					}
 				}
+
+				Picker("Future Events", systemImage: "calendar.badge.clock", selection: futureEventRangeBinding) {
+					ForEach(FutureEventRange.allCases) { range in
+						Text(range.title)
+							.tag(range)
+					}
+				}
 			} else {
 				Button { showSignInRequired() } label: { Label("Updates", systemImage: "switch.2") }
 			}
@@ -362,6 +369,36 @@ struct SettingsView: View {
 						guard generation == settingsSaveGeneration else { return }
 						settings = previous
 						statusBadgeManager.addBadge(id: UUID(), title: "Unable to save preferences", secondaryText: error.localizedDescription, priority: 4, view: .error)
+					}
+				}
+			}
+		)
+	}
+
+	private var futureEventRangeBinding: Binding<FutureEventRange> {
+		Binding(
+			get: { settings.futureEventRange },
+			set: { value in
+				settingsSaveGeneration += 1
+				let generation = settingsSaveGeneration
+				let previous = committedSettings
+				settings.futureEventRange = value
+				let proposed = settings
+				Task {
+					do {
+						try await settingsSync.updateSettings(proposed)
+						guard generation == settingsSaveGeneration else { return }
+						committedSettings = proposed
+					} catch {
+						guard generation == settingsSaveGeneration else { return }
+						settings = previous
+						statusBadgeManager.addBadge(
+							id: UUID(),
+							title: "Unable to save preferences",
+							secondaryText: error.localizedDescription,
+							priority: 4,
+							view: .error
+						)
 					}
 				}
 			}

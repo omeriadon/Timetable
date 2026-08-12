@@ -7,6 +7,7 @@ struct DatesView: View {
 	@Default(.calendarEvents) private var events
 	@Default(.gradeTracker) private var gradeTracker
 	@Default(.timetable) private var subjects
+	@Default(.accountSettings) private var accountSettings
 	@State private var presentationTarget: PlannerPresentationTarget?
 	@State private var eventService = CalendarEventsSyncService.shared
 	@Environment(\.statusBadgeManager) private var badges
@@ -213,8 +214,12 @@ struct DatesView: View {
 	}
 
 	private var dateWindow: ClosedRange<SchoolCalendarDate> {
-		let start = SchoolCalendarDate(TimetableClock.now, calendar: calendar)
-		let end = SchoolCalendarDate(calendar.date(byAdding: .month, value: 2, to: TimetableClock.now) ?? TimetableClock.now, calendar: calendar)
+		let now = TimetableClock.now
+		let start = SchoolCalendarDate(now, calendar: calendar)
+		let end = SchoolCalendarDate(
+			accountSettings.futureEventRange.endDate(from: now, calendar: calendar),
+			calendar: calendar
+		)
 		return start ... end
 	}
 

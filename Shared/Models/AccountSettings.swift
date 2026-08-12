@@ -26,6 +26,7 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 	var liveActivitiesEnabled: Bool
 	var highlightsCurrentDay: Bool
 	var appFontDesign: AppFontDesign
+	var futureEventRange: FutureEventRange
 	var watchBleedEnabled: Bool
 	var notificationsEnabled: Bool
 	var broadcastNotificationsEnabled: Bool
@@ -43,6 +44,7 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 		liveActivitiesEnabled: true,
 		highlightsCurrentDay: true,
 		appFontDesign: .monospaced,
+		futureEventRange: .oneMonth,
 		watchBleedEnabled: true,
 		notificationsEnabled: true,
 		broadcastNotificationsEnabled: true,
@@ -57,6 +59,7 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 		liveActivitiesEnabled: Bool,
 		highlightsCurrentDay: Bool = true,
 		appFontDesign: AppFontDesign = .monospaced,
+		futureEventRange: FutureEventRange = .oneMonth,
 		watchBleedEnabled: Bool = true,
 		notificationsEnabled: Bool,
 		broadcastNotificationsEnabled: Bool,
@@ -69,6 +72,7 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 		self.liveActivitiesEnabled = liveActivitiesEnabled
 		self.highlightsCurrentDay = highlightsCurrentDay
 		self.appFontDesign = appFontDesign
+		self.futureEventRange = futureEventRange
 		self.watchBleedEnabled = watchBleedEnabled
 		self.notificationsEnabled = notificationsEnabled
 		self.broadcastNotificationsEnabled = broadcastNotificationsEnabled
@@ -85,6 +89,7 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 		liveActivitiesEnabled = try container.decodeIfPresent(Bool.self, forKey: .liveActivitiesEnabled) ?? Self.default.liveActivitiesEnabled
 		highlightsCurrentDay = try container.decodeIfPresent(Bool.self, forKey: .highlightsCurrentDay) ?? Self.default.highlightsCurrentDay
 		appFontDesign = try container.decodeIfPresent(AppFontDesign.self, forKey: .appFontDesign) ?? Self.default.appFontDesign
+		futureEventRange = try container.decodeIfPresent(FutureEventRange.self, forKey: .futureEventRange) ?? Self.default.futureEventRange
 		watchBleedEnabled = try container.decodeIfPresent(Bool.self, forKey: .watchBleedEnabled) ?? Self.default.watchBleedEnabled
 		notificationsEnabled = try container.decodeIfPresent(Bool.self, forKey: .notificationsEnabled) ?? Self.default.notificationsEnabled
 		broadcastNotificationsEnabled = try container.decodeIfPresent(Bool.self, forKey: .broadcastNotificationsEnabled) ?? Self.default.broadcastNotificationsEnabled
