@@ -37,7 +37,7 @@ struct ProfileColourGrid: View {
 						.animation(.snappy(duration: 0.1), value: contains(item.colour))
 				}
 				.buttonStyle(.plain)
-				.accessibilityLabel(accessibilityLabel(for: item.colour))
+				.accessibilityLabel(colourAccessibilityLabel(for: item.colour))
 				.accessibilityValue(
 					contains(item.colour) ? "Selected" : "Not selected"
 				)
@@ -66,13 +66,6 @@ struct ProfileColourGrid: View {
 
 	private func contains(_ colour: RGBAColor) -> Bool {
 		selection.contains(colour)
-	}
-
-	static func accessibilityLabel(for colour: RGBAColor) -> String {
-		let red = Int((colour.r * 255).rounded())
-		let green = Int((colour.g * 255).rounded())
-		let blue = Int((colour.b * 255).rounded())
-		return "Profile colour, red \(red), green \(green), blue \(blue)"
 	}
 
 	static func makePalette(
@@ -222,7 +215,7 @@ struct ProfileForegroundColourGrid: View {
 				}
 		}
 		.buttonStyle(.plain)
-		.accessibilityLabel(ProfileColourGrid.accessibilityLabel(for: colour))
+		.accessibilityLabel(colourAccessibilityLabel(for: colour))
 		.accessibilityValue(isSelected ? "Selected" : "Not selected")
 		.accessibilityAddTraits(isSelected ? .isSelected : [])
 	}
@@ -231,4 +224,11 @@ struct ProfileForegroundColourGrid: View {
 		let luminance = 0.2126 * colour.r + 0.7152 * colour.g + 0.0722 * colour.b
 		return luminance > 0.6 ? .black : .white
 	}
+}
+
+func colourAccessibilityLabel(for colour: RGBAColor) -> String {
+	let red = Int((colour.r * 255).rounded())
+	let green = Int((colour.g * 255).rounded())
+	let blue = Int((colour.b * 255).rounded())
+	return "Profile colour, red \(red), green \(green), blue \(blue)"
 }
