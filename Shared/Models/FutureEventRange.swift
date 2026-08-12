@@ -32,15 +32,15 @@ nonisolated enum FutureEventRange: String, Codable, CaseIterable, Hashable, Iden
 	func endDate(from date: Date, calendar: Calendar) -> Date {
 		switch self {
 			case .oneWeek:
-				calendar.date(byAdding: .weekOfYear, value: 1, to: date) ?? date
+				return calendar.date(byAdding: .weekOfYear, value: 1, to: date) ?? date
 			case .twoWeeks:
-				calendar.date(byAdding: .weekOfYear, value: 2, to: date) ?? date
+				return calendar.date(byAdding: .weekOfYear, value: 2, to: date) ?? date
 			case .oneMonth:
-				calendar.date(byAdding: .month, value: 1, to: date) ?? date
+				return calendar.date(byAdding: .month, value: 1, to: date) ?? date
 			case .twoMonths:
-				calendar.date(byAdding: .month, value: 2, to: date) ?? date
+				return calendar.date(byAdding: .month, value: 2, to: date) ?? date
 			case .threeMonths:
-				calendar.date(byAdding: .month, value: 3, to: date) ?? date
+				return calendar.date(byAdding: .month, value: 3, to: date) ?? date
 			case .endOfYear:
 				let year = calendar.component(.year, from: date)
 				return calendar.date(from: DateComponents(
