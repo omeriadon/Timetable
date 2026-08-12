@@ -59,8 +59,6 @@ struct FriendStatusCard: View {
 						.font(style == .detail ? .body : .caption)
 						.foregroundStyle(.secondary)
 				}
-
-				Spacer(minLength: 1)
 			}
 			.foregroundStyle(.primary)
 			.padding(style == .detail ? 14 : 10)
@@ -142,7 +140,6 @@ struct FriendLocationStatusCard: View {
 						Text(statusTime)
 							.font(.caption2)
 							.foregroundStyle(.secondary)
-							.padding(.trailing, 2)
 					}
 				}
 			}
