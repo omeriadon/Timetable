@@ -281,16 +281,19 @@ struct SettingsView: View {
 				Label("About Timetable", systemImage: "info.circle")
 			}
 			.listRowBackground(
-				ColorfulView(
-					color: $colors,
-					speed: $speed,
-					bias: .constant(0.00001),
-					noise: .constant(64),
-					transitionSpeed: $colorTransitionSpeed,
-					frameLimit: .constant(60),
-					renderScale: .constant(1)
-				)
-				.background(.clear)
+				ZStack {
+					GlurView(radius: 2, offset: 0, interpolation: 0)
+
+					ColorfulView(
+						color: $colors,
+						speed: $speed,
+						bias: .constant(0.00001),
+						noise: .constant(64),
+						transitionSpeed: $colorTransitionSpeed,
+						frameLimit: .constant(60),
+						renderScale: .constant(1)
+					)
+				}
 			)
 
 			Label {
