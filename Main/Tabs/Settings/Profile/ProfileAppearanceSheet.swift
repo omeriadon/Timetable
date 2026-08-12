@@ -12,8 +12,6 @@ struct ProfileAppearanceSheet: View {
 	@State private var draft: ProfileAppearanceDraft
 	@State private var isSaving = false
 	@State private var presentsEmojiPicker = false
-	@State private var presentsFontPicker = false
-	@State private var presentsColourPicker = false
 
 	@State private var selectedPhotoItem: PhotosPickerItem?
 	@State private var photoSelectionState = ProfilePhotoSelectionState.idle
@@ -31,55 +29,6 @@ struct ProfileAppearanceSheet: View {
 		NavigationStack {
 			ScrollView {
 				VStack(spacing: 20) {
-					if draft.contentKind == .monogram {
-						GlassEffectContainer(spacing: 5) {
-							HStack {
-								Button(action: showFontPicker) {
-									Label {
-										Text("Font")
-									} icon: {
-										Image(systemName: "textformat")
-											.foregroundStyle(.tertiary)
-											.font(.caption)
-									}
-								}
-								.buttonStyle(.glass)
-								.popover(isPresented: $presentsFontPicker) {
-									ProfileFontPicker(
-										design: $draft.fontDesign,
-										weight: $draft.fontWeight
-									)
-									.frame(width: 300, height: 400)
-									.presentationCompactAdaptation(.popover)
-								}
-
-								Spacer()
-									.frame(width: 15)
-
-								HStack {
-									Text("Monogram")
-										.foregroundStyle(.tertiary)
-										.font(.caption)
-
-									TextField("", text: $draft.monogram)
-										.textCase(.uppercase)
-										.textFieldStyle(.plain)
-										.accessibilityLabel("Profile monogram")
-										.onChange(of: draft.monogram) { _, value in
-											let normalized = String(value.prefix(3)).uppercased()
-											if normalized != value {
-												draft.monogram = normalized
-											}
-										}
-								}
-								.padding(5)
-								.padding(.horizontal, 5)
-								.glassEffect(.clear.interactive())
-							}
-						}
-						.transition(.blurReplace)
-					}
-
 					if draft.contentKind == .photo {
 						ProfilePhotoControls(
 							selection: $selectedPhotoItem,
@@ -105,6 +54,14 @@ struct ProfileAppearanceSheet: View {
 					}
 
 					if draft.contentKind != .photo {
+						ProfileForegroundEditor(
+							contentKind: draft.contentKind,
+							foregroundColour: $draft.foregroundColour,
+							fontDesign: $draft.fontDesign,
+							fontWeight: $draft.fontWeight,
+							monogram: $draft.monogram
+						)
+
 						VStack(alignment: .center, spacing: 10) {
 							Text("Background")
 								.frame(maxWidth: .infinity, alignment: .leading)
@@ -218,14 +175,6 @@ struct ProfileAppearanceSheet: View {
 		presentsEmojiPicker = true
 	}
 
-	private func showFontPicker() {
-		presentsFontPicker = true
-	}
-
-	private func showColourPicker() {
-		presentsColourPicker = true
-	}
-
 	private func loadPhoto(_ item: PhotosPickerItem?) {
 		guard let item else {
 			return
@@ -285,6 +234,68 @@ struct ProfileAppearanceSheet: View {
 				close()
 			} catch {
 				statusBadges.present(error: error, title: "Unable to save profile")
+			}
+		}
+	}
+}
+
+private struct ProfileForegroundEditor: View {
+	let contentKind: ProfileContentKind
+	@Binding var foregroundColour: RGBAColor
+	@Binding var fontDesign: ProfileFontDesign
+	@Binding var fontWeight: ProfileFontWeight
+	@Binding var monogram: String
+	@State private var presentsFontPicker = false
+
+	var body: some View {
+		VStack(alignment: .center, spacing: 10) {
+			Text("Foreground")
+				.frame(maxWidth: .infinity, alignment: .leading)
+				.foregroundStyle(.secondary)
+
+			ProfileForegroundColourGrid(selection: $foregroundColour)
+				.clipShape(ConcentricRectangle(corners: .concentric(minimum: 20), isUniform: false))
+
+			if contentKind == .monogram {
+				GlassEffectContainer(spacing: 5) {
+					HStack {
+						Button("Font", systemImage: "textformat") {
+							presentsFontPicker = true
+						}
+						.buttonStyle(.glass)
+						.popover(isPresented: $presentsFontPicker) {
+							ProfileFontPicker(
+								design: $fontDesign,
+								weight: $fontWeight
+							)
+							.frame(width: 300, height: 400)
+							.presentationCompactAdaptation(.popover)
+						}
+
+						Spacer()
+							.frame(width: 15)
+
+						HStack {
+							Text("Monogram")
+								.foregroundStyle(.tertiary)
+								.font(.caption)
+
+							TextField("", text: $monogram)
+								.textCase(.uppercase)
+								.textFieldStyle(.plain)
+								.accessibilityLabel("Profile monogram")
+								.onChange(of: monogram) { _, value in
+									let normalized = String(value.prefix(3)).uppercased()
+									if normalized != value {
+										monogram = normalized
+									}
+								}
+						}
+						.padding(5)
+						.padding(.horizontal, 5)
+						.glassEffect(.clear.interactive())
+					}
+				}
 			}
 		}
 	}

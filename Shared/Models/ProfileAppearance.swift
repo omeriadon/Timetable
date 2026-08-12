@@ -6,18 +6,20 @@ nonisolated struct ProfileAppearance: Codable, Defaults.Serializable, Hashable, 
 	let contentKind: ProfileContentKind
 	let monogram: String
 	let emoji: String
+	let foregroundColour: RGBAColor
 	let fontDesign: ProfileFontDesign
 	let fontWeight: ProfileFontWeight
 	let colours: [RGBAColor]
 	let speed: Double
 	let noise: Double
 
-	static let currentVersion = 2
+	static let currentVersion = 3
 
 	static let `default` = ProfileAppearance(
 		contentKind: .emoji,
 		monogram: "",
 		emoji: "👤",
+		foregroundColour: RGBAColor(hexString: "#FFFFFF"),
 		fontDesign: .rounded,
 		fontWeight: .semibold,
 		colours: [
@@ -34,6 +36,7 @@ nonisolated struct ProfileAppearance: Codable, Defaults.Serializable, Hashable, 
 		contentKind: ProfileContentKind,
 		monogram: String,
 		emoji: String,
+		foregroundColour: RGBAColor,
 		fontDesign: ProfileFontDesign,
 		fontWeight: ProfileFontWeight,
 		colours: [RGBAColor],
@@ -44,6 +47,7 @@ nonisolated struct ProfileAppearance: Codable, Defaults.Serializable, Hashable, 
 		self.contentKind = contentKind
 		self.monogram = monogram
 		self.emoji = emoji
+		self.foregroundColour = foregroundColour.normalized
 		self.fontDesign = fontDesign
 		self.fontWeight = fontWeight
 		self.colours = Array(colours.prefix(3)).isEmpty ? Self.defaultColours : Array(colours.prefix(3))
@@ -56,6 +60,7 @@ nonisolated struct ProfileAppearance: Codable, Defaults.Serializable, Hashable, 
 		case contentKind
 		case monogram
 		case emoji
+		case foregroundColour
 		case fontDesign
 		case fontWeight
 		case colours
@@ -70,6 +75,8 @@ nonisolated struct ProfileAppearance: Codable, Defaults.Serializable, Hashable, 
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		version = try container.decodeIfPresent(Int.self, forKey: .version) ?? 1
 		monogram = try container.decodeIfPresent(String.self, forKey: .monogram) ?? ""
+		foregroundColour = try container.decodeIfPresent(RGBAColor.self, forKey: .foregroundColour)
+			?? RGBAColor(hexString: "#FFFFFF")
 		colours = try Array(
 			container.decodeIfPresent([RGBAColor].self, forKey: .colours) ?? Self.defaultColours
 		).prefix(3).map(\.self)
@@ -98,6 +105,7 @@ nonisolated struct ProfileAppearance: Codable, Defaults.Serializable, Hashable, 
 		try container.encode(contentKind, forKey: .contentKind)
 		try container.encode(monogram, forKey: .monogram)
 		try container.encode(emoji, forKey: .emoji)
+		try container.encode(foregroundColour, forKey: .foregroundColour)
 		try container.encode(fontDesign, forKey: .fontDesign)
 		try container.encode(fontWeight, forKey: .fontWeight)
 		try container.encode(colours, forKey: .colours)

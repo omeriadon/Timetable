@@ -186,6 +186,7 @@ struct FriendAvatar: View {
 			contentKind: .emoji,
 			monogram: "",
 			emoji: symbol == "person.fill" ? "👤" : "✨",
+			foregroundColour: RGBAColor(hexString: "#FFFFFF"),
 			fontDesign: .rounded,
 			fontWeight: .semibold,
 			colours: ProfileAppearance.default.colours,

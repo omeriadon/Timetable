@@ -4,14 +4,18 @@ struct ProfileColourGrid: View {
 	let close: () -> Void = {}
 	@Binding var selection: [RGBAColor]
 
-	private static let columnCount = 15
+	static let columnCount = 15
 
 	private let columns = Array(
 		repeating: GridItem(.flexible(), spacing: 0),
 		count: Self.columnCount
 	)
 
-	private let palette = Self.makePalette()
+	private let palette = Self.makePalette(
+		colourRowCount: 6,
+		columnCount: Self.columnCount,
+		includesMonochrome: true
+	)
 
 	var body: some View {
 		LazyVGrid(columns: columns, spacing: 0) {
@@ -64,19 +68,22 @@ struct ProfileColourGrid: View {
 		selection.contains(colour)
 	}
 
-	private func accessibilityLabel(for colour: RGBAColor) -> String {
+	static func accessibilityLabel(for colour: RGBAColor) -> String {
 		let red = Int((colour.r * 255).rounded())
 		let green = Int((colour.g * 255).rounded())
 		let blue = Int((colour.b * 255).rounded())
 		return "Profile colour, red \(red), green \(green), blue \(blue)"
 	}
 
-	private static func makePalette() -> [ProfilePaletteColour] {
-		let colourRowCount = 6
+	static func makePalette(
+		colourRowCount: Int,
+		columnCount: Int,
+		includesMonochrome: Bool
+	) -> [ProfilePaletteColour] {
 		let saturation = 0.75
 
 		var rows: [[ProfilePaletteColour]] = (0 ..< colourRowCount).map { row in
-			let t = Double(row) / Double(colourRowCount - 1)
+			let t = colourRowCount == 1 ? 0.5 : Double(row) / Double(colourRowCount - 1)
 			let lightness = 0.92 - t * 0.84
 
 			return (0 ..< columnCount).map { column in
@@ -87,13 +94,15 @@ struct ProfileColourGrid: View {
 			}
 		}
 
-		let greyRow = (0 ..< columnCount).map { column -> ProfilePaletteColour in
-			let t = Double(column) / Double(columnCount - 1)
-			let lightness = 1 - t
-			let colour = RGBAColor(red: lightness, green: lightness, blue: lightness, alpha: 1)
-			return ProfilePaletteColour(id: "grey-\(column)", colour: colour)
+		if includesMonochrome {
+			let greyRow = (0 ..< columnCount).map { column -> ProfilePaletteColour in
+				let t = Double(column) / Double(columnCount - 1)
+				let lightness = 1 - t
+				let colour = RGBAColor(red: lightness, green: lightness, blue: lightness, alpha: 1)
+				return ProfilePaletteColour(id: "grey-\(column)", colour: colour)
+			}
+			rows.append(greyRow)
 		}
-		rows.append(greyRow)
 
 		return rows.flatMap(\.self)
 	}
@@ -151,5 +160,75 @@ struct ProfileColourGrid: View {
 				(brightness, p, q)
 		}
 		return RGBAColor(red: components.0, green: components.1, blue: components.2, alpha: 1)
+	}
+}
+
+struct ProfileForegroundColourGrid: View {
+	@Binding var selection: RGBAColor
+
+	private let palette = ProfileColourGrid.makePalette(
+		colourRowCount: 2,
+		columnCount: ProfileColourGrid.columnCount - 1,
+		includesMonochrome: false
+	)
+	private let monochromeColours = [
+		RGBAColor(hexString: "#FFFFFF"),
+		RGBAColor(hexString: "#000000"),
+	]
+	private let columns = Array(
+		repeating: GridItem(.flexible(), spacing: 0),
+		count: ProfileColourGrid.columnCount - 1
+	)
+
+	var body: some View {
+		GeometryReader { proxy in
+			let swatchSize = proxy.size.width / CGFloat(ProfileColourGrid.columnCount)
+
+			HStack(spacing: 0) {
+				LazyVGrid(columns: columns, spacing: 0) {
+					ForEach(palette) { item in
+						colourButton(item.colour)
+					}
+				}
+				.frame(width: swatchSize * CGFloat(ProfileColourGrid.columnCount - 1))
+
+				VStack(spacing: 0) {
+					ForEach(monochromeColours, id: \.self) { colour in
+						colourButton(colour)
+					}
+				}
+				.frame(width: swatchSize)
+			}
+		}
+		.aspectRatio(CGFloat(ProfileColourGrid.columnCount) / 2, contentMode: .fit)
+		.compositingGroup()
+	}
+
+	private func colourButton(_ colour: RGBAColor) -> some View {
+		let isSelected = selection == colour
+
+		return Button {
+			selection = colour
+		} label: {
+			Rectangle()
+				.fill(colour.swiftUIColor)
+				.aspectRatio(1, contentMode: .fit)
+				.overlay {
+					if isSelected {
+						ConcentricRectangle(corners: .concentric(), isUniform: false)
+							.stroke(selectionStrokeColour(for: colour), lineWidth: 6)
+							.clipShape(ConcentricRectangle(corners: .concentric(), isUniform: false))
+					}
+				}
+		}
+		.buttonStyle(.plain)
+		.accessibilityLabel(ProfileColourGrid.accessibilityLabel(for: colour))
+		.accessibilityValue(isSelected ? "Selected" : "Not selected")
+		.accessibilityAddTraits(isSelected ? .isSelected : [])
+	}
+
+	private func selectionStrokeColour(for colour: RGBAColor) -> Color {
+		let luminance = 0.2126 * colour.r + 0.7152 * colour.g + 0.0722 * colour.b
+		return luminance > 0.6 ? .black : .white
 	}
 }

@@ -5,6 +5,7 @@ struct ProfileAppearanceDraft {
 	var contentKind: ProfileContentKind
 	var monogram: String
 	var emoji: String
+	var foregroundColour: RGBAColor
 	var fontDesign: ProfileFontDesign
 	var fontWeight: ProfileFontWeight
 	var colours: [RGBAColor]
@@ -20,6 +21,7 @@ struct ProfileAppearanceDraft {
 		contentKind = appearance.contentKind
 		monogram = appearance.monogram
 		emoji = appearance.emoji
+		foregroundColour = appearance.foregroundColour
 		fontDesign = appearance.fontDesign
 		fontWeight = appearance.fontWeight
 		colours = appearance.colours
@@ -33,6 +35,7 @@ struct ProfileAppearanceDraft {
 			contentKind: contentKind,
 			monogram: monogram,
 			emoji: emoji,
+			foregroundColour: foregroundColour,
 			fontDesign: fontDesign,
 			fontWeight: fontWeight,
 			colours: colours,

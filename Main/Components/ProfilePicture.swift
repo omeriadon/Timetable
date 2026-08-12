@@ -119,16 +119,14 @@ struct ProfilePicture: View {
 							)
 						)
 						.fontDesign(appearance.fontDesign.profilePictureFontDesign)
+						.foregroundStyle(appearance.foregroundColour.swiftUIColor)
 						.minimumScaleFactor(0.01)
 						.padding(size * 0.15)
-						.contentTransition(.numericText())
-						.animation(reduceMotion ? nil : .easeInOut, value: appearance.fontDesign.profilePictureFontDesign)
-						.animation(reduceMotion ? nil : .easeInOut, value: appearance.fontWeight.profilePictureFontWeight)
-						.animation(reduceMotion ? nil : .easeInOut, value: appearance.monogram)
 
 				case .emoji:
 					Text(appearance.emoji)
 						.font(.system(size: 150))
+						.foregroundStyle(appearance.foregroundColour.swiftUIColor)
 						.minimumScaleFactor(0.01)
 						.padding(size * 0.15)
 			}
