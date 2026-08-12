@@ -9,7 +9,15 @@ struct AdministrationFriendshipDateChangeRequestsView: View {
 	var body: some View {
 		List {
 			ForEach(filteredRequests) { request in
-				Section(request.requesterDisplayName ?? request.requesterID.uuidString) {
+				Section {
+					LabeledContent(
+						"Requested by",
+						value: request.requesterDisplayName ?? request.requesterID.uuidString
+					)
+					LabeledContent(
+						"Friend",
+						value: request.friendDisplayName ?? request.friendID?.uuidString ?? "Unavailable"
+					)
 					LabeledContent("Requested date") {
 						Text(request.requestedDate, format: .dateTime.minute().hour().day().month().year())
 					}
@@ -49,7 +57,9 @@ struct AdministrationFriendshipDateChangeRequestsView: View {
 		guard !query.isEmpty else { return requests }
 		return requests.filter {
 			($0.requesterDisplayName ?? "").localizedCaseInsensitiveContains(query)
+				|| ($0.friendDisplayName ?? "").localizedCaseInsensitiveContains(query)
 				|| $0.requesterID.uuidString.localizedCaseInsensitiveContains(query)
+				|| ($0.friendID?.uuidString.localizedCaseInsensitiveContains(query) == true)
 				|| statusLabel(for: $0.action).localizedCaseInsensitiveContains(query)
 		}
 	}
@@ -85,8 +95,15 @@ struct AdministrationUserReportsView: View {
 	var body: some View {
 		List {
 			ForEach(filteredReports) { report in
-				Section(report.reportedUserDisplayName ?? report.reportedUserID.uuidString) {
-					LabeledContent("Reported by", value: report.reporterDisplayName ?? report.reporterID.uuidString)
+				Section {
+					LabeledContent(
+						"Reported user",
+						value: report.reportedUserDisplayName ?? report.reportedUserID.uuidString
+					)
+					LabeledContent(
+						"Reported by",
+						value: report.reporterDisplayName ?? report.reporterID.uuidString
+					)
 					LabeledContent("Status", value: statusLabel(for: report.action))
 
 					if let createdAt = report.createdAt {

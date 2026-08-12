@@ -20,6 +20,8 @@ nonisolated struct AdministrationFriendshipDateChangeRequest: Codable, Identifia
 	let id: UUID
 	let requesterID: UUID
 	let requesterDisplayName: String?
+	let friendID: UUID?
+	let friendDisplayName: String?
 	let requestedDate: Date
 	let action: ModerationAction
 	let createdAt: Date?
