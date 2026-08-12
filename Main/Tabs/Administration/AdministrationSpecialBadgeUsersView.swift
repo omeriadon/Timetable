@@ -36,6 +36,7 @@ struct AdministrationSpecialBadgeUsersView: View {
 				}
 			}
 			.buttonStyle(.plain)
+			.glurListRowBackground()
 		}
 		.searchable(text: $searchText, prompt: "Search users")
 		.appNavigationTitle("Users")
