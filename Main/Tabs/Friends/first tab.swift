@@ -18,6 +18,8 @@ struct FriendOverview: View {
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 14) {
+			FriendLocationStatusCard(item: locationStatus)
+
 			FriendStatusCard(friend: statusSummary, style: .detail)
 
 			sharedClassesCard(comparison.sharedClasses)

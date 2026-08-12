@@ -211,8 +211,6 @@ struct FriendsView: View {
 			"Wednesday",
 			"Thursday",
 			"Friday",
-			"Saturday",
-			"Sunday",
 		]
 
 		var body: some View {

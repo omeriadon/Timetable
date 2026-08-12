@@ -51,17 +51,6 @@ struct FriendStatusCard: View {
 					HStack(spacing: 6) {
 						Image(systemName: scheduleStatus.symbol)
 						Text(scheduleStatus.title)
-						if style == .detail {
-							Spacer()
-							VStack(alignment: .trailing, spacing: 4) {
-								locationBadge(locationStatus)
-								if let statusTime = locationStatus.statusTime {
-									Text(statusTime)
-										.font(.caption2)
-										.foregroundStyle(.secondary)
-								}
-							}
-						}
 					}
 					.font(style == .detail ? .title3 : .body)
 					.contentTransition(.numericText())
@@ -76,9 +65,24 @@ struct FriendStatusCard: View {
 			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
 			.contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
 			.accessibilityElement(children: .combine)
-			.accessibilityLabel("\(displayName), \(scheduleStatus.title), \(nextClassTitle(for: scheduleStatus)), location status \(locationStatus.title)")
+			.accessibilityLabel(accessibilityLabel(
+				for: scheduleStatus,
+				locationStatus: locationStatus
+			))
 			.animation(reduceMotion ? nil : .bouncy, value: scheduleStatus.title)
 		}
+	}
+
+	private func accessibilityLabel(
+		for scheduleStatus: FriendScheduleStatus,
+		locationStatus: FriendLocationStatus
+	) -> String {
+		let schedule = "\(displayName), \(scheduleStatus.title), \(nextClassTitle(for: scheduleStatus))"
+		guard style == .list else {
+			return schedule
+		}
+
+		return "\(schedule), location status \(locationStatus.title)"
 	}
 
 	private func locationBadge(_ locationStatus: FriendLocationStatus) -> some View {
@@ -100,6 +104,54 @@ struct FriendStatusCard: View {
 			status.nextTitle
 		} else {
 			"Next: \(status.nextTitle)"
+		}
+	}
+}
+
+struct FriendLocationStatusCard: View {
+	let item: LocationStatusItem?
+
+	var body: some View {
+		TimelineView(.periodic(from: .now, by: 30)) { context in
+			let status = FriendLocationStatus(
+				item: item,
+				at: TimetableClock.adjusted(context.date)
+			)
+
+			HStack(spacing: 12) {
+				Image(systemName: "location.fill")
+
+				Text("Location")
+					.font(.title3)
+
+				Spacer()
+
+				VStack(alignment: .trailing, spacing: 4) {
+					Text(status.title)
+						.font(.caption)
+						.fontWeight(.medium)
+						.padding(5)
+						.glassEffect(
+							.regular.tint(status.tint ?? nil).interactive(),
+							in: Capsule()
+						)
+
+					if let statusTime = status.statusTime {
+						Text(statusTime)
+							.font(.caption2)
+							.foregroundStyle(.secondary)
+					}
+				}
+			}
+			.padding(14)
+			.frame(maxWidth: .infinity)
+			.foregroundStyle(.primary)
+			.glassEffect(
+				.clear.interactive(),
+				in: RoundedRectangle(cornerRadius: 28, style: .continuous)
+			)
+			.accessibilityElement(children: .combine)
+			.accessibilityLabel("Location status, \(status.title), \(status.statusTime ?? "time unavailable")")
 		}
 	}
 }
