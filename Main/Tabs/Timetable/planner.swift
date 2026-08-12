@@ -169,7 +169,7 @@ struct DatesView: View {
 		HStack(alignment: .center, spacing: 14) {
 			Image(systemName: entry.symbol)
 				.font(.title)
-				.frame(width: 42)
+				.frame(width: 52)
 
 			VStack(alignment: .leading, spacing: 4) {
 				Text(entry.title)

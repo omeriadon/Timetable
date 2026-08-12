@@ -219,7 +219,9 @@ private struct TodayEventRow: View {
 	let showsDate: Bool
 
 	var body: some View {
-		Label {
+		HStack {
+			Image(systemName: entry.symbol)
+
 			VStack(alignment: .leading) {
 				Text(entry.title)
 
@@ -229,8 +231,6 @@ private struct TodayEventRow: View {
 						.foregroundStyle(.black)
 				}
 			}
-		} icon: {
-			Image(systemName: entry.symbol)
 		}
 		.padding(.vertical, 4)
 		.font(.title3)
