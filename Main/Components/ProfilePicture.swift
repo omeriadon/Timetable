@@ -112,13 +112,9 @@ struct ProfilePicture: View {
 
 				case .monogram:
 					Text(appearance.monogram)
-						.font(
-							.system(
-								size: 150,
-								weight: appearance.fontWeight.profilePictureFontWeight,
-								design: appearance.fontDesign.profilePictureFontDesign
-							)
-						)
+						.font(.system(size: 150))
+						.fontDesign(appearance.fontDesign.profilePictureFontDesign)
+						.fontWeight(appearance.fontWeight.profilePictureFontWeight)
 						.foregroundStyle(appearance.foregroundColour.swiftUIColor)
 						.animation(
 							reduceMotion ? .none : .easeInOut(duration: 0.2),
