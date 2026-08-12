@@ -28,6 +28,8 @@ struct AdministrationAppVersionView: View {
 				Button("Save App Versions", systemImage: "checkmark", role: .confirm) {
 					save()
 				}
+				.foregroundStyle(.white)
+				.buttonSizing(.flexible)
 				.buttonStyle(.glassProminent)
 				.disabled(isLoading || isSaving || !versionsAreValid)
 			}

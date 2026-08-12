@@ -15,6 +15,7 @@ struct AdministrationDeviceStatisticsView: View {
 					LabeledContent("App Store", value: statistics.releaseDevices.formatted())
 				}
 			}
+			.glurListRowBackground()
 
 			Section("Device types") {
 				if let deviceTypes = model.statistics?.deviceTypes, !deviceTypes.isEmpty {
@@ -32,6 +33,7 @@ struct AdministrationDeviceStatisticsView: View {
 						.foregroundStyle(.secondary)
 				}
 			}
+			.glurListRowBackground()
 
 			Section("Operating system versions") {
 				Picker("View", selection: $operatingSystemChartMode) {
@@ -82,6 +84,7 @@ struct AdministrationDeviceStatisticsView: View {
 						.foregroundStyle(.secondary)
 				}
 			}
+			.glurListRowBackground()
 
 			Section("Operating systems by device type") {
 				let grouped = Dictionary(grouping: model.statistics?.deviceOSVersions ?? [], by: \.platform)
@@ -111,6 +114,7 @@ struct AdministrationDeviceStatisticsView: View {
 						.foregroundStyle(.secondary)
 				}
 			}
+			.glurListRowBackground()
 		}
 		.appPaperBackground()
 		.scrollEdgeEffect()
