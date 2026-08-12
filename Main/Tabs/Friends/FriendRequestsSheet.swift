@@ -121,6 +121,7 @@ struct FriendRequestsSheet: View {
 			.accessibilityLabel("Delete friend request")
 			.disabled(deletingRequestID == request.id)
 		}
+		.glurListRowBackground()
 		.padding(.vertical, 6)
 	}
 
@@ -146,6 +147,7 @@ struct FriendRequestsSheet: View {
 			.accessibilityLabel("Delete friend request")
 			.disabled(deletingRequestID == request.id)
 		}
+		.glurListRowBackground()
 		.padding(.vertical, 6)
 	}
 

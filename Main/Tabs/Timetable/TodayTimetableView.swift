@@ -700,11 +700,11 @@ private struct TodaySchoolPeriodRow: View {
 						if isExpanded, let subject {
 							Label(subject.teacher.displayName, systemImage: "person.fill")
 								.font(.headline)
-								.foregroundStyle(.black)
+								.foregroundStyle(.secondary)
 
 							Label(subject.classroom.displayName, systemImage: "door.left.hand.open")
 								.font(.headline)
-								.foregroundStyle(.black)
+								.foregroundStyle(.secondary)
 						}
 					}
 				}

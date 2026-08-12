@@ -228,6 +228,7 @@ struct TimetableView: View {
 						)
 						.drawingGroup(opaque: false)
 					}
+					.padding(.top, 5)
 					.padding(.bottom, Device.isMacOS ? 7 : 10)
 					.background {
 						ZStack {

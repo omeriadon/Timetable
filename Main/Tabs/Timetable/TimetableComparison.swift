@@ -141,4 +141,5 @@ func item(
 	.padding(15)
 	.glassEffect(.clear.tint(colour).interactive(), in: top ? AnyShape(RoundedRectangle(cornerRadius: 30)) : AnyShape(Capsule()))
 	.contentShape(Rectangle())
+	.foregroundStyle(.white)
 }

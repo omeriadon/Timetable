@@ -218,6 +218,7 @@ struct GradeAverageCard: View {
 		}
 		.padding(18)
 		.frame(maxWidth: .infinity, alignment: .leading)
+		.background(FriendForegroundPaperBackground(cornerRadius: 28))
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
 		.foregroundStyle(Color(.inversePrimary))
 		.accessibilityElement(children: .ignore)

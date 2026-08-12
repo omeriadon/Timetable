@@ -348,11 +348,11 @@ private struct FriendsSearchBar: View {
 							.submitLabel(.search)
 
 						Button(role: .cancel) {
-							text = ""
-
-							isPresented = false
-
-							isFocused = false
+							withAnimation(.easeInOut(duration: 0.3)) {
+								text = ""
+								isPresented = false
+								isFocused = false
+							}
 						} label: {
 							Image(systemName: "xmark")
 						}
@@ -367,9 +367,13 @@ private struct FriendsSearchBar: View {
 						Spacer()
 
 						Button {
-							isPresented = true
+							withAnimation(.easeInOut(duration: 0.3)) {
+								isPresented = true
+							}
 
-							isFocused = true
+							Task { @MainActor in
+								isFocused = true
+							}
 						} label: {
 							Label("Search friends", systemImage: "magnifyingglass")
 								.labelStyle(.iconOnly)
