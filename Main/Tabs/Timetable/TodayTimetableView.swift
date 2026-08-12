@@ -63,6 +63,16 @@ struct TodayTimetableView: View {
 						.padding(.vertical, 10)
 						.padding(.bottom, 5)
 						.padding(.horizontal, TodayCardLayout.contentInset)
+						.background {
+							GeometryReader { proxy in
+								Image("paper")
+									.resizable()
+									.scaledToFill()
+									.frame(width: proxy.size.width, height: proxy.size.height)
+									.clipped()
+							}
+							.clipShape(RoundedRectangle(cornerRadius: TodayCardLayout.outerCornerRadius))
+						}
 						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: TodayCardLayout.outerCornerRadius))
 					}
 
@@ -449,6 +459,16 @@ private struct TodaySchoolTimeline: View {
 		.padding(.top, 10)
 		.padding(.bottom, 8)
 		.padding(.horizontal, timelineHorizontalPadding)
+		.background {
+			GeometryReader { proxy in
+				Image("paper")
+					.resizable()
+					.scaledToFill()
+					.frame(width: proxy.size.width, height: proxy.size.height)
+					.clipped()
+			}
+			.clipShape(RoundedRectangle(cornerRadius: outerCornerRadius))
+		}
 		.glassEffect(.clear, in: RoundedRectangle(cornerRadius: outerCornerRadius))
 	}
 
@@ -502,11 +522,11 @@ private struct TodaySchoolTimeline: View {
 						if isExpanded, let subject {
 							Label(subject.teacher.displayName, systemImage: "person.fill")
 								.font(.headline)
-								.foregroundStyle(.secondary)
+								.foregroundStyle(.white)
 
 							Label(subject.classroom.displayName, systemImage: "door.left.hand.open")
 								.font(.headline)
-								.foregroundStyle(.secondary)
+								.foregroundStyle(.white)
 						}
 					}
 				}
@@ -526,8 +546,19 @@ private struct TodaySchoolTimeline: View {
 		}
 		.padding(10)
 		.frame(height: cardHeight, alignment: .top)
+		.foregroundStyle(.white)
 		.accessibilityLabel(subject?.id ?? "Free Period")
 		.accessibilityValue(isExpanded ? "Expanded" : "Collapsed")
+		.background {
+			GeometryReader { proxy in
+				Image("paperWhite")
+					.resizable()
+					.scaledToFill()
+					.frame(width: proxy.size.width, height: proxy.size.height)
+					.clipped()
+			}
+			.clipShape(RoundedRectangle(cornerRadius: periodCornerRadius, style: .continuous))
+		}
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: periodCornerRadius, style: .continuous))
 		.contentShape(RoundedRectangle(cornerRadius: periodCornerRadius, style: .continuous))
 		.onTapGesture {

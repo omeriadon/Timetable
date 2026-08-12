@@ -22,7 +22,6 @@ struct FriendsView: View {
 
 	var body: some View {
 		searchableContent
-			.appPaperBackground()
 			.animation(.easeInOut, value: searchText.isEmpty)
 			.scrollEdgeEffect()
 			.appNavigationTitle("Friends", style: .main, accent: true)

@@ -77,11 +77,6 @@ struct FriendOverview: View {
 						.padding(14)
 						.foregroundStyle(.black)
 						.frame(maxWidth: .infinity, alignment: .topLeading)
-						.background {
-							FriendWhitePaperBackground(
-								cornerRadius: FriendDetailLayout.itemCornerRadius
-							)
-						}
 						.clipShape(
 							RoundedRectangle(
 								cornerRadius: FriendDetailLayout.itemCornerRadius,
@@ -102,11 +97,6 @@ struct FriendOverview: View {
 		.padding(14)
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.foregroundStyle(.primary)
-		.background {
-			FriendGrayPaperBackground(
-				cornerRadius: FriendDetailLayout.cardCornerRadius
-			)
-		}
 		.glassEffect(
 			.clear.interactive(),
 			in: RoundedRectangle(
@@ -131,11 +121,6 @@ struct FriendOverview: View {
 							.foregroundStyle(subject.colour.swiftUIColor)
 							.padding(14)
 							.frame(maxWidth: .infinity, alignment: .leading)
-							.background {
-								FriendWhitePaperBackground(
-									cornerRadius: FriendDetailLayout.itemCornerRadius
-								)
-							}
 							.clipShape(
 								RoundedRectangle(
 									cornerRadius: FriendDetailLayout.itemCornerRadius,
@@ -156,11 +141,6 @@ struct FriendOverview: View {
 		.padding(14)
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.foregroundStyle(.primary)
-		.background {
-			FriendGrayPaperBackground(
-				cornerRadius: FriendDetailLayout.cardCornerRadius
-			)
-		}
 		.glassEffect(
 			.clear.interactive(),
 			in: RoundedRectangle(
