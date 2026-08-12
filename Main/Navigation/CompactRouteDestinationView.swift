@@ -40,6 +40,8 @@ struct CompactRouteDestinationView: View {
 				}
 			case .settings(.root):
 				EmptyView()
+			case .settings(.appearance):
+				AppearanceSettingsView()
 			case .settings(.account), .account(.root), .account(.profile):
 				AccountView()
 			case .account(.authentication):

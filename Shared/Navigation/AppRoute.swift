@@ -39,6 +39,7 @@ enum FriendsRoute: Codable, Hashable, Sendable {
 
 enum SettingsRoute: Codable, Hashable, Sendable {
 	case root
+	case appearance
 	case account
 	case updatesAndNotifications
 	case tagSubscriptions

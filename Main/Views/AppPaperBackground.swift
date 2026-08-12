@@ -1,15 +1,16 @@
+import Defaults
 import SwiftUI
 
 struct AppPaperBackground: View {
+	@Default(.accountSettings) private var accountSettings
+
 	var body: some View {
-		GeometryReader { proxy in
-			Image("backgroundPaper")
-				.resizable()
-				.scaledToFill()
-				.frame(width: proxy.size.width, height: proxy.size.height)
-				.clipped()
-				.accessibilityHidden(true)
+		ZStack {
+			AppBackgroundSurface(background: accountSettings.appBackground)
+				.id(accountSettings.appBackground)
+				.transition(.opacity)
 		}
+		.animation(.easeInOut(duration: 0.25), value: accountSettings.appBackground)
 		.ignoresSafeArea()
 	}
 }

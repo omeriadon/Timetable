@@ -144,6 +144,12 @@ struct SettingsView: View {
 		Section("Preferences") {
 			if sessionStore.isAuthenticated {
 				NavigationLink {
+					AppearanceSettingsView()
+				} label: {
+					Label("Appearance", systemImage: "paintpalette")
+				}
+
+				NavigationLink {
 					TagSubscriptionsView()
 				} label: {
 					Label("Subscribed Event Tags", systemImage: "tag")
@@ -152,15 +158,6 @@ struct SettingsView: View {
 
 			if sessionStore.isAuthenticated {
 				NavigationLink { AccountAndSyncSettingsView() } label: { Label("Updates & Notifications", systemImage: "switch.2") }
-
-				Picker("App Font", systemImage: "character", selection: appFontDesignBinding) {
-					ForEach(AppFontDesign.allCases) { design in
-						Text(design.title)
-							.fontDesign(design.swiftUIFontDesign)
-							.fontWidth(design.swiftUIFontWidth)
-							.tag(design)
-					}
-				}
 
 				Picker("Future Events", systemImage: "calendar.badge.clock", selection: futureEventRangeBinding) {
 					ForEach(FutureEventRange.allCases) { range in
@@ -335,30 +332,6 @@ struct SettingsView: View {
 				let generation = settingsSaveGeneration
 				let previous = committedSettings
 				settings.highlightsCurrentDay = value
-				let proposed = settings
-				Task {
-					do {
-						try await settingsSync.updateSettings(proposed)
-						guard generation == settingsSaveGeneration else { return }
-						committedSettings = proposed
-					} catch {
-						guard generation == settingsSaveGeneration else { return }
-						settings = previous
-						statusBadgeManager.addBadge(id: UUID(), title: "Unable to save preferences", secondaryText: error.localizedDescription, priority: 4, view: .error)
-					}
-				}
-			}
-		)
-	}
-
-	private var appFontDesignBinding: Binding<AppFontDesign> {
-		Binding(
-			get: { settings.appFontDesign },
-			set: { value in
-				settingsSaveGeneration += 1
-				let generation = settingsSaveGeneration
-				let previous = committedSettings
-				settings.appFontDesign = value
 				let proposed = settings
 				Task {
 					do {

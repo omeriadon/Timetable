@@ -25,6 +25,8 @@ struct WideRouteDestinationView: View {
 			switch route {
 				case .root, .timetable(.root), .friends(.root), .settings(.root), .administration(.root):
 					EmptyView()
+				case .settings(.appearance):
+					AppearanceSettingsView()
 				case let .timetable(.subject(_, subjectID, slot)):
 					TimetableSubjectInspectorView(subjectID: subjectID, slot: slot)
 				case .timetable(.planner), .timetable(.calendarEvent):

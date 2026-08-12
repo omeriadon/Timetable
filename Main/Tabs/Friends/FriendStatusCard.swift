@@ -60,7 +60,9 @@ struct FriendStatusCard: View {
 						.foregroundStyle(.secondary)
 				}
 
-				Spacer(minLength: 1)
+				if style == .detail {
+					Spacer(minLength: 1)
+				}
 			}
 			.foregroundStyle(.primary)
 			.padding(style == .detail ? 14 : 10)
