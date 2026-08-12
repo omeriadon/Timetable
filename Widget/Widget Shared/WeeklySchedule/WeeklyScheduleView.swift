@@ -32,6 +32,7 @@ struct WeeklyScheduleView: View {
 								.font(Device.isWatchOS ? .footnote.scaled(by: 0.5) : .callout)
 								.frame(height: Device.isWatchOS ? 10 : 20)
 								.blendMode(day == currentWeekdayIndex && Device.isNotWatchOS ? .destinationOut : .normal)
+								.foregroundStyle(Color.primary)
 
 							Spacer()
 						}

@@ -9,76 +9,6 @@ import Defaults
 import SwiftUI
 import WidgetKit
 
-let mathematics = Subject(
-	id: "mathematics",
-	symbol: "function",
-	colour: RGBAColor(hexString: "#3B82F6"),
-	slots: [Slot(0, 0), Slot(2, 1), Slot(4, 2)]
-)
-
-let english = Subject(
-	id: "english",
-	symbol: "book",
-	colour: RGBAColor(hexString: "#EF4444"),
-	slots: [Slot(1, 0), Slot(3, 2), Slot(4, 4)]
-)
-
-let science = Subject(
-	id: "science",
-	symbol: "atom",
-	colour: RGBAColor(hexString: "#10B981"),
-	slots: [Slot(0, 2), Slot(2, 3), Slot(3, 0)]
-)
-
-let history = Subject(
-	id: "history",
-	symbol: "building.columns.fill",
-	colour: RGBAColor(hexString: "#F59E0B"),
-	slots: [Slot(1, 1), Slot(3, 3)]
-)
-
-let geography = Subject(
-	id: "geography",
-	symbol: "globe.europe.africa.fill",
-	colour: RGBAColor(hexString: "#06B6D4"),
-	slots: [Slot(0, 4), Slot(2, 0)]
-)
-
-let physics = Subject(
-	id: "physics",
-	symbol: "bolt.fill",
-	colour: RGBAColor(hexString: "#8B5CF6"),
-	slots: [Slot(1, 4), Slot(4, 1)]
-)
-
-let chemistry = Subject(
-	id: "chemistry",
-	symbol: "testtube.2",
-	colour: RGBAColor(hexString: "#EC4899"),
-	slots: [Slot(0, 1), Slot(2, 4)]
-)
-
-let computerScience = Subject(
-	id: "computer-science",
-	symbol: "desktopcomputer",
-	colour: RGBAColor(hexString: "#64748B"),
-	slots: [Slot(1, 3), Slot(3, 1), Slot(4, 0)]
-)
-
-let art = Subject(
-	id: "art",
-	symbol: "paintpalette.fill",
-	colour: RGBAColor(hexString: "#F97316"),
-	slots: [Slot(2, 2), Slot(4, 3)]
-)
-
-let pe = Subject(
-	id: "physical-education",
-	symbol: "figure.run",
-	colour: RGBAColor(hexString: "#22C55E"),
-	slots: [Slot(0, 3), Slot(3, 4)]
-)
-
 struct FriendsTimeLeftView: View {
 	let entry: TimetableEntry
 
@@ -101,7 +31,7 @@ struct FriendsTimeLeftView: View {
 				.padding(.trailing, 2)
 				.overlay {
 					ContainerRelativeShape()
-						.stroke(.white.opacity(0.7), lineWidth: 1)
+						.stroke(.primary.opacity(0.7), lineWidth: 1)
 				}
 
 			Spacer()

@@ -79,7 +79,7 @@ private struct TimetableSummaryFriendsSection: View {
 				.font(.caption)
 				.foregroundStyle(.tertiary)
 
-			ForEach(schedules.prefix(3)) { schedule in
+			ForEach(schedules.prefix(4)) { schedule in
 				HStack(spacing: 8) {
 					WidgetProfilePicture(
 						profile: schedule.profile,
