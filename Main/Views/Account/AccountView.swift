@@ -72,7 +72,7 @@ struct AccountView: View {
 				.appPaperPresentation()
 		}
 		.animation(.easeInOut, value: sessionStore.state)
-		.preferredColorScheme(.dark)
+		.foregroundStyle(.white)
 	}
 
 	@ContentBuilder

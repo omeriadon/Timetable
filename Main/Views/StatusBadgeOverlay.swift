@@ -289,7 +289,7 @@ private struct StatusBadgeContent: View {
 				case .progressView:
 					ProgressView()
 						.controlSize(progressControlSize)
-						.preferredColorScheme(.dark)
+						.foregroundStyle(.white)
 				case .success:
 					statusSymbol("checkmark.circle.fill", color: .green, isTerminal: true)
 				case .error:
@@ -376,7 +376,7 @@ private struct StatusBadgeGauge: View {
 			if containsProgress {
 				ProgressView()
 					.controlSize(combinedProgressControlSize)
-					.preferredColorScheme(.dark)
+					.foregroundStyle(.white)
 			}
 		}
 	}
