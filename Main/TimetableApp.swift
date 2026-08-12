@@ -13,6 +13,7 @@
 import Defaults
 import Foundation
 import SwiftUI
+import Tinkerble
 import TipKit
 
 struct ImportResult: Equatable {
@@ -40,6 +41,8 @@ struct TimetableApp: App {
 	#endif
 
 	init() {
+		Tinkerble.shared.connect()
+
 		#if DEBUG
 			try? Tips.resetDatastore()
 		#endif

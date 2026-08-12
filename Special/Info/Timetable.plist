@@ -54,10 +54,16 @@
 	<true/>
 	<key>NSCalendarsFullAccessUsageDescription</key>
 	<string>Timetable needs to read your calendar to pull Compass Events from your schedule.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_tinkerble._tcp</string>
+	</array>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Timetable uses your location to record when you enter or leave campus.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Timetable uses your location to record when you enter or leave campus.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Tinkerble connects to the macOS companion app on your local development network.</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
 	<key>NSSupportsLiveActivitiesFrequentUpdates</key>
