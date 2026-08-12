@@ -85,6 +85,8 @@ struct WideRouteDestinationView: View {
 					AdministrationBroadcastNotificationView()
 				case .administration(.broadcastHistory), .administration(.broadcastRecord(id: _)):
 					AdministrationBroadcastHistoryView()
+				case .administration(.emailLog):
+					AdministrationEmailLogView()
 				case .administration(.administrators):
 					AdministrationAdministratorsView()
 				case .administration(.serverAccess):

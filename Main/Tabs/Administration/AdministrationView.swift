@@ -92,6 +92,7 @@ struct AdministrationView: View {
 		Section("Notifications") {
 			administrationLink("Broadcast Notification", systemImage: "megaphone", route: .administration(.broadcastNotification)) { AdministrationBroadcastNotificationView() }
 			administrationLink("Broadcast History", systemImage: "clock.arrow.circlepath", route: .administration(.broadcastHistory)) { AdministrationBroadcastHistoryView() }
+			administrationLink("Email Log", systemImage: "envelope.badge", route: .administration(.emailLog)) { AdministrationEmailLogView() }
 		}
 		.glurListRowBackground()
 

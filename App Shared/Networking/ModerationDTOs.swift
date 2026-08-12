@@ -36,3 +36,14 @@ nonisolated struct AdministrationUserReport: Codable, Identifiable, Sendable {
 	let action: ModerationAction
 	let createdAt: Date?
 }
+
+nonisolated struct AdministrationEmailDeliveryRecord: Codable, Identifiable, Sendable {
+	let id: UUID
+	let recipient: String
+	let subject: String
+	let body: String
+	let status: String
+	let failureReason: String?
+	let createdAt: Date?
+	let updatedAt: Date?
+}
