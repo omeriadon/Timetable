@@ -21,6 +21,8 @@
 		2A79F3B330138FD2003CA797 /* SFSymbolsPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 2A79F3B230138FD2003CA797 /* SFSymbolsPicker */; };
 		2A79F3B93013924E003CA797 /* IrregularGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2A79F3B83013924E003CA797 /* IrregularGradient */; };
 		2A99A535301C3525005E48F7 /* SwiftEmoji in Frameworks */ = {isa = PBXBuildFile; productRef = 2A99A534301C3525005E48F7 /* SwiftEmoji */; };
+		2A9DDB36302C419E0053D070 /* Tinkerble in Frameworks */ = {isa = PBXBuildFile; productRef = 2AF4B0C2B6B7C8D900123456 /* Tinkerble */; };
+		2A9DDB37302C419E0053D070 /* Agentation in Frameworks */ = {isa = PBXBuildFile; productRef = 2AF4B0C3B6B7C8D900123456 /* Agentation */; };
 		2AA6DF242FDFAC9000BBC70E /* Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2AA6DF142FDFAC8F00BBC70E /* Widget.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2AA6DF2C2FDFADAE00BBC70E /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AA6DF2B2FDFADAE00BBC70E /* Defaults */; };
 		2AB674D7300E387100A6815A /* Sticker in Frameworks */ = {isa = PBXBuildFile; productRef = 2AB674D6300E387100A6815A /* Sticker */; };
@@ -320,6 +322,8 @@
 		2A0237882F9C8EA000AB1E1F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				2A9DDB37302C419E0053D070 /* Agentation in Frameworks */,
+				2A9DDB36302C419E0053D070 /* Tinkerble in Frameworks */,
 				2A79F3B93013924E003CA797 /* IrregularGradient in Frameworks */,
 				2A79F3B030138FAB003CA797 /* Sticker in Frameworks */,
 				2AB674D7300E387100A6815A /* Sticker in Frameworks */,
@@ -592,7 +596,7 @@
 				2A5F91EF2FE650FE007302CF /* XCRemoteSwiftPackageReference "IrregularGradient" */,
 				2A324C052FF2980C00E6A3D5 /* XCRemoteSwiftPackageReference "ColorfulX" */,
 				2A324C0A2FF2980C00E6A3D5 /* XCRemoteSwiftPackageReference "FocusOnAppear" */,
-				2ABBBA022FF4AD3A00878A9D /* XCRemoteSwiftPackageReference "Portal" */,
+				2AF4B0C5B6B7C8D900123456 /* XCLocalSwiftPackageReference "../../Portal" */,
 				2A79F3AE30138FAB003CA797 /* XCLocalSwiftPackageReference "../Sticker-main" */,
 				2A79F3B130138FD2003CA797 /* XCLocalSwiftPackageReference "../SFSymbolsPickerForSwiftUI-main" */,
 				2A79F3B430138FFC003CA797 /* XCLocalSwiftPackageReference "../swiftui-window-overlay-main" */,
@@ -1368,6 +1372,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "../swiftui-window-overlay-main";
 		};
+		2AF4B0C5B6B7C8D900123456 /* XCLocalSwiftPackageReference "../../Portal" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../Portal";
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -1377,22 +1385,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 9.0.8;
-			};
-		};
-		2AF4B0C1B6B7C8D900123456 /* XCRemoteSwiftPackageReference "Tinkerble" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/edwardsanchez/Tinkerble";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
-		2AF4B0C4B6B7C8D900123456 /* XCRemoteSwiftPackageReference "swift-agentation" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ertembiyik/swift-agentation.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
 			};
 		};
 		2A324C052FF2980C00E6A3D5 /* XCRemoteSwiftPackageReference "ColorfulX" */ = {
@@ -1427,14 +1419,6 @@
 				minimumVersion = 1.1.0;
 			};
 		};
-		2ABBBA022FF4AD3A00878A9D /* XCRemoteSwiftPackageReference "Portal" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Aeastr/Portal";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 6.0.0;
-			};
-		};
 		2ABD92F8302B3D860076BFD1 /* XCRemoteSwiftPackageReference "Glur" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/joogps/Glur";
@@ -1451,6 +1435,22 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		2AF4B0C1B6B7C8D900123456 /* XCRemoteSwiftPackageReference "Tinkerble" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/edwardsanchez/Tinkerble";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		2AF4B0C4B6B7C8D900123456 /* XCRemoteSwiftPackageReference "swift-agentation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ertembiyik/swift-agentation.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1458,19 +1458,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2A0237992F9C907000AB1E1F /* XCRemoteSwiftPackageReference "Defaults" */;
 			productName = Defaults;
-		};
-		2AF4B0C2B6B7C8D900123456 /* Tinkerble */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2AF4B0C1B6B7C8D900123456 /* XCRemoteSwiftPackageReference "Tinkerble" */;
-			productName = Tinkerble;
-		};
-		2AF4B0C3B6B7C8D900123456 /* Agentation */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 2AF4B0C4B6B7C8D900123456 /* XCRemoteSwiftPackageReference "swift-agentation" */;
-			platformFilters = (
-				ios,
-			);
-			productName = Agentation;
 		};
 		2A1DB40D2F9DE9A300E5AE7C /* Defaults */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -1535,12 +1522,10 @@
 		};
 		2ABBBA032FF4AD3A00878A9D /* PortalHeaders */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 2ABBBA022FF4AD3A00878A9D /* XCRemoteSwiftPackageReference "Portal" */;
 			productName = PortalHeaders;
 		};
 		2ABBBA052FF4AD3A00878A9D /* PortalTransitions */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 2ABBBA022FF4AD3A00878A9D /* XCRemoteSwiftPackageReference "Portal" */;
 			productName = PortalTransitions;
 		};
 		2ABD92F9302B3D860076BFD1 /* Glur */ = {
@@ -1562,6 +1547,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2AE0F1392FE03989002B5D9D /* XCRemoteSwiftPackageReference "MaterialView" */;
 			productName = MaterialView;
+		};
+		2AF4B0C2B6B7C8D900123456 /* Tinkerble */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2AF4B0C1B6B7C8D900123456 /* XCRemoteSwiftPackageReference "Tinkerble" */;
+			productName = Tinkerble;
+		};
+		2AF4B0C3B6B7C8D900123456 /* Agentation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2AF4B0C4B6B7C8D900123456 /* XCRemoteSwiftPackageReference "swift-agentation" */;
+			productName = Agentation;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
