@@ -10,6 +10,9 @@
 #else
 	import Sticker
 #endif
+#if DEBUG && os(iOS)
+	import Agentation
+#endif
 import Defaults
 import Foundation
 import SwiftUI
@@ -42,6 +45,9 @@ struct TimetableApp: App {
 
 	init() {
 		Tinkerble.shared.connect()
+		#if DEBUG && os(iOS)
+			Agentation.shared.install()
+		#endif
 
 		#if DEBUG
 			try? Tips.resetDatastore()
