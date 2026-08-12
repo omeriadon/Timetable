@@ -533,7 +533,7 @@ private struct TodaySchoolTimeline: View {
 						}
 					}
 				}
-				.frame(maxHeight: .infinity, alignment: .centerLeading)
+				.frame(maxHeight: .infinity, alignment: .leading)
 
 				Spacer()
 

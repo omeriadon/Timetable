@@ -259,10 +259,10 @@ struct GradeAverageCard: View {
 		isTrailing: Bool
 	) -> some View {
 		averageSummaryText(title: title, value: value, isTrailing: isTrailing)
-		.frame(
-			maxWidth: .infinity,
-			alignment: isTrailing ? .trailing : .leading
-		)
+			.frame(
+				maxWidth: .infinity,
+				alignment: isTrailing ? .trailing : .leading
+			)
 	}
 
 	private func averageSummaryText(

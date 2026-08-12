@@ -1374,7 +1374,7 @@
 		};
 		2AF4B0C5B6B7C8D900123456 /* XCLocalSwiftPackageReference "../../Portal" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = "../../Portal";
+			relativePath = ../../Portal;
 		};
 /* End XCLocalSwiftPackageReference section */
 

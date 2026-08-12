@@ -35,13 +35,13 @@ struct FriendSearchRow: View {
 	private var accessibilityLabel: String {
 		switch relationship {
 			case .friends:
-				return "\(result.profile.displayName), friends"
+				"\(result.profile.displayName), friends"
 			case .pendingOutgoing:
-				return "\(result.profile.displayName), friend request sent"
+				"\(result.profile.displayName), friend request sent"
 			case .pendingIncoming:
-				return "\(result.profile.displayName), incoming friend request"
+				"\(result.profile.displayName), incoming friend request"
 			case nil:
-				return result.profile.displayName
+				result.profile.displayName
 		}
 	}
 
