@@ -112,9 +112,7 @@ struct ProfilePicture: View {
 
 				case .monogram:
 					Text(appearance.monogram)
-						.font(.system(size: 150))
-						.fontDesign(appearance.fontDesign.profilePictureFontDesign)
-						.fontWeight(appearance.fontWeight.profilePictureFontWeight)
+						.font(monogramFont)
 						.foregroundStyle(appearance.foregroundColour.swiftUIColor)
 						.animation(
 							reduceMotion ? .none : .easeInOut(duration: 0.2),
@@ -134,6 +132,54 @@ struct ProfilePicture: View {
 						.minimumScaleFactor(0.01)
 						.padding(size * 0.15)
 			}
+		}
+	}
+
+	private var monogramFont: Font {
+		let baseDescriptor = UIFont.systemFont(ofSize: 150).fontDescriptor
+		let designedDescriptor = baseDescriptor.withDesign(monogramUIFontDesign) ?? baseDescriptor
+		let weightedDescriptor = designedDescriptor.addingAttributes([
+			.traits: [
+				UIFontDescriptor.TraitKey.weight: monogramUIFontWeight.rawValue,
+			],
+		])
+
+		return Font(UIFont(descriptor: weightedDescriptor, size: 150))
+	}
+
+	private var monogramUIFontDesign: UIFontDescriptor.SystemDesign {
+		switch appearance.fontDesign {
+			case .default:
+				.default
+			case .serif:
+				.serif
+			case .monospaced:
+				.monospaced
+			case .rounded:
+				.rounded
+		}
+	}
+
+	private var monogramUIFontWeight: UIFont.Weight {
+		switch appearance.fontWeight {
+			case .ultraLight:
+				.ultraLight
+			case .thin:
+				.thin
+			case .light:
+				.light
+			case .regular:
+				.regular
+			case .medium:
+				.medium
+			case .semibold:
+				.semibold
+			case .bold:
+				.bold
+			case .heavy:
+				.heavy
+			case .black:
+				.black
 		}
 	}
 
