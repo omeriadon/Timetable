@@ -323,7 +323,7 @@ struct GradeSubjectCard: View {
 			Spacer()
 		}
 		.padding(14)
-		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+		.glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
 		.foregroundStyle(.primary)
 		.accessibilityElement(children: .ignore)
 		.accessibilityLabel("\(subject.id), \(average.map { $0.formatted(.percent.precision(.fractionLength(1))) } ?? "no assessments yet")")

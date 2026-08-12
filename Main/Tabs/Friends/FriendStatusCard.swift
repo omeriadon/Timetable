@@ -66,7 +66,7 @@ struct FriendStatusCard: View {
 			}
 			.foregroundStyle(.primary)
 			.padding(style == .detail ? 14 : 10)
-			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+			.glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
 			.contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
 			.accessibilityElement(children: .combine)
 			.accessibilityLabel(accessibilityLabel(
@@ -152,7 +152,7 @@ struct FriendLocationStatusCard: View {
 			.frame(maxWidth: .infinity)
 			.foregroundStyle(.primary)
 			.glassEffect(
-				.clear.interactive(),
+				.regular.interactive(),
 				in: RoundedRectangle(cornerRadius: 28, style: .continuous)
 			)
 			.accessibilityElement(children: .combine)

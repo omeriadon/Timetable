@@ -78,7 +78,7 @@ struct AboutView: View {
 						.padding()
 					}
 					.background {
-						GlurView(radius: 2, offset: 0, interpolation: 0)
+						GlurView(radius: 3, offset: 0, interpolation: 0)
 							.clipShape(RoundedRectangle(cornerRadius: 30))
 					}
 					.environment(\.colorScheme, .dark)
@@ -89,7 +89,7 @@ struct AboutView: View {
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.frame(height: 50)
 						.background {
-							GlurView(radius: 2, offset: 0, interpolation: 0)
+							GlurView(radius: 3, offset: 0, interpolation: 0)
 								.clipShape(Capsule())
 						}
 				}

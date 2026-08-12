@@ -105,7 +105,7 @@ struct FriendOverview: View {
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.foregroundStyle(.primary)
 		.glassEffect(
-			.clear.interactive(),
+			.regular.interactive(),
 			in: RoundedRectangle(
 				cornerRadius: FriendDetailLayout.cardCornerRadius,
 				style: .continuous
@@ -154,7 +154,7 @@ struct FriendOverview: View {
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.foregroundStyle(.primary)
 		.glassEffect(
-			.clear.interactive(),
+			.regular.interactive(),
 			in: RoundedRectangle(
 				cornerRadius: FriendDetailLayout.cardCornerRadius,
 				style: .continuous
@@ -279,7 +279,7 @@ private struct FriendDetailHeader: View {
 		.background {
 			FriendBackgroundPaperBackground(cornerRadius: 26)
 		}
-		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 26, style: .continuous))
+		.glassEffect(.regular.interactive(), in: RoundedRectangle(cornerRadius: 26, style: .continuous))
 	}
 }
 
