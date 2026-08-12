@@ -369,6 +369,10 @@ struct NotificationLeadTimesSelectionView: View {
 			.buttonSizing(.flexible)
 			.buttonStyle(.plain)
 			.glurListRowBackground()
+			.accessibilityLabel(leadTime.label)
+			.accessibilityValue(selection.contains(leadTime) ? "Selected" : "Not selected")
+			.accessibilityHint("Double tap to \(selection.contains(leadTime) ? "stop" : "start") receiving notifications \(leadTime.label)")
+			.accessibilityAddTraits(selection.contains(leadTime) ? .isSelected : [])
 		}
 		.appPaperBackground()
 		.safeAreaBar(edge: .top, alignment: .center, spacing: 5) {

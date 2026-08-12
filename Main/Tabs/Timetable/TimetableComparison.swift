@@ -59,6 +59,8 @@ struct TimetableComparison: View {
 									.tint(.white)
 								}
 								.buttonStyle(.plain)
+								.accessibilityLabel("\(friend.friend.displayName), \(theirSubject.id)")
+								.accessibilityHint("Shows subject details")
 								.popover(item: presentedSubjectBinding(for: friend.friend.id)) { presented in
 									SubjectContextPopover(
 										owner: presented.owner,

@@ -310,6 +310,8 @@ struct ArchivedEventsView: View {
 						}
 						.buttonStyle(.plain)
 						.glurListRowBackground()
+						.accessibilityElement(children: .combine)
+						.accessibilityLabel("\(event.title), \(event.date.startOfDay()?.formatted(date: .long, time: .omitted) ?? "unknown date")")
 					}
 				}
 			}

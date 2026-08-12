@@ -31,7 +31,37 @@ struct ProfilePhotoCropEditor: View {
 								.stroke(.white, lineWidth: 2)
 						}
 						.gesture(dragGesture.simultaneously(with: magnifyGesture))
-						.accessibilityLabel("Profile photo crop previexsw")
+						.accessibilityLabel("Profile photo crop preview")
+						.accessibilityValue("Zoom \(zoom.formatted(.number.precision(.fractionLength(1)))) times")
+						.accessibilityHint("Adjustable. Swipe up or down to change zoom. Use custom actions to reposition the photo.")
+						.accessibilityAdjustableAction { direction in
+							switch direction {
+								case .increment:
+									zoom = min(4, zoom + 0.1)
+								case .decrement:
+									zoom = max(1, zoom - 0.1)
+								@unknown default:
+									break
+							}
+							offset = clamped(offset)
+							lastZoom = zoom
+						}
+						.accessibilityAction(named: "Move left") {
+							offset = clamped(CGSize(width: offset.width - 20, height: offset.height))
+							lastOffset = offset
+						}
+						.accessibilityAction(named: "Move right") {
+							offset = clamped(CGSize(width: offset.width + 20, height: offset.height))
+							lastOffset = offset
+						}
+						.accessibilityAction(named: "Move up") {
+							offset = clamped(CGSize(width: offset.width, height: offset.height - 20))
+							lastOffset = offset
+						}
+						.accessibilityAction(named: "Move down") {
+							offset = clamped(CGSize(width: offset.width, height: offset.height + 20))
+							lastOffset = offset
+						}
 				} else {
 					ContentUnavailableView(
 						"Photo Unavailable",

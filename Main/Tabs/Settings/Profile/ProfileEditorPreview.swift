@@ -11,6 +11,8 @@ struct ProfileEditorPreview: View {
 			profilePicture
 		}
 		.buttonStyle(.plain)
+		.accessibilityLabel("Profile preview")
+		.accessibilityHint("Opens profile appearance settings")
 		.shadow(radius: 14)
 		.animation(
 			reduceMotion ? .none : .smooth(duration: 0.35),

@@ -211,5 +211,9 @@ struct WatchTimetableView: View {
 		}
 		.padding(.top, 2)
 		.tint(color)
+		.accessibilityElement(children: .ignore)
+		.accessibilityLabel(title)
+		.accessibilityValue(nextText ?? "Ends at \(end.formatted(date: .omitted, time: .shortened))")
+		.accessibilityAddTraits(.updatesFrequently)
 	}
 }

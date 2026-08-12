@@ -16,6 +16,7 @@ struct FriendsView: View {
 	@State private var showsArrivalStatistics = false
 	@State private var showsLocationStatusSheet = false
 	@Namespace private var friendSheetNamespace
+	@AccessibilityFocusState private var focusedFriendID: UUID?
 	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 	@Environment(\.appPresentation) private var presentation
 	@Environment(AppRouter.self) private var router
@@ -92,6 +93,16 @@ struct FriendsView: View {
 					showsLocationStatusSheet = true
 				}
 			}
+			.onChange(of: selectedFriend) { previousFriend, currentFriend in
+				guard currentFriend == nil, let previousFriend else {
+					return
+				}
+
+				Task { @MainActor in
+					try? await Task.sleep(for: .milliseconds(100))
+					focusedFriendID = previousFriend.id
+				}
+			}
 			.dynamicTypeSize(.medium)
 	}
 
@@ -161,6 +172,9 @@ struct FriendsView: View {
 							animatedScrollCard(FriendStatusCard(friend: friend))
 						}
 						.buttonStyle(.plain)
+						.accessibilityLabel(friend.friend.displayName)
+						.accessibilityHint("Opens \(friend.friend.displayName)'s timetable")
+						.accessibilityFocused($focusedFriendID, equals: friend.id)
 						.matchedTransitionSource(
 							id: friendTransitionID(friend),
 							in: friendSheetNamespace

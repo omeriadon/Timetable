@@ -16,6 +16,9 @@ struct ProfileFontPicker: View {
 							.contentTransition(.symbolEffect(.replace.wholeSymbol, options: .nonRepeating))
 							.font(.system(.body, design: candidate.swiftUIFontDesign))
 					}
+					.accessibilityLabel("Font design, \(candidate.title)")
+					.accessibilityValue(design == candidate ? "Selected" : "Not selected")
+					.accessibilityAddTraits(design == candidate ? .isSelected : [])
 				}
 			}
 			.glurListRowBackground()
@@ -38,6 +41,8 @@ struct ProfileFontPicker: View {
 					in: 0 ... Double(allCases.count - 1),
 					step: 1
 				)
+				.accessibilityLabel("Font weight")
+				.accessibilityValue(weight.rawValue.capitalized)
 			}
 			.glurListRowBackground()
 		}

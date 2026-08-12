@@ -8,6 +8,7 @@ struct WatchSignInView: View {
 			Image("Icon")
 				.resizable()
 				.aspectRatio(contentMode: .fit)
+				.accessibilityHidden(true)
 
 			Text("Sign in on iPhone to sign this Watch in")
 				.multilineTextAlignment(.center)
@@ -35,6 +36,8 @@ struct WatchSignInView: View {
 				.animation(.easeInOut(duration: 0.2), value: provisioningService.isRequesting)
 			}
 			.buttonStyle(.glassProminent)
+			.accessibilityLabel(provisioningService.isRequesting ? "Requesting sign in from iPhone" : "Sign in from iPhone")
+			.accessibilityHint("Requests a sign-in session from the paired iPhone")
 			.disabled(provisioningService.isRequesting == true)
 		}
 		.padding(.top, 20)

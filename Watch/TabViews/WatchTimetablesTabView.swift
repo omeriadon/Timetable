@@ -23,6 +23,7 @@ private struct WatchPaperBackground: View {
 				.scaledToFill()
 				.frame(width: proxy.size.width, height: proxy.size.height)
 				.clipped()
+				.accessibilityHidden(true)
 		}
 		.clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
 	}
