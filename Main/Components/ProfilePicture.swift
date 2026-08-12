@@ -16,6 +16,7 @@ struct ProfilePicture: View {
 	private let visibleBadges: [ProfileBadge]
 	let accessibilityName: String
 	let animatesBackground: Bool
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 
 	init(
 		appearance: ProfileAppearance,
@@ -121,9 +122,9 @@ struct ProfilePicture: View {
 						.minimumScaleFactor(0.01)
 						.padding(size * 0.15)
 						.contentTransition(.numericText())
-						.animation(.easeInOut, value: appearance.fontDesign.profilePictureFontDesign)
-						.animation(.easeInOut, value: appearance.fontWeight.profilePictureFontWeight)
-						.animation(.easeInOut, value: appearance.monogram)
+						.animation(reduceMotion ? nil : .easeInOut, value: appearance.fontDesign.profilePictureFontDesign)
+						.animation(reduceMotion ? nil : .easeInOut, value: appearance.fontWeight.profilePictureFontWeight)
+						.animation(reduceMotion ? nil : .easeInOut, value: appearance.monogram)
 
 				case .emoji:
 					Text(appearance.emoji)
@@ -136,7 +137,7 @@ struct ProfilePicture: View {
 
 	@ViewBuilder
 	private var profileBackground: some View {
-		if animatesBackground, appearance.contentKind != .photo {
+		if animatesBackground, !reduceMotion, appearance.contentKind != .photo {
 			ColorfulView(
 				color: .constant(appearance.colours.map(\.swiftUIColor)),
 				speed: .constant(appearance.speed),

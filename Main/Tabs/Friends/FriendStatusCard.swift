@@ -10,6 +10,7 @@ struct FriendStatusCard: View {
 	let friend: FriendSummary
 	let style: FriendStatusCardStyle
 	@Default(.schoolCalendar) private var schoolCalendar
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 
 	private var displayName: String {
 		friend.friend.displayName
@@ -76,7 +77,7 @@ struct FriendStatusCard: View {
 			.contentShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
 			.accessibilityElement(children: .combine)
 			.accessibilityLabel("\(displayName), \(scheduleStatus.title), \(nextClassTitle(for: scheduleStatus)), location status \(locationStatus.title)")
-			.animation(.bouncy, value: scheduleStatus.title)
+			.animation(reduceMotion ? nil : .bouncy, value: scheduleStatus.title)
 		}
 	}
 

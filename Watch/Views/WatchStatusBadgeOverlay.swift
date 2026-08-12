@@ -22,7 +22,6 @@ struct WatchStatusBadgeOverlay: View {
 			.frame(maxWidth: .infinity)
 			.padding(.top, metrics.topPadding)
 		}
-		.allowsHitTesting(false)
 		.animation(animation, value: manager.badges)
 		.animation(animation, value: manager.activeBadgeID)
 	}
@@ -118,6 +117,10 @@ private struct WatchBadgeCapsule: View {
 		.clipShape(.capsule)
 		.glassEffect(.clear.interactive(), in: .capsule)
 		.contentTransition(.interpolate)
+		.accessibilityElement(children: .ignore)
+		.accessibilityLabel(badge.title)
+		.accessibilityValue(badge.secondaryText ?? "")
+		.accessibilityAddTraits(.updatesFrequently)
 		.animation(
 			reduceMotion ? .easeInOut(duration: 0.16) : .spring(response: 0.34, dampingFraction: 0.92),
 			value: badge

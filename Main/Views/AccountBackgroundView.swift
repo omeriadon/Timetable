@@ -14,6 +14,7 @@ struct AccountBackgroundView: View {
 	@State private var colours: [Color] = [.black, .black]
 	@State private var noise: Double = 0
 	@State private var speed: Double = 0
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 
 	var body: some View {
 		ColorfulView(
@@ -29,7 +30,10 @@ struct AccountBackgroundView: View {
 			let loaded = await profile.profilePictureColours()
 			colours = loaded.map(\.swiftUIColor)
 			noise = profile.profilePictureNoise
-			 speed = profile.profilePictureSpeed
+			speed = reduceMotion ? 0 : profile.profilePictureSpeed
+		}
+		.onChange(of: reduceMotion) { _, shouldReduceMotion in
+			speed = shouldReduceMotion ? 0 : profile?.profilePictureSpeed ?? 0
 		}
 		.accessibilityHidden(true)
 	}

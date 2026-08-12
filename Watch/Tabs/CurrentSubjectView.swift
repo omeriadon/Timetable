@@ -10,6 +10,7 @@ import SwiftUI
 struct WatchTimetableView: View {
 	let subjects: [Subject]
 	let schoolCalendar: SchoolCalendarProjection
+	@Environment(\.accessibilityReduceMotion) private var reduceMotion
 
 	let shorter: Bool
 
@@ -150,7 +151,7 @@ struct WatchTimetableView: View {
 
 					Text(timerInterval: now ... end, countsDown: true, showsHours: true)
 						.contentTransition(.numericText(countsDown: true))
-						.animation(.easeInOut(duration: 0.5), value: now)
+						.animation(reduceMotion ? nil : .easeInOut(duration: 0.5), value: now)
 						.font(.title2)
 						.lineLimit(1)
 						.bold()
@@ -184,7 +185,7 @@ struct WatchTimetableView: View {
 
 						Text(Duration.seconds(seconds), format: .time(pattern: .hourMinuteSecond))
 							.contentTransition(.numericText(countsDown: true))
-							.animation(.easeInOut(duration: 0.3), value: seconds)
+							.animation(reduceMotion ? nil : .easeInOut(duration: 0.3), value: seconds)
 							.font(.title2)
 							.monospacedDigit()
 							.lineLimit(1)

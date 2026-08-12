@@ -79,6 +79,13 @@ struct StatusBadgeOverlay: View {
 			content
 				.offset(y: dragOffset)
 				.animation(.spring(duration: 0.4, bounce: 0.3), value: dragOffset)
+				.accessibilityElement(children: .ignore)
+				.accessibilityLabel(badge.title)
+				.accessibilityValue(badge.secondaryText ?? "")
+				.accessibilityHint("Double tap to dismiss")
+				.accessibilityAction {
+					manager.dismissMainBadge()
+				}
 				.gesture(
 					DragGesture(minimumDistance: 12)
 						.onChanged { value in
@@ -101,6 +108,13 @@ struct StatusBadgeOverlay: View {
 				)
 		#else
 			content
+				.accessibilityElement(children: .ignore)
+				.accessibilityLabel(badge.title)
+				.accessibilityValue(badge.secondaryText ?? "")
+				.accessibilityHint("Double tap to dismiss")
+				.accessibilityAction {
+					manager.dismissMainBadge()
+				}
 				.onHover { hovering in
 					withAnimation(animation) {
 						isHoveringMainBadge = hovering
