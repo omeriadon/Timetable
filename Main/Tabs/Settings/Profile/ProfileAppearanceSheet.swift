@@ -144,7 +144,7 @@ struct ProfileAppearanceSheet: View {
 				}
 			}
 		}
-		.foregroundStyle(.primary)
+		.foregroundStyle(Color.primary)
 		.sheet(isPresented: $presentsEmojiPicker) {
 			ProfileEmojiPicker(
 				selection: $draft.emoji,
