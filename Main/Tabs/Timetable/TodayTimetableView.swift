@@ -13,108 +13,87 @@ struct TodayTimetableView: View {
 
 	var body: some View {
 		TimelineView(.periodic(from: .now, by: 1)) { context in
-			let now = TimetableClock.adjusted(context.date)
-			ScrollView {
-				VStack(alignment: .leading, spacing: 16) {
-					VStack(alignment: .leading, spacing: 6) {
-						if let schoolWeather {
-							TodayWeatherSummary(weather: schoolWeather)
-						}
+			TodayTimetableContent(
+				subjects: subjects,
+				schoolCalendar: schoolCalendar,
+				calendarEvents: calendarEvents,
+				gradeTracker: gradeTracker,
+				schoolWeather: schoolWeather,
+				now: TimetableClock.adjusted(context.date),
+				expandedPeriodNumber: $expandedPeriodNumber,
+				eventSnapshot: $eventSnapshot
+			)
+		}
+		.task {
+			try? await weatherService.refresh()
+		}
+	}
+}
 
-						Text(now.formatted(.dateTime.weekday(.wide).day().month(.wide).hour(.defaultDigits(amPM: .wide)).minute(.defaultDigits).second(.defaultDigits)))
-							.contentTransition(.numericText())
-							.animation(.easeInOut, value: now)
-							.frame(maxWidth: .infinity, alignment: .leading)
-							.lineLimit(1)
-							.font(.system(size: 200))
-							.minimumScaleFactor(0.01)
-							.foregroundStyle(.primary)
+private struct TodayTimetableContent: View {
+	let subjects: [Subject]
+	let schoolCalendar: SchoolCalendarProjection
+	let calendarEvents: CalendarEventsProjection
+	let gradeTracker: GradeTrackerDocument
+	let schoolWeather: SchoolWeather?
+	let now: Date
+	@Binding var expandedPeriodNumber: Int?
+	@Binding var eventSnapshot: TodayEventSnapshot
 
-						if let termWeekLabel = termWeekLabel(for: now) {
-							Text(termWeekLabel)
-								.font(.title3)
-								.foregroundStyle(.secondary)
-								.frame(maxWidth: .infinity, alignment: .leading)
-						}
-					}
-					.foregroundStyle(.primary)
-					.padding(.leading, 6)
+	var body: some View {
+		ScrollView {
+			VStack(alignment: .leading, spacing: 16) {
+				TodayHeader(weather: schoolWeather, now: now, termWeekLabel: termWeekLabel)
 
-					if let noSchoolDay = eventSnapshot.noSchoolDay {
-						TodayNoSchoolDayCard(noSchoolDay: noSchoolDay)
-					}
-
-					if !eventSnapshot.todayEntries.isEmpty || !eventSnapshot.upcomingEntries.isEmpty {
-						VStack(alignment: .leading) {
-							Text("Events")
-								.font(.title)
-								.bold()
-
-							if !eventSnapshot.todayEntries.isEmpty {
-								eventSection("Today", entries: eventSnapshot.todayEntries)
-							}
-
-							if !eventSnapshot.upcomingEntries.isEmpty {
-								eventSection("Upcoming", entries: eventSnapshot.upcomingEntries, showsDate: true)
-							}
-						}
-						.foregroundStyle(.black)
-						.frame(maxWidth: .infinity, alignment: .leading)
-						.padding(.vertical, 10)
-						.padding(.bottom, 5)
-						.padding(.horizontal, TodayCardLayout.contentInset)
-						.background {
-							GeometryReader { proxy in
-								Image("paper")
-									.accessibilityHidden(true)
-									.resizable()
-									.scaledToFill()
-									.frame(width: proxy.size.width, height: proxy.size.height)
-									.clipped()
-							}
-							.clipShape(RoundedRectangle(cornerRadius: TodayCardLayout.outerCornerRadius))
-						}
-						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: TodayCardLayout.outerCornerRadius))
-					}
-
-					if let dayIndex = schoolCalendar.dayIndex(for: now), schoolCalendar.isSchoolDay(now), !subjects.isEmpty {
-						TodaySchoolTimeline(
-							subjects: subjects,
-							dayIndex: dayIndex,
-							now: now,
-							expandedPeriodNumber: $expandedPeriodNumber
-						)
-					} else if eventSnapshot.isEmpty {
-						TodayCountdown(subjects: subjects, schoolCalendar: schoolCalendar, now: now)
-					}
+				if let noSchoolDay = eventSnapshot.noSchoolDay {
+					TodayNoSchoolDayCard(noSchoolDay: noSchoolDay)
 				}
-				.padding(.vertical)
-				.padding(.horizontal, 10)
-				.frame(maxWidth: .infinity, alignment: .center)
+
+				if !eventSnapshot.todayEntries.isEmpty || !eventSnapshot.upcomingEntries.isEmpty {
+					TodayEventsCard(
+						todayEntries: eventSnapshot.todayEntries,
+						upcomingEntries: eventSnapshot.upcomingEntries
+					)
+				}
+
+				if let dayIndex = schoolCalendar.dayIndex(for: now), schoolCalendar.isSchoolDay(now), !subjects.isEmpty {
+					TodaySchoolTimeline(
+						subjects: subjects,
+						dayIndex: dayIndex,
+						now: now,
+						expandedPeriodNumber: $expandedPeriodNumber
+					)
+				} else if eventSnapshot.isEmpty {
+					TodayCountdown(subjects: subjects, schoolCalendar: schoolCalendar, now: now)
+				}
 			}
-			.task(id: TodayEventSnapshotInput(
+			.padding(.vertical)
+			.padding(.horizontal, 10)
+			.frame(maxWidth: .infinity, alignment: .center)
+		}
+		.task(id: snapshotInput) {
+			eventSnapshot = TodayEventSnapshot(
 				calendarEvents: calendarEvents,
 				gradeTracker: gradeTracker,
 				subjects: subjects,
 				schoolCalendar: schoolCalendar,
 				day: SchoolCalendarDate(now)
-			)) {
-				eventSnapshot = TodayEventSnapshot(
-					calendarEvents: calendarEvents,
-					gradeTracker: gradeTracker,
-					subjects: subjects,
-					schoolCalendar: schoolCalendar,
-					day: SchoolCalendarDate(now)
-				)
-			}
-			.task {
-				try? await weatherService.refresh()
-			}
+			)
 		}
 	}
 
-	private func termWeekLabel(for date: Date) -> String? {
-		let schoolDate = SchoolCalendarDate(date)
+	private var snapshotInput: TodayEventSnapshotInput {
+		TodayEventSnapshotInput(
+			calendarEvents: calendarEvents,
+			gradeTracker: gradeTracker,
+			subjects: subjects,
+			schoolCalendar: schoolCalendar,
+			day: SchoolCalendarDate(now)
+		)
+	}
+
+	private var termWeekLabel: String? {
+		let schoolDate = SchoolCalendarDate(now)
 		guard let term = schoolCalendar.termRanges.first(where: { range in
 			range.start <= schoolDate && schoolDate <= range.end
 		}) else {
@@ -125,8 +104,8 @@ struct TodayTimetableView: View {
 			.split(whereSeparator: { !$0.isNumber })
 			.first
 			.map(String.init) ?? "?"
-		let start = monday(of: term.start.startOfDay() ?? date)
-		let current = monday(of: schoolDate.startOfDay() ?? date)
+		let start = monday(of: term.start.startOfDay() ?? now)
+		let current = monday(of: schoolDate.startOfDay() ?? now)
 		let elapsedDays = SchoolCalendarProjection.perthCalendar
 			.dateComponents([.day], from: start, to: current)
 			.day ?? 0
@@ -140,44 +119,136 @@ struct TodayTimetableView: View {
 		let daysFromMonday = (weekday + 6) % 7
 		return calendar.date(byAdding: .day, value: -daysFromMonday, to: date) ?? date
 	}
+}
 
-	@ViewBuilder private func eventSection(_ title: String, entries: [TodayEventEntry], showsDate: Bool = false) -> some View {
+private struct TodayHeader: View {
+	let weather: SchoolWeather?
+	let now: Date
+	let termWeekLabel: String?
+
+	var body: some View {
+		VStack(alignment: .leading, spacing: 6) {
+			if let weather {
+				TodayWeatherSummary(weather: weather)
+			}
+
+			Text(now.formatted(.dateTime.weekday(.wide).day().month(.wide).hour(.defaultDigits(amPM: .wide)).minute(.defaultDigits).second(.defaultDigits)))
+				.contentTransition(.numericText())
+				.animation(.easeInOut, value: now)
+				.frame(maxWidth: .infinity, alignment: .leading)
+				.lineLimit(1)
+				.font(.system(size: 200))
+				.minimumScaleFactor(0.01)
+				.foregroundStyle(.primary)
+
+			if let termWeekLabel {
+				Text(termWeekLabel)
+					.font(.title3)
+					.foregroundStyle(.secondary)
+					.frame(maxWidth: .infinity, alignment: .leading)
+			}
+		}
+		.foregroundStyle(.primary)
+		.padding(.leading, 6)
+	}
+}
+
+private struct TodayEventsCard: View {
+	let todayEntries: [TodayEventEntry]
+	let upcomingEntries: [TodayEventEntry]
+
+	var body: some View {
+		VStack(alignment: .leading) {
+			Text("Events")
+				.font(.title)
+				.bold()
+
+			if !todayEntries.isEmpty {
+				TodayEventSection(title: "Today", entries: todayEntries)
+			}
+
+			if !upcomingEntries.isEmpty {
+				TodayEventSection(title: "Upcoming", entries: upcomingEntries, showsDate: true)
+			}
+		}
+		.foregroundStyle(.black)
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.padding(.vertical, 10)
+		.padding(.bottom, 5)
+		.padding(.horizontal, TodayCardLayout.contentInset)
+		.background {
+			GeometryReader { proxy in
+				Image("paper")
+					.resizable()
+					.scaledToFill()
+					.frame(width: proxy.size.width, height: proxy.size.height)
+					.clipped()
+					.accessibilityHidden(true)
+			}
+			.clipShape(RoundedRectangle(cornerRadius: TodayCardLayout.outerCornerRadius))
+		}
+		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: TodayCardLayout.outerCornerRadius))
+	}
+}
+
+private struct TodayEventSection: View {
+	let title: String
+	let entries: [TodayEventEntry]
+	let showsDate: Bool
+
+	init(title: String, entries: [TodayEventEntry], showsDate: Bool = false) {
+		self.title = title
+		self.entries = entries
+		self.showsDate = showsDate
+	}
+
+	var body: some View {
 		Text(title)
 			.fontWeight(.semibold)
 			.foregroundStyle(.black)
 			.padding(.top, 4)
 
 		ForEach(entries) { entry in
-			Label {
-				VStack(alignment: .leading) {
-					Text(entry.title)
-
-					if showsDate {
-						Text(entry.date.displayLabel)
-							.font(.footnote)
-							.foregroundStyle(.black)
-					}
-				}
-			} icon: {
-				Image(systemName: entry.symbol)
-			}
-			.padding(.vertical, 4)
-			.font(.title3)
-			.padding(5)
-			.frame(maxWidth: .infinity, alignment: .leading)
-			.foregroundStyle(.black)
-			.background {
-				GeometryReader { proxy in
-					Image(entry.backgroundImageName)
-						.resizable()
-						.scaledToFill()
-						.frame(width: proxy.size.width, height: proxy.size.height)
-						.clipped()
-				}
-				.clipShape(RoundedRectangle(cornerRadius: TodayCardLayout.innerCornerRadius))
-			}
-			.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: TodayCardLayout.innerCornerRadius))
+			TodayEventRow(entry: entry, showsDate: showsDate)
 		}
+	}
+}
+
+private struct TodayEventRow: View {
+	let entry: TodayEventEntry
+	let showsDate: Bool
+
+	var body: some View {
+		Label {
+			VStack(alignment: .leading) {
+				Text(entry.title)
+
+				if showsDate {
+					Text(entry.date.displayLabel)
+						.font(.footnote)
+						.foregroundStyle(.black)
+				}
+			}
+		} icon: {
+			Image(systemName: entry.symbol)
+		}
+		.padding(.vertical, 4)
+		.font(.title3)
+		.padding(5)
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.foregroundStyle(.black)
+		.background {
+			GeometryReader { proxy in
+				Image(entry.backgroundImageName)
+					.resizable()
+					.scaledToFill()
+					.frame(width: proxy.size.width, height: proxy.size.height)
+					.clipped()
+					.accessibilityHidden(true)
+			}
+			.clipShape(RoundedRectangle(cornerRadius: TodayCardLayout.innerCornerRadius))
+		}
+		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: TodayCardLayout.innerCornerRadius))
 	}
 }
 
@@ -510,66 +581,19 @@ private struct TodaySchoolTimeline: View {
 		let baseCardHeight = max(44, duration - 8)
 		let cardHeight = baseCardHeight + (isExpanded ? expandedContentHeight : 0)
 
-		VStack(alignment: .leading, spacing: 8) {
-			HStack(alignment: .center) {
-				HStack(alignment: .center, spacing: 10) {
-					Text("\(period.number)")
-						.font(.caption.monospacedDigit())
-						.frame(width: 15)
-
-					VStack(alignment: .leading, spacing: 4) {
-						Text(subject?.id ?? "Free Period")
-							.lineLimit(2)
-							.font(.title2)
-
-						if isExpanded, let subject {
-							Label(subject.teacher.displayName, systemImage: "person.fill")
-								.font(.headline)
-								.foregroundStyle(.black)
-
-							Label(subject.classroom.displayName, systemImage: "door.left.hand.open")
-								.font(.headline)
-								.foregroundStyle(.black)
-						}
-					}
-				}
-				.frame(maxHeight: .infinity, alignment: .leading)
-
-				Spacer()
-
-				if let subject {
-					Image(systemName: subject.symbol)
-						.resizable()
-						.aspectRatio(contentMode: .fit)
-						.frame(width: max(18, baseCardHeight - 40), height: max(18, baseCardHeight - 40))
-						.padding(.trailing, 10)
-						.foregroundStyle(subject.colour.swiftUIColor)
+		TodaySchoolPeriodRow(
+			periodNumber: period.number,
+			subject: subject,
+			isExpanded: isExpanded,
+			baseCardHeight: baseCardHeight,
+			cardHeight: cardHeight,
+			cornerRadius: periodCornerRadius,
+			toggleExpansion: {
+				withAnimation(.snappy(duration: 0.28)) {
+					expandedPeriodNumber = isExpanded ? nil : period.number
 				}
 			}
-		}
-		.padding(10)
-		.frame(height: cardHeight, alignment: .top)
-		.foregroundStyle(.black)
-		.accessibilityLabel(subject?.id ?? "Free Period")
-		.accessibilityValue(isExpanded ? "Expanded" : "Collapsed")
-		.background {
-			GeometryReader { proxy in
-				Image("paperWhite")
-					.accessibilityHidden(true)
-					.resizable()
-					.scaledToFill()
-					.frame(width: proxy.size.width, height: proxy.size.height)
-					.clipped()
-			}
-			.clipShape(RoundedRectangle(cornerRadius: periodCornerRadius, style: .continuous))
-		}
-		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: periodCornerRadius, style: .continuous))
-		.contentShape(RoundedRectangle(cornerRadius: periodCornerRadius, style: .continuous))
-		.onTapGesture {
-			withAnimation(.snappy(duration: 0.28)) {
-				expandedPeriodNumber = isExpanded ? nil : period.number
-			}
-		}
+		)
 	}
 
 	private var currentTimeMarker: some View {
@@ -648,6 +672,78 @@ private struct TodaySchoolTimeline: View {
 
 	private func timeLabel(_ time: TimeOfDay) -> String {
 		String(format: "%d:%02d", time.hour, time.minute)
+	}
+}
+
+private struct TodaySchoolPeriodRow: View {
+	let periodNumber: Int
+	let subject: Subject?
+	let isExpanded: Bool
+	let baseCardHeight: CGFloat
+	let cardHeight: CGFloat
+	let cornerRadius: CGFloat
+	let toggleExpansion: () -> Void
+
+	var body: some View {
+		VStack(alignment: .leading, spacing: 8) {
+			HStack(alignment: .center) {
+				HStack(alignment: .center, spacing: 10) {
+					Text(periodNumber.formatted())
+						.font(.caption.monospacedDigit())
+						.frame(width: 15)
+
+					VStack(alignment: .leading, spacing: 4) {
+						Text(subject?.id ?? "Free Period")
+							.lineLimit(2)
+							.font(.title2)
+
+						if isExpanded, let subject {
+							Label(subject.teacher.displayName, systemImage: "person.fill")
+								.font(.headline)
+								.foregroundStyle(.black)
+
+							Label(subject.classroom.displayName, systemImage: "door.left.hand.open")
+								.font(.headline)
+								.foregroundStyle(.black)
+						}
+					}
+				}
+				.frame(maxHeight: .infinity, alignment: .centerLeading)
+
+				Spacer()
+
+				if let subject {
+					Image(systemName: subject.symbol)
+						.resizable()
+						.aspectRatio(contentMode: .fit)
+						.frame(
+							width: max(18, baseCardHeight - 40),
+							height: max(18, baseCardHeight - 40)
+						)
+						.padding(.trailing, 10)
+						.foregroundStyle(subject.colour.swiftUIColor)
+				}
+			}
+		}
+		.padding(10)
+		.frame(height: cardHeight, alignment: .top)
+		.foregroundStyle(.black)
+		.accessibilityLabel(subject?.id ?? "Free Period")
+		.accessibilityValue(isExpanded ? "Expanded" : "Collapsed")
+		.background {
+			GeometryReader { proxy in
+				Image("paperWhite")
+					.resizable()
+					.scaledToFill()
+					.frame(width: proxy.size.width, height: proxy.size.height)
+					.clipped()
+					.accessibilityHidden(true)
+			}
+			.clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+		}
+		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+		.contentShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+		.onTapGesture(perform: toggleExpansion)
 	}
 }
 
