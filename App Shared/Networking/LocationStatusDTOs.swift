@@ -16,6 +16,7 @@ nonisolated struct LocationStatusCurrentResponse: Codable, Sendable {
 
 nonisolated struct LocationArrivalStatisticsResponse: Codable, Sendable {
 	let averageArrivalSecondsSinceMidnight: Double?
+	let weekdayAverageArrivalSecondsSinceMidnight: [Double?]
 }
 
 nonisolated struct FriendLocationNotificationPreferencesRequest: Codable, Sendable {

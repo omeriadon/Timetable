@@ -245,13 +245,26 @@ struct FriendsView: View {
 
 	private struct PersonalArrivalStatisticsView: View {
 		@State private var statistics: LocationArrivalStatisticsResponse?
+		private let weekdayNames = [
+			"Monday",
+			"Tuesday",
+			"Wednesday",
+			"Thursday",
+			"Friday",
+			"Saturday",
+			"Sunday",
+		]
 
 		var body: some View {
-			VStack(alignment: .leading, spacing: 8) {
+			VStack(alignment: .leading, spacing: 12) {
 				Text("Average arrival")
 					.font(.headline)
-				Text(formattedAverageArrival)
-					.foregroundStyle(.secondary)
+
+				LabeledContent("Overall", value: formattedAverageArrival)
+
+				ForEach(Array(weekdayNames.enumerated()), id: \.offset) { index, day in
+					LabeledContent(day, value: averageArrival(for: index))
+				}
 			}
 			.padding()
 			.task {
@@ -263,6 +276,17 @@ struct FriendsView: View {
 			guard let seconds = statistics?.averageArrivalSecondsSinceMidnight else {
 				return "No data"
 			}
+			return LocationArrivalTimeFormatter.string(for: seconds)
+		}
+
+		private func averageArrival(for weekdayIndex: Int) -> String {
+			guard let statistics,
+			      statistics.weekdayAverageArrivalSecondsSinceMidnight.indices.contains(weekdayIndex),
+			      let seconds = statistics.weekdayAverageArrivalSecondsSinceMidnight[weekdayIndex]
+			else {
+				return "No data"
+			}
+
 			return LocationArrivalTimeFormatter.string(for: seconds)
 		}
 	}
