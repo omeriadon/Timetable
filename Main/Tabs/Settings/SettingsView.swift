@@ -34,10 +34,10 @@ struct SettingsView: View {
 
 	@State private var colors = [
 		Color.brown,
-		Color(uiColor: .secondarySystemGroupedBackground),
-		Color(uiColor: .secondarySystemGroupedBackground),
-		Color(uiColor: .secondarySystemGroupedBackground),
-		Color(uiColor: .secondarySystemGroupedBackground),
+		Color(uiColor: .clear),
+		Color(uiColor: .clear),
+		Color(uiColor: .clear),
+		Color(uiColor: .clear),
 	]
 	@State private var speed = 0.6
 	@State private var colorTransitionSpeed = 10.0
