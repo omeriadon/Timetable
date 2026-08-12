@@ -12,6 +12,7 @@ struct SplashView: View {
 	var body: some View {
 		VStack(spacing: 50) {
 			Image("Icon")
+				.accessibilityHidden(true)
 				.resizable()
 				.aspectRatio(contentMode: .fit)
 				.frame(width: 300)

@@ -23,6 +23,7 @@ struct AboutView: View {
 			VStack {
 				ZStack(alignment: .bottomTrailing) {
 					Image("Icon")
+						.accessibilityHidden(true)
 						.resizable()
 						.aspectRatio(contentMode: .fit)
 						.frame(width: 200)

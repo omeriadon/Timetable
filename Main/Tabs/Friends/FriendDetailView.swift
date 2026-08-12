@@ -116,6 +116,7 @@ struct FriendDetailView: View {
 							close()
 						}
 						.labelStyle(.iconOnly)
+						.accessibilityLabel("Close friend details")
 					}
 				}
 
@@ -153,6 +154,7 @@ struct FriendDetailView: View {
 						}
 					}
 					.labelStyle(.iconOnly)
+					.accessibilityLabel("Friend actions")
 				}
 			}
 			.confirmationDialog(action?.title ?? "", isPresented: Binding(

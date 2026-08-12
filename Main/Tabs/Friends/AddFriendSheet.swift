@@ -82,6 +82,7 @@ struct AddFriendSheet: View {
 						close()
 					}
 					.labelStyle(.iconOnly)
+					.accessibilityLabel("Close add friend")
 				}
 			}
 		}

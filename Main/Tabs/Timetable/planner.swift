@@ -57,6 +57,7 @@ struct DatesView: View {
 			}
 			.controlSize(.extraLarge)
 			.labelStyle(.iconOnly)
+			.accessibilityLabel("Add personal event")
 			.buttonBorderShape(.circle)
 			.buttonStyle(.glassProminent)
 			.padding(.bottom, 15)

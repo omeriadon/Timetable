@@ -17,6 +17,7 @@ struct NameSheet: View {
 		NavigationStack {
 			VStack(alignment: .center) {
 				Image("Icon")
+					.accessibilityHidden(true)
 					.resizable()
 					.aspectRatio(contentMode: .fit)
 					.frame(maxWidth: 120)

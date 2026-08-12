@@ -65,6 +65,7 @@ struct FriendRequestsSheet: View {
 						close()
 					}
 					.labelStyle(.iconOnly)
+					.accessibilityLabel("Close friend requests")
 				}
 			}
 		}

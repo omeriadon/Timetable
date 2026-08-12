@@ -106,6 +106,7 @@ struct WideRouteDestinationView: View {
 				ToolbarItem(placement: .cancellationAction) {
 					Button("Close", systemImage: "xmark", action: close)
 						.labelStyle(.iconOnly)
+						.accessibilityLabel("Close")
 				}
 			}
 		}
