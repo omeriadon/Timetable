@@ -115,11 +115,15 @@ struct ProfilePicture: View {
 						.font(
 							.system(
 								size: 150,
-								weight: appearance.fontWeight.profilePictureFontWeight
+								weight: appearance.fontWeight.profilePictureFontWeight,
+								design: appearance.fontDesign.profilePictureFontDesign
 							)
 						)
-						.fontDesign(appearance.fontDesign.profilePictureFontDesign)
 						.foregroundStyle(appearance.foregroundColour.swiftUIColor)
+						.animation(
+							reduceMotion ? .none : .easeInOut(duration: 0.2),
+							value: appearance.foregroundColour
+						)
 						.minimumScaleFactor(0.01)
 						.padding(size * 0.15)
 
@@ -127,6 +131,10 @@ struct ProfilePicture: View {
 					Text(appearance.emoji)
 						.font(.system(size: 150))
 						.foregroundStyle(appearance.foregroundColour.swiftUIColor)
+						.animation(
+							reduceMotion ? .none : .easeInOut(duration: 0.2),
+							value: appearance.foregroundColour
+						)
 						.minimumScaleFactor(0.01)
 						.padding(size * 0.15)
 			}

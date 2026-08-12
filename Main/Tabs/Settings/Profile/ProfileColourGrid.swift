@@ -14,7 +14,9 @@ struct ProfileColourGrid: View {
 	private let palette = Self.makePalette(
 		colourRowCount: 6,
 		columnCount: Self.columnCount,
-		includesMonochrome: true
+		includesMonochrome: true,
+		topLightness: 0.92,
+		bottomLightness: 0.08
 	)
 
 	var body: some View {
@@ -71,13 +73,15 @@ struct ProfileColourGrid: View {
 	static func makePalette(
 		colourRowCount: Int,
 		columnCount: Int,
-		includesMonochrome: Bool
+		includesMonochrome: Bool,
+		topLightness: Double,
+		bottomLightness: Double
 	) -> [ProfilePaletteColour] {
 		let saturation = 0.75
 
 		var rows: [[ProfilePaletteColour]] = (0 ..< colourRowCount).map { row in
 			let t = colourRowCount == 1 ? 0.5 : Double(row) / Double(colourRowCount - 1)
-			let lightness = 0.92 - t * 0.84
+			let lightness = topLightness - t * (topLightness - bottomLightness)
 
 			return (0 ..< columnCount).map { column in
 				let hue = Double(column) / Double(columnCount)
@@ -162,7 +166,9 @@ struct ProfileForegroundColourGrid: View {
 	private let palette = ProfileColourGrid.makePalette(
 		colourRowCount: 2,
 		columnCount: ProfileColourGrid.columnCount - 1,
-		includesMonochrome: false
+		includesMonochrome: false,
+		topLightness: 0.70,
+		bottomLightness: 0.30
 	)
 	private let monochromeColours = [
 		RGBAColor(hexString: "#FFFFFF"),

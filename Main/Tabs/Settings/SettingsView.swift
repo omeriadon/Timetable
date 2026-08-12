@@ -16,6 +16,7 @@ struct SettingsView: View {
 	@Default(.timetable) var subjects
 	@Default(.lastServerSync) var lastServerSync
 	@Default(.userDisplayName) var userDisplayName
+	@Default(.accountProfile) private var accountProfile
 
 	@Environment(\.statusBadgeManager) private var statusBadgeManager
 	@State private var sessionStore = SessionStore.shared
@@ -64,6 +65,10 @@ struct SettingsView: View {
 				Label {
 					Text(userDisplayName)
 						.font(.title)
+						.foregroundStyle(
+							accountProfile?.appearance.foregroundColour.swiftUIColor
+								?? ProfileAppearance.default.foregroundColour.swiftUIColor
+						)
 				} icon: {
 					ProfilePicture(size: 50, accessibilityName: "Profile Picture")
 						.padding(.trailing)
