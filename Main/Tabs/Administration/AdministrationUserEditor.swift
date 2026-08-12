@@ -40,14 +40,29 @@ struct AdministrationUserEditor: View {
 				}
 
 				TextField("Name", text: $displayName)
+					.onChange(of: displayName) { _, newValue in
+						if newValue.count > 100 {
+							displayName = String(newValue.prefix(100))
+						}
+					}
 					.glurListRowBackground()
 				TextField("Email", text: $email)
 					.textInputAutocapitalization(.never)
 					.keyboardType(.emailAddress)
+					.onChange(of: email) { _, newValue in
+						if newValue.count > 100 {
+							email = String(newValue.prefix(100))
+						}
+					}
 					.glurListRowBackground()
 
 				Section {
 					SecureField(target.user == nil ? "Password" : "New Password", text: $password)
+						.onChange(of: password) { _, newValue in
+							if newValue.count > 100 {
+								password = String(newValue.prefix(100))
+							}
+						}
 				} footer: {
 					Text(target.user == nil ? "Passwords must contain at least eight characters." : "Leave blank to keep the current password.")
 				}

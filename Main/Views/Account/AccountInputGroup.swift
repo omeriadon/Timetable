@@ -13,6 +13,7 @@ struct AccountInputGroup: View {
 	@Binding var text: String
 	let problems: [String]
 	var isSecure = false
+	var maximumLength = 100
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 6) {
@@ -20,7 +21,8 @@ struct AccountInputGroup: View {
 				title: title,
 				systemImage: systemImage,
 				text: $text,
-				isSecure: isSecure
+				isSecure: isSecure,
+				maximumLength: maximumLength
 			)
 			ValidationMessagesView(messages: problems)
 		}

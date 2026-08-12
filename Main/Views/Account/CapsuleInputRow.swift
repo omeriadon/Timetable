@@ -12,6 +12,7 @@ struct CapsuleInputRow: View {
 	let systemImage: String
 	@Binding var text: String
 	var isSecure = false
+	var maximumLength = 100
 
 	var body: some View {
 		HStack(spacing: 12) {
@@ -35,6 +36,11 @@ struct CapsuleInputRow: View {
 				}
 			}
 			.textFieldStyle(.plain)
+		}
+		.onChange(of: text) { _, newValue in
+			if newValue.count > maximumLength {
+				text = String(newValue.prefix(maximumLength))
+			}
 		}
 		.padding(.horizontal)
 		.frame(minHeight: 44)

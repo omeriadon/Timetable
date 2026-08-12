@@ -66,8 +66,8 @@ final class AccountAuthenticationModel {
 		if !trimmed.contains("@") || trimmed.hasPrefix("@") || trimmed.hasSuffix("@") {
 			problems.append("Enter a valid email address.")
 		}
-		if trimmed.count > 45 {
-			problems.append("Your email must contain 45 characters or fewer.")
+		if trimmed.count > 100 {
+			problems.append("Your email must contain 100 characters or fewer.")
 		}
 		if mode == .signUp, !trimmed.lowercased().hasSuffix("@student.education.wa.edu.au") {
 			problems.append("Use your school email address.")
@@ -80,6 +80,9 @@ final class AccountAuthenticationModel {
 		if mode == .signUp, !password.isEmpty, password.count < 8 {
 			problems.append("Use at least eight characters.")
 		}
+		if password.count > 100 {
+			problems.append("Your password must contain 100 characters or fewer.")
+		}
 		return problems
 	}
 
@@ -88,6 +91,9 @@ final class AccountAuthenticationModel {
 		var problems: [String] = []
 		if !passwordConfirmation.isEmpty, passwordConfirmation != password {
 			problems.append("The passwords do not match.")
+		}
+		if passwordConfirmation.count > 100 {
+			problems.append("Your password must contain 100 characters or fewer.")
 		}
 		return problems
 	}

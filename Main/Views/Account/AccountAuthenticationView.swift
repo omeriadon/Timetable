@@ -36,7 +36,8 @@ struct AccountAuthenticationView: View {
 					title: "Verification Code",
 					systemImage: "number.square",
 					text: $model.verificationCode,
-					problems: []
+					problems: [],
+					maximumLength: 6
 				)
 
 				.keyboardType(.numberPad)
