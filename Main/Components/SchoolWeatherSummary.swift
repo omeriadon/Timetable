@@ -4,15 +4,18 @@ struct SchoolWeatherSummary: View {
 	let weather: SchoolWeather
 	let font: Font
 	let foregroundStyle: Color
+	let maximumSpacerWidth: CGFloat
 
 	init(
 		weather: SchoolWeather,
 		font: Font = .callout,
-		foregroundStyle: Color = .secondary
+		foregroundStyle: Color = .secondary,
+		maximumSpacerWidth: CGFloat = 15
 	) {
 		self.weather = weather
 		self.font = font
 		self.foregroundStyle = foregroundStyle
+		self.maximumSpacerWidth = maximumSpacerWidth
 	}
 
 	var body: some View {
@@ -24,12 +27,12 @@ struct SchoolWeatherSummary: View {
 			}
 
 			Spacer(minLength: 1)
-				.frame(maxWidth: 15)
+				.frame(maxWidth: maximumSpacerWidth)
 
 			Label(conditionTitle, systemImage: "cloud.sun")
 
 			Spacer(minLength: 1)
-				.frame(maxWidth: 15)
+				.frame(maxWidth: maximumSpacerWidth)
 
 			Label {
 				Text(
@@ -41,7 +44,7 @@ struct SchoolWeatherSummary: View {
 			}
 
 			Spacer(minLength: 1)
-				.frame(maxWidth: 15)
+				.frame(maxWidth: maximumSpacerWidth)
 
 			Label("UV \(weather.uvIndex)", systemImage: "sun.max")
 		}

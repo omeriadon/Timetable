@@ -177,7 +177,11 @@ struct DatesView: View {
 					.font(.headline)
 
 				if let weather = entry.weather {
-					SchoolWeatherSummary(weather: weather, font: .caption)
+					SchoolWeatherSummary(
+						weather: weather,
+						font: .caption2,
+						maximumSpacerWidth: 8
+					)
 				}
 
 				if !entry.kind.title.isEmpty {
@@ -702,7 +706,11 @@ struct CalendarEventEditor: View {
 						.glurListRowBackground()
 				}
 				if let weather = target.event?.weather {
-					SchoolWeatherSummary(weather: weather, font: .caption)
+					SchoolWeatherSummary(
+						weather: weather,
+						font: .caption2,
+						maximumSpacerWidth: 8
+					)
 						.glurListRowBackground()
 				}
 				DatePicker("Date", selection: $date, displayedComponents: .date)
@@ -782,7 +790,11 @@ struct CalendarEventEditor: View {
 		}
 
 		if let weather = target.event?.weather {
-			SchoolWeatherSummary(weather: weather, font: .caption)
+			SchoolWeatherSummary(
+				weather: weather,
+				font: .caption2,
+				maximumSpacerWidth: 8
+			)
 		}
 
 		LabeledContent("Date", value: date.formatted(date: .long, time: .omitted))
