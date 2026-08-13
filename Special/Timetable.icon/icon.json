@@ -483,7 +483,6 @@
           }
         },
         {
-          "glass" : false,
           "hidden-specializations" : [
             {
               "value" : true
@@ -493,13 +492,12 @@
               "value" : false
             }
           ],
-          "image-name" : "image.jpg",
-          "name" : "image",
-          "opacity" : 0.67,
+          "image-name" : "image 2.jpg",
+          "name" : "image 2",
           "position" : {
-            "scale" : 3.64,
+            "scale" : 1.59,
             "translation-in-points" : [
-              13.265306122448976,
+              14.328979591837026,
               0
             ]
           }
