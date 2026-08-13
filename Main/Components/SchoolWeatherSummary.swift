@@ -12,10 +12,12 @@ struct SchoolWeatherSummary: View {
 			}
 
 			Spacer(minLength: 1)
+				.frame(maxWidth: 15)
 
 			Label(conditionTitle, systemImage: "cloud.sun")
 
 			Spacer(minLength: 1)
+				.frame(maxWidth: 15)
 
 			Label {
 				Text(
@@ -27,6 +29,7 @@ struct SchoolWeatherSummary: View {
 			}
 
 			Spacer(minLength: 1)
+				.frame(maxWidth: 15)
 
 			Label("UV \(weather.uvIndex)", systemImage: "sun.max")
 		}

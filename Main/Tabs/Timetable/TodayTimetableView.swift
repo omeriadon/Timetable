@@ -225,6 +225,10 @@ private struct TodayEventRow: View {
 			VStack(alignment: .leading) {
 				Text(entry.title)
 
+				if let weather = entry.weather {
+					SchoolWeatherSummary(weather: weather)
+				}
+
 				if showsDate {
 					Text(entry.date.displayLabel)
 						.font(.footnote)
@@ -337,6 +341,7 @@ private struct TodayEventEntry: Equatable, Identifiable {
 	let date: SchoolCalendarDate
 	let symbol: String
 	let usesForegroundPaper: Bool
+	let weather: SchoolWeather?
 
 	var backgroundImageName: String {
 		usesForegroundPaper ? "foregroundPaper" : "paper"
@@ -352,6 +357,7 @@ private struct TodayEventEntry: Equatable, Identifiable {
 		date = event.date
 		symbol = event.symbol
 		usesForegroundPaper = !event.isGlobal
+		weather = event.weather
 	}
 
 	nonisolated init(assessment: GradeAssessment, subject: Subject?) {
@@ -360,6 +366,7 @@ private struct TodayEventEntry: Equatable, Identifiable {
 		date = assessment.date
 		symbol = subject?.symbol ?? "doc.text"
 		usesForegroundPaper = true
+		weather = nil
 	}
 
 	nonisolated static func areInDisplayOrder(_ lhs: Self, _ rhs: Self) -> Bool {
