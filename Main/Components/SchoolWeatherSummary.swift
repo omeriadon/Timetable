@@ -2,6 +2,18 @@ import SwiftUI
 
 struct SchoolWeatherSummary: View {
 	let weather: SchoolWeather
+	let font: Font
+	let foregroundStyle: Color
+
+	init(
+		weather: SchoolWeather,
+		font: Font = .callout,
+		foregroundStyle: Color = .secondary
+	) {
+		self.weather = weather
+		self.font = font
+		self.foregroundStyle = foregroundStyle
+	}
 
 	var body: some View {
 		HStack {
@@ -33,9 +45,9 @@ struct SchoolWeatherSummary: View {
 
 			Label("UV \(weather.uvIndex)", systemImage: "sun.max")
 		}
-		.font(.callout)
+		.font(font)
 		.frame(maxWidth: .infinity, alignment: .leading)
-		.foregroundStyle(.secondary)
+		.foregroundStyle(foregroundStyle)
 		.accessibilityElement(children: .combine)
 		.accessibilityLabel(
 			"School weather, \(weather.temperatureCelsius.formatted(.number.precision(.fractionLength(0)))) degrees Celsius, \(conditionTitle), \(weather.precipitationChance.formatted(.percent.precision(.fractionLength(0)))) chance of precipitation, UV index \(weather.uvIndex)"

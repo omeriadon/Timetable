@@ -129,7 +129,11 @@ private struct TodayHeader: View {
 	var body: some View {
 		VStack(alignment: .leading, spacing: 6) {
 			if let weather {
-				SchoolWeatherSummary(weather: weather)
+				SchoolWeatherSummary(
+					weather: weather,
+					font: .caption,
+					foregroundStyle: .black
+				)
 			}
 
 			Text(now.formatted(.dateTime.weekday(.wide).day().month(.wide).hour(.defaultDigits(amPM: .wide)).minute(.defaultDigits).second(.defaultDigits)))
@@ -226,7 +230,11 @@ private struct TodayEventRow: View {
 				Text(entry.title)
 
 				if let weather = entry.weather {
-					SchoolWeatherSummary(weather: weather)
+					SchoolWeatherSummary(
+						weather: weather,
+						font: .caption,
+						foregroundStyle: .black
+					)
 				}
 
 				if showsDate {
