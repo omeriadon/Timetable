@@ -121,7 +121,7 @@ final class AppRouter {
 	}
 
 	func navigate(to route: AppRoute) {
-		let destination = route.rootDestination
+		let destination = rootDestination(for: route)
 		selectedTab = destination
 		selectedSidebarDestination = destination
 
@@ -226,6 +226,21 @@ final class AppRouter {
 				settingsPath.append(route)
 			case .administration:
 				administrationPath.append(route)
+		}
+	}
+
+	private func rootDestination(for route: AppRoute) -> AppRootDestination {
+		guard route.rootDestination == .timetable,
+		      presentation != .iOS
+		else {
+			return route.rootDestination
+		}
+
+		switch selectedSidebarDestination {
+			case .timetableToday, .timetableWeek, .timetablePlanner:
+				return selectedSidebarDestination
+			default:
+				return .timetableToday
 		}
 	}
 

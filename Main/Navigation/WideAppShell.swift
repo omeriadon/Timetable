@@ -10,7 +10,7 @@ struct WideAppShell: View {
 		@Bindable var router = router
 
 		NavigationSplitView(columnVisibility: sidebarVisibility) {
-			List(selection: sidebarSelection) {
+			List {
 				Section {
 					sidebarRoot("Today", systemImage: "calendar.day.timeline.left", destination: .timetableToday)
 					sidebarRoot("Week", systemImage: "7.calendar", destination: .timetableWeek)
@@ -27,15 +27,19 @@ struct WideAppShell: View {
 				}
 			}
 			.safeAreaBar(edge: .bottom, spacing: 0) {
-				sidebarUtilityItem("Settings", systemImage: "gear", destination: .settings)
+				VStack(spacing: 2) {
+					sidebarRoot("Settings", systemImage: "gear", destination: .settings)
 
-				if accountProfile?.authority.isAdministrator == true {
-					sidebarUtilityItem(
-						"Administration",
-						systemImage: "calendar.badge.lock",
-						destination: .administration
-					)
+					if accountProfile?.authority.isAdministrator == true {
+						sidebarRoot(
+							"Administration",
+							systemImage: "calendar.badge.lock",
+							destination: .administration
+						)
+					}
 				}
+				.padding(.horizontal, 8)
+				.padding(.vertical, 6)
 			}
 			.appNavigationTitle(router.presentation == .iOS ? "Timetable" : "")
 			.listStyle(.sidebar)
@@ -110,18 +114,6 @@ struct WideAppShell: View {
 		router.sidebarPath.removeLast()
 	}
 
-	private var sidebarSelection: Binding<AppRootDestination?> {
-		Binding(
-			get: { router.selectedSidebarDestination },
-			set: { destination in
-				guard let destination else {
-					return
-				}
-				router.selectRoot(destination)
-			}
-		)
-	}
-
 	private var sidebarVisibility: Binding<NavigationSplitViewVisibility> {
 		Binding(
 			get: { router.sidebarVisibility.navigationSplitViewVisibility },
@@ -145,30 +137,21 @@ struct WideAppShell: View {
 		systemImage: String,
 		destination: AppRootDestination
 	) -> some View {
-		Label(title, systemImage: systemImage)
-			.tag(destination)
-	}
-
-	private func sidebarUtilityItem(
-		_ title: String,
-		systemImage: String,
-		destination: AppRootDestination
-	) -> some View {
-		Button {
-			router.selectRoot(destination)
-		} label: {
+		Button(action: { router.selectRoot(destination) }) {
 			Label(title, systemImage: systemImage)
 				.frame(maxWidth: .infinity, alignment: .leading)
-				.padding(.horizontal, 12)
-				.padding(.vertical, 8)
+				.padding(.horizontal, 10)
+				.padding(.vertical, 7)
 		}
 		.buttonStyle(.plain)
+		.foregroundStyle(router.selectedSidebarDestination == destination ? Color.accentColor : Color.primary)
 		.background {
 			if router.selectedSidebarDestination == destination {
 				RoundedRectangle(cornerRadius: 8)
-					.fill(.quaternary)
+					.fill(Color.accentColor.opacity(0.15))
 			}
 		}
 		.clipShape(RoundedRectangle(cornerRadius: 8))
+		.contentShape(Rectangle())
 	}
 }
