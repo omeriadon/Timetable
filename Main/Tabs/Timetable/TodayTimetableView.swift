@@ -131,7 +131,8 @@ private struct TodayHeader: View {
 			if let weather {
 				SchoolWeatherSummary(
 					weather: weather,
-					font: .caption
+					font: .caption,
+					maximumSpacerWidth: 15
 				)
 			}
 

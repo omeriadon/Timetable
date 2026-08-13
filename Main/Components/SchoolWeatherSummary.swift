@@ -49,6 +49,7 @@ struct SchoolWeatherSummary: View {
 			Label("UV \(weather.uvIndex)", systemImage: "sun.max")
 		}
 		.font(font)
+		.lineLimit(1)
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.foregroundStyle(foregroundStyle)
 		.accessibilityElement(children: .combine)
