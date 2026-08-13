@@ -53,7 +53,7 @@ nonisolated struct CalendarEvent: Codable, Defaults.Serializable, Hashable, Iden
 		date = try container.decode(SchoolCalendarDate.self, forKey: .date)
 		isGlobal = try container.decode(Bool.self, forKey: .isGlobal)
 		tagIDs = try container.decodeIfPresent([UUID].self, forKey: .tagIDs) ?? []
-		showsWeather = isGlobal && (try container.decodeIfPresent(Bool.self, forKey: .showsWeather) ?? false)
+		showsWeather = try isGlobal && (container.decodeIfPresent(Bool.self, forKey: .showsWeather) ?? false)
 		weather = showsWeather ? try container.decodeIfPresent(SchoolWeather.self, forKey: .weather) : nil
 		revision = try container.decodeIfPresent(Int.self, forKey: .revision) ?? 0
 		updatedAt = try container.decodeIfPresent(Date.self, forKey: .updatedAt)
