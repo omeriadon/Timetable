@@ -5225,12 +5225,12 @@
         }
       }
     },
-    "School weather, %@ degrees Celsius, %@, UV index %lld" : {
+    "School weather, %@ degrees Celsius, %@, %@ chance of precipitation, UV index %lld" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "School weather, %1$@ degrees Celsius, %2$@, UV index %3$lld"
+            "value" : "School weather, %1$@ degrees Celsius, %2$@, %3$@ chance of precipitation, UV index %4$lld"
           }
         }
       }
@@ -5718,6 +5718,9 @@
           }
         }
       }
+    },
+    "Show Weather" : {
+
     },
     "Shows subject details" : {
 
@@ -7157,6 +7160,7 @@
 
     },
     "What should we call you?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {

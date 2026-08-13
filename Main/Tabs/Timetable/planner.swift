@@ -713,7 +713,7 @@ struct CalendarEventEditor: View {
 						foregroundStyle: .white,
 						maximumSpacerWidth: 8
 					)
-						.glurListRowBackground()
+					.glurListRowBackground()
 				}
 				DatePicker("Date", selection: $date, displayedComponents: .date)
 					.glurListRowBackground()
