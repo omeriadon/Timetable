@@ -194,6 +194,7 @@ struct FriendsView: View {
 		}
 		.safeAreaBar(edge: .top, alignment: .center, spacing: 10) {
 			LocationStatusRow(showsArrivalStatistics: $showsArrivalStatistics)
+				.padding(.horizontal)
 				.popover(isPresented: $showsArrivalStatistics) {
 					PersonalArrivalStatisticsView()
 						.presentationCompactAdaptation(.popover)
@@ -222,7 +223,7 @@ struct FriendsView: View {
 					.padding(.bottom, 8)
 
 				LabeledContent("Overall", value: formattedAverageArrival)
-					.padding(.bottom, 4)
+					.padding(.bottom, 6)
 
 				ForEach(Array(weekdayNames.enumerated()), id: \.offset) { index, day in
 					LabeledContent(day, value: averageArrival(for: index))
@@ -299,10 +300,14 @@ private struct FriendsSearchBar: View {
 	@Namespace private var glassNamespace
 
 	var body: some View {
-		GlassEffectContainer {
-			Group {
-				if isPresented {
-					HStack(spacing: 10) {
+		GlassEffectContainer(spacing: 0) {
+			HStack {
+				if !isPresented {
+					Spacer()
+				}
+
+				HStack {
+					if isPresented {
 						Image(systemName: "magnifyingglass")
 							.foregroundStyle(.secondary)
 
@@ -310,52 +315,48 @@ private struct FriendsSearchBar: View {
 							.textFieldStyle(.plain)
 							.focused($isFocused)
 							.submitLabel(.search)
-
-						Button(role: .cancel) {
-							withAnimation(.easeInOut(duration: 0.3)) {
-								text = ""
-								isPresented = false
-								isFocused = false
-							}
-						} label: {
-							Image(systemName: "xmark")
-						}
-						.accessibilityLabel("Cancel search")
-					}
-					.padding(15)
-					.glassEffect(.regular.interactive(), in: Capsule())
-					.glassEffectID("search", in: glassNamespace)
-
-				} else {
-					HStack {
-						Spacer()
-
+					} else {
 						Button {
-							withAnimation(.easeInOut(duration: 0.3)) {
-								isPresented = true
-							}
-
-							Task { @MainActor in
-								isFocused = true
-							}
+							isPresented = true
+							isFocused = true
 						} label: {
 							Label("Search friends", systemImage: "magnifyingglass")
 								.labelStyle(.iconOnly)
-								.font(.title2)
 								.padding(7)
 						}
+						.buttonStyle(.plain)
 						.buttonBorderShape(.circle)
-						.buttonStyle(.glass)
-						.glassEffectID("search", in: glassNamespace)
 					}
 				}
+				.padding(10)
+				.glassEffect(.clear.interactive())
+				.glassEffectID("search", in: glassNamespace)
+
+				if isPresented {
+					Button(role: .cancel) {
+						text = ""
+						isPresented = false
+						isFocused = false
+					} label: {
+						Label("Cancel", systemImage: "xmark")
+							.labelStyle(.iconOnly)
+							.padding(7)
+					}
+					.padding(7)
+					.keyboardShortcut(.cancelAction)
+					.accessibilityLabel("Cancel search")
+					.buttonStyle(.plain)
+					.glassEffect(.clear.interactive(), in: Circle())
+					.glassEffectID("cancel", in: glassNamespace)
+				}
 			}
+			.animation(.easeInOut(duration: 0.3), value: isPresented)
+			.font(.title2)
+			.padding(.horizontal, 16)
+			.padding(.vertical, 10)
+			.frame(maxWidth: .infinity)
+			.padding(.bottom, 10)
 		}
-		.animation(.easeInOut(duration: 0.3), value: "\(isPresented)\(isFocused)")
-		.padding(.horizontal, 16)
-		.padding(.vertical, 10)
-		.frame(maxWidth: .infinity)
-		.padding(.bottom, 10)
 	}
 }
 

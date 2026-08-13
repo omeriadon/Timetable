@@ -149,38 +149,38 @@ struct FriendDetailView: View {
 						Button("Remove Friend", systemImage: "person.badge.minus", role: .destructive) {
 							action = .remove
 						}
-						.confirmationDialog(action?.title ?? "", isPresented: Binding(
-							get: { action != nil },
-							set: {
-								if !$0 {
-									action = nil
-								}
-							}
-						)) {
-							if let action {
-								Button(action.title, systemImage: action.symbol, role: .destructive) {
-									perform(action)
-								}
-							}
-							Button("Cancel", role: .cancel) {}
-						} message: {
-							Text(action?.message ?? "")
-						}
 
 						Button("Report", systemImage: "exclamationmark.bubble", role: .destructive) {
 							showsReportConfirmation = true
 						}
-						.confirmationDialog("Report Friend?", isPresented: $showsReportConfirmation) {
-							Button("Cancel", role: .cancel) {}
-							Button("Report", role: .destructive) {
-								report()
-							}
-						} message: {
-							Text("This sends a report for review. The friend remains visible in your account.")
-						}
 					}
 					.labelStyle(.iconOnly)
 					.accessibilityLabel("Friend actions")
+					.confirmationDialog(action?.title ?? "", isPresented: Binding(
+						get: { action != nil },
+						set: {
+							if !$0 {
+								action = nil
+							}
+						}
+					)) {
+						if let action {
+							Button(action.title, systemImage: action.symbol, role: .destructive) {
+								perform(action)
+							}
+						}
+						Button("Cancel", role: .cancel) {}
+					} message: {
+						Text(action?.message ?? "")
+					}
+					.confirmationDialog("Report Friend?", isPresented: $showsReportConfirmation) {
+						Button("Cancel", role: .cancel) {}
+						Button("Report", role: .destructive) {
+							report()
+						}
+					} message: {
+						Text("This sends a report for review. The friend remains visible in your account.")
+					}
 				}
 			}
 			.sheet(isPresented: $showsFriendsSinceRequest) {
