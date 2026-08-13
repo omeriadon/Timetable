@@ -41,24 +41,14 @@ final class NotificationRegistrationService {
 	func requestRemoteRegistration() async {
 		Print("Requesting remote APNs registration", category: .network)
 		do {
-			let granted = try await requestNotificationPermission()
-			guard granted else {
-				registrationFailed(NSError(
-					domain: "Notifications",
-					code: 1,
-					userInfo: [NSLocalizedDescriptionKey: "Notification permission was denied."]
-				))
-				return
-			}
-
-			badgeID = UUID()
-			registrationState = .registering
-
-			UIApplication.shared.registerForRemoteNotifications()
-
+			_ = try await requestNotificationPermission()
 		} catch {
-			registrationFailed(error)
+			PrintError("Notification authorization request failed", category: .network, error: error)
 		}
+
+		badgeID = UUID()
+		registrationState = .registering
+		UIApplication.shared.registerForRemoteNotifications()
 	}
 
 	func requestNotificationPermission() async throws -> Bool {
