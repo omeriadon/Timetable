@@ -45,30 +45,36 @@ struct FriendSearchRow: View {
 		}
 	}
 
-	@ViewBuilder
 	private var action: some View {
-		switch relationship {
-			case .friends:
-				Label("Friends", systemImage: "person.2.fill")
-					.font(.caption.weight(.semibold))
-					.foregroundStyle(.secondary)
-			case .pendingOutgoing:
-				Label("Request Sent", systemImage: "clock")
-					.font(.caption.weight(.semibold))
-					.foregroundStyle(.secondary)
-			case .pendingIncoming:
-				Label("Incoming Request", systemImage: "bell.badge")
-					.font(.caption.weight(.semibold))
-					.foregroundStyle(.tint)
-			case nil:
-				Button("Request", systemImage: "person.badge.plus") {
-					sendRequest()
-				}
-				.buttonStyle(.glassProminent)
-				.tint(.blue)
-				.foregroundStyle(.primary)
-				.disabled(isSending)
+		ZStack {
+			switch relationship {
+				case .friends:
+					Label("Friends", systemImage: "person.2.fill")
+						.font(.caption.weight(.semibold))
+						.foregroundStyle(.secondary)
+						.transition(.blurReplace)
+				case .pendingOutgoing:
+					Label("Request Sent", systemImage: "clock")
+						.font(.caption.weight(.semibold))
+						.foregroundStyle(.secondary)
+						.transition(.blurReplace)
+				case .pendingIncoming:
+					Label("Incoming Request", systemImage: "bell.badge")
+						.font(.caption.weight(.semibold))
+						.foregroundStyle(.tint)
+						.transition(.blurReplace)
+				case nil:
+					Button("Request", systemImage: "person.badge.plus") {
+						sendRequest()
+					}
+					.buttonStyle(.glassProminent)
+					.tint(.blue)
+					.foregroundStyle(.primary)
+					.disabled(isSending)
+					.transition(.blurReplace)
+			}
 		}
+		.animation(.easeInOut, value: relationship)
 	}
 
 	private func sendRequest() {

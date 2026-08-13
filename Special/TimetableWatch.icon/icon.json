@@ -5,15 +5,11 @@
   ],
   "fill-specializations" : [
     {
-      "value" : {
-        "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
-      }
+      "value" : "system-dark"
     },
     {
       "appearance" : "dark",
-      "value" : {
-        "solid" : "extended-gray:0.00000,1.00000"
-      }
+      "value" : "system-dark"
     }
   ],
   "groups" : [
@@ -124,7 +120,7 @@
         {
           "value" : {
             "kind" : "layer-color",
-            "opacity" : 2
+            "opacity" : 1.2
           }
         },
         {
@@ -261,11 +257,7 @@
       "hidden" : false,
       "layers" : [
         {
-          "blend-mode" : "normal",
           "fill-specializations" : [
-            {
-              "value" : "automatic"
-            },
             {
               "appearance" : "tinted",
               "value" : {
@@ -340,7 +332,7 @@
       ],
       "translucency" : {
         "enabled" : true,
-        "value" : 1
+        "value" : 0.44
       }
     },
     {
@@ -361,38 +353,7 @@
       ],
       "layers" : [
         {
-          "blend-mode-specializations" : [
-            {
-              "value" : "soft-light"
-            },
-            {
-              "appearance" : "dark",
-              "value" : "normal"
-            }
-          ],
           "fill-specializations" : [
-            {
-              "value" : {
-                "linear-gradient" : [
-                  "display-p3:0.95000,0.95000,0.95000,0.36000",
-                  "extended-gray:1.00000,0.42000"
-                ],
-                "orientation" : {
-                  "start" : {
-                    "x" : 0.5,
-                    "y" : 1
-                  },
-                  "stop" : {
-                    "x" : 0.5,
-                    "y" : 0
-                  }
-                }
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : "none"
-            },
             {
               "appearance" : "tinted",
               "value" : {
@@ -411,38 +372,7 @@
           }
         },
         {
-          "blend-mode-specializations" : [
-            {
-              "value" : "soft-light"
-            },
-            {
-              "appearance" : "dark",
-              "value" : "normal"
-            }
-          ],
           "fill-specializations" : [
-            {
-              "value" : {
-                "linear-gradient" : [
-                  "display-p3:0.95000,0.95000,0.95000,0.36000",
-                  "extended-gray:1.00000,0.42000"
-                ],
-                "orientation" : {
-                  "start" : {
-                    "x" : 0.5,
-                    "y" : 1
-                  },
-                  "stop" : {
-                    "x" : 0.5,
-                    "y" : 0
-                  }
-                }
-              }
-            },
-            {
-              "appearance" : "dark",
-              "value" : "none"
-            },
             {
               "appearance" : "tinted",
               "value" : {
@@ -457,50 +387,6 @@
             "translation-in-points" : [
               14.818979591836978,
               8.820000000000164
-            ]
-          }
-        },
-        {
-          "fill" : "none",
-          "glass" : false,
-          "hidden-specializations" : [
-            {
-              "value" : true
-            },
-            {
-              "appearance" : "light",
-              "value" : false
-            }
-          ],
-          "image-name" : "paper-gradient.png",
-          "name" : "paper-gradient",
-          "position" : {
-            "scale" : 2.81,
-            "translation-in-points" : [
-              14.328979591837026,
-              0
-            ]
-          }
-        },
-        {
-          "glass" : false,
-          "hidden-specializations" : [
-            {
-              "value" : true
-            },
-            {
-              "appearance" : "dark",
-              "value" : false
-            }
-          ],
-          "image-name" : "image.jpg",
-          "name" : "image",
-          "opacity" : 0.67,
-          "position" : {
-            "scale" : 3.64,
-            "translation-in-points" : [
-              13.265306122448976,
-              0
             ]
           }
         }
@@ -534,7 +420,7 @@
         {
           "appearance" : "light",
           "value" : {
-            "enabled" : false,
+            "enabled" : true,
             "value" : 0.48
           }
         },

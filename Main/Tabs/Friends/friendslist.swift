@@ -130,12 +130,6 @@ struct FriendsView: View {
 	private var friendsList: some View {
 		ScrollView {
 			let vStack = VStack(spacing: 14) {
-				LocationStatusRow(showsArrivalStatistics: $showsArrivalStatistics)
-					.popover(isPresented: $showsArrivalStatistics) {
-						PersonalArrivalStatisticsView()
-							.presentationCompactAdaptation(.popover)
-					}
-
 				if friends.isEmpty {
 					ContentUnavailableView(
 						"No Friends Yet",
@@ -143,10 +137,11 @@ struct FriendsView: View {
 						description: Text("Search by name to find friends.")
 					)
 					.padding(.top, 72)
+					.transition(.blurReplace)
 				} else if filteredFriends.isEmpty {
 					ContentUnavailableView.search(text: cleanedSearchText)
 						.padding(.top, 72)
-						.transition(.opacity)
+						.transition(.blurReplace)
 				} else {
 					let forEach = ForEach(filteredFriends) { friend in
 						Button {
@@ -166,7 +161,7 @@ struct FriendsView: View {
 							id: friendTransitionID(friend),
 							in: friendSheetNamespace
 						)
-						.transition(.opacity)
+						.transition(.blurReplace)
 					}
 
 					LazyVGrid(
@@ -197,6 +192,13 @@ struct FriendsView: View {
 					.padding()
 			}
 		}
+		.safeAreaBar(edge: .top, alignment: .center, spacing: 10) {
+			LocationStatusRow(showsArrivalStatistics: $showsArrivalStatistics)
+				.popover(isPresented: $showsArrivalStatistics) {
+					PersonalArrivalStatisticsView()
+						.presentationCompactAdaptation(.popover)
+				}
+		}
 		.minimizingToolbarOnScrollDown()
 		.refreshable {
 			await refresh()
@@ -214,11 +216,13 @@ struct FriendsView: View {
 		]
 
 		var body: some View {
-			VStack(alignment: .leading, spacing: 12) {
+			VStack(alignment: .center, spacing: 12) {
 				Text("Average arrival")
-					.font(.headline)
+					.font(.title3)
+					.padding(.bottom, 8)
 
 				LabeledContent("Overall", value: formattedAverageArrival)
+					.padding(.bottom, 4)
 
 				ForEach(Array(weekdayNames.enumerated()), id: \.offset) { index, day in
 					LabeledContent(day, value: averageArrival(for: index))

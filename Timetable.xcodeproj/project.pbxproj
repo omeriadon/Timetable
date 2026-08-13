@@ -217,6 +217,7 @@
 				"Info/Watch Widget.plist",
 				Info/Widget.plist,
 				Timetable.icon,
+				TimetableWatch.icon,
 			);
 			target = 2AA6DF132FDFAC8F00BBC70E /* Widget */;
 		};
@@ -973,7 +974,7 @@
 		2A098C8F2F9DB844002065BE /* Debug configuration for PBXNativeTarget "Watch" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = Timetable;
+				ASSETCATALOG_COMPILER_APPICON_NAME = TimetableWatch;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Special/Entitlements/Watch.entitlements;
@@ -1011,7 +1012,7 @@
 		2A098C902F9DB844002065BE /* Release configuration for PBXNativeTarget "Watch" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = Timetable;
+				ASSETCATALOG_COMPILER_APPICON_NAME = TimetableWatch;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Special/Entitlements/Watch.entitlements;
