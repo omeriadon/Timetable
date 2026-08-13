@@ -4,13 +4,13 @@ struct SchoolWeatherSummary: View {
 	let weather: SchoolWeather
 	let font: Font
 	let foregroundStyle: Color
-	let maximumSpacerWidth: CGFloat
+	let maximumSpacerWidth: CGFloat?
 
 	init(
 		weather: SchoolWeather,
 		font: Font = .callout,
 		foregroundStyle: Color = .secondary,
-		maximumSpacerWidth: CGFloat = 15
+		maximumSpacerWidth: CGFloat? = nil
 	) {
 		self.weather = weather
 		self.font = font

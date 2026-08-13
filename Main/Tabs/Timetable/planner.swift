@@ -180,6 +180,7 @@ struct DatesView: View {
 					SchoolWeatherSummary(
 						weather: weather,
 						font: .caption2,
+						foregroundStyle: .white,
 						maximumSpacerWidth: 8
 					)
 				}
@@ -709,6 +710,7 @@ struct CalendarEventEditor: View {
 					SchoolWeatherSummary(
 						weather: weather,
 						font: .caption2,
+						foregroundStyle: .white,
 						maximumSpacerWidth: 8
 					)
 						.glurListRowBackground()
@@ -793,6 +795,7 @@ struct CalendarEventEditor: View {
 			SchoolWeatherSummary(
 				weather: weather,
 				font: .caption2,
+				foregroundStyle: .white,
 				maximumSpacerWidth: 8
 			)
 		}
