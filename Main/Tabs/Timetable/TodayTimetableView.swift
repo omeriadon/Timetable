@@ -235,6 +235,7 @@ private struct TodayEventRow: View {
 						font: .caption,
 						foregroundStyle: .black
 					)
+					.padding(.trailing, 5)
 				}
 
 				if showsDate {
