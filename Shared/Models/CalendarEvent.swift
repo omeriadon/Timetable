@@ -25,6 +25,8 @@ nonisolated struct CalendarEvent: Codable, Defaults.Serializable, Hashable, Iden
 	let date: SchoolCalendarDate
 	let isGlobal: Bool
 	let tagIDs: [UUID]
+	let showsWeather: Bool
+	let weather: SchoolWeather?
 	let revision: Int
 	let updatedAt: Date?
 
@@ -36,6 +38,8 @@ nonisolated struct CalendarEvent: Codable, Defaults.Serializable, Hashable, Iden
 		case date
 		case isGlobal
 		case tagIDs
+		case showsWeather
+		case weather
 		case revision
 		case updatedAt
 	}
@@ -49,6 +53,8 @@ nonisolated struct CalendarEvent: Codable, Defaults.Serializable, Hashable, Iden
 		date = try container.decode(SchoolCalendarDate.self, forKey: .date)
 		isGlobal = try container.decode(Bool.self, forKey: .isGlobal)
 		tagIDs = try container.decodeIfPresent([UUID].self, forKey: .tagIDs) ?? []
+		showsWeather = isGlobal && (try container.decodeIfPresent(Bool.self, forKey: .showsWeather) ?? false)
+		weather = showsWeather ? try container.decodeIfPresent(SchoolWeather.self, forKey: .weather) : nil
 		revision = try container.decodeIfPresent(Int.self, forKey: .revision) ?? 0
 		updatedAt = try container.decodeIfPresent(Date.self, forKey: .updatedAt)
 	}

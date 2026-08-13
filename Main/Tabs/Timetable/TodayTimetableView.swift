@@ -129,7 +129,7 @@ private struct TodayHeader: View {
 	var body: some View {
 		VStack(alignment: .leading, spacing: 6) {
 			if let weather {
-				TodayWeatherSummary(weather: weather)
+				SchoolWeatherSummary(weather: weather)
 			}
 
 			Text(now.formatted(.dateTime.weekday(.wide).day().month(.wide).hour(.defaultDigits(amPM: .wide)).minute(.defaultDigits).second(.defaultDigits)))
@@ -249,40 +249,6 @@ private struct TodayEventRow: View {
 			.clipShape(RoundedRectangle(cornerRadius: TodayCardLayout.innerCornerRadius))
 		}
 		.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: TodayCardLayout.innerCornerRadius))
-	}
-}
-
-private struct TodayWeatherSummary: View {
-	let weather: SchoolWeather
-
-	var body: some View {
-		HStack(spacing: 16) {
-			Label {
-				Text("\(weather.temperatureCelsius.formatted(.number.precision(.fractionLength(0))))°C")
-			} icon: {
-				Image(systemName: "thermometer.medium")
-			}
-
-			Label(conditionTitle, systemImage: "cloud.sun")
-
-			Label("UV \(weather.uvIndex)", systemImage: "sun.max")
-		}
-		.font(.callout)
-		.frame(maxWidth: .infinity, alignment: .leading)
-		.foregroundStyle(.secondary)
-		.accessibilityElement(children: .combine)
-		.accessibilityLabel(
-			"School weather, \(weather.temperatureCelsius.formatted(.number.precision(.fractionLength(0)))) degrees Celsius, \(conditionTitle), UV index \(weather.uvIndex)"
-		)
-	}
-
-	private var conditionTitle: String {
-		weather.conditionCode
-			.replacingOccurrences(
-				of: "([a-z])([A-Z])",
-				with: "$1 $2",
-				options: .regularExpression
-			)
 	}
 }
 

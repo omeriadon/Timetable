@@ -5,6 +5,7 @@ nonisolated struct SchoolWeather: Codable, Defaults.Serializable, Equatable, Sen
 	let temperatureCelsius: Double
 	let conditionCode: String
 	let uvIndex: Int
+	let precipitationChance: Double
 	let observedAt: Date
 	let fetchedAt: Date
 	let isStale: Bool

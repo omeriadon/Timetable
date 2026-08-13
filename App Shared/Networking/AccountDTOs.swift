@@ -89,6 +89,7 @@ nonisolated struct CreateCalendarEventRequest: Codable, Sendable {
 	let symbol: String
 	let date: SchoolCalendarDate
 	let tagIDs: [UUID]
+	let showsWeather: Bool
 	let baseRevision: Int?
 
 	init(
@@ -98,6 +99,7 @@ nonisolated struct CreateCalendarEventRequest: Codable, Sendable {
 		symbol: String,
 		date: SchoolCalendarDate,
 		tagIDs: [UUID] = [],
+		showsWeather: Bool = false,
 		baseRevision: Int? = nil
 	) {
 		self.id = id
@@ -106,6 +108,7 @@ nonisolated struct CreateCalendarEventRequest: Codable, Sendable {
 		self.symbol = symbol
 		self.date = date
 		self.tagIDs = tagIDs
+		self.showsWeather = showsWeather
 		self.baseRevision = baseRevision
 	}
 
@@ -120,6 +123,7 @@ nonisolated struct CreateCalendarEventRequest: Codable, Sendable {
 			symbol: symbol,
 			date: date,
 			tagIDs: tagIDs,
+			showsWeather: showsWeather,
 			baseRevision: baseRevision
 		)
 	}

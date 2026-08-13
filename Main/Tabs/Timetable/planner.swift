@@ -176,6 +176,10 @@ struct DatesView: View {
 				Text(entry.title)
 					.font(.headline)
 
+				if let weather = entry.weather {
+					SchoolWeatherSummary(weather: weather)
+				}
+
 				if !entry.kind.title.isEmpty {
 					Text(entry.kind.title)
 						.font(.footnote)
@@ -426,6 +430,13 @@ private struct PlannerTimelineEntry: Identifiable {
 	let symbol: String
 	let kind: Kind
 
+	var weather: SchoolWeather? {
+		guard case let .event(event) = kind else {
+			return nil
+		}
+		return event.weather
+	}
+
 	var backgroundImageName: String {
 		usesForegroundPaper ? "foregroundPaper" : "paper"
 	}
@@ -622,6 +633,7 @@ struct CalendarEventEditor: View {
 	@State private var notes: String
 	@State private var symbol: String
 	@State private var date: Date
+	@State private var showsWeather: Bool
 	@State private var isSaving = false
 	@State private var showsSymbolPicker = false
 	@State private var administrationService = AdministrationService.shared
@@ -647,6 +659,7 @@ struct CalendarEventEditor: View {
 		_notes = State(initialValue: event?.notes ?? "")
 		_symbol = State(initialValue: event?.symbol ?? "calendar")
 		_date = State(initialValue: event?.date.startOfDay() ?? TimetableClock.now)
+		_showsWeather = State(initialValue: event?.showsWeather ?? false)
 		_selectedTagIDs = State(initialValue: Set(event?.tagIDs ?? []))
 		_tagSections = State(initialValue: Defaults[.eventTagCatalogue].sections)
 	}
@@ -684,6 +697,14 @@ struct CalendarEventEditor: View {
 				TextField("Notes", text: $notes, axis: .vertical)
 					.lineLimit(3 ... 6)
 					.glurListRowBackground()
+				if target.scope == .globalEvent {
+					Toggle("Show Weather", isOn: $showsWeather)
+						.glurListRowBackground()
+				}
+				if let weather = target.event?.weather {
+					SchoolWeatherSummary(weather: weather)
+						.glurListRowBackground()
+				}
 				DatePicker("Date", selection: $date, displayedComponents: .date)
 					.glurListRowBackground()
 				Button {
@@ -760,6 +781,10 @@ struct CalendarEventEditor: View {
 			LabeledContent("Notes", value: notes)
 		}
 
+		if let weather = target.event?.weather {
+			SchoolWeatherSummary(weather: weather)
+		}
+
 		LabeledContent("Date", value: date.formatted(date: .long, time: .omitted))
 	}
 
@@ -770,7 +795,8 @@ struct CalendarEventEditor: View {
 			notes: notes.isEmpty ? nil : notes,
 			symbol: symbol,
 			date: SchoolCalendarDate(date),
-			tagIDs: Array(selectedTagIDs)
+			tagIDs: Array(selectedTagIDs),
+			showsWeather: target.scope == .globalEvent && showsWeather
 		)
 		Task {
 			do { try await save(request, target.event); close() }
