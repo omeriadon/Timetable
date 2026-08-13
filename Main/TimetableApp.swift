@@ -104,6 +104,7 @@ struct TimetableApp: App {
 				}
 				.task {
 					NetworkManager.shared.configureFeedback { StatusBadgeManager.shared.present(networkError: $0) }
+					NetworkManager.shared.startMonitoring()
 					Task {
 						await checkAppVersion()
 					}

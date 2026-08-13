@@ -268,7 +268,7 @@ final class NetworkManager {
 		let configuration = URLSessionConfiguration.default
 		configuration.timeoutIntervalForRequest = 20
 		configuration.timeoutIntervalForResource = 30
-		configuration.waitsForConnectivity = false
+		configuration.waitsForConnectivity = true
 		configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
 		return URLSession(configuration: configuration)
 	}
