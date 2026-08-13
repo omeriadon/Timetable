@@ -1,7 +1,7 @@
 import Defaults
 import Foundation
 
-nonisolated struct SchoolWeather: Codable, Defaults.Serializable, Equatable, Sendable {
+nonisolated struct SchoolWeather: Codable, Defaults.Serializable, Equatable, Hashable, Sendable {
 	let temperatureCelsius: Double
 	let conditionCode: String
 	let uvIndex: Int
