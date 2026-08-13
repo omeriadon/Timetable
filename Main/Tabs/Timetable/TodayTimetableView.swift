@@ -232,9 +232,10 @@ private struct TodayEventRow: View {
 				if let weather = entry.weather {
 					SchoolWeatherSummary(
 						weather: weather,
-						font: .caption,
+						font: .caption2,
 						foregroundStyle: .black
 					)
+					.minimumScaleFactor(0.6)
 				}
 
 				if showsDate {
