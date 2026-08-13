@@ -25,11 +25,13 @@ struct SchoolWeatherSummary: View {
 			} icon: {
 				Image(systemName: "thermometer.medium")
 			}
+			.layoutPriority(1)
 
 			Spacer(minLength: 1)
 				.frame(maxWidth: maximumSpacerWidth)
 
 			Label(conditionTitle, systemImage: "cloud.sun")
+				.layoutPriority(1)
 
 			Spacer(minLength: 1)
 				.frame(maxWidth: maximumSpacerWidth)
@@ -42,11 +44,13 @@ struct SchoolWeatherSummary: View {
 			} icon: {
 				Image(systemName: "drop")
 			}
+			.layoutPriority(1)
 
 			Spacer(minLength: 1)
 				.frame(maxWidth: maximumSpacerWidth)
 
 			Label("UV \(weather.uvIndex)", systemImage: "sun.max")
+				.layoutPriority(1)
 		}
 		.font(font)
 		.lineLimit(1)
