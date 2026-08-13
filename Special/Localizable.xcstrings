@@ -60,6 +60,7 @@
       }
     },
     "%@ – %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -195,6 +196,7 @@
       }
     },
     "%lld %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -506,6 +508,7 @@
       }
     },
     "Add a Friend" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -691,6 +694,7 @@
       }
     },
     "Add Term Date" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -725,9 +729,6 @@
     "Adjustable. Swipe up or down to change zoom. Use custom actions to reposition the photo." : {
 
     },
-    "Admin" : {
-
-    },
     "Administration" : {
 
     },
@@ -748,6 +749,7 @@
       }
     },
     "Administrators" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -898,9 +900,6 @@
     "Appearance" : {
 
     },
-    "Applies before first period and after recess or lunch." : {
-
-    },
     "Approve" : {
 
     },
@@ -1003,9 +1002,6 @@
         }
       }
     },
-    "Arrived: " : {
-
-    },
     "Assessment" : {
 
     },
@@ -1098,6 +1094,7 @@
       }
     },
     "Badges" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -1209,6 +1206,7 @@
       }
     },
     "Broadcast History" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -1225,6 +1223,7 @@
       }
     },
     "Broadcast Notification" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -1314,9 +1313,6 @@
           }
         }
       }
-    },
-    "Change Friends Since" : {
-
     },
     "Check what subjects your friends have right now, along with time left." : {
       "localizations" : {
@@ -1728,9 +1724,6 @@
     "Creates a new subject%@" : {
 
     },
-    "Current Class" : {
-
-    },
     "Current Subject" : {
       "localizations" : {
         "fr" : {
@@ -1833,6 +1826,7 @@
       }
     },
     "Debug Testing" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -2315,6 +2309,7 @@
       }
     },
     "Edit Section" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -2468,6 +2463,7 @@
       }
     },
     "Event Tags" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -2845,6 +2841,7 @@
       }
     },
     "Friend Requests" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -3399,9 +3396,6 @@
           }
         }
       }
-    },
-    "Left: " : {
-
     },
     "Limit" : {
       "localizations" : {
@@ -4178,12 +4172,6 @@
         }
       }
     },
-    "Off Campus" : {
-
-    },
-    "On Campus" : {
-
-    },
     "On the day" : {
       "localizations" : {
         "fr" : {
@@ -4616,6 +4604,7 @@
 
     },
     "Profile Storage" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -4632,6 +4621,7 @@
       }
     },
     "Pupil Free Days" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -5219,6 +5209,7 @@
       }
     },
     "School Events" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -5786,6 +5777,7 @@
       }
     },
     "Sign In Required" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -5802,6 +5794,7 @@
       }
     },
     "Sign in to use this feature." : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -6341,6 +6334,7 @@
 
     },
     "Term Dates" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -7036,6 +7030,7 @@
       }
     },
     "userDisplayName" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -7315,6 +7310,7 @@
       }
     },
     "You can change subjects, teachers and classrooms in settings if they have issues." : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -7514,6 +7510,7 @@
       }
     },
     "Your Timetable" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
