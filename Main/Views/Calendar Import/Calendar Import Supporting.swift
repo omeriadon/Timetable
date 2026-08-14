@@ -199,13 +199,12 @@ enum CalendarImportStep: Equatable {
 	case matchingEvents
 	case processingSubjects
 	case finalising
-	case choosingSubjectTags
 	case done
 
 	case error(String)
 
 	var total: Int {
-		9
+		8
 	}
 
 	var progress: Int {
@@ -224,10 +223,8 @@ enum CalendarImportStep: Equatable {
 				6
 			case .finalising:
 				7
-			case .choosingSubjectTags:
-				8
 			case .done:
-				9
+				8
 			case .error:
 				total
 		}
@@ -249,8 +246,6 @@ enum CalendarImportStep: Equatable {
 				"Translating titles..."
 			case .finalising:
 				"Finalising..."
-			case .choosingSubjectTags:
-				"Choose subject tags..."
 			case .done:
 				""
 			case let .error(t):

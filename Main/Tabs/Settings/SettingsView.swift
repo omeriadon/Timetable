@@ -149,12 +149,6 @@ struct SettingsView: View {
 				} label: {
 					Label("Appearance", systemImage: "paintpalette")
 				}
-
-				NavigationLink {
-					TagSubscriptionsView()
-				} label: {
-					Label("Subscribed Event Tags", systemImage: "tag")
-				}
 			}
 
 			if sessionStore.isAuthenticated {

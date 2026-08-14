@@ -48,8 +48,6 @@ struct CompactRouteDestinationView: View {
 				AccountAuthenticationView(allowsSignUp: true)
 			case .settings(.updatesAndNotifications):
 				AccountAndSyncSettingsView()
-			case .settings(.tagSubscriptions):
-				TagSubscriptionsView()
 			case .settings(.feedback):
 				FeedbackView(
 					close: router.popCurrentRoute,

@@ -724,12 +724,14 @@ struct CalendarEventEditor: View {
 				}
 				.glurListRowBackground()
 
-				EventTagSelector(
-					sections: tagSections,
-					allowsYearGroups: target.scope == .globalEvent,
-					selectedTagIDs: $selectedTagIDs
-				)
-				.glurListRowBackground()
+				if target.scope == .globalEvent {
+					EventTagSelector(
+						sections: tagSections,
+						allowsYearGroups: true,
+						selectedTagIDs: $selectedTagIDs
+					)
+					.glurListRowBackground()
+				}
 			}
 		}
 		.appNavigationTitle(navigationTitle)

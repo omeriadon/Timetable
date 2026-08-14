@@ -55,8 +55,6 @@ struct WideRouteDestinationView: View {
 					AccountAuthenticationView(allowsSignUp: true)
 				case .settings(.updatesAndNotifications):
 					AccountAndSyncSettingsView()
-				case .settings(.tagSubscriptions):
-					TagSubscriptionsView()
 				case .settings(.feedback):
 					FeedbackView(
 						close: close,

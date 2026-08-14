@@ -42,7 +42,6 @@ enum SettingsRoute: Codable, Hashable, Sendable {
 	case appearance
 	case account
 	case updatesAndNotifications
-	case tagSubscriptions
 	case feedback
 	case about
 	case profileAppearance
