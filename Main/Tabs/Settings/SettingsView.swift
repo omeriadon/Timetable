@@ -32,6 +32,9 @@ struct SettingsView: View {
 	@State private var showEditTimetableSheet = false
 	@State private var showFeedbackSheet = false
 	@State private var showImportConfirmation = false
+	#if DEBUG
+		@State private var usesReleaseAppIcon = UIApplication.shared.alternateIconName == "Timetable"
+	#endif
 
 	@State private var colors = [
 		Color.brown,
@@ -173,6 +176,14 @@ struct SettingsView: View {
 		.glurListRowBackground()
 
 		Section("Developer") {
+			#if DEBUG
+				Toggle("Release App Icon", systemImage: "app.badge", isOn: $usesReleaseAppIcon)
+					.disabled(!UIApplication.shared.supportsAlternateIcons)
+					.onChange(of: usesReleaseAppIcon) { oldValue, newValue in
+						changeAppIcon(useReleaseIcon: newValue, previousValue: oldValue)
+					}
+			#endif
+
 			if _isDebugAssertConfiguration() || Defaults[.userDisplayName].contains("Adon") || Defaults[.calendarEvents].canManageGlobalEvents {
 				LabeledContent {
 					TextField("Seconds", value: $debugOffset, format: .number)
@@ -349,6 +360,25 @@ struct SettingsView: View {
 	private var versionAndBuild: String {
 		"\(Bundle.main.appVersion) (\(Bundle.main.buildNumber))"
 	}
+
+	#if DEBUG
+		private func changeAppIcon(useReleaseIcon: Bool, previousValue: Bool) {
+			Task {
+				do {
+					try await UIApplication.shared.setAlternateIconName(useReleaseIcon ? "Timetable" : nil)
+				} catch {
+					usesReleaseAppIcon = previousValue
+					statusBadgeManager.addBadge(
+						id: UUID(),
+						title: "Unable to Change App Icon",
+						secondaryText: error.localizedDescription,
+						priority: 4,
+						view: .error
+					)
+				}
+			}
+		}
+	#endif
 
 	private func showSignInRequired() {
 		statusBadgeManager.signInRequired()
