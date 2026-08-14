@@ -29,7 +29,7 @@ final class LocationStatusService: NSObject, CLLocationManagerDelegate {
 	}
 
 	func start() async {
-		guard Platform.current == .iOS else {
+		guard Platform.current == .iOS, Defaults[.locationStatusEnabled] else {
 			return
 		}
 
@@ -39,7 +39,7 @@ final class LocationStatusService: NSObject, CLLocationManagerDelegate {
 	}
 
 	func requestAuthorization() {
-		guard Platform.current == .iOS else {
+		guard Platform.current == .iOS, Defaults[.locationStatusEnabled] else {
 			return
 		}
 
@@ -55,6 +55,18 @@ final class LocationStatusService: NSObject, CLLocationManagerDelegate {
 				break
 			@unknown default:
 				break
+		}
+	}
+
+	func setEnabled(_ isEnabled: Bool) {
+		Defaults[.locationStatusEnabled] = isEnabled
+		if isEnabled {
+			requestAuthorization()
+			Task {
+				await start()
+			}
+		} else {
+			stopMonitoring()
 		}
 	}
 
@@ -131,7 +143,7 @@ final class LocationStatusService: NSObject, CLLocationManagerDelegate {
 	}
 
 	private func startMonitoringIfAuthorized() {
-		guard locationManager.authorizationStatus == .authorizedAlways else {
+		guard Defaults[.locationStatusEnabled], locationManager.authorizationStatus == .authorizedAlways else {
 			return
 		}
 
@@ -147,7 +159,17 @@ final class LocationStatusService: NSObject, CLLocationManagerDelegate {
 		locationManager.requestState(for: Self.withinTenMinutesRegion)
 	}
 
+	private func stopMonitoring() {
+		locationManager.stopMonitoring(for: Self.schoolRegion)
+		locationManager.stopMonitoring(for: Self.withinFiveMinutesRegion)
+		locationManager.stopMonitoring(for: Self.withinTenMinutesRegion)
+		isMonitoring = false
+	}
+
 	private func record(_ state: LocationStatus) {
+		guard Defaults[.locationStatusEnabled] else {
+			return
+		}
 		let item = LocationStatusItem(state: state, updatedAt: .now)
 		guard Defaults[.locationStatus]?.state != state else {
 			return

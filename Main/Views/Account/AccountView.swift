@@ -11,6 +11,8 @@ import SwiftUI
 struct AccountView: View {
 	@State private var sessionStore = SessionStore.shared
 	@Default(.userDisplayName) private var displayName
+	@Default(.locationStatusEnabled) private var locationStatusEnabled
+	@Default(.hasSeenLocationStatusWhatsNew) private var hasSeenLocationStatusWhatsNew
 	@State private var showDeleteConfirmation = false
 	@State private var showsProfileEditor = false
 	@State private var isDeleting = false
@@ -77,6 +79,23 @@ struct AccountView: View {
 
 	@ContentBuilder
 	private func accountRows(profile: AccountProfile) -> some View {
+		Section("Status") {
+			Toggle("Status", systemImage: "location.fill", isOn: $locationStatusEnabled)
+				.onChange(of: locationStatusEnabled) { _, isEnabled in
+					hasSeenLocationStatusWhatsNew = true
+					service.setEnabled(isEnabled)
+				}
+
+			if locationStatusEnabled, service.authorizationStatus != .authorizedAlways {
+				Button("Open Location Settings", systemImage: "gear") {
+					if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+						UIApplication.shared.open(settingsURL)
+					}
+				}
+			}
+		}
+		.glurListRowBackground()
+
 		Section("Profile") {
 			Button {
 				showsProfileEditor = true
@@ -144,17 +163,6 @@ struct AccountView: View {
 			}
 		}
 		.glurListRowBackground()
-
-		if service.authorizationStatus != .authorizedAlways {
-			Section("Status") {
-				Button("Open Location Settings", systemImage: "location.fill") {
-					if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-						UIApplication.shared.open(settingsURL)
-					}
-				}
-			}
-			.glurListRowBackground()
-		}
 
 		Section {
 			Button("Sign Out", systemImage: "door.right.hand.open", role: .destructive, action: signOut)

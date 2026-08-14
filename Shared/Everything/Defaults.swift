@@ -86,6 +86,7 @@ extension Defaults.Keys {
 	static let incomingFriendRequests = Key<[FriendSummary]>("incomingFriendRequests", default: [], suite: sharedDefaults)
 	static let outgoingFriendRequests = Key<[FriendSummary]>("outgoingFriendRequests", default: [], suite: sharedDefaults)
 	static let locationStatus = Key<LocationStatusItem?>("locationStatus", default: nil, suite: sharedDefaults)
+	static let locationStatusEnabled = Key<Bool>("locationStatusEnabled", default: true, suite: sharedDefaults)
 	static let pendingLocationStatusUpdates = Key<[LocationStatusItem]>("pendingLocationStatusUpdates", default: [], suite: sharedDefaults)
 	static let hasSeenLocationStatusWhatsNew = Key<Bool>("hasSeenLocationStatusWhatsNew_v1", default: false, suite: sharedDefaults)
 	static let profileAppearance = Key<ProfileAppearance>("profileAppearance", default: .default, suite: sharedDefaults)
