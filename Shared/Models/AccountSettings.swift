@@ -43,7 +43,7 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 	static let `default` = AccountSettings(
 		liveActivitiesEnabled: true,
 		appFontDesign: .monospaced,
-		appBackground: .blackPaper,
+		appBackground: .paper,
 		futureEventRange: .oneMonth,
 		watchBleedEnabled: true,
 		notificationsEnabled: true,
@@ -58,7 +58,7 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 	init(
 		liveActivitiesEnabled: Bool,
 		appFontDesign: AppFontDesign = .monospaced,
-		appBackground: AppBackground = .blackPaper,
+		appBackground: AppBackground = .paper,
 		futureEventRange: FutureEventRange = .oneMonth,
 		watchBleedEnabled: Bool = true,
 		notificationsEnabled: Bool,

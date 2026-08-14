@@ -22,22 +22,8 @@ struct AppBackgroundSurface: View {
 		switch background {
 			case .solid:
 				Color(white: colorScheme == .dark ? 0 : 1)
-			case .systemGray:
-				Color.gray
-			case .blackPaper:
-				backgroundImage(named: "backgroundPaper")
-			case .grayPaper:
-				backgroundImage(named: "paperGray")
-			case .brownPaper:
-				backgroundImage(named: "paper")
-			case .dome:
-				backgroundImage(named: "appBackgroundDome")
-			case .peak:
-				backgroundImage(named: "appBackgroundPeak")
-			case .tree:
-				backgroundImage(named: "appBackgroundTree")
-			case .valley:
-				backgroundImage(named: "appBackgroundValley")
+			case .paper:
+				backgroundImage(named: colorScheme == .dark ? "backgroundPaper" : "paperWhite")
 		}
 	}
 

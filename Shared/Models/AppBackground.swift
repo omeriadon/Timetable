@@ -1,15 +1,8 @@
 import Foundation
 
 nonisolated enum AppBackground: String, Codable, CaseIterable, Hashable, Identifiable {
-	case blackPaper
-	case grayPaper
-	case brownPaper
 	case solid
-	case systemGray
-	case dome
-	case peak
-	case tree
-	case valley
+	case paper
 
 	var id: Self {
 		self
@@ -17,37 +10,24 @@ nonisolated enum AppBackground: String, Codable, CaseIterable, Hashable, Identif
 
 	var title: String {
 		switch self {
-			case .blackPaper:
-				"Black Paper"
-			case .grayPaper:
-				"Gray Paper"
-			case .brownPaper:
-				"Brown Paper"
 			case .solid:
-				"Solid Black or White"
-			case .systemGray:
-				"System Gray"
-			case .dome:
-				"Dome"
-			case .peak:
-				"Peak"
-			case .tree:
-				"Tree"
-			case .valley:
-				"Valley"
+				"Solid"
+			case .paper:
+				"Paper"
 		}
 	}
 
 	var symbol: String {
 		switch self {
-			case .blackPaper, .grayPaper, .brownPaper:
-				"doc.text.image"
 			case .solid:
 				"circle.lefthalf.filled"
-			case .systemGray:
-				"circle.fill"
-			case .dome, .peak, .tree, .valley:
-				"photo"
+			case .paper:
+				"doc.text.image"
 		}
+	}
+
+	init(from decoder: any Decoder) throws {
+		let value = try decoder.singleValueContainer().decode(String.self)
+		self = value == Self.solid.rawValue ? .solid : .paper
 	}
 }
