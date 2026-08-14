@@ -368,6 +368,7 @@ nonisolated struct BroadcastNotificationRequest: Codable, Sendable {
 	let title: String
 	let subtitle: String?
 	let body: String?
+	let respectsUserPreference: Bool
 }
 
 nonisolated struct BroadcastNotificationResponse: Codable, Sendable {

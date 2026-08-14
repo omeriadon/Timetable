@@ -5,6 +5,7 @@ struct AdministrationBroadcastNotificationView: View {
 	@State private var title = ""
 	@State private var subtitle = ""
 	@State private var notifBody = ""
+	@State private var onlySendToOptedInUsers = true
 	@State private var isSending = false
 	@Environment(\.statusBadgeManager) private var badges
 
@@ -17,6 +18,11 @@ struct AdministrationBroadcastNotificationView: View {
 			TextField("Message", text: $notifBody, axis: .vertical)
 				.lineLimit(4 ... 8)
 				.glurListRowBackground()
+			Toggle(isOn: $onlySendToOptedInUsers) {
+				Text("Only Send to Opted-In Users")
+				Text("When disabled, this broadcast is sent to every registered device regardless of the user's Special Event Notifications setting.")
+			}
+			.glurListRowBackground()
 		}
 		.appPaperBackground()
 		.appNavigationTitle("Broadcast Notification", accent: true)
@@ -49,7 +55,8 @@ struct AdministrationBroadcastNotificationView: View {
 		let request = BroadcastNotificationRequest(
 			title: title,
 			subtitle: subtitle.nilIfEmpty,
-			body: notifBody.nilIfEmpty
+			body: notifBody.nilIfEmpty,
+			respectsUserPreference: onlySendToOptedInUsers
 		)
 
 		Task {
