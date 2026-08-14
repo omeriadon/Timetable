@@ -2444,6 +2444,9 @@
         }
       }
     },
+    "et" : {
+
+    },
     "Event Notifications" : {
       "localizations" : {
         "fr" : {
@@ -6986,6 +6989,7 @@
       }
     },
     "Updating" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
