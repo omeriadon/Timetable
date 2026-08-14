@@ -26,6 +26,7 @@ struct SettingsView: View {
 	@State private var committedSettings = Defaults[.accountSettings]
 	@State private var settingsSync = AccountSettingsSyncService.shared
 	@State private var settingsSaveGeneration = 0
+	@State private var liveActivityDebugState: LiveActivityDebugStateResponse?
 	@Default(.debugOffset) private var debugOffset
 
 	@State private var showCalendarImportSheet = false
@@ -54,6 +55,9 @@ struct SettingsView: View {
 			.scrollEdgeEffectStyle(.soft, for: .top)
 			.appPaperBackground()
 			.appNavigationTitle("Settings", style: .main, accent: true)
+			.task(id: sessionStore.isAuthenticated) {
+				await refreshLiveActivityDebugState()
+			}
 	}
 
 	private var accountBackground: some View {
@@ -185,7 +189,7 @@ struct SettingsView: View {
 					}
 			#endif // DEBUG
 
-			if _isDebugAssertConfiguration() || Defaults[.userDisplayName].contains("Adon") || Defaults[.calendarEvents].canManageGlobalEvents {
+			if canUseDeveloperTools {
 				LabeledContent {
 					TextField("Seconds", value: $debugOffset, format: .number)
 						.multilineTextAlignment(.trailing)
@@ -194,38 +198,29 @@ struct SettingsView: View {
 					Label("Debug Offset", systemImage: "clock.arrow.trianglehead.counterclockwise.rotate.90")
 				}
 
-				Button("Test progress badge", systemImage: "progress.indicator") {
-					addDebugStatusBadge(title: "Syncing account", secondaryText: "Working", view: .progressView)
-				}
-				Button("Test success badge", systemImage: "checkmark.circle") {
-					addDebugStatusBadge(title: "Saving timetable", view: .success)
-				}
-				Button("Test info badge", systemImage: "info.circle") {
-					addDebugStatusBadge(title: "Info here", view: .info)
-				}
-				Button("Test error badge", systemImage: "xmark.circle") {
-					addDebugStatusBadge(title: "Contacting server", view: .error)
-				}
-				Button("Test warning badge", systemImage: "exclamationmark.triangle") {
-					addDebugStatusBadge(title: "Checking timetable", view: .warning)
-				}
-				Button("Test progress and gauge badge", systemImage: "arrow.trianglehead.2.clockwise.rotate.90") {
-					Task {
-						let id = UUID()
-						statusBadgeManager.addBadge(id: id, title: "Preparing timetable", priority: 3, view: .progressViewAndGauge(currentStep: 1, totalSteps: 3))
+				liveActivityDebugMenu
 
-						try? await Task.sleep(for: .seconds(1))
-
-						statusBadgeManager.updateBadge(id: id, title: "Preparing timetable", view: .progressViewAndGauge(currentStep: 2, totalSteps: 3))
-
-						try? await Task.sleep(for: .seconds(1))
-
-						statusBadgeManager.updateBadge(id: id, title: "Preparing timetable", view: .progressViewAndGauge(currentStep: 3, totalSteps: 3))
-
-						try? await Task.sleep(for: .seconds(1))
-
-						statusBadgeManager.updateBadge(id: id, title: "Prepared timetable", view: .success)
+				Menu {
+					Button("Test progress badge", systemImage: "progress.indicator") {
+						addDebugStatusBadge(title: "Syncing account", secondaryText: "Working", view: .progressView)
 					}
+					Button("Test success badge", systemImage: "checkmark.circle") {
+						addDebugStatusBadge(title: "Saving timetable", view: .success)
+					}
+					Button("Test info badge", systemImage: "info.circle") {
+						addDebugStatusBadge(title: "Info here", view: .info)
+					}
+					Button("Test error badge", systemImage: "xmark.circle") {
+						addDebugStatusBadge(title: "Contacting server", view: .error)
+					}
+					Button("Test warning badge", systemImage: "exclamationmark.triangle") {
+						addDebugStatusBadge(title: "Checking timetable", view: .warning)
+					}
+					Button("Test progress and gauge badge", systemImage: "arrow.trianglehead.2.clockwise.rotate.90") {
+						runDebugGaugeBadge()
+					}
+				} label: {
+					Label("Test status badges", systemImage: "app.badge")
 				}
 			}
 
@@ -358,6 +353,99 @@ struct SettingsView: View {
 		Task {
 			try? await Task.sleep(for: .seconds(4))
 			statusBadgeManager.updateBadge(id: id, title: "Done", view: .success)
+		}
+	}
+
+	@ViewBuilder
+	private var liveActivityDebugMenu: some View {
+		if let liveActivityDebugState,
+		   !liveActivityDebugState.isActive || liveActivityDebugState.canUpdate
+		{
+			Menu {
+				if !liveActivityDebugState.isActive {
+					Button("Start", systemImage: "play.fill") {
+						performLiveActivityDebugAction {
+							try await LiveActivityRegistrationService.shared.startDebugActivity()
+						}
+					}
+				} else if liveActivityDebugState.canUpdate {
+					Button("Stop", systemImage: "stop.fill", role: .destructive) {
+						performLiveActivityDebugAction {
+							try await LiveActivityRegistrationService.shared.stopDebugActivity()
+						}
+					}
+
+					Divider()
+
+					ForEach(DebugTransition.allCases, id: \.self) { transition in
+						Button("Update to \(transition.title)", systemImage: transition.symbol) {
+							performLiveActivityDebugAction {
+								try await LiveActivityRegistrationService.shared.updateDebugActivity(to: transition)
+							}
+						}
+					}
+				}
+			} label: {
+				Label("Test Live Activity", systemImage: "rectangle.bottomthird.inset.filled")
+			}
+		}
+	}
+
+	private var canUseDeveloperTools: Bool {
+		_isDebugAssertConfiguration()
+			|| Defaults[.userDisplayName].contains("Adon")
+			|| Defaults[.calendarEvents].canManageGlobalEvents
+	}
+
+	private func refreshLiveActivityDebugState() async {
+		guard canUseDeveloperTools, sessionStore.isAuthenticated else {
+			liveActivityDebugState = nil
+			return
+		}
+
+		do {
+			liveActivityDebugState = try await LiveActivityRegistrationService.shared.debugState()
+		} catch {
+			liveActivityDebugState = nil
+		}
+	}
+
+	private func performLiveActivityDebugAction(
+		_ action: @escaping @MainActor () async throws -> LiveActivityDebugStateResponse
+	) {
+		Task {
+			do {
+				liveActivityDebugState = try await action()
+				try? await Task.sleep(for: .seconds(2))
+				await refreshLiveActivityDebugState()
+			} catch {
+				statusBadgeManager.addBadge(
+					id: UUID(),
+					title: "Live Activity Test Failed",
+					secondaryText: error.localizedDescription,
+					priority: 4,
+					view: .error
+				)
+			}
+		}
+	}
+
+	private func runDebugGaugeBadge() {
+		Task {
+			let id = UUID()
+			statusBadgeManager.addBadge(id: id, title: "Preparing timetable", priority: 3, view: .progressViewAndGauge(currentStep: 1, totalSteps: 3))
+
+			try? await Task.sleep(for: .seconds(1))
+
+			statusBadgeManager.updateBadge(id: id, title: "Preparing timetable", view: .progressViewAndGauge(currentStep: 2, totalSteps: 3))
+
+			try? await Task.sleep(for: .seconds(1))
+
+			statusBadgeManager.updateBadge(id: id, title: "Preparing timetable", view: .progressViewAndGauge(currentStep: 3, totalSteps: 3))
+
+			try? await Task.sleep(for: .seconds(1))
+
+			statusBadgeManager.updateBadge(id: id, title: "Prepared timetable", view: .success)
 		}
 	}
 

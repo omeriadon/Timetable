@@ -79,6 +79,42 @@ final class LiveActivityRegistrationService {
 		}
 	}
 
+	func debugState() async throws -> LiveActivityDebugStateResponse {
+		try await networkManager.send(
+			.v1LiveActivityDebugState(
+				installationID: ClientIdentityProvider.shared.identity().installationID
+			)
+		)
+	}
+
+	func startDebugActivity() async throws -> LiveActivityDebugStateResponse {
+		try await networkManager.send(
+			.v1LiveActivityDebugStart,
+			body: LiveActivityDebugRequest(
+				installationID: ClientIdentityProvider.shared.identity().installationID
+			)
+		)
+	}
+
+	func updateDebugActivity(to transition: DebugTransition) async throws -> LiveActivityDebugStateResponse {
+		try await networkManager.send(
+			.v1LiveActivityDebugUpdate,
+			body: LiveActivityDebugUpdateRequest(
+				installationID: ClientIdentityProvider.shared.identity().installationID,
+				transition: transition.rawValue
+			)
+		)
+	}
+
+	func stopDebugActivity() async throws -> LiveActivityDebugStateResponse {
+		try await networkManager.send(
+			.v1LiveActivityDebugStop,
+			body: LiveActivityDebugRequest(
+				installationID: ClientIdentityProvider.shared.identity().installationID
+			)
+		)
+	}
+
 	private func observePushToStartToken() {
 		guard pushToStartTask == nil else { return }
 		pushToStartTask = Task { [weak self] in
@@ -298,8 +334,61 @@ private extension Endpoint {
 	static let v1LiveActivityToken = Endpoint("/v1/devices/current/live-activity-token", method: .put)
 	static let v1LiveActivityTokenDelete = Endpoint("/v1/devices/current/live-activity-token", method: .delete)
 	static let v1LiveActivityReconcile = Endpoint("/v1/live-activities/current/reconcile", method: .post)
+	static func v1LiveActivityDebugState(installationID: String) -> Endpoint {
+		Endpoint(
+			"/v1/live-activities/debug",
+			queryItems: [URLQueryItem(name: "installationID", value: installationID)]
+		)
+	}
+
+	static let v1LiveActivityDebugStart = Endpoint("/v1/live-activities/debug/start", method: .post)
+	static let v1LiveActivityDebugUpdate = Endpoint("/v1/live-activities/debug/update", method: .post)
+	static let v1LiveActivityDebugStop = Endpoint("/v1/live-activities/debug/stop", method: .post)
 
 	static func v1LiveActivityUpdateToken(activityKey: String) -> Endpoint {
 		Endpoint("/v1/live-activities/\(activityKey)/update-token", method: .put)
+	}
+}
+
+nonisolated enum DebugTransition: String, CaseIterable, Sendable {
+	case beforeSchool = "morning"
+	case firstPeriod = "period1"
+	case recess
+	case lunch
+	case lastPeriod = "period6"
+	case afterLastPeriod = "finished"
+
+	var title: String {
+		switch self {
+			case .beforeSchool:
+				"Before School"
+			case .firstPeriod:
+				"First Period"
+			case .recess:
+				"Recess"
+			case .lunch:
+				"Lunch"
+			case .lastPeriod:
+				"Last Period"
+			case .afterLastPeriod:
+				"Right After Last Period"
+		}
+	}
+
+	var symbol: String {
+		switch self {
+			case .beforeSchool:
+				"sunrise.fill"
+			case .firstPeriod:
+				"1.circle.fill"
+			case .recess:
+				"cup.and.saucer.fill"
+			case .lunch:
+				"takeoutbag.and.cup.and.straw.fill"
+			case .lastPeriod:
+				"6.circle.fill"
+			case .afterLastPeriod:
+				"figure.walk"
+		}
 	}
 }

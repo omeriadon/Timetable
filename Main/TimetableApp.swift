@@ -153,6 +153,15 @@ struct TimetableApp: App {
 				#endif // os(iOS)
 				.onChange(of: scenePhase) { _, phase in
 					guard phase == .active else { return }
+					Task {
+						await LocationStatusService.shared.handleApplicationDidBecomeActive()
+					}
+				}
+				.onChange(of: NetworkManager.shared.isOnline) { _, isOnline in
+					guard isOnline else { return }
+					Task {
+						await LocationStatusService.shared.handleNetworkBecameAvailable()
+					}
 				}
 				.onChange(of: sessionStore.state) { _, state in
 					guard case .authenticated = state else { return }

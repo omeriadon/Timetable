@@ -16,6 +16,7 @@ final class LocationStatusService: NSObject, CLLocationManagerDelegate {
 	private let networkManager: NetworkManager
 	private let locationManager = CLLocationManager()
 	private var isMonitoring = false
+	private var isMonitoringSignificantLocationChanges = false
 	private var isFlushing = false
 
 	private(set) var authorizationStatus: CLAuthorizationStatus
@@ -36,6 +37,23 @@ final class LocationStatusService: NSObject, CLLocationManagerDelegate {
 		await flushPendingUpdates()
 		await refreshCurrentStatus()
 		startMonitoringIfAuthorized()
+	}
+
+	func handleApplicationDidBecomeActive() async {
+		guard Platform.current == .iOS, Defaults[.locationStatusEnabled] else {
+			return
+		}
+
+		await flushPendingUpdates()
+		startMonitoringIfAuthorized()
+	}
+
+	func handleNetworkBecameAvailable() async {
+		guard Platform.current == .iOS, Defaults[.locationStatusEnabled] else {
+			return
+		}
+
+		await flushPendingUpdates()
 	}
 
 	func requestAuthorization() {
@@ -121,6 +139,16 @@ final class LocationStatusService: NSObject, CLLocationManagerDelegate {
 		}
 	}
 
+	func locationManager(_: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+		guard let location = locations.last,
+		      location.horizontalAccuracy >= 0
+		else {
+			return
+		}
+
+		record(status(for: location))
+	}
+
 	private func handleEntry(for identifier: String) {
 		if identifier != Self.schoolRegion.identifier,
 		   Defaults[.locationStatus]?.state == .onCampus
@@ -161,6 +189,11 @@ final class LocationStatusService: NSObject, CLLocationManagerDelegate {
 			isMonitoring = true
 		}
 
+		if !isMonitoringSignificantLocationChanges {
+			locationManager.startMonitoringSignificantLocationChanges()
+			isMonitoringSignificantLocationChanges = true
+		}
+
 		locationManager.requestState(for: Self.schoolRegion)
 		locationManager.requestState(for: Self.withinFiveMinutesRegion)
 		locationManager.requestState(for: Self.withinTenMinutesRegion)
@@ -170,7 +203,9 @@ final class LocationStatusService: NSObject, CLLocationManagerDelegate {
 		locationManager.stopMonitoring(for: Self.schoolRegion)
 		locationManager.stopMonitoring(for: Self.withinFiveMinutesRegion)
 		locationManager.stopMonitoring(for: Self.withinTenMinutesRegion)
+		locationManager.stopMonitoringSignificantLocationChanges()
 		isMonitoring = false
+		isMonitoringSignificantLocationChanges = false
 	}
 
 	private func record(_ state: LocationStatus) {
@@ -178,10 +213,6 @@ final class LocationStatusService: NSObject, CLLocationManagerDelegate {
 			return
 		}
 		let item = LocationStatusItem(state: state, updatedAt: .now)
-		guard Defaults[.locationStatus]?.state != state else {
-			return
-		}
-
 		Defaults[.locationStatus] = item
 		var pendingUpdates = Defaults[.pendingLocationStatusUpdates]
 		pendingUpdates.append(item)
@@ -191,6 +222,26 @@ final class LocationStatusService: NSObject, CLLocationManagerDelegate {
 			await flushPendingUpdates()
 		}
 	}
+
+	private func status(for location: CLLocation) -> LocationStatus {
+		let distance = location.distance(from: Self.schoolLocation)
+
+		switch distance {
+			case ...Self.schoolRegion.radius:
+				.onCampus
+			case ...Self.withinFiveMinutesRegion.radius:
+				.withinFiveMinutes
+			case ...Self.withinTenMinutesRegion.radius:
+				.withinTenMinutes
+			default:
+				.offCampus
+		}
+	}
+
+	private static let schoolLocation = CLLocation(
+		latitude: schoolRegion.center.latitude,
+		longitude: schoolRegion.center.longitude
+	)
 
 	private func flushPendingUpdates() async {
 		guard !isFlushing, SessionStore.shared.isAuthenticated else {
