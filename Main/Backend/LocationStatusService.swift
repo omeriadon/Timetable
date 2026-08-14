@@ -228,13 +228,13 @@ final class LocationStatusService: NSObject, CLLocationManagerDelegate {
 
 		switch distance {
 			case ...Self.schoolRegion.radius:
-				.onCampus
+				return .onCampus
 			case ...Self.withinFiveMinutesRegion.radius:
-				.withinFiveMinutes
+				return .withinFiveMinutes
 			case ...Self.withinTenMinutesRegion.radius:
-				.withinTenMinutes
+				return .withinTenMinutes
 			default:
-				.offCampus
+				return .offCampus
 		}
 	}
 
