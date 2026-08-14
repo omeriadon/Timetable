@@ -359,26 +359,24 @@ struct SettingsView: View {
 
 	private var liveActivityDebugMenu: some View {
 		Menu {
-			if liveActivityDebugState?.isActive == false {
-				Button("Start", systemImage: "play.fill") {
-					performLiveActivityDebugAction {
-						try await LiveActivityRegistrationService.shared.startDebugActivity()
-					}
+			Button("Start", systemImage: "play.fill") {
+				performLiveActivityDebugAction {
+					try await LiveActivityRegistrationService.shared.startDebugActivity()
 				}
-			} else if liveActivityDebugState?.canUpdate == true {
-				Button("Stop", systemImage: "stop.fill", role: .destructive) {
-					performLiveActivityDebugAction {
-						try await LiveActivityRegistrationService.shared.stopDebugActivity()
-					}
+			}
+
+			Button("Stop", systemImage: "stop.fill", role: .destructive) {
+				performLiveActivityDebugAction {
+					try await LiveActivityRegistrationService.shared.stopDebugActivity()
 				}
+			}
 
-				Divider()
+			Divider()
 
-				ForEach(DebugTransition.allCases, id: \.self) { transition in
-					Button("Update to \(transition.title)", systemImage: transition.symbol) {
-						performLiveActivityDebugAction {
-							try await LiveActivityRegistrationService.shared.updateDebugActivity(to: transition)
-						}
+			ForEach(DebugTransition.allCases, id: \.self) { transition in
+				Button("Update to \(transition.title)", systemImage: transition.symbol) {
+					performLiveActivityDebugAction {
+						try await LiveActivityRegistrationService.shared.updateDebugActivity(to: transition)
 					}
 				}
 			}
