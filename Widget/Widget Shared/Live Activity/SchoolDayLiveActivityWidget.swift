@@ -43,7 +43,7 @@ struct SchoolDayLiveActivityWidget: Widget {
 							ProgressView(timerInterval: startDate ... endDate, countsDown: false) {
 								EmptyView()
 							} currentValueLabel: {
-								Text(timerInterval: startDate ... endDate, countsDown: true, showsHours: false)
+								Text(.currentDate, format: .timer(countingDownIn: startDate ..< endDate, showsHours: false))
 							}
 							.progressViewStyle(.circular)
 							.tint(context.state.color.swiftUIColor)
@@ -112,7 +112,7 @@ struct SchoolDayLiveActivityWidget: Widget {
 					ProgressView(timerInterval: startDate ... endDate, countsDown: false) {
 						EmptyView()
 					} currentValueLabel: {
-						Text(timerInterval: startDate ... endDate, countsDown: true, showsHours: false)
+						Text(.currentDate, format: .timer(countingDownIn: startDate ..< endDate, showsHours: false))
 							.monospacedDigit()
 					}
 					.progressViewStyle(.circular)
@@ -176,7 +176,7 @@ private struct SchoolDayLiveActivityView: View {
 			   let endDate = context.state.endDate,
 			   startDate < endDate
 			{
-				Text(timerInterval: startDate ... endDate, countsDown: true, showsHours: false)
+				Text(.currentDate, format: .timer(countingDownIn: startDate ..< endDate, showsHours: false))
 					.font(.system(size: 25, weight: .regular))
 					.monospacedDigit()
 			} else {
@@ -223,11 +223,11 @@ private struct SchoolDayLiveActivityView: View {
 					.progressViewStyle(.linear)
 
 				HStack(alignment: .lastTextBaseline) {
-//					Text(timerInterval: startDate ... endDate, countsDown: true, showsHours: false)
-//						.foregroundStyle(.white)
-//						.font(.system(size: 20))
-//						.monospacedDigit()
-//						.fixedSize(horizontal: true, vertical: false)
+					Text(.currentDate, format: .timer(countingDownIn: startDate ..< endDate, showsHours: false))
+						.foregroundStyle(.white)
+						.font(.system(size: 20))
+						.monospacedDigit()
+						.fixedSize(horizontal: true, vertical: false)
 
 					if let nextText = context.state.nextText {
 						Spacer()
