@@ -10,6 +10,7 @@ import Defaults
 import GlurBackdrop
 import SwiftUI
 import TipKit
+import UIKit
 import WidgetKit
 
 struct SettingsView: View {
@@ -233,6 +234,28 @@ struct SettingsView: View {
 				Label("Reload widgets now", systemImage: "widget.large")
 					.foregroundStyle(.accent)
 			}
+
+			Button {
+				try? Tips.resetDatastore()
+				statusBadgeManager.addBadge(
+					id: UUID(),
+					title: "Tips Reset",
+					secondaryText: "Restart app to see effects.",
+					priority: 3,
+					view: .success
+				)
+			} label: {
+				Label("Reset Tips", systemImage: "lightbulb")
+			}
+
+			Label {
+				Text("Last Server Sync")
+
+				Text(lastServerSync?.formatted(date: .complete, time: .complete) ?? "Never")
+					.foregroundStyle(.secondary)
+			} icon: {
+				Image(systemName: "checkmark.icloud")
+			}
 		}
 		.glurListRowBackground()
 
@@ -251,28 +274,6 @@ struct SettingsView: View {
 				FeedbackView(close: { showFeedbackSheet = false })
 					.presentationDetents([.fraction(0.7)])
 					.appPaperPresentation()
-			}
-
-			Button {
-				try? Tips.resetDatastore()
-
-				statusBadgeManager.addBadge(id: UUID(), title: "Tips Reset", secondaryText: "Restart app to see effects.", priority: 3, view: .success)
-
-			} label: {
-				HStack(alignment: .center) {
-					Image(systemName: "lightbulb")
-						.foregroundStyle(.tint)
-						.imageScale(.large)
-						.padding(.trailing, 10)
-
-					VStack(alignment: .leading) {
-						Text("Reset Tips")
-							.foregroundStyle(.accent)
-						Text("After you restart the app, tips will show again, highlighting features of the app.")
-							.foregroundStyle(.secondary)
-							.font(.callout)
-					}
-				}
 			}
 
 			NavigationLink {
@@ -296,23 +297,16 @@ struct SettingsView: View {
 				}
 			)
 
-			Label {
-				Text("Last Server Sync")
-
-				Text(lastServerSync?.formatted(date: .complete, time: .complete) ?? "Never")
-					.foregroundStyle(.secondary)
-			} icon: {
-				Image(systemName: "checkmark.icloud")
-			}
-
-			Label {
+			Button {
+				UIPasteboard.general.string = versionAndBuild
+				statusBadgeManager.addBadge(id: UUID(), title: "Copied", priority: 3, view: .success)
+			} label: {
 				HStack {
-					Text("\(Bundle.main.appVersion)")
+					Image(systemName: "hammer")
+					Text(Bundle.main.appVersion)
 					Text("(\(Bundle.main.buildNumber))")
 						.foregroundStyle(.secondary)
 				}
-			} icon: {
-				Image(systemName: "hammer")
 			}
 		}
 		.glurListRowBackground()
@@ -356,6 +350,10 @@ struct SettingsView: View {
 			try? await Task.sleep(for: .seconds(4))
 			statusBadgeManager.updateBadge(id: id, title: "Done", view: .success)
 		}
+	}
+
+	private var versionAndBuild: String {
+		"\(Bundle.main.appVersion) (\(Bundle.main.buildNumber))"
 	}
 
 	private func showSignInRequired() {
