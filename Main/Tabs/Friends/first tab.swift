@@ -170,7 +170,8 @@ struct FriendOverview: View {
 
 struct FriendInfo: View {
 	let detail: FriendDetail
-	let requestFriendsSinceDate: () -> Void
+	let editFriendsSinceDate: () -> Void
+	let sheetNamespace: Namespace.ID
 	let updateLocationNotificationPreferences: (Set<LocationNotificationPreference>) -> Void
 
 	var body: some View {
@@ -192,7 +193,7 @@ struct FriendInfo: View {
 			.glurListRowBackground()
 
 			Section {
-				Button(action: requestFriendsSinceDate) {
+				Button(action: editFriendsSinceDate) {
 					HStack {
 						Label("Friends since", systemImage: "calendar")
 
@@ -202,6 +203,7 @@ struct FriendInfo: View {
 							.foregroundStyle(.secondary)
 					}
 				}
+				.matchedTransitionSource(id: "friends-since", in: sheetNamespace)
 			}
 			.glurListRowBackground()
 		}
@@ -283,26 +285,38 @@ private struct FriendDetailHeader: View {
 	}
 }
 
-struct FriendshipDateChangeRequestSheet: View {
+struct FriendshipDateEditorSheet: View {
 	let friendID: UUID
 	let currentDate: Date
 	let close: () -> Void
+	let didSave: () -> Void
 	@State private var requestedDate: Date
 	@State private var service = FriendService.shared
 	@State private var isSending = false
 	@Environment(\.statusBadgeManager) private var badges
 
-	init(friendID: UUID, currentDate: Date, close: @escaping () -> Void) {
+	init(
+		friendID: UUID,
+		currentDate: Date,
+		close: @escaping () -> Void,
+		didSave: @escaping () -> Void
+	) {
 		self.friendID = friendID
 		self.currentDate = currentDate
 		self.close = close
-		_requestedDate = State(initialValue: currentDate)
+		self.didSave = didSave
+		_requestedDate = State(initialValue: min(max(currentDate, Self.minimumDate), Self.maximumDate))
 	}
 
 	var body: some View {
 		NavigationStack {
 			List {
-				DatePicker("Friends since", selection: $requestedDate, displayedComponents: .date)
+				DatePicker(
+					"Friends since",
+					selection: $requestedDate,
+					in: Self.minimumDate ... Self.maximumDate,
+					displayedComponents: .date
+				)
 					.glurListRowBackground()
 			}
 			.appNavigationTitle("Change Friends Since")
@@ -312,7 +326,7 @@ struct FriendshipDateChangeRequestSheet: View {
 					Button(role: .cancel, action: close)
 				}
 				ToolbarItem(placement: .confirmationAction) {
-					Button("Request", systemImage: "paperplane.fill", role: .confirm) {
+					Button("Save", systemImage: "checkmark", role: .confirm) {
 						send()
 					}
 					.disabled(isSending)
@@ -327,16 +341,27 @@ struct FriendshipDateChangeRequestSheet: View {
 		Task {
 			defer { isSending = false }
 			do {
-				try await service.requestFriendsSinceDate(
+				try await service.updateFriendsSinceDate(
 					friendID: friendID,
-					requestedDate: requestedDate
+					date: requestedDate
 				)
+				didSave()
 				close()
 			} catch {
-				badges.present(error: error, title: "Unable to request date change")
+				badges.present(error: error, title: "Unable to change date")
 			}
 		}
 	}
+
+	private static let minimumDate = Calendar.current.date(
+		from: DateComponents(year: 2010, month: 1, day: 1)
+	) ?? .distantPast
+
+	private static let maximumDate = Calendar.current.date(
+		byAdding: .day,
+		value: -1,
+		to: Calendar.current.startOfDay(for: .now)
+	) ?? .now
 }
 
 private enum FriendDetailLayout {

@@ -145,10 +145,10 @@ final class FriendService {
 		return detail
 	}
 
-	func requestFriendsSinceDate(friendID: UUID, requestedDate: Date) async throws {
+	func updateFriendsSinceDate(friendID: UUID, date: Date) async throws {
 		try await networkManager.send(
-			Endpoint("/v1/friends/\(friendID.uuidString)/friends-since-request", method: .post),
-			body: FriendshipDateChangeRequest(requestedDate: requestedDate),
+			Endpoint("/v1/friends/\(friendID.uuidString)/friends-since", method: .put),
+			body: FriendshipDateChangeRequest(requestedDate: date),
 			context: .userInitiated
 		)
 	}

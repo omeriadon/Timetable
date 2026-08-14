@@ -108,21 +108,6 @@ final class AdministrationService {
 		try await networkManager.send(Endpoint("/v1/administration/users/\(id.uuidString)"), context: .userInitiated)
 	}
 
-	func friendshipDateChangeRequests() async throws -> [AdministrationFriendshipDateChangeRequest] {
-		try await networkManager.send(Endpoint("/v1/administration/friends-since-requests"))
-	}
-
-	func resolveFriendshipDateChangeRequest(
-		id: UUID,
-		action: ModerationAction
-	) async throws -> AdministrationFriendshipDateChangeRequest {
-		try await networkManager.send(
-			Endpoint("/v1/administration/friends-since-requests/\(id.uuidString)", method: .put),
-			body: AdministrationModerationResolutionRequest(action: action),
-			context: .userInitiated
-		)
-	}
-
 	func userReports() async throws -> [AdministrationUserReport] {
 		try await networkManager.send(Endpoint("/v1/administration/user-reports"))
 	}

@@ -10,8 +10,9 @@ struct FriendDetailView: View {
 	@State private var selectedTab = FriendDetailTab.main
 	@State private var action: FriendAction?
 	@State private var showsReportConfirmation = false
-	@State private var showsFriendsSinceRequest = false
+	@State private var showsFriendsSinceEditor = false
 	@State private var isLoading: Bool
+	@Namespace private var sheetNamespace
 	@Environment(\.statusBadgeManager) private var badges
 	@Environment(\.appPresentation) private var presentation
 
@@ -71,7 +72,8 @@ struct FriendDetailView: View {
 
 							FriendInfo(
 								detail: detail,
-								requestFriendsSinceDate: { showsFriendsSinceRequest = true },
+								editFriendsSinceDate: { showsFriendsSinceEditor = true },
+								sheetNamespace: sheetNamespace,
 								updateLocationNotificationPreferences: updateLocationNotificationPreferences
 							)
 							.scrollIndicators(.hidden)
@@ -183,12 +185,16 @@ struct FriendDetailView: View {
 					}
 				}
 			}
-			.sheet(isPresented: $showsFriendsSinceRequest) {
+			.sheet(isPresented: $showsFriendsSinceEditor) {
 				if let detail {
-					FriendshipDateChangeRequestSheet(
+					FriendshipDateEditorSheet(
 						friendID: detail.friend.id,
 						currentDate: detail.acceptedAt,
-						close: { showsFriendsSinceRequest = false }
+						close: { showsFriendsSinceEditor = false },
+						didSave: { Task { await load() } }
+					)
+					.navigationTransition(
+						.zoom(sourceID: "friends-since", in: sheetNamespace)
 					)
 					.presentationDetents([.fraction(0.5)])
 					.appPaperPresentation()

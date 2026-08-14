@@ -56,9 +56,6 @@ struct AdministrationView: View {
 		.glurListRowBackground()
 
 		Section {
-			administrationLink("Friends-Since Requests", systemImage: "person.2.badge.gearshape", route: .administration(.friendshipDateChangeRequests)) {
-				AdministrationFriendshipDateChangeRequestsView()
-			}
 			administrationLink("User Reports", systemImage: "exclamationmark.bubble", route: .administration(.userReports)) {
 				AdministrationUserReportsView()
 			}
