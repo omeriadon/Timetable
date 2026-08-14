@@ -220,13 +220,13 @@ final class LocationStatusService: NSObject, CLLocationManagerDelegate {
 
 	private static let withinFiveMinutesRegion = CLCircularRegion(
 		center: schoolRegion.center,
-		radius: 500,
+		radius: 1500,
 		identifier: "school-campus-within-5-minutes"
 	)
 
 	private static let withinTenMinutesRegion = CLCircularRegion(
 		center: schoolRegion.center,
-		radius: 1000,
+		radius: 3500,
 		identifier: "school-campus-within-10-minutes"
 	)
 
