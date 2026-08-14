@@ -5,7 +5,6 @@
 //  Created by Adon Omeri on 11/7/2026.
 //
 
-import Defaults
 import SwiftUI
 
 #if os(iOS)
@@ -29,8 +28,6 @@ final class HapticManager {
 	private init() {}
 
 	func play(_ event: HapticEvent) {
-		guard Defaults[.hapticsEnabled] else { return }
-
 		#if os(iOS)
 			switch event {
 				case .button, .selection:

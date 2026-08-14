@@ -169,10 +169,6 @@ struct SettingsView: View {
 				Button { showSignInRequired() } label: { Label("Updates", systemImage: "switch.2") }
 			}
 
-			Toggle("Highlight Current Day in timetables", systemImage: "inset.filled.lefthalf.righthalf.rectangle", isOn: highlightsCurrentDayBinding)
-
-			Toggle("Haptic Feedback", systemImage: "iphone.radiowaves.left.and.right", isOn: hapticsBinding)
-
 			NavigationLink {
 				ArchivedEventsView()
 			} label: {
@@ -322,32 +318,6 @@ struct SettingsView: View {
 		.glurListRowBackground()
 	}
 
-	@Default(.hapticsEnabled) private var hapticsEnabled
-
-	private var highlightsCurrentDayBinding: Binding<Bool> {
-		Binding(
-			get: { settings.highlightsCurrentDay },
-			set: { value in
-				settingsSaveGeneration += 1
-				let generation = settingsSaveGeneration
-				let previous = committedSettings
-				settings.highlightsCurrentDay = value
-				let proposed = settings
-				Task {
-					do {
-						try await settingsSync.updateSettings(proposed)
-						guard generation == settingsSaveGeneration else { return }
-						committedSettings = proposed
-					} catch {
-						guard generation == settingsSaveGeneration else { return }
-						settings = previous
-						statusBadgeManager.addBadge(id: UUID(), title: "Unable to save preferences", secondaryText: error.localizedDescription, priority: 4, view: .error)
-					}
-				}
-			}
-		)
-	}
-
 	private var futureEventRangeBinding: Binding<FutureEventRange> {
 		Binding(
 			get: { settings.futureEventRange },
@@ -376,10 +346,6 @@ struct SettingsView: View {
 				}
 			}
 		)
-	}
-
-	private var hapticsBinding: Binding<Bool> {
-		Binding(get: { hapticsEnabled }, set: { hapticsEnabled = $0 })
 	}
 
 	private func addDebugStatusBadge(title: String, secondaryText: String? = nil, view: StatusBadgeView) {

@@ -92,7 +92,6 @@ extension Defaults.Keys {
 	static let userDisplayName = Key<String>("userDisplayName", default: "Account", suite: sharedDefaults)
 	static let ownerIsSearchable = Key<Bool>("ownerIsSearchable", default: true, suite: sharedDefaults)
 	static let ownerTimetableID = Key<String>("ownerTimetableID", default: "", suite: sharedDefaults)
-	static let hapticsEnabled = Key<Bool>("hapticsEnabled", default: true, suite: sharedDefaults)
 	static let persistsNavigationState = Key<Bool>("persistsNavigationState", default: false, suite: sharedDefaults)
 	static let eventTagCatalogue = Key<EventTagCatalogueResponse>("eventTagCatalogue", default: EventTagCatalogueResponse(sections: []), suite: sharedDefaults)
 	static let eventTagSubscriptionIDs = Key<[UUID]>("eventTagSubscriptionIDs", default: [], suite: sharedDefaults)

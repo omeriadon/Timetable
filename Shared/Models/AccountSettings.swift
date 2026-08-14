@@ -24,7 +24,6 @@ nonisolated enum NotificationLeadTime: Int, Codable, CaseIterable, Defaults.Seri
 
 nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 	var liveActivitiesEnabled: Bool
-	var highlightsCurrentDay: Bool
 	var appFontDesign: AppFontDesign
 	var appBackground: AppBackground
 	var futureEventRange: FutureEventRange
@@ -43,7 +42,6 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 
 	static let `default` = AccountSettings(
 		liveActivitiesEnabled: true,
-		highlightsCurrentDay: true,
 		appFontDesign: .monospaced,
 		appBackground: .blackPaper,
 		futureEventRange: .oneMonth,
@@ -59,7 +57,6 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 
 	init(
 		liveActivitiesEnabled: Bool,
-		highlightsCurrentDay: Bool = true,
 		appFontDesign: AppFontDesign = .monospaced,
 		appBackground: AppBackground = .blackPaper,
 		futureEventRange: FutureEventRange = .oneMonth,
@@ -73,7 +70,6 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 		serverRevision: Int = 0
 	) {
 		self.liveActivitiesEnabled = liveActivitiesEnabled
-		self.highlightsCurrentDay = highlightsCurrentDay
 		self.appFontDesign = appFontDesign
 		self.appBackground = appBackground
 		self.futureEventRange = futureEventRange
@@ -91,7 +87,6 @@ nonisolated struct AccountSettings: Codable, Defaults.Serializable, Hashable {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let legacyContainer = try decoder.container(keyedBy: LegacyCodingKeys.self)
 		liveActivitiesEnabled = try container.decodeIfPresent(Bool.self, forKey: .liveActivitiesEnabled) ?? Self.default.liveActivitiesEnabled
-		highlightsCurrentDay = try container.decodeIfPresent(Bool.self, forKey: .highlightsCurrentDay) ?? Self.default.highlightsCurrentDay
 		appFontDesign = try container.decodeIfPresent(AppFontDesign.self, forKey: .appFontDesign) ?? Self.default.appFontDesign
 		appBackground = try container.decodeIfPresent(AppBackground.self, forKey: .appBackground) ?? Self.default.appBackground
 		futureEventRange = try container.decodeIfPresent(FutureEventRange.self, forKey: .futureEventRange) ?? Self.default.futureEventRange

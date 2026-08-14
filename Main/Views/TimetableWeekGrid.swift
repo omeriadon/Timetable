@@ -30,7 +30,7 @@ struct TimetableWeekGrid: View {
 					}
 				}
 				.background {
-					if accountSettings.highlightsCurrentDay, currentDayIndex == day {
+					if currentDayIndex == day {
 						ZStack {
 							RoundedRectangle(cornerRadius: 12, style: .continuous)
 								.fill(.primary.opacity(0.1))
