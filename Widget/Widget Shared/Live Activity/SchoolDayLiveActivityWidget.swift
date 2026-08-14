@@ -54,9 +54,7 @@ struct SchoolDayLiveActivityWidget: Widget {
 				}
 
 				DynamicIslandExpandedRegion(.bottom) {
-					var isBreak: Bool {
-						context.state.phase == .recess || context.state.phase == .lunch
-					}
+					let isBreak = context.state.phase == .recess || context.state.phase == .lunch
 
 					VStack(alignment: .center, spacing: 6) {
 						HStack {
@@ -71,10 +69,15 @@ struct SchoolDayLiveActivityWidget: Widget {
 
 						if let nextText = context.state.nextText {
 							HStack(alignment: .lastTextBaseline) {
-								Text(nextLabel(nextText))
-									.font(.system(size: 19))
-									.bold()
-									.lineLimit(1)
+								Text(
+									nextLabel(
+										nextText,
+										isBeforeSchool: context.state.phase == .beforeSchool
+									)
+								)
+								.font(.system(size: 19))
+								.bold()
+								.lineLimit(1)
 							}
 							.padding(.horizontal, 10)
 						}
@@ -141,6 +144,18 @@ struct SchoolDayLiveActivityWidget: Widget {
 			.widgetURL(AppRoute.timetable(.root).url)
 		}
 		.supplementalActivityFamilies([.small, .medium])
+	}
+
+	func nextLabel(_ nextText: String, isBeforeSchool: Bool) -> String {
+		if nextText == "Last Period" {
+			return nextText
+		}
+
+		if isBeforeSchool {
+			return "First: \(nextText)"
+		}
+
+		return "Next: \(nextText)"
 	}
 }
 
@@ -260,7 +275,7 @@ private struct SchoolDayLiveActivityView: View {
 		.activityBackgroundTint(context.state.color.swiftUIColor)
 	}
 
-	private func nextLabel(_ nextText: String) -> String {
+	func nextLabel(_ nextText: String) -> String {
 		if nextText == "Last Period" {
 			return nextText
 		}

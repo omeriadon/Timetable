@@ -2689,10 +2689,8 @@
         }
       }
     },
-    "First Period" : {
-
-    },
     "First Period:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -2725,6 +2723,9 @@
           }
         }
       }
+    },
+    "First:" : {
+
     },
     "Font" : {
       "localizations" : {
@@ -3345,6 +3346,7 @@
       }
     },
     "Last Period" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
