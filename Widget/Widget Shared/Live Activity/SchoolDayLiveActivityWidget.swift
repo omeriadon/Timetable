@@ -223,11 +223,11 @@ private struct SchoolDayLiveActivityView: View {
 					.progressViewStyle(.linear)
 
 				HStack(alignment: .lastTextBaseline) {
-					Text(timerInterval: startDate ... endDate, countsDown: true, showsHours: false)
-						.foregroundStyle(.white)
-						.font(.system(size: 20))
-						.monospacedDigit()
-						.fixedSize(horizontal: true, vertical: false)
+//					Text(timerInterval: startDate ... endDate, countsDown: true, showsHours: false)
+//						.foregroundStyle(.white)
+//						.font(.system(size: 20))
+//						.monospacedDigit()
+//						.fixedSize(horizontal: true, vertical: false)
 
 					if let nextText = context.state.nextText {
 						Spacer()
