@@ -357,38 +357,33 @@ struct SettingsView: View {
 		}
 	}
 
-	@ViewBuilder
 	private var liveActivityDebugMenu: some View {
-		if let liveActivityDebugState,
-		   !liveActivityDebugState.isActive || liveActivityDebugState.canUpdate
-		{
-			Menu {
-				if !liveActivityDebugState.isActive {
-					Button("Start", systemImage: "play.fill") {
-						performLiveActivityDebugAction {
-							try await LiveActivityRegistrationService.shared.startDebugActivity()
-						}
+		Menu {
+			if liveActivityDebugState?.isActive == false {
+				Button("Start", systemImage: "play.fill") {
+					performLiveActivityDebugAction {
+						try await LiveActivityRegistrationService.shared.startDebugActivity()
 					}
-				} else if liveActivityDebugState.canUpdate {
-					Button("Stop", systemImage: "stop.fill", role: .destructive) {
-						performLiveActivityDebugAction {
-							try await LiveActivityRegistrationService.shared.stopDebugActivity()
-						}
+				}
+			} else if liveActivityDebugState?.canUpdate == true {
+				Button("Stop", systemImage: "stop.fill", role: .destructive) {
+					performLiveActivityDebugAction {
+						try await LiveActivityRegistrationService.shared.stopDebugActivity()
 					}
+				}
 
-					Divider()
+				Divider()
 
-					ForEach(DebugTransition.allCases, id: \.self) { transition in
-						Button("Update to \(transition.title)", systemImage: transition.symbol) {
-							performLiveActivityDebugAction {
-								try await LiveActivityRegistrationService.shared.updateDebugActivity(to: transition)
-							}
+				ForEach(DebugTransition.allCases, id: \.self) { transition in
+					Button("Update to \(transition.title)", systemImage: transition.symbol) {
+						performLiveActivityDebugAction {
+							try await LiveActivityRegistrationService.shared.updateDebugActivity(to: transition)
 						}
 					}
 				}
-			} label: {
-				Label("Test Live Activity", systemImage: "rectangle.bottomthird.inset.filled")
 			}
+		} label: {
+			Label("Test Live Activity", systemImage: "rectangle.bottomthird.inset.filled")
 		}
 	}
 
