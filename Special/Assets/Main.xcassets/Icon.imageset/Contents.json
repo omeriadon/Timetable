@@ -3,16 +3,6 @@
     {
       "filename" : "Timetable-iOS-Default-1024@1x.png",
       "idiom" : "universal"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "dark"
-        }
-      ],
-      "filename" : "Timetable-iOS-Dark-1024@1x.png",
-      "idiom" : "universal"
     }
   ],
   "info" : {
