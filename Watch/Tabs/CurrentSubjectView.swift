@@ -131,7 +131,7 @@ struct WatchTimetableView: View {
 				if isBeforeSchool {
 					Spacer(minLength: 1)
 
-					Text("First Period")
+					Text("First:")
 						.font(.caption)
 
 					Image(systemName: symbol)

@@ -257,7 +257,7 @@ struct GetCurrentSubjectIntentView: View {
 
 					Spacer(minLength: 50)
 
-					Text("First Period:")
+					Text("First:")
 						.font(.body)
 						.foregroundStyle(.secondary)
 

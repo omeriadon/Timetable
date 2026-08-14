@@ -217,17 +217,19 @@ private struct SchoolDayLiveActivityView: View {
 			.font(.system(size: 22, weight: .bold))
 			.lineLimit(1)
 
+			// Items must be commented out due to an insanely annoying apple bug that i cant even report because its so convoluted and
+			// represents the absolute failure that is apples current software is. what a shame. even sadder, android is not any better.
 			if let startDate = context.state.startDate, let endDate = context.state.endDate, startDate < endDate {
-				ProgressView(timerInterval: startDate ... endDate, countsDown: false)
-					.tint(.white)
-					.progressViewStyle(.linear)
+//				ProgressView(timerInterval: startDate ... endDate, countsDown: false)
+//					.tint(.white)
+//					.progressViewStyle(.linear)
 
 				HStack(alignment: .lastTextBaseline) {
-					Text(.currentDate, format: .timer(countingDownIn: startDate ..< endDate, showsHours: false))
-						.foregroundStyle(.white)
-						.font(.system(size: 20))
-						.monospacedDigit()
-						.fixedSize(horizontal: true, vertical: false)
+//					Text(.currentDate, format: .timer(countingDownIn: startDate ..< endDate, showsHours: false))
+//						.foregroundStyle(.white)
+//						.font(.system(size: 20))
+//						.monospacedDigit()
+//						.fixedSize(horizontal: true, vertical: false)
 
 					if let nextText = context.state.nextText {
 						Spacer()
