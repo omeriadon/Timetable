@@ -122,6 +122,13 @@ final class LocationStatusService: NSObject, CLLocationManagerDelegate {
 	}
 
 	private func handleEntry(for identifier: String) {
+		if identifier != Self.schoolRegion.identifier,
+		   Defaults[.locationStatus]?.state == .onCampus
+		{
+			record(.offCampus)
+			return
+		}
+
 		switch identifier {
 			case Self.schoolRegion.identifier:
 				record(.onCampus)
