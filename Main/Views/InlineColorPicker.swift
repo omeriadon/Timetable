@@ -115,38 +115,38 @@ public struct InlineColorPicker<T: ColorOptions>: View {
 		return Array(enumType.allCases.compactMap { $0 as? T })
 	}
 
-	let columns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 5)
-
 	public var body: some View {
-		let pickerBody = ZStack {
-			LazyVGrid(columns: columns, spacing: 4) {
-				ForEach(colors.indices, id: \.self) { colorIndex in
-					let color = colors[colorIndex]
-					let isSelected = (color == selectedColor.wrappedValue)
+		let columns = Array(
+			repeating: GridItem(.flexible(), spacing: 0),
+			count: colors.count
+		)
+		let pickerBody = LazyVGrid(columns: columns, spacing: 0) {
+			ForEach(colors, id: \.self) { color in
+				let isSelected = (color == selectedColor.wrappedValue)
 
-					Button {
-						selectedColor.wrappedValue = color
-					} label: {
-						if color.SwiftUIColor == .primary {
-							Image(systemName: "circle.righthalf.fill")
-						} else {
-							Circle()
-								.fill(color.SwiftUIColor)
-								.stroke(
-									.white,
-									lineWidth: isSelected ? 3 : 0
-								)
-								.frame(width: 28, height: 28)
+				Button {
+					selectedColor.wrappedValue = color
+				} label: {
+					Rectangle()
+						.fill(color.SwiftUIColor)
+						.aspectRatio(1, contentMode: .fit)
+						.overlay {
+							if isSelected {
+								ConcentricRectangle(corners: .concentric(), isUniform: false)
+									.stroke(.white, lineWidth: 6)
+									.clipShape(ConcentricRectangle(corners: .concentric(), isUniform: false))
+									.transition(.blurReplace)
+							}
 						}
-					}
-					.frame(width: 44, height: 44)
-					.buttonStyle(.plain)
-					.accessibilityLabel(accessibilityName(for: color))
-					.accessibilityValue(isSelected ? "Selected" : "Not selected")
-					.accessibilityAddTraits(isSelected ? .isSelected : [])
+						.animation(.snappy(duration: 0.1), value: isSelected)
 				}
+				.buttonStyle(.plain)
+				.accessibilityLabel(accessibilityName(for: color))
+				.accessibilityValue(isSelected ? "Selected" : "Not selected")
+				.accessibilityAddTraits(isSelected ? .isSelected : [])
 			}
 		}
+		.compositingGroup()
 
 		if let description, let systemImage {
 			VStack {

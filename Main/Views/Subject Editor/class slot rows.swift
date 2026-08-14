@@ -28,21 +28,25 @@ struct SlotEditorSectionView: View {
 						subject.slots.removeAll { $0.id == slot.id }
 					}
 				)
-				.transition(.scale.combined(with: .opacity))
+				.transition(.opacity)
 			}
 
 			if subject.slots.count < 4 {
-				Button {
-					subject.slots.append(
-						EditableSlot(day: 0, period: TimetableLayout.allowedPeriods(for: 0).first ?? 1)
-					)
-				} label: {
+				Button(action: addSlot) {
 					Label("Add Slot", systemImage: "plus")
 				}
 				.buttonStyle(.glass)
 				.buttonBorderShape(.capsule)
 				.disabled(isSaving)
 			}
+		}
+	}
+
+	private func addSlot() {
+		withAnimation(.snappy) {
+			subject.slots.append(
+				EditableSlot(day: 0, period: TimetableLayout.allowedPeriods(for: 0).first ?? 1)
+			)
 		}
 	}
 }
