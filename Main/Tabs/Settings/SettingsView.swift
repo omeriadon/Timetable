@@ -306,11 +306,14 @@ struct SettingsView: View {
 				UIPasteboard.general.string = versionAndBuild
 				statusBadgeManager.addBadge(id: UUID(), title: "Copied", priority: 3, view: .success)
 			} label: {
-				HStack {
-					Image(systemName: "hammer")
+				Label {
 					Text(Bundle.main.appVersion)
 					Text("(\(Bundle.main.buildNumber))")
 						.foregroundStyle(.secondary)
+
+				} icon: {
+					Image(systemName: "hammer")
+						.foregroundStyle(.accent)
 				}
 			}
 		}

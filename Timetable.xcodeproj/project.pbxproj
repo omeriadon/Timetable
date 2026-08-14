@@ -31,7 +31,6 @@
 		2ABD92FA302B3D860076BFD1 /* Glur in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABD92F9302B3D860076BFD1 /* Glur */; };
 		2ABD92FC302B3D860076BFD1 /* GlurBackdrop in Frameworks */ = {isa = PBXBuildFile; productRef = 2ABD92FB302B3D860076BFD1 /* GlurBackdrop */; };
 		2AC5F7ED2FD8435700B813EA /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2AC5F7EC2FD8435700B813EA /* Defaults */; };
-		2AE0586F300B591D00473DBD /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 2A02379A2F9C907000AB1E1F /* Defaults */; };
 		2AE0F13B2FE03989002B5D9D /* MaterialView in Frameworks */ = {isa = PBXBuildFile; platformFilters = (macos, ); productRef = 2AE0F13A2FE03989002B5D9D /* MaterialView */; };
 /* End PBXBuildFile section */
 
@@ -110,7 +109,6 @@
 		2A098C832F9DB842002065BE /* Watch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Watch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2A2586A02FB5D6490030C8CD /* Watch Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Watch Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2AA6DF142FDFAC8F00BBC70E /* Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Widget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		2AF3B0073000000000000007 /* TimetableTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TimetableTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -362,12 +360,6 @@
 				2AA6DF2C2FDFADAE00BBC70E /* Defaults in Frameworks */,
 			);
 		};
-		2AF3B0043000000000000004 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			files = (
-				2AE0586F300B591D00473DBD /* Defaults in Frameworks */,
-			);
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -392,7 +384,6 @@
 				2A098C832F9DB842002065BE /* Watch.app */,
 				2A2586A02FB5D6490030C8CD /* Watch Widget.appex */,
 				2AA6DF142FDFAC8F00BBC70E /* Widget.appex */,
-				2AF3B0073000000000000007 /* TimetableTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -528,24 +519,6 @@
 			productReference = 2AA6DF142FDFAC8F00BBC70E /* Widget.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		2AF3B0023000000000000002 /* TimetableTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 2AF3B00A300000000000000A /* Build configuration list for PBXNativeTarget "TimetableTests" */;
-			buildPhases = (
-				2AF3B0033000000000000003 /* Sources */,
-				2AF3B0043000000000000004 /* Frameworks */,
-				2AF3B0053000000000000005 /* Resources */,
-			);
-			buildRules = (
-			);
-			name = TimetableTests;
-			packageProductDependencies = (
-				2A02379A2F9C907000AB1E1F /* Defaults */,
-			);
-			productName = TimetableTests;
-			productReference = 2AF3B0073000000000000007 /* TimetableTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -614,7 +587,6 @@
 				2AA6DF132FDFAC8F00BBC70E /* Widget */,
 				2A098C822F9DB842002065BE /* Watch */,
 				2A25869F2FB5D6490030C8CD /* Watch Widget */,
-				2AF3B0023000000000000002 /* TimetableTests */,
 			);
 		};
 /* End PBXProject section */
@@ -640,11 +612,6 @@
 			files = (
 			);
 		};
-		2AF3B0053000000000000005 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			files = (
-			);
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -664,11 +631,6 @@
 			);
 		};
 		2AA6DF102FDFAC8F00BBC70E /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			files = (
-			);
-		};
-		2AF3B0033000000000000003 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
 			);
@@ -857,6 +819,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = Timetable;
 				INFOPLIST_KEY_CFBundleDocumentTypes = "<array><dict><key>CFBundleTypeName</key><string>Timetable Share</string><key>CFBundleTypeRole</key><string>Editor</string><key>LSHandlerRank</key><string>Owner</string><key>LSItemContentTypes</key><array><string>pt.adonis.timetable.share</string></array></dict></array>";
 				INFOPLIST_KEY_CFBundleURLTypes = "<array><dict><key>CFBundleTypeRole</key><string>Editor</string><key>CFBundleURLName</key><string>com.omeriadon.Timetable</string><key>CFBundleURLSchemes</key><array><string>timetable</string></array></dict></array>";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Timetable needs to read your calendar to pull Compass Events from your schedule.";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
@@ -931,6 +894,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = Timetable;
 				INFOPLIST_KEY_CFBundleDocumentTypes = "<array><dict><key>CFBundleTypeName</key><string>Timetable Share</string><key>CFBundleTypeRole</key><string>Editor</string><key>LSHandlerRank</key><string>Owner</string><key>LSItemContentTypes</key><array><string>pt.adonis.timetable.share</string></array></dict></array>";
 				INFOPLIST_KEY_CFBundleURLTypes = "<array><dict><key>CFBundleTypeRole</key><string>Editor</string><key>CFBundleURLName</key><string>com.omeriadon.Timetable</string><key>CFBundleURLSchemes</key><array><string>timetable</string></array></dict></array>";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Timetable needs to read your calendar to pull Compass Events from your schedule.";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
@@ -985,6 +949,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Timetable;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.omeriadon.Timetable;
@@ -1023,6 +988,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Timetable;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.omeriadon.Timetable;
@@ -1068,6 +1034,7 @@
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				INFOPLIST_FILE = "Special/Info/Watch Widget.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Timetable Widgets";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -1123,6 +1090,7 @@
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				INFOPLIST_FILE = "Special/Info/Watch Widget.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Timetable Widgets";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
@@ -1181,6 +1149,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Special/Info/Widget.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Timetable Widgets";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1240,6 +1209,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Special/Info/Widget.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Timetable Widgets";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1273,32 +1243,6 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 26.0;
-			};
-			name = Release;
-		};
-		2AF3B0093000000000000009 /* Debug configuration for PBXNativeTarget "TimetableTests" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.omeriadon.TimetableTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		2AF3B00B300000000000000B /* Release configuration for PBXNativeTarget "TimetableTests" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.omeriadon.TimetableTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -1342,14 +1286,6 @@
 			buildConfigurations = (
 				2AA6DF262FDFAC9000BBC70E /* Debug configuration for PBXNativeTarget "Widget" */,
 				2AA6DF272FDFAC9000BBC70E /* Release configuration for PBXNativeTarget "Widget" */,
-			);
-			defaultConfigurationName = Release;
-		};
-		2AF3B00A300000000000000A /* Build configuration list for PBXNativeTarget "TimetableTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				2AF3B0093000000000000009 /* Debug configuration for PBXNativeTarget "TimetableTests" */,
-				2AF3B00B300000000000000B /* Release configuration for PBXNativeTarget "TimetableTests" */,
 			);
 			defaultConfigurationName = Release;
 		};

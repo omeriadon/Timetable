@@ -22,6 +22,7 @@ struct UIKitTabView: UIViewControllerRepresentable {
 	func makeUIViewController(context: Context) -> UITabBarController {
 		let controller = UITabBarController()
 		controller.delegate = context.coordinator
+		controller.tabBarMinimizeBehavior = .onScrollDown
 		controller.viewControllers = items.map(makeViewController)
 		applyFontDesign(to: controller)
 		select(selection, in: controller)

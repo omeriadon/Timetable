@@ -217,6 +217,7 @@ struct TimetableView: View {
 				}
 				.scrollEdgeEffect(direction: .clearTopDarkBottom, offset: 0.9, maxBlurRadius: 1, maximumOpacity: 0.7)
 				.scrollEdgeEffect(offset: 0.9, maxBlurRadius: 6, maximumOpacity: 1)
+				.scrollEdgeEffectStyle(.soft, for: .bottom)
 				.scrollIndicators(.visible)
 				.opacity(selectedSlot == nil ? 0 : 1)
 				.safeAreaBar(edge: .top, alignment: .center, spacing: 10) {
