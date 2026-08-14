@@ -10,7 +10,7 @@ import SwiftUI
 
 @main
 struct TimetableWatchApp: App {
-	@WKExtensionDelegateAdaptor(WatchExtensionDelegate.self) private var extensionDelegate
+	@WKApplicationDelegateAdaptor(WatchExtensionDelegate.self) private var applicationDelegate
 	@State private var sessionStore = SessionStore.shared
 	@State private var statusBadgeManager = StatusBadgeManager.shared
 	@Default(.accountSettings) private var accountSettings

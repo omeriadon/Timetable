@@ -22,7 +22,7 @@ final class WatchNotificationRegistrationService {
 			PrintError("Watch notification authorization request failed", category: .network, error: error)
 		}
 
-		WKExtension.shared().registerForRemoteNotifications()
+		WKApplication.shared().registerForRemoteNotifications()
 	}
 
 	func receive(deviceToken: Data) async {

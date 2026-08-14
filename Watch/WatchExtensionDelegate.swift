@@ -2,7 +2,7 @@ import Foundation
 import WatchKit
 
 @MainActor
-final class WatchExtensionDelegate: NSObject, WKExtensionDelegate {
+final class WatchExtensionDelegate: NSObject, WKApplicationDelegate {
 	func didRegisterForRemoteNotifications(withDeviceToken deviceToken: Data) {
 		Task {
 			await WatchNotificationRegistrationService.shared.receive(deviceToken: deviceToken)
