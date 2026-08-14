@@ -3,19 +3,7 @@
     "refractivity",
     "specular-location"
   ],
-  "fill-specializations" : [
-    {
-      "value" : {
-        "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
-      }
-    },
-    {
-      "appearance" : "dark",
-      "value" : {
-        "solid" : "extended-gray:0.00000,1.00000"
-      }
-    }
-  ],
+  "fill" : "system-dark",
   "groups" : [
     {
       "blur-material" : 0.05,
@@ -32,12 +20,7 @@
             }
           ],
           "name" : "Frame 18",
-          "opacity-specializations" : [
-            {
-              "appearance" : "dark",
-              "value" : 0.35
-            }
-          ],
+          "opacity" : 0.68,
           "position-specializations" : [
             {
               "value" : {
@@ -125,13 +108,6 @@
           "value" : {
             "kind" : "layer-color",
             "opacity" : 2
-          }
-        },
-        {
-          "appearance" : "dark",
-          "value" : {
-            "kind" : "layer-color",
-            "opacity" : 0.8
           }
         },
         {
@@ -344,53 +320,12 @@
       }
     },
     {
-      "blend-mode-specializations" : [
-        {
-          "appearance" : "dark",
-          "value" : "normal"
-        }
-      ],
-      "hidden-specializations" : [
-        {
-          "value" : false
-        },
-        {
-          "idiom" : "watchOS",
-          "value" : true
-        }
-      ],
+      "hidden" : false,
       "layers" : [
         {
-          "blend-mode-specializations" : [
-            {
-              "value" : "soft-light"
-            },
-            {
-              "appearance" : "dark",
-              "value" : "normal"
-            }
-          ],
+          "blend-mode" : "normal",
           "fill-specializations" : [
             {
-              "value" : {
-                "linear-gradient" : [
-                  "display-p3:0.95000,0.95000,0.95000,0.36000",
-                  "extended-gray:1.00000,0.42000"
-                ],
-                "orientation" : {
-                  "start" : {
-                    "x" : 0.5,
-                    "y" : 1
-                  },
-                  "stop" : {
-                    "x" : 0.5,
-                    "y" : 0
-                  }
-                }
-              }
-            },
-            {
-              "appearance" : "dark",
               "value" : "none"
             },
             {
@@ -400,8 +335,15 @@
               }
             }
           ],
+          "hidden-specializations" : [
+            {
+              "idiom" : "watchOS",
+              "value" : true
+            }
+          ],
           "image-name" : "Tuesday.png",
           "name" : "Tuesday",
+          "opacity" : 0.53,
           "position" : {
             "scale" : 0.98,
             "translation-in-points" : [
@@ -411,36 +353,9 @@
           }
         },
         {
-          "blend-mode-specializations" : [
-            {
-              "value" : "soft-light"
-            },
-            {
-              "appearance" : "dark",
-              "value" : "normal"
-            }
-          ],
+          "blend-mode" : "normal",
           "fill-specializations" : [
             {
-              "value" : {
-                "linear-gradient" : [
-                  "display-p3:0.95000,0.95000,0.95000,0.36000",
-                  "extended-gray:1.00000,0.42000"
-                ],
-                "orientation" : {
-                  "start" : {
-                    "x" : 0.5,
-                    "y" : 1
-                  },
-                  "stop" : {
-                    "x" : 0.5,
-                    "y" : 0
-                  }
-                }
-              }
-            },
-            {
-              "appearance" : "dark",
               "value" : "none"
             },
             {
@@ -450,8 +365,15 @@
               }
             }
           ],
+          "hidden-specializations" : [
+            {
+              "idiom" : "watchOS",
+              "value" : true
+            }
+          ],
           "image-name" : "Wednesday.png",
           "name" : "Wednesday",
+          "opacity" : 0.53,
           "position" : {
             "scale" : 0.98,
             "translation-in-points" : [
@@ -461,39 +383,18 @@
           }
         },
         {
-          "fill" : "none",
-          "glass" : false,
-          "hidden-specializations" : [
+          "hidden" : false,
+          "image-name" : "paper-light.jpg",
+          "name" : "paper-light",
+          "opacity-specializations" : [
             {
-              "value" : true
+              "value" : 0.87
             },
             {
-              "appearance" : "light",
-              "value" : false
+              "idiom" : "watchOS",
+              "value" : 1
             }
           ],
-          "image-name" : "paper-gradient.png",
-          "name" : "paper-gradient",
-          "position" : {
-            "scale" : 2.81,
-            "translation-in-points" : [
-              14.328979591837026,
-              0
-            ]
-          }
-        },
-        {
-          "hidden-specializations" : [
-            {
-              "value" : true
-            },
-            {
-              "appearance" : "dark",
-              "value" : false
-            }
-          ],
-          "image-name" : "image 2.jpg",
-          "name" : "image 2",
           "position" : {
             "scale" : 1.59,
             "translation-in-points" : [
@@ -504,12 +405,7 @@
         }
       ],
       "name" : "Second",
-      "opacity-specializations" : [
-        {
-          "appearance" : "dark",
-          "value" : 0.32
-        }
-      ],
+      "opacity" : 1,
       "position" : {
         "scale" : 0.98,
         "translation-in-points" : [
@@ -530,17 +426,10 @@
           }
         },
         {
-          "appearance" : "light",
-          "value" : {
-            "enabled" : false,
-            "value" : 0.48
-          }
-        },
-        {
           "idiom" : "watchOS",
           "value" : {
             "enabled" : true,
-            "value" : 0.99
+            "value" : 0
           }
         }
       ]
