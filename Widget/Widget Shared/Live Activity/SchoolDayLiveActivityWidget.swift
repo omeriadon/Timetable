@@ -71,7 +71,7 @@ struct SchoolDayLiveActivityWidget: Widget {
 
 						if let nextText = context.state.nextText {
 							HStack(alignment: .lastTextBaseline) {
-								Text(nextText == "Last Period" ? "Last Period" : "Next: \(nextText)")
+								Text(nextLabel(nextText))
 									.font(.system(size: 19))
 									.bold()
 									.lineLimit(1)
@@ -188,7 +188,7 @@ private struct SchoolDayLiveActivityView: View {
 
 			if let nextText = context.state.nextText {
 				HStack {
-					Text(nextText == "Last Period" ? "Last Period" : "Next: \(nextText)")
+					Text(nextLabel(nextText))
 						.font(.system(size: 20, weight: .regular))
 						.lineLimit(1)
 				}
@@ -233,7 +233,7 @@ private struct SchoolDayLiveActivityView: View {
 						Spacer()
 							.frame(width: 40)
 
-						Text(nextText == "Last Period" ? "Last Period" : "Next: \(nextText)")
+						Text(nextLabel(nextText))
 							.font(.system(size: 16))
 							.lineLimit(1)
 							.truncationMode(.tail)
@@ -256,6 +256,16 @@ private struct SchoolDayLiveActivityView: View {
 		.padding(.vertical, 10)
 		.tint(context.state.color.swiftUIColor)
 		.activityBackgroundTint(context.state.color.swiftUIColor)
+	}
+
+	private func nextLabel(_ nextText: String) -> String {
+		if nextText == "Last Period" {
+			return nextText
+		}
+		if context.state.phase == .beforeSchool {
+			return "First: \(nextText)"
+		}
+		return "Next: \(nextText)"
 	}
 }
 
