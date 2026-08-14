@@ -10,6 +10,7 @@ import SwiftUI
 
 @main
 struct TimetableWatchApp: App {
+	@WKExtensionDelegateAdaptor(WatchExtensionDelegate.self) private var extensionDelegate
 	@State private var sessionStore = SessionStore.shared
 	@State private var statusBadgeManager = StatusBadgeManager.shared
 	@Default(.accountSettings) private var accountSettings
@@ -46,9 +47,11 @@ struct TimetableWatchApp: App {
 			WatchProvisioningService.shared.requestSessionIfPossible()
 		}
 		SessionStore.shared.configureDeviceLifecycle {
+			await WatchNotificationRegistrationService.shared.uploadPendingToken()
 			await DeviceSynchronizationService.shared.synchronize()
 		} signingOut: {
 			await DeviceSynchronizationService.shared.remove()
+			WatchNotificationRegistrationService.shared.clearLocalRegistration()
 		}
 		NetworkManager.shared.configureFeedback {
 			StatusBadgeManager.shared.present(networkError: $0)
@@ -56,5 +59,6 @@ struct TimetableWatchApp: App {
 		NetworkManager.shared.startMonitoring()
 		WatchProvisioningService.shared.activate()
 		await SessionStore.shared.restore()
+		await WatchNotificationRegistrationService.shared.requestRemoteRegistration()
 	}
 }
