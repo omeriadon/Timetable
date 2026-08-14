@@ -348,6 +348,7 @@ struct ArchivedEventsView: View {
 				} label: {
 					Label("Delete Past Events", systemImage: "gauge.range.33to100.dotted.with.needle")
 				}
+				.menuActionDismissBehavior(.enabled)
 				.tint(.white)
 			}
 		}

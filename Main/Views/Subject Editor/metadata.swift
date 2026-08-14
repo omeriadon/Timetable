@@ -112,6 +112,7 @@ struct SubjectMetadataEditorView: View {
 			Button("Save", role: .confirm) {
 				commit(target)
 			}
+			.buttonStyle(.glassProminent)
 
 			Button("Cancel", role: .cancel) {}
 		} message: { target in
@@ -183,7 +184,7 @@ private enum MetadataEditTarget: Identifiable {
 	var helpText: String {
 		switch self {
 			case .classroom:
-				"MU12"
+				"For example, MU12"
 
 			case .teacher:
 				"Enter in capitals using first initial and last name."

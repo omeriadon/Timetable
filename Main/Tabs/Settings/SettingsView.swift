@@ -58,6 +58,7 @@ struct SettingsView: View {
 
 	private var accountBackground: some View {
 		AccountBackgroundView(profile: Defaults[.accountProfile])
+			.clipShape(Capsule())
 	}
 
 	@ContentBuilder
@@ -157,7 +158,7 @@ struct SettingsView: View {
 			if sessionStore.isAuthenticated {
 				NavigationLink { AccountAndSyncSettingsView() } label: { Label("Updates & Notifications", systemImage: "switch.2") }
 
-				Picker("Future Events", systemImage: "calendar.badge.clock", selection: futureEventRangeBinding) {
+				Picker("Show Future Events", systemImage: "calendar.badge.clock", selection: futureEventRangeBinding) {
 					ForEach(FutureEventRange.allCases) { range in
 						Text(range.title)
 							.tag(range)
@@ -182,7 +183,7 @@ struct SettingsView: View {
 					.onChange(of: usesReleaseAppIcon) { oldValue, newValue in
 						changeAppIcon(useReleaseIcon: newValue, previousValue: oldValue)
 					}
-			#endif
+			#endif // DEBUG
 
 			if _isDebugAssertConfiguration() || Defaults[.userDisplayName].contains("Adon") || Defaults[.calendarEvents].canManageGlobalEvents {
 				LabeledContent {

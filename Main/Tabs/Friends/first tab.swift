@@ -317,7 +317,7 @@ struct FriendshipDateEditorSheet: View {
 					in: Self.minimumDate ... Self.maximumDate,
 					displayedComponents: .date
 				)
-					.glurListRowBackground()
+				.glurListRowBackground()
 			}
 			.appNavigationTitle("Change Friends Since")
 			.appPaperBackground()
