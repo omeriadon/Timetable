@@ -5,6 +5,7 @@ import Foundation
 nonisolated struct SchoolDayActivityAttributes: ActivityAttributes {
 	let activityKey: String
 	let schoolDate: String
+	let isDebug: Bool?
 
 	nonisolated enum Phase: String, Codable, Hashable {
 		case beforeSchool

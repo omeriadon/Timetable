@@ -308,9 +308,12 @@ final class LiveActivityRegistrationService {
 			: 0
 		let currentMinute = (components.hour ?? 0) * 60 + (components.minute ?? 0)
 
-		for activity in Activity<SchoolDayActivityAttributes>.activities
-			where activity.attributes.schoolDate != today || currentMinute >= dismissal
-		{
+		for activity in Activity<SchoolDayActivityAttributes>.activities {
+			let attributes = activity.attributes
+			let isDebugActivity = attributes.isDebug == true || attributes.schoolDate.hasPrefix("debug-")
+			guard !isDebugActivity else { continue }
+			guard attributes.schoolDate != today || currentMinute >= dismissal else { continue }
+
 			await activity.end(nil, dismissalPolicy: .immediate)
 		}
 	}

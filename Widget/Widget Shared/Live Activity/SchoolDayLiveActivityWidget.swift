@@ -262,7 +262,8 @@ private struct SchoolDayLiveActivityView: View {
 extension SchoolDayActivityAttributes {
 	static let preview = SchoolDayActivityAttributes(
 		activityKey: "preview-school-day",
-		schoolDate: "2026-07-04"
+		schoolDate: "2026-07-04",
+		isDebug: false
 	)
 }
 
