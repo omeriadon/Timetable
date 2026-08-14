@@ -46,7 +46,7 @@ struct FeedbackView: View {
 
 			TextField(
 				text: $message,
-				prompt: Text("Describe the feedback or bug"),
+				prompt: Text("Describe the \(category.lowercased())"),
 				axis: .vertical,
 				label: {
 					EmptyView()

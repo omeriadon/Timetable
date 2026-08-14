@@ -79,23 +79,6 @@ struct AccountView: View {
 
 	@ContentBuilder
 	private func accountRows(profile: AccountProfile) -> some View {
-		Section("Status") {
-			Toggle("Status", systemImage: "location.fill", isOn: $locationStatusEnabled)
-				.onChange(of: locationStatusEnabled) { _, isEnabled in
-					hasSeenLocationStatusWhatsNew = true
-					service.setEnabled(isEnabled)
-				}
-
-			if locationStatusEnabled, service.authorizationStatus != .authorizedAlways {
-				Button("Open Location Settings", systemImage: "gear") {
-					if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-						UIApplication.shared.open(settingsURL)
-					}
-				}
-			}
-		}
-		.glurListRowBackground()
-
 		Section("Profile") {
 			Button {
 				showsProfileEditor = true
@@ -125,6 +108,20 @@ struct AccountView: View {
 		.glurListRowBackground()
 
 		Section {
+			Toggle("Status", systemImage: "location.fill", isOn: $locationStatusEnabled)
+				.onChange(of: locationStatusEnabled) { _, isEnabled in
+					hasSeenLocationStatusWhatsNew = true
+					service.setEnabled(isEnabled)
+				}
+
+			if locationStatusEnabled, service.authorizationStatus != .authorizedAlways {
+				Button("Open Location Settings", systemImage: "gear") {
+					if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+						UIApplication.shared.open(settingsURL)
+					}
+				}
+			}
+
 			if isLoadingYearGroups, yearGroupTags.isEmpty {
 				LabeledContent("Year Group") {
 					ProgressView()

@@ -303,10 +303,11 @@ struct SettingsView: View {
 				statusBadgeManager.addBadge(id: UUID(), title: "Copied", priority: 3, view: .success)
 			} label: {
 				Label {
-					Text(Bundle.main.appVersion)
-					Text("(\(Bundle.main.buildNumber))")
-						.foregroundStyle(.secondary)
-
+					HStack {
+						Text(Bundle.main.appVersion)
+						Text("(\(Bundle.main.buildNumber))")
+							.foregroundStyle(.secondary)
+					}
 				} icon: {
 					Image(systemName: "hammer")
 						.foregroundStyle(.accent)
