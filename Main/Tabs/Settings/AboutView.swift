@@ -97,7 +97,6 @@ struct AboutView: View {
 			.padding(.horizontal)
 		}
 		.scrollContentBackground(.hidden)
-		.foregroundStyle(.white)
 		.scrollEdgeEffect()
 		.background {
 			ColorfulView(

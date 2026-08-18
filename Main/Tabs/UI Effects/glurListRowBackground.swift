@@ -11,9 +11,12 @@ import SwiftUI
 extension View {
 	func glurListRowBackground() -> some View {
 		listRowBackground(
-			GlurView(radius: 3, offset: 0, interpolation: 0)
+			appBackground()
 		)
 	}
-}
 
-// 	.glurListRowBackground()
+	func appBackground() -> some View {
+		Rectangle()
+			.fill(.ultraThinMaterial.opacity(0.8))
+	}
+}

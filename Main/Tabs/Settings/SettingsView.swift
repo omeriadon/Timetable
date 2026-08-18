@@ -284,7 +284,7 @@ struct SettingsView: View {
 			}
 			.listRowBackground(
 				ZStack {
-					GlurView(radius: 3, offset: 0, interpolation: 0)
+					appBackground()
 
 					ColorfulView(
 						color: $colors,

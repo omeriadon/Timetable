@@ -80,7 +80,7 @@ private struct EventTagSelectionView: View {
 			.contentShape(Rectangle())
 		}
 		.buttonStyle(.plain)
-		.listRowBackground(isSelected ? AnyView(Color.accentColor) : AnyView(GlurView(radius: 3, offset: 0, interpolation: 0)))
+		.listRowBackground(isSelected ? AnyView(Color.accentColor) : AnyView(appBackground()))
 		.animation(.snappy(duration: 0.1), value: isSelected)
 		.accessibilityLabel(tag.displayName)
 		.accessibilityValue(isSelected ? "Selected" : "Not selected")
