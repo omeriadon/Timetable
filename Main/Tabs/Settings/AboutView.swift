@@ -10,6 +10,8 @@ import GlurBackdrop
 import SwiftUI
 
 struct AboutView: View {
+	@State private var contributors: [AboutContributorResponse] = []
+	@State private var loadError: String?
 	@State private var colors = [
 		Color.brown,
 		Color.clear,
@@ -56,26 +58,26 @@ struct AboutView: View {
 						.padding(.horizontal)
 
 					VStack(spacing: 0) {
-						LabeledContent("Adon Omeri", value: "Software Engineer")
-							.padding()
+						ForEach(contributors) { contributor in
+							LabeledContent(contributor.name, value: contributor.role)
+								.padding()
 
-						Divider()
-							.padding(.horizontal)
+							if contributor.id != contributors.last?.id {
+								Divider()
+									.padding(.horizontal)
+							}
+						}
 
-						LabeledContent(
-							"Bob Han-Busi",
-							value: "Human Interface Design"
-						)
-						.padding()
-
-						Divider()
-							.padding(.horizontal)
-
-						LabeledContent(
-							"Joshua Gilgallon",
-							value: "Infrastructure & Hosting"
-						)
-						.padding()
+						if contributors.isEmpty {
+							if let loadError {
+								Text(loadError)
+									.foregroundStyle(.secondary)
+									.padding()
+							} else {
+								ProgressView()
+									.padding()
+							}
+						}
 					}
 					.background {
 						GlurView(radius: 3, offset: 0, interpolation: 0)
@@ -95,6 +97,13 @@ struct AboutView: View {
 				}
 			}
 			.padding(.horizontal)
+		}
+		.task {
+			do {
+				contributors = try await AdministrationService.shared.aboutContributors()
+			} catch {
+				loadError = error.localizedDescription
+			}
 		}
 		.scrollContentBackground(.hidden)
 		.scrollEdgeEffect()

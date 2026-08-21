@@ -13,6 +13,10 @@ final class AdministrationService {
 		try await networkManager.send(.v1Administration)
 	}
 
+	func aboutContributors() async throws -> [AboutContributorResponse] {
+		try await networkManager.send(.v1About)
+	}
+
 	func tagCatalogue() async throws -> EventTagCatalogueResponse {
 		let response: EventTagCatalogueResponse = try await networkManager.send(.v1Tags)
 		Defaults[.eventTagCatalogue] = response
@@ -270,6 +274,7 @@ final class AdministrationService {
 }
 
 private extension Endpoint {
+	static let v1About = Endpoint("/v1/about")
 	static let v1Administration = Endpoint("/v1/administration")
 	static let v1AdministrationUsers = Endpoint("/v1/administration/users")
 	static let v1AdministrationUsersCreate = Endpoint("/v1/administration/users", method: .post)

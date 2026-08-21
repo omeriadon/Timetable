@@ -171,6 +171,13 @@ nonisolated struct AdministrationDashboardResponse: Codable, Sendable {
 	}
 }
 
+nonisolated struct AboutContributorResponse: Codable, Identifiable, Sendable {
+	let id: UUID
+	let name: String
+	let role: String
+	let sortOrder: Int
+}
+
 nonisolated struct AdministrationUserResponse: Codable, Identifiable, Sendable, Equatable {
 	let id: UUID
 	let displayName: String
