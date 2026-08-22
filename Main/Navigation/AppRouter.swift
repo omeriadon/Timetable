@@ -41,6 +41,11 @@ final class AppRouter {
 		didSet { persistIfNeeded() }
 	}
 
+	var isShowingAbout: Bool {
+		selectedSidebarDestination == .settings
+			&& sidebarPath.last == .settings(.about)
+	}
+
 	var sidebarVisibility: AppSidebarVisibility
 
 	var inspectorRoute: AppRoute? {

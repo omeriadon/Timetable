@@ -43,6 +43,8 @@ struct WideAppShell: View {
 			}
 			.appNavigationTitle(router.presentation == .iOS ? "Timetable" : "")
 			.listStyle(.sidebar)
+			.scrollContentBackground(.hidden)
+			.background(.clear)
 			.scrollEdgeEffectStyle(.soft, for: .all)
 			.navigationSplitViewColumnWidth(min: 220, ideal: 260, max: 320)
 		} detail: {
@@ -56,6 +58,7 @@ struct WideAppShell: View {
 						)
 					}
 			}
+			.background(.clear)
 			.navigationSplitViewColumnWidth(min: 540, ideal: 700, max: 860)
 		}
 		.inspector(isPresented: inspectorPresented) {
@@ -78,7 +81,12 @@ struct WideAppShell: View {
 				.inspectorColumnWidth(min: 400, ideal: 500, max: 700)
 			}
 		}
-		.appPaperBackground()
+		.scrollContentBackground(.hidden)
+		.background {
+			if !router.isShowingAbout {
+				AppPaperBackground()
+			}
+		}
 		.onReceive(NotificationCenter.default.publisher(for: .openTimetableTab)) { _ in
 			router.selectRoot(.timetableToday)
 		}

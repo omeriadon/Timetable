@@ -10,15 +10,10 @@ import GlurBackdrop
 import SwiftUI
 
 struct AboutView: View {
+	@Environment(\.appPresentation) private var presentation
 	@State private var contributors: [AboutContributorResponse] = []
 	@State private var loadError: String?
-	@State private var colors = [
-		Color.brown,
-		Color.clear,
-		Color.clear,
-	]
-	@State private var speed = 0.6
-	@State private var colorTransitionSpeed = 10.0
+	@State private var pointerLocation: CGPoint?
 
 	var body: some View {
 		ScrollView {
@@ -98,6 +93,16 @@ struct AboutView: View {
 			}
 			.padding(.horizontal)
 		}
+		#if os(macOS)
+		.onContinuousHover(coordinateSpace: .local) { phase in
+			switch phase {
+				case let .active(location):
+					pointerLocation = location
+				case .ended:
+					pointerLocation = nil
+			}
+		}
+		#endif
 		.task {
 			do {
 				contributors = try await AdministrationService.shared.aboutContributors()
@@ -108,16 +113,60 @@ struct AboutView: View {
 		.scrollContentBackground(.hidden)
 		.scrollEdgeEffect()
 		.background {
-			ColorfulView(
-				color: $colors,
-				speed: $speed,
-				bias: .constant(0.00001),
-				noise: .constant(64),
-				transitionSpeed: $colorTransitionSpeed,
-				frameLimit: .constant(60),
-				renderScale: .constant(1)
-			)
-			.ignoresSafeArea()
+			if presentation == .iOS {
+				AboutBackgroundView(pointerLocation: $pointerLocation)
+			}
 		}
+	}
+}
+
+struct AboutBackgroundView: View {
+	@Binding private var pointerLocation: CGPoint?
+	@State private var colors = [
+		Color.brown,
+		Color.clear,
+		Color.clear,
+	]
+	@State private var speed = 0.6
+	@State private var colorTransitionSpeed = 10.0
+
+	init(pointerLocation: Binding<CGPoint?> = .constant(nil)) {
+		_pointerLocation = pointerLocation
+	}
+
+	var body: some View {
+		GeometryReader { proxy in
+			ZStack {
+				ColorfulView(
+					color: $colors,
+					speed: $speed,
+					bias: .constant(0.00001),
+					noise: .constant(64),
+					transitionSpeed: $colorTransitionSpeed,
+					frameLimit: .constant(60),
+					renderScale: .constant(1)
+				)
+
+				if let pointerLocation {
+					RadialGradient(
+						colors: [
+							Color.white.opacity(0.2),
+							Color.white.opacity(0.04),
+							Color.clear,
+						],
+						center: UnitPoint(
+							x: pointerLocation.x / max(proxy.size.width, 1),
+							y: pointerLocation.y / max(proxy.size.height, 1)
+						),
+						startRadius: 0,
+						endRadius: 260
+					)
+					.blur(radius: 10)
+				}
+			}
+		}
+		.ignoresSafeArea()
+		.accessibilityHidden(true)
+		.allowsHitTesting(false)
 	}
 }
