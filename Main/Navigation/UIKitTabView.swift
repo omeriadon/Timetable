@@ -29,7 +29,9 @@ struct UIKitTabView: UIViewControllerRepresentable {
 		return controller
 	}
 
-	func updateUIViewController(_ controller: UITabBarController, context _: Context) {
+	func updateUIViewController(_ controller: UITabBarController, context: Context) {
+		context.coordinator.updateItems(items)
+
 		if controller.viewControllers?.count != items.count {
 			controller.viewControllers = items.map(makeViewController)
 		}
@@ -84,18 +86,22 @@ struct UIKitTabView: UIViewControllerRepresentable {
 
 	final class Coordinator: NSObject, UITabBarControllerDelegate {
 		private let selection: Binding<MainTab>
-		private let items: [UIKitTabItem]
+		private var itemValues: [MainTab]
 
 		init(selection: Binding<MainTab>, items: [UIKitTabItem]) {
 			self.selection = selection
-			self.items = items
+			itemValues = items.map(\.value)
+		}
+
+		func updateItems(_ items: [UIKitTabItem]) {
+			itemValues = items.map(\.value)
 		}
 
 		func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
 			guard let index = tabBarController.viewControllers?.firstIndex(of: viewController),
-			      items.indices.contains(index)
+			      itemValues.indices.contains(index)
 			else { return }
-			selection.wrappedValue = items[index].value
+			selection.wrappedValue = itemValues[index]
 		}
 	}
 }
