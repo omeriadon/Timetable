@@ -97,51 +97,11 @@ struct UIKitTabView: UIViewControllerRepresentable {
 			else { return }
 			selection.wrappedValue = items[index].value
 		}
-
-		func tabBarController(
-			_: UITabBarController,
-			animationControllerForTransitionFrom _: UIViewController,
-			to _: UIViewController
-		) -> UIViewControllerAnimatedTransitioning? {
-			TabTransitionAnimator()
-		}
 	}
 }
 
 extension Array {
 	func appendingIf(_ condition: Bool, _ item: @autoclosure () -> Element) -> [Element] {
 		condition ? self + [item()] : self
-	}
-}
-
-private final class TabTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning {
-	func transitionDuration(using _: UIViewControllerContextTransitioning?) -> TimeInterval {
-		0.1
-	}
-
-	func animateTransition(using context: UIViewControllerContextTransitioning) {
-		guard let fromView = context.view(forKey: .from),
-		      let toView = context.view(forKey: .to)
-		else {
-			context.completeTransition(false)
-			return
-		}
-
-		let container = context.containerView
-		toView.frame = container.bounds
-		toView.alpha = 0
-		container.addSubview(toView)
-		UIView.animate(
-			withDuration: transitionDuration(using: context),
-			delay: 0,
-			options: [.curveEaseInOut, .beginFromCurrentState]
-		) {
-			fromView.alpha = 0
-			toView.alpha = 1
-		} completion: { finished in
-			fromView.alpha = 1
-			toView.alpha = 1
-			context.completeTransition(finished)
-		}
 	}
 }
