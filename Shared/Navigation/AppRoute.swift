@@ -65,6 +65,7 @@ enum AdministrationRoute: Codable, Hashable, Sendable {
 	case broadcastHistory
 	case broadcastRecord(id: UUID)
 	case emailLog
+	case aboutContributors
 	case administrators
 	case serverAccess
 	case appVersion

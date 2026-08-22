@@ -492,6 +492,9 @@
         }
       }
     },
+    "Add Contributor" : {
+
+    },
     "Add Event Notification" : {
       "localizations" : {
         "fr" : {
@@ -1661,6 +1664,12 @@
     "Continues without importing your timetable" : {
 
     },
+    "Contributor" : {
+
+    },
+    "Contributors" : {
+
+    },
     "Create" : {
       "localizations" : {
         "fr" : {
@@ -1911,6 +1920,12 @@
           }
         }
       }
+    },
+    "Delete Contributor" : {
+
+    },
+    "Delete Contributor?" : {
+
     },
     "Delete Event" : {
       "localizations" : {
@@ -3589,6 +3604,18 @@
           }
         }
       }
+    },
+    "Move %@ down" : {
+
+    },
+    "Move %@ up" : {
+
+    },
+    "Move Down" : {
+
+    },
+    "Move Up" : {
+
     },
     "Move down" : {
 
@@ -6458,6 +6485,9 @@
         }
       }
     },
+    "The contributor will appear in the About section in the current order." : {
+
+    },
     "The system default font with each available SwiftUI width." : {
 
     },
@@ -6476,6 +6506,9 @@
           }
         }
       }
+    },
+    "These names appear in the About section of the app and website." : {
+
     },
     "This account is not an administrator." : {
       "localizations" : {
@@ -6575,6 +6608,9 @@
           }
         }
       }
+    },
+    "This removes the contributor from the About section." : {
+
     },
     "This removes the pending friend request." : {
       "localizations" : {

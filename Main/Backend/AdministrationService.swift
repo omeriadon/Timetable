@@ -17,6 +17,46 @@ final class AdministrationService {
 		try await networkManager.send(.v1About)
 	}
 
+	func administrationAboutContributors() async throws -> [AboutContributorResponse] {
+		try await networkManager.send(.v1AdministrationAboutContributors)
+	}
+
+	func save(
+		_ request: AdministrationAboutContributorRequest,
+		id: UUID?
+	) async throws -> [AboutContributorResponse] {
+		try await networkManager.send(
+			id.map {
+				Endpoint(
+					"/v1/administration/about-contributors/\($0.uuidString)",
+					method: .put
+				)
+			} ?? .v1AdministrationAboutContributorsCreate,
+			body: request,
+			context: .userInitiated
+		)
+	}
+
+	func deleteAboutContributor(id: UUID) async throws -> [AboutContributorResponse] {
+		try await networkManager.send(
+			Endpoint(
+				"/v1/administration/about-contributors/\(id.uuidString)",
+				method: .delete
+			),
+			context: .userInitiated
+		)
+	}
+
+	func reorderAboutContributors(
+		_ contributorIDs: [UUID]
+	) async throws -> [AboutContributorResponse] {
+		try await networkManager.send(
+			.v1AdministrationAboutContributorsOrder,
+			body: AdministrationAboutContributorOrderRequest(contributorIDs: contributorIDs),
+			context: .userInitiated
+		)
+	}
+
 	func tagCatalogue() async throws -> EventTagCatalogueResponse {
 		let response: EventTagCatalogueResponse = try await networkManager.send(.v1Tags)
 		Defaults[.eventTagCatalogue] = response
@@ -278,6 +318,9 @@ private extension Endpoint {
 	static let v1Administration = Endpoint("/v1/administration")
 	static let v1AdministrationUsers = Endpoint("/v1/administration/users")
 	static let v1AdministrationUsersCreate = Endpoint("/v1/administration/users", method: .post)
+	static let v1AdministrationAboutContributors = Endpoint("/v1/administration/about-contributors")
+	static let v1AdministrationAboutContributorsCreate = Endpoint("/v1/administration/about-contributors", method: .post)
+	static let v1AdministrationAboutContributorsOrder = Endpoint("/v1/administration/about-contributors/order", method: .put)
 	static let v1AdministrationCalendar = Endpoint("/v1/administration/calendar")
 	static let v1AdministrationCalendarCreate = Endpoint("/v1/administration/calendar", method: .post)
 	static let v1AdministrationBroadcastNotification = Endpoint("/v1/administration/broadcast-notification", method: .post)

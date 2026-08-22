@@ -85,6 +85,8 @@ struct WideRouteDestinationView: View {
 					AdministrationBroadcastHistoryView()
 				case .administration(.emailLog):
 					AdministrationEmailLogView()
+				case .administration(.aboutContributors):
+					AdministrationAboutContributorsView()
 				case .administration(.administrators):
 					AdministrationAdministratorsView()
 				case .administration(.serverAccess):

@@ -178,6 +178,15 @@ nonisolated struct AboutContributorResponse: Codable, Identifiable, Sendable {
 	let sortOrder: Int
 }
 
+nonisolated struct AdministrationAboutContributorRequest: Codable, Sendable {
+	let name: String
+	let role: String
+}
+
+nonisolated struct AdministrationAboutContributorOrderRequest: Codable, Sendable {
+	let contributorIDs: [UUID]
+}
+
 nonisolated struct AdministrationUserResponse: Codable, Identifiable, Sendable, Equatable {
 	let id: UUID
 	let displayName: String

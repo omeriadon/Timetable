@@ -102,6 +102,7 @@ struct AdministrationView: View {
 
 		if authority == .systemOwner {
 			Section("System Administration") {
+				administrationLink("About Contributors", systemImage: "person.3", route: .administration(.aboutContributors)) { AdministrationAboutContributorsView() }
 				administrationLink("Administrators", systemImage: "person.badge.shield.checkmark", route: .administration(.administrators)) { AdministrationAdministratorsView() }
 				administrationLink("App Version", systemImage: "arrow.down.app", route: .administration(.appVersion)) { AdministrationAppVersionView() }
 				administrationLink("Debug Testing", systemImage: "testtube.2", route: .administration(.serverAccess)) { AdministrationDevelopmentAccessView() }
