@@ -69,9 +69,6 @@ final class AccountAuthenticationModel {
 		if trimmed.count > 100 {
 			problems.append("Your email must contain 100 characters or fewer.")
 		}
-		if mode == .signUp, !trimmed.lowercased().hasSuffix("@student.education.wa.edu.au") {
-			problems.append("Use your school email address.")
-		}
 		return problems
 	}
 
