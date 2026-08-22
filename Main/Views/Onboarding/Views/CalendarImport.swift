@@ -15,6 +15,7 @@ struct OnboardingCalendarImportView: View {
 	let context: OnboardingPageContext
 
 	@State private var clickedImport = false
+	@State private var canSkipImport = true
 	@State private var errorResetTask: Task<Void, Never>?
 
 	var body: some View {
@@ -24,6 +25,7 @@ struct OnboardingCalendarImportView: View {
 					VStack(spacing: 25) {
 						Button {
 							clickedImport = true
+							canSkipImport = false
 							context.isWorking = true
 						} label: {
 							VStack {
@@ -43,6 +45,7 @@ struct OnboardingCalendarImportView: View {
 				case true:
 					CalendarImportView(dismissesWhenFinished: false) { succeeded in
 						errorResetTask?.cancel()
+						canSkipImport = !succeeded
 						context.configure(
 							canAdvance: succeeded,
 							isWorking: false,
@@ -57,12 +60,27 @@ struct OnboardingCalendarImportView: View {
 					.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 30))
 					.transition(.blurReplace)
 			}
+
+			if canSkipImport {
+				Button("Skip Import", systemImage: "forward.end") {
+					context.configure(
+						canAdvance: true,
+						isWorking: false,
+						statusMessage: "Calendar import skipped."
+					)
+				}
+				.buttonStyle(.glass)
+				.foregroundStyle(.red)
+				.controlSize(.small)
+				.accessibilityHint("Continues without importing your timetable")
+			}
 		}
 		.onAppear {
 			context.isWorking = false
 		}
 		.onDisappear {
 			clickedImport = false
+			canSkipImport = true
 			errorResetTask?.cancel()
 		}
 		.animation(.easeInOut, value: clickedImport)
