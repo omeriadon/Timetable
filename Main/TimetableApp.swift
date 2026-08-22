@@ -38,7 +38,6 @@ struct TimetableApp: App {
 
 	@State private var sessionStore = SessionStore.shared
 	@State private var statusBadgeManager = StatusBadgeManager.shared
-	@State private var aboutPointerLocation: CGPoint?
 
 	#if os(macOS)
 		@NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
@@ -69,11 +68,7 @@ struct TimetableApp: App {
 		WindowGroup {
 			AppRouterHost { router in
 				ZStack {
-					if router.isShowingAbout {
-						AboutBackgroundView(pointerLocation: $aboutPointerLocation)
-					} else {
-						AppPaperBackground()
-					}
+					AppPaperBackground()
 
 					ZStack {
 						switch sessionStore.state {
@@ -99,21 +94,6 @@ struct TimetableApp: App {
 					.id(accountSettings.appFontDesign)
 					.transition(.opacity.animation(.easeInOut(duration: 0.3)))
 				}
-				#if os(macOS)
-				.onContinuousHover(coordinateSpace: .local) { phase in
-					guard router.isShowingAbout else {
-						aboutPointerLocation = nil
-						return
-					}
-
-					switch phase {
-						case let .active(location):
-							aboutPointerLocation = location
-						case .ended:
-							aboutPointerLocation = nil
-					}
-				}
-				#endif
 				.animation(.easeInOut(duration: 0.1), value: accountSettings.appFontDesign)
 				.onOpenURL { url in
 					handleAppRoute(url, router: router)
@@ -198,22 +178,19 @@ struct TimetableApp: App {
 				#if os(macOS)
 					.frame(minWidth: 800, minHeight: 600)
 					.background {
-						if !router.isShowingAbout {
-							CustomMaterialView()
-								.ignoresSafeArea()
-						}
+						CustomMaterialView()
+							.ignoresSafeArea()
 					}
-					.aboutWindowToolbarBackground(isShowingAbout: router.isShowingAbout)
 				#else
 					.overlay {
-						if launchIllusionVisible {
-							LaunchIllusionView {
-								launchIllusionVisible = false
+							if launchIllusionVisible {
+								LaunchIllusionView {
+									launchIllusionVisible = false
+								}
+								.ignoresSafeArea()
+								.allowsHitTesting(false)
 							}
-							.ignoresSafeArea()
-							.allowsHitTesting(false)
 						}
-					}
 				#endif
 			}
 		}
@@ -283,16 +260,3 @@ struct TimetableApp: App {
 		NotificationCenter.default.post(name: .openTimetableDestination, object: route)
 	}
 }
-
-#if os(macOS)
-	private extension View {
-		@ViewBuilder
-		func aboutWindowToolbarBackground(isShowingAbout: Bool) -> some View {
-			if isShowingAbout {
-				toolbarBackground(.clear, for: .window)
-			} else {
-				self
-			}
-		}
-	}
-#endif
