@@ -735,6 +735,7 @@
       }
     },
     "Adon Omeri" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -1112,6 +1113,7 @@
 
     },
     "Bob Han-Busi" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -1447,9 +1449,6 @@
     "Classroom, %@" : {
 
     },
-    "Clear selection" : {
-
-    },
     "Close" : {
       "localizations" : {
         "fr" : {
@@ -1657,6 +1656,9 @@
 
     },
     "Continues to the next setup step" : {
+
+    },
+    "Continues without importing your timetable" : {
 
     },
     "Create" : {
@@ -2291,9 +2293,6 @@
           }
         }
       }
-    },
-    "Edit timetable" : {
-
     },
     "Edits the classroom" : {
 
@@ -3080,9 +3079,6 @@
     "Goal ATAR" : {
 
     },
-    "Grade settings" : {
-
-    },
     "Grades" : {
 
     },
@@ -3188,9 +3184,6 @@
         }
       }
     },
-    "Import timetable" : {
-
-    },
     "Import timetable from Calendar again?" : {
       "localizations" : {
         "fr" : {
@@ -3272,6 +3265,7 @@
       }
     },
     "Joshua Gilgallon" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -4628,15 +4622,6 @@
     "Recorded status updates" : {
 
     },
-    "Refresh administration" : {
-
-    },
-    "Refresh grades" : {
-
-    },
-    "Refresh timetable" : {
-
-    },
     "Reload Year Groups" : {
       "localizations" : {
         "fr" : {
@@ -5475,9 +5460,6 @@
         }
       }
     },
-    "Send test email" : {
-
-    },
     "Sender" : {
       "localizations" : {
         "fr" : {
@@ -5837,6 +5819,9 @@
           }
         }
       }
+    },
+    "Skip Import" : {
+
     },
     "Slot Conflict" : {
       "localizations" : {

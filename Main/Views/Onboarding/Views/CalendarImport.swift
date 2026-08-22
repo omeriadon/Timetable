@@ -19,46 +19,48 @@ struct OnboardingCalendarImportView: View {
 	@State private var errorResetTask: Task<Void, Never>?
 
 	var body: some View {
-		ZStack {
-			switch clickedImport {
-				case false:
-					VStack(spacing: 25) {
-						Button {
-							clickedImport = true
-							canSkipImport = false
-							context.isWorking = true
-						} label: {
-							VStack {
-								Label("Import Schedule from Compass", systemImage: "square.and.arrow.down")
-									.font(.title2)
-									.multilineTextAlignment(.center)
+		VStack {
+			ZStack {
+				switch clickedImport {
+					case false:
+						VStack(spacing: 25) {
+							Button {
+								clickedImport = true
+								canSkipImport = false
+								context.isWorking = true
+							} label: {
+								VStack {
+									Label("Import Schedule from Compass", systemImage: "square.and.arrow.down")
+										.font(.title2)
+										.multilineTextAlignment(.center)
+								}
+							}
+							.controlSize(.extraLarge)
+							.buttonStyle(.glassProminent)
+
+							Text("You will need to have synced Compass Schedule to Apple Calendar.")
+								.multilineTextAlignment(.center)
+						}
+						.transition(.blurReplace)
+
+					case true:
+						CalendarImportView(dismissesWhenFinished: false) { succeeded in
+							errorResetTask?.cancel()
+							canSkipImport = !succeeded
+							context.configure(
+								canAdvance: succeeded,
+								isWorking: false,
+								statusMessage: succeeded ? "Calendar imported." : "Calendar import failed."
+							)
+							if !succeeded {
+								scheduleErrorReset()
 							}
 						}
-						.controlSize(.extraLarge)
-						.buttonStyle(.glassProminent)
-
-						Text("You will need to have synced Compass Schedule to Apple Calendar.")
-							.multilineTextAlignment(.center)
-					}
-					.transition(.blurReplace)
-
-				case true:
-					CalendarImportView(dismissesWhenFinished: false) { succeeded in
-						errorResetTask?.cancel()
-						canSkipImport = !succeeded
-						context.configure(
-							canAdvance: succeeded,
-							isWorking: false,
-							statusMessage: succeeded ? "Calendar imported." : "Calendar import failed."
-						)
-						if !succeeded {
-							scheduleErrorReset()
-						}
-					}
-					.padding(10)
-					.padding(.top, 5)
-					.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 30))
-					.transition(.blurReplace)
+						.padding(10)
+						.padding(.top, 5)
+						.glassEffect(.clear.interactive(), in: RoundedRectangle(cornerRadius: 30))
+						.transition(.blurReplace)
+				}
 			}
 
 			if canSkipImport {
